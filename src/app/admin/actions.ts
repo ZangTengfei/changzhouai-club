@@ -18,6 +18,17 @@ function getOptionalValue(formData: FormData, key: string) {
   return value || null;
 }
 
+function getOptionalInteger(formData: FormData, key: string) {
+  const value = String(formData.get(key) ?? "").trim();
+
+  if (!value) {
+    return 0;
+  }
+
+  const parsed = Number.parseInt(value, 10);
+  return Number.isNaN(parsed) ? 0 : parsed;
+}
+
 export async function saveAdminEvent(formData: FormData) {
   const { supabase, user } = await requireStaffContext();
 
@@ -54,6 +65,7 @@ export async function saveAdminEvent(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/events");
+  revalidatePath("/archive");
   redirect("/admin?saved=event");
 }
 
@@ -68,6 +80,71 @@ export async function deleteAdminEvent(formData: FormData) {
 
   revalidatePath("/admin");
   revalidatePath("/events");
+  revalidatePath("/archive");
   revalidatePath("/account");
   redirect("/admin?saved=deleted");
+}
+
+export async function saveAdminEventPhoto(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+
+  const eventId = String(formData.get("event_id") ?? "").trim();
+  const photoId = String(formData.get("photo_id") ?? "").trim();
+  const imageUrl = String(formData.get("image_url") ?? "").trim();
+
+  if (!eventId || !imageUrl) {
+    redirect("/admin?error=missing_photo_fields");
+  }
+
+  const payload = {
+    event_id: eventId,
+    image_url: imageUrl,
+    caption: getOptionalValue(formData, "caption"),
+    sort_order: getOptionalInteger(formData, "sort_order"),
+  };
+
+  if (photoId) {
+    await supabase.from("event_photos").update(payload).eq("id", photoId);
+  } else {
+    await supabase.from("event_photos").insert(payload);
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/events");
+  revalidatePath("/archive");
+  redirect(`/admin?saved=photo#event-${eventId}`);
+}
+
+export async function deleteAdminEventPhoto(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+
+  const eventId = String(formData.get("event_id") ?? "").trim();
+  const photoId = String(formData.get("photo_id") ?? "").trim();
+
+  if (photoId) {
+    await supabase.from("event_photos").delete().eq("id", photoId);
+  }
+
+  revalidatePath("/admin");
+  revalidatePath("/events");
+  revalidatePath("/archive");
+  redirect(`/admin?saved=photo_deleted#event-${eventId}`);
+}
+
+export async function setAdminEventCoverImage(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+
+  const eventId = String(formData.get("event_id") ?? "").trim();
+  const imageUrl = String(formData.get("image_url") ?? "").trim();
+
+  if (!eventId || !imageUrl) {
+    redirect("/admin?error=missing_photo_fields");
+  }
+
+  await supabase.from("events").update({ cover_image_url: imageUrl }).eq("id", eventId);
+
+  revalidatePath("/admin");
+  revalidatePath("/events");
+  revalidatePath("/archive");
+  redirect(`/admin?saved=cover#event-${eventId}`);
 }

@@ -21,6 +21,7 @@
 把这个 SQL 跑到 Supabase：
 
 - `supabase/migrations/202603290001_initial_community_schema.sql`
+- `supabase/migrations/202603290002_event_assets_storage.sql`
 - `supabase/seed/202603290002_seed_existing_events.sql`
 
 这份 SQL 会创建：
@@ -42,6 +43,25 @@
 - 基础 RLS policies
 
 种子 SQL 会把目前网站里已经公开展示的 6 场历史活动写入 `events` 表，状态都是 `completed`。
+同时会同步写入 `event_photos`，让首页、活动页和归档页统一从数据库读取历史活动内容。
+
+历史活动图片现在建议放到 Supabase Storage：
+
+- bucket: `event-assets`
+- 历史图片路径：`events/historical/<filename>`
+
+如果你需要把仓库里的历史图片批量迁移到 Storage，可以运行：
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=... \
+SUPABASE_SERVICE_ROLE_KEY=... \
+node scripts/migrate-event-images-to-storage.mjs
+```
+
+注意：
+
+- 现在历史活动展示已经不再依赖仓库里的静态活动数组
+- 在生产环境里，记得先执行这份种子 SQL，再部署删除静态回退后的代码
 
 ## 3. 新增下一场待报名活动
 

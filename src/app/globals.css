@@ -435,6 +435,91 @@ img {
   gap: 20px;
 }
 
+.admin-event-summary-list,
+.admin-photo-list {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-event-summary-card,
+.admin-photo-card,
+.admin-photo-create,
+.admin-cover-panel {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 249, 239, 0.86);
+}
+
+.admin-event-summary-card {
+  grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr) auto;
+  align-items: center;
+}
+
+.admin-event-summary-main h3,
+.admin-cover-panel h3,
+.admin-photo-create h3 {
+  margin-bottom: 8px;
+}
+
+.admin-event-summary-main p,
+.admin-event-meta p,
+.admin-image-preview p,
+.admin-photo-body p {
+  margin: 0;
+}
+
+.admin-event-meta {
+  display: grid;
+  gap: 8px;
+}
+
+.admin-photo-card {
+  grid-template-columns: minmax(220px, 320px) minmax(0, 1fr);
+  align-items: start;
+}
+
+.admin-photo-body {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-photo-actions {
+  flex-wrap: wrap;
+}
+
+.storage-field {
+  display: grid;
+  gap: 10px;
+}
+
+.storage-field-actions {
+  align-items: center;
+}
+
+.storage-field-status {
+  color: rgba(24, 54, 52, 0.72);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.admin-image-preview {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-image-preview img {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid rgba(15, 122, 106, 0.14);
+  background: rgba(15, 122, 106, 0.08);
+}
+
 .admin-delete-form {
   margin-top: 18px;
 }
@@ -452,6 +537,18 @@ img {
     monospace;
   font-size: 0.92rem;
   word-break: break-all;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .section {
@@ -593,6 +690,16 @@ img {
   height: auto;
 }
 
+.event-image-fallback {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+  padding: 24px;
+  color: rgba(24, 54, 52, 0.72);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
 .event-list {
   display: grid;
   gap: 20px;
@@ -709,6 +816,11 @@ img {
 
   .registration-card {
     flex-direction: column;
+  }
+
+  .admin-event-summary-card,
+  .admin-photo-card {
+    grid-template-columns: 1fr;
   }
 
   .hero,

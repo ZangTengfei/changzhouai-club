@@ -1,4 +1,5 @@
 import { deleteAdminEvent, saveAdminEvent } from "@/app/admin/actions";
+import { StorageImageUrlField } from "@/components/storage-image-url-field";
 
 type AdminEvent = {
   id: string;
@@ -129,11 +130,12 @@ export function AdminEventForm({
 
           <label className="form-field form-field-wide">
             <span>封面图路径</span>
-            <input
-              className="input"
+            <StorageImageUrlField
               name="cover_image_url"
               defaultValue={event?.cover_image_url ?? ""}
-              placeholder="/events/event-07-20260405.jpg"
+              eventSlug={event?.slug ?? ""}
+              placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
+              uploadLabel="上传封面"
             />
           </label>
         </div>

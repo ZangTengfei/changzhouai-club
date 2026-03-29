@@ -1,18 +1,36 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { SectionHeading } from "@/components/section-heading";
+import { getCompletedEventRecaps } from "@/lib/community-events";
 import {
   activityMoments,
-  communityStats,
   cooperationAreas,
   homeHighlights,
   joinSteps,
-  latestEventRecaps,
   memberTags,
 } from "@/lib/site-data";
 
-export default function HomePage() {
+function formatMetricDate(isoDate: string | null) {
+  if (!isoDate) {
+    return "待更新";
+  }
+
+  return isoDate.replaceAll("-", ".");
+}
+
+export default async function HomePage() {
+  const completedEvents = await getCompletedEventRecaps();
+  const latestCompletedEvent = completedEvents[0];
+  const recentEvents = completedEvents.slice(0, 3);
+  const communityStats = [
+    { value: "200+", label: "现有群成员" },
+    { value: `${completedEvents.length} 场`, label: "已举办线下活动" },
+    {
+      value: formatMetricDate(latestCompletedEvent?.isoDate ?? null),
+      label: "最近一次活动日期",
+    },
+  ];
+
   return (
     <div className="page-stack">
       <section className="hero surface">
@@ -20,8 +38,10 @@ export default function HomePage() {
           <p className="eyebrow">Changzhou AI Club</p>
           <h1>常州本地 AI 开发者社区</h1>
           <p>
-            连接常州的开发者、产品人、创业者与企业需求，定期组织线下交流与主题分享。到
-            2026 年 3 月 28 日，我们已经完成了 6 场线下活动。
+            连接常州的开发者、产品人、创业者与企业需求，定期组织线下交流与主题分享。
+            {latestCompletedEvent
+              ? `到 ${latestCompletedEvent.dateLabel}，我们已经完成了 ${completedEvents.length} 场线下活动。`
+              : "社区正在持续组织线下交流与主题分享。"}
           </p>
 
           <div className="cta-row">
@@ -29,7 +49,7 @@ export default function HomePage() {
               立即加入社群
             </Link>
             <Link href="/events" className="button button-secondary">
-              查看 6 场活动回顾
+              查看 {completedEvents.length} 场活动回顾
             </Link>
           </div>
 
@@ -47,7 +67,7 @@ export default function HomePage() {
           <p className="eyebrow">现在的社区状态</p>
           <h2>先把活动做好，再自然长出后面的共建</h2>
           <p>
-            现在最真实、最有说服力的资产就是已经发生的 6 场线下活动。网站第一阶段会优先把这些活动和分享氛围沉淀下来。
+            现在最真实、最有说服力的资产就是已经发生的线下活动。网站第一阶段会优先把这些活动和分享氛围沉淀下来。
           </p>
           <div className="detail-pills">
             <span>真实活动回顾</span>
@@ -79,35 +99,40 @@ export default function HomePage() {
       <section className="section">
         <SectionHeading
           eyebrow="最近活动"
-          title="最近三场活动已经形成了稳定的线下节奏"
+          title="最近几场活动已经形成了稳定的线下节奏"
           description="先让访客看到活动是真的在持续发生，再让他们决定要不要加入，这是目前最重要的转化逻辑。"
         />
-        <div className="card-grid">
-          {latestEventRecaps.map((item) => (
-            <article className="event-card" key={item.isoDate}>
-              <div className="event-media">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  width={item.width}
-                  height={item.height}
-                />
-              </div>
-              <div className="event-card-body">
-                <div className="pill-row">
-                  <span className="pill">{item.date}</span>
+        {recentEvents.length > 0 ? (
+          <div className="card-grid">
+            {recentEvents.map((item) => (
+              <article className="event-card" key={item.id}>
+                <div className="event-media">
+                  {item.imageUrl ? (
+                    <img src={item.imageUrl} alt={item.title} loading="lazy" />
+                  ) : (
+                    <div className="event-image-fallback">活动图片待补充</div>
+                  )}
                 </div>
-                <h3>{item.title}</h3>
-                <p>{item.summary}</p>
-                <div className="detail-pills">
-                  {item.highlights.map((highlight) => (
-                    <span key={highlight}>{highlight}</span>
-                  ))}
+                <div className="event-card-body">
+                  <div className="pill-row">
+                    <span className="pill">{item.dateLabel}</span>
+                  </div>
+                  <h3>{item.title}</h3>
+                  <p>{item.summary}</p>
+                  <div className="detail-pills">
+                    {item.highlights.map((highlight) => (
+                      <span key={highlight}>{highlight}</span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </article>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="note-strip">
+            当前数据库里还没有已完成活动。把历史活动种子导入后，这里就会自动展示最近的活动回顾。
+          </div>
+        )}
       </section>
 
       <section className="section">

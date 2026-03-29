@@ -7,12 +7,6 @@ export const navItems = [
   { href: "/cooperate", label: "合作联系" },
 ];
 
-export const communityStats = [
-  { value: "200+", label: "现有群成员" },
-  { value: "6 场", label: "已举办线下活动" },
-  { value: "2026.03.28", label: "最近一次活动日期" },
-];
-
 export const homeHighlights = [
   {
     title: "线下交流",
@@ -31,94 +25,21 @@ export const homeHighlights = [
   },
 ];
 
-export const eventRecaps = [
-  {
-    title: "第 1 场线下交流",
-    date: "2026 年 1 月 24 日",
-    isoDate: "2026-01-24",
-    image: "/events/event-01-20260124.jpg",
-    width: 1440,
-    height: 1080,
-    summary:
-      "社区启动后的第一次线下见面，重点是认识彼此、交换近况，也让大家对这个社群的节奏有了更具体的感受。",
-    highlights: ["线下自由交流", "启动期成员认识", "社区节奏初步形成"],
-  },
-  {
-    title: "第 2 场线下交流",
-    date: "2026 年 2 月 8 日",
-    isoDate: "2026-02-08",
-    image: "/events/event-02-20260208.jpg",
-    width: 1440,
-    height: 1075,
-    summary:
-      "第二次线下活动延续了开放交流的氛围，开始有更多围绕 AI 工具、应用方向和个人实践的讨论。",
-    highlights: ["成员持续回流", "AI 应用讨论", "社区氛围升温"],
-  },
-  {
-    title: "第 3 场线下交流",
-    date: "2026 年 3 月 8 日",
-    isoDate: "2026-03-08",
-    image: "/events/event-03-20260308.jpg",
-    width: 1440,
-    height: 1080,
-    summary:
-      "进入 3 月后，活动开始更稳定地形成固定节奏，也逐步出现成员自发带来的主题和经验分享。",
-    highlights: ["固定节奏形成", "主题交流", "成员参与度提升"],
-  },
-  {
-    title: "第 4 场线下交流",
-    date: "2026 年 3 月 14 日",
-    isoDate: "2026-03-14",
-    image: "/events/event-04-20260314.jpeg",
-    width: 1200,
-    height: 896,
-    summary:
-      "这一场的交流更偏向实践和工具视角，大家开始把具体的产品想法、技术路线和落地问题拿到线下讨论。",
-    highlights: ["实践导向更强", "工具与路线讨论", "问题带到现场解决"],
-  },
-  {
-    title: "第 5 场线下交流",
-    date: "2026 年 3 月 21 日",
-    isoDate: "2026-03-21",
-    image: "/events/event-05-20260321.jpeg",
-    width: 1280,
-    height: 960,
-    summary:
-      "开始出现社区成员分享自己正在研发中的项目与想法，活动不再只是交流，也开始承载轻量展示和反馈。",
-    highlights: ["成员自研分享", "项目想法交流", "从交流走向展示"],
-  },
-  {
-    title: "第 6 场线下交流",
-    date: "2026 年 3 月 28 日",
-    isoDate: "2026-03-28",
-    image: "/events/event-06-20260328.jpg",
-    width: 1706,
-    height: 1279,
-    summary:
-      "最近一次活动继续延续高频节奏，社区已经形成了稳定线下碰面的惯性，也为后续官网和更系统的运营打下了基础。",
-    highlights: ["高频活动节奏", "稳定社区连接", "为后续运营做准备"],
-  },
-];
-
-export const latestEventRecaps = [...eventRecaps]
-  .sort((a, b) => b.isoDate.localeCompare(a.isoDate))
-  .slice(0, 3);
-
 export const activityMoments = [
   {
     title: "持续线下碰面",
     description:
-      "从 2026 年 1 月 24 日到 2026 年 3 月 28 日，社区已经累计举办 6 场线下交流，节奏非常明确。",
+      "社区已经形成固定线下见面的节奏，这也是整个社区最有说服力的信号。",
   },
   {
     title: "成员开始主动分享",
     description:
-      "在最近几场活动中，已经有成员带着自己研发中的项目和想法来到现场做分享与交流。",
+      "最近几场活动里，已经有成员带着自己研发中的项目和想法来到现场做分享与交流。",
   },
   {
     title: "官网开始承接沉淀",
     description:
-      "这版网站会先把活动沉淀下来，让新朋友一眼看到社区是真实发生、持续发生的。",
+      "这版网站会先把活动和成员参与痕迹沉淀下来，让新朋友一眼看到社区是真实发生、持续发生的。",
   },
 ];
 

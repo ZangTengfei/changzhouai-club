@@ -1,15 +1,14 @@
-import Image from "next/image";
 import type { Metadata } from "next";
 
 import { EventRegistrationForm } from "@/components/event-registration-form";
 import { PageHero } from "@/components/page-hero";
+import { getCompletedEventRecaps } from "@/lib/community-events";
 import { hasSupabaseEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
-import { eventRecaps } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "活动",
-  description: "查看常州 AI 社区已经举办的 6 场线下活动和现场回顾。",
+  description: "查看常州 AI 社区的历史活动回顾和当前可报名活动。",
 };
 
 export default async function EventsPage({
@@ -19,6 +18,7 @@ export default async function EventsPage({
 }) {
   const enabled = hasSupabaseEnv();
   const params = await searchParams;
+  const completedEvents = await getCompletedEventRecaps();
   let scheduledEvents: Array<{
     id: string;
     title: string;
@@ -63,10 +63,10 @@ export default async function EventsPage({
       <PageHero
         eyebrow="Events"
         title="社区活动"
-        description="截至 2026 年 3 月 29 日，社区已经完成 6 场线下交流。这里先把活动照片和每场活动的状态沉淀下来。"
+        description={`当前站点会自动展示 ${completedEvents.length} 场已完成活动的回顾，并承接后续活动报名。你在后台更新活动内容后，这里会直接同步。`}
       >
         <div className="note-strip">
-          这页现在主打真实回顾。后续你只要继续补活动标题、主题和分享要点，它就会越来越有内容密度。
+          这页现在主打真实活动回顾。后续你只要继续补活动简介、封面和现场照片，它就会越来越有内容密度。
         </div>
       </PageHero>
 
@@ -107,22 +107,19 @@ export default async function EventsPage({
       </section>
 
       <section className="event-list">
-        {eventRecaps
-          .slice()
-          .sort((a, b) => b.isoDate.localeCompare(a.isoDate))
-          .map((item) => (
-            <article className="event-feature" key={item.isoDate}>
+        {completedEvents.length > 0 ? (
+          completedEvents.map((item) => (
+            <article className="event-feature" key={item.id}>
               <div className="event-feature-media">
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  width={item.width}
-                  height={item.height}
-                />
+                {item.imageUrl ? (
+                  <img src={item.imageUrl} alt={item.title} loading="lazy" />
+                ) : (
+                  <div className="event-image-fallback">活动图片待补充</div>
+                )}
               </div>
               <div className="event-feature-copy">
                 <div className="pill-row">
-                  <span className="pill">{item.date}</span>
+                  <span className="pill">{item.dateLabel}</span>
                   <span className="pill">已完成</span>
                 </div>
                 <h2>{item.title}</h2>
@@ -134,7 +131,12 @@ export default async function EventsPage({
                 </div>
               </div>
             </article>
-          ))}
+          ))
+        ) : (
+          <div className="note-strip">
+            当前数据库里还没有已完成活动。把历史活动导入后，这里就会自动展示完整回顾。
+          </div>
+        )}
       </section>
 
       <section className="two-up">
