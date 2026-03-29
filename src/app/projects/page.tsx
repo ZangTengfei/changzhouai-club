@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 
 import { PageHero } from "@/components/page-hero";
-import { joinSteps, projectList } from "@/lib/site-data";
+import { joinSteps, projectStatus } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "项目共建",
-  description: "围绕真实需求发起协作项目，让社区成员在实践中连接起来。",
+  description: "查看常州 AI 社区当前的项目状态，以及后续项目共建会如何自然长出来。",
 };
 
 export default function ProjectsPage() {
@@ -14,24 +14,18 @@ export default function ProjectsPage() {
       <PageHero
         eyebrow="Projects"
         title="项目共建"
-        description="围绕真实需求发起协作项目，让社区成员在实践中连接起来，而不只停留在讨论层面。"
+        description="截至 2026 年 3 月 29 日，社区还没有正式公开招募的共建项目。这一页会诚实展示当前状态，而不是提前包装。"
       >
         <div className="note-strip">
-          第一版不用追求项目很多，优先展示 2-3 个方向清晰、角色明确的项目即可。
+          目前更真实的情况是：活动里已经开始出现成员自研项目的分享，但还没进入正式的社区项目阶段。
         </div>
       </PageHero>
 
       <section className="card-grid">
-        {projectList.map((item) => (
+        {projectStatus.map((item) => (
           <article className="card" key={item.title}>
-            <div className="pill-row">
-              <span className="pill">{item.stage}</span>
-            </div>
             <h3>{item.title}</h3>
-            <p>{item.summary}</p>
-            <ul className="detail-list">
-              <li>当前需要：{item.roles}</li>
-            </ul>
+            <p>{item.description}</p>
           </article>
         ))}
       </section>

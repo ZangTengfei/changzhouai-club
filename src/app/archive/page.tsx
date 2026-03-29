@@ -1,11 +1,12 @@
+import Image from "next/image";
 import type { Metadata } from "next";
 
 import { PageHero } from "@/components/page-hero";
-import { archiveItems } from "@/lib/site-data";
+import { archiveItems, eventRecaps } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "往期回顾",
-  description: "沉淀常州 AI 社区的活动回顾、分享记录与项目里程碑。",
+  description: "沉淀常州 AI 社区活动照片、分享线索和后续内容资产。",
 };
 
 export default function ArchivePage() {
@@ -14,7 +15,7 @@ export default function ArchivePage() {
       <PageHero
         eyebrow="Archive"
         title="往期回顾"
-        description="这部分会逐步沉淀活动照片、分享主题、资料链接和项目里程碑，帮助社区形成可复用内容资产。"
+        description="这部分会优先沉淀活动照片、分享主题线索和每一场活动的时间记录，帮助社区逐步形成可复用内容资产。"
       />
 
       <section className="card-grid">
@@ -22,6 +23,25 @@ export default function ArchivePage() {
           <article className="card" key={item.title}>
             <h3>{item.title}</h3>
             <p>{item.description}</p>
+          </article>
+        ))}
+      </section>
+
+      <section className="gallery-grid">
+        {eventRecaps.map((item) => (
+          <article className="gallery-card" key={item.isoDate}>
+            <div className="gallery-media">
+              <Image
+                src={item.image}
+                alt={item.title}
+                width={item.width}
+                height={item.height}
+              />
+            </div>
+            <div className="gallery-copy">
+              <h3>{item.title}</h3>
+              <p>{item.date}</p>
+            </div>
           </article>
         ))}
       </section>

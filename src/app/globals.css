@@ -427,6 +427,71 @@ img {
   font-weight: 700;
 }
 
+.event-card,
+.gallery-card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.event-card-body,
+.gallery-copy {
+  padding: 20px 22px 22px;
+}
+
+.event-media,
+.gallery-media,
+.event-feature-media {
+  overflow: hidden;
+  background: rgba(15, 122, 106, 0.08);
+}
+
+.event-media img,
+.gallery-media img,
+.event-feature-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.event-list {
+  display: grid;
+  gap: 20px;
+}
+
+.event-feature {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: rgba(255, 251, 244, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.event-feature-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+}
+
+.event-feature-copy h2 {
+  margin: 0;
+  font-size: clamp(1.7rem, 2.4vw, 2.5rem);
+  line-height: 1.1;
+  font-family:
+    "Iowan Old Style",
+    "Source Han Serif SC",
+    "Songti SC",
+    serif;
+}
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
 .site-footer {
   padding: 0 0 32px;
 }
@@ -449,7 +514,8 @@ img {
 @media (max-width: 1024px) {
   .hero,
   .page-hero,
-  .footer-grid {
+  .footer-grid,
+  .event-feature {
     grid-template-columns: 1fr;
   }
 
@@ -457,7 +523,8 @@ img {
   .three-up,
   .two-up,
   .field-grid,
-  .faq-grid {
+  .faq-grid,
+  .gallery-grid {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -491,7 +558,8 @@ img {
   .two-up,
   .field-grid,
   .faq-grid,
-  .stat-grid {
+  .stat-grid,
+  .gallery-grid {
     grid-template-columns: 1fr;
   }
 
