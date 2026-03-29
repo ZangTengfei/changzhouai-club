@@ -82,3 +82,21 @@
 2. 活动报名写入 `event_registrations`
 3. 账号页显示活动参与记录
 4. 增加微信绑定表单和扫码绑定流程
+
+## 7. 开启活动后台权限
+
+活动后台地址是：
+
+- `/admin`
+
+第一次使用时，需要先把你的账号提升为 `admin` 或 `organizer`。
+
+可以在 Supabase SQL Editor 执行：
+
+```sql
+update public.members
+set status = 'admin'
+where id = '<你的 auth user id>';
+```
+
+这个 `id` 可以直接在网站账号页 `/account` 里看到。
