@@ -7,7 +7,9 @@ import {
   formatAdminEventDate,
   formatAdminEventStatus,
   formatAdminRegistrationStatus,
+  getAdminEventStatusTone,
   getAdminErrorMessage,
+  getAdminRegistrationStatusTone,
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 import { loadAdminEventOrThrow } from "@/lib/admin/events";
@@ -59,7 +61,13 @@ export default async function AdminEventDetailPage({
         </div>
 
         <div className="pill-row">
-          <span className="pill">{formatAdminEventStatus(eventDetail.status)}</span>
+          <span
+            className={`pill admin-status-pill admin-status-pill-${getAdminEventStatusTone(
+              eventDetail.status,
+            )}`}
+          >
+            {formatAdminEventStatus(eventDetail.status)}
+          </span>
           <span className="pill">{formatAdminEventDate(eventDetail.event_at)}</span>
           <span className="pill">照片 {eventDetail.photos.length}</span>
           <span className="pill">报名 {eventDetail.registrations.length}</span>
@@ -126,7 +134,11 @@ export default async function AdminEventDetailPage({
                 </div>
 
                 <div className="admin-list-cell">
-                  <span className="pill">
+                  <span
+                    className={`pill admin-registration-pill admin-registration-pill-${getAdminRegistrationStatusTone(
+                      registration.status,
+                    )}`}
+                  >
                     {formatAdminRegistrationStatus(registration.status)}
                   </span>
                 </div>

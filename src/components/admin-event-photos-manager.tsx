@@ -46,7 +46,7 @@ export function AdminEventPhotosManager({
         {coverImageUrl ? (
           <div className="admin-image-preview">
             <img src={coverImageUrl} alt={`${eventTitle} 封面`} loading="lazy" />
-            <p>{coverImageUrl}</p>
+            <p className="admin-image-url">{coverImageUrl}</p>
           </div>
         ) : (
           <div className="note-strip">当前还没有设置封面图。</div>
@@ -62,20 +62,20 @@ export function AdminEventPhotosManager({
               <article className="admin-photo-card" key={photo.id}>
                 <div className="admin-image-preview">
                   <img src={photo.image_url} alt={photo.caption ?? eventTitle} loading="lazy" />
-                  <p>{photo.image_url}</p>
+                  <p className="admin-image-url">{photo.image_url}</p>
                 </div>
 
                 <div className="admin-photo-body">
-                  <div className="pill-row">
+                  <div className="pill-row admin-photo-meta">
                     <span className="pill">排序 {photo.sort_order}</span>
                     {isCover ? <span className="pill">当前封面</span> : null}
                   </div>
 
-                  <form action={saveAdminEventPhoto} className="account-form">
+                  <form action={saveAdminEventPhoto} className="account-form admin-photo-form">
                     <input type="hidden" name="event_id" value={eventId} />
                     <input type="hidden" name="photo_id" value={photo.id} />
 
-                    <div className="form-grid">
+                    <div className="form-grid admin-photo-form-grid">
                       <label className="form-field form-field-wide">
                         <span>图片路径</span>
                         <StorageImageUrlField
@@ -153,10 +153,10 @@ export function AdminEventPhotosManager({
           <p>推荐先把图片上传到 Supabase Storage，再把公开 URL 贴到这里。</p>
         </div>
 
-        <form action={saveAdminEventPhoto} className="account-form">
+        <form action={saveAdminEventPhoto} className="account-form admin-photo-form">
           <input type="hidden" name="event_id" value={eventId} />
 
-          <div className="form-grid">
+          <div className="form-grid admin-photo-form-grid">
             <label className="form-field form-field-wide">
               <span>图片路径</span>
               <StorageImageUrlField

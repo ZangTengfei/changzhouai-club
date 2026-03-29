@@ -67,3 +67,33 @@ export function formatAdminEventStatus(status: string) {
 export function formatAdminRegistrationStatus(status: string) {
   return adminRegistrationStatusLabelMap[status] ?? status;
 }
+
+export function getAdminEventStatusTone(status: string) {
+  switch (status) {
+    case "draft":
+      return "draft";
+    case "scheduled":
+      return "scheduled";
+    case "completed":
+      return "completed";
+    case "cancelled":
+      return "cancelled";
+    default:
+      return "neutral";
+  }
+}
+
+export function getAdminRegistrationStatusTone(status: string) {
+  switch (status) {
+    case "registered":
+      return "registered";
+    case "waitlist":
+      return "waitlist";
+    case "attended":
+      return "attended";
+    case "cancelled":
+      return "cancelled";
+    default:
+      return "neutral";
+  }
+}
