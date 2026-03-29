@@ -1,7 +1,10 @@
 import Image from "next/image";
 import type { Metadata } from "next";
 
+import { EventRegistrationForm } from "@/components/event-registration-form";
 import { PageHero } from "@/components/page-hero";
+import { hasSupabaseEnv } from "@/lib/env";
+import { createClient } from "@/lib/supabase/server";
 import { eventRecaps } from "@/lib/site-data";
 
 export const metadata: Metadata = {
@@ -9,7 +12,52 @@ export const metadata: Metadata = {
   description: "查看常州 AI 社区已经举办的 6 场线下活动和现场回顾。",
 };
 
-export default function EventsPage() {
+export default async function EventsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ registered?: string; error?: string }>;
+}) {
+  const enabled = hasSupabaseEnv();
+  const params = await searchParams;
+  let scheduledEvents: Array<{
+    id: string;
+    title: string;
+    summary: string | null;
+    event_at: string | null;
+    venue: string | null;
+    city: string | null;
+    slug: string;
+  }> = [];
+  let registeredEventIds = new Set<string>();
+  let isLoggedIn = false;
+
+  if (enabled) {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    isLoggedIn = Boolean(user);
+
+    const [{ data: eventsData }, { data: registrations }] = await Promise.all([
+      supabase
+        .from("events")
+        .select("id, title, summary, event_at, venue, city, slug")
+        .eq("status", "scheduled")
+        .order("event_at", { ascending: true }),
+      user
+        ? supabase
+            .from("event_registrations")
+            .select("event_id")
+            .eq("user_id", user.id)
+            .eq("status", "registered")
+        : Promise.resolve({ data: [] }),
+    ]);
+
+    scheduledEvents = eventsData ?? [];
+    registeredEventIds = new Set((registrations ?? []).map((item) => item.event_id));
+  }
+
   return (
     <div className="page-stack">
       <PageHero
@@ -21,6 +69,42 @@ export default function EventsPage() {
           这页现在主打真实回顾。后续你只要继续补活动标题、主题和分享要点，它就会越来越有内容密度。
         </div>
       </PageHero>
+
+      {params.registered ? (
+        <div className="note-strip">报名成功，已经写入你的社区账号记录。</div>
+      ) : null}
+
+      {params.error ? (
+        <div className="note-strip">报名失败，请稍后再试。</div>
+      ) : null}
+
+      <section className="section">
+        <div className="section-heading">
+          <p className="eyebrow">Upcoming</p>
+          <h2>活动报名</h2>
+          <p>
+            只要 Supabase 里有 `scheduled` 状态的活动，这一页就会自动显示报名入口。现在你已经可以用登录账号把报名写入 `event_registrations` 表了。
+          </p>
+        </div>
+
+        {scheduledEvents.length > 0 ? (
+          <div className="card-grid">
+            {scheduledEvents.map((event) => (
+              <EventRegistrationForm
+                key={event.id}
+                event={event}
+                isLoggedIn={isLoggedIn}
+                isRegistered={registeredEventIds.has(event.id)}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="note-strip">
+            当前数据库里还没有 `scheduled`
+            状态的活动，所以这里先不显示报名卡片。你后面只要新增下一场活动，这里就会自动出现报名入口。
+          </div>
+        )}
+      </section>
 
       <section className="event-list">
         {eventRecaps
@@ -59,7 +143,7 @@ export default function EventsPage() {
           <ul className="detail-list">
             <li>访客能一眼确认社区不是空站，而是真的持续在线下活动</li>
             <li>新成员可以快速感受到社区的真实氛围和线下频率</li>
-            <li>每一场活动都能逐步变成后续传播素材</li>
+            <li>一旦下一场活动进入数据库，就能直接开放登录报名</li>
           </ul>
         </article>
         <article className="card">

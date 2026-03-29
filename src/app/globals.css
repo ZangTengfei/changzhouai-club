@@ -343,6 +343,86 @@ img {
   color: var(--muted);
 }
 
+.account-form {
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.form-field {
+  display: grid;
+  gap: 8px;
+}
+
+.form-field span {
+  font-weight: 700;
+}
+
+.form-field-wide {
+  grid-column: 1 / -1;
+}
+
+.input {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid rgba(24, 54, 52, 0.14);
+  border-radius: 14px;
+  background: rgba(255, 252, 247, 0.95);
+  color: var(--ink);
+  font: inherit;
+}
+
+.textarea {
+  min-height: 120px;
+  padding: 14px;
+  resize: vertical;
+}
+
+.checkbox-list {
+  display: grid;
+  gap: 12px;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--ink);
+}
+
+.checkbox-row input {
+  margin-top: 4px;
+}
+
+.registration-form {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.registration-list {
+  display: grid;
+  gap: 16px;
+}
+
+.registration-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 251, 245, 0.9);
+}
+
 .section {
   display: grid;
   gap: 20px;
@@ -590,6 +670,14 @@ img {
   .stat-grid,
   .gallery-grid {
     grid-template-columns: 1fr;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .registration-card {
+    flex-direction: column;
   }
 
   .hero,

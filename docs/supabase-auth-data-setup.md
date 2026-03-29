@@ -21,6 +21,7 @@
 把这个 SQL 跑到 Supabase：
 
 - `supabase/migrations/202603290001_initial_community_schema.sql`
+- `supabase/seed/202603290002_seed_existing_events.sql`
 
 这份 SQL 会创建：
 
@@ -40,13 +41,29 @@
 - `is_staff()`：供 RLS 权限判断 `organizer/admin`
 - 基础 RLS policies
 
-## 3. 打开 Google 登录
+种子 SQL 会把目前网站里已经公开展示的 6 场历史活动写入 `events` 表，状态都是 `completed`。
+
+## 3. 新增下一场待报名活动
+
+当你要开放下一场活动报名时，只要在 Supabase 里插入一条 `status = 'scheduled'` 的 `events` 记录，网站活动页就会自动显示报名入口。
+
+最小字段建议：
+
+- `slug`
+- `title`
+- `summary`
+- `event_at`
+- `venue`
+- `city`
+- `status = 'scheduled'`
+
+## 4. 打开 Google 登录
 
 在 Supabase Auth 里启用 Google Provider，然后在 Google Cloud Console 配好 OAuth。
 
 推荐先只做 Google，把网站账号体系和成员资料跑顺。微信建议放到第二阶段，作为“登录后绑定”的身份补充。
 
-## 4. 当前代码入口
+## 5. 当前代码入口
 
 - 登录页：`/login`
 - OAuth 回调：`/auth/callback`
@@ -54,8 +71,10 @@
 - SSR client：`src/lib/supabase/server.ts`
 - Browser client：`src/lib/supabase/client.ts`
 - Session refresh：`proxy.ts`
+- 活动报名 action：`src/app/events/actions.ts`
+- 账号资料 action：`src/app/account/actions.ts`
 
-## 5. 第二阶段建议
+## 6. 第二阶段建议
 
 接下来最适合继续做的顺序：
 
