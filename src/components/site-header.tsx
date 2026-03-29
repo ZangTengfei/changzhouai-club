@@ -26,6 +26,12 @@ export function SiteHeader() {
           <Link href="/join" className="button button-secondary">
             加入社群
           </Link>
+          <Link href="/login" className="button button-secondary">
+            登录
+          </Link>
+          <Link href="/account" className="button button-secondary">
+            账号中心
+          </Link>
           <Link href="/cooperate" className="button">
             提交合作需求
           </Link>

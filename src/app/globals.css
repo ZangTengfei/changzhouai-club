@@ -314,6 +314,35 @@ img {
   gap: 24px;
 }
 
+.auth-stack {
+  display: grid;
+  gap: 18px;
+}
+
+.auth-card,
+.account-shell {
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 251, 244, 0.92);
+  box-shadow: var(--shadow);
+}
+
+.auth-card h2,
+.account-shell h1 {
+  margin: 0 0 12px;
+}
+
+.auth-button,
+.auth-link {
+  width: fit-content;
+}
+
+.auth-hint {
+  margin-top: 12px;
+  color: var(--muted);
+}
+
 .section {
   display: grid;
   gap: 20px;
