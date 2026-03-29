@@ -737,31 +737,31 @@ img {
   font-weight: 700;
 }
 
-.admin-status-pill-draft {
+.pill.admin-status-pill-draft {
   background: rgba(90, 108, 105, 0.14);
   border-color: rgba(90, 108, 105, 0.18);
   color: #48605c;
 }
 
-.admin-status-pill-scheduled {
+.pill.admin-status-pill-scheduled {
   background: rgba(15, 122, 106, 0.14);
   border-color: rgba(15, 122, 106, 0.18);
   color: #0f6f61;
 }
 
-.admin-status-pill-completed {
+.pill.admin-status-pill-completed {
   background: rgba(24, 54, 52, 0.1);
   border-color: rgba(24, 54, 52, 0.12);
   color: #4c6663;
 }
 
-.admin-status-pill-cancelled {
+.pill.admin-status-pill-cancelled {
   background: rgba(196, 90, 58, 0.14);
   border-color: rgba(196, 90, 58, 0.18);
   color: #aa5a40;
 }
 
-.admin-status-pill-neutral {
+.pill.admin-status-pill-neutral {
   background: rgba(24, 54, 52, 0.08);
   border-color: rgba(24, 54, 52, 0.12);
   color: #4c6663;
@@ -773,31 +773,31 @@ img {
   font-weight: 700;
 }
 
-.admin-registration-pill-registered {
+.pill.admin-registration-pill-registered {
   background: rgba(15, 122, 106, 0.14);
   border-color: rgba(15, 122, 106, 0.18);
   color: #0f6f61;
 }
 
-.admin-registration-pill-waitlist {
+.pill.admin-registration-pill-waitlist {
   background: rgba(236, 142, 68, 0.16);
   border-color: rgba(236, 142, 68, 0.22);
   color: #aa642e;
 }
 
-.admin-registration-pill-attended {
+.pill.admin-registration-pill-attended {
   background: rgba(45, 119, 90, 0.16);
   border-color: rgba(45, 119, 90, 0.22);
   color: #26674d;
 }
 
-.admin-registration-pill-cancelled {
+.pill.admin-registration-pill-cancelled {
   background: rgba(196, 90, 58, 0.14);
   border-color: rgba(196, 90, 58, 0.18);
   color: #aa5a40;
 }
 
-.admin-registration-pill-neutral {
+.pill.admin-registration-pill-neutral {
   background: rgba(24, 54, 52, 0.08);
   border-color: rgba(24, 54, 52, 0.12);
   color: #4c6663;
