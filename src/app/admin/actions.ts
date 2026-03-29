@@ -5,6 +5,8 @@ import { redirect } from "next/navigation";
 
 import { requireStaffContext } from "@/lib/supabase/guards";
 
+const ADMIN_EVENTS_PATH = "/admin/events";
+
 function normalizeSlug(raw: string) {
   return raw
     .trim()
@@ -29,6 +31,16 @@ function getOptionalInteger(formData: FormData, key: string) {
   return Number.isNaN(parsed) ? 0 : parsed;
 }
 
+function revalidateEventPaths(eventId?: string) {
+  revalidatePath(ADMIN_EVENTS_PATH);
+  revalidatePath("/events");
+  revalidatePath("/archive");
+
+  if (eventId) {
+    revalidatePath(`${ADMIN_EVENTS_PATH}/${eventId}`);
+  }
+}
+
 export async function saveAdminEvent(formData: FormData) {
   const { supabase, user } = await requireStaffContext();
 
@@ -39,7 +51,7 @@ export async function saveAdminEvent(formData: FormData) {
   const status = String(formData.get("status") ?? "draft").trim();
 
   if (!title || !slug) {
-    redirect("/admin?error=missing_required_fields");
+    redirect(`${ADMIN_EVENTS_PATH}?error=missing_required_fields`);
   }
 
   const payload = {
@@ -55,18 +67,31 @@ export async function saveAdminEvent(formData: FormData) {
   };
 
   if (eventId) {
-    await supabase.from("events").update(payload).eq("id", eventId);
-  } else {
-    await supabase.from("events").insert({
-      ...payload,
-      created_by: user.id,
-    });
-  }
+    const { error } = await supabase.from("events").update(payload).eq("id", eventId);
 
-  revalidatePath("/admin");
-  revalidatePath("/events");
-  revalidatePath("/archive");
-  redirect("/admin?saved=event");
+    if (error) {
+      redirect(`${ADMIN_EVENTS_PATH}/${eventId}?error=database_write_failed`);
+    }
+
+    revalidateEventPaths(eventId);
+    redirect(`${ADMIN_EVENTS_PATH}/${eventId}?saved=event`);
+  } else {
+    const { data: createdEvent, error } = await supabase
+      .from("events")
+      .insert({
+        ...payload,
+        created_by: user.id,
+      })
+      .select("id")
+      .single();
+
+    if (error || !createdEvent?.id) {
+      redirect(`${ADMIN_EVENTS_PATH}?error=database_write_failed`);
+    }
+
+    revalidateEventPaths(createdEvent.id);
+    redirect(`${ADMIN_EVENTS_PATH}/${createdEvent.id}?saved=event`);
+  }
 }
 
 export async function deleteAdminEvent(formData: FormData) {
@@ -75,14 +100,16 @@ export async function deleteAdminEvent(formData: FormData) {
   const eventId = String(formData.get("event_id") ?? "").trim();
 
   if (eventId) {
-    await supabase.from("events").delete().eq("id", eventId);
+    const { error } = await supabase.from("events").delete().eq("id", eventId);
+
+    if (error) {
+      redirect(`${ADMIN_EVENTS_PATH}/${eventId}?error=database_write_failed`);
+    }
   }
 
-  revalidatePath("/admin");
-  revalidatePath("/events");
-  revalidatePath("/archive");
+  revalidateEventPaths();
   revalidatePath("/account");
-  redirect("/admin?saved=deleted");
+  redirect(`${ADMIN_EVENTS_PATH}?saved=deleted`);
 }
 
 export async function saveAdminEventPhoto(formData: FormData) {
@@ -93,7 +120,7 @@ export async function saveAdminEventPhoto(formData: FormData) {
   const imageUrl = String(formData.get("image_url") ?? "").trim();
 
   if (!eventId || !imageUrl) {
-    redirect("/admin?error=missing_photo_fields");
+    redirect(`${ADMIN_EVENTS_PATH}?error=missing_photo_fields`);
   }
 
   const payload = {
@@ -104,15 +131,21 @@ export async function saveAdminEventPhoto(formData: FormData) {
   };
 
   if (photoId) {
-    await supabase.from("event_photos").update(payload).eq("id", photoId);
+    const { error } = await supabase.from("event_photos").update(payload).eq("id", photoId);
+
+    if (error) {
+      redirect(`${ADMIN_EVENTS_PATH}/${eventId}?error=database_write_failed`);
+    }
   } else {
-    await supabase.from("event_photos").insert(payload);
+    const { error } = await supabase.from("event_photos").insert(payload);
+
+    if (error) {
+      redirect(`${ADMIN_EVENTS_PATH}/${eventId}?error=database_write_failed`);
+    }
   }
 
-  revalidatePath("/admin");
-  revalidatePath("/events");
-  revalidatePath("/archive");
-  redirect(`/admin?saved=photo#event-${eventId}`);
+  revalidateEventPaths(eventId);
+  redirect(`${ADMIN_EVENTS_PATH}/${eventId}?saved=photo`);
 }
 
 export async function deleteAdminEventPhoto(formData: FormData) {
@@ -122,13 +155,15 @@ export async function deleteAdminEventPhoto(formData: FormData) {
   const photoId = String(formData.get("photo_id") ?? "").trim();
 
   if (photoId) {
-    await supabase.from("event_photos").delete().eq("id", photoId);
+    const { error } = await supabase.from("event_photos").delete().eq("id", photoId);
+
+    if (error) {
+      redirect(`${ADMIN_EVENTS_PATH}/${eventId}?error=database_write_failed`);
+    }
   }
 
-  revalidatePath("/admin");
-  revalidatePath("/events");
-  revalidatePath("/archive");
-  redirect(`/admin?saved=photo_deleted#event-${eventId}`);
+  revalidateEventPaths(eventId);
+  redirect(`${ADMIN_EVENTS_PATH}/${eventId}?saved=photo_deleted`);
 }
 
 export async function setAdminEventCoverImage(formData: FormData) {
@@ -138,13 +173,18 @@ export async function setAdminEventCoverImage(formData: FormData) {
   const imageUrl = String(formData.get("image_url") ?? "").trim();
 
   if (!eventId || !imageUrl) {
-    redirect("/admin?error=missing_photo_fields");
+    redirect(`${ADMIN_EVENTS_PATH}?error=missing_photo_fields`);
   }
 
-  await supabase.from("events").update({ cover_image_url: imageUrl }).eq("id", eventId);
+  const { error } = await supabase
+    .from("events")
+    .update({ cover_image_url: imageUrl })
+    .eq("id", eventId);
 
-  revalidatePath("/admin");
-  revalidatePath("/events");
-  revalidatePath("/archive");
-  redirect(`/admin?saved=cover#event-${eventId}`);
+  if (error) {
+    redirect(`${ADMIN_EVENTS_PATH}/${eventId}?error=database_write_failed`);
+  }
+
+  revalidateEventPaths(eventId);
+  redirect(`${ADMIN_EVENTS_PATH}/${eventId}?saved=cover`);
 }

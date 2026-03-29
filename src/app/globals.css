@@ -428,20 +428,113 @@ img {
   padding: 24px;
 }
 
-.admin-events,
-.admin-event-block,
-.admin-registration-list {
+.admin-layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 280px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.admin-sidebar,
+.admin-content,
+.admin-page-stack {
   display: grid;
   gap: 20px;
 }
 
-.admin-event-summary-list,
-.admin-photo-list {
+.admin-sidebar {
+  padding: 22px;
+  position: sticky;
+  top: 96px;
+}
+
+.admin-sidebar-copy h2 {
+  margin-bottom: 8px;
+}
+
+.admin-sidebar-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.admin-nav {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-nav-item {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid rgba(15, 122, 106, 0.1);
+  border-radius: 16px;
+  background: rgba(255, 249, 239, 0.72);
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.admin-nav-item:hover,
+.admin-nav-item:focus-visible {
+  transform: translateY(-1px);
+  background: rgba(15, 122, 106, 0.08);
+  border-color: rgba(15, 122, 106, 0.18);
+}
+
+.admin-nav-item strong {
+  font-size: 0.98rem;
+}
+
+.admin-nav-item span {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.admin-nav-item-active {
+  background: rgba(15, 122, 106, 0.1);
+  border-color: rgba(15, 122, 106, 0.28);
+}
+
+.admin-toolbar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.admin-toolbar-side {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-mini-stat {
+  display: grid;
+  gap: 2px;
+  min-width: 118px;
+  padding: 14px 16px;
+  border: 1px solid rgba(15, 122, 106, 0.14);
+  border-radius: 18px;
+  background: rgba(255, 249, 239, 0.78);
+}
+
+.admin-mini-stat strong {
+  font-size: 1.1rem;
+  line-height: 1.1;
+}
+
+.admin-mini-stat span {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.admin-registration-list,
+.admin-photo-list,
+.admin-list {
   display: grid;
   gap: 18px;
 }
 
-.admin-event-summary-card,
+.admin-list-header,
+.admin-list-row,
 .admin-photo-card,
 .admin-photo-create,
 .admin-cover-panel {
@@ -453,9 +546,56 @@ img {
   background: rgba(255, 249, 239, 0.86);
 }
 
-.admin-event-summary-card {
-  grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr) auto;
+.admin-list-header,
+.admin-list-row {
+  min-width: 0;
+}
+
+.admin-list-header {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: rgba(24, 54, 52, 0.04);
+}
+
+.admin-list-row {
   align-items: center;
+}
+
+.admin-events-list-grid {
+  grid-template-columns: minmax(0, 2.1fr) minmax(170px, 0.95fr) minmax(120px, 0.65fr) minmax(170px, 0.9fr) auto;
+}
+
+.admin-registration-list-grid {
+  grid-template-columns: minmax(0, 1.3fr) minmax(190px, 1fr) minmax(120px, 0.7fr) minmax(180px, 0.9fr) minmax(0, 1fr);
+}
+
+.admin-list-primary,
+.admin-list-cell,
+.admin-list-actions {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-list-title {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.admin-list-summary,
+.admin-compact-note {
+  margin: 0;
+}
+
+.admin-compact-note,
+.admin-list-cell span {
+  color: var(--muted);
+}
+
+.admin-list-actions {
+  justify-items: start;
 }
 
 .admin-event-summary-main h3,
@@ -465,15 +605,9 @@ img {
 }
 
 .admin-event-summary-main p,
-.admin-event-meta p,
 .admin-image-preview p,
 .admin-photo-body p {
   margin: 0;
-}
-
-.admin-event-meta {
-  display: grid;
-  gap: 8px;
 }
 
 .admin-photo-card {
@@ -484,6 +618,17 @@ img {
 .admin-photo-body {
   display: grid;
   gap: 16px;
+}
+
+.admin-empty-state {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+  padding: 8px 0;
+}
+
+.admin-empty-state h3 {
+  margin: 0;
 }
 
 .admin-photo-actions {
@@ -537,6 +682,25 @@ img {
     monospace;
   font-size: 0.92rem;
   word-break: break-all;
+}
+
+.debug-panel {
+  margin: 0;
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px solid rgba(24, 54, 52, 0.12);
+  background: rgba(24, 54, 52, 0.05);
+  color: var(--ink);
+  font-family:
+    "SFMono-Regular",
+    "Menlo",
+    "Monaco",
+    monospace;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .sr-only {
@@ -818,9 +982,23 @@ img {
     flex-direction: column;
   }
 
-  .admin-event-summary-card,
+  .admin-layout,
+  .admin-events-list-grid,
+  .admin-registration-list-grid,
   .admin-photo-card {
     grid-template-columns: 1fr;
+  }
+
+  .admin-toolbar {
+    flex-direction: column;
+  }
+
+  .admin-list-header {
+    display: none;
+  }
+
+  .admin-sidebar {
+    position: static;
   }
 
   .hero,
