@@ -469,6 +469,143 @@ img {
   background: rgba(255, 251, 245, 0.9);
 }
 
+.member-avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: 22px;
+  border: 1px solid rgba(15, 122, 106, 0.12);
+  background: rgba(255, 250, 242, 0.9);
+  box-shadow: 0 10px 24px rgba(24, 54, 52, 0.06);
+}
+
+.member-avatar-sm {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+}
+
+.member-avatar-image,
+.member-avatar-fallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.member-avatar-image {
+  object-fit: cover;
+}
+
+.member-avatar-fallback {
+  background: linear-gradient(135deg, rgba(15, 122, 106, 0.9), rgba(236, 142, 68, 0.86));
+  color: #fffaf2;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.member-directory-grid,
+.admin-member-card-list {
+  display: grid;
+  gap: 18px;
+}
+
+.member-directory-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.member-directory-card,
+.admin-member-card {
+  display: grid;
+  gap: 16px;
+}
+
+.member-directory-card {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 249, 239, 0.86);
+  box-shadow: var(--shadow);
+}
+
+.member-directory-header,
+.admin-member-card-header,
+.admin-member-identity,
+.admin-member-card-meta {
+  display: grid;
+  gap: 16px;
+}
+
+.member-directory-header,
+.admin-member-identity {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.member-directory-copy,
+.admin-member-copy,
+.admin-member-meta-block {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.member-directory-copy h3,
+.admin-member-copy h3 {
+  margin: 0;
+}
+
+.member-directory-copy p,
+.admin-member-copy p,
+.admin-member-meta-block p,
+.admin-member-bio {
+  margin: 0;
+  color: var(--muted);
+}
+
+.member-directory-bio,
+.admin-member-bio {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--muted);
+  line-height: 1.7;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.member-directory-signals,
+.member-skill-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.member-skill-list span {
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: rgba(15, 122, 106, 0.08);
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.member-signal-pill {
+  border: 1px solid rgba(15, 122, 106, 0.16);
+  background: rgba(15, 122, 106, 0.1);
+  color: #0f6f61;
+}
+
+.member-signal-pill-warm {
+  border-color: rgba(236, 142, 68, 0.2);
+  background: rgba(236, 142, 68, 0.14);
+  color: #a7602f;
+}
+
 .admin-shell,
 .admin-card {
   padding: 24px;
@@ -681,6 +818,23 @@ img {
 
 .admin-list-row {
   align-items: start;
+}
+
+.admin-member-card-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-member-card {
+  align-content: start;
+}
+
+.admin-member-card-header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.admin-member-card-meta {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .admin-registration-list-grid {
@@ -1268,8 +1422,15 @@ img {
   .admin-event-card-row,
   .admin-event-card-main,
   .admin-event-card-details,
+  .admin-member-card-list,
+  .admin-member-card-header,
+  .admin-member-card-meta,
   .admin-registration-list-grid,
   .admin-photo-card {
+    grid-template-columns: 1fr;
+  }
+
+  .member-directory-grid {
     grid-template-columns: 1fr;
   }
 

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
+import { MemberAvatar } from "@/components/member-avatar";
 import { PageHero } from "@/components/page-hero";
+import { getPublicMembersDirectory } from "@/lib/community-members";
 import { memberTags } from "@/lib/site-data";
 
 export const metadata: Metadata = {
@@ -8,7 +10,11 @@ export const metadata: Metadata = {
   description: "展示常州 AI 社区的成员技能分布和参与方向。",
 };
 
-export default function MembersPage() {
+export default async function MembersPage() {
+  const directory = await getPublicMembersDirectory();
+  const skillTags =
+    directory.skillTags.length > 0 ? directory.skillTags : memberTags;
+
   return (
     <div className="page-stack">
       <PageHero
@@ -16,28 +22,86 @@ export default function MembersPage() {
         title="成员地图"
         description="第一版更关注成员能力分布和参与方向，而不是做公开通讯录，让每个人先被看见、再被匹配。"
       >
-        <div className="note-strip">
-          这页后续很适合接成员提交表单，再自动汇总技能标签、角色分布和参与意愿。
+        <div className="stat-grid">
+          <article className="metric-card">
+            <strong>{directory.stats.publicMembers}</strong>
+            <span>公开成员</span>
+          </article>
+          <article className="metric-card">
+            <strong>{directory.stats.willingToShare}</strong>
+            <span>愿意分享</span>
+          </article>
+          <article className="metric-card">
+            <strong>{directory.stats.willingToJoinProjects}</strong>
+            <span>愿意共建</span>
+          </article>
         </div>
       </PageHero>
 
-      <section className="card-grid">
-        <article className="card">
-          <h3>角色分布</h3>
-          <p>开发者、产品、设计、运营、高校同学、创业团队和企业数字化岗位都可以在这里找到位置。</p>
-        </article>
-        <article className="card">
+      {directory.members.length > 0 ? (
+        <section className="member-directory-grid">
+          {directory.members.map((member) => (
+            <article className="member-directory-card" key={member.id}>
+              <div className="member-directory-header">
+                <MemberAvatar
+                  name={member.displayName}
+                  avatarUrl={member.avatarUrl}
+                />
+
+                <div className="member-directory-copy">
+                  <h3>{member.displayName}</h3>
+                  <p>{member.city}</p>
+                </div>
+              </div>
+
+              <p className="member-directory-bio">
+                {member.bio ?? "这位成员已经加入社区，正在等待补充更完整的个人介绍。"}
+              </p>
+
+              <div className="member-directory-signals">
+                <span className="pill member-signal-pill">愿意分享</span>
+                {member.willingToJoinProjects ? (
+                  <span className="pill member-signal-pill member-signal-pill-warm">
+                    愿意参与共建
+                  </span>
+                ) : null}
+              </div>
+
+              {member.skills.length > 0 ? (
+                <div className="member-skill-list">
+                  {member.skills.map((skill) => (
+                    <span key={`${member.id}-${skill}`}>{skill}</span>
+                  ))}
+                </div>
+              ) : (
+                <div className="note-strip">这位成员还没有补充技能标签。</div>
+              )}
+            </article>
+          ))}
+        </section>
+      ) : (
+        <div className="note-strip">
+          当前还没有设置为公开展示的成员。只要成员在账号页完善资料，并勾选愿意分享，这里就会自动出现。
+        </div>
+      )}
+
+      <section className="two-up">
+        <article className="field-panel">
           <h3>公开策略</h3>
-          <p>第一版建议只公开标签和方向，不公开个人联系方式，兼顾展示效果和成员隐私。</p>
+          <p>
+            当前成员页默认只展示愿意公开分享的成员，不公开邮箱和联系方式，先把技能、城市和方向沉淀下来。
+          </p>
         </article>
-        <article className="card">
-          <h3>后续可扩展</h3>
-          <p>等成员数量和内容都稳定后，再考虑增加分享者名单、项目参与记录和专题小组页面。</p>
+        <article className="field-panel">
+          <h3>适合被展示的成员</h3>
+          <p>
+            已经愿意参与线下交流、愿意分享经验、愿意参与后续项目协作的朋友，会更适合出现在这一页。
+          </p>
         </article>
       </section>
 
       <section className="tag-cloud">
-        {memberTags.map((tag) => (
+        {skillTags.map((tag) => (
           <span key={tag}>{tag}</span>
         ))}
       </section>

@@ -22,8 +22,16 @@ const adminEventStatusLabelMap: Record<string, string> = {
 const adminRegistrationStatusLabelMap: Record<string, string> = {
   registered: "已报名",
   waitlist: "候补",
-  attended: "已到场",
+  waitlisted: "候补",
   cancelled: "已取消",
+};
+
+const adminMemberStatusLabelMap: Record<string, string> = {
+  pending: "待完善",
+  active: "活跃成员",
+  organizer: "组织者",
+  admin: "管理员",
+  paused: "暂停中",
 };
 
 export function getAdminSavedMessage(code?: string) {
@@ -68,6 +76,10 @@ export function formatAdminRegistrationStatus(status: string) {
   return adminRegistrationStatusLabelMap[status] ?? status;
 }
 
+export function formatAdminMemberStatus(status: string) {
+  return adminMemberStatusLabelMap[status] ?? status;
+}
+
 export function getAdminEventStatusTone(status: string) {
   switch (status) {
     case "draft":
@@ -88,10 +100,26 @@ export function getAdminRegistrationStatusTone(status: string) {
     case "registered":
       return "registered";
     case "waitlist":
+    case "waitlisted":
       return "waitlist";
-    case "attended":
-      return "attended";
     case "cancelled":
+      return "cancelled";
+    default:
+      return "neutral";
+  }
+}
+
+export function getAdminMemberStatusTone(status: string) {
+  switch (status) {
+    case "pending":
+      return "draft";
+    case "active":
+      return "scheduled";
+    case "organizer":
+      return "registered";
+    case "admin":
+      return "waitlist";
+    case "paused":
       return "cancelled";
     default:
       return "neutral";
