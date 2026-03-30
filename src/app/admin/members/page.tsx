@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { updateAdminMember } from "@/app/admin/actions";
-import { MemberAvatar } from "@/components/member-avatar";
 import {
+  formatAdminJoinRequestStatus,
   formatAdminMemberStatus,
   getAdminErrorMessage,
+  getAdminJoinRequestStatusTone,
   getAdminMemberStatusTone,
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
@@ -13,13 +13,16 @@ import { loadAdminMembersData } from "@/lib/admin/members";
 
 export const metadata: Metadata = {
   title: "成员管理",
-  description: "查看和管理社区成员。",
+  description: "查看成员与加入申请列表，并进入详情页处理资料。",
 };
 
 type SearchParams = {
   status?: string;
   visibility?: string;
   intent?: string;
+  request_status?: string;
+  member_query?: string;
+  request_query?: string;
   saved?: string;
   error?: string;
 };
@@ -32,10 +35,31 @@ function formatDate(value: string | null) {
   return new Date(value).toLocaleString("zh-CN");
 }
 
+function normalizeSearchText(value: string) {
+  return value.trim().toLocaleLowerCase("zh-CN");
+}
+
+function matchesKeyword(fields: Array<string | null | undefined | string[]>, keyword: string) {
+  if (!keyword) {
+    return true;
+  }
+
+  return fields.some((field) => {
+    if (Array.isArray(field)) {
+      return field.some((item) => normalizeSearchText(item).includes(keyword));
+    }
+
+    return normalizeSearchText(field ?? "").includes(keyword);
+  });
+}
+
 function buildMembersFilterHref(
   status: string,
   visibility: string,
   intent: string,
+  requestStatus: string,
+  memberQuery: string,
+  requestQuery: string,
 ) {
   const params = new URLSearchParams();
 
@@ -51,8 +75,26 @@ function buildMembersFilterHref(
     params.set("intent", intent);
   }
 
+  if (requestStatus !== "all") {
+    params.set("request_status", requestStatus);
+  }
+
+  if (memberQuery.trim()) {
+    params.set("member_query", memberQuery.trim());
+  }
+
+  if (requestQuery.trim()) {
+    params.set("request_query", requestQuery.trim());
+  }
+
   const query = params.toString();
   return query ? `/admin/members?${query}` : "/admin/members";
+}
+
+function buildDetailHref(basePath: string, currentPath: string) {
+  const params = new URLSearchParams();
+  params.set("from", currentPath);
+  return `${basePath}?${params.toString()}`;
 }
 
 export default async function AdminMembersPage({
@@ -66,6 +108,19 @@ export default async function AdminMembersPage({
   const statusFilter = params.status ?? "all";
   const visibilityFilter = params.visibility ?? "all";
   const intentFilter = params.intent ?? "all";
+  const requestStatusFilter = params.request_status ?? "all";
+  const memberQueryInput = (params.member_query ?? "").trim();
+  const requestQueryInput = (params.request_query ?? "").trim();
+  const memberKeyword = normalizeSearchText(memberQueryInput);
+  const requestKeyword = normalizeSearchText(requestQueryInput);
+  const currentMembersPath = buildMembersFilterHref(
+    statusFilter,
+    visibilityFilter,
+    intentFilter,
+    requestStatusFilter,
+    memberQueryInput,
+    requestQueryInput,
+  );
 
   const filteredMembers = members.filter((member) => {
     if (statusFilter !== "all" && member.status !== statusFilter) {
@@ -88,7 +143,32 @@ export default async function AdminMembersPage({
       return false;
     }
 
-    return true;
+    return matchesKeyword(
+      [member.displayName, member.email, member.city, member.bio, member.skills],
+      memberKeyword,
+    );
+  });
+
+  const filteredJoinRequests = joinRequests.filter((request) => {
+    if (requestStatusFilter !== "all" && request.status !== requestStatusFilter) {
+      return false;
+    }
+
+    return matchesKeyword(
+      [
+        request.displayName,
+        request.wechat,
+        request.city,
+        request.roleLabel,
+        request.organization,
+        request.monthlyTime,
+        request.note,
+        request.adminNote,
+        request.skills,
+        request.interests,
+      ],
+      requestKeyword,
+    );
   });
 
   return (
@@ -97,9 +177,9 @@ export default async function AdminMembersPage({
         <div className="admin-toolbar">
           <div className="section-heading">
             <p className="eyebrow">Members</p>
-            <h2>成员管理</h2>
+            <h2>成员列表</h2>
             <p>
-              这里现在已经能查看成员资料，并直接调整成员状态和公开展示开关。后面可以继续补搜索、批量操作和标签管理。
+              这里先收成标准列表页。成员资料、加入申请和运营设置都放到详情页里处理，后台结构会更稳定，也更方便后续扩展。
             </p>
           </div>
 
@@ -140,7 +220,7 @@ export default async function AdminMembersPage({
         <div className="section-heading">
           <p className="eyebrow">Filters</p>
           <h2>成员筛选</h2>
-          <p>先按成员状态、公开展示和参与意愿筛选，方便你快速找到可运营的人群。</p>
+          <p>先按成员状态、公开展示和参与意愿筛选，方便你快速定位可运营的人群。</p>
         </div>
 
         <div className="admin-filter-group">
@@ -156,7 +236,14 @@ export default async function AdminMembersPage({
             ].map(([value, label]) => (
               <Link
                 key={value}
-                href={buildMembersFilterHref(value, visibilityFilter, intentFilter)}
+                href={buildMembersFilterHref(
+                  value,
+                  visibilityFilter,
+                  intentFilter,
+                  requestStatusFilter,
+                  memberQueryInput,
+                  requestQueryInput,
+                )}
                 className={
                   statusFilter === value
                     ? "admin-filter-chip admin-filter-chip-active"
@@ -179,7 +266,14 @@ export default async function AdminMembersPage({
             ].map(([value, label]) => (
               <Link
                 key={value}
-                href={buildMembersFilterHref(statusFilter, value, intentFilter)}
+                href={buildMembersFilterHref(
+                  statusFilter,
+                  value,
+                  intentFilter,
+                  requestStatusFilter,
+                  memberQueryInput,
+                  requestQueryInput,
+                )}
                 className={
                   visibilityFilter === value
                     ? "admin-filter-chip admin-filter-chip-active"
@@ -202,7 +296,14 @@ export default async function AdminMembersPage({
             ].map(([value, label]) => (
               <Link
                 key={value}
-                href={buildMembersFilterHref(statusFilter, visibilityFilter, value)}
+                href={buildMembersFilterHref(
+                  statusFilter,
+                  visibilityFilter,
+                  value,
+                  requestStatusFilter,
+                  memberQueryInput,
+                  requestQueryInput,
+                )}
                 className={
                   intentFilter === value
                     ? "admin-filter-chip admin-filter-chip-active"
@@ -214,182 +315,251 @@ export default async function AdminMembersPage({
             ))}
           </div>
         </div>
+
+        <form action="/admin/members" className="admin-search-form">
+          <input type="hidden" name="status" value={statusFilter} />
+          <input type="hidden" name="visibility" value={visibilityFilter} />
+          <input type="hidden" name="intent" value={intentFilter} />
+          <input type="hidden" name="request_status" value={requestStatusFilter} />
+          <input type="hidden" name="request_query" value={requestQueryInput} />
+
+          <label className="form-field admin-search-field">
+            <span>成员搜索</span>
+            <input
+              className="input"
+              type="search"
+              name="member_query"
+              defaultValue={memberQueryInput}
+              placeholder="搜索姓名、邮箱、城市、技能"
+            />
+          </label>
+
+          <div className="admin-search-actions">
+            <button type="submit" className="button button-secondary">
+              搜索成员
+            </button>
+            {memberQueryInput ? (
+              <Link
+                href={buildMembersFilterHref(
+                  statusFilter,
+                  visibilityFilter,
+                  intentFilter,
+                  requestStatusFilter,
+                  "",
+                  requestQueryInput,
+                )}
+                className="button button-secondary"
+              >
+                清空搜索
+              </Link>
+            ) : null}
+          </div>
+        </form>
       </section>
 
-      {filteredMembers.length > 0 ? (
-        <section className="admin-member-card-list">
-          {filteredMembers.map((member) => (
-            <article className="surface admin-card admin-member-card" key={member.id}>
-              <div className="admin-member-card-header">
-                <div className="admin-member-identity">
-                  <MemberAvatar
-                    name={member.displayName}
-                    avatarUrl={member.avatarUrl}
-                    size="sm"
-                  />
+      <section className="surface admin-card">
+        <div className="section-heading">
+          <p className="eyebrow">Members</p>
+          <h2>成员结果</h2>
+          <p>当前筛选后共有 {filteredMembers.length} 位成员。点击任意一行可进入详情页。</p>
+        </div>
 
-                  <div className="admin-member-copy">
-                    <h3>{member.displayName}</h3>
-                    <p>{member.email ?? "未提供邮箱"}</p>
-                    <p>{member.city}</p>
-                  </div>
+        {filteredMembers.length > 0 ? (
+          <div className="admin-list">
+            <div className="admin-list-header admin-member-list-grid">
+              <span>成员</span>
+              <span>城市与加入时间</span>
+              <span>状态</span>
+              <span>参与概况</span>
+              <span>意愿与技能</span>
+            </div>
+
+            {filteredMembers.map((member) => (
+              <Link
+                key={member.id}
+                href={buildDetailHref(`/admin/members/${member.id}`, currentMembersPath)}
+                className="admin-list-row admin-member-list-grid admin-list-link"
+              >
+                <div className="admin-list-primary">
+                  <h3 className="admin-list-title">{member.displayName}</h3>
+                  <p className="admin-compact-note">{member.email ?? "未提供邮箱"}</p>
                 </div>
 
-                <span
-                  className={`pill admin-status-pill admin-status-pill-${getAdminMemberStatusTone(
-                    member.status,
-                  )}`}
-                >
-                  {formatAdminMemberStatus(member.status)}
-                </span>
-              </div>
-
-              <div className="admin-member-card-meta">
-                <div className="admin-member-meta-block">
-                  <span className="admin-card-label">参与意愿</span>
-                  <div className="pill-row">
-                    <span className="pill member-signal-pill">
-                      {member.willingToShare ? "愿意分享" : "暂不分享"}
-                    </span>
-                    <span className="pill member-signal-pill member-signal-pill-warm">
-                      {member.willingToJoinProjects ? "愿意共建" : "暂不共建"}
-                    </span>
-                    <span className="pill member-signal-pill">
-                      {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
-                    </span>
-                  </div>
+                <div className="admin-list-cell">
+                  <span>{member.city}</span>
+                  <span>加入于 {formatDate(member.joinedAt)}</span>
                 </div>
 
-                <div className="admin-member-meta-block">
-                  <span className="admin-card-label">参与概况</span>
-                  <p>活动报名 {member.registrationCount} 次</p>
-                  <p>加入时间 {formatDate(member.joinedAt)}</p>
-                  <p>最近活跃 {formatDate(member.lastActiveAt)}</p>
-                </div>
-              </div>
-
-              <p className="admin-member-bio">
-                {member.bio ?? "这位成员还没有补充个人介绍。"}
-              </p>
-
-              {member.skills.length > 0 ? (
-                <div className="member-skill-list">
-                  {member.skills.map((skill) => (
-                    <span key={`${member.id}-${skill}`}>{skill}</span>
-                  ))}
-                </div>
-              ) : (
-                <div className="note-strip">这位成员还没有补充技能标签。</div>
-              )}
-
-              <form action={updateAdminMember} className="admin-inline-form">
-                <input type="hidden" name="member_id" value={member.id} />
-
-                <div className="form-grid admin-member-settings-grid">
-                  <label className="form-field">
-                    <span>成员状态</span>
-                    <select className="input" name="status" defaultValue={member.status}>
-                      <option value="pending">pending</option>
-                      <option value="active">active</option>
-                      <option value="organizer">organizer</option>
-                      <option value="admin">admin</option>
-                      <option value="paused">paused</option>
-                    </select>
-                  </label>
-
-                  <label className="checkbox-row admin-member-visibility-toggle">
-                    <input
-                      type="checkbox"
-                      name="is_publicly_visible"
-                      defaultChecked={member.isPubliclyVisible}
-                    />
-                    <span>公开展示到成员页</span>
-                  </label>
+                <div className="admin-list-cell">
+                  <span
+                    className={`pill admin-status-pill admin-status-pill-${getAdminMemberStatusTone(
+                      member.status,
+                    )}`}
+                  >
+                    {formatAdminMemberStatus(member.status)}
+                  </span>
+                  <span>{member.isPubliclyVisible ? "公开展示中" : "未公开展示"}</span>
                 </div>
 
-                <div className="cta-row">
-                  <button type="submit" className="button button-secondary">
-                    保存成员设置
-                  </button>
+                <div className="admin-list-cell">
+                  <span>活动报名 {member.registrationCount} 次</span>
+                  <span>最近活跃 {formatDate(member.lastActiveAt)}</span>
                 </div>
-              </form>
-            </article>
-          ))}
-        </section>
-      ) : (
-        <section className="surface admin-card">
+
+                <div className="admin-list-cell">
+                  <span>
+                    {member.willingToShare ? "愿意分享" : "暂不分享"} /{" "}
+                    {member.willingToJoinProjects ? "愿意共建" : "暂不共建"}
+                  </span>
+                  <span>{member.skills.slice(0, 3).join(" · ") || "未填写技能标签"}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
           <div className="note-strip">当前筛选条件下还没有成员数据。</div>
-        </section>
-      )}
+        )}
+      </section>
 
       <section className="surface admin-card">
         <div className="section-heading">
           <p className="eyebrow">Join Requests</p>
-          <h2>加入申请</h2>
-          <p>这里会显示从“加入社区”页面提交的新申请，方便你后续手动跟进和转化为正式成员。</p>
+          <h2>加入申请列表</h2>
+          <p>申请通过后，对方仍需要注册或登录网站，才能真正进入正式成员体系。</p>
         </div>
 
-        {joinRequests.length > 0 ? (
-          <div className="admin-join-request-list">
-            {joinRequests.map((request) => (
-              <article className="admin-join-request-card" key={request.id}>
-                <div className="admin-join-request-header">
-                  <div>
-                    <h3>{request.displayName}</h3>
-                    <p>
-                      {request.city}
-                      {request.roleLabel ? ` · ${request.roleLabel}` : ""}
-                      {request.organization ? ` · ${request.organization}` : ""}
-                    </p>
-                  </div>
+        <div className="admin-filter-group">
+          <span className="admin-filter-label">申请状态</span>
+          <div className="admin-filter-row">
+            {[
+              ["all", "全部"],
+              ["new", "新申请"],
+              ["contacted", "已联系"],
+              ["approved", "已通过"],
+              ["archived", "已归档"],
+            ].map(([value, label]) => (
+              <Link
+                key={value}
+                href={buildMembersFilterHref(
+                  statusFilter,
+                  visibilityFilter,
+                  intentFilter,
+                  value,
+                  memberQueryInput,
+                  requestQueryInput,
+                )}
+                className={
+                  requestStatusFilter === value
+                    ? "admin-filter-chip admin-filter-chip-active"
+                    : "admin-filter-chip"
+                }
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
 
-                  <span className="pill admin-status-pill admin-status-pill-draft">
-                    {request.status}
+        <form action="/admin/members" className="admin-search-form">
+          <input type="hidden" name="status" value={statusFilter} />
+          <input type="hidden" name="visibility" value={visibilityFilter} />
+          <input type="hidden" name="intent" value={intentFilter} />
+          <input type="hidden" name="request_status" value={requestStatusFilter} />
+          <input type="hidden" name="member_query" value={memberQueryInput} />
+
+          <label className="form-field admin-search-field">
+            <span>申请搜索</span>
+            <input
+              className="input"
+              type="search"
+              name="request_query"
+              defaultValue={requestQueryInput}
+              placeholder="搜索姓名、微信号、机构、备注"
+            />
+          </label>
+
+          <div className="admin-search-actions">
+            <button type="submit" className="button button-secondary">
+              搜索申请
+            </button>
+            {requestQueryInput ? (
+              <Link
+                href={buildMembersFilterHref(
+                  statusFilter,
+                  visibilityFilter,
+                  intentFilter,
+                  requestStatusFilter,
+                  memberQueryInput,
+                  "",
+                )}
+                className="button button-secondary"
+              >
+                清空搜索
+              </Link>
+            ) : null}
+          </div>
+        </form>
+
+        {filteredJoinRequests.length > 0 ? (
+          <div className="admin-list">
+            <div className="admin-list-header admin-join-request-list-grid">
+              <span>申请者</span>
+              <span>联系与身份</span>
+              <span>状态</span>
+              <span>时间节点</span>
+              <span>意向与备注</span>
+            </div>
+
+            {filteredJoinRequests.map((request) => (
+              <Link
+                key={request.id}
+                href={buildDetailHref(
+                  `/admin/members/requests/${request.id}`,
+                  currentMembersPath,
+                )}
+                className="admin-list-row admin-join-request-list-grid admin-list-link"
+              >
+                <div className="admin-list-primary">
+                  <h3 className="admin-list-title">{request.displayName}</h3>
+                  <p className="admin-compact-note">{request.city}</p>
+                </div>
+
+                <div className="admin-list-cell">
+                  <span>微信号 {request.wechat}</span>
+                  <span>
+                    {request.roleLabel ?? "未填写角色"}
+                    {request.organization ? ` · ${request.organization}` : ""}
                   </span>
                 </div>
 
-                <div className="admin-join-request-meta">
-                  <p>微信号：{request.wechat}</p>
-                  <p>提交时间：{formatDate(request.createdAt)}</p>
-                  <p>可投入时间：{request.monthlyTime ?? "未填写"}</p>
+                <div className="admin-list-cell">
+                  <span
+                    className={`pill admin-status-pill admin-status-pill-${getAdminJoinRequestStatusTone(
+                      request.status,
+                    )}`}
+                  >
+                    {formatAdminJoinRequestStatus(request.status)}
+                  </span>
+                  <span>{request.monthlyTime ?? "未填写可投入时间"}</span>
                 </div>
 
-                <div className="pill-row">
-                  <span className="pill member-signal-pill">
-                    {request.willingToAttend ? "愿意线下参加" : "暂不线下参加"}
-                  </span>
-                  <span className="pill member-signal-pill">
-                    {request.willingToShare ? "愿意分享" : "暂不分享"}
-                  </span>
-                  <span className="pill member-signal-pill member-signal-pill-warm">
+                <div className="admin-list-cell">
+                  <span>提交于 {formatDate(request.createdAt)}</span>
+                  <span>联系 {formatDate(request.contactedAt)}</span>
+                </div>
+
+                <div className="admin-list-cell">
+                  <span>
+                    {request.willingToAttend ? "愿意线下参加" : "暂不线下参加"} /{" "}
                     {request.willingToJoinProjects ? "愿意共建" : "暂不共建"}
                   </span>
+                  <span>{request.adminNote ?? request.note ?? "暂时还没有补充备注"}</span>
                 </div>
-
-                {request.skills.length > 0 ? (
-                  <div className="member-skill-list">
-                    {request.skills.map((skill) => (
-                      <span key={`${request.id}-skill-${skill}`}>{skill}</span>
-                    ))}
-                  </div>
-                ) : null}
-
-                {request.interests.length > 0 ? (
-                  <div className="member-skill-list">
-                    {request.interests.map((interest) => (
-                      <span key={`${request.id}-interest-${interest}`}>{interest}</span>
-                    ))}
-                  </div>
-                ) : null}
-
-                <p className="admin-member-bio">
-                  {request.note ?? "这位申请者还没有补充额外说明。"}
-                </p>
-              </article>
+              </Link>
             ))}
           </div>
         ) : (
-          <div className="note-strip">当前还没有新的加入申请。</div>
+          <div className="note-strip">当前筛选条件下还没有加入申请。</div>
         )}
       </section>
     </div>

@@ -1,3 +1,5 @@
+import { notFound } from "next/navigation";
+
 import { getStaffContext } from "@/lib/supabase/guards";
 
 type AdminProfileRow = {
@@ -40,6 +42,14 @@ type AdminJoinRequestRow = {
   willing_to_share: boolean;
   willing_to_join_projects: boolean;
   status: string;
+  admin_note: string | null;
+  contacted_at: string | null;
+  approved_at: string | null;
+  invited_to_register_at: string | null;
+  joined_group_at: string | null;
+  first_attended_event_at: string | null;
+  converted_to_member_at: string | null;
+  converted_member_id: string | null;
   created_at: string;
 };
 
@@ -75,7 +85,22 @@ export type AdminJoinRequest = {
   willingToShare: boolean;
   willingToJoinProjects: boolean;
   status: string;
+  adminNote: string | null;
+  contactedAt: string | null;
+  approvedAt: string | null;
+  invitedToRegisterAt: string | null;
+  joinedGroupAt: string | null;
+  firstAttendedEventAt: string | null;
+  convertedToMemberAt: string | null;
+  convertedMemberId: string | null;
+  convertedMemberDisplayName: string | null;
   createdAt: string;
+};
+
+export type AdminMemberOption = {
+  id: string;
+  displayName: string;
+  email: string | null;
 };
 
 export type AdminMembersData = {
@@ -108,6 +133,21 @@ function getMemberSortWeight(status: string) {
   }
 }
 
+function getJoinRequestSortWeight(status: string) {
+  switch (status) {
+    case "new":
+      return 0;
+    case "contacted":
+      return 1;
+    case "approved":
+      return 2;
+    case "archived":
+      return 3;
+    default:
+      return 4;
+  }
+}
+
 export async function loadAdminMembersData(): Promise<AdminMembersData> {
   const { supabase } = await getStaffContext();
 
@@ -129,7 +169,7 @@ export async function loadAdminMembersData(): Promise<AdminMembersData> {
     supabase
       .from("community_join_requests")
       .select(
-        "id, display_name, wechat, city, role_label, organization, monthly_time, skills, interests, note, willing_to_attend, willing_to_share, willing_to_join_projects, status, created_at",
+        "id, display_name, wechat, city, role_label, organization, monthly_time, skills, interests, note, willing_to_attend, willing_to_share, willing_to_join_projects, status, admin_note, contacted_at, approved_at, invited_to_register_at, joined_group_at, first_attended_event_at, converted_to_member_at, converted_member_id, created_at",
       )
       .order("created_at", { ascending: false }),
   ]);
@@ -185,24 +225,46 @@ export async function loadAdminMembersData(): Promise<AdminMembersData> {
 
       return a.displayName.localeCompare(b.displayName, "zh-CN");
     });
+  const memberNamesById = new Map(mergedMembers.map((member) => [member.id, member.displayName]));
 
-  const mappedJoinRequests = joinRequests.map((request) => ({
-    id: request.id,
-    displayName: request.display_name,
-    wechat: request.wechat,
-    city: request.city?.trim() || "常州",
-    roleLabel: request.role_label,
-    organization: request.organization,
-    monthlyTime: request.monthly_time,
-    skills: request.skills ?? [],
-    interests: request.interests ?? [],
-    note: request.note,
-    willingToAttend: request.willing_to_attend,
-    willingToShare: request.willing_to_share,
-    willingToJoinProjects: request.willing_to_join_projects,
-    status: request.status,
-    createdAt: request.created_at,
-  }));
+  const mappedJoinRequests = joinRequests
+    .map((request) => ({
+      id: request.id,
+      displayName: request.display_name,
+      wechat: request.wechat,
+      city: request.city?.trim() || "常州",
+      roleLabel: request.role_label,
+      organization: request.organization,
+      monthlyTime: request.monthly_time,
+      skills: request.skills ?? [],
+      interests: request.interests ?? [],
+      note: request.note,
+      willingToAttend: request.willing_to_attend,
+      willingToShare: request.willing_to_share,
+      willingToJoinProjects: request.willing_to_join_projects,
+      status: request.status,
+      adminNote: request.admin_note,
+      contactedAt: request.contacted_at,
+      approvedAt: request.approved_at,
+      invitedToRegisterAt: request.invited_to_register_at,
+      joinedGroupAt: request.joined_group_at,
+      firstAttendedEventAt: request.first_attended_event_at,
+      convertedToMemberAt: request.converted_to_member_at,
+      convertedMemberId: request.converted_member_id,
+      convertedMemberDisplayName: request.converted_member_id
+        ? memberNamesById.get(request.converted_member_id) ?? null
+        : null,
+      createdAt: request.created_at,
+    }))
+    .sort((a, b) => {
+      const weightDiff = getJoinRequestSortWeight(a.status) - getJoinRequestSortWeight(b.status);
+
+      if (weightDiff !== 0) {
+        return weightDiff;
+      }
+
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
   return {
     members: mergedMembers,
@@ -218,6 +280,39 @@ export async function loadAdminMembersData(): Promise<AdminMembersData> {
       ).length,
       joinRequests: mappedJoinRequests.length,
     },
+    queryErrors,
+  };
+}
+
+export async function loadAdminMemberOrThrow(memberId: string) {
+  const { members, queryErrors } = await loadAdminMembersData();
+  const member = members.find((item) => item.id === memberId);
+
+  if (!member) {
+    notFound();
+  }
+
+  return {
+    member,
+    queryErrors,
+  };
+}
+
+export async function loadAdminJoinRequestOrThrow(requestId: string) {
+  const { members, joinRequests, queryErrors } = await loadAdminMembersData();
+  const joinRequest = joinRequests.find((item) => item.id === requestId);
+
+  if (!joinRequest) {
+    notFound();
+  }
+
+  return {
+    joinRequest,
+    memberOptions: members.map((member) => ({
+      id: member.id,
+      displayName: member.displayName,
+      email: member.email,
+    })) as AdminMemberOption[],
     queryErrors,
   };
 }

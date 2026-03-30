@@ -2,6 +2,9 @@ const adminSavedMessageMap: Record<string, string> = {
   event: "活动信息已保存。",
   deleted: "活动已删除。",
   member: "成员设置已更新。",
+  member_profile: "成员资料已更新。",
+  join_request: "加入申请状态已更新。",
+  join_request_pipeline: "加入申请转化节点已更新。",
   photo: "活动照片已保存。",
   photo_deleted: "活动照片已删除。",
   cover: "活动封面已更新。",
@@ -33,6 +36,13 @@ const adminMemberStatusLabelMap: Record<string, string> = {
   organizer: "组织者",
   admin: "管理员",
   paused: "暂停中",
+};
+
+const adminJoinRequestStatusLabelMap: Record<string, string> = {
+  new: "新申请",
+  contacted: "已联系",
+  approved: "已通过",
+  archived: "已归档",
 };
 
 export function getAdminSavedMessage(code?: string) {
@@ -81,6 +91,10 @@ export function formatAdminMemberStatus(status: string) {
   return adminMemberStatusLabelMap[status] ?? status;
 }
 
+export function formatAdminJoinRequestStatus(status: string) {
+  return adminJoinRequestStatusLabelMap[status] ?? status;
+}
+
 export function getAdminEventStatusTone(status: string) {
   switch (status) {
     case "draft":
@@ -122,6 +136,21 @@ export function getAdminMemberStatusTone(status: string) {
       return "waitlist";
     case "paused":
       return "cancelled";
+    default:
+      return "neutral";
+  }
+}
+
+export function getAdminJoinRequestStatusTone(status: string) {
+  switch (status) {
+    case "new":
+      return "waitlist";
+    case "contacted":
+      return "registered";
+    case "approved":
+      return "scheduled";
+    case "archived":
+      return "completed";
     default:
       return "neutral";
   }

@@ -507,8 +507,7 @@ img {
   letter-spacing: 0.04em;
 }
 
-.member-directory-grid,
-.admin-member-card-list {
+.member-directory-grid {
   display: grid;
   gap: 18px;
 }
@@ -621,6 +620,23 @@ img {
 .admin-inline-form {
   display: grid;
   gap: 12px;
+}
+
+.admin-search-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: end;
+}
+
+.admin-search-field {
+  margin-top: 4px;
+}
+
+.admin-search-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .admin-filter-label {
@@ -882,35 +898,76 @@ img {
   align-items: start;
 }
 
-.admin-member-card-list {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.admin-list-link {
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.admin-list-link:hover,
+.admin-list-link:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(15, 122, 106, 0.18);
+  background: rgba(255, 250, 242, 0.94);
+  box-shadow: 0 14px 34px rgba(24, 54, 52, 0.06);
+}
+
+.admin-member-list-grid {
+  grid-template-columns:
+    minmax(0, 1.25fr)
+    minmax(180px, 0.9fr)
+    minmax(130px, 0.72fr)
+    minmax(180px, 0.95fr)
+    minmax(0, 1fr);
+}
+
+.admin-join-request-list-grid {
+  grid-template-columns:
+    minmax(0, 1.1fr)
+    minmax(190px, 1fr)
+    minmax(150px, 0.8fr)
+    minmax(180px, 0.9fr)
+    minmax(0, 1fr);
 }
 
 .admin-member-card {
+  display: grid;
+  gap: 16px;
   align-content: start;
 }
 
 .admin-member-card-header {
+  display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
+  gap: 16px;
+}
+
+.admin-member-identity,
+.admin-member-copy,
+.admin-member-card-meta {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-member-identity {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+}
+
+.admin-member-copy h3,
+.admin-member-copy p {
+  margin: 0;
+}
+
+.admin-member-copy p {
+  color: var(--muted);
 }
 
 .admin-member-card-meta {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.admin-join-request-list {
-  display: grid;
-  gap: 18px;
-}
-
-.admin-join-request-card {
-  display: grid;
-  gap: 16px;
-  padding: 20px 22px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: rgba(255, 249, 239, 0.82);
 }
 
 .admin-join-request-header,
@@ -943,6 +1000,64 @@ img {
 .admin-member-settings-grid {
   grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
   align-items: center;
+}
+
+.admin-join-request-settings-grid {
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  align-items: start;
+}
+
+.admin-join-request-note-field {
+  min-width: 0;
+}
+
+.admin-join-request-notes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-note-panel {
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  border: 1px solid rgba(15, 122, 106, 0.1);
+  border-radius: 16px;
+  background: rgba(255, 251, 245, 0.88);
+}
+
+.admin-note-panel .admin-member-bio {
+  margin: 0;
+}
+
+.admin-progress-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.admin-progress-item {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px dashed rgba(24, 54, 52, 0.14);
+  border-radius: 14px;
+  background: rgba(255, 252, 247, 0.82);
+}
+
+.admin-progress-item strong,
+.admin-progress-item p {
+  margin: 0;
+}
+
+.admin-progress-item p {
+  color: var(--muted);
+}
+
+.admin-progress-item-complete {
+  border-style: solid;
+  border-color: rgba(15, 122, 106, 0.18);
+  background: rgba(15, 122, 106, 0.08);
 }
 
 .admin-member-visibility-toggle {
@@ -1538,11 +1653,16 @@ img {
   .admin-event-card-row,
   .admin-event-card-main,
   .admin-event-card-details,
-  .admin-member-card-list,
+  .admin-member-list-grid,
+  .admin-join-request-list-grid,
   .admin-member-card-header,
   .admin-member-card-meta,
+  .admin-member-identity,
   .admin-join-request-header,
+  .admin-join-request-notes,
+  .admin-progress-grid,
   .admin-member-settings-grid,
+  .admin-join-request-settings-grid,
   .admin-registration-list-grid,
   .admin-photo-card {
     grid-template-columns: 1fr;
@@ -1554,6 +1674,10 @@ img {
 
   .admin-toolbar {
     flex-direction: column;
+  }
+
+  .admin-search-form {
+    grid-template-columns: 1fr;
   }
 
   .admin-sidebar {

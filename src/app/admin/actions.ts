@@ -32,8 +32,38 @@ function getOptionalInteger(formData: FormData, key: string) {
   return Number.isNaN(parsed) ? 0 : parsed;
 }
 
+function normalizeSkills(raw: string) {
+  return raw
+    .split(/[,，\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function buildRedirectPath(basePath: string, redirectTo: string | null, params: Record<string, string>) {
+  const safeTarget = redirectTo?.startsWith("/") ? redirectTo : basePath;
+  const [pathname, query = ""] = safeTarget.split("?");
+  const searchParams = new URLSearchParams(query);
+
+  Object.entries(params).forEach(([key, value]) => {
+    searchParams.set(key, value);
+  });
+
+  const nextQuery = searchParams.toString();
+  return nextQuery ? `${pathname}?${nextQuery}` : pathname;
+}
+
+function revalidateRedirectPath(redirectTo: string | null) {
+  if (!redirectTo?.startsWith("/")) {
+    return;
+  }
+
+  const [pathname] = redirectTo.split("?");
+  revalidatePath(pathname);
+}
+
 function revalidateEventPaths(eventId?: string) {
   revalidatePath(ADMIN_EVENTS_PATH);
+  revalidatePath("/");
   revalidatePath("/events");
   revalidatePath("/archive");
 
@@ -200,10 +230,15 @@ export async function updateAdminMember(formData: FormData) {
 
   const memberId = String(formData.get("member_id") ?? "").trim();
   const status = String(formData.get("status") ?? "").trim();
+  const redirectTo = getOptionalValue(formData, "redirect_to");
   const isPubliclyVisible = formData.get("is_publicly_visible") === "on";
 
   if (!memberId || !status) {
-    redirect(`${ADMIN_MEMBERS_PATH}?error=missing_required_fields`);
+    redirect(
+      buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+        error: "missing_required_fields",
+      }),
+    );
   }
 
   const { error } = await supabase
@@ -215,9 +250,240 @@ export async function updateAdminMember(formData: FormData) {
     .eq("id", memberId);
 
   if (error) {
-    redirect(`${ADMIN_MEMBERS_PATH}?error=database_write_failed`);
+    redirect(
+      buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+        error: "database_write_failed",
+      }),
+    );
   }
 
   revalidateMemberPaths();
-  redirect(`${ADMIN_MEMBERS_PATH}?saved=member`);
+  revalidateRedirectPath(redirectTo);
+  redirect(
+    buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+      saved: "member",
+    }),
+  );
+}
+
+export async function updateAdminMemberProfile(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+
+  const memberId = String(formData.get("member_id") ?? "").trim();
+  const redirectTo = getOptionalValue(formData, "redirect_to");
+  const displayName = getOptionalValue(formData, "display_name");
+  const city = getOptionalValue(formData, "city") ?? "常州";
+  const bio = getOptionalValue(formData, "bio");
+  const skills = normalizeSkills(String(formData.get("skills") ?? ""));
+  const willingToShare = formData.get("willing_to_share") === "on";
+  const willingToJoinProjects = formData.get("willing_to_join_projects") === "on";
+
+  if (!memberId) {
+    redirect(
+      buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+        error: "missing_required_fields",
+      }),
+    );
+  }
+
+  const [{ error: profileError }, { error: memberError }] = await Promise.all([
+    supabase
+      .from("profiles")
+      .update({
+        display_name: displayName,
+        city,
+        bio,
+        skills,
+      })
+      .eq("id", memberId),
+    supabase
+      .from("members")
+      .update({
+        willing_to_share: willingToShare,
+        willing_to_join_projects: willingToJoinProjects,
+      })
+      .eq("id", memberId),
+  ]);
+
+  if (profileError || memberError) {
+    redirect(
+      buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+        error: "database_write_failed",
+      }),
+    );
+  }
+
+  revalidateMemberPaths();
+  revalidateRedirectPath(redirectTo);
+  redirect(
+    buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+      saved: "member_profile",
+    }),
+  );
+}
+
+export async function updateAdminJoinRequest(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+
+  const requestId = String(formData.get("request_id") ?? "").trim();
+  const status = String(formData.get("status") ?? "").trim();
+  const redirectTo = getOptionalValue(formData, "redirect_to");
+  const adminNote = getOptionalValue(formData, "admin_note");
+
+  if (!requestId || !status) {
+    redirect(
+      buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+        error: "missing_required_fields",
+      }),
+    );
+  }
+
+  const { data: existingRequest, error: existingError } = await supabase
+    .from("community_join_requests")
+    .select("contacted_at, approved_at")
+    .eq("id", requestId)
+    .single();
+
+  if (existingError || !existingRequest) {
+    redirect(
+      buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+        error: "database_write_failed",
+      }),
+    );
+  }
+
+  const now = new Date().toISOString();
+  const payload: {
+    status: string;
+    admin_note: string | null;
+    contacted_at?: string;
+    approved_at?: string;
+  } = {
+    status,
+    admin_note: adminNote,
+  };
+
+  if (status === "contacted" && !existingRequest.contacted_at) {
+    payload.contacted_at = now;
+  }
+
+  if (status === "approved") {
+    if (!existingRequest.contacted_at) {
+      payload.contacted_at = now;
+    }
+
+    if (!existingRequest.approved_at) {
+      payload.approved_at = now;
+    }
+  }
+
+  const { error } = await supabase
+    .from("community_join_requests")
+    .update(payload)
+    .eq("id", requestId);
+
+  if (error) {
+    redirect(
+      buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+        error: "database_write_failed",
+      }),
+    );
+  }
+
+  revalidateMemberPaths();
+  revalidateRedirectPath(redirectTo);
+  redirect(
+    buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+      saved: "join_request",
+    }),
+  );
+}
+
+export async function updateAdminJoinRequestPipeline(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+
+  const requestId = String(formData.get("request_id") ?? "").trim();
+  const redirectTo = getOptionalValue(formData, "redirect_to");
+  const convertedMemberId = getOptionalValue(formData, "converted_member_id");
+
+  if (!requestId) {
+    redirect(
+      buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+        error: "missing_required_fields",
+      }),
+    );
+  }
+
+  const { data: existingRequest, error: existingError } = await supabase
+    .from("community_join_requests")
+    .select(
+      "status, contacted_at, approved_at, invited_to_register_at, joined_group_at, first_attended_event_at, converted_to_member_at, converted_member_id",
+    )
+    .eq("id", requestId)
+    .single();
+
+  if (existingError || !existingRequest) {
+    redirect(
+      buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+        error: "database_write_failed",
+      }),
+    );
+  }
+
+  const now = new Date().toISOString();
+  const markInvited = formData.get("mark_invited_to_register") === "on";
+  const markJoinedGroup = formData.get("mark_joined_group") === "on";
+  const markFirstAttended = formData.get("mark_first_attended_event") === "on";
+  const markConverted = formData.get("mark_converted_to_member") === "on";
+
+  const nextStatus =
+    markConverted || convertedMemberId
+      ? existingRequest.status === "archived"
+        ? "archived"
+        : "approved"
+      : existingRequest.status;
+
+  const payload = {
+    status: nextStatus,
+    invited_to_register_at: markInvited
+      ? existingRequest.invited_to_register_at ?? now
+      : null,
+    joined_group_at: markJoinedGroup ? existingRequest.joined_group_at ?? now : null,
+    first_attended_event_at: markFirstAttended
+      ? existingRequest.first_attended_event_at ?? now
+      : null,
+    converted_to_member_at: markConverted
+      ? existingRequest.converted_to_member_at ?? now
+      : null,
+    converted_member_id: convertedMemberId,
+    contacted_at:
+      markJoinedGroup || markFirstAttended || markConverted || convertedMemberId
+        ? existingRequest.contacted_at ?? now
+        : existingRequest.contacted_at,
+    approved_at:
+      markConverted || convertedMemberId
+        ? existingRequest.approved_at ?? now
+        : existingRequest.approved_at,
+  };
+
+  const { error } = await supabase
+    .from("community_join_requests")
+    .update(payload)
+    .eq("id", requestId);
+
+  if (error) {
+    redirect(
+      buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+        error: "database_write_failed",
+      }),
+    );
+  }
+
+  revalidateMemberPaths();
+  revalidateRedirectPath(redirectTo);
+  redirect(
+    buildRedirectPath(ADMIN_MEMBERS_PATH, redirectTo, {
+      saved: "join_request_pipeline",
+    }),
+  );
 }
