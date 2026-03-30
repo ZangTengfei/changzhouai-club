@@ -103,11 +103,13 @@ img {
   place-items: center;
   width: 46px;
   height: 46px;
-  border-radius: 16px;
-  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-warm) 100%);
-  color: #fff9ef;
-  font-weight: 800;
-  letter-spacing: 0.08em;
+  flex-shrink: 0;
+}
+
+.brand-mark-icon {
+  display: block;
+  width: 46px;
+  height: 46px;
 }
 
 .brand-copy {
@@ -1314,6 +1316,98 @@ img {
   flex-wrap: wrap;
 }
 
+.logo-lab-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.logo-draft-card {
+  display: grid;
+  gap: 20px;
+  padding: 24px;
+}
+
+.logo-draft-preview {
+  display: grid;
+  gap: 18px;
+}
+
+.logo-draft-mark-shell {
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(242, 166, 90, 0.12), transparent 30%),
+    linear-gradient(180deg, rgba(15, 122, 106, 0.96), rgba(13, 95, 83, 0.98));
+}
+
+.logo-draft-mark {
+  width: min(72%, 220px);
+  height: auto;
+}
+
+.logo-draft-meta {
+  display: grid;
+  gap: 14px;
+}
+
+.logo-draft-favicon {
+  display: grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background: var(--accent);
+}
+
+.logo-draft-favicon-mark {
+  width: 46px;
+  height: 46px;
+}
+
+.logo-draft-header-demo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.8);
+}
+
+.logo-draft-header-badge {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
+  background: var(--accent);
+  flex: 0 0 46px;
+}
+
+.logo-draft-header-mark {
+  width: 30px;
+  height: 30px;
+}
+
+.logo-draft-header-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.logo-draft-header-copy strong {
+  font-size: 0.95rem;
+}
+
+.logo-draft-header-copy small {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
 .storage-field {
   display: grid;
   gap: 10px;
@@ -1659,7 +1753,8 @@ img {
   .two-up,
   .field-grid,
   .faq-grid,
-  .gallery-grid {
+  .gallery-grid,
+  .logo-lab-grid {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -1715,7 +1810,8 @@ img {
   .field-grid,
   .faq-grid,
   .stat-grid,
-  .gallery-grid {
+  .gallery-grid,
+  .logo-lab-grid {
     grid-template-columns: 1fr;
   }
 

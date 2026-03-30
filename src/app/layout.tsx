@@ -9,17 +9,17 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://changzhouai.club"),
   title: {
-    default: "常州 AI 社区",
-    template: "%s | 常州 AI 社区",
+    default: "常州 AI 开发者社区",
+    template: "%s | 常州 AI 开发者社区",
   },
   description:
     "连接常州的开发者、产品人、创业者与企业需求，定期组织线下交流、主题分享与项目共建。",
   openGraph: {
-    title: "常州 AI 社区",
+    title: "常州 AI 开发者社区",
     description:
       "一个立足常州本地的 AI 开发者社区，关注线下交流、项目共建与企业合作。",
     url: "https://changzhouai.club",
-    siteName: "常州 AI 社区",
+    siteName: "常州 AI 开发者社区",
     locale: "zh_CN",
     type: "website",
   },

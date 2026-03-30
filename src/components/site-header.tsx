@@ -1,15 +1,18 @@
 import Link from "next/link";
 
 import { SiteAccountEntry } from "@/components/site-account-entry";
+import { SiteLogoMark } from "@/components/site-logo-mark";
 import { navItems } from "@/lib/site-data";
 export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="container header-inner">
         <Link href="/" className="brand">
-          <span className="brand-mark">CZ</span>
+          <span className="brand-mark">
+            <SiteLogoMark className="brand-mark-icon" />
+          </span>
           <span className="brand-copy">
-            <strong>常州 AI 社区</strong>
+            <strong>常州 AI 开发者社区</strong>
             <small>Changzhou AI Club</small>
           </span>
         </Link>

@@ -1,0 +1,109 @@
+type LogoDraftProps = {
+  className?: string;
+};
+
+export function LogoDraftCityNodes({ className }: LogoDraftProps) {
+  return (
+    <svg
+      viewBox="0 0 128 128"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className={className}
+    >
+      <path
+        d="M78 40H50L36 64L50 88H78"
+        stroke="#F7F0E4"
+        strokeWidth="8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M78 40L92 64L78 88"
+        stroke="#F2A65A"
+        strokeWidth="8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="78" cy="40" r="8" fill="#F7F0E4" />
+      <circle cx="50" cy="40" r="8" fill="#F7F0E4" />
+      <circle cx="36" cy="64" r="8" fill="#F7F0E4" />
+      <circle cx="50" cy="88" r="8" fill="#F7F0E4" />
+      <circle cx="78" cy="88" r="8" fill="#F7F0E4" />
+      <circle cx="92" cy="64" r="8" fill="#F2A65A" />
+    </svg>
+  );
+}
+
+export function LogoDraftBuildEngine({ className }: LogoDraftProps) {
+  return (
+    <svg
+      viewBox="0 0 128 128"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className={className}
+    >
+      <path
+        d="M94 39H60C49 39 41 47 41 57V71C41 81 49 89 60 89H94"
+        stroke="#F7F0E4"
+        strokeWidth="11"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M62 48L79 64L62 80"
+        stroke="#EE9650"
+        strokeWidth="9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M80 51L92 64L80 77"
+        stroke="#F5B775"
+        strokeWidth="5.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="41" cy="57" r="5.5" fill="#F7F0E4" />
+      <circle cx="41" cy="71" r="5.5" fill="#F7F0E4" />
+      <circle cx="94" cy="39" r="5.5" fill="#F7F0E4" />
+      <circle cx="94" cy="89" r="5.5" fill="#F7F0E4" />
+    </svg>
+  );
+}
+
+export function LogoDraftCityAgent({ className }: LogoDraftProps) {
+  return (
+    <svg
+      viewBox="0 0 128 128"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className={className}
+    >
+      <path
+        d="M42 42H82C92.5 42 100 49.2 100 59V67C100 76.8 92.5 84 82 84H66L50 96V84H42C31.5 84 24 76.8 24 67V59C24 49.2 31.5 42 42 42Z"
+        stroke="#F7F0E4"
+        strokeWidth="8"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M42 66H68"
+        stroke="#F7F0E4"
+        strokeWidth="8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M80 54L94 64L80 74"
+        stroke="#F2A65A"
+        strokeWidth="8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="42" cy="66" r="6" fill="#F7F0E4" />
+      <circle cx="68" cy="66" r="6" fill="#F7F0E4" />
+      <circle cx="94" cy="64" r="6" fill="#F2A65A" />
+    </svg>
+  );
+}

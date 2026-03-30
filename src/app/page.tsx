@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { SectionHeading } from "@/components/section-heading";
-import { getCompletedEventRecaps } from "@/lib/community-events";
+import { getCompletedEventRecaps, getScheduledEvents } from "@/lib/community-events";
 import {
   activityMoments,
   cooperationAreas,
@@ -19,7 +19,9 @@ function formatMetricDate(isoDate: string | null) {
 }
 
 export default async function HomePage() {
+  const scheduledEvents = await getScheduledEvents();
   const completedEvents = await getCompletedEventRecaps();
+  const featuredScheduledEvents = scheduledEvents.slice(0, 3);
   const latestCompletedEvent = completedEvents[0];
   const recentEvents = completedEvents.slice(0, 3);
   const communityStats = [
@@ -42,6 +44,9 @@ export default async function HomePage() {
             {latestCompletedEvent
               ? `到 ${latestCompletedEvent.dateLabel}，我们已经完成了 ${completedEvents.length} 场线下活动。`
               : "社区正在持续组织线下交流与主题分享。"}
+            {scheduledEvents.length > 0
+              ? ` 当前还有 ${scheduledEvents.length} 场活动正在开放报名。`
+              : ""}
           </p>
 
           <div className="cta-row">
@@ -49,7 +54,9 @@ export default async function HomePage() {
               立即加入社群
             </Link>
             <Link href="/events" className="button button-secondary">
-              查看 {completedEvents.length} 场活动回顾
+              {scheduledEvents.length > 0
+                ? `查看 ${scheduledEvents.length} 场可报名活动`
+                : `查看 ${completedEvents.length} 场活动回顾`}
             </Link>
           </div>
 
@@ -95,6 +102,40 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {featuredScheduledEvents.length > 0 ? (
+        <section className="section">
+          <SectionHeading
+            eyebrow="正在报名"
+            title="首页也直接展示当前可报名的活动"
+            description="让第一次来到网站的人不用再点进二级页，也能立刻看到社区下一步正在发生什么。"
+          />
+          <div className="card-grid">
+            {featuredScheduledEvents.map((event) => (
+              <article className="card" key={event.id}>
+                <div className="pill-row">
+                  <span className="pill">
+                    {event.event_at ? new Date(event.event_at).toLocaleString("zh-CN") : "时间待定"}
+                  </span>
+                  <span className="pill">{event.city ?? "常州"}</span>
+                  <span className="pill">开放报名</span>
+                </div>
+                <h3>{event.title}</h3>
+                <p>{event.summary ?? "这是一场已经开放报名的社区活动。"}</p>
+                <ul className="detail-list">
+                  <li>地点：{event.venue ?? "待公布"}</li>
+                  <li>活动标识：{event.slug}</li>
+                </ul>
+                <div className="cta-row">
+                  <Link href="/events" className="button">
+                    去活动页报名
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="section">
         <SectionHeading

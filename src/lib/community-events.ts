@@ -21,6 +21,17 @@ type CompletedEventRow = {
   event_photos: EventPhotoRow[] | null;
 };
 
+export type PublicScheduledEvent = {
+  id: string;
+  title: string;
+  summary: string | null;
+  event_at: string | null;
+  venue: string | null;
+  city: string | null;
+  slug: string;
+  cover_image_url: string | null;
+};
+
 export type PublicGalleryImage = {
   id: string;
   imageUrl: string;
@@ -132,4 +143,19 @@ export async function getCompletedEventRecaps() {
   }
 
   return (data as CompletedEventRow[]).map(mapCompletedEvent);
+}
+
+export async function getScheduledEvents() {
+  if (!hasSupabaseEnv()) {
+    return [] as PublicScheduledEvent[];
+  }
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("events")
+    .select("id, title, summary, event_at, venue, city, slug, cover_image_url")
+    .eq("status", "scheduled")
+    .order("event_at", { ascending: true, nullsFirst: false });
+
+  return (data ?? []) as PublicScheduledEvent[];
 }

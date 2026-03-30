@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { EventRegistrationForm } from "@/components/event-registration-form";
 import { PageHero } from "@/components/page-hero";
-import { getCompletedEventRecaps } from "@/lib/community-events";
+import { getCompletedEventRecaps, getScheduledEvents } from "@/lib/community-events";
 import { hasSupabaseEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
@@ -19,15 +19,7 @@ export default async function EventsPage({
   const enabled = hasSupabaseEnv();
   const params = await searchParams;
   const completedEvents = await getCompletedEventRecaps();
-  let scheduledEvents: Array<{
-    id: string;
-    title: string;
-    summary: string | null;
-    event_at: string | null;
-    venue: string | null;
-    city: string | null;
-    slug: string;
-  }> = [];
+  const scheduledEvents = await getScheduledEvents();
   let registeredEventIds = new Set<string>();
   let isLoggedIn = false;
 
@@ -39,12 +31,7 @@ export default async function EventsPage({
 
     isLoggedIn = Boolean(user);
 
-    const [{ data: eventsData }, { data: registrations }] = await Promise.all([
-      supabase
-        .from("events")
-        .select("id, title, summary, event_at, venue, city, slug")
-        .eq("status", "scheduled")
-        .order("event_at", { ascending: true }),
+    const [{ data: registrations }] = await Promise.all([
       user
         ? supabase
             .from("event_registrations")
@@ -54,7 +41,6 @@ export default async function EventsPage({
         : Promise.resolve({ data: [] }),
     ]);
 
-    scheduledEvents = eventsData ?? [];
     registeredEventIds = new Set((registrations ?? []).map((item) => item.event_id));
   }
 
