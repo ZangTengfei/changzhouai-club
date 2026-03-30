@@ -11,6 +11,7 @@ type AccountState = {
   label: string;
   name: string;
   avatarUrl: string | null;
+  isStaff: boolean;
 };
 
 function getAccountInitials(name: string) {
@@ -38,6 +39,7 @@ const defaultState: AccountState = {
   label: "登录",
   name: "登录",
   avatarUrl: null,
+  isStaff: false,
 };
 
 export function SiteAccountEntry() {
@@ -69,12 +71,19 @@ export function SiteAccountEntry() {
         typeof user.user_metadata?.avatar_url === "string"
           ? user.user_metadata.avatar_url
           : null;
+      const { data: member } = await supabase
+        .from("members")
+        .select("status")
+        .eq("id", user.id)
+        .maybeSingle();
+      const isStaff = ["organizer", "admin"].includes(member?.status ?? "");
 
       setAccount({
         href: "/account",
         label: "账号中心",
         name: displayName,
         avatarUrl,
+        isStaff,
       });
     }
 
@@ -92,25 +101,33 @@ export function SiteAccountEntry() {
   }, []);
 
   return (
-    <Link
-      href={account.href}
-      className="account-entry"
-      aria-label={account.label}
-      title={account.label}
-    >
-      {account.avatarUrl ? (
-        <img
-          src={account.avatarUrl}
-          alt={account.name}
-          className="account-avatar-image"
-          referrerPolicy="no-referrer"
-        />
-      ) : (
-        <span className="account-avatar-fallback">
-          {getAccountInitials(account.name)}
-        </span>
-      )}
-      <span className="sr-only">{account.label}</span>
-    </Link>
+    <div className="account-entry-group">
+      {account.isStaff ? (
+        <Link href="/admin" className="account-admin-link">
+          后台
+        </Link>
+      ) : null}
+
+      <Link
+        href={account.href}
+        className="account-entry"
+        aria-label={account.label}
+        title={account.label}
+      >
+        {account.avatarUrl ? (
+          <img
+            src={account.avatarUrl}
+            alt={account.name}
+            className="account-avatar-image"
+            referrerPolicy="no-referrer"
+          />
+        ) : (
+          <span className="account-avatar-fallback">
+            {getAccountInitials(account.name)}
+          </span>
+        )}
+        <span className="sr-only">{account.label}</span>
+      </Link>
+    </div>
   );
 }

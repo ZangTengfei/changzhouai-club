@@ -121,6 +121,14 @@ export default async function AccountPage({
               {member?.willing_to_join_projects ? "是" : "否"}
             </li>
           </ul>
+
+          {["organizer", "admin"].includes(member?.status ?? "") ? (
+            <div className="cta-row">
+              <Link href="/admin" className="button">
+                进入社区后台
+              </Link>
+            </div>
+          ) : null}
         </article>
       </section>
 

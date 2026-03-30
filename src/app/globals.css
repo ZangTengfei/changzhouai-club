@@ -207,6 +207,36 @@ img {
   background: rgba(15, 122, 106, 0.08);
 }
 
+.account-entry-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.account-admin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid rgba(15, 122, 106, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 250, 242, 0.84);
+  color: var(--ink);
+  font-weight: 700;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.account-admin-link:hover,
+.account-admin-link:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(15, 122, 106, 0.28);
+  background: rgba(15, 122, 106, 0.08);
+}
+
 .account-avatar-image,
 .account-avatar-fallback {
   display: grid;
@@ -1072,6 +1102,15 @@ img {
   grid-template-columns: minmax(0, 1.3fr) minmax(190px, 1fr) minmax(120px, 0.7fr) minmax(180px, 0.9fr) minmax(0, 1fr);
 }
 
+.admin-lead-list-grid {
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(180px, 0.9fr)
+    minmax(0, 1.2fr)
+    minmax(180px, 0.9fr)
+    minmax(220px, 0.95fr);
+}
+
 .admin-list-primary,
 .admin-list-cell,
 .admin-list-actions {
@@ -1626,6 +1665,14 @@ img {
     width: auto;
   }
 
+  .header-actions .account-entry-group {
+    flex: 1 1 100%;
+  }
+
+  .header-actions .account-admin-link {
+    flex: 1 1 140px;
+  }
+
   .header-actions .account-entry {
     flex: 0 0 46px;
     width: 46px;
@@ -1661,6 +1708,7 @@ img {
   .admin-join-request-header,
   .admin-join-request-notes,
   .admin-progress-grid,
+  .admin-lead-list-grid,
   .admin-member-settings-grid,
   .admin-join-request-settings-grid,
   .admin-registration-list-grid,

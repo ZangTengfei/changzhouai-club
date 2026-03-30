@@ -487,3 +487,43 @@ export async function updateAdminJoinRequestPipeline(formData: FormData) {
     }),
   );
 }
+
+export async function updateAdminLead(formData: FormData) {
+  const { supabase, user } = await requireStaffContext();
+
+  const leadId = String(formData.get("lead_id") ?? "").trim();
+  const status = String(formData.get("status") ?? "").trim();
+  const redirectTo = getOptionalValue(formData, "redirect_to");
+
+  if (!leadId || !status) {
+    redirect(
+      buildRedirectPath("/admin/leads", redirectTo, {
+        error: "missing_required_fields",
+      }),
+    );
+  }
+
+  const { error } = await supabase
+    .from("cooperation_leads")
+    .update({
+      status,
+      owner_id: user.id,
+    })
+    .eq("id", leadId);
+
+  if (error) {
+    redirect(
+      buildRedirectPath("/admin/leads", redirectTo, {
+        error: "database_write_failed",
+      }),
+    );
+  }
+
+  revalidatePath("/admin/leads");
+  revalidateRedirectPath(redirectTo);
+  redirect(
+    buildRedirectPath("/admin/leads", redirectTo, {
+      saved: "lead",
+    }),
+  );
+}
