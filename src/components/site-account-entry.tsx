@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { hasSupabaseEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/client";
@@ -44,6 +44,9 @@ const defaultState: AccountState = {
 
 export function SiteAccountEntry() {
   const [account, setAccount] = useState<AccountState>(defaultState);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [pending, setPending] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!hasSupabaseEnv()) {
@@ -76,14 +79,13 @@ export function SiteAccountEntry() {
         .select("status")
         .eq("id", user.id)
         .maybeSingle();
-      const isStaff = ["organizer", "admin"].includes(member?.status ?? "");
 
       setAccount({
         href: "/account",
         label: "账号中心",
         name: displayName,
         avatarUrl,
-        isStaff,
+        isStaff: ["organizer", "admin"].includes(member?.status ?? ""),
       });
     }
 
@@ -100,19 +102,67 @@ export function SiteAccountEntry() {
     };
   }, []);
 
-  return (
-    <div className="account-entry-group">
-      {account.isStaff ? (
-        <Link href="/admin" className="account-admin-link">
-          后台
-        </Link>
-      ) : null}
+  useEffect(() => {
+    function handlePointerDown(event: MouseEvent) {
+      if (!menuRef.current?.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
 
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  async function handleSignOut() {
+    if (pending || account.href !== "/account") {
+      return;
+    }
+
+    setPending(true);
+    setMenuOpen(false);
+
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  }
+
+  if (account.href !== "/account") {
+    return (
       <Link
         href={account.href}
         className="account-entry"
         aria-label={account.label}
         title={account.label}
+      >
+        <span className="account-avatar-fallback">
+          {getAccountInitials(account.name)}
+        </span>
+        <span className="sr-only">{account.label}</span>
+      </Link>
+    );
+  }
+
+  return (
+    <div className="account-menu" ref={menuRef}>
+      <button
+        type="button"
+        className={`account-entry${menuOpen ? " account-entry-active" : ""}`}
+        aria-label={account.label}
+        aria-haspopup="menu"
+        aria-expanded={menuOpen}
+        title={account.label}
+        onClick={() => setMenuOpen((open) => !open)}
       >
         {account.avatarUrl ? (
           <img
@@ -127,7 +177,41 @@ export function SiteAccountEntry() {
           </span>
         )}
         <span className="sr-only">{account.label}</span>
-      </Link>
+      </button>
+
+      {menuOpen ? (
+        <div className="account-dropdown" role="menu" aria-label="账号菜单">
+          <Link
+            href="/account"
+            className="account-dropdown-item"
+            role="menuitem"
+            onClick={() => setMenuOpen(false)}
+          >
+            进入用户主页
+          </Link>
+
+          {account.isStaff ? (
+            <Link
+              href="/admin"
+              className="account-dropdown-item"
+              role="menuitem"
+              onClick={() => setMenuOpen(false)}
+            >
+              管理后台
+            </Link>
+          ) : null}
+
+          <button
+            type="button"
+            className="account-dropdown-item"
+            role="menuitem"
+            onClick={handleSignOut}
+            disabled={pending}
+          >
+            {pending ? "退出中..." : "退出登录"}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

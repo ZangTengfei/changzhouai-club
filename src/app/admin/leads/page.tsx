@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { updateAdminLead } from "@/app/admin/actions";
 import {
   formatAdminLeadStatus,
   getAdminErrorMessage,
@@ -17,6 +16,7 @@ export const metadata: Metadata = {
 
 type SearchParams = {
   status?: string;
+  query?: string;
   saved?: string;
   error?: string;
 };
@@ -25,15 +25,37 @@ function formatDate(value: string) {
   return new Date(value).toLocaleString("zh-CN");
 }
 
-function buildLeadsFilterHref(status: string) {
+function normalizeSearchText(value: string) {
+  return value.trim().toLocaleLowerCase("zh-CN");
+}
+
+function matchesKeyword(fields: Array<string | null | undefined>, keyword: string) {
+  if (!keyword) {
+    return true;
+  }
+
+  return fields.some((field) => normalizeSearchText(field ?? "").includes(keyword));
+}
+
+function buildLeadsFilterHref(status: string, query: string) {
   const params = new URLSearchParams();
 
   if (status !== "all") {
     params.set("status", status);
   }
 
-  const query = params.toString();
-  return query ? `/admin/leads?${query}` : "/admin/leads";
+  if (query.trim()) {
+    params.set("query", query.trim());
+  }
+
+  const nextQuery = params.toString();
+  return nextQuery ? `/admin/leads?${nextQuery}` : "/admin/leads";
+}
+
+function buildLeadDetailHref(leadId: string, currentPath: string) {
+  const params = new URLSearchParams();
+  params.set("from", currentPath);
+  return `/admin/leads/${leadId}?${params.toString()}`;
 }
 
 export default async function AdminLeadsPage({
@@ -44,9 +66,32 @@ export default async function AdminLeadsPage({
   const params = await searchParams;
   const { leads, stats, queryErrors } = await loadAdminLeadsData();
   const statusFilter = params.status ?? "all";
-  const filteredLeads = leads.filter((lead) =>
-    statusFilter === "all" ? true : lead.status === statusFilter,
-  );
+  const queryInput = (params.query ?? "").trim();
+  const keyword = normalizeSearchText(queryInput);
+  const currentPath = buildLeadsFilterHref(statusFilter, queryInput);
+
+  const filteredLeads = leads.filter((lead) => {
+    if (statusFilter !== "all" && lead.status !== statusFilter) {
+      return false;
+    }
+
+    return matchesKeyword(
+      [
+        lead.companyName,
+        lead.contactName,
+        lead.contactWechat,
+        lead.contactPhone,
+        lead.requirementType,
+        lead.requirementSummary,
+        lead.budgetRange,
+        lead.desiredTimeline,
+        lead.ownerDisplayName,
+        lead.ownerEmail,
+        lead.adminNote,
+      ],
+      keyword,
+    );
+  });
 
   return (
     <div className="admin-page-stack">
@@ -55,7 +100,7 @@ export default async function AdminLeadsPage({
           <div className="section-heading">
             <p className="eyebrow">Leads</p>
             <h2>合作线索</h2>
-            <p>这里现在已经能承接公开合作页提交的线索，并在后台持续筛选和更新跟进状态。</p>
+            <p>列表页先负责快速扫盘。每条线索的备注、状态和后续跟进动作，统一放到详情页里处理。</p>
           </div>
 
           <div className="admin-toolbar-side">
@@ -95,7 +140,7 @@ export default async function AdminLeadsPage({
         <div className="section-heading">
           <p className="eyebrow">Filters</p>
           <h2>线索筛选</h2>
-          <p>先按线索状态快速扫盘，后面再逐步补负责人、备注和更完整的跟进记录。</p>
+          <p>先按线索状态和关键词快速定位，再进入详情页补备注和推进状态。</p>
         </div>
 
         <div className="admin-filter-group">
@@ -111,7 +156,7 @@ export default async function AdminLeadsPage({
             ].map(([value, label]) => (
               <Link
                 key={value}
-                href={buildLeadsFilterHref(value)}
+                href={buildLeadsFilterHref(value, queryInput)}
                 className={
                   statusFilter === value
                     ? "admin-filter-chip admin-filter-chip-active"
@@ -123,9 +168,44 @@ export default async function AdminLeadsPage({
             ))}
           </div>
         </div>
+
+        <form action="/admin/leads" className="admin-search-form">
+          <input type="hidden" name="status" value={statusFilter} />
+
+          <label className="form-field admin-search-field">
+            <span>线索搜索</span>
+            <input
+              className="input"
+              type="search"
+              name="query"
+              defaultValue={queryInput}
+              placeholder="搜索公司、联系人、微信、电话、需求、备注"
+            />
+          </label>
+
+          <div className="admin-search-actions">
+            <button type="submit" className="button button-secondary">
+              搜索线索
+            </button>
+            {queryInput ? (
+              <Link
+                href={buildLeadsFilterHref(statusFilter, "")}
+                className="button button-secondary"
+              >
+                清空搜索
+              </Link>
+            ) : null}
+          </div>
+        </form>
       </section>
 
       <section className="surface admin-card">
+        <div className="section-heading">
+          <p className="eyebrow">Lead List</p>
+          <h2>线索结果</h2>
+          <p>当前筛选后共有 {filteredLeads.length} 条线索。点击任意一行可进入详情页。</p>
+        </div>
+
         {filteredLeads.length > 0 ? (
           <div className="admin-list">
             <div className="admin-list-header admin-lead-list-grid">
@@ -133,11 +213,15 @@ export default async function AdminLeadsPage({
               <span>联系方式</span>
               <span>需求概况</span>
               <span>预算与时间</span>
-              <span>状态更新</span>
+              <span>负责人与进度</span>
             </div>
 
             {filteredLeads.map((lead) => (
-              <article className="admin-list-row admin-lead-list-grid" key={lead.id}>
+              <Link
+                key={lead.id}
+                href={buildLeadDetailHref(lead.id, currentPath)}
+                className="admin-list-row admin-lead-list-grid admin-list-link"
+              >
                 <div className="admin-list-primary">
                   <h3 className="admin-list-title">{lead.companyName}</h3>
                   <p className="admin-compact-note">
@@ -161,33 +245,24 @@ export default async function AdminLeadsPage({
                   <span>提交于 {formatDate(lead.createdAt)}</span>
                 </div>
 
-                <form action={updateAdminLead} className="admin-inline-form">
-                  <input type="hidden" name="lead_id" value={lead.id} />
-                  <input type="hidden" name="redirect_to" value={buildLeadsFilterHref(statusFilter)} />
-
-                  <div className="admin-list-actions">
-                    <span
-                      className={`pill admin-status-pill admin-status-pill-${getAdminLeadStatusTone(
-                        lead.status,
-                      )}`}
-                    >
-                      {formatAdminLeadStatus(lead.status)}
-                    </span>
-
-                    <select className="input" name="status" defaultValue={lead.status}>
-                      <option value="new">新线索</option>
-                      <option value="contacted">已联系</option>
-                      <option value="qualified">已判断可跟进</option>
-                      <option value="won">已成交</option>
-                      <option value="lost">已关闭</option>
-                    </select>
-
-                    <button type="submit" className="button button-secondary">
-                      保存状态
-                    </button>
-                  </div>
-                </form>
-              </article>
+                <div className="admin-list-cell">
+                  <span
+                    className={`pill admin-status-pill admin-status-pill-${getAdminLeadStatusTone(
+                      lead.status,
+                    )}`}
+                  >
+                    {formatAdminLeadStatus(lead.status)}
+                  </span>
+                  <span>
+                    负责人：{lead.ownerDisplayName ?? "暂未分配"}
+                    {lead.ownerEmail ? ` · ${lead.ownerEmail}` : ""}
+                  </span>
+                  <span>最近更新：{formatDate(lead.updatedAt)}</span>
+                  <span className="admin-list-snippet">
+                    {lead.adminNote ?? "暂时还没有管理员备注"}
+                  </span>
+                </div>
+              </Link>
             ))}
           </div>
         ) : (
