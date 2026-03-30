@@ -219,7 +219,7 @@ export default async function AdminJoinRequestDetailPage({
           <div className="admin-note-panel">
             <span className="admin-card-label">申请者补充</span>
             <p className="admin-member-bio">
-              {joinRequest.note ?? "这位申请者还没有补充额外说明。"}
+              {joinRequest.note ?? "这位申请者暂未补充额外说明。"}
             </p>
           </div>
 
@@ -253,7 +253,7 @@ export default async function AdminJoinRequestDetailPage({
                 name="admin_note"
                 rows={4}
                 defaultValue={joinRequest.adminNote ?? ""}
-                placeholder="例如：已加微信、适合哪类活动、后续是否适合项目协作"
+                placeholder="例如：已加微信、适合哪类活动、是否适合项目协作"
               />
             </label>
           </div>
@@ -272,7 +272,7 @@ export default async function AdminJoinRequestDetailPage({
           <div className="section-heading">
             <p className="eyebrow">Pipeline</p>
             <h2>转化节点</h2>
-            <p>勾选后保存会记录当前时间；取消勾选则会清除对应记录，适合把申请转化过程沉淀成可追踪的运营链路。</p>
+            <p>记录申请者从初次接触到成为正式成员的关键节点，方便持续跟进。</p>
           </div>
 
           <div className="checkbox-list">

@@ -208,7 +208,7 @@ export default async function AdminLeadDetailPage({
                 className="input"
                 name="next_action"
                 defaultValue={lead.nextAction ?? ""}
-                placeholder="例如：约一次需求澄清电话、先邀请参加下一场活动、先匹配 2 位候选成员"
+                placeholder="例如：约一次需求澄清电话、邀请参加下一场活动、匹配 2 位候选成员"
               />
             </label>
 
@@ -239,7 +239,7 @@ export default async function AdminLeadDetailPage({
                 name="admin_note"
                 rows={5}
                 defaultValue={lead.adminNote ?? ""}
-                placeholder="例如：已电话沟通、需要先做内部分享、预算仍待确认、适合优先匹配哪类社区成员"
+                placeholder="例如：已电话沟通、适合安排专题分享、预算仍待确认、适合匹配哪类社区成员"
               />
             </label>
           </div>
@@ -256,7 +256,7 @@ export default async function AdminLeadDetailPage({
         <div className="section-heading">
           <p className="eyebrow">Matches</p>
           <h2>候选成员匹配</h2>
-          <p>先把可能适合的人匹配出来，再记录联系、引荐和推进状态，这样合作需求才能真正闭环。</p>
+          <p>为这条线索维护候选成员、匹配状态与引荐记录，方便持续推进合作。</p>
         </div>
 
         {lead.matches.length > 0 ? (
@@ -348,7 +348,7 @@ export default async function AdminLeadDetailPage({
           </div>
         ) : (
           <div className="note-strip">
-            这条线索还没有匹配候选成员。你可以先加 1 到 3 位最合适的人，再慢慢推进状态。
+            这条线索暂未匹配候选成员，可先补充最合适的成员人选。
           </div>
         )}
 
@@ -356,7 +356,7 @@ export default async function AdminLeadDetailPage({
           <div className="section-heading">
             <p className="eyebrow">New Match</p>
             <h3>新增候选成员</h3>
-            <p>先匹配最有可能的人，不用一开始就拉太多，保持每条线索的推进节奏清晰。</p>
+            <p>补充适合参与该需求的成员，便于联系、引荐和协作安排。</p>
           </div>
 
           <form action={saveAdminLeadMatch} className="admin-inline-form">
@@ -395,7 +395,7 @@ export default async function AdminLeadDetailPage({
                   className="input textarea"
                   name="note"
                   rows={4}
-                  placeholder="例如：擅长做企业内部 AI 应用、适合先参与需求澄清、已经在线下活动里交流过"
+                  placeholder="例如：擅长做企业场景 AI 应用、适合参与需求澄清、已经在线下活动里交流过"
                 />
               </label>
             </div>

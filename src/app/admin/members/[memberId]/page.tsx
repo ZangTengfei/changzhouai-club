@@ -167,7 +167,7 @@ export default async function AdminMemberDetailPage({
             ))}
           </div>
         ) : (
-          <div className="note-strip">这位成员还没有补充技能标签。</div>
+          <div className="note-strip">这位成员尚未补充技能标签。</div>
         )}
 
         <form action={updateAdminMemberProfile} className="admin-inline-form">
@@ -177,7 +177,7 @@ export default async function AdminMemberDetailPage({
           <div className="section-heading">
             <p className="eyebrow">Profile</p>
             <h2>成员基础资料</h2>
-            <p>这里维护展示名、城市、技能和参与意愿，适合作为社群运营的统一成员档案。</p>
+            <p>维护展示名、城市、技能和参与意愿，沉淀清晰的成员档案。</p>
           </div>
 
           <div className="form-grid">
@@ -239,7 +239,7 @@ export default async function AdminMemberDetailPage({
                 name="willing_to_join_projects"
                 defaultChecked={member.willingToJoinProjects}
               />
-              <span>后续如果有合适项目，愿意参与协作</span>
+              <span>如有合适项目，愿意参与协作</span>
             </label>
           </div>
 

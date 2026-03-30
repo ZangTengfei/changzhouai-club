@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "活动",
-  description: "查看常州 AI 社区的历史活动回顾和当前可报名活动。",
+  description: "浏览常州 AI 开发者社区的近期活动与往期回顾。",
 };
 
 export default async function EventsPage({
@@ -50,10 +50,10 @@ export default async function EventsPage({
       <PageHero
         eyebrow="Events"
         title="社区活动"
-        description={`当前站点会自动展示 ${completedEvents.length} 场已完成活动的回顾，并承接后续活动报名。你在后台更新活动内容后，这里会直接同步。`}
+        description={`浏览社区近期活动与 ${completedEvents.length} 场往期回顾，了解活动主题、报名信息与现场内容。`}
       >
         <div className="note-strip">
-          这页现在主打真实活动回顾。后续你只要继续补活动简介、封面和现场照片，它就会越来越有内容密度。
+          通过活动安排、报名入口与往期回顾，快速了解社区的交流节奏与内容方向。
         </div>
       </PageHero>
 
@@ -70,7 +70,7 @@ export default async function EventsPage({
           <p className="eyebrow">Upcoming</p>
           <h2>活动报名</h2>
           <p>
-            只要 Supabase 里有 `scheduled` 状态的活动，这一页就会自动显示报名入口。现在你已经可以用登录账号把报名写入 `event_registrations` 表了。
+            查看近期开放报名的活动，获取时间、地点、简介与报名方式。
           </p>
         </div>
 
@@ -88,8 +88,7 @@ export default async function EventsPage({
           </div>
         ) : (
           <div className="note-strip">
-            当前数据库里还没有 `scheduled`
-            状态的活动，所以这里先不显示报名卡片。你后面只要新增下一场活动，这里就会自动出现报名入口。
+            暂无开放报名的活动，欢迎关注社区即将发布的活动安排。
           </div>
         )}
       </section>
@@ -127,26 +126,26 @@ export default async function EventsPage({
           ))
         ) : (
           <div className="note-strip">
-            当前数据库里还没有已完成活动。把历史活动导入后，这里就会自动展示完整回顾。
+            暂无往期活动回顾，欢迎稍后查看更新内容。
           </div>
         )}
       </section>
 
       <section className="two-up">
         <article className="card">
-          <h3>这一页现在最有价值的地方</h3>
+          <h3>活动页提供什么</h3>
           <ul className="detail-list">
-            <li>访客能一眼确认社区不是空站，而是真的持续在线下活动</li>
-            <li>新成员可以快速感受到社区的真实氛围和线下频率</li>
-            <li>一旦下一场活动进入数据库，就能直接开放登录报名</li>
+            <li>查看近期活动的时间、地点、主题与报名入口</li>
+            <li>了解社区过往活动的内容方向与现场氛围</li>
+            <li>为新成员和合作伙伴提供稳定的活动信息窗口</li>
           </ul>
         </article>
         <article className="card">
-          <h3>后续还可以继续补什么</h3>
+          <h3>活动内容包含哪些信息</h3>
           <ul className="detail-list">
-            <li>每场活动的主题关键词</li>
-            <li>现场分享人的名字或方向</li>
-            <li>当场讨论过的 2-3 个话题</li>
+            <li>活动主题、时间地点与报名说明</li>
+            <li>现场分享人与议程安排</li>
+            <li>活动回顾、照片与讨论线索</li>
           </ul>
         </article>
       </section>

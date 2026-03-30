@@ -37,9 +37,7 @@ export default async function AdminEventsPage({
           <div className="section-heading">
             <p className="eyebrow">Events</p>
             <h2>活动列表</h2>
-            <p>
-              后台首页先只保留列表视图。点进单场活动后，再处理编辑、相册和报名名单，整体会更像常见管理后台。
-            </p>
+            <p>集中查看全部活动，并进入单场活动页维护详情、相册和报名名单。</p>
           </div>
 
           <div className="admin-toolbar-side">
@@ -70,9 +68,9 @@ export default async function AdminEventsPage({
       {showDebug ? (
         <section className="surface admin-card">
           <div className="section-heading">
-            <p className="eyebrow">Debug</p>
-            <h2>服务端调试信息</h2>
-            <p>这里显示后台列表在服务端实际查到的数据概况。</p>
+            <p className="eyebrow">Diagnostics</p>
+            <h2>数据诊断信息</h2>
+            <p>这里展示活动列表当前加载到的数据概况，便于排查读取问题。</p>
           </div>
 
           <pre className="debug-panel">{JSON.stringify(debugSnapshot, null, 2)}</pre>
@@ -134,8 +132,8 @@ export default async function AdminEventsPage({
           </div>
         ) : (
           <div className="admin-empty-state">
-            <h3>当前还没有活动数据</h3>
-            <p>可以先创建第一场活动，创建后会直接进入该活动的详情页继续维护内容。</p>
+            <h3>暂未创建活动</h3>
+            <p>创建活动后，即可继续补充详情、相册和报名信息。</p>
             <div className="cta-row">
               <Link href="/admin/events/new" className="button">
                 去创建活动

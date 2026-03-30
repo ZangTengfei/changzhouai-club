@@ -5,7 +5,7 @@ import { AdminEventForm } from "@/components/admin-event-form";
 
 export const metadata: Metadata = {
   title: "新建活动",
-  description: "创建新的社区活动。",
+  description: "录入新的社区活动并完善基础信息。",
 };
 
 export default function NewAdminEventPage() {
@@ -16,7 +16,7 @@ export default function NewAdminEventPage() {
           <div className="section-heading">
             <p className="eyebrow">New Event</p>
             <h2>新建活动</h2>
-            <p>先创建活动基本信息。活动创建成功后，会自动跳到详情页继续补封面、相册和报名名单。</p>
+            <p>填写活动基础信息，创建后可继续补充详情介绍、照片与报名名单。</p>
           </div>
 
           <div className="cta-row">

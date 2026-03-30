@@ -5,7 +5,7 @@ import { joinSteps, projectStatus } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "项目共建",
-  description: "查看常州 AI 社区当前的项目状态，以及后续项目共建会如何自然长出来。",
+  description: "了解常州 AI 开发者社区的项目方向、共建状态与参与方式。",
 };
 
 export default function ProjectsPage() {
@@ -14,10 +14,10 @@ export default function ProjectsPage() {
       <PageHero
         eyebrow="Projects"
         title="项目共建"
-        description="截至 2026 年 3 月 29 日，社区还没有正式公开招募的共建项目。这一页会诚实展示当前状态，而不是提前包装。"
+        description="这里展示社区当前的项目状态、共建方向与参与路径。现阶段以活动交流、需求连接和成员协作为主，适合关注正在酝酿的合作机会。"
       >
         <div className="note-strip">
-          目前更真实的情况是：活动里已经开始出现成员自研项目的分享，但还没进入正式的社区项目阶段。
+          社区成员已经在活动中分享自研项目、工具与实践案例。正式共建项目会在目标、负责人和参与角色明确后开放协作。
         </div>
       </PageHero>
 

@@ -26,16 +26,16 @@ export default async function CooperatePage({
       <PageHero
         eyebrow="Cooperate"
         title="提交合作需求"
-        description="欢迎企业、机构、园区和高校与我们交流合作。现在已经可以直接在站内提交需求，后台合作线索页会收到这条线索。"
+        description="欢迎企业、机构、园区与高校与社区发起合作交流，围绕分享、培训、PoC 与项目协作展开连接。"
       >
         <div className="note-strip">
-          如果你希望组织主题分享、企业内训、PoC、项目交付或人才连接，都可以从这里统一提交。
+          如需主题分享、企业内训、PoC、项目交付或人才连接，欢迎通过本页提交合作需求。
         </div>
       </PageHero>
 
       {params.submitted ? (
         <div className="note-strip">
-          提交成功，我们已经收到这条合作需求。后续会根据你填写的联系方式与你继续沟通。
+          提交成功，我们已收到你的合作需求，并会根据你填写的联系方式尽快联系。
         </div>
       ) : null}
 
@@ -59,7 +59,7 @@ export default async function CooperatePage({
           </div>
         </article>
         <article className="field-panel">
-          <h3>建议收集的合作信息</h3>
+          <h3>合作信息</h3>
           <ul className="field-list">
             <li>公司 / 机构名称</li>
             <li>联系人与微信 / 手机号</li>
@@ -74,7 +74,7 @@ export default async function CooperatePage({
         <div className="section-heading">
           <p className="eyebrow">Lead Form</p>
           <h2>提交合作需求</h2>
-          <p>先把场景、需求和联系方式写清楚，后面做线索跟进、成员匹配和项目推进会更顺。</p>
+          <p>请尽量完整填写合作背景、需求场景与联系方式，便于进一步沟通与对接。</p>
         </div>
 
         <form action={submitCooperationLead} className="join-form">
@@ -91,12 +91,12 @@ export default async function CooperatePage({
 
             <label className="form-field">
               <span>微信号</span>
-              <input className="input" name="contact_wechat" placeholder="建议至少填写微信或手机号之一" />
+              <input className="input" name="contact_wechat" placeholder="请至少填写微信或手机号其中一项" />
             </label>
 
             <label className="form-field">
               <span>手机号</span>
-              <input className="input" name="contact_phone" placeholder="建议至少填写微信或手机号之一" />
+              <input className="input" name="contact_phone" placeholder="请至少填写微信或手机号其中一项" />
             </label>
 
             <label className="form-field">
@@ -106,7 +106,7 @@ export default async function CooperatePage({
 
             <label className="form-field">
               <span>预算范围</span>
-              <input className="input" name="budget_range" placeholder="例如：5k-20k / 待评估 / 先沟通" />
+              <input className="input" name="budget_range" placeholder="例如：5k-20k / 预算待评估 / 需进一步沟通" />
             </label>
 
             <label className="form-field form-field-wide">
@@ -142,12 +142,12 @@ export default async function CooperatePage({
         <article className="step-card">
           <span>01</span>
           <h3>需求沟通</h3>
-          <p>先确认合作目标、行业背景、时间窗口和输出预期。</p>
+          <p>确认合作目标、行业背景、时间安排与预期结果。</p>
         </article>
         <article className="step-card">
           <span>02</span>
           <h3>匹配人选</h3>
-          <p>根据场景匹配社区成员、分享者或项目协作小组。</p>
+          <p>根据合作场景匹配社区成员、分享者或协作团队。</p>
         </article>
         <article className="step-card">
           <span>03</span>

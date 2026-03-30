@@ -43,9 +43,7 @@ export default async function AdminEventDetailPage({
           <div className="section-heading">
             <p className="eyebrow">Event Detail</p>
             <h2>{eventDetail.title}</h2>
-            <p>
-              单场活动详情页负责编辑活动信息、相册内容和报名名单，避免后台首页变成一条超长工作台。
-            </p>
+            <p>集中维护这场活动的基本信息、相册内容与报名名单。</p>
           </div>
 
           <div className="admin-toolbar-side">
@@ -110,10 +108,7 @@ export default async function AdminEventDetailPage({
         <div className="section-heading">
           <p className="eyebrow">Registrations</p>
           <h2>{eventDetail.title} 的报名名单</h2>
-          <p>
-            当前报名数：{eventDetail.registrations.length}
-            。这一页后面很适合继续补签到、到场状态和导出功能。
-          </p>
+          <p>当前报名数：{eventDetail.registrations.length}，可在这里查看成员信息与报名备注。</p>
         </div>
 
         {eventDetail.registrations.length > 0 ? (
@@ -164,7 +159,7 @@ export default async function AdminEventDetailPage({
             ))}
           </div>
         ) : (
-          <div className="note-strip">这场活动目前还没有报名记录。</div>
+          <div className="note-strip">这场活动暂时还没有报名记录。</div>
         )}
       </section>
     </div>

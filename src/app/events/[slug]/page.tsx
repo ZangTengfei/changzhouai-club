@@ -144,7 +144,7 @@ export default async function EventDetailPage({
 
           {!hasOverview && !hasAgenda && !hasSpeakers ? (
             <div className="note-strip">
-              这场活动的详细说明还在补充中。你可以先看时间地点和报名状态，后面活动介绍、议程和分享内容会继续完善。
+              活动基本信息已发布，详细介绍与议程内容将陆续补充。
             </div>
           ) : null}
         </article>
@@ -177,8 +177,8 @@ export default async function EventDetailPage({
 
             <p>
               {event.status === "completed"
-                ? "这场活动已经结束，当前页面会继续沉淀活动回顾、现场照片和分享线索。"
-                : "这场活动目前不开放报名。如有变更，页面内容会随后台同步更新。"}
+                ? "活动已结束，欢迎通过本页继续查看回顾内容与现场照片。"
+                : "本场活动当前暂未开放报名，相关信息以页面发布内容为准。"}
             </p>
 
             {event.registrationNote ? (
@@ -204,7 +204,7 @@ export default async function EventDetailPage({
               </div>
             ) : (
               <div className="note-strip">
-                当前还没有补充更完整的活动介绍，后面可以在后台继续完善活动背景、议题安排和适合参与的人群。
+                活动介绍将围绕主题背景、交流内容与适合参与的人群持续补充。
               </div>
             )}
           </article>
@@ -239,7 +239,7 @@ export default async function EventDetailPage({
 
             {!hasAgenda && !hasSpeakers ? (
               <div className="note-strip">
-                当前还没有补充议程和分享信息，后面可以继续把这场活动的结构化内容沉淀到这里。
+                议程安排与分享信息将在确认后更新到本页。
               </div>
             ) : null}
           </article>
@@ -251,7 +251,7 @@ export default async function EventDetailPage({
           <div className="section-heading">
             <p className="eyebrow">After Event</p>
             <h2>活动回顾</h2>
-            <p>这一部分适合持续沉淀每场活动最值得留下来的观察、问题和后续动作。</p>
+            <p>这里记录活动中的重点内容、交流线索与值得沉淀的现场观察。</p>
           </div>
 
           <div className="event-detail-richtext">
@@ -267,7 +267,7 @@ export default async function EventDetailPage({
           <div className="section-heading">
             <p className="eyebrow">Gallery</p>
             <h2>现场照片</h2>
-            <p>活动封面和后台上传的照片会一起沉淀在这里。</p>
+            <p>通过现场照片回看活动氛围与交流瞬间。</p>
           </div>
 
           <div className="gallery-grid">

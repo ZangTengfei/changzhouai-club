@@ -17,14 +17,12 @@ export default async function AdminLayout({
           <p className="eyebrow">Admin</p>
           <h1>当前账号还没有后台权限</h1>
           <p>
-            你的当前成员状态是 `{member?.status ?? "pending"}`。活动后台只对
-            `organizer` 或 `admin` 开放。
+            你的当前成员状态是 `{member?.status ?? "pending"}`。社区后台仅对
+            `organizer` 或 `admin` 角色开放。
           </p>
           <div className="note-strip">
-            先到账号页复制你的用户 ID，再在 Supabase 里执行：
-            <code className="inline-code">
-              update public.members set status = 'admin' where id = '{user.id}';
-            </code>
+            如需开通后台权限，请联系站点管理员处理。当前账号 ID：
+            <code className="inline-code">{user.id}</code>
           </div>
         </section>
       </div>
@@ -38,7 +36,7 @@ export default async function AdminLayout({
           <div>
             <p className="eyebrow">Admin</p>
             <h1>社区后台</h1>
-            <p>先把活动管理做顺，再逐步扩到成员管理、合作线索和更完整的社区运营后台。</p>
+            <p>统一管理社区活动、成员资料与合作线索，支持日常运营和内容维护。</p>
           </div>
 
           <div className="admin-toolbar-side">
@@ -55,7 +53,7 @@ export default async function AdminLayout({
           <div className="admin-sidebar-copy">
             <p className="eyebrow">Workspace</p>
             <h2>运营导航</h2>
-            <p>后台结构先按常见管理台来排，列表优先，详情独立，方便后续持续扩展。</p>
+            <p>按活动、成员和合作线索分类管理，列表浏览与详情维护分开处理。</p>
           </div>
           <AdminNav />
         </aside>

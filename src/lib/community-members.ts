@@ -133,19 +133,19 @@ export async function getPublicMembersDirectory(): Promise<PublicMembersDirector
       {
         id: "organizers",
         title: "核心组织者",
-        description: "适合先认识社区节奏、了解活动方向和后续合作方式。",
+        description: "帮助你快速了解社区节奏、活动方向与组织角色。",
         members: organizers,
       },
       {
         id: "sharers",
         title: "愿意分享的成员",
-        description: "适合作为活动嘉宾候选、主题共创者和后续内容线索来源。",
+        description: "适合作为活动嘉宾、主题共创者与内容交流对象。",
         members: sharers,
       },
       {
         id: "builders",
         title: "愿意参与共建",
-        description: "适合后续项目协作、需求对接和小范围试点推进。",
+        description: "适合项目协作、需求对接与小范围试点推进。",
         members: builders,
       },
     ].filter((group) => group.members.length > 0),

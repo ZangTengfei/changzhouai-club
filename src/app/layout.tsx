@@ -13,11 +13,11 @@ export const metadata: Metadata = {
     template: "%s | 常州 AI 开发者社区",
   },
   description:
-    "连接常州的开发者、产品人、创业者与企业需求，定期组织线下交流、主题分享与项目共建。",
+    "连接常州的开发者、产品人、创业者、高校同学与企业伙伴，持续组织线下交流、主题分享与合作对接。",
   openGraph: {
     title: "常州 AI 开发者社区",
     description:
-      "一个立足常州本地的 AI 开发者社区，关注线下交流、项目共建与企业合作。",
+      "一个立足常州本地的 AI 开发者社区，关注线下交流、成员连接与企业合作。",
     url: "https://changzhouai.club",
     siteName: "常州 AI 开发者社区",
     locale: "zh_CN",

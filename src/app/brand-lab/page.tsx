@@ -7,8 +7,8 @@ import {
 } from "@/components/logo-drafts";
 
 export const metadata: Metadata = {
-  title: "Logo 草案",
-  description: "查看常州 AI 社区的 3 个 logo 草案方向。",
+  title: "品牌视觉",
+  description: "查看常州 AI 开发者社区当前标识的设计方向与应用展示。",
 };
 
 const logoDrafts = [
@@ -18,7 +18,7 @@ const logoDrafts = [
     title: "城市节点",
     summary:
       "把常州 AI 社区看作一个正在形成的本地节点网络，核心是连接人、活动、项目和需求。",
-    note: "推荐优先深化。它最贴合你现在“活动驱动 + 资源连接 + 需求承接”的阶段。",
+    note: "当前站点标识基于这一方向延展，兼顾社区连接感、城市属性与小尺寸下的辨识度。",
     Mark: LogoDraftCityNodes,
   },
   {
@@ -27,7 +27,7 @@ const logoDrafts = [
     title: "共建引擎",
     summary:
       "更强调执行和推进感，适合表达“不是聊天群，而是能推动分享、项目和合作落地的社区引擎”。",
-    note: "如果你想更偏开发者社区、工程文化和行动导向，这个方向会更强。",
+    note: "这一方向更适合强调开发者氛围、行动导向与持续推进的社区气质。",
     Mark: LogoDraftBuildEngine,
   },
   {
@@ -36,7 +36,7 @@ const logoDrafts = [
     title: "城市智能体",
     summary:
       "把城市、对话和智能感揉在一起，更像一个具有品牌辨识度的 AI 社区标识。",
-    note: "更品牌化，也更抽象，适合第二阶段做完整视觉升级时继续深化。",
+    note: "这一方向更偏品牌表达，适合在活动视觉、内容传播与延展设计中形成独特识别。",
     Mark: LogoDraftCityAgent,
   },
 ];
@@ -47,9 +47,9 @@ export default function BrandLabPage() {
       <section className="surface page-hero">
         <div className="section-heading">
           <p className="eyebrow">Brand Lab</p>
-          <h1>Logo 三个方向草案</h1>
+          <h1>品牌视觉方向</h1>
           <p>
-            这页先不替换现有站点标识，而是把三个方向并排放出来，方便你直接判断哪条路径最值得继续精修。
+            这里展示社区标识的三个视觉方向，以及它们在站点图标、页眉和小尺寸场景中的呈现效果。
           </p>
         </div>
       </section>

@@ -26,16 +26,16 @@ export default async function JoinPage({
       <PageHero
         eyebrow="Join"
         title="加入常州 AI 社区"
-        description="欢迎加入线下交流、项目共建与长期协作。你可以是学习者、参与者、分享者，也可以成为项目合作者。"
+        description="欢迎加入线下交流、主题分享与长期协作，和更多本地 AI 实践者建立连接。"
       >
         <div className="note-strip">
-          现在已经可以直接在站内提交加入申请。你提交后，后台成员管理页会收到这条申请。
+          无论你是开发者、产品人、创业者、高校同学还是企业从业者，都欢迎加入社区交流。
         </div>
       </PageHero>
 
       {params.submitted ? (
         <div className="note-strip">
-          提交成功，我们已经收到你的加入申请。后面可以在群里或线下活动里继续碰面，也欢迎你先去完善社区账号资料。
+          提交成功，我们已收到你的加入申请，将通过你留下的联系方式与你取得联系。
         </div>
       ) : null}
 
@@ -58,17 +58,17 @@ export default async function JoinPage({
 
       <section className="field-grid">
         <article className="field-panel">
-          <h3>建议收集的基础信息</h3>
+          <h3>基础信息</h3>
           <ul className="field-list">
             <li>昵称或姓名</li>
             <li>微信号</li>
             <li>所在城市</li>
-            <li>当前身份 / 公司 / 学校</li>
+            <li>身份 / 公司 / 学校</li>
             <li>每月可投入时间</li>
           </ul>
         </article>
         <article className="field-panel">
-          <h3>建议收集的能力与兴趣</h3>
+          <h3>能力与兴趣</h3>
           <ul className="field-list">
             <li>技能方向</li>
             <li>感兴趣的 AI 主题</li>
@@ -83,7 +83,7 @@ export default async function JoinPage({
         <div className="section-heading">
           <p className="eyebrow">Join Form</p>
           <h2>提交加入申请</h2>
-          <p>先把你的基础信息、技能方向和参与意愿告诉我们，后面做活动邀约、成员匹配和项目共建会更顺。</p>
+          <p>欢迎填写你的基础信息、技能方向与参与意愿，帮助社区更好地建立连接与交流。</p>
         </div>
 
         <form action={submitJoinRequest} className="join-form">
@@ -95,7 +95,7 @@ export default async function JoinPage({
 
             <label className="form-field">
               <span>微信号</span>
-              <input className="input" name="wechat" placeholder="方便后续联系" required />
+              <input className="input" name="wechat" placeholder="用于联系" required />
             </label>
 
             <label className="form-field">
@@ -104,7 +104,7 @@ export default async function JoinPage({
             </label>
 
             <label className="form-field">
-              <span>当前身份</span>
+              <span>身份</span>
               <input className="input" name="role_label" placeholder="开发 / 产品 / 学生 / 创业者" />
             </label>
 
@@ -158,7 +158,7 @@ export default async function JoinPage({
             </label>
             <label className="checkbox-row">
               <input type="checkbox" name="willing_to_join_projects" />
-              <span>愿意参与后续项目共建</span>
+              <span>愿意参与项目协作</span>
             </label>
           </div>
 

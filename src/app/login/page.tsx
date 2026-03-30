@@ -6,7 +6,7 @@ import { hasSupabaseEnv } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "登录",
-  description: "使用 Google 登录常州 AI 社区，后续可继续补充成员资料和绑定微信。",
+  description: "使用 Google 登录常州 AI 开发者社区账号。",
 };
 
 export default async function LoginPage({
@@ -22,10 +22,10 @@ export default async function LoginPage({
       <PageHero
         eyebrow="Login"
         title="登录社区账号"
-        description="先把统一用户体系搭起来，后续成员资料、活动报名、分享记录和微信绑定都会从这里继续生长。"
+        description="登录社区账号后，可完善个人资料、查看活动记录，并参与更多社区互动。"
       >
         <div className="note-strip">
-          第一阶段先接 Google 登录，这是当前最稳、开发成本也最低的起点。
+          通过社区账号统一管理个人资料、活动记录与协作信息。
         </div>
       </PageHero>
 

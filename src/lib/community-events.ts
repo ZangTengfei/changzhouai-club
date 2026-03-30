@@ -190,7 +190,7 @@ function mapCompletedEvent(row: EventRow): PublicEventRecap {
     summary:
       row.summary ??
       row.description ??
-      "这场活动已经完成，后续可以继续补充现场主题、分享内容和回顾摘要。",
+      "这场活动已经完成，欢迎通过活动记录了解现场主题、分享内容与交流氛围。",
     dateLabel: row.event_at ? formatEventDateLabel(row.event_at) : "时间待定",
     isoDate: row.event_at ? row.event_at.slice(0, 10) : row.id,
     locationLabel: buildLocationLabel(row.city, row.venue),
@@ -214,7 +214,7 @@ function mapPublicEventDetail(row: EventRow): PublicEventDetail {
     summary:
       row.summary ??
       row.description ??
-      "这是一场常州 AI 开发者社区的线下活动，详情会随着后台内容更新持续完善。",
+      "这是一场常州 AI 开发者社区的线下活动，欢迎查看时间、地点与活动介绍。",
     eventAt: row.event_at,
     dateLabel: row.event_at ? formatEventDateLabel(row.event_at) : "时间待定",
     dateTimeLabel: formatEventDateTimeLabel(row.event_at),

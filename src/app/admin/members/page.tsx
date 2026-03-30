@@ -178,9 +178,7 @@ export default async function AdminMembersPage({
           <div className="section-heading">
             <p className="eyebrow">Members</p>
             <h2>成员列表</h2>
-            <p>
-              这里先收成标准列表页。成员资料、加入申请和运营设置都放到详情页里处理，后台结构会更稳定，也更方便后续扩展。
-            </p>
+            <p>查看成员档案、参与意愿与公开状态，并进入详情页维护资料与运营设置。</p>
           </div>
 
           <div className="admin-toolbar-side">
@@ -220,7 +218,7 @@ export default async function AdminMembersPage({
         <div className="section-heading">
           <p className="eyebrow">Filters</p>
           <h2>成员筛选</h2>
-          <p>先按成员状态、公开展示和参与意愿筛选，方便你快速定位可运营的人群。</p>
+          <p>按成员状态、公开展示和参与意愿筛选，快速定位需要跟进的人群。</p>
         </div>
 
         <div className="admin-filter-group">
@@ -417,7 +415,7 @@ export default async function AdminMembersPage({
             ))}
           </div>
         ) : (
-          <div className="note-strip">当前筛选条件下还没有成员数据。</div>
+          <div className="note-strip">当前筛选条件下没有成员数据。</div>
         )}
       </section>
 
@@ -425,7 +423,7 @@ export default async function AdminMembersPage({
         <div className="section-heading">
           <p className="eyebrow">Join Requests</p>
           <h2>加入申请列表</h2>
-          <p>申请通过后，对方仍需要注册或登录网站，才能真正进入正式成员体系。</p>
+          <p>查看待处理申请、联系进度与转化情况，便于持续跟进潜在成员。</p>
         </div>
 
         <div className="admin-filter-group">
@@ -559,7 +557,7 @@ export default async function AdminMembersPage({
             ))}
           </div>
         ) : (
-          <div className="note-strip">当前筛选条件下还没有加入申请。</div>
+          <div className="note-strip">当前筛选条件下没有加入申请。</div>
         )}
       </section>
     </div>

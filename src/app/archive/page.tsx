@@ -7,7 +7,7 @@ import { archiveItems } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "往期回顾",
-  description: "沉淀常州 AI 社区活动照片、分享线索和后续内容资产。",
+  description: "回顾常州 AI 开发者社区的活动照片、分享主题与现场记录。",
 };
 
 export default async function ArchivePage() {
@@ -28,7 +28,7 @@ export default async function ArchivePage() {
       <PageHero
         eyebrow="Archive"
         title="往期回顾"
-        description={`这部分现在会自动读取 ${completedEvents.length} 场已完成活动的归档内容，沉淀照片、主题线索和每场活动的时间记录。`}
+        description={`这里汇集了 ${completedEvents.length} 场已归档活动的照片、主题线索与时间记录，方便了解社区的交流内容与活动节奏。`}
       />
 
       <section className="card-grid">
@@ -59,7 +59,7 @@ export default async function ArchivePage() {
         </section>
       ) : (
         <div className="note-strip">
-          当前数据库里还没有活动相册。导入历史活动后，这里会自动沉淀所有照片。
+          活动相册整理完成后，会在这里持续展示社区的现场照片与回顾内容。
         </div>
       )}
     </div>

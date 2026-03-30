@@ -26,40 +26,37 @@ export function LoginPanel({
       ) : null}
 
       <div className="auth-card">
-        <h2>先接入 Google 登录</h2>
+        <h2>使用 Google 登录</h2>
         <p>
-          这一步会先把社区账号体系搭起来，后续成员资料、活动报名、分享记录和权限都可以落在同一个用户体系上。
+          登录后可进入社区账号中心，完善资料、查看活动报名记录，并参与社区活动与协作。
         </p>
         <GoogleSignInButton enabled={enabled} nextPath={nextPath} />
         {!enabled ? (
           <p className="auth-hint">
-            还没有配置 Supabase 环境变量。把 `.env.example` 里的两个公开变量填好后，这个按钮就可以直接工作。
+            当前登录服务暂未启用，请稍后再试。
           </p>
         ) : null}
       </div>
 
       <div className="auth-card">
-        <h2>微信绑定怎么做</h2>
+        <h2>账号能力</h2>
         <p>
-          后续更建议做“先登录，再绑定微信”的模式。这样你可以先把统一用户 ID 和资料体系跑起来，再把微信身份补到同一个账号上。
+          社区账号会承载成员资料、活动参与记录与协作信息，帮助你在社区内持续积累个人档案。
         </p>
         <ul className="detail-list">
-          <li>第一阶段：Google 登录 + 完善资料</li>
-          <li>第二阶段：账号中心里增加微信扫码绑定</li>
-          <li>第三阶段：视需求再决定是否开放微信直接登录</li>
+          <li>完善个人资料与技能方向</li>
+          <li>查看活动报名与参与记录</li>
+          <li>逐步接入更多社区身份与协作能力</li>
         </ul>
-        <p className="auth-hint">
-          这样做的好处是开发成本更低，也不会把第一版登录流程做得太重。
-        </p>
       </div>
 
       <div className="auth-card">
-        <h2>登录后会去哪</h2>
+        <h2>登录后将进入账号中心</h2>
         <p>
-          登录成功后会跳转到账号页，后面我们会把“成员资料完善”“分享意愿”“活动参与记录”都放在那里。
+          你可以在账号中心维护个人资料、查看活动记录，并持续参与社区交流与合作。
         </p>
         <Link href="/account" className="button button-secondary auth-link">
-          查看账号页结构
+          查看账号中心
         </Link>
       </div>
     </div>

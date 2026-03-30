@@ -60,7 +60,7 @@ export default async function MembersPage() {
       <PageHero
         eyebrow="Members"
         title="成员地图"
-        description="第一版更关注成员能力分布和参与方向，而不是做公开通讯录，让每个人先被看见、再被匹配。"
+        description="展示社区成员的角色分布、能力方向与参与意愿，帮助更多人建立连接与合作。"
       >
         <div className="stat-grid">
           <article className="metric-card">
@@ -80,21 +80,21 @@ export default async function MembersPage() {
 
       <section className="card-grid">
         <article className="card">
-          <h3>这页不只是成员展示</h3>
+          <h3>认识社区成员</h3>
           <p>
-            它也可以作为你日常运营的外部入口，让新朋友快速看到社区里已经有哪些角色、方向和参与意愿。
+            快速了解社区中已经聚集的角色、方向与参与方式，建立更明确的成员画像。
           </p>
         </article>
         <article className="card">
-          <h3>适合拿来找分享嘉宾</h3>
+          <h3>发现分享者</h3>
           <p>
-            愿意分享的成员会优先被看见，后面你做活动策划时，可以更快锁定潜在分享者和主题来源。
+            愿意分享的成员会优先展示，方便活动策划与主题邀约。
           </p>
         </article>
         <article className="card">
-          <h3>也适合做合作匹配</h3>
+          <h3>促进合作连接</h3>
           <p>
-            当外部合作需求进来时，你可以先从这页识别哪些成员更适合参与讨论、试点或后续项目共建。
+            通过成员方向与参与信号，帮助社区内外更高效地建立协作关系。
           </p>
         </article>
       </section>
@@ -103,9 +103,9 @@ export default async function MembersPage() {
         <section className="section">
           <div className="section-heading">
             <p className="eyebrow">精选分组</p>
-            <h2>先按运营视角把成员分出来</h2>
+            <h2>精选成员分组</h2>
             <p>
-              第一版不做复杂筛选，也能先让“组织者”“可邀约分享者”“可匹配共建者”这些关键人群被看见。
+              通过不同分组快速认识社区中的组织者、分享者与合作参与者。
             </p>
           </div>
 
@@ -153,9 +153,9 @@ export default async function MembersPage() {
         <section className="section">
           <div className="section-heading">
             <p className="eyebrow">公开成员</p>
-            <h2>当前公开展示的社区成员</h2>
+            <h2>社区成员名录</h2>
             <p>
-              这里保留克制的信息密度，只展示适合公开的能力、方向和参与信号，不直接公开联系方式。
+              页面展示经成员授权公开的信息，包括方向、技能与参与信号，不直接公开联系方式。
             </p>
           </div>
 
@@ -199,7 +199,7 @@ export default async function MembersPage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="note-strip">这位成员还没有补充技能标签。</div>
+                  <div className="note-strip">这位成员暂未补充技能标签。</div>
                 )}
               </article>
             ))}
@@ -207,21 +207,21 @@ export default async function MembersPage() {
         </section>
       ) : (
         <div className="note-strip">
-          当前还没有设置为公开展示的成员。你后面可以在后台成员管理页里直接打开“公开展示到成员页”开关。
+          暂无公开成员信息，欢迎稍后再来查看社区成员名录。
         </div>
       )}
 
       <section className="two-up">
         <article className="field-panel">
-          <h3>公开策略</h3>
+          <h3>展示方式</h3>
           <p>
-            当前成员页只展示后台明确设置为“公开展示”的成员，不公开邮箱和联系方式，先把技能、城市和方向沉淀下来。
+            仅展示成员授权公开的个人简介、城市、技能与参与方向，兼顾连接效率与信息边界。
           </p>
         </article>
         <article className="field-panel">
-          <h3>这页当前能帮助什么</h3>
+          <h3>页面价值</h3>
           <p>
-            你现在已经可以把它当作社区公开名片、分享嘉宾池和合作匹配前置页面来使用。目前公开成员覆盖 {directory.stats.cities} 个城市分布。
+            这是社区对外展示成员结构的重要窗口，也能支持活动组织、主题邀约与合作交流。目前公开成员覆盖 {directory.stats.cities} 个城市。
           </p>
         </article>
       </section>

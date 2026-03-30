@@ -23,7 +23,7 @@ export function AccountProfileForm({
         <p className="eyebrow">Profile</p>
         <h2>完善成员资料</h2>
         <p>
-          先把最基础的显示名、城市、技能和参与意愿补齐，后面活动报名和成员匹配就能直接复用这些信息。
+          完善显示名、城市、技能与参与意愿，帮助社区在活动组织、成员连接与合作交流中更好地认识你。
         </p>
       </div>
 
@@ -85,7 +85,7 @@ export function AccountProfileForm({
             name="willing_to_join_projects"
             defaultChecked={member?.willing_to_join_projects ?? false}
           />
-          <span>后续如果有合适项目，我愿意参与协作</span>
+          <span>如有合适的合作机会，我愿意参与协作</span>
         </label>
       </div>
 

@@ -41,9 +41,7 @@ export function AdminEventForm({
       <div className="section-heading">
         <p className="eyebrow">{isEditing ? "Edit Event" : "New Event"}</p>
         <h2>{isEditing ? `编辑：${event?.title}` : "新建活动"}</h2>
-        <p>
-          这里维护的是数据库里的正式活动数据。只要状态是 `scheduled`，活动页就会自动显示报名入口。
-        </p>
+        <p>在这里维护活动标题、时间、介绍、议程与展示素材，确保公开页面信息完整清晰。</p>
       </div>
 
       <form action={saveAdminEvent} className="account-form">

@@ -30,9 +30,7 @@ export function AdminEventPhotosManager({
       <div className="section-heading">
         <p className="eyebrow">Gallery</p>
         <h2>{eventTitle} 的照片管理</h2>
-        <p>
-          第一版先支持维护照片 URL、说明和排序。现在活动图片已经迁到 Supabase Storage，后续也建议统一使用 Storage 公网地址。
-        </p>
+        <p>统一维护活动封面、相册图片、说明文字与展示顺序，便于公开页展示和归档回顾。</p>
       </div>
 
       <div className="admin-cover-panel">
@@ -49,7 +47,7 @@ export function AdminEventPhotosManager({
             <p className="admin-image-url">{coverImageUrl}</p>
           </div>
         ) : (
-          <div className="note-strip">当前还没有设置封面图。</div>
+          <div className="note-strip">暂未设置封面图。</div>
         )}
       </div>
 
@@ -145,7 +143,7 @@ export function AdminEventPhotosManager({
         </div>
       ) : (
         <div className="note-strip">
-          这场活动还没有相册照片。可以先添加一张主照片，后面再慢慢补现场图。
+          这场活动暂未添加相册照片，可先上传封面或现场照片。
         </div>
       )}
 
@@ -153,7 +151,7 @@ export function AdminEventPhotosManager({
         <div className="section-heading">
           <p className="eyebrow">New Photo</p>
           <h3>新增活动照片</h3>
-          <p>推荐先把图片上传到 Supabase Storage，再把公开 URL 贴到这里。</p>
+          <p>上传图片后可补充说明与排序，用于活动详情页和往期回顾展示。</p>
         </div>
 
         <form action={saveAdminEventPhoto} className="account-form admin-photo-form">

@@ -26,12 +26,8 @@ export default async function AccountPage({
       <div className="page-stack">
         <section className="surface account-shell">
           <p className="eyebrow">Account</p>
-          <h1>账号页已准备好</h1>
-          <p>
-            当前还没有配置 Supabase 环境变量，所以登录和账号系统暂时不会真正工作。先把
-            `NEXT_PUBLIC_SUPABASE_URL` 和 `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
-            配好后，这一页就会自动接管登录后的用户信息。
-          </p>
+          <h1>账号服务暂未开放</h1>
+          <p>当前账号服务暂未启用，请稍后再试。</p>
           <div className="cta-row">
             <Link href="/login" className="button">
               返回登录页
@@ -83,7 +79,7 @@ export default async function AccountPage({
         <p className="eyebrow">Account</p>
         <h1>社区账号中心</h1>
         <p>
-          这里现在已经可以保存成员资料，并逐步沉淀你的活动报名记录。后面活动参与、分享记录和微信绑定也会继续接到这里。
+          在这里维护成员资料、查看活动报名记录，并持续沉淀你在社区中的参与信息。
         </p>
         <div className="cta-row">
           <SignOutButton enabled />
@@ -117,7 +113,7 @@ export default async function AccountPage({
             <li>成员状态：{member?.status ?? "pending"}</li>
             <li>愿意分享：{member?.willing_to_share ? "是" : "否"}</li>
             <li>
-              愿意参与后续共建：
+              愿意参与社区共建：
               {member?.willing_to_join_projects ? "是" : "否"}
             </li>
           </ul>
@@ -130,9 +126,7 @@ export default async function AccountPage({
         <div className="section-heading">
           <p className="eyebrow">Registrations</p>
           <h2>我报名过的活动</h2>
-          <p>
-            这里会显示你的活动报名记录。后面如果接上签到和分享记录，也会从这里继续往下走。
-          </p>
+          <p>这里汇总你的活动报名记录，方便随时查看参与状态与活动信息。</p>
         </div>
 
         {registrations && registrations.length > 0 ? (
@@ -201,8 +195,7 @@ export default async function AccountPage({
           </div>
         ) : (
           <div className="note-strip">
-            你还没有报名任何活动。后面只要数据库里新增了 `scheduled`
-            状态的活动，登录后就可以直接在活动页完成报名。
+            你还没有报名任何活动，可以前往活动页查看正在开放报名的社区活动。
           </div>
         )}
       </section>

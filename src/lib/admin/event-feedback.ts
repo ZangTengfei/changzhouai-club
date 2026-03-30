@@ -17,7 +17,7 @@ const adminSavedMessageMap: Record<string, string> = {
 const adminErrorMessageMap: Record<string, string> = {
   missing_required_fields: "提交时缺少必要字段，请检查活动标题和 slug。",
   missing_photo_fields: "请至少填写活动照片路径，再提交。",
-  database_write_failed: "数据库写入失败，请稍后再试。",
+  database_write_failed: "保存失败，请稍后再试。",
 };
 
 const adminEventStatusLabelMap: Record<string, string> = {

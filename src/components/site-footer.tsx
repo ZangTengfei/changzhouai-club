@@ -8,7 +8,7 @@ export function SiteFooter() {
           <p className="eyebrow">Changzhou AI Club</p>
           <h3>把本地的 AI 人连接起来，把交流变成共建。</h3>
           <p>
-            第一版网站围绕活动、项目和合作入口搭建，后续会继续补充回顾内容、成员地图和表单接入。
+            社区围绕活动、成员连接与合作交流持续生长，欢迎更多本地实践者与伙伴加入。
           </p>
         </div>
 
@@ -46,12 +46,20 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <h4>域名建议</h4>
+          <h4>联系方式</h4>
           <ul className="footer-list">
-            <li>`changzhouai.club` 作为主站</li>
-            <li>`aiincz.com` 用作短链或活动跳转</li>
-            <li>`join.changzhouai.club` 可做表单入口</li>
-            <li>`events.changzhouai.club` 可做活动页</li>
+            <li>
+              <Link href="/join">加入社区</Link>
+            </li>
+            <li>
+              <Link href="/cooperate">提交合作需求</Link>
+            </li>
+            <li>
+              <Link href="/events">查看近期活动</Link>
+            </li>
+            <li>
+              <Link href="/members">浏览成员地图</Link>
+            </li>
           </ul>
         </div>
       </div>

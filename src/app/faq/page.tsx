@@ -14,7 +14,7 @@ export default function FaqPage() {
       <PageHero
         eyebrow="FAQ"
         title="常见问题"
-        description="把常见沟通问题提前说明清楚，能减少你在微信里重复回复，也能让网站转化更顺畅。"
+        description="集中查看关于社区定位、活动形式、加入方式与合作方向的常见问题。"
       />
 
       <section className="faq-grid">

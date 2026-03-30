@@ -102,7 +102,7 @@ export default async function AdminLeadsPage({
           <div className="section-heading">
             <p className="eyebrow">Leads</p>
             <h2>合作线索</h2>
-            <p>列表页先负责快速扫盘。每条线索的备注、状态和后续跟进动作，统一放到详情页里处理。</p>
+            <p>查看全部合作需求，快速了解状态、负责人、候选成员与跟进动作。</p>
           </div>
 
           <div className="admin-toolbar-side">
@@ -146,7 +146,7 @@ export default async function AdminLeadsPage({
         <div className="section-heading">
           <p className="eyebrow">Filters</p>
           <h2>线索筛选</h2>
-          <p>先按线索状态和关键词快速定位，再进入详情页补备注和推进状态。</p>
+          <p>按线索状态和关键词筛选，快速定位需要优先推进的合作需求。</p>
         </div>
 
         <div className="admin-filter-group">
@@ -281,7 +281,7 @@ export default async function AdminLeadsPage({
             ))}
           </div>
         ) : (
-          <div className="note-strip">当前筛选条件下还没有合作线索。</div>
+          <div className="note-strip">当前筛选条件下没有合作线索。</div>
         )}
       </section>
     </div>
