@@ -606,6 +606,17 @@ img {
   color: #a7602f;
 }
 
+.join-form-shell {
+  display: grid;
+  gap: 20px;
+  padding: 26px;
+}
+
+.join-form {
+  display: grid;
+  gap: 20px;
+}
+
 .admin-filter-group,
 .admin-inline-form {
   display: grid;
@@ -886,6 +897,41 @@ img {
 
 .admin-member-card-meta {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-join-request-list {
+  display: grid;
+  gap: 18px;
+}
+
+.admin-join-request-card {
+  display: grid;
+  gap: 16px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: rgba(255, 249, 239, 0.82);
+}
+
+.admin-join-request-header,
+.admin-join-request-meta {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-join-request-header {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.admin-join-request-header h3 {
+  margin: 0;
+}
+
+.admin-join-request-header p,
+.admin-join-request-meta p {
+  margin: 0;
+  color: var(--muted);
 }
 
 .admin-inline-form {
@@ -1495,6 +1541,7 @@ img {
   .admin-member-card-list,
   .admin-member-card-header,
   .admin-member-card-meta,
+  .admin-join-request-header,
   .admin-member-settings-grid,
   .admin-registration-list-grid,
   .admin-photo-card {

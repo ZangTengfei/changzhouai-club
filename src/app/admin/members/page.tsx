@@ -61,7 +61,7 @@ export default async function AdminMembersPage({
   searchParams: Promise<SearchParams>;
 }) {
   const params = await searchParams;
-  const { members, stats, queryErrors } = await loadAdminMembersData();
+  const { members, joinRequests, stats, queryErrors } = await loadAdminMembersData();
 
   const statusFilter = params.status ?? "all";
   const visibilityFilter = params.visibility ?? "all";
@@ -115,6 +115,10 @@ export default async function AdminMembersPage({
             <div className="admin-mini-stat">
               <strong>{stats.willingToJoinProjects}</strong>
               <span>愿意共建</span>
+            </div>
+            <div className="admin-mini-stat">
+              <strong>{stats.joinRequests}</strong>
+              <span>加入申请</span>
             </div>
           </div>
         </div>
@@ -317,6 +321,77 @@ export default async function AdminMembersPage({
           <div className="note-strip">当前筛选条件下还没有成员数据。</div>
         </section>
       )}
+
+      <section className="surface admin-card">
+        <div className="section-heading">
+          <p className="eyebrow">Join Requests</p>
+          <h2>加入申请</h2>
+          <p>这里会显示从“加入社区”页面提交的新申请，方便你后续手动跟进和转化为正式成员。</p>
+        </div>
+
+        {joinRequests.length > 0 ? (
+          <div className="admin-join-request-list">
+            {joinRequests.map((request) => (
+              <article className="admin-join-request-card" key={request.id}>
+                <div className="admin-join-request-header">
+                  <div>
+                    <h3>{request.displayName}</h3>
+                    <p>
+                      {request.city}
+                      {request.roleLabel ? ` · ${request.roleLabel}` : ""}
+                      {request.organization ? ` · ${request.organization}` : ""}
+                    </p>
+                  </div>
+
+                  <span className="pill admin-status-pill admin-status-pill-draft">
+                    {request.status}
+                  </span>
+                </div>
+
+                <div className="admin-join-request-meta">
+                  <p>微信号：{request.wechat}</p>
+                  <p>提交时间：{formatDate(request.createdAt)}</p>
+                  <p>可投入时间：{request.monthlyTime ?? "未填写"}</p>
+                </div>
+
+                <div className="pill-row">
+                  <span className="pill member-signal-pill">
+                    {request.willingToAttend ? "愿意线下参加" : "暂不线下参加"}
+                  </span>
+                  <span className="pill member-signal-pill">
+                    {request.willingToShare ? "愿意分享" : "暂不分享"}
+                  </span>
+                  <span className="pill member-signal-pill member-signal-pill-warm">
+                    {request.willingToJoinProjects ? "愿意共建" : "暂不共建"}
+                  </span>
+                </div>
+
+                {request.skills.length > 0 ? (
+                  <div className="member-skill-list">
+                    {request.skills.map((skill) => (
+                      <span key={`${request.id}-skill-${skill}`}>{skill}</span>
+                    ))}
+                  </div>
+                ) : null}
+
+                {request.interests.length > 0 ? (
+                  <div className="member-skill-list">
+                    {request.interests.map((interest) => (
+                      <span key={`${request.id}-interest-${interest}`}>{interest}</span>
+                    ))}
+                  </div>
+                ) : null}
+
+                <p className="admin-member-bio">
+                  {request.note ?? "这位申请者还没有补充额外说明。"}
+                </p>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="note-strip">当前还没有新的加入申请。</div>
+        )}
+      </section>
     </div>
   );
 }

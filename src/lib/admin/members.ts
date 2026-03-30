@@ -25,6 +25,24 @@ type AdminRegistrationRow = {
   status: string;
 };
 
+type AdminJoinRequestRow = {
+  id: string;
+  display_name: string;
+  wechat: string;
+  city: string | null;
+  role_label: string | null;
+  organization: string | null;
+  monthly_time: string | null;
+  skills: string[] | null;
+  interests: string[] | null;
+  note: string | null;
+  willing_to_attend: boolean;
+  willing_to_share: boolean;
+  willing_to_join_projects: boolean;
+  status: string;
+  created_at: string;
+};
+
 export type AdminMember = {
   id: string;
   email: string | null;
@@ -42,13 +60,33 @@ export type AdminMember = {
   registrationCount: number;
 };
 
+export type AdminJoinRequest = {
+  id: string;
+  displayName: string;
+  wechat: string;
+  city: string;
+  roleLabel: string | null;
+  organization: string | null;
+  monthlyTime: string | null;
+  skills: string[];
+  interests: string[];
+  note: string | null;
+  willingToAttend: boolean;
+  willingToShare: boolean;
+  willingToJoinProjects: boolean;
+  status: string;
+  createdAt: string;
+};
+
 export type AdminMembersData = {
   members: AdminMember[];
+  joinRequests: AdminJoinRequest[];
   stats: {
     totalMembers: number;
     activeMembers: number;
     willingToShare: number;
     willingToJoinProjects: number;
+    joinRequests: number;
   };
   queryErrors: string[];
 };
@@ -77,6 +115,7 @@ export async function loadAdminMembersData(): Promise<AdminMembersData> {
     { data: profilesData, error: profilesError },
     { data: membersData, error: membersError },
     { data: registrationsData, error: registrationsError },
+    { data: joinRequestsData, error: joinRequestsError },
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -87,15 +126,23 @@ export async function loadAdminMembersData(): Promise<AdminMembersData> {
         "id, status, willing_to_share, willing_to_join_projects, is_publicly_visible, joined_at, last_active_at",
       ),
     supabase.from("event_registrations").select("user_id, status"),
+    supabase
+      .from("community_join_requests")
+      .select(
+        "id, display_name, wechat, city, role_label, organization, monthly_time, skills, interests, note, willing_to_attend, willing_to_share, willing_to_join_projects, status, created_at",
+      )
+      .order("created_at", { ascending: false }),
   ]);
 
   const profiles = (profilesData ?? []) as AdminProfileRow[];
   const members = (membersData ?? []) as AdminMemberRow[];
   const registrations = (registrationsData ?? []) as AdminRegistrationRow[];
+  const joinRequests = (joinRequestsData ?? []) as AdminJoinRequestRow[];
   const queryErrors = [
     profilesError?.message,
     membersError?.message,
     registrationsError?.message,
+    joinRequestsError?.message,
   ].filter(Boolean) as string[];
 
   const profilesById = new Map(profiles.map((profile) => [profile.id, profile]));
@@ -139,8 +186,27 @@ export async function loadAdminMembersData(): Promise<AdminMembersData> {
       return a.displayName.localeCompare(b.displayName, "zh-CN");
     });
 
+  const mappedJoinRequests = joinRequests.map((request) => ({
+    id: request.id,
+    displayName: request.display_name,
+    wechat: request.wechat,
+    city: request.city?.trim() || "常州",
+    roleLabel: request.role_label,
+    organization: request.organization,
+    monthlyTime: request.monthly_time,
+    skills: request.skills ?? [],
+    interests: request.interests ?? [],
+    note: request.note,
+    willingToAttend: request.willing_to_attend,
+    willingToShare: request.willing_to_share,
+    willingToJoinProjects: request.willing_to_join_projects,
+    status: request.status,
+    createdAt: request.created_at,
+  }));
+
   return {
     members: mergedMembers,
+    joinRequests: mappedJoinRequests,
     stats: {
       totalMembers: mergedMembers.length,
       activeMembers: mergedMembers.filter((member) =>
@@ -150,6 +216,7 @@ export async function loadAdminMembersData(): Promise<AdminMembersData> {
       willingToJoinProjects: mergedMembers.filter(
         (member) => member.willingToJoinProjects,
       ).length,
+      joinRequests: mappedJoinRequests.length,
     },
     queryErrors,
   };
