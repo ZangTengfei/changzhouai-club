@@ -15,6 +15,7 @@ type AdminMemberRow = {
   status: string;
   willing_to_share: boolean;
   willing_to_join_projects: boolean;
+  is_publicly_visible: boolean;
   joined_at: string;
   last_active_at: string | null;
 };
@@ -35,6 +36,7 @@ export type AdminMember = {
   status: string;
   willingToShare: boolean;
   willingToJoinProjects: boolean;
+  isPubliclyVisible: boolean;
   joinedAt: string;
   lastActiveAt: string | null;
   registrationCount: number;
@@ -81,7 +83,9 @@ export async function loadAdminMembersData(): Promise<AdminMembersData> {
       .select("id, email, display_name, avatar_url, city, bio, skills"),
     supabase
       .from("members")
-      .select("id, status, willing_to_share, willing_to_join_projects, joined_at, last_active_at"),
+      .select(
+        "id, status, willing_to_share, willing_to_join_projects, is_publicly_visible, joined_at, last_active_at",
+      ),
     supabase.from("event_registrations").select("user_id, status"),
   ]);
 
@@ -119,6 +123,7 @@ export async function loadAdminMembersData(): Promise<AdminMembersData> {
         status: member.status,
         willingToShare: member.willing_to_share,
         willingToJoinProjects: member.willing_to_join_projects,
+        isPubliclyVisible: member.is_publicly_visible,
         joinedAt: member.joined_at,
         lastActiveAt: member.last_active_at,
         registrationCount: registrationsByUserId.get(member.id) ?? 0,

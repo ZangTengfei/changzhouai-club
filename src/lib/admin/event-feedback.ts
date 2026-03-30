@@ -1,6 +1,7 @@
 const adminSavedMessageMap: Record<string, string> = {
   event: "活动信息已保存。",
   deleted: "活动已删除。",
+  member: "成员设置已更新。",
   photo: "活动照片已保存。",
   photo_deleted: "活动照片已删除。",
   cover: "活动封面已更新。",

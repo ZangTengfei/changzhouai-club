@@ -606,6 +606,57 @@ img {
   color: #a7602f;
 }
 
+.admin-filter-group,
+.admin-inline-form {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-filter-label {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-filter-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(15, 122, 106, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 249, 239, 0.76);
+  color: var(--muted);
+  font-weight: 600;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.admin-filter-chip:hover,
+.admin-filter-chip:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(15, 122, 106, 0.18);
+  background: rgba(15, 122, 106, 0.08);
+  color: var(--ink);
+}
+
+.admin-filter-chip-active {
+  border-color: rgba(15, 122, 106, 0.2);
+  background: rgba(15, 122, 106, 0.12);
+  color: #0f6f61;
+}
+
 .admin-shell,
 .admin-card {
   padding: 24px;
@@ -835,6 +886,25 @@ img {
 
 .admin-member-card-meta {
   grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.admin-inline-form {
+  margin-top: 4px;
+  padding-top: 16px;
+  border-top: 1px dashed rgba(15, 122, 106, 0.16);
+}
+
+.admin-member-settings-grid {
+  grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+  align-items: center;
+}
+
+.admin-member-visibility-toggle {
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid rgba(15, 122, 106, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 251, 245, 0.9);
 }
 
 .admin-registration-list-grid {
@@ -1425,6 +1495,7 @@ img {
   .admin-member-card-list,
   .admin-member-card-header,
   .admin-member-card-meta,
+  .admin-member-settings-grid,
   .admin-registration-list-grid,
   .admin-photo-card {
     grid-template-columns: 1fr;

@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { requireStaffContext } from "@/lib/supabase/guards";
 
 const ADMIN_EVENTS_PATH = "/admin/events";
+const ADMIN_MEMBERS_PATH = "/admin/members";
 
 function normalizeSlug(raw: string) {
   return raw
@@ -39,6 +40,11 @@ function revalidateEventPaths(eventId?: string) {
   if (eventId) {
     revalidatePath(`${ADMIN_EVENTS_PATH}/${eventId}`);
   }
+}
+
+function revalidateMemberPaths() {
+  revalidatePath(ADMIN_MEMBERS_PATH);
+  revalidatePath("/members");
 }
 
 export async function saveAdminEvent(formData: FormData) {
@@ -187,4 +193,31 @@ export async function setAdminEventCoverImage(formData: FormData) {
 
   revalidateEventPaths(eventId);
   redirect(`${ADMIN_EVENTS_PATH}/${eventId}?saved=cover`);
+}
+
+export async function updateAdminMember(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+
+  const memberId = String(formData.get("member_id") ?? "").trim();
+  const status = String(formData.get("status") ?? "").trim();
+  const isPubliclyVisible = formData.get("is_publicly_visible") === "on";
+
+  if (!memberId || !status) {
+    redirect(`${ADMIN_MEMBERS_PATH}?error=missing_required_fields`);
+  }
+
+  const { error } = await supabase
+    .from("members")
+    .update({
+      status,
+      is_publicly_visible: isPubliclyVisible,
+    })
+    .eq("id", memberId);
+
+  if (error) {
+    redirect(`${ADMIN_MEMBERS_PATH}?error=database_write_failed`);
+  }
+
+  revalidateMemberPaths();
+  redirect(`${ADMIN_MEMBERS_PATH}?saved=member`);
 }

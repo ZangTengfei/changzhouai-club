@@ -11,6 +11,7 @@ type PublicMemberRow = {
   status: string;
   willing_to_share: boolean;
   willing_to_join_projects: boolean;
+  is_publicly_visible: boolean;
   joined_at: string;
 };
 
@@ -24,6 +25,7 @@ export type PublicMember = {
   status: string;
   willingToShare: boolean;
   willingToJoinProjects: boolean;
+  isPubliclyVisible: boolean;
   joinedAt: string;
 };
 
@@ -48,6 +50,7 @@ function mapPublicMember(row: PublicMemberRow): PublicMember {
     status: row.status,
     willingToShare: row.willing_to_share,
     willingToJoinProjects: row.willing_to_join_projects,
+    isPubliclyVisible: row.is_publicly_visible,
     joinedAt: row.joined_at,
   };
 }

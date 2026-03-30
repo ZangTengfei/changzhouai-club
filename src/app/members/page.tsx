@@ -59,7 +59,10 @@ export default async function MembersPage() {
               </p>
 
               <div className="member-directory-signals">
-                <span className="pill member-signal-pill">愿意分享</span>
+                <span className="pill member-signal-pill">公开展示中</span>
+                {member.willingToShare ? (
+                  <span className="pill member-signal-pill">愿意分享</span>
+                ) : null}
                 {member.willingToJoinProjects ? (
                   <span className="pill member-signal-pill member-signal-pill-warm">
                     愿意参与共建
@@ -81,7 +84,7 @@ export default async function MembersPage() {
         </section>
       ) : (
         <div className="note-strip">
-          当前还没有设置为公开展示的成员。只要成员在账号页完善资料，并勾选愿意分享，这里就会自动出现。
+          当前还没有设置为公开展示的成员。你后面可以在后台成员管理页里直接打开“公开展示到成员页”开关。
         </div>
       )}
 
@@ -89,7 +92,7 @@ export default async function MembersPage() {
         <article className="field-panel">
           <h3>公开策略</h3>
           <p>
-            当前成员页默认只展示愿意公开分享的成员，不公开邮箱和联系方式，先把技能、城市和方向沉淀下来。
+            当前成员页只展示后台明确设置为“公开展示”的成员，不公开邮箱和联系方式，先把技能、城市和方向沉淀下来。
           </p>
         </article>
         <article className="field-panel">
