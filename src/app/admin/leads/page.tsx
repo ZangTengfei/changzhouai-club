@@ -88,6 +88,8 @@ export default async function AdminLeadsPage({
         lead.ownerDisplayName,
         lead.ownerEmail,
         lead.adminNote,
+        lead.nextAction,
+        lead.matches.map((match) => match.memberDisplayName).join(" "),
       ],
       keyword,
     );
@@ -119,6 +121,10 @@ export default async function AdminLeadsPage({
             <div className="admin-mini-stat">
               <strong>{stats.qualifiedCount}</strong>
               <span>可跟进</span>
+            </div>
+            <div className="admin-mini-stat">
+              <strong>{stats.matchedCount}</strong>
+              <span>已匹配成员</span>
             </div>
           </div>
         </div>
@@ -256,6 +262,15 @@ export default async function AdminLeadsPage({
                   <span>
                     负责人：{lead.ownerDisplayName ?? "暂未分配"}
                     {lead.ownerEmail ? ` · ${lead.ownerEmail}` : ""}
+                  </span>
+                  <span>
+                    候选成员：{lead.matchCount > 0 ? `${lead.matchCount} 位` : "暂未匹配"}
+                  </span>
+                  <span>
+                    下一步：{lead.nextAction ?? "待补充"}
+                    {lead.nextActionAt
+                      ? ` · ${formatDate(lead.nextActionAt)}`
+                      : ""}
                   </span>
                   <span>最近更新：{formatDate(lead.updatedAt)}</span>
                   <span className="admin-list-snippet">

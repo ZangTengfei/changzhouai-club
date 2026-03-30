@@ -54,9 +54,19 @@ export default async function AdminEventDetailPage({
               <span>当前报名</span>
             </div>
 
-            <Link href="/admin/events" className="button button-secondary">
-              返回活动列表
-            </Link>
+            <div className="cta-row">
+              <Link
+                href={`/events/${eventDetail.slug}`}
+                className="button"
+                target="_blank"
+                rel="noreferrer"
+              >
+                查看公开页
+              </Link>
+              <Link href="/admin/events" className="button button-secondary">
+                返回活动列表
+              </Link>
+            </div>
           </div>
         </div>
 

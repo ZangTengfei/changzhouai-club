@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { EventRegistrationForm } from "@/components/event-registration-form";
 import { PageHero } from "@/components/page-hero";
@@ -81,6 +82,7 @@ export default async function EventsPage({
                 event={event}
                 isLoggedIn={isLoggedIn}
                 isRegistered={registeredEventIds.has(event.id)}
+                redirectTo={`/events/${event.slug}`}
               />
             ))}
           </div>
@@ -114,6 +116,11 @@ export default async function EventsPage({
                   {item.highlights.map((highlight) => (
                     <span key={highlight}>{highlight}</span>
                   ))}
+                </div>
+                <div className="cta-row">
+                  <Link href={`/events/${item.slug}`} className="button button-secondary">
+                    查看活动详情
+                  </Link>
                 </div>
               </div>
             </article>

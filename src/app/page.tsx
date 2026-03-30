@@ -127,8 +127,8 @@ export default async function HomePage() {
                   <li>活动标识：{event.slug}</li>
                 </ul>
                 <div className="cta-row">
-                  <Link href="/events" className="button">
-                    去活动页报名
+                  <Link href={`/events/${event.slug}`} className="button">
+                    查看详情并报名
                   </Link>
                 </div>
               </article>
@@ -164,6 +164,11 @@ export default async function HomePage() {
                     {item.highlights.map((highlight) => (
                       <span key={highlight}>{highlight}</span>
                     ))}
+                  </div>
+                  <div className="cta-row">
+                    <Link href={`/events/${item.slug}`} className="button button-secondary">
+                      查看活动详情
+                    </Link>
                   </div>
                 </div>
               </article>

@@ -32,12 +32,28 @@ export type PublicMember = {
 export type PublicMembersDirectory = {
   members: PublicMember[];
   skillTags: string[];
+  featuredGroups: Array<{
+    id: string;
+    title: string;
+    description: string;
+    members: PublicMember[];
+  }>;
   stats: {
     publicMembers: number;
+    organizers: number;
     willingToShare: number;
     willingToJoinProjects: number;
+    cities: number;
   };
 };
+
+function pickMembers(
+  members: PublicMember[],
+  predicate: (member: PublicMember) => boolean,
+  limit: number,
+) {
+  return members.filter(predicate).slice(0, limit);
+}
 
 function mapPublicMember(row: PublicMemberRow): PublicMember {
   return {
@@ -87,10 +103,13 @@ export async function getPublicMembersDirectory(): Promise<PublicMembersDirector
     return {
       members: [],
       skillTags: [],
+      featuredGroups: [],
       stats: {
         publicMembers: 0,
+        organizers: 0,
         willingToShare: 0,
         willingToJoinProjects: 0,
+        cities: 0,
       },
     };
   }
@@ -98,14 +117,46 @@ export async function getPublicMembersDirectory(): Promise<PublicMembersDirector
   const supabase = await createClient();
   const { data } = await supabase.rpc("list_public_members");
   const members = ((data ?? []) as PublicMemberRow[]).map(mapPublicMember);
+  const cityCount = new Set(members.map((member) => member.city)).size;
+  const organizers = pickMembers(
+    members,
+    (member) => ["admin", "organizer"].includes(member.status),
+    4,
+  );
+  const sharers = pickMembers(members, (member) => member.willingToShare, 4);
+  const builders = pickMembers(members, (member) => member.willingToJoinProjects, 4);
 
   return {
     members,
     skillTags: buildTopSkillTags(members),
+    featuredGroups: [
+      {
+        id: "organizers",
+        title: "核心组织者",
+        description: "适合先认识社区节奏、了解活动方向和后续合作方式。",
+        members: organizers,
+      },
+      {
+        id: "sharers",
+        title: "愿意分享的成员",
+        description: "适合作为活动嘉宾候选、主题共创者和后续内容线索来源。",
+        members: sharers,
+      },
+      {
+        id: "builders",
+        title: "愿意参与共建",
+        description: "适合后续项目协作、需求对接和小范围试点推进。",
+        members: builders,
+      },
+    ].filter((group) => group.members.length > 0),
     stats: {
       publicMembers: members.length,
+      organizers: members.filter((member) =>
+        ["admin", "organizer"].includes(member.status),
+      ).length,
       willingToShare: members.filter((member) => member.willingToShare).length,
       willingToJoinProjects: members.filter((member) => member.willingToJoinProjects).length,
+      cities: cityCount,
     },
   };
 }

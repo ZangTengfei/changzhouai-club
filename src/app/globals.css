@@ -663,6 +663,47 @@ img {
   color: #a7602f;
 }
 
+.member-spotlight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.member-spotlight-card {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at top right, rgba(236, 142, 68, 0.08), transparent 30%),
+    rgba(255, 250, 242, 0.9);
+  box-shadow: var(--shadow);
+}
+
+.member-spotlight-card .section-heading {
+  max-width: none;
+}
+
+.member-spotlight-card h3 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.member-spotlight-list {
+  display: grid;
+  gap: 14px;
+}
+
+.member-spotlight-item {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(24, 54, 52, 0.08);
+  border-radius: var(--radius-md);
+  background: rgba(255, 252, 247, 0.86);
+}
+
 .join-form-shell {
   display: grid;
   gap: 20px;
@@ -1137,6 +1178,28 @@ img {
     minmax(0, 1.2fr)
     minmax(180px, 0.9fr)
     minmax(220px, 0.95fr);
+}
+
+.admin-lead-match-list {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-lead-match-card,
+.admin-lead-match-create {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(15, 122, 106, 0.12);
+  border-radius: 18px;
+  background: rgba(255, 251, 245, 0.88);
+}
+
+.admin-lead-match-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: start;
 }
 
 .admin-list-primary,
@@ -1715,6 +1778,80 @@ img {
     serif;
 }
 
+.event-detail-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
+  overflow: hidden;
+}
+
+.event-detail-copy {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: 30px;
+}
+
+.event-detail-heading {
+  display: grid;
+  gap: 12px;
+}
+
+.event-detail-heading h1 {
+  margin: 0;
+  font-size: clamp(2.3rem, 4.1vw, 4rem);
+  line-height: 1.02;
+  font-family:
+    "Iowan Old Style",
+    "Source Han Serif SC",
+    "Songti SC",
+    serif;
+}
+
+.event-detail-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.02rem;
+}
+
+.event-detail-media {
+  min-height: 320px;
+  background: rgba(15, 122, 106, 0.08);
+}
+
+.event-detail-media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.event-detail-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.event-detail-panel h3 {
+  margin: 0 0 10px;
+}
+
+.event-detail-richtext {
+  display: grid;
+  gap: 14px;
+}
+
+.event-detail-richtext p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.event-detail-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+}
+
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1744,7 +1881,8 @@ img {
   .hero,
   .page-hero,
   .footer-grid,
-  .event-feature {
+  .event-feature,
+  .event-detail-hero {
     grid-template-columns: 1fr;
   }
 
@@ -1754,7 +1892,8 @@ img {
   .field-grid,
   .faq-grid,
   .gallery-grid,
-  .logo-lab-grid {
+  .logo-lab-grid,
+  .member-spotlight-grid {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -1811,7 +1950,8 @@ img {
   .faq-grid,
   .stat-grid,
   .gallery-grid,
-  .logo-lab-grid {
+  .logo-lab-grid,
+  .member-spotlight-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1827,6 +1967,7 @@ img {
   .admin-event-card-row,
   .admin-event-card-main,
   .admin-event-card-details,
+  .admin-lead-match-head,
   .admin-member-list-grid,
   .admin-join-request-list-grid,
   .admin-member-card-header,

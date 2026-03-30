@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { requireStaffContext } from "@/lib/supabase/guards";
 
 const ADMIN_EVENTS_PATH = "/admin/events";
+const ADMIN_LEADS_PATH = "/admin/leads";
 const ADMIN_MEMBERS_PATH = "/admin/members";
 
 function normalizeSlug(raw: string) {
@@ -61,7 +62,7 @@ function revalidateRedirectPath(redirectTo: string | null) {
   revalidatePath(pathname);
 }
 
-function revalidateEventPaths(eventId?: string) {
+function revalidateEventPaths(eventId?: string, eventSlug?: string) {
   revalidatePath(ADMIN_EVENTS_PATH);
   revalidatePath("/");
   revalidatePath("/events");
@@ -70,11 +71,23 @@ function revalidateEventPaths(eventId?: string) {
   if (eventId) {
     revalidatePath(`${ADMIN_EVENTS_PATH}/${eventId}`);
   }
+
+  if (eventSlug) {
+    revalidatePath(`/events/${eventSlug}`);
+  }
 }
 
 function revalidateMemberPaths() {
   revalidatePath(ADMIN_MEMBERS_PATH);
   revalidatePath("/members");
+}
+
+function revalidateLeadPaths(leadId?: string) {
+  revalidatePath(ADMIN_LEADS_PATH);
+
+  if (leadId) {
+    revalidatePath(`${ADMIN_LEADS_PATH}/${leadId}`);
+  }
 }
 
 export async function saveAdminEvent(formData: FormData) {
@@ -95,6 +108,10 @@ export async function saveAdminEvent(formData: FormData) {
     slug,
     summary: getOptionalValue(formData, "summary"),
     description: getOptionalValue(formData, "description"),
+    agenda: getOptionalValue(formData, "agenda"),
+    speaker_lineup: getOptionalValue(formData, "speaker_lineup"),
+    registration_note: getOptionalValue(formData, "registration_note"),
+    recap: getOptionalValue(formData, "recap"),
     event_at: getOptionalValue(formData, "event_at"),
     venue: getOptionalValue(formData, "venue"),
     city: getOptionalValue(formData, "city") ?? "常州",
@@ -109,7 +126,7 @@ export async function saveAdminEvent(formData: FormData) {
       redirect(`${ADMIN_EVENTS_PATH}/${eventId}?error=database_write_failed`);
     }
 
-    revalidateEventPaths(eventId);
+    revalidateEventPaths(eventId, slug);
     redirect(`${ADMIN_EVENTS_PATH}/${eventId}?saved=event`);
   } else {
     const { data: createdEvent, error } = await supabase
@@ -125,7 +142,7 @@ export async function saveAdminEvent(formData: FormData) {
       redirect(`${ADMIN_EVENTS_PATH}?error=database_write_failed`);
     }
 
-    revalidateEventPaths(createdEvent.id);
+    revalidateEventPaths(createdEvent.id, slug);
     redirect(`${ADMIN_EVENTS_PATH}/${createdEvent.id}?saved=event`);
   }
 }
@@ -152,6 +169,7 @@ export async function saveAdminEventPhoto(formData: FormData) {
   const { supabase } = await requireStaffContext();
 
   const eventId = String(formData.get("event_id") ?? "").trim();
+  const eventSlug = String(formData.get("event_slug") ?? "").trim();
   const photoId = String(formData.get("photo_id") ?? "").trim();
   const imageUrl = String(formData.get("image_url") ?? "").trim();
 
@@ -180,7 +198,7 @@ export async function saveAdminEventPhoto(formData: FormData) {
     }
   }
 
-  revalidateEventPaths(eventId);
+  revalidateEventPaths(eventId, eventSlug || undefined);
   redirect(`${ADMIN_EVENTS_PATH}/${eventId}?saved=photo`);
 }
 
@@ -188,6 +206,7 @@ export async function deleteAdminEventPhoto(formData: FormData) {
   const { supabase } = await requireStaffContext();
 
   const eventId = String(formData.get("event_id") ?? "").trim();
+  const eventSlug = String(formData.get("event_slug") ?? "").trim();
   const photoId = String(formData.get("photo_id") ?? "").trim();
 
   if (photoId) {
@@ -198,7 +217,7 @@ export async function deleteAdminEventPhoto(formData: FormData) {
     }
   }
 
-  revalidateEventPaths(eventId);
+  revalidateEventPaths(eventId, eventSlug || undefined);
   redirect(`${ADMIN_EVENTS_PATH}/${eventId}?saved=photo_deleted`);
 }
 
@@ -206,6 +225,7 @@ export async function setAdminEventCoverImage(formData: FormData) {
   const { supabase } = await requireStaffContext();
 
   const eventId = String(formData.get("event_id") ?? "").trim();
+  const eventSlug = String(formData.get("event_slug") ?? "").trim();
   const imageUrl = String(formData.get("image_url") ?? "").trim();
 
   if (!eventId || !imageUrl) {
@@ -221,7 +241,7 @@ export async function setAdminEventCoverImage(formData: FormData) {
     redirect(`${ADMIN_EVENTS_PATH}/${eventId}?error=database_write_failed`);
   }
 
-  revalidateEventPaths(eventId);
+  revalidateEventPaths(eventId, eventSlug || undefined);
   redirect(`${ADMIN_EVENTS_PATH}/${eventId}?saved=cover`);
 }
 
@@ -520,9 +540,10 @@ export async function updateAdminLead(formData: FormData) {
   }
 
   revalidatePath("/admin/leads");
+  revalidateLeadPaths(leadId);
   revalidateRedirectPath(redirectTo);
   redirect(
-    buildRedirectPath("/admin/leads", redirectTo, {
+    buildRedirectPath(ADMIN_LEADS_PATH, redirectTo, {
       saved: "lead",
     }),
   );
@@ -536,6 +557,9 @@ export async function updateAdminLeadDetail(formData: FormData) {
   const redirectTo = getOptionalValue(formData, "redirect_to");
   const adminNote = getOptionalValue(formData, "admin_note");
   const ownerId = getOptionalValue(formData, "owner_id");
+  const nextAction = getOptionalValue(formData, "next_action");
+  const nextActionAt = getOptionalValue(formData, "next_action_at");
+  const lastContactedAt = getOptionalValue(formData, "last_contacted_at");
 
   if (!leadId || !status) {
     redirect(
@@ -551,6 +575,9 @@ export async function updateAdminLeadDetail(formData: FormData) {
       status,
       admin_note: adminNote,
       owner_id: ownerId,
+      next_action: nextAction,
+      next_action_at: nextActionAt,
+      last_contacted_at: lastContactedAt,
     })
     .eq("id", leadId);
 
@@ -562,11 +589,110 @@ export async function updateAdminLeadDetail(formData: FormData) {
     );
   }
 
-  revalidatePath("/admin/leads");
+  revalidateLeadPaths(leadId);
   revalidateRedirectPath(redirectTo);
   redirect(
-    buildRedirectPath("/admin/leads", redirectTo, {
+    buildRedirectPath(ADMIN_LEADS_PATH, redirectTo, {
       saved: "lead_detail",
+    }),
+  );
+}
+
+export async function saveAdminLeadMatch(formData: FormData) {
+  const { supabase, user } = await requireStaffContext();
+
+  const leadId = String(formData.get("lead_id") ?? "").trim();
+  const matchId = String(formData.get("match_id") ?? "").trim();
+  const memberId = String(formData.get("member_id") ?? "").trim();
+  const status = String(formData.get("status") ?? "suggested").trim();
+  const note = getOptionalValue(formData, "note");
+  const redirectTo = getOptionalValue(formData, "redirect_to");
+
+  if (!leadId || !memberId || !status) {
+    redirect(
+      buildRedirectPath(ADMIN_LEADS_PATH, redirectTo, {
+        error: "missing_required_fields",
+      }),
+    );
+  }
+
+  if (matchId) {
+    const { error } = await supabase
+      .from("cooperation_lead_matches")
+      .update({
+        member_id: memberId,
+        status,
+        note,
+      })
+      .eq("id", matchId);
+
+    if (error) {
+      redirect(
+        buildRedirectPath(ADMIN_LEADS_PATH, redirectTo, {
+          error: "database_write_failed",
+        }),
+      );
+    }
+  } else {
+    const { error } = await supabase.from("cooperation_lead_matches").insert({
+      lead_id: leadId,
+      member_id: memberId,
+      status,
+      note,
+      created_by: user.id,
+    });
+
+    if (error) {
+      redirect(
+        buildRedirectPath(ADMIN_LEADS_PATH, redirectTo, {
+          error: "database_write_failed",
+        }),
+      );
+    }
+  }
+
+  revalidateLeadPaths(leadId);
+  revalidateRedirectPath(redirectTo);
+  redirect(
+    buildRedirectPath(ADMIN_LEADS_PATH, redirectTo, {
+      saved: "lead_match",
+    }),
+  );
+}
+
+export async function deleteAdminLeadMatch(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+
+  const leadId = String(formData.get("lead_id") ?? "").trim();
+  const matchId = String(formData.get("match_id") ?? "").trim();
+  const redirectTo = getOptionalValue(formData, "redirect_to");
+
+  if (!leadId || !matchId) {
+    redirect(
+      buildRedirectPath(ADMIN_LEADS_PATH, redirectTo, {
+        error: "missing_required_fields",
+      }),
+    );
+  }
+
+  const { error } = await supabase
+    .from("cooperation_lead_matches")
+    .delete()
+    .eq("id", matchId);
+
+  if (error) {
+    redirect(
+      buildRedirectPath(ADMIN_LEADS_PATH, redirectTo, {
+        error: "database_write_failed",
+      }),
+    );
+  }
+
+  revalidateLeadPaths(leadId);
+  revalidateRedirectPath(redirectTo);
+  redirect(
+    buildRedirectPath(ADMIN_LEADS_PATH, redirectTo, {
+      saved: "lead_match_deleted",
     }),
   );
 }

@@ -158,11 +158,18 @@ export default async function AccountPage({
                 | null;
 
               const event = Array.isArray(rawEvent) ? rawEvent[0] : rawEvent;
+              const eventHref = event?.slug ? `/events/${event.slug}` : null;
 
               return (
                 <article className="registration-card" key={registration.id}>
                   <div>
-                    <h3>{event?.title ?? "未找到活动"}</h3>
+                    <h3>
+                      {eventHref ? (
+                        <Link href={eventHref}>{event?.title ?? "未找到活动"}</Link>
+                      ) : (
+                        (event?.title ?? "未找到活动")
+                      )}
+                    </h3>
                     <p>
                       报名状态：{registration.status}
                       {event?.event_at

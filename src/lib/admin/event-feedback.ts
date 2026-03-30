@@ -3,6 +3,8 @@ const adminSavedMessageMap: Record<string, string> = {
   deleted: "活动已删除。",
   lead: "合作线索状态已更新。",
   lead_detail: "合作线索详情已更新。",
+  lead_match: "线索匹配成员已更新。",
+  lead_match_deleted: "线索匹配成员已删除。",
   member: "成员设置已更新。",
   member_profile: "成员资料已更新。",
   join_request: "加入申请状态已更新。",
@@ -46,6 +48,14 @@ const adminLeadStatusLabelMap: Record<string, string> = {
   qualified: "已判断可跟进",
   won: "已成交",
   lost: "已关闭",
+};
+
+const adminLeadMatchStatusLabelMap: Record<string, string> = {
+  suggested: "候选建议",
+  contacted: "已联系成员",
+  introduced: "已引荐对接",
+  active: "进入推进",
+  not_fit: "暂不匹配",
 };
 
 const adminJoinRequestStatusLabelMap: Record<string, string> = {
@@ -107,6 +117,10 @@ export function formatAdminJoinRequestStatus(status: string) {
 
 export function formatAdminLeadStatus(status: string) {
   return adminLeadStatusLabelMap[status] ?? status;
+}
+
+export function formatAdminLeadMatchStatus(status: string) {
+  return adminLeadMatchStatusLabelMap[status] ?? status;
 }
 
 export function getAdminEventStatusTone(status: string) {
@@ -181,6 +195,23 @@ export function getAdminLeadStatusTone(status: string) {
     case "won":
       return "completed";
     case "lost":
+      return "cancelled";
+    default:
+      return "neutral";
+  }
+}
+
+export function getAdminLeadMatchStatusTone(status: string) {
+  switch (status) {
+    case "suggested":
+      return "waitlist";
+    case "contacted":
+      return "registered";
+    case "introduced":
+      return "scheduled";
+    case "active":
+      return "completed";
+    case "not_fit":
       return "cancelled";
     default:
       return "neutral";

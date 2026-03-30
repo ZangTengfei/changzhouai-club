@@ -8,7 +8,7 @@ type EventPhotoRow = {
   sort_order: number;
 };
 
-type CompletedEventRow = {
+type EventRow = {
   id: string;
   slug: string;
   title: string;
@@ -18,6 +18,11 @@ type CompletedEventRow = {
   venue: string | null;
   city: string | null;
   cover_image_url: string | null;
+  agenda: string | null;
+  speaker_lineup: string | null;
+  registration_note: string | null;
+  recap: string | null;
+  status: string;
   event_photos: EventPhotoRow[] | null;
 };
 
@@ -30,6 +35,7 @@ export type PublicScheduledEvent = {
   city: string | null;
   slug: string;
   cover_image_url: string | null;
+  registration_note?: string | null;
 };
 
 export type PublicGalleryImage = {
@@ -51,6 +57,35 @@ export type PublicEventRecap = {
   gallery: PublicGalleryImage[];
 };
 
+export type PublicEventDetail = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  eventAt: string | null;
+  dateLabel: string;
+  dateTimeLabel: string;
+  status: string;
+  statusLabel: string;
+  city: string | null;
+  venue: string | null;
+  locationLabel: string;
+  imageUrl: string | null;
+  descriptionParagraphs: string[];
+  agendaItems: string[];
+  speakerItems: string[];
+  registrationNote: string | null;
+  recapParagraphs: string[];
+  gallery: PublicGalleryImage[];
+};
+
+const publicEventStatusLabelMap: Record<string, string> = {
+  draft: "草稿",
+  scheduled: "开放报名",
+  completed: "已结束",
+  cancelled: "已取消",
+};
+
 function formatEventDateLabel(value: string) {
   return new Intl.DateTimeFormat("zh-CN", {
     year: "numeric",
@@ -67,6 +102,28 @@ function buildLocationLabel(city: string | null, venue: string | null) {
   return city ?? "常州";
 }
 
+function parseLineList(value: string | null) {
+  if (!value) {
+    return [] as string[];
+  }
+
+  return value
+    .split("\n")
+    .map((item) => item.trim().replace(/^[\s\-*•\d.、]+/, ""))
+    .filter(Boolean);
+}
+
+function parseParagraphs(value: string | null) {
+  if (!value) {
+    return [] as string[];
+  }
+
+  return value
+    .split(/\n\s*\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
 function dedupeGalleryItems(items: PublicGalleryImage[]) {
   const seen = new Set<string>();
 
@@ -80,7 +137,7 @@ function dedupeGalleryItems(items: PublicGalleryImage[]) {
   });
 }
 
-function mapCompletedEvent(row: CompletedEventRow): PublicEventRecap {
+function buildEventGallery(row: EventRow) {
   const photos = (row.event_photos ?? [])
     .slice()
     .sort((a, b) => a.sort_order - b.sort_order)
@@ -101,6 +158,29 @@ function mapCompletedEvent(row: CompletedEventRow): PublicEventRecap {
     : [];
 
   const gallery = dedupeGalleryItems([...coverImage, ...photos]);
+  return gallery;
+}
+
+function formatEventDateTimeLabel(value: string | null) {
+  if (!value) {
+    return "时间待定";
+  }
+
+  return new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+function formatPublicEventStatus(status: string) {
+  return publicEventStatusLabelMap[status] ?? status;
+}
+
+function mapCompletedEvent(row: EventRow): PublicEventRecap {
+  const gallery = buildEventGallery(row);
   const photoCount = gallery.length;
 
   return {
@@ -124,6 +204,35 @@ function mapCompletedEvent(row: CompletedEventRow): PublicEventRecap {
   };
 }
 
+function mapPublicEventDetail(row: EventRow): PublicEventDetail {
+  const gallery = buildEventGallery(row);
+
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    summary:
+      row.summary ??
+      row.description ??
+      "这是一场常州 AI 开发者社区的线下活动，详情会随着后台内容更新持续完善。",
+    eventAt: row.event_at,
+    dateLabel: row.event_at ? formatEventDateLabel(row.event_at) : "时间待定",
+    dateTimeLabel: formatEventDateTimeLabel(row.event_at),
+    status: row.status,
+    statusLabel: formatPublicEventStatus(row.status),
+    city: row.city,
+    venue: row.venue,
+    locationLabel: buildLocationLabel(row.city, row.venue),
+    imageUrl: row.cover_image_url ?? gallery[0]?.imageUrl ?? null,
+    descriptionParagraphs: parseParagraphs(row.description),
+    agendaItems: parseLineList(row.agenda),
+    speakerItems: parseLineList(row.speaker_lineup),
+    registrationNote: row.registration_note,
+    recapParagraphs: parseParagraphs(row.recap),
+    gallery,
+  };
+}
+
 export async function getCompletedEventRecaps() {
   if (!hasSupabaseEnv()) {
     return [] as PublicEventRecap[];
@@ -133,7 +242,7 @@ export async function getCompletedEventRecaps() {
   const { data } = await supabase
     .from("events")
     .select(
-      "id, slug, title, summary, description, event_at, venue, city, cover_image_url, event_photos(id, image_url, caption, sort_order)",
+      "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, recap, status, event_photos(id, image_url, caption, sort_order)",
     )
     .eq("status", "completed")
     .order("event_at", { ascending: false, nullsFirst: false });
@@ -142,7 +251,7 @@ export async function getCompletedEventRecaps() {
     return [] as PublicEventRecap[];
   }
 
-  return (data as CompletedEventRow[]).map(mapCompletedEvent);
+  return (data as EventRow[]).map(mapCompletedEvent);
 }
 
 export async function getScheduledEvents() {
@@ -153,9 +262,33 @@ export async function getScheduledEvents() {
   const supabase = await createClient();
   const { data } = await supabase
     .from("events")
-    .select("id, title, summary, event_at, venue, city, slug, cover_image_url")
+    .select(
+      "id, title, summary, event_at, venue, city, slug, cover_image_url, registration_note",
+    )
     .eq("status", "scheduled")
     .order("event_at", { ascending: true, nullsFirst: false });
 
   return (data ?? []) as PublicScheduledEvent[];
+}
+
+export async function getPublicEventBySlug(slug: string) {
+  if (!hasSupabaseEnv()) {
+    return null;
+  }
+
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("events")
+    .select(
+      "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, recap, status, event_photos(id, image_url, caption, sort_order)",
+    )
+    .eq("slug", slug)
+    .in("status", ["scheduled", "completed", "cancelled"])
+    .maybeSingle();
+
+  if (!data) {
+    return null;
+  }
+
+  return mapPublicEventDetail(data as EventRow);
 }

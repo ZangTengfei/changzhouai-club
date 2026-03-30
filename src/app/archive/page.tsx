@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 import { PageHero } from "@/components/page-hero";
 import { getCompletedEventRecaps } from "@/lib/community-events";
@@ -14,6 +15,7 @@ export default async function ArchivePage() {
   const galleryItems = completedEvents.flatMap((event) =>
     event.gallery.map((image) => ({
       id: image.id,
+      eventSlug: event.slug,
       eventTitle: event.title,
       eventDate: event.dateLabel,
       imageUrl: image.imageUrl,
@@ -46,7 +48,9 @@ export default async function ArchivePage() {
                 <img src={item.imageUrl} alt={item.caption ?? item.eventTitle} loading="lazy" />
               </div>
               <div className="gallery-copy">
-                <h3>{item.eventTitle}</h3>
+                <h3>
+                  <Link href={`/events/${item.eventSlug}`}>{item.eventTitle}</Link>
+                </h3>
                 <p>{item.eventDate}</p>
                 {item.caption && item.caption !== item.eventTitle ? <p>{item.caption}</p> : null}
               </div>

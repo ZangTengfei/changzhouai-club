@@ -7,6 +7,10 @@ type AdminEvent = {
   title: string;
   summary: string | null;
   description: string | null;
+  agenda: string | null;
+  speaker_lineup: string | null;
+  registration_note: string | null;
+  recap: string | null;
   event_at: string | null;
   venue: string | null;
   city: string | null;
@@ -85,6 +89,50 @@ export function AdminEventForm({
               defaultValue={event?.description ?? ""}
               rows={4}
               placeholder="可选：写更详细的活动内容、议题安排和适合人群。"
+            />
+          </label>
+
+          <label className="form-field form-field-wide">
+            <span>议程安排</span>
+            <textarea
+              className="input textarea"
+              name="agenda"
+              defaultValue={event?.agenda ?? ""}
+              rows={5}
+              placeholder={"一行一项，例如：\n19:30 签到与自由交流\n20:00 主题分享\n20:40 Demo 展示与问答"}
+            />
+          </label>
+
+          <label className="form-field form-field-wide">
+            <span>分享人与组织者</span>
+            <textarea
+              className="input textarea"
+              name="speaker_lineup"
+              defaultValue={event?.speaker_lineup ?? ""}
+              rows={4}
+              placeholder={"一行一项，例如：\n分享：某位社区成员 / AI Agent 工作流\n主持：社区组织者"}
+            />
+          </label>
+
+          <label className="form-field form-field-wide">
+            <span>报名提示</span>
+            <textarea
+              className="input textarea"
+              name="registration_note"
+              defaultValue={event?.registration_note ?? ""}
+              rows={3}
+              placeholder="例如：本场人数有限，请报名后按时参加；现场欢迎自带项目和问题来交流。"
+            />
+          </label>
+
+          <label className="form-field form-field-wide">
+            <span>活动回顾</span>
+            <textarea
+              className="input textarea"
+              name="recap"
+              defaultValue={event?.recap ?? ""}
+              rows={5}
+              placeholder={"适合用于活动结束后的内容沉淀。支持分段输入，例如：\n\n这场活动主要围绕...\n\n现场讨论比较集中的问题包括..."}
             />
           </label>
 

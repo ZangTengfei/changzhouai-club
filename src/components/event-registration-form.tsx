@@ -10,17 +10,25 @@ type UpcomingEvent = {
   venue: string | null;
   city: string | null;
   slug: string;
+  registration_note?: string | null;
 };
 
 export function EventRegistrationForm({
   event,
   isLoggedIn,
   isRegistered,
+  redirectTo,
+  showDetailLink = true,
 }: {
   event: UpcomingEvent;
   isLoggedIn: boolean;
   isRegistered: boolean;
+  redirectTo?: string;
+  showDetailLink?: boolean;
 }) {
+  const detailHref = `/events/${event.slug}`;
+  const nextPath = redirectTo ?? detailHref;
+
   return (
     <article className="card">
       <div className="pill-row">
@@ -33,12 +41,14 @@ export function EventRegistrationForm({
         <li>地点：{event.venue ?? "待公布"}</li>
         <li>活动标识：{event.slug}</li>
       </ul>
+      {event.registration_note ? <div className="note-strip">{event.registration_note}</div> : null}
 
       {isRegistered ? (
         <div className="note-strip">你已经报名这场活动了，可以去账号页查看报名记录。</div>
       ) : isLoggedIn ? (
         <form action={registerForEvent} className="registration-form">
           <input type="hidden" name="event_id" value={event.id} />
+          <input type="hidden" name="redirect_to" value={nextPath} />
           <label className="form-field">
             <span>报名备注</span>
             <textarea
@@ -54,11 +64,19 @@ export function EventRegistrationForm({
         </form>
       ) : (
         <div className="cta-row">
-          <Link href="/login?next=/events" className="button">
+          <Link href={`/login?next=${encodeURIComponent(nextPath)}`} className="button">
             登录后报名
           </Link>
         </div>
       )}
+
+      {showDetailLink ? (
+        <div className="cta-row">
+          <Link href={detailHref} className="button button-secondary">
+            查看活动详情
+          </Link>
+        </div>
+      ) : null}
     </article>
   );
 }

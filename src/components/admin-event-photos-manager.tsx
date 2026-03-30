@@ -73,6 +73,7 @@ export function AdminEventPhotosManager({
 
                   <form action={saveAdminEventPhoto} className="account-form admin-photo-form">
                     <input type="hidden" name="event_id" value={eventId} />
+                    <input type="hidden" name="event_slug" value={eventSlug} />
                     <input type="hidden" name="photo_id" value={photo.id} />
 
                     <div className="form-grid admin-photo-form-grid">
@@ -120,6 +121,7 @@ export function AdminEventPhotosManager({
                     {!isCover ? (
                       <form action={setAdminEventCoverImage}>
                         <input type="hidden" name="event_id" value={eventId} />
+                        <input type="hidden" name="event_slug" value={eventSlug} />
                         <input type="hidden" name="image_url" value={photo.image_url} />
                         <button type="submit" className="button button-secondary">
                           设为封面
@@ -129,6 +131,7 @@ export function AdminEventPhotosManager({
 
                     <form action={deleteAdminEventPhoto}>
                       <input type="hidden" name="event_id" value={eventId} />
+                      <input type="hidden" name="event_slug" value={eventSlug} />
                       <input type="hidden" name="photo_id" value={photo.id} />
                       <button type="submit" className="button button-secondary">
                         删除照片
@@ -155,6 +158,7 @@ export function AdminEventPhotosManager({
 
         <form action={saveAdminEventPhoto} className="account-form admin-photo-form">
           <input type="hidden" name="event_id" value={eventId} />
+          <input type="hidden" name="event_slug" value={eventSlug} />
 
           <div className="form-grid admin-photo-form-grid">
             <label className="form-field form-field-wide">
