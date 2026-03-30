@@ -1,7 +1,9 @@
 import Link from "next/link";
 
+import { MemberAvatar } from "@/components/member-avatar";
 import { SectionHeading } from "@/components/section-heading";
 import { getCompletedEventRecaps, getScheduledEvents } from "@/lib/community-events";
+import { getPublicMembersDirectory } from "@/lib/community-members";
 import {
   activityMoments,
   cooperationAreas,
@@ -18,14 +20,57 @@ function formatMetricDate(isoDate: string | null) {
   return isoDate.replaceAll("-", ".");
 }
 
+function formatMemberStatus(status: string) {
+  switch (status) {
+    case "admin":
+      return "管理员";
+    case "organizer":
+      return "组织者";
+    case "active":
+      return "活跃成员";
+    case "pending":
+      return "待完善";
+    case "paused":
+      return "暂停中";
+    default:
+      return status;
+  }
+}
+
+function buildMemberPositioning(member: {
+  status: string;
+  willingToShare: boolean;
+  willingToJoinProjects: boolean;
+  skills: string[];
+}) {
+  const tags = [formatMemberStatus(member.status)];
+
+  if (member.willingToShare) {
+    tags.push("愿意分享");
+  }
+
+  if (member.willingToJoinProjects) {
+    tags.push("愿意共建");
+  }
+
+  member.skills.slice(0, 2).forEach((skill) => {
+    tags.push(skill);
+  });
+
+  return tags.slice(0, 4);
+}
+
 export default async function HomePage() {
   const scheduledEvents = await getScheduledEvents();
   const completedEvents = await getCompletedEventRecaps();
+  const directory = await getPublicMembersDirectory();
   const featuredScheduledEvents = scheduledEvents.slice(0, 3);
   const latestCompletedEvent = completedEvents[0];
   const recentEvents = completedEvents.slice(0, 3);
+  const featuredMembers = directory.members.slice(0, 6);
   const communityStats = [
     { value: "200+", label: "现有群成员" },
+    { value: `${directory.stats.publicMembers}`, label: "已入驻网站成员" },
     { value: `${completedEvents.length} 场`, label: "已举办线下活动" },
     {
       value: formatMetricDate(latestCompletedEvent?.isoDate ?? null),
@@ -203,8 +248,53 @@ export default async function HomePage() {
           title="社区成员来自不同角色，但会在同一类问题上碰面"
           description="成员来自开发、产品、创业、教育与产业一线，在 AI 应用、工程实践与合作探索中持续交流。"
         />
+
+        {featuredMembers.length > 0 ? (
+          <>
+            <div className="member-directory-grid">
+              {featuredMembers.map((member) => (
+                <article className="member-directory-card" key={member.id}>
+                  <div className="member-directory-header">
+                    <MemberAvatar
+                      name={member.displayName}
+                      avatarUrl={member.avatarUrl}
+                    />
+
+                    <div className="member-directory-copy">
+                      <h3>{member.displayName}</h3>
+                      <p>{member.city}</p>
+                    </div>
+                  </div>
+
+                  <p className="member-directory-bio">
+                    {member.bio ?? "这位成员已加入社区，欢迎在线下活动和交流中进一步认识。"}
+                  </p>
+
+                  <div className="member-directory-signals">
+                    {buildMemberPositioning(member).map((tag) => (
+                      <span className="pill member-signal-pill" key={`${member.id}-${tag}`}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div className="cta-row">
+              <Link href="/members" className="button button-secondary">
+                查看全部成员
+              </Link>
+            </div>
+          </>
+        ) : (
+          <div className="note-strip">
+            成员名录正在持续完善，欢迎前往加入页面提交资料，成为首页展示的社区成员。
+          </div>
+        )}
+
         <div className="tag-cloud">
-          {memberTags.map((tag) => (
+          {(directory.skillTags.length > 0 ? directory.skillTags : memberTags).map((tag) => (
             <span key={tag}>{tag}</span>
           ))}
         </div>
