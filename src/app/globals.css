@@ -490,6 +490,109 @@ img {
   gap: 24px;
 }
 
+.route-loading-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.route-loading-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) auto;
+  gap: 20px;
+  align-items: center;
+  padding: 28px 30px;
+}
+
+.route-loading-copy {
+  display: grid;
+  gap: 10px;
+}
+
+.route-loading-copy h1 {
+  margin: 0;
+  font-family:
+    "Iowan Old Style",
+    "Source Han Serif SC",
+    "Songti SC",
+    serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+}
+
+.route-loading-copy p:last-child {
+  margin: 0;
+  color: var(--muted);
+}
+
+.route-loading-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 1px solid rgba(15, 122, 106, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 251, 245, 0.84);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.route-loading-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--accent);
+  animation: route-loading-pulse 1s ease-in-out infinite;
+}
+
+.route-loading-card {
+  display: grid;
+  gap: 12px;
+}
+
+.route-loading-line {
+  height: 12px;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, rgba(15, 122, 106, 0.08), rgba(15, 122, 106, 0.18), rgba(15, 122, 106, 0.08));
+  background-size: 200% 100%;
+  animation: route-loading-shimmer 1.15s linear infinite;
+}
+
+.route-loading-line-title {
+  width: min(62%, 220px);
+  height: 18px;
+}
+
+.route-loading-line-short {
+  width: 68%;
+}
+
+@keyframes route-loading-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes route-loading-pulse {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: scale(0.94);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .auth-stack {
   display: grid;
   gap: 18px;
@@ -1954,6 +2057,7 @@ img {
 @media (max-width: 1024px) {
   .hero,
   .page-hero,
+  .route-loading-hero,
   .footer-grid,
   .event-feature,
   .event-detail-hero {
@@ -1967,6 +2071,7 @@ img {
   .faq-grid,
   .gallery-grid,
   .logo-lab-grid,
+  .route-loading-grid,
   .member-spotlight-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -2073,6 +2178,7 @@ img {
   .faq-grid,
   .gallery-grid,
   .logo-lab-grid,
+  .route-loading-grid,
   .member-spotlight-grid {
     grid-template-columns: 1fr;
   }
@@ -2124,6 +2230,7 @@ img {
 
   .hero,
   .page-hero,
+  .route-loading-hero,
   .footer-grid {
     padding: 22px;
   }
@@ -2152,6 +2259,7 @@ img {
 
   .hero,
   .page-hero,
+  .route-loading-hero,
   .footer-grid,
   .event-detail-copy {
     gap: 18px;
@@ -2198,10 +2306,17 @@ img {
     gap: 8px;
   }
 
+  .route-loading-copy h1,
   .hero-copy h1,
   .page-hero h1 {
     font-size: clamp(2rem, 12vw, 3rem);
     line-height: 1.06;
+  }
+
+  .route-loading-badge {
+    width: fit-content;
+    min-height: 44px;
+    padding: 0 16px;
   }
 
   .section-heading h2,

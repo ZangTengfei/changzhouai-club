@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { getStaffContext } from "@/lib/supabase/guards";
+import { getStaffContextResult, requireStaffContext } from "@/lib/supabase/guards";
 
 export type AdminEventRow = {
   id: string;
@@ -69,12 +69,20 @@ export type AdminEventsData = {
   debugSnapshot: AdminDebugSnapshot;
 };
 
+type StaffContext = Awaited<ReturnType<typeof getStaffContextResult>>;
+
 function sortPhotos(photos: AdminEventPhotoRow[]) {
   return photos.slice().sort((a, b) => a.sort_order - b.sort_order);
 }
 
-export async function loadAdminEventsData(): Promise<AdminEventsData> {
-  const { supabase, user, member, isStaff } = await getStaffContext();
+export async function loadAdminEventsData(
+  context?: StaffContext,
+): Promise<AdminEventsData> {
+  const { supabase, user, member, isStaff } = context ?? (await requireStaffContext());
+
+  if (!user) {
+    throw new Error("Admin events data requires an authenticated staff user.");
+  }
 
   const [
     { data: eventsData, error: eventsError },

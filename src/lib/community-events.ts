@@ -1,5 +1,7 @@
+import { unstable_cache } from "next/cache";
+
 import { hasSupabaseEnv } from "@/lib/env";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 type EventPhotoRow = {
   id: string;
@@ -78,6 +80,8 @@ export type PublicEventDetail = {
   recapParagraphs: string[];
   gallery: PublicGalleryImage[];
 };
+
+const PUBLIC_EVENTS_REVALIDATE_SECONDS = 60;
 
 const publicEventStatusLabelMap: Record<string, string> = {
   draft: "草稿",
@@ -238,20 +242,7 @@ export async function getCompletedEventRecaps() {
     return [] as PublicEventRecap[];
   }
 
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("events")
-    .select(
-      "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, recap, status, event_photos(id, image_url, caption, sort_order)",
-    )
-    .eq("status", "completed")
-    .order("event_at", { ascending: false, nullsFirst: false });
-
-  if (!data || data.length === 0) {
-    return [] as PublicEventRecap[];
-  }
-
-  return (data as EventRow[]).map(mapCompletedEvent);
+  return getCachedCompletedEventRecaps();
 }
 
 export async function getScheduledEvents() {
@@ -259,16 +250,7 @@ export async function getScheduledEvents() {
     return [] as PublicScheduledEvent[];
   }
 
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("events")
-    .select(
-      "id, title, summary, event_at, venue, city, slug, cover_image_url, registration_note",
-    )
-    .eq("status", "scheduled")
-    .order("event_at", { ascending: true, nullsFirst: false });
-
-  return (data ?? []) as PublicScheduledEvent[];
+  return getCachedScheduledEvents();
 }
 
 export async function getPublicEventBySlug(slug: string) {
@@ -276,19 +258,65 @@ export async function getPublicEventBySlug(slug: string) {
     return null;
   }
 
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("events")
-    .select(
-      "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, recap, status, event_photos(id, image_url, caption, sort_order)",
-    )
-    .eq("slug", slug)
-    .in("status", ["scheduled", "completed", "cancelled"])
-    .maybeSingle();
-
-  if (!data) {
-    return null;
-  }
-
-  return mapPublicEventDetail(data as EventRow);
+  return getCachedPublicEventBySlug(slug);
 }
+
+const getCachedCompletedEventRecaps = unstable_cache(
+  async () => {
+    const supabase = createPublicServerClient();
+    const { data } = await supabase
+      .from("events")
+      .select(
+        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, recap, status, event_photos(id, image_url, caption, sort_order)",
+      )
+      .eq("status", "completed")
+      .order("event_at", { ascending: false, nullsFirst: false });
+
+    if (!data || data.length === 0) {
+      return [] as PublicEventRecap[];
+    }
+
+    return (data as EventRow[]).map(mapCompletedEvent);
+  },
+  ["public-completed-event-recaps"],
+  { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
+);
+
+const getCachedScheduledEvents = unstable_cache(
+  async () => {
+    const supabase = createPublicServerClient();
+    const { data } = await supabase
+      .from("events")
+      .select(
+        "id, title, summary, event_at, venue, city, slug, cover_image_url, registration_note",
+      )
+      .eq("status", "scheduled")
+      .order("event_at", { ascending: true, nullsFirst: false });
+
+    return (data ?? []) as PublicScheduledEvent[];
+  },
+  ["public-scheduled-events"],
+  { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
+);
+
+const getCachedPublicEventBySlug = unstable_cache(
+  async (slug: string) => {
+    const supabase = createPublicServerClient();
+    const { data } = await supabase
+      .from("events")
+      .select(
+        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, recap, status, event_photos(id, image_url, caption, sort_order)",
+      )
+      .eq("slug", slug)
+      .in("status", ["scheduled", "completed", "cancelled"])
+      .maybeSingle();
+
+    if (!data) {
+      return null;
+    }
+
+    return mapPublicEventDetail(data as EventRow);
+  },
+  ["public-event-detail-by-slug"],
+  { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
+);

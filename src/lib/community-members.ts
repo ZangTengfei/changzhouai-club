@@ -1,5 +1,7 @@
+import { unstable_cache } from "next/cache";
+
 import { hasSupabaseEnv } from "@/lib/env";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 type PublicMemberRow = {
   id: string;
@@ -46,6 +48,8 @@ export type PublicMembersDirectory = {
     cities: number;
   };
 };
+
+const PUBLIC_MEMBERS_REVALIDATE_SECONDS = 60;
 
 function pickMembers(
   members: PublicMember[],
@@ -114,49 +118,57 @@ export async function getPublicMembersDirectory(): Promise<PublicMembersDirector
     };
   }
 
-  const supabase = await createClient();
-  const { data } = await supabase.rpc("list_public_members");
-  const members = ((data ?? []) as PublicMemberRow[]).map(mapPublicMember);
-  const cityCount = new Set(members.map((member) => member.city)).size;
-  const organizers = pickMembers(
-    members,
-    (member) => ["admin", "organizer"].includes(member.status),
-    4,
-  );
-  const sharers = pickMembers(members, (member) => member.willingToShare, 4);
-  const builders = pickMembers(members, (member) => member.willingToJoinProjects, 4);
-
-  return {
-    members,
-    skillTags: buildTopSkillTags(members),
-    featuredGroups: [
-      {
-        id: "organizers",
-        title: "核心组织者",
-        description: "帮助你快速了解社区节奏、活动方向与组织角色。",
-        members: organizers,
-      },
-      {
-        id: "sharers",
-        title: "愿意分享的成员",
-        description: "适合作为活动嘉宾、主题共创者与内容交流对象。",
-        members: sharers,
-      },
-      {
-        id: "builders",
-        title: "愿意参与共建",
-        description: "适合项目协作、需求对接与小范围试点推进。",
-        members: builders,
-      },
-    ].filter((group) => group.members.length > 0),
-    stats: {
-      publicMembers: members.length,
-      organizers: members.filter((member) =>
-        ["admin", "organizer"].includes(member.status),
-      ).length,
-      willingToShare: members.filter((member) => member.willingToShare).length,
-      willingToJoinProjects: members.filter((member) => member.willingToJoinProjects).length,
-      cities: cityCount,
-    },
-  };
+  return getCachedPublicMembersDirectory();
 }
+
+const getCachedPublicMembersDirectory = unstable_cache(
+  async (): Promise<PublicMembersDirectory> => {
+    const supabase = createPublicServerClient();
+    const { data } = await supabase.rpc("list_public_members");
+    const members = ((data ?? []) as PublicMemberRow[]).map(mapPublicMember);
+    const cityCount = new Set(members.map((member) => member.city)).size;
+    const organizers = pickMembers(
+      members,
+      (member) => ["admin", "organizer"].includes(member.status),
+      4,
+    );
+    const sharers = pickMembers(members, (member) => member.willingToShare, 4);
+    const builders = pickMembers(members, (member) => member.willingToJoinProjects, 4);
+
+    return {
+      members,
+      skillTags: buildTopSkillTags(members),
+      featuredGroups: [
+        {
+          id: "organizers",
+          title: "核心组织者",
+          description: "帮助你快速了解社区节奏、活动方向与组织角色。",
+          members: organizers,
+        },
+        {
+          id: "sharers",
+          title: "愿意分享的成员",
+          description: "适合作为活动嘉宾、主题共创者与内容交流对象。",
+          members: sharers,
+        },
+        {
+          id: "builders",
+          title: "愿意参与共建",
+          description: "适合项目协作、需求对接与小范围试点推进。",
+          members: builders,
+        },
+      ].filter((group) => group.members.length > 0),
+      stats: {
+        publicMembers: members.length,
+        organizers: members.filter((member) =>
+          ["admin", "organizer"].includes(member.status),
+        ).length,
+        willingToShare: members.filter((member) => member.willingToShare).length,
+        willingToJoinProjects: members.filter((member) => member.willingToJoinProjects).length,
+        cities: cityCount,
+      },
+    };
+  },
+  ["public-members-directory"],
+  { revalidate: PUBLIC_MEMBERS_REVALIDATE_SECONDS },
+);

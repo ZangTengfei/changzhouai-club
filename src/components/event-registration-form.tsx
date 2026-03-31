@@ -15,13 +15,13 @@ type UpcomingEvent = {
 
 export function EventRegistrationForm({
   event,
-  isLoggedIn,
+  authState,
   isRegistered,
   redirectTo,
   showDetailLink = true,
 }: {
   event: UpcomingEvent;
-  isLoggedIn: boolean;
+  authState: "loading" | "logged_out" | "logged_in";
   isRegistered: boolean;
   redirectTo?: string;
   showDetailLink?: boolean;
@@ -45,7 +45,7 @@ export function EventRegistrationForm({
 
       {isRegistered ? (
         <div className="note-strip">你已经报名这场活动了，可以去账号页查看报名记录。</div>
-      ) : isLoggedIn ? (
+      ) : authState === "logged_in" ? (
         <form action={registerForEvent} className="registration-form">
           <input type="hidden" name="event_id" value={event.id} />
           <input type="hidden" name="redirect_to" value={nextPath} />
@@ -62,6 +62,8 @@ export function EventRegistrationForm({
             报名这场活动
           </button>
         </form>
+      ) : authState === "loading" ? (
+        <div className="note-strip">正在检查你的报名状态...</div>
       ) : (
         <div className="cta-row">
           <Link href={`/login?next=${encodeURIComponent(nextPath)}`} className="button">

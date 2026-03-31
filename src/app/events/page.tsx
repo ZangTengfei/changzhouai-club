@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { EventRegistrationForm } from "@/components/event-registration-form";
+import { EventsRegistrationGrid } from "@/components/events-registration-grid";
 import { PageHero } from "@/components/page-hero";
 import { getCompletedEventRecaps, getScheduledEvents } from "@/lib/community-events";
-import { hasSupabaseEnv } from "@/lib/env";
-import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "活动",
@@ -17,33 +15,11 @@ export default async function EventsPage({
 }: {
   searchParams: Promise<{ registered?: string; error?: string }>;
 }) {
-  const enabled = hasSupabaseEnv();
   const params = await searchParams;
-  const completedEvents = await getCompletedEventRecaps();
-  const scheduledEvents = await getScheduledEvents();
-  let registeredEventIds = new Set<string>();
-  let isLoggedIn = false;
-
-  if (enabled) {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    isLoggedIn = Boolean(user);
-
-    const [{ data: registrations }] = await Promise.all([
-      user
-        ? supabase
-            .from("event_registrations")
-            .select("event_id")
-            .eq("user_id", user.id)
-            .eq("status", "registered")
-        : Promise.resolve({ data: [] }),
-    ]);
-
-    registeredEventIds = new Set((registrations ?? []).map((item) => item.event_id));
-  }
+  const [completedEvents, scheduledEvents] = await Promise.all([
+    getCompletedEventRecaps(),
+    getScheduledEvents(),
+  ]);
 
   return (
     <div className="page-stack">
@@ -75,17 +51,7 @@ export default async function EventsPage({
         </div>
 
         {scheduledEvents.length > 0 ? (
-          <div className="card-grid">
-            {scheduledEvents.map((event) => (
-              <EventRegistrationForm
-                key={event.id}
-                event={event}
-                isLoggedIn={isLoggedIn}
-                isRegistered={registeredEventIds.has(event.id)}
-                redirectTo={`/events/${event.slug}`}
-              />
-            ))}
-          </div>
+          <EventsRegistrationGrid events={scheduledEvents} />
         ) : (
           <div className="note-strip">
             暂无开放报名的活动，欢迎关注社区即将发布的活动安排。

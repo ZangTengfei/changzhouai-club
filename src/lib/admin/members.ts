@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { getStaffContext } from "@/lib/supabase/guards";
+import { getStaffContextResult, requireStaffContext } from "@/lib/supabase/guards";
 
 type AdminProfileRow = {
   id: string;
@@ -116,6 +116,8 @@ export type AdminMembersData = {
   queryErrors: string[];
 };
 
+type StaffContext = Awaited<ReturnType<typeof getStaffContextResult>>;
+
 function getMemberSortWeight(status: string) {
   switch (status) {
     case "admin":
@@ -148,8 +150,10 @@ function getJoinRequestSortWeight(status: string) {
   }
 }
 
-export async function loadAdminMembersData(): Promise<AdminMembersData> {
-  const { supabase } = await getStaffContext();
+export async function loadAdminMembersData(
+  context?: StaffContext,
+): Promise<AdminMembersData> {
+  const { supabase } = context ?? (await requireStaffContext());
 
   const [
     { data: profilesData, error: profilesError },

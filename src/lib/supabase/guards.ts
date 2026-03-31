@@ -4,14 +4,19 @@ import { createClient } from "@/lib/supabase/server";
 
 const STAFF_STATUSES = new Set(["organizer", "admin"]);
 
-export async function getStaffContext() {
+export async function getStaffContextResult() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect("/login?next=/admin");
+    return {
+      supabase,
+      user: null,
+      member: null,
+      isStaff: false,
+    };
   }
 
   const { data: member } = await supabase
@@ -26,6 +31,16 @@ export async function getStaffContext() {
     member,
     isStaff: STAFF_STATUSES.has(member?.status ?? ""),
   };
+}
+
+export async function getStaffContext() {
+  const context = await getStaffContextResult();
+
+  if (!context.user) {
+    redirect("/login?next=/admin");
+  }
+
+  return context;
 }
 
 export async function requireStaffContext() {

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 
-import { getStaffContext } from "@/lib/supabase/guards";
+import { getStaffContextResult, requireStaffContext } from "@/lib/supabase/guards";
 
 type AdminLeadRow = {
   id: string;
@@ -112,6 +112,8 @@ export type AdminLeadsData = {
   queryErrors: string[];
 };
 
+type StaffContext = Awaited<ReturnType<typeof getStaffContextResult>>;
+
 function getLeadSortWeight(status: string) {
   switch (status) {
     case "new":
@@ -133,8 +135,10 @@ function getProfileDisplayName(profile?: AdminLeadProfileRow) {
   return profile?.display_name?.trim() || profile?.email || "未填写显示名";
 }
 
-export async function loadAdminLeadsData(): Promise<AdminLeadsData> {
-  const { supabase } = await getStaffContext();
+export async function loadAdminLeadsData(
+  context?: StaffContext,
+): Promise<AdminLeadsData> {
+  const { supabase } = context ?? (await requireStaffContext());
 
   const [
     { data, error },

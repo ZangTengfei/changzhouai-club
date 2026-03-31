@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { EventRegistrationForm } from "@/components/event-registration-form";
-import { hasSupabaseEnv } from "@/lib/env";
+import { EventDetailRegistrationPanel } from "@/components/event-detail-registration-panel";
 import { getPublicEventBySlug } from "@/lib/community-events";
-import { createClient } from "@/lib/supabase/server";
 
 type EventDetailSearchParams = {
   registered?: string;
@@ -45,30 +43,6 @@ export default async function EventDetailPage({
 
   if (!event) {
     notFound();
-  }
-
-  let isLoggedIn = false;
-  let isRegistered = false;
-
-  if (hasSupabaseEnv() && event.status === "scheduled") {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    isLoggedIn = Boolean(user);
-
-    if (user) {
-      const { data: registration } = await supabase
-        .from("event_registrations")
-        .select("id")
-        .eq("event_id", event.id)
-        .eq("user_id", user.id)
-        .eq("status", "registered")
-        .maybeSingle();
-
-      isRegistered = Boolean(registration);
-    }
   }
 
   const detailHref = `/events/${event.slug}`;
@@ -150,22 +124,7 @@ export default async function EventDetailPage({
         </article>
 
         {event.status === "scheduled" ? (
-          <EventRegistrationForm
-            event={{
-              id: event.id,
-              title: event.title,
-              summary: event.summary,
-              event_at: event.eventAt,
-              venue: event.venue,
-              city: event.city,
-              slug: event.slug,
-              registration_note: event.registrationNote,
-            }}
-            isLoggedIn={isLoggedIn}
-            isRegistered={isRegistered}
-            redirectTo={detailHref}
-            showDetailLink={false}
-          />
+          <EventDetailRegistrationPanel event={event} redirectTo={detailHref} />
         ) : (
           <article className="card event-detail-panel">
             <div className="section-heading">
