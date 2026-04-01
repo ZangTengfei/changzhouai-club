@@ -26,10 +26,10 @@ export default async function JoinPage({
       <PageHero
         eyebrow="Join"
         title="加入常州 AI 社区"
-        description="欢迎加入线下交流、主题分享与长期协作，和更多本地 AI 实践者建立连接。"
+        description="欢迎加入线下交流、主题分享与长期协作，和更多本地 AI 实践者建立连接。无论你是在公司内部推动 AI，还是在探索 OPC、独立开发与个人产品，都很适合加入。"
       >
         <div className="note-strip">
-          无论你是开发者、产品人、创业者、高校同学还是企业从业者，都欢迎加入社区交流。
+          无论你是开发者、产品人、创业者、高校同学、企业从业者，还是正在尝试一人产品与独立业务的实践者，都欢迎加入社区交流。
         </div>
       </PageHero>
 

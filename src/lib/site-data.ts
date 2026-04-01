@@ -14,9 +14,9 @@ export const homeHighlights = [
       "围绕常州本地的 AI 讨论、实操分享和自由交流，持续建立真实连接。",
   },
   {
-    title: "成员分享",
+    title: "OPC 与独立实践",
     description:
-      "活动里已经有社区成员分享自己正在打磨的项目、工具和实践，交流氛围持续形成。",
+      "关注 AI 时代的一人产品、独立开发、自动化服务与高杠杆个体实践，帮助更多想法走向真实验证。",
   },
   {
     title: "企业合作",
@@ -61,14 +61,38 @@ export const projectStatus = [
   },
 ];
 
+export const opcTracks = [
+  {
+    title: "个人产品与微型 SaaS",
+    description:
+      "围绕独立产品、垂直工具和微型 SaaS，讨论从想法验证到上线迭代的真实路径。",
+  },
+  {
+    title: "AI 自动化服务",
+    description:
+      "聚焦基于 Agent、工作流和行业知识的自动化服务，探索高杠杆交付与持续复用。",
+  },
+  {
+    title: "内容、咨询与轻交付",
+    description:
+      "关注 AI 时代个体如何把经验、内容和咨询能力产品化，形成更稳定的业务结构。",
+  },
+];
+
 export const memberTags = [
   "LLM 应用",
   "Agent",
   "RAG / 知识库",
+  "OPC",
+  "独立开发",
+  "个人产品",
+  "微型 SaaS",
   "前端工程",
   "后端服务",
   "自动化工作流",
   "产品设计",
+  "AI 自动化服务",
+  "咨询交付",
   "运营增长",
   "企业信息化",
   "高校交流",

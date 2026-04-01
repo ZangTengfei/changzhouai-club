@@ -28,14 +28,19 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    radial-gradient(circle at top left, rgba(15, 122, 106, 0.15), transparent 30%),
-    radial-gradient(circle at 85% 12%, rgba(236, 142, 68, 0.18), transparent 26%),
+    radial-gradient(
+      circle at top left,
+      rgba(15, 122, 106, 0.15),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 85% 12%,
+      rgba(236, 142, 68, 0.18),
+      transparent 26%
+    ),
     linear-gradient(180deg, #f6f1e9 0%, #f2ebdf 100%);
   font-family:
-    "Avenir Next",
-    "PingFang SC",
-    "Hiragino Sans GB",
-    "Microsoft YaHei",
+    "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
     sans-serif;
   line-height: 1.6;
 }
@@ -213,7 +218,9 @@ img {
   color: var(--muted);
   font-weight: 600;
   text-align: center;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .nav-links a:hover,
@@ -352,7 +359,11 @@ img {
 .account-avatar-fallback {
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, rgba(15, 122, 106, 0.92), rgba(236, 142, 68, 0.88));
+  background: linear-gradient(
+    135deg,
+    rgba(15, 122, 106, 0.92),
+    rgba(236, 142, 68, 0.88)
+  );
   color: #fffaf2;
   font-size: 0.82rem;
   font-weight: 800;
@@ -381,18 +392,14 @@ img {
 .page-hero h1,
 .section-heading h2 {
   margin: 0;
-  font-family:
-    "Iowan Old Style",
-    "Source Han Serif SC",
-    "Songti SC",
-    serif;
+  font-family: "Iowan Old Style", "Source Han Serif SC", "Songti SC", serif;
   letter-spacing: -0.03em;
   line-height: 1.02;
 }
 
 .hero-copy h1 {
   font-size: clamp(2.6rem, 5vw, 4.9rem);
-  max-width: 10ch;
+  max-width: 11ch;
 }
 
 .hero-copy p,
@@ -433,8 +440,11 @@ img {
   display: flex;
   flex-direction: column;
   gap: 18px;
-  background:
-    linear-gradient(145deg, rgba(255, 250, 242, 0.96), rgba(250, 239, 222, 0.9));
+  background: linear-gradient(
+    145deg,
+    rgba(255, 250, 242, 0.96),
+    rgba(250, 239, 222, 0.9)
+  );
 }
 
 .hero-panel h2,
@@ -472,17 +482,27 @@ img {
 }
 
 .metric-card {
+  display: grid;
+  align-content: start;
+  gap: 8px;
   background: rgba(255, 250, 242, 0.78);
+  overflow: hidden;
 }
 
 .metric-card strong {
   display: block;
-  font-size: 2rem;
-  line-height: 1;
+  font-size: clamp(1.85rem, 4vw, 3rem);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+  overflow-wrap: anywhere;
 }
 
 .metric-card span {
   color: var(--muted);
+  font-size: clamp(0.98rem, 1.4vw, 1.2rem);
+  line-height: 1.24;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
 }
 
 .page-stack {
@@ -511,11 +531,7 @@ img {
 
 .route-loading-copy h1 {
   margin: 0;
-  font-family:
-    "Iowan Old Style",
-    "Source Han Serif SC",
-    "Songti SC",
-    serif;
+  font-family: "Iowan Old Style", "Source Han Serif SC", "Songti SC", serif;
   font-size: clamp(2rem, 4vw, 3.2rem);
   letter-spacing: -0.03em;
   line-height: 1.04;
@@ -555,8 +571,12 @@ img {
 .route-loading-line {
   height: 12px;
   border-radius: 999px;
-  background:
-    linear-gradient(90deg, rgba(15, 122, 106, 0.08), rgba(15, 122, 106, 0.18), rgba(15, 122, 106, 0.08));
+  background: linear-gradient(
+    90deg,
+    rgba(15, 122, 106, 0.08),
+    rgba(15, 122, 106, 0.18),
+    rgba(15, 122, 106, 0.08)
+  );
   background-size: 200% 100%;
   animation: route-loading-shimmer 1.15s linear infinite;
 }
@@ -735,7 +755,11 @@ img {
 }
 
 .member-avatar-fallback {
-  background: linear-gradient(135deg, rgba(15, 122, 106, 0.9), rgba(236, 142, 68, 0.86));
+  background: linear-gradient(
+    135deg,
+    rgba(15, 122, 106, 0.9),
+    rgba(236, 142, 68, 0.86)
+  );
   color: #fffaf2;
   font-size: 0.9rem;
   font-weight: 800;
@@ -853,7 +877,11 @@ img {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(circle at top right, rgba(236, 142, 68, 0.08), transparent 30%),
+    radial-gradient(
+      circle at top right,
+      rgba(236, 142, 68, 0.08),
+      transparent 30%
+    ),
     rgba(255, 250, 242, 0.9);
   box-shadow: var(--shadow);
 }
@@ -1005,7 +1033,10 @@ img {
   border: 1px solid rgba(15, 122, 106, 0.1);
   border-radius: 16px;
   background: rgba(255, 249, 239, 0.72);
-  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    transform 0.18s ease;
 }
 
 .admin-nav-item:hover,
@@ -1134,7 +1165,10 @@ img {
 }
 
 .admin-event-card-details {
-  grid-template-columns: minmax(0, 1.15fr) minmax(110px, 0.72fr) minmax(140px, 0.88fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(110px, 0.72fr) minmax(
+      140px,
+      0.88fr
+    );
   gap: 18px;
   align-items: start;
 }
@@ -1345,7 +1379,10 @@ img {
 }
 
 .admin-registration-list-grid {
-  grid-template-columns: minmax(0, 1.3fr) minmax(190px, 1fr) minmax(120px, 0.7fr) minmax(180px, 0.9fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1.3fr) minmax(190px, 1fr) minmax(
+      120px,
+      0.7fr
+    ) minmax(180px, 0.9fr) minmax(0, 1fr);
 }
 
 .admin-lead-list-grid {
@@ -1579,7 +1616,11 @@ img {
   min-height: 240px;
   border-radius: 28px;
   background:
-    radial-gradient(circle at 20% 20%, rgba(242, 166, 90, 0.12), transparent 30%),
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(242, 166, 90, 0.12),
+      transparent 30%
+    ),
     linear-gradient(180deg, rgba(15, 122, 106, 0.96), rgba(13, 95, 83, 0.98));
 }
 
@@ -1689,11 +1730,7 @@ img {
   border-radius: 14px;
   background: rgba(24, 54, 52, 0.05);
   color: var(--muted);
-  font-family:
-    "SFMono-Regular",
-    "Menlo",
-    "Monaco",
-    monospace;
+  font-family: "SFMono-Regular", "Menlo", "Monaco", monospace;
   font-size: 0.84rem;
   line-height: 1.55;
   overflow-wrap: anywhere;
@@ -1733,11 +1770,7 @@ img {
   padding: 12px 14px;
   border-radius: 12px;
   background: rgba(24, 54, 52, 0.08);
-  font-family:
-    "SFMono-Regular",
-    "Menlo",
-    "Monaco",
-    monospace;
+  font-family: "SFMono-Regular", "Menlo", "Monaco", monospace;
   font-size: 0.92rem;
   word-break: break-all;
 }
@@ -1749,11 +1782,7 @@ img {
   border: 1px solid rgba(24, 54, 52, 0.12);
   background: rgba(24, 54, 52, 0.05);
   color: var(--ink);
-  font-family:
-    "SFMono-Regular",
-    "Menlo",
-    "Monaco",
-    monospace;
+  font-family: "SFMono-Regular", "Menlo", "Monaco", monospace;
   font-size: 0.9rem;
   line-height: 1.6;
   overflow-x: auto;
@@ -1948,11 +1977,7 @@ img {
   margin: 0;
   font-size: clamp(1.7rem, 2.4vw, 2.5rem);
   line-height: 1.1;
-  font-family:
-    "Iowan Old Style",
-    "Source Han Serif SC",
-    "Songti SC",
-    serif;
+  font-family: "Iowan Old Style", "Source Han Serif SC", "Songti SC", serif;
 }
 
 .event-detail-hero {
@@ -1977,11 +2002,7 @@ img {
   margin: 0;
   font-size: clamp(2.3rem, 4.1vw, 4rem);
   line-height: 1.02;
-  font-family:
-    "Iowan Old Style",
-    "Source Han Serif SC",
-    "Songti SC",
-    serif;
+  font-family: "Iowan Old Style", "Source Han Serif SC", "Songti SC", serif;
 }
 
 .event-detail-summary {
@@ -2080,7 +2101,7 @@ img {
     flex-wrap: nowrap;
     gap: 4px;
   }
-  
+
   .nav-links a {
     padding: 10px 8px;
     font-size: 0.95rem;

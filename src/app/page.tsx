@@ -2,7 +2,10 @@ import Link from "next/link";
 
 import { MemberAvatar } from "@/components/member-avatar";
 import { SectionHeading } from "@/components/section-heading";
-import { getCompletedEventRecaps, getScheduledEvents } from "@/lib/community-events";
+import {
+  getCompletedEventRecaps,
+  getScheduledEvents,
+} from "@/lib/community-events";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import {
   activityMoments,
@@ -17,7 +20,13 @@ function formatMetricDate(isoDate: string | null) {
     return "待更新";
   }
 
-  return isoDate.replaceAll("-", ".");
+  const [, month, day] = isoDate.split("-");
+
+  if (!month || !day) {
+    return isoDate.replaceAll("-", ".");
+  }
+
+  return `${month}.${day}`;
 }
 
 function formatMemberStatus(status: string) {
@@ -70,7 +79,6 @@ export default async function HomePage() {
   const featuredMembers = directory.members.slice(0, 6);
   const communityStats = [
     { value: "200+", label: "现有群成员" },
-    { value: `${directory.stats.publicMembers}`, label: "已入驻网站成员" },
     { value: `${completedEvents.length} 场`, label: "已举办线下活动" },
     {
       value: formatMetricDate(latestCompletedEvent?.isoDate ?? null),
@@ -85,7 +93,7 @@ export default async function HomePage() {
           <p className="eyebrow">Changzhou AI Club</p>
           <h1>常州 AI 开发者社区</h1>
           <p>
-            连接常州的开发者、产品人、创业者、高校同学与企业伙伴，持续组织线下交流、主题分享与合作对接。
+            连接常州的开发者、OPC、产品人、创业者、高校同学与企业伙伴，持续组织线下交流、主题分享与合作对接。
             {latestCompletedEvent
               ? `到 ${latestCompletedEvent.dateLabel}，我们已经完成了 ${completedEvents.length} 场线下活动。`
               : "社区持续举办线下交流与主题分享活动。"}
@@ -135,7 +143,7 @@ export default async function HomePage() {
       <section className="section">
         <SectionHeading
           eyebrow="我们在做什么"
-          title="连接常州本地的 AI 人与实践场景"
+          title="连接 AI 开发者与实践场景"
           description="通过活动、分享与合作交流，把分散在不同角色和行业中的 AI 实践者连接起来。"
         />
         <div className="card-grid">
@@ -160,7 +168,9 @@ export default async function HomePage() {
               <article className="card" key={event.id}>
                 <div className="pill-row">
                   <span className="pill">
-                    {event.event_at ? new Date(event.event_at).toLocaleString("zh-CN") : "时间待定"}
+                    {event.event_at
+                      ? new Date(event.event_at).toLocaleString("zh-CN")
+                      : "时间待定"}
                   </span>
                   <span className="pill">{event.city ?? "常州"}</span>
                   <span className="pill">开放报名</span>
@@ -211,7 +221,10 @@ export default async function HomePage() {
                     ))}
                   </div>
                   <div className="cta-row">
-                    <Link href={`/events/${item.slug}`} className="button button-secondary">
+                    <Link
+                      href={`/events/${item.slug}`}
+                      className="button button-secondary"
+                    >
                       查看活动详情
                     </Link>
                   </div>
@@ -267,12 +280,16 @@ export default async function HomePage() {
                   </div>
 
                   <p className="member-directory-bio">
-                    {member.bio ?? "这位成员已加入社区，欢迎在线下活动和交流中进一步认识。"}
+                    {member.bio ??
+                      "这位成员已加入社区，欢迎在线下活动和交流中进一步认识。"}
                   </p>
 
                   <div className="member-directory-signals">
                     {buildMemberPositioning(member).map((tag) => (
-                      <span className="pill member-signal-pill" key={`${member.id}-${tag}`}>
+                      <span
+                        className="pill member-signal-pill"
+                        key={`${member.id}-${tag}`}
+                      >
                         {tag}
                       </span>
                     ))}
@@ -294,7 +311,10 @@ export default async function HomePage() {
         )}
 
         <div className="tag-cloud">
-          {(directory.skillTags.length > 0 ? directory.skillTags : memberTags).map((tag) => (
+          {(directory.skillTags.length > 0
+            ? directory.skillTags
+            : memberTags
+          ).map((tag) => (
             <span key={tag}>{tag}</span>
           ))}
         </div>
