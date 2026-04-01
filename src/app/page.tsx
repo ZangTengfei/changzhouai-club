@@ -135,7 +135,7 @@ export default async function HomePage() {
             <span>合作对接</span>
           </div>
           <div className="hero-note">
-            欢迎开发者、产品人、创业者、高校师生与企业伙伴加入交流。
+            欢迎开发者、OPC、产品人、创业者、高校师生与企业伙伴加入交流。
           </div>
         </aside>
       </section>
@@ -165,7 +165,7 @@ export default async function HomePage() {
           />
           <div className="card-grid">
             {featuredScheduledEvents.map((event) => (
-              <article className="card" key={event.id}>
+              <article className="card scheduled-event-card" key={event.id}>
                 <div className="pill-row">
                   <span className="pill">
                     {event.event_at
@@ -179,7 +179,6 @@ export default async function HomePage() {
                 <p>{event.summary ?? "这是一场已经开放报名的社区活动。"}</p>
                 <ul className="detail-list">
                   <li>地点：{event.venue ?? "待公布"}</li>
-                  <li>活动标识：{event.slug}</li>
                 </ul>
                 <div className="cta-row">
                   <Link href={`/events/${event.slug}`} className="button">

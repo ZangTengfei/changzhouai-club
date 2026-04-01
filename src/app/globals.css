@@ -505,6 +505,27 @@ img {
   text-wrap: balance;
 }
 
+.scheduled-event-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.scheduled-event-card h3 {
+  margin: 18px 0 0;
+}
+
+.scheduled-event-card p {
+  margin: 12px 0 0;
+}
+
+.scheduled-event-card .detail-list {
+  margin-top: 18px;
+}
+
+.scheduled-event-card .cta-row {
+  margin-top: 18px;
+}
+
 .page-stack {
   display: grid;
   gap: 24px;
