@@ -26,15 +26,19 @@ export function EventDetailRegistrationPanel({
     }
 
     const supabase = createClient();
+    let cancelled = false;
 
-    async function syncRegistrationState() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    async function syncRegistrationState(userId?: string | null) {
+      const resolvedUserId =
+        userId ??
+        (await supabase.auth.getSession()).data.session?.user.id ??
+        null;
 
-      if (!user) {
-        setIsRegistered(false);
-        setAuthState("logged_out");
+      if (!resolvedUserId) {
+        if (!cancelled) {
+          setIsRegistered(false);
+          setAuthState("logged_out");
+        }
         return;
       }
 
@@ -42,23 +46,26 @@ export function EventDetailRegistrationPanel({
         .from("event_registrations")
         .select("id")
         .eq("event_id", event.id)
-        .eq("user_id", user.id)
+        .eq("user_id", resolvedUserId)
         .eq("status", "registered")
         .maybeSingle();
 
-      setIsRegistered(Boolean(registration));
-      setAuthState("logged_in");
+      if (!cancelled) {
+        setIsRegistered(Boolean(registration));
+        setAuthState("logged_in");
+      }
     }
 
     void syncRegistrationState();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      void syncRegistrationState();
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      void syncRegistrationState(session?.user?.id ?? null);
     });
 
     return () => {
+      cancelled = true;
       subscription.unsubscribe();
     };
   }, [event.id]);

@@ -24,37 +24,46 @@ export function EventsRegistrationGrid({
     }
 
     const supabase = createClient();
+    let cancelled = false;
 
-    async function syncRegistrationState() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    async function syncRegistrationState(userId?: string | null) {
+      const resolvedUserId =
+        userId ??
+        (await supabase.auth.getSession()).data.session?.user.id ??
+        null;
 
-      if (!user) {
-        setRegisteredEventIds(new Set());
-        setAuthState("logged_out");
+      if (!resolvedUserId) {
+        if (!cancelled) {
+          setRegisteredEventIds(new Set());
+          setAuthState("logged_out");
+        }
         return;
       }
 
       const { data: registrations } = await supabase
         .from("event_registrations")
         .select("event_id")
-        .eq("user_id", user.id)
+        .eq("user_id", resolvedUserId)
         .eq("status", "registered");
 
-      setRegisteredEventIds(new Set((registrations ?? []).map((item) => item.event_id)));
-      setAuthState("logged_in");
+      if (!cancelled) {
+        setRegisteredEventIds(
+          new Set((registrations ?? []).map((item) => item.event_id)),
+        );
+        setAuthState("logged_in");
+      }
     }
 
     void syncRegistrationState();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      void syncRegistrationState();
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      void syncRegistrationState(session?.user?.id ?? null);
     });
 
     return () => {
+      cancelled = true;
       subscription.unsubscribe();
     };
   }, []);

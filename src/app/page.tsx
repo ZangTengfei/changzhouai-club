@@ -200,7 +200,11 @@ export default async function HomePage() {
         {recentEvents.length > 0 ? (
           <div className="card-grid">
             {recentEvents.map((item) => (
-              <article className="event-card" key={item.id}>
+              <Link
+                href={`/events/${item.slug}`}
+                className="event-card event-card-link"
+                key={item.id}
+              >
                 <div className="event-media">
                   {item.imageUrl ? (
                     <img src={item.imageUrl} alt={item.title} loading="lazy" />
@@ -219,16 +223,8 @@ export default async function HomePage() {
                       <span key={highlight}>{highlight}</span>
                     ))}
                   </div>
-                  <div className="cta-row">
-                    <Link
-                      href={`/events/${item.slug}`}
-                      className="button button-secondary"
-                    >
-                      查看活动详情
-                    </Link>
-                  </div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         ) : (

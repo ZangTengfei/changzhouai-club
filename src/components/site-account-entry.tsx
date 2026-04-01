@@ -54,14 +54,26 @@ export function SiteAccountEntry() {
     }
 
     const supabase = createClient();
+    let cancelled = false;
 
-    async function syncAccountState() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    async function syncAccountState(sessionUser?: {
+      id: string;
+      email?: string | null;
+      user_metadata?: {
+        full_name?: string;
+        name?: string;
+        avatar_url?: string;
+      };
+    } | null) {
+      const user =
+        sessionUser ??
+        (await supabase.auth.getSession()).data.session?.user ??
+        null;
 
       if (!user) {
-        setAccount(defaultState);
+        if (!cancelled) {
+          setAccount(defaultState);
+        }
         return;
       }
 
@@ -80,24 +92,27 @@ export function SiteAccountEntry() {
         .eq("id", user.id)
         .maybeSingle();
 
-      setAccount({
-        href: "/account",
-        label: "账号中心",
-        name: displayName,
-        avatarUrl,
-        isStaff: ["organizer", "admin"].includes(member?.status ?? ""),
-      });
+      if (!cancelled) {
+        setAccount({
+          href: "/account",
+          label: "账号中心",
+          name: displayName,
+          avatarUrl,
+          isStaff: ["organizer", "admin"].includes(member?.status ?? ""),
+        });
+      }
     }
 
     void syncAccountState();
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      void syncAccountState();
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      void syncAccountState(session?.user ?? null);
     });
 
     return () => {
+      cancelled = true;
       subscription.unsubscribe();
     };
   }, []);
