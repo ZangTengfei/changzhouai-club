@@ -170,6 +170,10 @@ export default async function MembersPage() {
             </p>
           </div>
 
+          <p className="section-note">
+            已注册成员 <strong>{directory.members.length}</strong> 人
+          </p>
+
           <div className="member-directory-grid">
             {directory.members.map((member) => (
               <article className="member-directory-card" key={member.id}>
@@ -221,21 +225,6 @@ export default async function MembersPage() {
           暂无公开成员信息，欢迎稍后再来查看社区成员名录。
         </div>
       )}
-
-      <section className="two-up">
-        <article className="field-panel">
-          <h3>展示方式</h3>
-          <p>
-            仅展示成员授权公开的个人简介、城市、技能与参与方向，兼顾连接效率与信息边界。
-          </p>
-        </article>
-        <article className="field-panel">
-          <h3>页面价值</h3>
-          <p>
-            这是社区对外展示成员结构的重要窗口，也能支持活动组织、主题邀约与合作交流。目前公开成员覆盖 {directory.stats.cities} 个城市。
-          </p>
-        </article>
-      </section>
 
       <section className="tag-cloud">
         {skillTags.map((tag) => (

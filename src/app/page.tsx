@@ -278,12 +278,6 @@ export default async function HomePage() {
                 </article>
               ))}
             </div>
-
-            <div className="cta-row">
-              <Link href="/members" className="button button-secondary">
-                查看全部成员
-              </Link>
-            </div>
           </>
         ) : (
           <div className="note-strip">
