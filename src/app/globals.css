@@ -690,6 +690,14 @@ img {
   font-weight: 700;
 }
 
+.form-field-help {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
 .form-label-row {
   display: flex;
   align-items: center;

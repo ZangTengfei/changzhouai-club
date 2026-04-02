@@ -113,9 +113,12 @@ export function AccountProfileForm({
           <input
             className="input"
             name="city"
-            defaultValue={profile?.city ?? "常州"}
-            placeholder="常州"
+            defaultValue={profile?.city ?? ""}
+            placeholder="例如：常州·新北区 / 常州·天宁区 / 无锡"
           />
+          <p className="form-field-help">
+            如果你在常州，建议填写到区，方便大家更准确地建立线下连接。
+          </p>
         </label>
 
         <label className="form-field">
