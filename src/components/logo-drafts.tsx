@@ -107,3 +107,61 @@ export function LogoDraftCityAgent({ className }: LogoDraftProps) {
     </svg>
   );
 }
+
+export function LogoDraftCAICMonogram({ className }: LogoDraftProps) {
+  return (
+    <svg
+      viewBox="0 0 128 128"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+      className={className}
+    >
+      <path
+        d="M33 44H24C18 44 14 48 14 54V74C14 80 18 84 24 84H33"
+        stroke="#F7F0E4"
+        strokeWidth="8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M40 84L50 44L60 84"
+        stroke="#F2A65A"
+        strokeWidth="8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M44 68H56"
+        stroke="#F6D5B1"
+        strokeWidth="7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M68 44H80"
+        stroke="#F2A65A"
+        strokeWidth="8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M74 44V84"
+        stroke="#F2A65A"
+        strokeWidth="8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M68 84H80"
+        stroke="#F2A65A"
+        strokeWidth="8"
+        strokeLinecap="round"
+      />
+      <path
+        d="M114 44H105C99 44 95 48 95 54V74C95 80 99 84 105 84H114"
+        stroke="#F7F0E4"
+        strokeWidth="8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}

@@ -218,7 +218,7 @@ function mapPublicEventDetail(row: EventRow): PublicEventDetail {
     summary:
       row.summary ??
       row.description ??
-      "这是一场常州 AI 开发者社区的线下活动，欢迎查看时间、地点与活动介绍。",
+      "这是一场常州 AI 社区的线下活动，欢迎查看时间、地点与活动介绍。",
     eventAt: row.event_at,
     dateLabel: row.event_at ? formatEventDateLabel(row.event_at) : "时间待定",
     dateTimeLabel: formatEventDateTimeLabel(row.event_at),

@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { MemberAvatar } from "@/components/member-avatar";
 import { SectionHeading } from "@/components/section-heading";
+import { ToneBadge } from "@/components/tone-badge";
 import {
   getCompletedEventRecaps,
   getScheduledEvents,
@@ -46,22 +47,8 @@ function formatMemberStatus(status: string) {
   }
 }
 
-function buildMemberSignals(member: {
-  status: string;
-  willingToShare: boolean;
-  willingToJoinProjects: boolean;
-}) {
-  const tags = [formatMemberStatus(member.status)];
-
-  if (member.willingToShare) {
-    tags.push("愿意分享");
-  }
-
-  if (member.willingToJoinProjects) {
-    tags.push("愿意共建");
-  }
-
-  return tags;
+function buildPrimaryMemberSignal(member: { status: string }) {
+  return formatMemberStatus(member.status);
 }
 
 export default async function HomePage() {
@@ -86,7 +73,7 @@ export default async function HomePage() {
       <section className="hero surface">
         <div className="hero-copy">
           <p className="eyebrow">Changzhou AI Club</p>
-          <h1>常州 AI 开发者社区</h1>
+          <h1>常州 AI 社区</h1>
           <p>
             连接常州的开发者、OPC、产品人、创业者、高校同学与企业伙伴，持续组织线下交流、主题分享与合作对接。
             {latestCompletedEvent
@@ -266,16 +253,10 @@ export default async function HomePage() {
                     <div className="member-directory-copy">
                       <h3>{member.displayName}</h3>
                       <div className="member-directory-meta">
-                        <p>{member.city}</p>
                         <div className="member-directory-signals member-directory-signals-compact">
-                          {buildMemberSignals(member).map((tag) => (
-                            <span
-                              className="pill member-signal-pill member-signal-pill-compact"
-                              key={`${member.id}-${tag}`}
-                            >
-                              {tag}
-                            </span>
-                          ))}
+                          <span className="pill member-signal-pill member-signal-pill-compact">
+                            {buildPrimaryMemberSignal(member)}
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -289,7 +270,7 @@ export default async function HomePage() {
                   {member.skills.length > 0 ? (
                     <div className="member-skill-list member-skill-list-home">
                       {member.skills.slice(0, 4).map((skill) => (
-                        <span key={`${member.id}-${skill}`}>{skill}</span>
+                        <ToneBadge key={`${member.id}-${skill}`} label={skill} />
                       ))}
                     </div>
                   ) : null}
@@ -314,7 +295,7 @@ export default async function HomePage() {
             ? directory.skillTags
             : memberTags
           ).map((tag) => (
-            <span key={tag}>{tag}</span>
+            <ToneBadge key={tag} label={tag} />
           ))}
         </div>
       </section>
@@ -346,7 +327,7 @@ export default async function HomePage() {
             <h3>可合作方向</h3>
             <div className="tag-cloud">
               {cooperationAreas.map((item) => (
-                <span key={item}>{item}</span>
+                <ToneBadge key={item} label={item} />
               ))}
             </div>
           </article>

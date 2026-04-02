@@ -21,7 +21,7 @@ export async function generateMetadata({
   if (!event) {
     return {
       title: "活动详情",
-      description: "查看常州 AI 开发者社区的活动详情。",
+      description: "查看常州 AI 社区的活动详情。",
     };
   }
 

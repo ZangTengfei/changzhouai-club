@@ -109,21 +109,20 @@ img {
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 46px;
+  width: 54px;
+  height: 30px;
   flex-shrink: 0;
 }
 
 .brand-mark-icon {
   display: block;
-  width: 46px;
-  height: 46px;
+  width: 54px;
+  height: auto;
 }
 
 .brand-copy {
   display: flex;
   flex-direction: column;
-  gap: 2px;
 }
 
 .brand-copy strong {
@@ -829,6 +828,13 @@ img {
 .member-directory-header,
 .admin-member-identity {
   grid-template-columns: auto minmax(0, 1fr);
+}
+
+.member-directory-header {
+  align-items: start;
+}
+
+.admin-member-identity {
   align-items: center;
 }
 
@@ -877,13 +883,51 @@ img {
   gap: 10px;
 }
 
-.member-skill-list span {
+.tone-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
   padding: 9px 12px;
   border-radius: 999px;
-  background: rgba(15, 122, 106, 0.08);
-  color: var(--ink);
+  border: 1px solid transparent;
   font-size: 0.9rem;
   font-weight: 600;
+}
+
+.tone-badge-0 {
+  border-color: rgba(15, 122, 106, 0.16);
+  background: rgba(15, 122, 106, 0.08);
+  color: #0f6f61;
+}
+
+.tone-badge-1 {
+  border-color: rgba(236, 142, 68, 0.18);
+  background: rgba(236, 142, 68, 0.12);
+  color: #a7602f;
+}
+
+.tone-badge-2 {
+  border-color: rgba(56, 118, 195, 0.18);
+  background: rgba(56, 118, 195, 0.11);
+  color: #325f97;
+}
+
+.tone-badge-3 {
+  border-color: rgba(190, 82, 82, 0.16);
+  background: rgba(190, 82, 82, 0.1);
+  color: #9c4545;
+}
+
+.tone-badge-4 {
+  border-color: rgba(111, 129, 58, 0.16);
+  background: rgba(111, 129, 58, 0.11);
+  color: #5f7130;
+}
+
+.tone-badge-5 {
+  border-color: rgba(92, 99, 112, 0.16);
+  background: rgba(92, 99, 112, 0.1);
+  color: #4c5260;
 }
 
 .member-signal-pill {
@@ -897,10 +941,11 @@ img {
 }
 
 .member-signal-pill-compact {
-  min-height: 28px;
-  padding: 0 10px;
-  font-size: 0.82rem;
+  min-height: 24px;
+  padding: 0 8px;
+  font-size: 0.74rem;
   font-weight: 700;
+  line-height: 1;
 }
 
 .member-signal-pill-warm {
@@ -909,10 +954,7 @@ img {
   color: #a7602f;
 }
 
-.member-skill-list-home span {
-  border: 1px solid rgba(24, 54, 52, 0.08);
-  background: rgba(24, 54, 52, 0.04);
-  color: var(--muted);
+.member-skill-list-home .tone-badge {
   font-size: 0.84rem;
   font-weight: 600;
 }
@@ -1432,10 +1474,9 @@ img {
 }
 
 .admin-registration-list-grid {
-  grid-template-columns: minmax(0, 1.3fr) minmax(190px, 1fr) minmax(
-      120px,
-      0.7fr
-    ) minmax(180px, 0.9fr) minmax(0, 1fr);
+  grid-template-columns:
+    minmax(0, 1.3fr) minmax(190px, 1fr) minmax(120px, 0.7fr)
+    minmax(180px, 0.9fr) minmax(0, 1fr);
 }
 
 .admin-lead-list-grid {
@@ -1648,7 +1689,7 @@ img {
 
 .logo-lab-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 20px;
 }
 
@@ -1960,11 +2001,8 @@ img {
   gap: 10px;
 }
 
-.tag-cloud span {
+.tag-cloud .tone-badge {
   padding: 10px 14px;
-  border-radius: 999px;
-  background: rgba(236, 142, 68, 0.14);
-  color: var(--ink);
   font-weight: 700;
 }
 
@@ -2400,8 +2438,11 @@ img {
 
   .brand-mark,
   .brand-mark-icon {
-    width: 42px;
-    height: 42px;
+    width: 46px;
+  }
+
+  .brand-mark {
+    height: 26px;
   }
 
   .brand-copy strong {

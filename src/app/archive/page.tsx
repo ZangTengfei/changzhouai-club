@@ -7,7 +7,7 @@ import { archiveItems } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "往期回顾",
-  description: "回顾常州 AI 开发者社区的活动照片、分享主题与现场记录。",
+  description: "回顾常州 AI 社区的活动照片、分享主题与现场记录。",
 };
 
 export default async function ArchivePage() {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import {
+  LogoDraftCAICMonogram,
   LogoDraftBuildEngine,
   LogoDraftCityAgent,
   LogoDraftCityNodes,
@@ -8,7 +9,7 @@ import {
 
 export const metadata: Metadata = {
   title: "品牌视觉",
-  description: "查看常州 AI 开发者社区当前标识的设计方向与应用展示。",
+  description: "查看常州 AI 社区当前标识的设计方向与应用展示。",
 };
 
 const logoDrafts = [
@@ -18,7 +19,7 @@ const logoDrafts = [
     title: "城市节点",
     summary:
       "把常州 AI 社区看作一个正在形成的本地节点网络，核心是连接人、活动、项目和需求。",
-    note: "当前站点标识基于这一方向延展，兼顾社区连接感、城市属性与小尺寸下的辨识度。",
+    note: "这一方向更强调社区连接和城市节点的关系，适合延展成图形化主标识。",
     Mark: LogoDraftCityNodes,
   },
   {
@@ -39,6 +40,15 @@ const logoDrafts = [
     note: "这一方向更偏品牌表达，适合在活动视觉、内容传播与延展设计中形成独特识别。",
     Mark: LogoDraftCityAgent,
   },
+  {
+    id: "caic-monogram",
+    eyebrow: "Direction 04",
+    title: "CAIC 字母组合",
+    summary:
+      "用更纯粹的 CAIC 字母组合表达 Changzhou AI Club，让缩写本身成为主要识别。",
+    note: "当前站点标识已切换到这一方向，用更干净的字母结构测试缩写识别度和真实使用效果。",
+    Mark: LogoDraftCAICMonogram,
+  },
 ];
 
 export default function BrandLabPage() {
@@ -49,7 +59,7 @@ export default function BrandLabPage() {
           <p className="eyebrow">Brand Lab</p>
           <h1>品牌视觉方向</h1>
           <p>
-            这里展示社区标识的三个视觉方向，以及它们在站点图标、页眉和小尺寸场景中的呈现效果。
+            这里展示社区标识的四个视觉方向，以及它们在站点图标、页眉和小尺寸场景中的呈现效果。
           </p>
         </div>
       </section>
@@ -78,7 +88,7 @@ export default function BrandLabPage() {
                     <Mark className="logo-draft-header-mark" />
                   </div>
                   <div className="logo-draft-header-copy">
-                    <strong>常州 AI 开发者社区</strong>
+                    <strong>常州 AI 社区</strong>
                     <small>Changzhou AI Club</small>
                   </div>
                 </div>
