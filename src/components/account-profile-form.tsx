@@ -1,3 +1,7 @@
+"use client";
+
+import { useFormStatus } from "react-dom";
+
 import { updateAccountProfile } from "@/app/account/actions";
 
 type AccountProfileFormProps = {
@@ -12,6 +16,16 @@ type AccountProfileFormProps = {
     willing_to_join_projects: boolean | null;
   } | null;
 };
+
+function AccountProfileSubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <button type="submit" className="button" disabled={pending}>
+      {pending ? "保存中..." : "保存资料"}
+    </button>
+  );
+}
 
 export function AccountProfileForm({
   profile,
@@ -90,9 +104,7 @@ export function AccountProfileForm({
       </div>
 
       <div className="cta-row">
-        <button type="submit" className="button">
-          保存资料
-        </button>
+        <AccountProfileSubmitButton />
       </div>
     </form>
   );
