@@ -14,6 +14,8 @@ import {
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 
+const SHOW_JOIN_REQUESTS = false;
+
 function formatDate(value: string | null) {
   if (!value) {
     return "暂无记录";
@@ -191,10 +193,12 @@ export function AdminMembersPageClient() {
               <strong>{data?.stats.willingToJoinProjects ?? "..."}</strong>
               <span>愿意共建</span>
             </div>
-            <div className="admin-mini-stat">
-              <strong>{data?.stats.joinRequests ?? "..."}</strong>
-              <span>加入申请</span>
-            </div>
+            {SHOW_JOIN_REQUESTS ? (
+              <div className="admin-mini-stat">
+                <strong>{data?.stats.joinRequests ?? "..."}</strong>
+                <span>加入申请</span>
+              </div>
+            ) : null}
           </div>
         </div>
       </section>
@@ -413,152 +417,154 @@ export function AdminMembersPageClient() {
         )}
       </section>
 
-      <section className="surface admin-card">
-        <div className="section-heading">
-          <p className="eyebrow">Join Requests</p>
-          <h2>加入申请列表</h2>
-          <p>查看待处理申请、联系进度与转化情况，便于持续跟进潜在成员。</p>
-        </div>
-
-        <div className="admin-filter-group">
-          <span className="admin-filter-label">申请状态</span>
-          <div className="admin-filter-row">
-            {[
-              ["all", "全部"],
-              ["new", "新申请"],
-              ["contacted", "已联系"],
-              ["approved", "已通过"],
-              ["archived", "已归档"],
-            ].map(([value, label]) => (
-              <Link
-                key={value}
-                href={buildMembersFilterHref(
-                  statusFilter,
-                  visibilityFilter,
-                  intentFilter,
-                  value,
-                  memberQueryInput,
-                  requestQueryInput,
-                )}
-                className={
-                  requestStatusFilter === value
-                    ? "admin-filter-chip admin-filter-chip-active"
-                    : "admin-filter-chip"
-                }
-              >
-                {label}
-              </Link>
-            ))}
+      {SHOW_JOIN_REQUESTS ? (
+        <section className="surface admin-card">
+          <div className="section-heading">
+            <p className="eyebrow">Join Requests</p>
+            <h2>加入申请列表</h2>
+            <p>查看待处理申请、联系进度与转化情况，便于持续跟进潜在成员。</p>
           </div>
-        </div>
 
-        <form action="/admin/members" className="admin-search-form">
-          <input type="hidden" name="status" value={statusFilter} />
-          <input type="hidden" name="visibility" value={visibilityFilter} />
-          <input type="hidden" name="intent" value={intentFilter} />
-          <input type="hidden" name="request_status" value={requestStatusFilter} />
-          <input type="hidden" name="member_query" value={memberQueryInput} />
-
-          <label className="form-field admin-search-field">
-            <span>申请搜索</span>
-            <input
-              className="input"
-              type="search"
-              name="request_query"
-              defaultValue={requestQueryInput}
-              placeholder="搜索姓名、微信号、机构、备注"
-            />
-          </label>
-
-          <div className="admin-search-actions">
-            <button type="submit" className="button button-secondary">
-              搜索申请
-            </button>
-            {requestQueryInput ? (
-              <Link
-                href={buildMembersFilterHref(
-                  statusFilter,
-                  visibilityFilter,
-                  intentFilter,
-                  requestStatusFilter,
-                  memberQueryInput,
-                  "",
-                )}
-                className="button button-secondary"
-              >
-                清空搜索
-              </Link>
-            ) : null}
-          </div>
-        </form>
-
-        {isLoading ? (
-          <div className="note-strip">正在加载加入申请...</div>
-        ) : filteredJoinRequests.length > 0 ? (
-          <div className="admin-list">
-            <div className="admin-list-header admin-join-request-list-grid">
-              <span>申请者</span>
-              <span>联系与身份</span>
-              <span>状态</span>
-              <span>时间节点</span>
-              <span>意向与备注</span>
+          <div className="admin-filter-group">
+            <span className="admin-filter-label">申请状态</span>
+            <div className="admin-filter-row">
+              {[
+                ["all", "全部"],
+                ["new", "新申请"],
+                ["contacted", "已联系"],
+                ["approved", "已通过"],
+                ["archived", "已归档"],
+              ].map(([value, label]) => (
+                <Link
+                  key={value}
+                  href={buildMembersFilterHref(
+                    statusFilter,
+                    visibilityFilter,
+                    intentFilter,
+                    value,
+                    memberQueryInput,
+                    requestQueryInput,
+                  )}
+                  className={
+                    requestStatusFilter === value
+                      ? "admin-filter-chip admin-filter-chip-active"
+                      : "admin-filter-chip"
+                  }
+                >
+                  {label}
+                </Link>
+              ))}
             </div>
-
-            {filteredJoinRequests.map((request) => (
-              <Link
-                key={request.id}
-                href={buildDetailHref(
-                  `/admin/members/requests/${request.id}`,
-                  currentMembersPath,
-                )}
-                className="admin-list-row admin-join-request-list-grid admin-list-link"
-              >
-                <div className="admin-list-primary">
-                  <h3 className="admin-list-title">{request.displayName}</h3>
-                  <p className="admin-compact-note">微信：{request.wechat}</p>
-                </div>
-
-                <div className="admin-list-cell">
-                  <span>{request.city}</span>
-                  <span>{request.roleLabel ?? "未填写角色"}</span>
-                  <span>{request.organization ?? "未填写组织"}</span>
-                </div>
-
-                <div className="admin-list-cell">
-                  <span
-                    className={`pill admin-status-pill admin-status-pill-${getAdminJoinRequestStatusTone(
-                      request.status,
-                    )}`}
-                  >
-                    {formatAdminJoinRequestStatus(request.status)}
-                  </span>
-                  <span>
-                    {request.convertedMemberDisplayName
-                      ? `已转成员：${request.convertedMemberDisplayName}`
-                      : "尚未转为成员"}
-                  </span>
-                </div>
-
-                <div className="admin-list-cell">
-                  <span>申请于 {formatDate(request.createdAt)}</span>
-                  <span>已联系 {formatDate(request.contactedAt)}</span>
-                  <span>已通过 {formatDate(request.approvedAt)}</span>
-                </div>
-
-                <div className="admin-list-cell">
-                  <span>
-                    {request.willingToShare ? "愿意分享" : "暂不分享"} /{" "}
-                    {request.willingToJoinProjects ? "愿意共建" : "暂不共建"}
-                  </span>
-                  <span>{request.skills.slice(0, 3).join(" · ") || "未填写技能标签"}</span>
-                </div>
-              </Link>
-            ))}
           </div>
-        ) : (
-          <div className="note-strip">当前筛选条件下没有加入申请。</div>
-        )}
-      </section>
+
+          <form action="/admin/members" className="admin-search-form">
+            <input type="hidden" name="status" value={statusFilter} />
+            <input type="hidden" name="visibility" value={visibilityFilter} />
+            <input type="hidden" name="intent" value={intentFilter} />
+            <input type="hidden" name="request_status" value={requestStatusFilter} />
+            <input type="hidden" name="member_query" value={memberQueryInput} />
+
+            <label className="form-field admin-search-field">
+              <span>申请搜索</span>
+              <input
+                className="input"
+                type="search"
+                name="request_query"
+                defaultValue={requestQueryInput}
+                placeholder="搜索姓名、微信号、机构、备注"
+              />
+            </label>
+
+            <div className="admin-search-actions">
+              <button type="submit" className="button button-secondary">
+                搜索申请
+              </button>
+              {requestQueryInput ? (
+                <Link
+                  href={buildMembersFilterHref(
+                    statusFilter,
+                    visibilityFilter,
+                    intentFilter,
+                    requestStatusFilter,
+                    memberQueryInput,
+                    "",
+                  )}
+                  className="button button-secondary"
+                >
+                  清空搜索
+                </Link>
+              ) : null}
+            </div>
+          </form>
+
+          {isLoading ? (
+            <div className="note-strip">正在加载加入申请...</div>
+          ) : filteredJoinRequests.length > 0 ? (
+            <div className="admin-list">
+              <div className="admin-list-header admin-join-request-list-grid">
+                <span>申请者</span>
+                <span>联系与身份</span>
+                <span>状态</span>
+                <span>时间节点</span>
+                <span>意向与备注</span>
+              </div>
+
+              {filteredJoinRequests.map((request) => (
+                <Link
+                  key={request.id}
+                  href={buildDetailHref(
+                    `/admin/members/requests/${request.id}`,
+                    currentMembersPath,
+                  )}
+                  className="admin-list-row admin-join-request-list-grid admin-list-link"
+                >
+                  <div className="admin-list-primary">
+                    <h3 className="admin-list-title">{request.displayName}</h3>
+                    <p className="admin-compact-note">微信：{request.wechat}</p>
+                  </div>
+
+                  <div className="admin-list-cell">
+                    <span>{request.city}</span>
+                    <span>{request.roleLabel ?? "未填写角色"}</span>
+                    <span>{request.organization ?? "未填写组织"}</span>
+                  </div>
+
+                  <div className="admin-list-cell">
+                    <span
+                      className={`pill admin-status-pill admin-status-pill-${getAdminJoinRequestStatusTone(
+                        request.status,
+                      )}`}
+                    >
+                      {formatAdminJoinRequestStatus(request.status)}
+                    </span>
+                    <span>
+                      {request.convertedMemberDisplayName
+                        ? `已转成员：${request.convertedMemberDisplayName}`
+                        : "尚未转为成员"}
+                    </span>
+                  </div>
+
+                  <div className="admin-list-cell">
+                    <span>申请于 {formatDate(request.createdAt)}</span>
+                    <span>已联系 {formatDate(request.contactedAt)}</span>
+                    <span>已通过 {formatDate(request.approvedAt)}</span>
+                  </div>
+
+                  <div className="admin-list-cell">
+                    <span>
+                      {request.willingToShare ? "愿意分享" : "暂不分享"} /{" "}
+                      {request.willingToJoinProjects ? "愿意共建" : "暂不共建"}
+                    </span>
+                    <span>{request.skills.slice(0, 3).join(" · ") || "未填写技能标签"}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="note-strip">当前筛选条件下没有加入申请。</div>
+          )}
+        </section>
+      ) : null}
     </div>
   );
 }
