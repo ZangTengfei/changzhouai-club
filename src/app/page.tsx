@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { MemberAvatar } from "@/components/member-avatar";
 import { SectionHeading } from "@/components/section-heading";
+import { SiteSponsors } from "@/components/site-sponsors";
 import { ToneBadge } from "@/components/tone-badge";
 import {
   getCompletedEventRecaps,
@@ -347,6 +348,8 @@ export default async function HomePage() {
           </article>
         </div>
       </section>
+
+      <SiteSponsors />
     </div>
   );
 }
