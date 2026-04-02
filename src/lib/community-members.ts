@@ -20,6 +20,11 @@ type PublicMemberRow = {
   joined_at: string;
 };
 
+type PublicMemberStatsRow = {
+  registered_members: number;
+  public_members: number;
+};
+
 export type PublicMember = {
   id: string;
   displayName: string;
@@ -46,6 +51,7 @@ export type PublicMembersDirectory = {
     members: PublicMember[];
   }>;
   stats: {
+    registeredMembers: number;
     publicMembers: number;
     organizers: number;
     willingToShare: number;
@@ -134,6 +140,7 @@ export async function getPublicMembersDirectory(): Promise<PublicMembersDirector
       skillTags: [],
       featuredGroups: [],
       stats: {
+        registeredMembers: 0,
         publicMembers: 0,
         organizers: 0,
         willingToShare: 0,
@@ -157,9 +164,17 @@ export async function getPublicMemberById(memberId: string) {
 const getCachedPublicMembersDirectory = unstable_cache(
   async (): Promise<PublicMembersDirectory> => {
     const supabase = createPublicServerClient();
-    const { data } = await supabase.rpc("list_public_members");
+    const [{ data }, { data: statsDataRaw }] = await Promise.all([
+      supabase.rpc("list_public_members"),
+      supabase.rpc("get_public_member_stats").maybeSingle(),
+    ]);
     const members = ((data ?? []) as PublicMemberRow[]).map(mapPublicMember);
+    const statsData = (statsDataRaw ?? null) as PublicMemberStatsRow | null;
     const cityCount = new Set(members.map((member) => member.city)).size;
+    const registeredMembers =
+      typeof statsData?.registered_members === "number"
+        ? statsData.registered_members
+        : members.length;
     const organizers = pickMembers(
       members,
       (member) => ["admin", "organizer"].includes(member.status),
@@ -192,6 +207,7 @@ const getCachedPublicMembersDirectory = unstable_cache(
         },
       ].filter((group) => group.members.length > 0),
       stats: {
+        registeredMembers,
         publicMembers: members.length,
         organizers: members.filter((member) =>
           ["admin", "organizer"].includes(member.status),

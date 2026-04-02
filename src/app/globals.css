@@ -1093,13 +1093,6 @@ img {
   font-weight: 600;
 }
 
-.member-directory-link-label {
-  margin-top: 6px;
-  color: var(--accent-strong);
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
 .member-profile-hero {
   display: grid;
   gap: 22px;

@@ -67,8 +67,6 @@ export function MemberDirectoryCard({
       ) : (
         <p className="member-directory-tags-empty">技能标签待补充</p>
       )}
-
-      <span className="member-directory-link-label">查看成员页</span>
     </Link>
   );
 }

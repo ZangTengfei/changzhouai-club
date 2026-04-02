@@ -45,6 +45,7 @@ export default async function HomePage() {
   const completedEvents = await getCompletedEventRecaps();
   const directory = await getPublicMembersDirectory();
   const featuredScheduledEvents = scheduledEvents.slice(0, 3);
+  const primaryScheduledEvent = featuredScheduledEvents[0];
   const latestCompletedEvent = completedEvents[0];
   const recentEvents = completedEvents.slice(0, 3);
   const featuredMembers = directory.members.slice(0, 6);
@@ -77,11 +78,6 @@ export default async function HomePage() {
             <Link href="/join" className="button">
               立即加入社区
             </Link>
-            <Link href="/events" className="button button-secondary">
-              {scheduledEvents.length > 0
-                ? `查看 ${scheduledEvents.length} 场可报名活动`
-                : `查看 ${completedEvents.length} 场活动回顾`}
-            </Link>
           </div>
 
           <div className="stat-grid">
@@ -95,56 +91,82 @@ export default async function HomePage() {
         </div>
 
         <aside className="hero-panel">
-          <p className="eyebrow">社区定位</p>
-          <h2>以活动为连接点，汇聚本地 AI 人才与合作机会</h2>
-          <p>
-            社区以线下活动、成员连接和合作对接为核心，面向本地实践者与组织建立长期交流网络。
-          </p>
-          <div className="detail-pills">
-            <span>线下活动</span>
-            <span>成员分享</span>
-            <span>合作对接</span>
-          </div>
-          <div className="hero-note">
-            欢迎开发者、OPC、产品人、创业者、高校师生与企业伙伴加入交流。
-          </div>
+          <p className="eyebrow">开放报名活动</p>
+          {primaryScheduledEvent ? (
+            <>
+              <h2>{primaryScheduledEvent.title}</h2>
+              <p>
+                {primaryScheduledEvent.summary ?? "这是一场已经开放报名的社区活动。"}
+              </p>
+              <div className="detail-pills">
+                <span>
+                  {primaryScheduledEvent.event_at
+                    ? new Date(primaryScheduledEvent.event_at).toLocaleString("zh-CN")
+                    : "时间待定"}
+                </span>
+                <span>{primaryScheduledEvent.city ?? "常州"}</span>
+                <span>开放报名</span>
+              </div>
+              <div className="hero-note">
+                地点：{primaryScheduledEvent.venue ?? "待公布"}
+              </div>
+              <div className="cta-row">
+                <Link
+                  href={`/events/${primaryScheduledEvent.slug}`}
+                  className="button"
+                >
+                  查看详情并报名
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2>近期报名活动正在筹备</h2>
+              <p>
+                新一期线下交流和主题分享正在准备中，活动开放后会第一时间在这里更新。
+              </p>
+              <div className="detail-pills">
+                <span>线下活动</span>
+                <span>主题分享</span>
+                <span>持续更新</span>
+              </div>
+              <div className="cta-row">
+                <Link href="/events" className="button">
+                  查看活动页
+                </Link>
+              </div>
+            </>
+          )}
         </aside>
       </section>
 
-      {featuredScheduledEvents.length > 0 ? (
-        <section className="section">
-          <SectionHeading
-            eyebrow="近期活动"
-            title="开放报名中的活动"
-            description="浏览近期正在开放报名的社区活动，了解时间、地点与主题安排。"
-          />
-          <div className="card-grid">
-            {featuredScheduledEvents.map((event) => (
-              <article className="card scheduled-event-card" key={event.id}>
-                <div className="pill-row">
-                  <span className="pill">
-                    {event.event_at
-                      ? new Date(event.event_at).toLocaleString("zh-CN")
-                      : "时间待定"}
-                  </span>
-                  <span className="pill">{event.city ?? "常州"}</span>
-                  <span className="pill pill-warm">开放报名</span>
-                </div>
-                <h3>{event.title}</h3>
-                <p>{event.summary ?? "这是一场已经开放报名的社区活动。"}</p>
-                <ul className="detail-list">
-                  <li>地点：{event.venue ?? "待公布"}</li>
-                </ul>
-                <div className="cta-row">
-                  <Link href={`/events/${event.slug}`} className="button">
-                    查看详情并报名
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      <section className="section">
+        <SectionHeading
+          eyebrow="社区定位"
+          title="以活动为连接点，汇聚本地 AI 人才与合作机会"
+          description="社区围绕固定线下见面、成员分享与合作对接，帮助常州本地实践者建立长期交流网络。"
+        />
+        <div className="card-grid">
+          <article className="card">
+            <h3>线下活动</h3>
+            <p>
+              持续组织线下交流和主题分享，让本地开发者、产品人、创业者和高校同学有稳定碰面的场域。
+            </p>
+          </article>
+          <article className="card">
+            <h3>成员连接</h3>
+            <p>
+              通过成员地图和资料沉淀，让大家更容易找到相近方向的人，建立长期的交流与互助关系。
+            </p>
+          </article>
+          <article className="card">
+            <h3>合作对接</h3>
+            <p>
+              面向企业、园区、高校与独立实践者开放合作入口，支持主题分享、PoC、项目协作和人才连接。
+            </p>
+          </article>
+        </div>
+      </section>
 
       <section className="section">
         <SectionHeading
@@ -197,18 +219,16 @@ export default async function HomePage() {
         />
 
         {featuredMembers.length > 0 ? (
-          <>
-            <div className="member-directory-grid member-directory-grid-home">
-              {featuredMembers.map((member) => (
-                <MemberDirectoryCard
-                  key={member.id}
-                  member={member}
-                  headline={formatMemberHeadline(member)}
-                  bioFallback="这位成员已加入社区，欢迎在线下活动和交流中进一步认识。"
-                />
-              ))}
-            </div>
-          </>
+          <div className="member-directory-grid member-directory-grid-home">
+            {featuredMembers.map((member) => (
+              <MemberDirectoryCard
+                key={member.id}
+                member={member}
+                headline={formatMemberHeadline(member)}
+                bioFallback="这位成员已加入社区，欢迎在线下活动和交流中进一步认识。"
+              />
+            ))}
+          </div>
         ) : (
           <div className="note-strip">
             成员名录正在持续完善，欢迎前往加入页面提交资料，成为首页展示的社区成员。

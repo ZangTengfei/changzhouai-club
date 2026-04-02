@@ -35,12 +35,12 @@ export default async function MembersPage() {
       >
         <div className="stat-grid">
           <article className="metric-card">
-            <strong>{directory.stats.publicMembers}</strong>
-            <span>公开成员</span>
+            <strong>{directory.stats.registeredMembers}</strong>
+            <span>注册成员</span>
           </article>
           <article className="metric-card">
-            <strong>{directory.stats.cities}</strong>
-            <span>覆盖城市</span>
+            <strong>{directory.stats.publicMembers}</strong>
+            <span>公开成员</span>
           </article>
         </div>
       </PageHero>
