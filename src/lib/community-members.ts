@@ -146,6 +146,14 @@ export async function getPublicMembersDirectory(): Promise<PublicMembersDirector
   return getCachedPublicMembersDirectory();
 }
 
+export async function getPublicMemberById(memberId: string) {
+  if (!hasSupabaseEnv()) {
+    return null;
+  }
+
+  return getCachedPublicMemberById(memberId);
+}
+
 const getCachedPublicMembersDirectory = unstable_cache(
   async (): Promise<PublicMembersDirectory> => {
     const supabase = createPublicServerClient();
@@ -195,5 +203,19 @@ const getCachedPublicMembersDirectory = unstable_cache(
     };
   },
   ["public-members-directory"],
+  { revalidate: PUBLIC_MEMBERS_REVALIDATE_SECONDS },
+);
+
+const getCachedPublicMemberById = unstable_cache(
+  async (memberId: string) => {
+    const supabase = createPublicServerClient();
+    const { data } = await supabase.rpc("list_public_members");
+    const member = ((data ?? []) as PublicMemberRow[])
+      .map(mapPublicMember)
+      .find((item) => item.id === memberId);
+
+    return member ?? null;
+  },
+  ["public-member-detail-by-id"],
   { revalidate: PUBLIC_MEMBERS_REVALIDATE_SECONDS },
 );

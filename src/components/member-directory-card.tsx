@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { MemberAvatar } from "@/components/member-avatar";
 import { ToneBadge } from "@/components/tone-badge";
 import type { PublicMember } from "@/lib/community-members";
@@ -29,9 +31,14 @@ export function MemberDirectoryCard({
   bioFallback,
 }: MemberDirectoryCardProps) {
   const visibleSkills = getVisibleSkills(member.skills);
+  const href = `/members/${member.id}`;
 
   return (
-    <article className="member-directory-card">
+    <Link
+      href={href}
+      className="member-directory-card member-directory-card-link"
+      aria-label={`查看 ${member.displayName} 的成员主页`}
+    >
       <div className="member-directory-header">
         <MemberAvatar name={member.displayName} avatarUrl={member.avatarUrl} />
 
@@ -60,6 +67,8 @@ export function MemberDirectoryCard({
       ) : (
         <p className="member-directory-tags-empty">技能标签待补充</p>
       )}
-    </article>
+
+      <span className="member-directory-link-label">查看成员页</span>
+    </Link>
   );
 }
