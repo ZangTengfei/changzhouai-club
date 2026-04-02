@@ -6,6 +6,7 @@ import {
   saveAdminLeadMatch,
   updateAdminLeadDetail,
 } from "@/app/admin/actions";
+import { ToneBadge } from "@/components/tone-badge";
 import {
   formatAdminLeadMatchStatus,
   formatAdminLeadStatus,
@@ -293,7 +294,7 @@ export default async function AdminLeadDetailPage({
                 {match.memberSkills.length > 0 ? (
                   <div className="member-skill-list">
                     {match.memberSkills.map((skill) => (
-                      <span key={`${match.id}-${skill}`}>{skill}</span>
+                      <ToneBadge key={`${match.id}-${skill}`} label={skill} />
                     ))}
                   </div>
                 ) : null}

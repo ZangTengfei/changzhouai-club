@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { submitCooperationLead } from "@/app/cooperate/actions";
 import { PageHero } from "@/components/page-hero";
+import { ToneBadge } from "@/components/tone-badge";
 import { cooperationAreas } from "@/lib/site-data";
 
 export const metadata: Metadata = {
@@ -54,7 +55,7 @@ export default async function CooperatePage({
           <h3>可合作方向</h3>
           <div className="tag-cloud">
             {cooperationAreas.map((item) => (
-              <span key={item}>{item}</span>
+              <ToneBadge key={item} label={item} />
             ))}
           </div>
         </article>

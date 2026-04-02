@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { MemberAvatar } from "@/components/member-avatar";
 import { PageHero } from "@/components/page-hero";
+import { ToneBadge } from "@/components/tone-badge";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import { memberTags } from "@/lib/site-data";
 
@@ -195,7 +196,7 @@ export default async function MembersPage() {
                 {member.skills.length > 0 ? (
                   <div className="member-skill-list">
                     {member.skills.map((skill) => (
-                      <span key={`${member.id}-${skill}`}>{skill}</span>
+                      <ToneBadge key={`${member.id}-${skill}`} label={skill} />
                     ))}
                   </div>
                 ) : (
@@ -228,7 +229,7 @@ export default async function MembersPage() {
 
       <section className="tag-cloud">
         {skillTags.map((tag) => (
-          <span key={tag}>{tag}</span>
+          <ToneBadge key={tag} label={tag} />
         ))}
       </section>
     </div>

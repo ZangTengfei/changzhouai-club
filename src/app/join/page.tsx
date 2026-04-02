@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { submitJoinRequest } from "@/app/join/actions";
 import { PageHero } from "@/components/page-hero";
+import { ToneBadge } from "@/components/tone-badge";
 import { joinSteps, memberTags } from "@/lib/site-data";
 
 export const metadata: Metadata = {
@@ -174,7 +175,7 @@ export default async function JoinPage({
         <h3>社区常见关注方向</h3>
         <div className="tag-cloud">
           {memberTags.map((tag) => (
-            <span key={tag}>{tag}</span>
+            <ToneBadge key={tag} label={tag} />
           ))}
         </div>
       </section>

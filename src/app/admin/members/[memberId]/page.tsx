@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { updateAdminMember, updateAdminMemberProfile } from "@/app/admin/actions";
 import { MemberAvatar } from "@/components/member-avatar";
+import { ToneBadge } from "@/components/tone-badge";
 import {
   formatAdminMemberStatus,
   getAdminErrorMessage,
@@ -163,7 +164,7 @@ export default async function AdminMemberDetailPage({
         {member.skills.length > 0 ? (
           <div className="member-skill-list">
             {member.skills.map((skill) => (
-              <span key={`${member.id}-${skill}`}>{skill}</span>
+              <ToneBadge key={`${member.id}-${skill}`} label={skill} />
             ))}
           </div>
         ) : (

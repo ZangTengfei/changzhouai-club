@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 
 import { hasSupabaseEnv } from "@/lib/env";
+import { memberTags } from "@/lib/site-data";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 type PublicMemberRow = {
@@ -50,6 +51,7 @@ export type PublicMembersDirectory = {
 };
 
 const PUBLIC_MEMBERS_REVALIDATE_SECONDS = 60;
+const PUBLIC_MEMBER_TAG_LIMIT = 18;
 
 function pickMembers(
   members: PublicMember[],
@@ -98,8 +100,25 @@ function buildTopSkillTags(members: PublicMember[]) {
 
       return a[0].localeCompare(b[0], "zh-CN");
     })
-    .slice(0, 18)
+    .slice(0, PUBLIC_MEMBER_TAG_LIMIT)
     .map(([skill]) => skill);
+}
+
+function buildDirectorySkillTags(members: PublicMember[]) {
+  const realTags = buildTopSkillTags(members);
+  const mergedTags = new Set<string>();
+
+  [...realTags, ...memberTags].forEach((tag) => {
+    const normalized = tag.trim();
+
+    if (!normalized || mergedTags.has(normalized)) {
+      return;
+    }
+
+    mergedTags.add(normalized);
+  });
+
+  return Array.from(mergedTags).slice(0, PUBLIC_MEMBER_TAG_LIMIT);
 }
 
 export async function getPublicMembersDirectory(): Promise<PublicMembersDirectory> {
@@ -137,7 +156,7 @@ const getCachedPublicMembersDirectory = unstable_cache(
 
     return {
       members,
-      skillTags: buildTopSkillTags(members),
+      skillTags: buildDirectorySkillTags(members),
       featuredGroups: [
         {
           id: "organizers",

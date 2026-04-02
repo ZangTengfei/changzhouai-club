@@ -5,6 +5,7 @@ import {
   updateAdminJoinRequest,
   updateAdminJoinRequestPipeline,
 } from "@/app/admin/actions";
+import { ToneBadge } from "@/components/tone-badge";
 import {
   formatAdminJoinRequestStatus,
   getAdminErrorMessage,
@@ -202,7 +203,7 @@ export default async function AdminJoinRequestDetailPage({
         {joinRequest.skills.length > 0 ? (
           <div className="member-skill-list">
             {joinRequest.skills.map((skill) => (
-              <span key={`${joinRequest.id}-skill-${skill}`}>{skill}</span>
+              <ToneBadge key={`${joinRequest.id}-skill-${skill}`} label={skill} />
             ))}
           </div>
         ) : null}
@@ -210,7 +211,7 @@ export default async function AdminJoinRequestDetailPage({
         {joinRequest.interests.length > 0 ? (
           <div className="member-skill-list">
             {joinRequest.interests.map((interest) => (
-              <span key={`${joinRequest.id}-interest-${interest}`}>{interest}</span>
+              <ToneBadge key={`${joinRequest.id}-interest-${interest}`} label={interest} />
             ))}
           </div>
         ) : null}
