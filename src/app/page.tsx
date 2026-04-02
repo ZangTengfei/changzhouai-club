@@ -10,7 +10,6 @@ import {
 } from "@/lib/community-events";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import {
-  activityMoments,
   cooperationAreas,
   homeHighlights,
   joinSteps,
@@ -226,22 +225,6 @@ export default async function HomePage() {
             暂无活动回顾内容，欢迎稍后再来查看社区的最新活动记录。
           </div>
         )}
-      </section>
-
-      <section className="section">
-        <SectionHeading
-          eyebrow="社区特色"
-          title="围绕活动、成员与合作持续生长"
-          description="社区以真实交流为基础，逐步沉淀成员连接、内容分享与本地合作机会。"
-        />
-        <div className="three-up">
-          {activityMoments.map((item) => (
-            <article className="card" key={item.title}>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
-            </article>
-          ))}
-        </div>
       </section>
 
       <section className="section">
