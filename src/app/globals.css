@@ -800,6 +800,10 @@ img {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.member-directory-grid-home {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .member-directory-card,
 .admin-member-card {
   display: grid;
@@ -839,6 +843,11 @@ img {
 .member-directory-copy h3,
 .admin-member-copy h3 {
   margin: 0;
+}
+
+.member-directory-meta {
+  display: grid;
+  gap: 10px;
 }
 
 .member-directory-copy p,
@@ -883,10 +892,29 @@ img {
   color: #0f6f61;
 }
 
+.member-directory-signals-compact {
+  gap: 8px;
+}
+
+.member-signal-pill-compact {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
 .member-signal-pill-warm {
   border-color: rgba(236, 142, 68, 0.2);
   background: rgba(236, 142, 68, 0.14);
   color: #a7602f;
+}
+
+.member-skill-list-home span {
+  border: 1px solid rgba(24, 54, 52, 0.08);
+  background: rgba(24, 54, 52, 0.04);
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 600;
 }
 
 .member-spotlight-grid {
@@ -2170,6 +2198,10 @@ img {
     border-radius: 28px;
     align-items: center;
   }
+
+  .member-directory-grid-home {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 820px) {
@@ -2287,6 +2319,10 @@ img {
   }
 
   .member-directory-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .member-directory-grid-home {
     grid-template-columns: 1fr;
   }
 

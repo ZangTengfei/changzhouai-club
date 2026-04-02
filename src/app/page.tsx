@@ -46,11 +46,10 @@ function formatMemberStatus(status: string) {
   }
 }
 
-function buildMemberPositioning(member: {
+function buildMemberSignals(member: {
   status: string;
   willingToShare: boolean;
   willingToJoinProjects: boolean;
-  skills: string[];
 }) {
   const tags = [formatMemberStatus(member.status)];
 
@@ -62,11 +61,7 @@ function buildMemberPositioning(member: {
     tags.push("愿意共建");
   }
 
-  member.skills.slice(0, 2).forEach((skill) => {
-    tags.push(skill);
-  });
-
-  return tags.slice(0, 4);
+  return tags;
 }
 
 export default async function HomePage() {
@@ -259,7 +254,7 @@ export default async function HomePage() {
 
         {featuredMembers.length > 0 ? (
           <>
-            <div className="member-directory-grid">
+            <div className="member-directory-grid member-directory-grid-home">
               {featuredMembers.map((member) => (
                 <article className="member-directory-card" key={member.id}>
                   <div className="member-directory-header">
@@ -270,7 +265,19 @@ export default async function HomePage() {
 
                     <div className="member-directory-copy">
                       <h3>{member.displayName}</h3>
-                      <p>{member.city}</p>
+                      <div className="member-directory-meta">
+                        <p>{member.city}</p>
+                        <div className="member-directory-signals member-directory-signals-compact">
+                          {buildMemberSignals(member).map((tag) => (
+                            <span
+                              className="pill member-signal-pill member-signal-pill-compact"
+                              key={`${member.id}-${tag}`}
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -279,16 +286,13 @@ export default async function HomePage() {
                       "这位成员已加入社区，欢迎在线下活动和交流中进一步认识。"}
                   </p>
 
-                  <div className="member-directory-signals">
-                    {buildMemberPositioning(member).map((tag) => (
-                      <span
-                        className="pill member-signal-pill"
-                        key={`${member.id}-${tag}`}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
+                  {member.skills.length > 0 ? (
+                    <div className="member-skill-list member-skill-list-home">
+                      {member.skills.slice(0, 4).map((skill) => (
+                        <span key={`${member.id}-${skill}`}>{skill}</span>
+                      ))}
+                    </div>
+                  ) : null}
                 </article>
               ))}
             </div>
