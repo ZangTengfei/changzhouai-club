@@ -7,17 +7,48 @@ import { updateAccountProfile } from "@/app/account/actions";
 type AccountProfileFormProps = {
   profile: {
     display_name: string | null;
+    wechat: string | null;
     city: string | null;
     role_label: string | null;
     organization: string | null;
+    monthly_time: string | null;
     bio: string | null;
     skills: string[] | null;
+    interests: string[] | null;
   } | null;
   member: {
+    willing_to_attend: boolean | null;
     willing_to_share: boolean | null;
     willing_to_join_projects: boolean | null;
   } | null;
 };
+
+function FieldTag({ required }: { required: boolean }) {
+  return (
+    <span
+      className={`field-meta-tag ${
+        required ? "field-meta-tag-required" : "field-meta-tag-optional"
+      }`}
+    >
+      {required ? "必填" : "选填"}
+    </span>
+  );
+}
+
+function FieldLabel({
+  label,
+  required,
+}: {
+  label: string;
+  required: boolean;
+}) {
+  return (
+    <span className="form-label-row">
+      <span>{label}</span>
+      <FieldTag required={required} />
+    </span>
+  );
+}
 
 function AccountProfileSubmitButton() {
   const { pending } = useFormStatus();
@@ -37,25 +68,37 @@ export function AccountProfileForm({
     <form action={updateAccountProfile} className="account-form surface">
       <div className="section-heading">
         <p className="eyebrow">Profile</p>
-        <h2>完善成员资料</h2>
+        <h2>完善加入资料</h2>
         <p>
-          完善显示名、城市、技能与参与意愿，帮助社区在活动组织、成员连接与合作交流中更好地认识你。
+          标记为必填的项目用于完成社区加入；其余内容都可以稍后再回来补充或更新。
         </p>
       </div>
 
       <div className="form-grid">
         <label className="form-field">
-          <span>显示名</span>
+          <FieldLabel label="显示名" required />
           <input
             className="input"
             name="display_name"
             defaultValue={profile?.display_name ?? ""}
             placeholder="比如：张三"
+            required
           />
         </label>
 
         <label className="form-field">
-          <span>城市</span>
+          <FieldLabel label="微信号" required />
+          <input
+            className="input"
+            name="wechat"
+            defaultValue={profile?.wechat ?? ""}
+            placeholder="用于社区联系"
+            required
+          />
+        </label>
+
+        <label className="form-field">
+          <FieldLabel label="城市" required={false} />
           <input
             className="input"
             name="city"
@@ -65,7 +108,7 @@ export function AccountProfileForm({
         </label>
 
         <label className="form-field">
-          <span>身份 / 角色</span>
+          <FieldLabel label="身份 / 角色" required={false} />
           <input
             className="input"
             name="role_label"
@@ -75,7 +118,7 @@ export function AccountProfileForm({
         </label>
 
         <label className="form-field">
-          <span>公司 / 学校 / 团队</span>
+          <FieldLabel label="公司 / 学校 / 团队" required={false} />
           <input
             className="input"
             name="organization"
@@ -84,8 +127,18 @@ export function AccountProfileForm({
           />
         </label>
 
+        <label className="form-field">
+          <FieldLabel label="每月可投入时间" required={false} />
+          <input
+            className="input"
+            name="monthly_time"
+            defaultValue={profile?.monthly_time ?? ""}
+            placeholder="例如：每周 2 小时 / 每月参加 1 次线下活动"
+          />
+        </label>
+
         <label className="form-field form-field-wide">
-          <span>技能标签</span>
+          <FieldLabel label="技能标签" required={false} />
           <input
             className="input"
             name="skills"
@@ -95,7 +148,17 @@ export function AccountProfileForm({
         </label>
 
         <label className="form-field form-field-wide">
-          <span>个人简介</span>
+          <FieldLabel label="感兴趣的主题" required={false} />
+          <input
+            className="input"
+            name="interests"
+            defaultValue={profile?.interests?.join("，") ?? ""}
+            placeholder="例如：LLM 应用，自动化工作流，项目交付"
+          />
+        </label>
+
+        <label className="form-field form-field-wide">
+          <FieldLabel label="个人简介" required={false} />
           <textarea
             className="input textarea"
             name="bio"
@@ -110,10 +173,24 @@ export function AccountProfileForm({
         <label className="checkbox-row">
           <input
             type="checkbox"
+            name="willing_to_attend"
+            defaultChecked={member?.willing_to_attend ?? true}
+          />
+          <span className="checkbox-label-copy">
+            <span>我愿意参加线下活动</span>
+            <FieldTag required={false} />
+          </span>
+        </label>
+        <label className="checkbox-row">
+          <input
+            type="checkbox"
             name="willing_to_share"
             defaultChecked={member?.willing_to_share ?? false}
           />
-          <span>我愿意在社区活动里做主题分享</span>
+          <span className="checkbox-label-copy">
+            <span>我愿意在社区活动里做主题分享</span>
+            <FieldTag required={false} />
+          </span>
         </label>
         <label className="checkbox-row">
           <input
@@ -121,7 +198,10 @@ export function AccountProfileForm({
             name="willing_to_join_projects"
             defaultChecked={member?.willing_to_join_projects ?? false}
           />
-          <span>如有合适的合作机会，我愿意参与协作</span>
+          <span className="checkbox-label-copy">
+            <span>如有合适的合作机会，我愿意参与协作</span>
+            <FieldTag required={false} />
+          </span>
         </label>
       </div>
 

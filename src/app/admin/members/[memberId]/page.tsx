@@ -134,6 +134,7 @@ export default async function AdminMemberDetailPage({
             <div className="admin-member-copy">
               <h3>{member.displayName}</h3>
               <p>{member.email ?? "未提供邮箱"}</p>
+              <p>{member.wechat ?? "未填写微信号"}</p>
               <p>{member.roleLabel ?? "未填写身份"}</p>
               <p>{member.organization ?? "未填写公司 / 学校 / 团队"}</p>
               <p>{member.city}</p>
@@ -161,11 +162,17 @@ export default async function AdminMemberDetailPage({
             <p className="admin-member-bio">
               活动报名：{member.registrationCount} 次
             </p>
+            <p className="admin-member-bio">
+              每月可投入时间：{member.monthlyTime ?? "未填写"}
+            </p>
           </div>
 
           <div className="admin-note-panel">
             <span className="admin-card-label">参与意愿</span>
             <div className="pill-row">
+              <span className="pill member-signal-pill">
+                {member.willingToAttend ? "愿意参加线下活动" : "暂不参加线下活动"}
+              </span>
               <span className="pill member-signal-pill">
                 {member.willingToShare ? "愿意分享" : "暂不分享"}
               </span>
@@ -196,6 +203,17 @@ export default async function AdminMemberDetailPage({
           <div className="note-strip">这位成员尚未补充技能标签。</div>
         )}
 
+        {member.interests.length > 0 ? (
+          <div className="admin-note-panel">
+            <span className="admin-card-label">感兴趣的主题</span>
+            <div className="member-skill-list">
+              {member.interests.map((interest) => (
+                <ToneBadge key={`${member.id}-${interest}`} label={interest} />
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <form action={updateAdminMemberProfile} className="admin-inline-form">
           <input type="hidden" name="member_id" value={member.id} />
           <input type="hidden" name="redirect_to" value={currentPath} />
@@ -220,6 +238,16 @@ export default async function AdminMemberDetailPage({
                     : member.displayName
                 }
                 placeholder="比如：张三"
+              />
+            </label>
+
+            <label className="form-field">
+              <span>微信号</span>
+              <input
+                className="input"
+                name="wechat"
+                defaultValue={member.wechat ?? ""}
+                placeholder="用于联系"
               />
             </label>
 
@@ -253,6 +281,16 @@ export default async function AdminMemberDetailPage({
               />
             </label>
 
+            <label className="form-field">
+              <span>每月可投入时间</span>
+              <input
+                className="input"
+                name="monthly_time"
+                defaultValue={member.monthlyTime ?? ""}
+                placeholder="例如：每周 2 小时 / 每月参加 1 次活动"
+              />
+            </label>
+
             <label className="form-field form-field-wide">
               <span>技能标签</span>
               <input
@@ -260,6 +298,16 @@ export default async function AdminMemberDetailPage({
                 name="skills"
                 defaultValue={member.skills.join("，")}
                 placeholder="例如：Agent，RAG，前端工程，自动化工作流"
+              />
+            </label>
+
+            <label className="form-field form-field-wide">
+              <span>感兴趣的主题</span>
+              <input
+                className="input"
+                name="interests"
+                defaultValue={member.interests.join("，")}
+                placeholder="例如：LLM 应用，自动化工作流，项目交付"
               />
             </label>
 
@@ -276,6 +324,15 @@ export default async function AdminMemberDetailPage({
           </div>
 
           <div className="checkbox-list">
+            <label className="checkbox-row">
+              <input
+                type="checkbox"
+                name="willing_to_attend"
+                defaultChecked={member.willingToAttend}
+              />
+              <span>愿意参加线下活动</span>
+            </label>
+
             <label className="checkbox-row">
               <input
                 type="checkbox"

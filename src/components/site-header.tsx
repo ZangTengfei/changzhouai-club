@@ -62,10 +62,7 @@ export function SiteHeader() {
 
         <div className="header-actions">
           <Link href="/join" className="button button-secondary" onClick={() => setMenuOpen(false)}>
-            加入社群
-          </Link>
-          <Link href="/cooperate" className="button" onClick={() => setMenuOpen(false)}>
-            提交合作需求
+            加入社区
           </Link>
         </div>
 

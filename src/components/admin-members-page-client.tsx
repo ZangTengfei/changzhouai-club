@@ -131,7 +131,16 @@ export function AdminMembersPageClient() {
       }
 
       return matchesKeyword(
-        [member.displayName, member.email, member.city, member.bio, member.skills],
+        [
+          member.displayName,
+          member.email,
+          member.wechat,
+          member.city,
+          member.monthlyTime,
+          member.bio,
+          member.skills,
+          member.interests,
+        ],
         memberKeyword,
       );
     }) ?? [];

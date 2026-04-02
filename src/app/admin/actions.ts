@@ -292,11 +292,15 @@ export async function updateAdminMemberProfile(formData: FormData) {
   const memberId = String(formData.get("member_id") ?? "").trim();
   const redirectTo = getOptionalValue(formData, "redirect_to");
   const displayName = getOptionalValue(formData, "display_name");
+  const wechat = getOptionalValue(formData, "wechat");
   const city = getOptionalValue(formData, "city") ?? "常州";
   const roleLabel = getOptionalValue(formData, "role_label");
   const organization = getOptionalValue(formData, "organization");
+  const monthlyTime = getOptionalValue(formData, "monthly_time");
   const bio = getOptionalValue(formData, "bio");
   const skills = normalizeSkills(String(formData.get("skills") ?? ""));
+  const interests = normalizeSkills(String(formData.get("interests") ?? ""));
+  const willingToAttend = formData.get("willing_to_attend") === "on";
   const willingToShare = formData.get("willing_to_share") === "on";
   const willingToJoinProjects = formData.get("willing_to_join_projects") === "on";
 
@@ -313,16 +317,20 @@ export async function updateAdminMemberProfile(formData: FormData) {
       .from("profiles")
       .update({
         display_name: displayName,
+        wechat,
         city,
         role_label: roleLabel,
         organization,
+        monthly_time: monthlyTime,
         bio,
         skills,
+        interests,
       })
       .eq("id", memberId),
     supabase
       .from("members")
       .update({
+        willing_to_attend: willingToAttend,
         willing_to_share: willingToShare,
         willing_to_join_projects: willingToJoinProjects,
       })

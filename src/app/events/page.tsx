@@ -96,25 +96,6 @@ export default async function EventsPage({
           </div>
         )}
       </section>
-
-      <section className="two-up">
-        <article className="card">
-          <h3>活动页提供什么</h3>
-          <ul className="detail-list">
-            <li>查看近期活动的时间、地点、主题与报名入口</li>
-            <li>了解社区过往活动的内容方向与现场氛围</li>
-            <li>为新成员和合作伙伴提供稳定的活动信息窗口</li>
-          </ul>
-        </article>
-        <article className="card">
-          <h3>活动内容包含哪些信息</h3>
-          <ul className="detail-list">
-            <li>活动主题、时间地点与报名说明</li>
-            <li>现场分享人与议程安排</li>
-            <li>活动回顾、照片与讨论线索</li>
-          </ul>
-        </article>
-      </section>
     </div>
   );
 }

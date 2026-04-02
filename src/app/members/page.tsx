@@ -75,16 +75,12 @@ export default async function MembersPage() {
       >
         <div className="stat-grid">
           <article className="metric-card">
+            <strong>{directory.members.length}</strong>
+            <span>已注册成员</span>
+          </article>
+          <article className="metric-card">
             <strong>{directory.stats.publicMembers}</strong>
             <span>公开成员</span>
-          </article>
-          <article className="metric-card">
-            <strong>{directory.stats.organizers}</strong>
-            <span>组织者 / 管理员</span>
-          </article>
-          <article className="metric-card">
-            <strong>{directory.stats.willingToJoinProjects}</strong>
-            <span>愿意共建</span>
           </article>
         </div>
       </PageHero>
@@ -169,10 +165,6 @@ export default async function MembersPage() {
               页面展示经成员授权公开的信息，包括方向、技能与参与信号，不直接公开联系方式。
             </p>
           </div>
-
-          <p className="section-note">
-            已注册成员 <strong>{directory.members.length}</strong> 人
-          </p>
 
           <div className="member-directory-grid">
             {directory.members.map((member) => (

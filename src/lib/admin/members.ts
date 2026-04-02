@@ -7,16 +7,20 @@ type AdminProfileRow = {
   email: string | null;
   display_name: string | null;
   avatar_url: string | null;
+  wechat: string | null;
   city: string | null;
   role_label: string | null;
   organization: string | null;
+  monthly_time: string | null;
   bio: string | null;
   skills: string[] | null;
+  interests: string[] | null;
 };
 
 type AdminMemberRow = {
   id: string;
   status: string;
+  willing_to_attend: boolean;
   willing_to_share: boolean;
   willing_to_join_projects: boolean;
   is_publicly_visible: boolean;
@@ -60,11 +64,15 @@ export type AdminMember = {
   email: string | null;
   displayName: string;
   avatarUrl: string | null;
+  wechat: string | null;
   city: string;
   roleLabel: string | null;
   organization: string | null;
+  monthlyTime: string | null;
   bio: string | null;
   skills: string[];
+  interests: string[];
+  willingToAttend: boolean;
   status: string;
   willingToShare: boolean;
   willingToJoinProjects: boolean;
@@ -167,11 +175,13 @@ export async function loadAdminMembersData(
   ] = await Promise.all([
     supabase
       .from("profiles")
-      .select("id, email, display_name, avatar_url, city, role_label, organization, bio, skills"),
+      .select(
+        "id, email, display_name, avatar_url, wechat, city, role_label, organization, monthly_time, bio, skills, interests",
+      ),
     supabase
       .from("members")
       .select(
-        "id, status, willing_to_share, willing_to_join_projects, is_publicly_visible, joined_at, last_active_at",
+        "id, status, willing_to_attend, willing_to_share, willing_to_join_projects, is_publicly_visible, joined_at, last_active_at",
       ),
     supabase.from("event_registrations").select("user_id, status"),
     supabase
@@ -212,11 +222,15 @@ export async function loadAdminMembersData(
         email: profile?.email ?? null,
         displayName: profile?.display_name?.trim() || "未填写显示名",
         avatarUrl: profile?.avatar_url ?? null,
+        wechat: profile?.wechat?.trim() || null,
         city: profile?.city?.trim() || "常州",
         roleLabel: profile?.role_label?.trim() || null,
         organization: profile?.organization?.trim() || null,
+        monthlyTime: profile?.monthly_time?.trim() || null,
         bio: profile?.bio ?? null,
         skills: profile?.skills ?? [],
+        interests: profile?.interests ?? [],
+        willingToAttend: member.willing_to_attend,
         status: member.status,
         willingToShare: member.willing_to_share,
         willingToJoinProjects: member.willing_to_join_projects,

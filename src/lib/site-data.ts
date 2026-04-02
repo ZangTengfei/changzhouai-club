@@ -1,9 +1,8 @@
 export const navItems = [
   { href: "/", label: "首页" },
   { href: "/events", label: "活动" },
-  { href: "/projects", label: "项目共建" },
   { href: "/members", label: "成员地图" },
-  { href: "/join", label: "加入我们" },
+  { href: "/projects", label: "项目共建" },
   { href: "/cooperate", label: "合作联系" },
 ];
 
@@ -101,9 +100,9 @@ export const memberTags = [
 ];
 
 export const joinSteps = [
-  "了解社区关注的方向与合作主题",
-  "完善你的技能、兴趣与可参与方式",
-  "根据活动、需求与招募信息加入协作",
+  "使用 Google 登录，创建你的社区账号",
+  "先完成显示名和微信号这两个必填项",
+  "在个人页持续补充资料、报名活动和参与协作",
 ];
 
 export const cooperationAreas = [
@@ -152,6 +151,6 @@ export const faqItems = [
   {
     question: "网站支持在线提交申请和合作需求吗？",
     answer:
-      "支持。你可以直接在网站内提交加入申请和合作需求，相关信息会进入社区后台统一处理。",
+      "支持。加入社区现在统一通过登录后完善个人资料完成；合作需求仍然可以直接在线提交。",
   },
 ];

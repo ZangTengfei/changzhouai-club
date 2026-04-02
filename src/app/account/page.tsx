@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 export default async function AccountPage({
   searchParams,
 }: {
-  searchParams: Promise<{ updated?: string }>;
+  searchParams: Promise<{ updated?: string; error?: string; onboarding?: string }>;
 }) {
   const enabled = hasSupabaseEnv();
   const params = await searchParams;
@@ -47,19 +47,24 @@ export default async function AccountPage({
   const user = userData.user;
 
   if (!user) {
-    redirect("/login?next=/account");
+    const nextPath = params.onboarding ? "/account?onboarding=1" : "/account";
+    redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   }
 
   const [{ data: profile }, { data: member }, { data: registrations }] =
     await Promise.all([
       supabase
         .from("profiles")
-        .select("display_name, city, role_label, organization, bio, skills")
+        .select(
+          "display_name, wechat, city, role_label, organization, monthly_time, bio, skills, interests",
+        )
         .eq("id", user.id)
         .maybeSingle(),
       supabase
         .from("members")
-        .select("status, willing_to_share, willing_to_join_projects")
+        .select(
+          "status, willing_to_attend, willing_to_share, willing_to_join_projects",
+        )
         .eq("id", user.id)
         .maybeSingle(),
       supabase
@@ -72,6 +77,9 @@ export default async function AccountPage({
     ]);
 
   const identities = identityData?.identities ?? [];
+  const profileComplete = Boolean(
+    profile?.display_name?.trim() && profile?.wechat?.trim(),
+  );
 
   return (
     <div className="page-stack">
@@ -86,11 +94,25 @@ export default async function AccountPage({
         </div>
       </section>
 
+      {params.onboarding || !profileComplete ? (
+        <div className="note-strip">
+          先补完显示名和微信号这两个必填项，就可以完成加入；其他资料都可以稍后继续完善。
+        </div>
+      ) : null}
+
       {params.updated ? (
         <div className="note-strip">
           {params.updated === "profile"
             ? "成员资料已保存。"
             : "活动报名状态已更新。"}
+        </div>
+      ) : null}
+
+      {params.error ? (
+        <div className="note-strip">
+          {params.error === "missing_required_fields"
+            ? "请先填写显示名和微信号这两个必填项。"
+            : "资料保存失败，请稍后再试。"}
         </div>
       ) : null}
 
@@ -111,8 +133,11 @@ export default async function AccountPage({
           <h3>当前成员状态</h3>
           <ul className="field-list">
             <li>成员状态：{member?.status ?? "pending"}</li>
+            <li>微信号：{profile?.wechat ?? "未填写"}</li>
             <li>身份：{profile?.role_label ?? "未填写"}</li>
             <li>公司 / 学校 / 团队：{profile?.organization ?? "未填写"}</li>
+            <li>每月可投入时间：{profile?.monthly_time ?? "未填写"}</li>
+            <li>愿意参加线下活动：{member?.willing_to_attend ? "是" : "否"}</li>
             <li>愿意分享：{member?.willing_to_share ? "是" : "否"}</li>
             <li>
               愿意参与社区共建：

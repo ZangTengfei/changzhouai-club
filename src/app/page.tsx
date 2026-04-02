@@ -97,7 +97,7 @@ export default async function HomePage() {
 
           <div className="cta-row">
             <Link href="/join" className="button">
-              立即加入社群
+              立即加入社区
             </Link>
             <Link href="/events" className="button button-secondary">
               {scheduledEvents.length > 0
@@ -166,7 +166,7 @@ export default async function HomePage() {
                       : "时间待定"}
                   </span>
                   <span className="pill">{event.city ?? "常州"}</span>
-                  <span className="pill">开放报名</span>
+                  <span className="pill pill-warm">开放报名</span>
                 </div>
                 <h3>{event.title}</h3>
                 <p>{event.summary ?? "这是一场已经开放报名的社区活动。"}</p>

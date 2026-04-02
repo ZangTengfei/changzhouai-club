@@ -374,7 +374,7 @@ img {
 }
 
 .site-main {
-  padding: 30px 0 72px;
+  padding: 30px 0 40px;
 }
 
 .surface {
@@ -498,6 +498,7 @@ img {
   line-height: 0.96;
   letter-spacing: -0.05em;
   overflow-wrap: anywhere;
+  color: var(--accent-warm);
 }
 
 .metric-card span {
@@ -684,8 +685,37 @@ img {
   min-width: 0;
 }
 
-.form-field span {
+.form-field > span,
+.form-label-row {
   font-weight: 700;
+}
+
+.form-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.field-meta-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  letter-spacing: 0.04em;
+}
+
+.field-meta-tag-required {
+  background: rgba(236, 142, 68, 0.16);
+  color: var(--accent-strong);
+}
+
+.field-meta-tag-optional {
+  background: rgba(15, 122, 106, 0.1);
+  color: var(--accent-strong);
 }
 
 .form-field-wide {
@@ -720,6 +750,13 @@ img {
   align-items: flex-start;
   gap: 10px;
   color: var(--ink);
+}
+
+.checkbox-label-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .checkbox-row input {
@@ -1941,6 +1978,11 @@ img {
   color: var(--ink);
   font-size: 0.92rem;
   font-weight: 600;
+}
+
+.pill-warm {
+  background: rgba(236, 142, 68, 0.12);
+  color: var(--accent-warm);
 }
 
 .detail-list,

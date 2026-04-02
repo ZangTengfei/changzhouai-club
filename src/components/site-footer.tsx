@@ -25,7 +25,7 @@ export function SiteFooter() {
               <Link href="/members">成员地图</Link>
             </li>
             <li>
-              <Link href="/join">加入我们</Link>
+              <Link href="/join">加入社区</Link>
             </li>
           </ul>
         </div>
