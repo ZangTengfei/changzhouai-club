@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { MemberAvatar } from "@/components/member-avatar";
+import { MemberDirectoryCard } from "@/components/member-directory-card";
 import { PageHero } from "@/components/page-hero";
 import { ToneBadge } from "@/components/tone-badge";
 import { getPublicMembersDirectory } from "@/lib/community-members";
@@ -10,46 +10,6 @@ export const metadata: Metadata = {
   title: "成员地图",
   description: "展示常州 AI 社区的成员技能分布和参与方向。",
 };
-
-function formatMemberStatus(status: string) {
-  switch (status) {
-    case "admin":
-      return "管理员";
-    case "organizer":
-      return "组织者";
-    case "active":
-      return "活跃成员";
-    case "pending":
-      return "待完善";
-    case "paused":
-      return "暂停中";
-    default:
-      return status;
-  }
-}
-
-function buildMemberPositioning(member: {
-  status: string;
-  willingToShare: boolean;
-  willingToJoinProjects: boolean;
-  skills: string[];
-}) {
-  const tags = [formatMemberStatus(member.status)];
-
-  if (member.willingToShare) {
-    tags.push("可邀约分享");
-  }
-
-  if (member.willingToJoinProjects) {
-    tags.push("可匹配共建");
-  }
-
-  member.skills.slice(0, 2).forEach((skill) => {
-    tags.push(skill);
-  });
-
-  return tags.slice(0, 4);
-}
 
 function formatMemberHeadline(member: {
   roleLabel: string | null;
@@ -75,12 +35,12 @@ export default async function MembersPage() {
       >
         <div className="stat-grid">
           <article className="metric-card">
-            <strong>{directory.members.length}</strong>
-            <span>已注册成员</span>
-          </article>
-          <article className="metric-card">
             <strong>{directory.stats.publicMembers}</strong>
             <span>公开成员</span>
+          </article>
+          <article className="metric-card">
+            <strong>{directory.stats.cities}</strong>
+            <span>覆盖城市</span>
           </article>
         </div>
       </PageHero>
@@ -95,7 +55,7 @@ export default async function MembersPage() {
         <article className="card">
           <h3>发现分享者</h3>
           <p>
-            愿意分享的成员会优先展示，方便活动策划与主题邀约。
+            成员展示由管理员统一审核设置，公开后更方便活动策划与主题邀约。
           </p>
         </article>
         <article className="card">
@@ -118,47 +78,12 @@ export default async function MembersPage() {
 
           <div className="member-directory-grid">
             {directory.members.map((member) => (
-              <article className="member-directory-card" key={member.id}>
-                <div className="member-directory-header">
-                  <MemberAvatar
-                    name={member.displayName}
-                    avatarUrl={member.avatarUrl}
-                  />
-
-                  <div className="member-directory-copy">
-                    <h3>{member.displayName}</h3>
-                    <p>{formatMemberHeadline(member)}</p>
-                  </div>
-                </div>
-
-                <p className="member-directory-bio">
-                  {member.bio ?? "这位成员已经加入社区，正在等待补充更完整的个人介绍。"}
-                </p>
-
-                <div className="member-directory-signals">
-                  <span className="pill member-signal-pill">
-                    {formatMemberStatus(member.status)}
-                  </span>
-                  {member.willingToShare ? (
-                    <span className="pill member-signal-pill">愿意分享</span>
-                  ) : null}
-                  {member.willingToJoinProjects ? (
-                    <span className="pill member-signal-pill member-signal-pill-warm">
-                      愿意参与共建
-                    </span>
-                  ) : null}
-                </div>
-
-                {member.skills.length > 0 ? (
-                  <div className="member-skill-list">
-                    {member.skills.map((skill) => (
-                      <ToneBadge key={`${member.id}-${skill}`} label={skill} />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="note-strip">这位成员暂未补充技能标签。</div>
-                )}
-              </article>
+              <MemberDirectoryCard
+                key={member.id}
+                member={member}
+                headline={formatMemberHeadline(member)}
+                bioFallback="这位成员已经加入社区，正在等待补充更完整的个人介绍。"
+              />
             ))}
           </div>
         </section>

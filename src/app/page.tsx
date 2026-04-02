@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { MemberAvatar } from "@/components/member-avatar";
+import { MemberDirectoryCard } from "@/components/member-directory-card";
 import { SectionHeading } from "@/components/section-heading";
 import { SiteSponsors } from "@/components/site-sponsors";
 import { ToneBadge } from "@/components/tone-badge";
@@ -200,37 +200,12 @@ export default async function HomePage() {
           <>
             <div className="member-directory-grid member-directory-grid-home">
               {featuredMembers.map((member) => (
-                <article className="member-directory-card" key={member.id}>
-                  <div className="member-directory-header">
-                    <MemberAvatar
-                      name={member.displayName}
-                      avatarUrl={member.avatarUrl}
-                    />
-
-                    <div className="member-directory-copy">
-                      <h3>{member.displayName}</h3>
-                      {formatMemberHeadline(member) ? (
-                        <p>{formatMemberHeadline(member)}</p>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  <p className="member-directory-bio">
-                    {member.bio ??
-                      "这位成员已加入社区，欢迎在线下活动和交流中进一步认识。"}
-                  </p>
-
-                  {member.skills.length > 0 ? (
-                    <div className="member-skill-list member-skill-list-home">
-                      {member.skills.slice(0, 4).map((skill) => (
-                        <ToneBadge
-                          key={`${member.id}-${skill}`}
-                          label={skill}
-                        />
-                      ))}
-                    </div>
-                  ) : null}
-                </article>
+                <MemberDirectoryCard
+                  key={member.id}
+                  member={member}
+                  headline={formatMemberHeadline(member)}
+                  bioFallback="这位成员已加入社区，欢迎在线下活动和交流中进一步认识。"
+                />
               ))}
             </div>
           </>

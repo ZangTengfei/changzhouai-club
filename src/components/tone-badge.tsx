@@ -19,6 +19,14 @@ function getToneBadgeIndex(label: string) {
 
 export function ToneBadge({ label }: ToneBadgeProps) {
   const toneIndex = getToneBadgeIndex(label);
+  const normalizedLabel = label.trim();
 
-  return <span className={`tone-badge tone-badge-${toneIndex}`}>{label}</span>;
+  return (
+    <span
+      className={`tone-badge tone-badge-${toneIndex}`}
+      title={normalizedLabel}
+    >
+      {normalizedLabel}
+    </span>
+  );
 }
