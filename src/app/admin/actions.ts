@@ -293,6 +293,8 @@ export async function updateAdminMemberProfile(formData: FormData) {
   const redirectTo = getOptionalValue(formData, "redirect_to");
   const displayName = getOptionalValue(formData, "display_name");
   const city = getOptionalValue(formData, "city") ?? "常州";
+  const roleLabel = getOptionalValue(formData, "role_label");
+  const organization = getOptionalValue(formData, "organization");
   const bio = getOptionalValue(formData, "bio");
   const skills = normalizeSkills(String(formData.get("skills") ?? ""));
   const willingToShare = formData.get("willing_to_share") === "on";
@@ -312,6 +314,8 @@ export async function updateAdminMemberProfile(formData: FormData) {
       .update({
         display_name: displayName,
         city,
+        role_label: roleLabel,
+        organization,
         bio,
         skills,
       })

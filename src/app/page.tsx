@@ -52,6 +52,17 @@ function buildPrimaryMemberSignal(member: { status: string }) {
   return formatMemberStatus(member.status);
 }
 
+function formatMemberHeadline(member: {
+  roleLabel: string | null;
+  organization: string | null;
+}) {
+  if (member.roleLabel && member.organization) {
+    return `${member.roleLabel} · ${member.organization}`;
+  }
+
+  return member.roleLabel ?? member.organization;
+}
+
 export default async function HomePage() {
   const scheduledEvents = await getScheduledEvents();
   const completedEvents = await getCompletedEventRecaps();
@@ -61,7 +72,7 @@ export default async function HomePage() {
   const recentEvents = completedEvents.slice(0, 3);
   const featuredMembers = directory.members.slice(0, 6);
   const communityStats = [
-    { value: "200+", label: "现有群成员" },
+    { value: "200+", label: "全网群成员" },
     { value: `${completedEvents.length} 场`, label: "已举办线下活动" },
     {
       value: formatMetricDate(latestCompletedEvent?.isoDate ?? null),
@@ -253,6 +264,9 @@ export default async function HomePage() {
 
                     <div className="member-directory-copy">
                       <h3>{member.displayName}</h3>
+                      {formatMemberHeadline(member) ? (
+                        <p>{formatMemberHeadline(member)}</p>
+                      ) : null}
                       <div className="member-directory-meta">
                         <div className="member-directory-signals member-directory-signals-compact">
                           <span className="pill member-signal-pill member-signal-pill-compact">
@@ -271,7 +285,10 @@ export default async function HomePage() {
                   {member.skills.length > 0 ? (
                     <div className="member-skill-list member-skill-list-home">
                       {member.skills.slice(0, 4).map((skill) => (
-                        <ToneBadge key={`${member.id}-${skill}`} label={skill} />
+                        <ToneBadge
+                          key={`${member.id}-${skill}`}
+                          label={skill}
+                        />
                       ))}
                     </div>
                   ) : null}

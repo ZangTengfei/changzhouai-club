@@ -54,7 +54,7 @@ export default async function AccountPage({
     await Promise.all([
       supabase
         .from("profiles")
-        .select("display_name, city, bio, skills")
+        .select("display_name, city, role_label, organization, bio, skills")
         .eq("id", user.id)
         .maybeSingle(),
       supabase
@@ -111,6 +111,8 @@ export default async function AccountPage({
           <h3>当前成员状态</h3>
           <ul className="field-list">
             <li>成员状态：{member?.status ?? "pending"}</li>
+            <li>身份：{profile?.role_label ?? "未填写"}</li>
+            <li>公司 / 学校 / 团队：{profile?.organization ?? "未填写"}</li>
             <li>愿意分享：{member?.willing_to_share ? "是" : "否"}</li>
             <li>
               愿意参与社区共建：

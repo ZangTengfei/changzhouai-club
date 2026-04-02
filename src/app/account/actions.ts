@@ -24,6 +24,8 @@ export async function updateAccountProfile(formData: FormData) {
 
   const displayName = String(formData.get("display_name") ?? "").trim();
   const city = String(formData.get("city") ?? "").trim() || "常州";
+  const roleLabel = String(formData.get("role_label") ?? "").trim();
+  const organization = String(formData.get("organization") ?? "").trim();
   const bio = String(formData.get("bio") ?? "").trim();
   const skills = normalizeSkills(String(formData.get("skills") ?? ""));
   const willingToShare = formData.get("willing_to_share") === "on";
@@ -32,6 +34,8 @@ export async function updateAccountProfile(formData: FormData) {
   await supabase.from("profiles").update({
     display_name: displayName || null,
     city,
+    role_label: roleLabel || null,
+    organization: organization || null,
     bio: bio || null,
     skills,
   }).eq("id", user.id);

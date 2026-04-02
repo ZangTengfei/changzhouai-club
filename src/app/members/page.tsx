@@ -51,6 +51,16 @@ function buildMemberPositioning(member: {
   return tags.slice(0, 4);
 }
 
+function formatMemberHeadline(member: {
+  roleLabel: string | null;
+  organization: string | null;
+  city: string;
+}) {
+  const items = [member.roleLabel, member.organization, member.city].filter(Boolean);
+
+  return items.join(" · ");
+}
+
 export default async function MembersPage() {
   const directory = await getPublicMembersDirectory();
   const skillTags =
@@ -130,7 +140,7 @@ export default async function MembersPage() {
 
                         <div className="member-directory-copy">
                           <h3>{member.displayName}</h3>
-                          <p>{member.city}</p>
+                          <p>{formatMemberHeadline(member)}</p>
                         </div>
                       </div>
 
@@ -171,7 +181,7 @@ export default async function MembersPage() {
 
                   <div className="member-directory-copy">
                     <h3>{member.displayName}</h3>
-                    <p>{member.city}</p>
+                    <p>{formatMemberHeadline(member)}</p>
                   </div>
                 </div>
 

@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { updateAdminMember, updateAdminMemberProfile } from "@/app/admin/actions";
+import {
+  updateAdminMember,
+  updateAdminMemberProfile,
+} from "@/app/admin/actions";
 import { MemberAvatar } from "@/components/member-avatar";
 import { ToneBadge } from "@/components/tone-badge";
 import {
@@ -47,7 +50,9 @@ function buildCurrentPath(memberId: string, from?: string) {
   }
 
   const query = params.toString();
-  return query ? `/admin/members/${memberId}?${query}` : `/admin/members/${memberId}`;
+  return query
+    ? `/admin/members/${memberId}?${query}`
+    : `/admin/members/${memberId}`;
 }
 
 export default async function AdminMemberDetailPage({
@@ -58,7 +63,9 @@ export default async function AdminMemberDetailPage({
   searchParams: Promise<SearchParams>;
 }) {
   const [routeParams, query] = await Promise.all([params, searchParams]);
-  const { member, queryErrors } = await loadAdminMemberOrThrow(routeParams.memberId);
+  const { member, queryErrors } = await loadAdminMemberOrThrow(
+    routeParams.memberId,
+  );
   const backHref = getBackHref(query.from);
   const currentPath = buildCurrentPath(routeParams.memberId, query.from);
 
@@ -69,7 +76,9 @@ export default async function AdminMemberDetailPage({
           <div className="section-heading">
             <p className="eyebrow">Member Detail</p>
             <h2>{member.displayName}</h2>
-            <p>这里集中处理成员资料、参与概况和后台设置，列表页只保留浏览与筛选。</p>
+            <p>
+              这里集中处理成员资料、参与概况和后台设置，列表页只保留浏览与筛选。
+            </p>
           </div>
 
           <div className="admin-toolbar-side">
@@ -93,7 +102,9 @@ export default async function AdminMemberDetailPage({
             {formatAdminMemberStatus(member.status)}
           </span>
           <span className="pill">{member.city}</span>
-          <span className="pill">{member.isPubliclyVisible ? "公开展示中" : "未公开展示"}</span>
+          <span className="pill">
+            {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
+          </span>
         </div>
       </section>
 
@@ -106,17 +117,25 @@ export default async function AdminMemberDetailPage({
       ) : null}
 
       {queryErrors.length > 0 ? (
-        <div className="note-strip">后台数据读取出现问题：{queryErrors.join(" | ")}</div>
+        <div className="note-strip">
+          后台数据读取出现问题：{queryErrors.join(" | ")}
+        </div>
       ) : null}
 
       <section className="surface admin-card admin-member-card">
         <div className="admin-member-card-header">
           <div className="admin-member-identity">
-            <MemberAvatar name={member.displayName} avatarUrl={member.avatarUrl} size="sm" />
+            <MemberAvatar
+              name={member.displayName}
+              avatarUrl={member.avatarUrl}
+              size="sm"
+            />
 
             <div className="admin-member-copy">
               <h3>{member.displayName}</h3>
               <p>{member.email ?? "未提供邮箱"}</p>
+              <p>{member.roleLabel ?? "未填写身份"}</p>
+              <p>{member.organization ?? "未填写公司 / 学校 / 团队"}</p>
               <p>{member.city}</p>
             </div>
           </div>
@@ -133,9 +152,15 @@ export default async function AdminMemberDetailPage({
         <div className="admin-member-card-meta">
           <div className="admin-note-panel">
             <span className="admin-card-label">参与概况</span>
-            <p className="admin-member-bio">加入时间：{formatDate(member.joinedAt)}</p>
-            <p className="admin-member-bio">最近活跃：{formatDate(member.lastActiveAt)}</p>
-            <p className="admin-member-bio">活动报名：{member.registrationCount} 次</p>
+            <p className="admin-member-bio">
+              加入时间：{formatDate(member.joinedAt)}
+            </p>
+            <p className="admin-member-bio">
+              最近活跃：{formatDate(member.lastActiveAt)}
+            </p>
+            <p className="admin-member-bio">
+              活动报名：{member.registrationCount} 次
+            </p>
           </div>
 
           <div className="admin-note-panel">
@@ -178,7 +203,9 @@ export default async function AdminMemberDetailPage({
           <div className="section-heading">
             <p className="eyebrow">Profile</p>
             <h2>成员基础资料</h2>
-            <p>维护展示名、城市、技能和参与意愿，沉淀清晰的成员档案。</p>
+            <p>
+              维护展示名、身份、组织、城市、技能和参与意愿，沉淀清晰的成员档案。
+            </p>
           </div>
 
           <div className="form-grid">
@@ -187,8 +214,12 @@ export default async function AdminMemberDetailPage({
               <input
                 className="input"
                 name="display_name"
-                defaultValue={member.displayName === "未填写显示名" ? "" : member.displayName}
-                placeholder="比如：张腾飞 / Nobug"
+                defaultValue={
+                  member.displayName === "未填写显示名"
+                    ? ""
+                    : member.displayName
+                }
+                placeholder="比如：张三"
               />
             </label>
 
@@ -199,6 +230,26 @@ export default async function AdminMemberDetailPage({
                 name="city"
                 defaultValue={member.city}
                 placeholder="常州"
+              />
+            </label>
+
+            <label className="form-field">
+              <span>身份 / 角色</span>
+              <input
+                className="input"
+                name="role_label"
+                defaultValue={member.roleLabel ?? ""}
+                placeholder="例如：开发者 / 产品经理 / 创业者 / 学生"
+              />
+            </label>
+
+            <label className="form-field">
+              <span>公司 / 学校 / 团队</span>
+              <input
+                className="input"
+                name="organization"
+                defaultValue={member.organization ?? ""}
+                placeholder="例如：SenseLeap.ai / 常州大学 / 独立开发"
               />
             </label>
 
@@ -258,7 +309,11 @@ export default async function AdminMemberDetailPage({
           <div className="form-grid admin-member-settings-grid">
             <label className="form-field">
               <span>成员状态</span>
-              <select className="input" name="status" defaultValue={member.status}>
+              <select
+                className="input"
+                name="status"
+                defaultValue={member.status}
+              >
                 <option value="pending">pending</option>
                 <option value="active">active</option>
                 <option value="organizer">organizer</option>

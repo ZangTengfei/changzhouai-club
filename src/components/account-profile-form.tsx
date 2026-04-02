@@ -8,6 +8,8 @@ type AccountProfileFormProps = {
   profile: {
     display_name: string | null;
     city: string | null;
+    role_label: string | null;
+    organization: string | null;
     bio: string | null;
     skills: string[] | null;
   } | null;
@@ -48,7 +50,7 @@ export function AccountProfileForm({
             className="input"
             name="display_name"
             defaultValue={profile?.display_name ?? ""}
-            placeholder="比如：张腾飞 / Nobug"
+            placeholder="比如：张三"
           />
         </label>
 
@@ -59,6 +61,26 @@ export function AccountProfileForm({
             name="city"
             defaultValue={profile?.city ?? "常州"}
             placeholder="常州"
+          />
+        </label>
+
+        <label className="form-field">
+          <span>身份 / 角色</span>
+          <input
+            className="input"
+            name="role_label"
+            defaultValue={profile?.role_label ?? ""}
+            placeholder="例如：开发者 / 产品经理 / 创业者 / 学生"
+          />
+        </label>
+
+        <label className="form-field">
+          <span>公司 / 学校 / 团队</span>
+          <input
+            className="input"
+            name="organization"
+            defaultValue={profile?.organization ?? ""}
+            placeholder="例如：SenseLeap.ai / 常州大学 / 独立开发"
           />
         </label>
 

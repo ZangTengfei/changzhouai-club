@@ -8,6 +8,8 @@ type AdminProfileRow = {
   display_name: string | null;
   avatar_url: string | null;
   city: string | null;
+  role_label: string | null;
+  organization: string | null;
   bio: string | null;
   skills: string[] | null;
 };
@@ -59,6 +61,8 @@ export type AdminMember = {
   displayName: string;
   avatarUrl: string | null;
   city: string;
+  roleLabel: string | null;
+  organization: string | null;
   bio: string | null;
   skills: string[];
   status: string;
@@ -163,7 +167,7 @@ export async function loadAdminMembersData(
   ] = await Promise.all([
     supabase
       .from("profiles")
-      .select("id, email, display_name, avatar_url, city, bio, skills"),
+      .select("id, email, display_name, avatar_url, city, role_label, organization, bio, skills"),
     supabase
       .from("members")
       .select(
@@ -209,6 +213,8 @@ export async function loadAdminMembersData(
         displayName: profile?.display_name?.trim() || "未填写显示名",
         avatarUrl: profile?.avatar_url ?? null,
         city: profile?.city?.trim() || "常州",
+        roleLabel: profile?.role_label?.trim() || null,
+        organization: profile?.organization?.trim() || null,
         bio: profile?.bio ?? null,
         skills: profile?.skills ?? [],
         status: member.status,

@@ -9,6 +9,8 @@ type PublicMemberRow = {
   display_name: string | null;
   avatar_url: string | null;
   city: string | null;
+  role_label: string | null;
+  organization: string | null;
   bio: string | null;
   skills: string[] | null;
   status: string;
@@ -23,6 +25,8 @@ export type PublicMember = {
   displayName: string;
   avatarUrl: string | null;
   city: string;
+  roleLabel: string | null;
+  organization: string | null;
   bio: string | null;
   skills: string[];
   status: string;
@@ -67,6 +71,8 @@ function mapPublicMember(row: PublicMemberRow): PublicMember {
     displayName: row.display_name?.trim() || "社区成员",
     avatarUrl: row.avatar_url,
     city: row.city?.trim() || "常州",
+    roleLabel: row.role_label?.trim() || null,
+    organization: row.organization?.trim() || null,
     bio: row.bio,
     skills: row.skills ?? [],
     status: row.status,
