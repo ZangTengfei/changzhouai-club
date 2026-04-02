@@ -56,7 +56,7 @@ export default async function AccountPage({
       supabase
         .from("profiles")
         .select(
-          "display_name, wechat, city, role_label, organization, monthly_time, bio, skills, interests",
+          "display_name, avatar_url, wechat, city, role_label, organization, monthly_time, bio, skills, interests",
         )
         .eq("id", user.id)
         .maybeSingle(),
@@ -112,7 +112,9 @@ export default async function AccountPage({
         <div className="note-strip">
           {params.error === "missing_required_fields"
             ? "请先填写显示名和微信号这两个必填项。"
-            : "资料保存失败，请稍后再试。"}
+            : params.error === "invalid_avatar_url"
+              ? "头像地址格式无效，请填写以 http 或 https 开头的公开图片地址。"
+              : "资料保存失败，请稍后再试。"}
         </div>
       ) : null}
 
@@ -133,6 +135,7 @@ export default async function AccountPage({
           <h3>当前成员状态</h3>
           <ul className="field-list">
             <li>成员状态：{member?.status ?? "pending"}</li>
+            <li>头像：{profile?.avatar_url ? "已设置" : "未设置"}</li>
             <li>微信号：{profile?.wechat ?? "未填写"}</li>
             <li>身份：{profile?.role_label ?? "未填写"}</li>
             <li>公司 / 学校 / 团队：{profile?.organization ?? "未填写"}</li>
@@ -148,7 +151,7 @@ export default async function AccountPage({
         </article>
       </section>
 
-      <AccountProfileForm profile={profile} member={member} />
+      <AccountProfileForm userId={user.id} profile={profile} member={member} />
 
       <section className="surface account-shell">
         <div className="section-heading">

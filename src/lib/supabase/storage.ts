@@ -1,4 +1,5 @@
 export const EVENT_ASSETS_BUCKET = "event-assets";
+export const MEMBER_AVATARS_BUCKET = "member-avatars";
 
 function sanitizeSegment(value: string) {
   return value
@@ -18,6 +19,11 @@ export function buildEventAssetPath(eventSlug: string, fileName: string) {
   const timestamp = Date.now();
 
   return `events/${safeEventSlug}/${timestamp}-${safeFileName}`;
+}
+
+export function buildMemberAvatarPath(userId: string) {
+  const safeUserId = sanitizeSegment(userId || "member");
+  return `${safeUserId}/avatar`;
 }
 
 export function getStoragePublicUrl(supabaseUrl: string, bucket: string, path: string) {

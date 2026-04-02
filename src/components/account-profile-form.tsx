@@ -3,10 +3,13 @@
 import { useFormStatus } from "react-dom";
 
 import { updateAccountProfile } from "@/app/account/actions";
+import { AccountAvatarField } from "@/components/account-avatar-field";
 
 type AccountProfileFormProps = {
+  userId: string;
   profile: {
     display_name: string | null;
+    avatar_url: string | null;
     wechat: string | null;
     city: string | null;
     role_label: string | null;
@@ -61,6 +64,7 @@ function AccountProfileSubmitButton() {
 }
 
 export function AccountProfileForm({
+  userId,
   profile,
   member,
 }: AccountProfileFormProps) {
@@ -75,6 +79,13 @@ export function AccountProfileForm({
       </div>
 
       <div className="form-grid">
+        <AccountAvatarField
+          name="avatar_url"
+          defaultValue={profile?.avatar_url ?? ""}
+          userId={userId}
+          displayName={profile?.display_name ?? "我的头像"}
+        />
+
         <label className="form-field">
           <FieldLabel label="显示名" required />
           <input

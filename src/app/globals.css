@@ -1837,6 +1837,26 @@ img {
   font-weight: 600;
 }
 
+.account-avatar-field {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.account-avatar-preview {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.account-avatar-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
 .admin-image-preview {
   display: grid;
   gap: 10px;
@@ -2452,6 +2472,10 @@ img {
   }
 
   .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-avatar-field {
     grid-template-columns: 1fr;
   }
 

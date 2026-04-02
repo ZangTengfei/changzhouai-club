@@ -20,6 +20,26 @@ function normalizeTags(raw: string) {
     .filter(Boolean);
 }
 
+function normalizeAvatarUrl(raw: string) {
+  const value = raw.trim();
+
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const url = new URL(value);
+
+    if (!["http:", "https:"].includes(url.protocol)) {
+      return null;
+    }
+
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
 export async function updateAccountProfile(formData: FormData) {
   const supabase = await createClient();
   const {
@@ -44,6 +64,7 @@ export async function updateAccountProfile(formData: FormData) {
   ]);
 
   const displayName = String(formData.get("display_name") ?? "").trim();
+  const rawAvatarUrl = String(formData.get("avatar_url") ?? "");
   const wechat = String(formData.get("wechat") ?? "").trim();
   const city = String(formData.get("city") ?? "").trim() || "常州";
   const roleLabel = String(formData.get("role_label") ?? "").trim();
@@ -55,9 +76,14 @@ export async function updateAccountProfile(formData: FormData) {
   const willingToAttend = formData.get("willing_to_attend") === "on";
   const willingToShare = formData.get("willing_to_share") === "on";
   const willingToJoinProjects = formData.get("willing_to_join_projects") === "on";
+  const avatarUrl = normalizeAvatarUrl(rawAvatarUrl);
 
   if (!displayName || !wechat) {
     redirect("/account?error=missing_required_fields");
+  }
+
+  if (rawAvatarUrl.trim() && !avatarUrl) {
+    redirect("/account?error=invalid_avatar_url");
   }
 
   const completedProfileNow = Boolean(displayName && wechat);
@@ -75,6 +101,7 @@ export async function updateAccountProfile(formData: FormData) {
       .from("profiles")
       .update({
         display_name: displayName || null,
+        avatar_url: avatarUrl,
         wechat,
         city,
         role_label: roleLabel || null,
@@ -103,6 +130,19 @@ export async function updateAccountProfile(formData: FormData) {
       userId: user.id,
     });
     redirect("/account?error=save_failed");
+  }
+
+  const { error: authUpdateError } = await supabase.auth.updateUser({
+    data: {
+      avatar_url: avatarUrl,
+    },
+  });
+
+  if (authUpdateError) {
+    console.error("Failed to update auth avatar metadata.", {
+      authUpdateError,
+      userId: user.id,
+    });
   }
 
   if (shouldNotifyAdmin) {
@@ -135,6 +175,8 @@ export async function updateAccountProfile(formData: FormData) {
   }
 
   revalidatePath("/account");
+  revalidatePath("/");
+  revalidatePath("/members");
   redirect("/account?updated=profile");
 }
 

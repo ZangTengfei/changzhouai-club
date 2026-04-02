@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { hasSupabaseEnv } from "@/lib/env";
@@ -43,6 +44,7 @@ const defaultState: AccountState = {
 };
 
 export function SiteAccountEntry() {
+  const pathname = usePathname();
   const [account, setAccount] = useState<AccountState>(defaultState);
   const [menuOpen, setMenuOpen] = useState(false);
   const [pending, setPending] = useState(false);
@@ -77,20 +79,26 @@ export function SiteAccountEntry() {
         return;
       }
 
+      const [{ data: profile }, { data: member }] = await Promise.all([
+        supabase
+          .from("profiles")
+          .select("display_name, avatar_url")
+          .eq("id", user.id)
+          .maybeSingle(),
+        supabase.from("members").select("status").eq("id", user.id).maybeSingle(),
+      ]);
+
       const displayName =
+        profile?.display_name ||
         user.user_metadata?.full_name ||
         user.user_metadata?.name ||
         user.email ||
         "账号";
       const avatarUrl =
-        typeof user.user_metadata?.avatar_url === "string"
+        profile?.avatar_url ||
+        (typeof user.user_metadata?.avatar_url === "string"
           ? user.user_metadata.avatar_url
-          : null;
-      const { data: member } = await supabase
-        .from("members")
-        .select("status")
-        .eq("id", user.id)
-        .maybeSingle();
+          : null);
 
       if (!cancelled) {
         setAccount({
@@ -115,7 +123,7 @@ export function SiteAccountEntry() {
       cancelled = true;
       subscription.unsubscribe();
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
