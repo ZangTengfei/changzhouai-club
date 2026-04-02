@@ -11,7 +11,6 @@ import {
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import {
   cooperationAreas,
-  homeHighlights,
   joinSteps,
   memberTags,
 } from "@/lib/site-data";
@@ -28,27 +27,6 @@ function formatMetricDate(isoDate: string | null) {
   }
 
   return `${month}.${day}`;
-}
-
-function formatMemberStatus(status: string) {
-  switch (status) {
-    case "admin":
-      return "管理员";
-    case "organizer":
-      return "组织者";
-    case "active":
-      return "活跃成员";
-    case "pending":
-      return "待完善";
-    case "paused":
-      return "暂停中";
-    default:
-      return status;
-  }
-}
-
-function buildPrimaryMemberSignal(member: { status: string }) {
-  return formatMemberStatus(member.status);
 }
 
 function formatMemberHeadline(member: {
@@ -131,22 +109,6 @@ export default async function HomePage() {
             欢迎开发者、OPC、产品人、创业者、高校师生与企业伙伴加入交流。
           </div>
         </aside>
-      </section>
-
-      <section className="section">
-        <SectionHeading
-          eyebrow="我们在做什么"
-          title="连接 AI 开发者与实践场景"
-          description="通过活动、分享与合作交流，把分散在不同角色和行业中的 AI 实践者连接起来。"
-        />
-        <div className="card-grid">
-          {homeHighlights.map((item) => (
-            <article className="card" key={item.title}>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
-            </article>
-          ))}
-        </div>
       </section>
 
       {featuredScheduledEvents.length > 0 ? (
@@ -250,13 +212,6 @@ export default async function HomePage() {
                       {formatMemberHeadline(member) ? (
                         <p>{formatMemberHeadline(member)}</p>
                       ) : null}
-                      <div className="member-directory-meta">
-                        <div className="member-directory-signals member-directory-signals-compact">
-                          <span className="pill member-signal-pill member-signal-pill-compact">
-                            {buildPrimaryMemberSignal(member)}
-                          </span>
-                        </div>
-                      </div>
                     </div>
                   </div>
 

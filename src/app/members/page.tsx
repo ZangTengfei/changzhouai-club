@@ -106,56 +106,6 @@ export default async function MembersPage() {
         </article>
       </section>
 
-      {directory.featuredGroups.length > 0 ? (
-        <section className="section">
-          <div className="section-heading">
-            <p className="eyebrow">精选分组</p>
-            <h2>精选成员分组</h2>
-            <p>
-              通过不同分组快速认识社区中的组织者、分享者与合作参与者。
-            </p>
-          </div>
-
-          <div className="member-spotlight-grid">
-            {directory.featuredGroups.map((group) => (
-              <article className="member-spotlight-card" key={group.id}>
-                <div className="section-heading">
-                  <p className="eyebrow">{group.title}</p>
-                  <h3>{group.title}</h3>
-                  <p>{group.description}</p>
-                </div>
-
-                <div className="member-spotlight-list">
-                  {group.members.map((member) => (
-                    <article className="member-spotlight-item" key={`${group.id}-${member.id}`}>
-                      <div className="member-directory-header">
-                        <MemberAvatar
-                          name={member.displayName}
-                          avatarUrl={member.avatarUrl}
-                        />
-
-                        <div className="member-directory-copy">
-                          <h3>{member.displayName}</h3>
-                          <p>{formatMemberHeadline(member)}</p>
-                        </div>
-                      </div>
-
-                      <div className="member-directory-signals">
-                        {buildMemberPositioning(member).map((tag) => (
-                          <span className="pill member-signal-pill" key={`${member.id}-${tag}`}>
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
       {directory.members.length > 0 ? (
         <section className="section">
           <div className="section-heading">
