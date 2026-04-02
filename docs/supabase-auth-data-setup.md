@@ -16,6 +16,13 @@
 
 `SUPABASE_SERVICE_ROLE_KEY` 先不是必须，后续做表格同步或管理脚本时再加。
 
+如果你想在“有人完成注册资料”后收到邮件，再额外补这些可选值：
+
+- `RESEND_API_KEY`
+- `ADMIN_NOTIFICATION_EMAIL`
+- `ADMIN_NOTIFICATION_FROM_EMAIL`
+- `NEXT_PUBLIC_SITE_URL`
+
 ## 2. 初始化数据库
 
 把这个 SQL 跑到 Supabase：
@@ -93,6 +100,7 @@ node scripts/migrate-event-images-to-storage.mjs
 - Session refresh：`proxy.ts`
 - 活动报名 action：`src/app/events/actions.ts`
 - 账号资料 action：`src/app/account/actions.ts`
+- 邮件通知：`src/lib/email.ts`
 
 ## 6. 第二阶段建议
 
