@@ -6,6 +6,10 @@ import { redirect } from "next/navigation";
 import { sendAdminRegistrationNotification } from "@/lib/email";
 import { createClient } from "@/lib/supabase/server";
 
+function isMissingSchemaColumnError(error: { code?: string | null } | null | undefined) {
+  return error?.code === "PGRST204";
+}
+
 function normalizeSkills(raw: string) {
   return raw
     .split(/[,，\n]/)
@@ -50,7 +54,7 @@ export async function updateAccountProfile(formData: FormData) {
     redirect("/login?next=/account");
   }
 
-  const [{ data: existingProfile }, { data: existingMember }] = await Promise.all([
+  const [{ data: existingProfile }, existingMemberResult] = await Promise.all([
     supabase
       .from("profiles")
       .select("display_name, wechat, email")
@@ -62,6 +66,17 @@ export async function updateAccountProfile(formData: FormData) {
       .eq("id", user.id)
       .maybeSingle(),
   ]);
+  const existingMember = existingMemberResult.data;
+  const supportsRegistrationTracking = !isMissingSchemaColumnError(
+    existingMemberResult.error,
+  );
+
+  if (existingMemberResult.error && supportsRegistrationTracking) {
+    console.error("Failed to load account member tracking fields.", {
+      memberError: existingMemberResult.error,
+      userId: user.id,
+    });
+  }
 
   const displayName = String(formData.get("display_name") ?? "").trim();
   const rawAvatarUrl = String(formData.get("avatar_url") ?? "");
@@ -88,9 +103,13 @@ export async function updateAccountProfile(formData: FormData) {
 
   const completedProfileNow = Boolean(displayName && wechat);
   const shouldMarkOnboardingComplete =
-    completedProfileNow && !existingMember?.onboarding_completed_at;
+    supportsRegistrationTracking &&
+    completedProfileNow &&
+    !existingMember?.onboarding_completed_at;
   const shouldNotifyAdmin =
-    completedProfileNow && !existingMember?.admin_registration_notified_at;
+    supportsRegistrationTracking &&
+    completedProfileNow &&
+    !existingMember?.admin_registration_notified_at;
   const completionTimestamp =
     shouldMarkOnboardingComplete
       ? new Date().toISOString()
@@ -118,7 +137,9 @@ export async function updateAccountProfile(formData: FormData) {
         willing_to_attend: willingToAttend,
         willing_to_share: willingToShare,
         willing_to_join_projects: willingToJoinProjects,
-        ...(completionTimestamp ? { onboarding_completed_at: completionTimestamp } : {}),
+        ...(supportsRegistrationTracking && completionTimestamp
+          ? { onboarding_completed_at: completionTimestamp }
+          : {}),
       })
       .eq("id", user.id),
   ]);
