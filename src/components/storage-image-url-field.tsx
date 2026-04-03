@@ -2,9 +2,6 @@
 
 import { useRef, useState } from "react";
 
-import { createClient } from "@/lib/supabase/client";
-import { buildEventAssetPath, EVENT_ASSETS_BUCKET } from "@/lib/supabase/storage";
-
 export function StorageImageUrlField({
   name,
   defaultValue = "",
@@ -34,21 +31,23 @@ export function StorageImageUrlField({
     setError(null);
 
     try {
-      const supabase = createClient();
-      const assetPath = buildEventAssetPath(eventSlug, file.name);
-      const { error: uploadError } = await supabase.storage
-        .from(EVENT_ASSETS_BUCKET)
-        .upload(assetPath, file, {
-          upsert: true,
-          contentType: file.type || undefined,
-        });
+      const payload = new FormData();
+      payload.append("eventSlug", eventSlug);
+      payload.append("file", file);
 
-      if (uploadError) {
-        throw uploadError;
+      const response = await fetch("/api/admin/storage/event-assets", {
+        method: "POST",
+        body: payload,
+      });
+      const result = (await response.json().catch(() => null)) as
+        | { publicUrl?: string; message?: string }
+        | null;
+
+      if (!response.ok || !result?.publicUrl) {
+        throw new Error(result?.message || "图片上传失败，请稍后再试。");
       }
 
-      const { data } = supabase.storage.from(EVENT_ASSETS_BUCKET).getPublicUrl(assetPath);
-      setValue(data.publicUrl);
+      setValue(result.publicUrl);
     } catch (uploadError) {
       const message =
         uploadError instanceof Error ? uploadError.message : "图片上传失败，请稍后再试。";

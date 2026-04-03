@@ -49,6 +49,15 @@ export default async function HomePage() {
   const latestCompletedEvent = completedEvents[0];
   const recentEvents = completedEvents.slice(0, 3);
   const featuredMembers = directory.members.slice(0, 8);
+  const primaryEventHasCover = Boolean(primaryScheduledEvent?.cover_image_url);
+  const primaryEventPanelStyle =
+    primaryScheduledEvent?.cover_image_url
+      ? {
+          backgroundImage: `linear-gradient(180deg, rgba(18, 37, 36, 0.22) 0%, rgba(18, 37, 36, 0.66) 56%, rgba(18, 37, 36, 0.92) 100%), url("${primaryScheduledEvent.cover_image_url}")`,
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+        }
+      : undefined;
   const communityStats = [
     { value: "200+", label: "全网群成员" },
     { value: `${completedEvents.length} 场`, label: "已举办线下活动" },
@@ -90,7 +99,10 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <aside className="hero-panel">
+        <aside
+          className={`hero-panel${primaryEventHasCover ? " hero-panel-with-image" : ""}`}
+          style={primaryEventPanelStyle}
+        >
           <p className="eyebrow">开放报名活动</p>
           {primaryScheduledEvent ? (
             <>

@@ -450,6 +450,44 @@ img {
   );
 }
 
+.hero-panel-with-image {
+  color: #fffaf2;
+  border-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    0 24px 50px rgba(17, 35, 33, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.hero-panel-with-image p,
+.hero-panel-with-image .hero-note,
+.hero-panel-with-image .detail-pills span {
+  color: rgba(255, 250, 242, 0.92);
+}
+
+.hero-panel-with-image .eyebrow {
+  color: rgba(255, 245, 224, 0.84);
+}
+
+.hero-panel-with-image .detail-pills span {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.hero-panel-with-image .hero-note {
+  background: rgba(9, 18, 18, 0.26);
+  backdrop-filter: blur(8px);
+}
+
+.hero-panel-with-image .button {
+  background: rgba(255, 248, 240, 0.94);
+  color: var(--ink);
+}
+
+.hero-panel-with-image .button:hover,
+.hero-panel-with-image .button:focus-visible {
+  background: #ffffff;
+}
+
 .hero-panel h2,
 .metric-card strong,
 .card h3,
