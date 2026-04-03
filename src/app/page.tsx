@@ -48,7 +48,7 @@ export default async function HomePage() {
   const primaryScheduledEvent = featuredScheduledEvents[0];
   const latestCompletedEvent = completedEvents[0];
   const recentEvents = completedEvents.slice(0, 3);
-  const featuredMembers = directory.members.slice(0, 6);
+  const featuredMembers = directory.members.slice(0, 8);
   const communityStats = [
     { value: "200+", label: "全网群成员" },
     { value: `${completedEvents.length} 场`, label: "已举办线下活动" },
