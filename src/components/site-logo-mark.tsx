@@ -13,45 +13,45 @@ export function SiteLogoMark({ className }: SiteLogoMarkProps) {
     >
       <path
         d="M33 44H24C18 44 14 48 14 54V74C14 80 18 84 24 84H33"
-        stroke="#0F7A6A"
+        stroke="var(--logo-primary)"
         strokeWidth="8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M40 84L50 44L60 84"
-        stroke="#EE9650"
+        stroke="var(--logo-secondary)"
         strokeWidth="8"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
       <path
         d="M44 68H56"
-        stroke="#F5B775"
+        stroke="var(--logo-highlight)"
         strokeWidth="7"
         strokeLinecap="round"
       />
       <path
         d="M68 44H80"
-        stroke="#EE9650"
+        stroke="var(--logo-secondary)"
         strokeWidth="8"
         strokeLinecap="round"
       />
       <path
         d="M74 44V84"
-        stroke="#EE9650"
+        stroke="var(--logo-secondary)"
         strokeWidth="8"
         strokeLinecap="round"
       />
       <path
         d="M68 84H80"
-        stroke="#EE9650"
+        stroke="var(--logo-secondary)"
         strokeWidth="8"
         strokeLinecap="round"
       />
       <path
         d="M114 44H105C99 44 95 48 95 54V74C95 80 99 84 105 84H114"
-        stroke="#0F7A6A"
+        stroke="var(--logo-primary)"
         strokeWidth="8"
         strokeLinecap="round"
         strokeLinejoin="round"

@@ -53,7 +53,7 @@ export default async function HomePage() {
   const primaryEventPanelStyle =
     primaryScheduledEvent?.cover_image_url
       ? {
-          backgroundImage: `linear-gradient(180deg, rgba(18, 37, 36, 0.22) 0%, rgba(18, 37, 36, 0.66) 56%, rgba(18, 37, 36, 0.92) 100%), url("${primaryScheduledEvent.cover_image_url}")`,
+          backgroundImage: `linear-gradient(180deg, var(--hero-overlay-start) 0%, var(--hero-overlay-mid) 56%, var(--hero-overlay-end) 100%), url("${primaryScheduledEvent.cover_image_url}")`,
           backgroundPosition: "center",
           backgroundSize: "cover",
         }
