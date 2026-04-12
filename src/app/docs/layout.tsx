@@ -21,7 +21,7 @@ export default async function DocsLayout({
         pageMap={pageMap}
         navbar={<DocsNavbar />}
         footer={<DocsFooter />}
-        docsRepositoryBase="https://github.com/nobugai/changzhouai-club/blob/main/content"
+        docsRepositoryBase="https://github.com/ZangTengfei/changzhouai-club/blob/main/content"
         editLink="在 GitHub 上编辑此页"
         feedback={{
           content: "有想补充的内容？欢迎直接提 PR。",
