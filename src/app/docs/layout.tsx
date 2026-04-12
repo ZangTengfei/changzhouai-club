@@ -32,6 +32,10 @@ export default async function DocsLayout({
           defaultMenuCollapseLevel: 2,
           toggleButton: true,
         }}
+        nextThemes={{
+          defaultTheme: "light",
+          forcedTheme: "light",
+        }}
         toc={{
           title: "本页目录",
           backToTop: "回到顶部",
