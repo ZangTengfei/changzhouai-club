@@ -77,7 +77,7 @@ export default async function AdminMemberDetailPage({
             <p className="eyebrow">Member Detail</p>
             <h2>{member.displayName}</h2>
             <p>
-              这里集中处理成员资料、参与概况和后台设置，列表页只保留浏览与筛选。
+              这里集中处理成员资料、参与概况和完整后台设置，列表页则承担快捷运营操作。
             </p>
           </div>
 

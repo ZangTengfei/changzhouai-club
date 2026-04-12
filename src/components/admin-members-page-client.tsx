@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
+import { updateAdminMember } from "@/app/admin/actions";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminMembersData } from "@/lib/admin/members";
 import {
@@ -15,6 +16,8 @@ import {
 } from "@/lib/admin/event-feedback";
 
 const SHOW_JOIN_REQUESTS = false;
+const MEMBERS_PER_PAGE = 20;
+const MEMBER_STATUS_OPTIONS = ["pending", "active", "organizer", "admin", "paused"] as const;
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -49,6 +52,7 @@ function buildMembersFilterHref(
   requestStatus: string,
   memberQuery: string,
   requestQuery: string,
+  memberPage = 1,
 ) {
   const params = new URLSearchParams();
 
@@ -76,14 +80,88 @@ function buildMembersFilterHref(
     params.set("request_query", requestQuery.trim());
   }
 
+  if (memberPage > 1) {
+    params.set("member_page", String(memberPage));
+  }
+
   const query = params.toString();
   return query ? `/admin/members?${query}` : "/admin/members";
+}
+
+function parsePage(value: string | null) {
+  const page = Number.parseInt(value ?? "", 10);
+
+  if (Number.isNaN(page) || page < 1) {
+    return 1;
+  }
+
+  return page;
 }
 
 function buildDetailHref(basePath: string, currentPath: string) {
   const params = new URLSearchParams();
   params.set("from", currentPath);
   return `${basePath}?${params.toString()}`;
+}
+
+function AdminMemberQuickActions({
+  member,
+  redirectTo,
+  detailHref,
+}: {
+  member: AdminMembersData["members"][number];
+  redirectTo: string;
+  detailHref: string;
+}) {
+  const visibilityActionLabel = member.isPubliclyVisible ? "从成员页隐藏" : "公开到成员页";
+
+  return (
+    <div className="admin-member-quick-actions">
+      <form action={updateAdminMember} className="admin-member-quick-form">
+        <input type="hidden" name="member_id" value={member.id} />
+        <input type="hidden" name="redirect_to" value={redirectTo} />
+        {member.isPubliclyVisible ? (
+          <input type="hidden" name="is_publicly_visible" value="on" />
+        ) : null}
+
+        <label className="form-field">
+          <span>成员状态</span>
+          <select className="input" name="status" defaultValue={member.status}>
+            {MEMBER_STATUS_OPTIONS.map((status) => (
+              <option key={status} value={status}>
+                {formatAdminMemberStatus(status)}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <div className="admin-member-quick-buttons">
+          <button type="submit" className="button button-secondary">
+            保存状态
+          </button>
+          <Link href={detailHref} className="button button-secondary">
+            查看详情
+          </Link>
+        </div>
+      </form>
+
+      <form action={updateAdminMember}>
+        <input type="hidden" name="member_id" value={member.id} />
+        <input type="hidden" name="redirect_to" value={redirectTo} />
+        <input type="hidden" name="status" value={member.status} />
+        {!member.isPubliclyVisible ? (
+          <input type="hidden" name="is_publicly_visible" value="on" />
+        ) : null}
+
+        <button
+          type="submit"
+          className={member.isPubliclyVisible ? "button button-secondary" : "button"}
+        >
+          {visibilityActionLabel}
+        </button>
+      </form>
+    </div>
+  );
 }
 
 export function AdminMembersPageClient() {
@@ -96,19 +174,11 @@ export function AdminMembersPageClient() {
   const requestStatusFilter = searchParams.get("request_status") ?? "all";
   const memberQueryInput = (searchParams.get("member_query") ?? "").trim();
   const requestQueryInput = (searchParams.get("request_query") ?? "").trim();
+  const requestedMemberPage = parsePage(searchParams.get("member_page"));
   const memberKeyword = normalizeSearchText(memberQueryInput);
   const requestKeyword = normalizeSearchText(requestQueryInput);
   const saved = searchParams.get("saved") ?? undefined;
   const queryError = searchParams.get("error") ?? undefined;
-
-  const currentMembersPath = buildMembersFilterHref(
-    statusFilter,
-    visibilityFilter,
-    intentFilter,
-    requestStatusFilter,
-    memberQueryInput,
-    requestQueryInput,
-  );
 
   const filteredMembers =
     data?.members.filter((member) => {
@@ -147,6 +217,28 @@ export function AdminMembersPageClient() {
       );
     }) ?? [];
 
+  const totalMemberPages = Math.max(1, Math.ceil(filteredMembers.length / MEMBERS_PER_PAGE));
+  const currentMemberPage = Math.min(requestedMemberPage, totalMemberPages);
+  const memberPageStartIndex = (currentMemberPage - 1) * MEMBERS_PER_PAGE;
+  const paginatedMembers = filteredMembers.slice(
+    memberPageStartIndex,
+    memberPageStartIndex + MEMBERS_PER_PAGE,
+  );
+  const currentMembersPath = buildMembersFilterHref(
+    statusFilter,
+    visibilityFilter,
+    intentFilter,
+    requestStatusFilter,
+    memberQueryInput,
+    requestQueryInput,
+    currentMemberPage,
+  );
+  const currentMemberRangeStart = filteredMembers.length === 0 ? 0 : memberPageStartIndex + 1;
+  const currentMemberRangeEnd =
+    filteredMembers.length === 0
+      ? 0
+      : Math.min(memberPageStartIndex + MEMBERS_PER_PAGE, filteredMembers.length);
+
   const filteredJoinRequests =
     data?.joinRequests.filter((request) => {
       if (requestStatusFilter !== "all" && request.status !== requestStatusFilter) {
@@ -177,7 +269,7 @@ export function AdminMembersPageClient() {
           <div className="section-heading">
             <p className="eyebrow">Members</p>
             <h2>成员列表</h2>
-            <p>查看成员档案、参与意愿与公开状态，并进入详情页维护资料与运营设置。</p>
+            <p>查看成员档案、参与意愿与公开状态，并直接在列表中处理常用运营设置。</p>
           </div>
 
           <div className="admin-toolbar-side">
@@ -237,6 +329,7 @@ export function AdminMembersPageClient() {
                   requestStatusFilter,
                   memberQueryInput,
                   requestQueryInput,
+                  1,
                 )}
                 className={
                   statusFilter === value
@@ -267,6 +360,7 @@ export function AdminMembersPageClient() {
                   requestStatusFilter,
                   memberQueryInput,
                   requestQueryInput,
+                  1,
                 )}
                 className={
                   visibilityFilter === value
@@ -297,6 +391,7 @@ export function AdminMembersPageClient() {
                   requestStatusFilter,
                   memberQueryInput,
                   requestQueryInput,
+                  1,
                 )}
                 className={
                   intentFilter === value
@@ -341,6 +436,7 @@ export function AdminMembersPageClient() {
                   requestStatusFilter,
                   "",
                   requestQueryInput,
+                  1,
                 )}
                 className="button button-secondary"
               >
@@ -355,26 +451,94 @@ export function AdminMembersPageClient() {
         <div className="section-heading">
           <p className="eyebrow">Members</p>
           <h2>成员结果</h2>
-          <p>当前筛选后共有 {filteredMembers.length} 位成员。点击任意一行可进入详情页。</p>
+          <p>
+            当前筛选后共有 {filteredMembers.length} 位成员，当前显示第 {currentMemberRangeStart}-
+            {currentMemberRangeEnd} 位。
+          </p>
         </div>
 
         {isLoading ? (
           <div className="note-strip">正在加载成员列表...</div>
-        ) : filteredMembers.length > 0 ? (
+        ) : paginatedMembers.length > 0 ? (
           <div className="admin-list">
+            <div className="admin-pagination">
+              <p className="admin-pagination-summary">
+                第 {currentMemberPage} / {totalMemberPages} 页，每页 {MEMBERS_PER_PAGE} 位成员
+              </p>
+
+              <div className="admin-pagination-actions">
+                <Link
+                  href={buildMembersFilterHref(
+                    statusFilter,
+                    visibilityFilter,
+                    intentFilter,
+                    requestStatusFilter,
+                    memberQueryInput,
+                    requestQueryInput,
+                    1,
+                  )}
+                  className="button button-secondary"
+                >
+                  首页
+                </Link>
+                <Link
+                  href={buildMembersFilterHref(
+                    statusFilter,
+                    visibilityFilter,
+                    intentFilter,
+                    requestStatusFilter,
+                    memberQueryInput,
+                    requestQueryInput,
+                    Math.max(1, currentMemberPage - 1),
+                  )}
+                  className="button button-secondary"
+                >
+                  上一页
+                </Link>
+                <Link
+                  href={buildMembersFilterHref(
+                    statusFilter,
+                    visibilityFilter,
+                    intentFilter,
+                    requestStatusFilter,
+                    memberQueryInput,
+                    requestQueryInput,
+                    Math.min(totalMemberPages, currentMemberPage + 1),
+                  )}
+                  className="button button-secondary"
+                >
+                  下一页
+                </Link>
+                <Link
+                  href={buildMembersFilterHref(
+                    statusFilter,
+                    visibilityFilter,
+                    intentFilter,
+                    requestStatusFilter,
+                    memberQueryInput,
+                    requestQueryInput,
+                    totalMemberPages,
+                  )}
+                  className="button button-secondary"
+                >
+                  末页
+                </Link>
+              </div>
+            </div>
+
             <div className="admin-list-header admin-member-list-grid">
               <span>成员</span>
               <span>城市与加入时间</span>
               <span>状态</span>
               <span>参与概况</span>
               <span>意愿与技能</span>
+              <span>快捷操作</span>
             </div>
 
-            {filteredMembers.map((member) => (
-              <Link
+            {paginatedMembers.map((member) => (
+              <div
                 key={member.id}
-                href={buildDetailHref(`/admin/members/${member.id}`, currentMembersPath)}
-                className="admin-list-row admin-member-list-grid admin-list-link"
+                className="admin-list-row admin-member-list-grid admin-member-row"
               >
                 <div className="admin-list-primary">
                   <h3 className="admin-list-title">{member.displayName}</h3>
@@ -409,7 +573,15 @@ export function AdminMembersPageClient() {
                   </span>
                   <span>{member.skills.slice(0, 3).join(" · ") || "未填写技能标签"}</span>
                 </div>
-              </Link>
+
+                <div className="admin-list-actions">
+                  <AdminMemberQuickActions
+                    member={member}
+                    redirectTo={currentMembersPath}
+                    detailHref={buildDetailHref(`/admin/members/${member.id}`, currentMembersPath)}
+                  />
+                </div>
+              </div>
             ))}
           </div>
         ) : (
@@ -444,6 +616,7 @@ export function AdminMembersPageClient() {
                     value,
                     memberQueryInput,
                     requestQueryInput,
+                    1,
                   )}
                   className={
                     requestStatusFilter === value
@@ -488,6 +661,7 @@ export function AdminMembersPageClient() {
                     requestStatusFilter,
                     memberQueryInput,
                     "",
+                    1,
                   )}
                   className="button button-secondary"
                 >
