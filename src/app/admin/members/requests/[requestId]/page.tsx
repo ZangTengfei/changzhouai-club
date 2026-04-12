@@ -90,7 +90,6 @@ export default async function AdminJoinRequestDetailPage({
           <div className="section-heading">
             <p className="eyebrow">Join Request Detail</p>
             <h2>{joinRequest.displayName}</h2>
-            <p>这里集中查看申请资料、跟进节点和管理员备注，方便你持续把申请转成真实社区关系。</p>
           </div>
 
           <div className="admin-toolbar-side">
@@ -273,7 +272,6 @@ export default async function AdminJoinRequestDetailPage({
           <div className="section-heading">
             <p className="eyebrow">Pipeline</p>
             <h2>转化节点</h2>
-            <p>记录申请者从初次接触到成为正式成员的关键节点，方便持续跟进。</p>
           </div>
 
           <div className="checkbox-list">

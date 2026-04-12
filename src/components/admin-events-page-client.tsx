@@ -31,7 +31,6 @@ export function AdminEventsPageClient() {
           <div className="section-heading">
             <p className="eyebrow">Events</p>
             <h2>活动列表</h2>
-            <p>集中查看全部活动，并进入单场活动页维护详情、相册和报名名单。</p>
           </div>
 
           <div className="admin-toolbar-side">
@@ -59,7 +58,6 @@ export function AdminEventsPageClient() {
           <div className="section-heading">
             <p className="eyebrow">Diagnostics</p>
             <h2>数据诊断信息</h2>
-            <p>这里展示活动列表当前加载到的数据概况，便于排查读取问题。</p>
           </div>
 
           <pre className="debug-panel">{JSON.stringify(data.debugSnapshot, null, 2)}</pre>

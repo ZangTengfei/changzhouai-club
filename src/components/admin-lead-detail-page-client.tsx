@@ -198,7 +198,6 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
             <div className="section-heading">
               <p className="eyebrow">Lead Detail</p>
               <h2>{lead.companyName}</h2>
-              <p>这里不只是记录线索本身，也负责把它推进到具体成员匹配和下一步动作上。</p>
             </div>
 
             <div className="admin-toolbar-side">
@@ -371,7 +370,6 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
             <div className="section-heading">
               <p className="eyebrow">Matches</p>
               <h2>候选成员匹配</h2>
-              <p>为这条线索维护候选成员、匹配状态与引荐记录，方便持续推进合作。</p>
             </div>
 
             {lead.matches.length > 0 ? (
@@ -473,7 +471,6 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
               <div className="section-heading">
                 <p className="eyebrow">New Match</p>
                 <h3>新增候选成员</h3>
-                <p>补充适合参与该需求的成员，便于联系、引荐和协作安排。</p>
               </div>
 
               <form

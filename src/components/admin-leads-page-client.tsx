@@ -93,7 +93,6 @@ export function AdminLeadsPageClient() {
           <div className="section-heading">
             <p className="eyebrow">Leads</p>
             <h2>合作线索</h2>
-            <p>查看全部合作需求，快速了解状态、负责人、候选成员与跟进动作。</p>
           </div>
 
           <div className="admin-toolbar-side">
@@ -132,7 +131,6 @@ export function AdminLeadsPageClient() {
         <div className="section-heading">
           <p className="eyebrow">Filters</p>
           <h2>线索筛选</h2>
-          <p>按线索状态和关键词筛选，快速定位需要优先推进的合作需求。</p>
         </div>
 
         <div className="admin-filter-group">
@@ -195,7 +193,6 @@ export function AdminLeadsPageClient() {
         <div className="section-heading">
           <p className="eyebrow">Lead List</p>
           <h2>线索结果</h2>
-          <p>当前筛选后共有 {filteredLeads.length} 条线索。点击任意一行可进入详情页。</p>
         </div>
 
         {isLoading ? (

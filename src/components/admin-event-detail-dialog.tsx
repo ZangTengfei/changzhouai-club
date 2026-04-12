@@ -26,7 +26,6 @@ export function AdminEventDetailDialog({
             <div className="admin-dialog-copy">
               <span className="admin-card-label">Modal Workspace</span>
               <strong>活动详情</strong>
-              <p>在弹窗内直接维护活动信息、相册和报名名单，不打断列表浏览。</p>
             </div>
 
             <Dialog.Close asChild>

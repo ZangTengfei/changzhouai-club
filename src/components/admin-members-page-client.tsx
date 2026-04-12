@@ -340,7 +340,6 @@ export function AdminMembersPageClient() {
           <div className="section-heading">
             <p className="eyebrow">Members</p>
             <h2>成员列表</h2>
-            <p>查看成员档案、参与意愿与公开状态，并直接在列表中处理常用运营设置。</p>
           </div>
 
           <div className="admin-toolbar-side">
@@ -377,7 +376,6 @@ export function AdminMembersPageClient() {
         <div className="section-heading">
           <p className="eyebrow">Filters</p>
           <h2>成员筛选</h2>
-          <p>按成员状态、公开展示和参与意愿筛选，快速定位需要跟进的人群。</p>
         </div>
 
         <div className="admin-filter-group">
@@ -522,10 +520,6 @@ export function AdminMembersPageClient() {
         <div className="section-heading">
           <p className="eyebrow">Members</p>
           <h2>成员结果</h2>
-          <p>
-            当前筛选后共有 {filteredMembers.length} 位成员，当前显示第 {currentMemberRangeStart}-
-            {currentMemberRangeEnd} 位。
-          </p>
         </div>
 
         {isLoading ? (
@@ -665,7 +659,6 @@ export function AdminMembersPageClient() {
           <div className="section-heading">
             <p className="eyebrow">Join Requests</p>
             <h2>加入申请列表</h2>
-            <p>查看待处理申请、联系进度与转化情况，便于持续跟进潜在成员。</p>
           </div>
 
           <div className="admin-filter-group">

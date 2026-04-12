@@ -108,7 +108,6 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
             <div className="section-heading">
               <p className="eyebrow">Member Detail</p>
               <h2>{member.displayName}</h2>
-              <p>这里集中处理成员资料、参与概况和完整后台设置，列表页则承担快捷运营操作。</p>
             </div>
 
             <div className="admin-toolbar-side">
@@ -239,7 +238,6 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
             <div className="section-heading">
               <p className="eyebrow">Profile</p>
               <h2>成员基础资料</h2>
-              <p>维护展示名、身份、组织、城市、技能和参与意愿，沉淀清晰的成员档案。</p>
             </div>
 
             <div className="form-grid">

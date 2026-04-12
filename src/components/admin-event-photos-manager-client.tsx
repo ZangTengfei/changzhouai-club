@@ -146,7 +146,6 @@ export function AdminEventPhotosManagerClient({
       <div className="section-heading">
         <p className="eyebrow">Gallery</p>
         <h2>{eventTitle} 的照片管理</h2>
-        <p>统一维护活动封面、相册图片、说明文字与展示顺序，便于公开页展示和归档回顾。</p>
       </div>
 
       {feedback ? <div className="note-strip">{feedback}</div> : null}
@@ -270,7 +269,6 @@ export function AdminEventPhotosManagerClient({
         <div className="section-heading">
           <p className="eyebrow">New Photo</p>
           <h3>新增活动照片</h3>
-          <p>上传图片后可补充说明与排序，用于活动详情页和往期回顾展示。</p>
         </div>
 
         <form

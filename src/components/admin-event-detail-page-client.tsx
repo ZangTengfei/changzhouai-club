@@ -66,7 +66,6 @@ export function AdminEventDetailPageClient({
             <div className="section-heading">
               <p className="eyebrow">Event Detail</p>
               <h2>{eventDetail.title}</h2>
-              <p>集中维护这场活动的基本信息、相册内容与报名名单。</p>
             </div>
 
             <div className="admin-toolbar-side">
@@ -146,9 +145,6 @@ export function AdminEventDetailPageClient({
             <div className="section-heading">
               <p className="eyebrow">Registrations</p>
               <h2>{eventDetail.title} 的报名名单</h2>
-              <p>
-                当前报名数：{eventDetail.registrations.length}，可在这里查看成员信息与报名备注。
-              </p>
             </div>
 
             {eventDetail.registrations.length > 0 ? (

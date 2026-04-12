@@ -141,7 +141,6 @@ export function AdminEventEditorFormClient({
       <div className="section-heading">
         <p className="eyebrow">{isEditing ? "Edit Event" : "New Event"}</p>
         <h2>{isEditing ? `编辑：${event?.title}` : "新建活动"}</h2>
-        <p>在这里维护活动标题、时间、介绍、议程与展示素材，确保公开页面信息完整清晰。</p>
       </div>
 
       {feedback ? <div className="note-strip">{feedback}</div> : null}
