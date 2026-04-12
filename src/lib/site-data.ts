@@ -1,19 +1,10 @@
-export type NavItemIcon =
-  | "home"
-  | "events"
-  | "members"
-  | "projects"
-  | "cooperate"
-  | "docs";
-
 export const navItems = [
-  { href: "/", label: "首页", icon: "home" },
-  { href: "/events", label: "活动", icon: "events" },
-  { href: "/members", label: "成员地图", icon: "members" },
-  { href: "/projects", label: "项目共建", icon: "projects" },
-  { href: "/cooperate", label: "合作联系", icon: "cooperate" },
-  { href: "/docs", label: "知识库", icon: "docs" },
-] satisfies Array<{ href: string; label: string; icon: NavItemIcon }>;
+  { href: "/", label: "首页" },
+  { href: "/events", label: "活动" },
+  { href: "/members", label: "成员地图" },
+  { href: "/projects", label: "项目共建" },
+  { href: "/cooperate", label: "合作联系" },
+];
 
 export const homeHighlights = [
   {
