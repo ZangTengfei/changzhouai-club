@@ -12,8 +12,8 @@ export default async function AdminLayout({
 
   if (!isStaff) {
     return (
-      <div className="page-stack">
-        <section className="surface admin-shell">
+      <div className="page-stack admin-access-state">
+        <section className="surface admin-shell admin-access-card">
           <p className="eyebrow">Admin</p>
           <h1>当前账号还没有后台权限</h1>
           <p>
@@ -30,18 +30,18 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="admin-app-shell">
+    <div className="admin-app-shell" data-admin-ui="compact">
       <aside className="admin-sidebar">
         <div className="admin-sidebar-brand">
-          <p className="eyebrow">Admin</p>
+          <p className="eyebrow">Operations</p>
           <h1>社区后台</h1>
-          <p>活动、成员与合作线索统一在这里维护，采用标准管理后台工作区组织。</p>
+          <p>采用更紧凑的工作区布局，优先留给列表、状态和表单操作更多空间。</p>
         </div>
 
         <div className="admin-sidebar-panel">
-          <span className="admin-card-label">当前权限</span>
+          <span className="admin-card-label">当前角色</span>
           <strong>{member?.status ?? "pending"}</strong>
-          <p>左侧切换模块，右侧进入表格与增删改查页面。</p>
+          <p>左侧切换模块，右侧处理列表、详情与维护动作。</p>
         </div>
 
         <div className="admin-sidebar-nav">
@@ -60,7 +60,7 @@ export default async function AdminLayout({
             <div>
               <p className="eyebrow">Workspace</p>
               <h2>运营工作区</h2>
-              <p>右侧区域用于列表、详情、表单和批量管理操作。</p>
+              <p>右侧区域承载高密度管理界面，用于筛选、编辑和批量处理。</p>
             </div>
 
             <div className="admin-toolbar-side">
