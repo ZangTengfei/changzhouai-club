@@ -46,18 +46,18 @@ export default async function AdminLayout({
             </div>
           </div>
         </div>
-      </section>
 
-      <section className="admin-layout">
-        <aside className="surface admin-sidebar">
+        <div className="admin-shell-nav">
           <div className="admin-sidebar-copy">
             <p className="eyebrow">Workspace</p>
             <h2>运营导航</h2>
             <p>按活动、成员和合作线索分类管理，列表浏览与详情维护分开处理。</p>
           </div>
           <AdminNav />
-        </aside>
+        </div>
+      </section>
 
+      <section className="admin-layout">
         <div className="admin-content">{children}</div>
       </section>
     </div>

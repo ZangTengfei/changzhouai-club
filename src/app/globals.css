@@ -1369,7 +1369,7 @@ img {
 
 .admin-layout {
   display: grid;
-  grid-template-columns: minmax(240px, 280px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
   align-items: start;
 }
@@ -1379,6 +1379,14 @@ img {
 .admin-page-stack {
   display: grid;
   gap: 20px;
+}
+
+.admin-shell-nav {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(var(--accent-rgb), 0.12);
 }
 
 .admin-sidebar {
@@ -1396,8 +1404,14 @@ img {
 }
 
 .admin-nav {
-  display: grid;
-  gap: 10px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.admin-nav > * {
+  flex: 1 1 220px;
 }
 
 .admin-nav-item {
@@ -2816,6 +2830,10 @@ img {
 
   .admin-search-form {
     grid-template-columns: 1fr;
+  }
+
+  .admin-nav > * {
+    flex-basis: 100%;
   }
 
   .admin-sidebar {
