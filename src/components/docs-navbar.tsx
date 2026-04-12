@@ -4,7 +4,6 @@ export function DocsNavbar() {
   return (
     <div className="docs-navbar-shell">
       <Link href="/docs" className="docs-navbar-brand">
-        <span className="docs-navbar-badge">Docs</span>
         <span className="docs-navbar-copy">
           <strong>常州 AI 社区知识库</strong>
           <small>共建资料、方法与沉淀</small>
