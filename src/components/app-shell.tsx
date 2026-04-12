@@ -10,8 +10,9 @@ import { SiteHeader } from "@/components/site-header";
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const isDocsRoute = pathname === "/docs" || pathname.startsWith("/docs/");
+  const isAdminRoute = pathname === "/admin" || pathname.startsWith("/admin/");
 
-  if (isDocsRoute) {
+  if (isDocsRoute || isAdminRoute) {
     return children;
   }
 

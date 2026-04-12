@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type ResourceState<T> = {
   data: T | null;
@@ -9,6 +9,7 @@ type ResourceState<T> = {
 };
 
 export function useAdminResource<T>(url: string) {
+  const [reloadKey, setReloadKey] = useState(0);
   const [state, setState] = useState<ResourceState<T>>({
     data: null,
     error: null,
@@ -59,7 +60,14 @@ export function useAdminResource<T>(url: string) {
     return () => {
       cancelled = true;
     };
-  }, [url]);
+  }, [url, reloadKey]);
 
-  return state;
+  const reload = useCallback(() => {
+    setReloadKey((current) => current + 1);
+  }, []);
+
+  return {
+    ...state,
+    reload,
+  };
 }

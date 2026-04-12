@@ -285,38 +285,6 @@ img {
   color: var(--ink);
 }
 
-.header-icon-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  border: 1px solid rgba(var(--accent-rgb), 0.14);
-  border-radius: 999px;
-  background: rgba(var(--accent-rgb), 0.06);
-  color: var(--muted);
-  transition:
-    transform 0.18s ease,
-    background-color 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease;
-}
-
-.header-icon-link:hover,
-.header-icon-link:focus-visible {
-  transform: translateY(-1px);
-  border-color: rgba(var(--accent-rgb), 0.28);
-  background: rgba(var(--accent-rgb), 0.1);
-  color: var(--ink);
-}
-
-.header-icon-link svg {
-  display: block;
-  width: 1.18rem;
-  height: 1.18rem;
-}
-
 .button {
   display: inline-flex;
   align-items: center;
@@ -1569,18 +1537,31 @@ img {
   padding: 24px;
 }
 
-.admin-layout {
+.admin-app-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 20px;
-  align-items: start;
+  grid-template-columns: 280px minmax(0, 1fr);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(var(--accent-rgb), 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(var(--surface-soft-rgb), 0.96), rgba(var(--surface-rgb), 0.92));
 }
 
-.admin-sidebar,
+.admin-layout,
 .admin-content,
-.admin-page-stack {
+.admin-page-stack,
+.admin-workspace {
   display: grid;
   gap: 20px;
+}
+
+.admin-workspace {
+  min-width: 0;
+  padding: 24px;
+  align-content: start;
+}
+
+.admin-shell-compact {
+  padding: 20px 24px;
 }
 
 .admin-shell-header {
@@ -1589,8 +1570,45 @@ img {
 }
 
 .admin-sidebar {
-  padding: 22px;
-  position: static;
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  min-height: 100vh;
+  padding: 28px 18px;
+  border-right: 1px solid rgba(var(--ink-rgb), 0.08);
+  background:
+    linear-gradient(180deg, rgba(var(--surface-rgb), 0.98), rgba(var(--surface-muted-rgb), 0.94));
+  position: sticky;
+  top: 0;
+}
+
+.admin-sidebar-brand,
+.admin-sidebar-panel,
+.admin-sidebar-nav {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-radius: 22px;
+  background: rgba(var(--surface-rgb), 0.86);
+}
+
+.admin-sidebar-brand h1,
+.admin-sidebar-panel p,
+.admin-sidebar-brand p,
+.admin-sidebar-copy h2,
+.admin-sidebar-copy p {
+  margin: 0;
+}
+
+.admin-sidebar-brand h1 {
+  font-size: clamp(1.8rem, 2vw, 2.4rem);
+  line-height: 1;
+}
+
+.admin-sidebar-panel strong {
+  font-size: 1.2rem;
+  line-height: 1.1;
 }
 
 .admin-sidebar-copy h2 {
@@ -1602,14 +1620,8 @@ img {
 }
 
 .admin-nav {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  align-items: stretch;
-}
-
-.admin-nav > * {
-  flex: 1 1 220px;
+  display: grid;
+  gap: 10px;
 }
 
 .admin-nav-item {
@@ -1644,6 +1656,7 @@ img {
 .admin-nav-item-active {
   background: rgba(var(--accent-rgb), 0.1);
   border-color: rgba(var(--accent-rgb), 0.28);
+  box-shadow: inset 0 0 0 1px rgba(var(--accent-rgb), 0.08);
 }
 
 .admin-toolbar {
@@ -1833,6 +1846,14 @@ img {
     minmax(180px, 0.86fr)
     minmax(0, 0.92fr)
     minmax(240px, 1fr);
+}
+
+.admin-event-list-grid {
+  grid-template-columns:
+    minmax(0, 1.3fr)
+    minmax(220px, 0.95fr)
+    minmax(120px, 0.5fr)
+    minmax(180px, 0.8fr);
 }
 
 .admin-join-request-list-grid {
@@ -2944,6 +2965,7 @@ img {
   }
 
   .nav-links a {
+    display: block;
     min-height: 0;
     padding: 8px 2px;
     border-radius: 0;
@@ -3002,10 +3024,12 @@ img {
     flex-direction: column;
   }
 
+  .admin-app-shell,
   .admin-layout,
   .admin-event-card-row,
   .admin-event-card-main,
   .admin-event-card-details,
+  .admin-event-list-grid,
   .admin-lead-match-head,
   .admin-member-list-grid,
   .admin-join-request-list-grid,
@@ -3035,6 +3059,10 @@ img {
     flex-direction: column;
   }
 
+  .admin-workspace {
+    padding: 18px;
+  }
+
   .admin-search-form {
     grid-template-columns: 1fr;
   }
@@ -3043,8 +3071,10 @@ img {
     gap: 14px;
   }
 
-  .admin-nav > * {
-    flex-basis: 100%;
+  .admin-sidebar {
+    min-height: auto;
+    padding: 18px;
+    position: static;
   }
 
   .hero,

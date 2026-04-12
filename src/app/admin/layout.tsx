@@ -30,31 +30,50 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="page-stack">
-      <section className="surface admin-shell">
-        <div className="admin-toolbar">
-          <div className="admin-shell-header">
-            <div>
-              <p className="eyebrow">Admin</p>
-              <h1>社区后台</h1>
-              <p>统一管理社区活动、成员资料与合作线索，支持日常运营和内容维护。</p>
-            </div>
-
-            <AdminNav />
-          </div>
-
-          <div className="admin-toolbar-side">
-            <div className="admin-mini-stat">
-              <strong>{member?.status ?? "pending"}</strong>
-              <span>当前权限</span>
-            </div>
-          </div>
+    <div className="admin-app-shell">
+      <aside className="admin-sidebar">
+        <div className="admin-sidebar-brand">
+          <p className="eyebrow">Admin</p>
+          <h1>社区后台</h1>
+          <p>活动、成员与合作线索统一在这里维护，采用标准管理后台工作区组织。</p>
         </div>
-      </section>
 
-      <section className="admin-layout">
+        <div className="admin-sidebar-panel">
+          <span className="admin-card-label">当前权限</span>
+          <strong>{member?.status ?? "pending"}</strong>
+          <p>左侧切换模块，右侧进入表格与增删改查页面。</p>
+        </div>
+
+        <div className="admin-sidebar-nav">
+          <div className="admin-sidebar-copy">
+            <p className="eyebrow">Workspace</p>
+            <h2>管理菜单</h2>
+          </div>
+
+          <AdminNav />
+        </div>
+      </aside>
+
+      <main className="admin-workspace">
+        <header className="surface admin-shell admin-shell-compact">
+          <div className="admin-toolbar">
+            <div>
+              <p className="eyebrow">Workspace</p>
+              <h2>运营工作区</h2>
+              <p>右侧区域用于列表、详情、表单和批量管理操作。</p>
+            </div>
+
+            <div className="admin-toolbar-side">
+              <div className="admin-mini-stat">
+                <strong>{member?.status ?? "pending"}</strong>
+                <span>当前权限</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
         <div className="admin-content">{children}</div>
-      </section>
+      </main>
     </div>
   );
 }

@@ -67,53 +67,47 @@ export function AdminEventsPageClient() {
         {isLoading ? (
           <div className="note-strip">正在加载活动列表...</div>
         ) : data && data.events.length > 0 ? (
-          <div className="admin-event-card-list">
+          <div className="admin-list">
+            <div className="admin-list-header admin-event-list-grid">
+              <span>活动</span>
+              <span>时间与地点</span>
+              <span>状态</span>
+              <span>数据概况</span>
+            </div>
+
             {data.events.map((event) => (
               <Link
                 key={event.id}
                 href={`/admin/events/${event.id}`}
-                className="admin-event-card-row"
+                className="admin-list-row admin-event-list-grid admin-list-link"
               >
-                <div className="admin-event-card-main">
-                  <div className="admin-event-card-title">
-                    <h3 className="admin-list-title">{event.title}</h3>
-                    <p className="admin-event-summary">
-                      {event.summary ?? "暂未填写活动简介。"}
-                    </p>
-                    <p className="admin-event-slug">{event.slug}</p>
-                  </div>
+                <div className="admin-list-primary">
+                  <h3 className="admin-list-title">{event.title}</h3>
+                  <p className="admin-event-summary">{event.summary ?? "暂未填写活动简介。"}</p>
+                  <p className="admin-event-slug">{event.slug}</p>
+                </div>
 
-                  <div className="admin-event-card-details">
-                    <div className="admin-event-card-block">
-                      <span className="admin-card-label">时间与地点</span>
-                      <strong>{formatAdminEventDate(event.event_at)}</strong>
-                      <span>
-                        {event.venue
-                          ? `${event.city ?? "常州"} · ${event.venue}`
-                          : (event.city ?? "常州")}
-                      </span>
-                    </div>
+                <div className="admin-list-cell">
+                  <strong>{formatAdminEventDate(event.event_at)}</strong>
+                  <span>
+                    {event.venue ? `${event.city ?? "常州"} · ${event.venue}` : (event.city ?? "常州")}
+                  </span>
+                </div>
 
-                    <div className="admin-event-card-block">
-                      <span className="admin-card-label">状态</span>
-                      <span
-                        className={`pill admin-status-pill admin-status-pill-${getAdminEventStatusTone(
-                          event.status,
-                        )}`}
-                      >
-                        {formatAdminEventStatus(event.status)}
-                      </span>
-                    </div>
+                <div className="admin-list-cell">
+                  <span
+                    className={`pill admin-status-pill admin-status-pill-${getAdminEventStatusTone(
+                      event.status,
+                    )}`}
+                  >
+                    {formatAdminEventStatus(event.status)}
+                  </span>
+                </div>
 
-                    <div className="admin-event-card-block">
-                      <span className="admin-card-label">数据概况</span>
-                      <div className="admin-event-card-metrics">
-                        <span>报名 {event.registrations.length}</span>
-                        <span>照片 {event.photos.length}</span>
-                        <span>封面 {event.cover_image_url ? "已设置" : "未设置"}</span>
-                      </div>
-                    </div>
-                  </div>
+                <div className="admin-list-cell">
+                  <span>报名 {event.registrations.length}</span>
+                  <span>照片 {event.photos.length}</span>
+                  <span>封面 {event.cover_image_url ? "已设置" : "未设置"}</span>
                 </div>
               </Link>
             ))}

@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useState, useTransition } from "react";
 
-import { updateAdminMember } from "@/app/admin/actions";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminMembersData } from "@/lib/admin/members";
 import {
@@ -106,24 +106,84 @@ function buildDetailHref(basePath: string, currentPath: string) {
 
 function AdminMemberQuickActions({
   member,
-  redirectTo,
   detailHref,
+  onChanged,
 }: {
   member: AdminMembersData["members"][number];
-  redirectTo: string;
   detailHref: string;
+  onChanged?: () => void;
 }) {
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
   const visibilityActionLabel = member.isPubliclyVisible ? "从成员页隐藏" : "公开到成员页";
+
+  async function submitPayload(payload: Record<string, unknown>) {
+    const response = await fetch(`/api/admin/members/${member.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const result = (await response.json().catch(() => null)) as
+      | { error?: string; saved?: string }
+      | null;
+
+    if (!response.ok) {
+      throw new Error(getAdminErrorMessage(result?.error) ?? "提交失败，请稍后再试。");
+    }
+
+    setFeedback(getAdminSavedMessage(result?.saved ?? "member_profile"));
+    onChanged?.();
+  }
+
+  function buildMemberPayload(nextStatus: string, nextVisibility: boolean) {
+    return {
+      display_name: member.displayName === "未填写显示名" ? "" : member.displayName,
+      wechat: member.wechat ?? "",
+      city: member.city,
+      role_label: member.roleLabel ?? "",
+      organization: member.organization ?? "",
+      monthly_time: member.monthlyTime ?? "",
+      skills: member.skills.join("，"),
+      interests: member.interests.join("，"),
+      bio: member.bio ?? "",
+      status: nextStatus,
+      willing_to_attend: member.willingToAttend,
+      willing_to_share: member.willingToShare,
+      willing_to_join_projects: member.willingToJoinProjects,
+      is_publicly_visible: nextVisibility,
+    };
+  }
 
   return (
     <div className="admin-member-quick-actions">
-      <form action={updateAdminMember} className="admin-member-quick-form">
-        <input type="hidden" name="member_id" value={member.id} />
-        <input type="hidden" name="redirect_to" value={redirectTo} />
-        {member.isPubliclyVisible ? (
-          <input type="hidden" name="is_publicly_visible" value="on" />
-        ) : null}
+      {feedback ? <span className="admin-compact-note">{feedback}</span> : null}
+      {error ? <span className="admin-compact-note">{error}</span> : null}
 
+      <form
+        className="admin-member-quick-form"
+        onSubmit={(formEvent) => {
+          formEvent.preventDefault();
+          const formData = new FormData(formEvent.currentTarget);
+
+          startTransition(async () => {
+            setFeedback(null);
+            setError(null);
+
+            try {
+              await submitPayload(
+                buildMemberPayload(String(formData.get("status") ?? member.status), member.isPubliclyVisible),
+              );
+            } catch (submitError) {
+              setError(
+                submitError instanceof Error ? submitError.message : "提交失败，请稍后再试。",
+              );
+            }
+          });
+        }}
+      >
         <label className="form-field">
           <span>成员状态</span>
           <select className="input" name="status" defaultValue={member.status}>
@@ -136,8 +196,8 @@ function AdminMemberQuickActions({
         </label>
 
         <div className="admin-member-quick-buttons">
-          <button type="submit" className="button button-secondary">
-            保存状态
+          <button type="submit" className="button button-secondary" disabled={isPending}>
+            {isPending ? "保存中..." : "保存状态"}
           </button>
           <Link href={detailHref} className="button button-secondary">
             查看详情
@@ -145,19 +205,30 @@ function AdminMemberQuickActions({
         </div>
       </form>
 
-      <form action={updateAdminMember}>
-        <input type="hidden" name="member_id" value={member.id} />
-        <input type="hidden" name="redirect_to" value={redirectTo} />
-        <input type="hidden" name="status" value={member.status} />
-        {!member.isPubliclyVisible ? (
-          <input type="hidden" name="is_publicly_visible" value="on" />
-        ) : null}
+      <form
+        onSubmit={(formEvent) => {
+          formEvent.preventDefault();
 
+          startTransition(async () => {
+            setFeedback(null);
+            setError(null);
+
+            try {
+              await submitPayload(buildMemberPayload(member.status, !member.isPubliclyVisible));
+            } catch (submitError) {
+              setError(
+                submitError instanceof Error ? submitError.message : "提交失败，请稍后再试。",
+              );
+            }
+          });
+        }}
+      >
         <button
           type="submit"
           className={member.isPubliclyVisible ? "button button-secondary" : "button"}
+          disabled={isPending}
         >
-          {visibilityActionLabel}
+          {isPending ? "提交中..." : visibilityActionLabel}
         </button>
       </form>
     </div>
@@ -166,7 +237,7 @@ function AdminMemberQuickActions({
 
 export function AdminMembersPageClient() {
   const searchParams = useSearchParams();
-  const { data, error, isLoading } = useAdminResource<AdminMembersData>("/api/admin/members");
+  const { data, error, isLoading, reload } = useAdminResource<AdminMembersData>("/api/admin/members");
 
   const statusFilter = searchParams.get("status") ?? "all";
   const visibilityFilter = searchParams.get("visibility") ?? "all";
@@ -577,8 +648,8 @@ export function AdminMembersPageClient() {
                 <div className="admin-list-actions">
                   <AdminMemberQuickActions
                     member={member}
-                    redirectTo={currentMembersPath}
                     detailHref={buildDetailHref(`/admin/members/${member.id}`, currentMembersPath)}
+                    onChanged={reload}
                   />
                 </div>
               </div>
