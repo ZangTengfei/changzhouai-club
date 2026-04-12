@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
 
-import { AdminEventDetailDialog } from "@/components/admin-event-detail-dialog";
+import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminEventsData } from "@/lib/admin/events";
 import {
@@ -17,8 +16,7 @@ import {
 
 export function AdminEventsPageClient() {
   const searchParams = useSearchParams();
-  const { data, error, isLoading, reload } = useAdminResource<AdminEventsData>("/api/admin/events");
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const { data, error, isLoading } = useAdminResource<AdminEventsData>("/api/admin/events");
 
   const saved = searchParams.get("saved") ?? undefined;
   const queryError = searchParams.get("error") ?? undefined;
@@ -26,6 +24,11 @@ export function AdminEventsPageClient() {
 
   return (
     <div className="admin-page-stack">
+      <AdminToastSignals
+        success={getAdminSavedMessage(saved)}
+        error={queryError ? getAdminErrorMessage(queryError) : null}
+      />
+
       <section className="surface admin-card">
         <div className="admin-toolbar">
           <div className="section-heading">
@@ -46,8 +49,6 @@ export function AdminEventsPageClient() {
         </div>
       </section>
 
-      {saved ? <div className="note-strip">{getAdminSavedMessage(saved)}</div> : null}
-      {queryError ? <div className="note-strip">{getAdminErrorMessage(queryError)}</div> : null}
       {error ? <div className="note-strip">后台数据读取出现问题：{error}</div> : null}
       {data && data.queryErrors.length > 0 ? (
         <div className="note-strip">后台数据读取出现问题：{data.queryErrors.join(" | ")}</div>
@@ -74,13 +75,13 @@ export function AdminEventsPageClient() {
               <span>时间与地点</span>
               <span>状态</span>
               <span>数据概况</span>
-              <span>操作</span>
             </div>
 
             {data.events.map((event) => (
-              <article
+              <Link
                 key={event.id}
-                className="admin-list-row admin-event-list-grid admin-event-row"
+                href={`/admin/events/${event.id}`}
+                className="admin-list-row admin-event-list-grid admin-list-link"
               >
                 <div className="admin-list-primary">
                   <h3 className="admin-list-title">{event.title}</h3>
@@ -110,20 +111,7 @@ export function AdminEventsPageClient() {
                   <span>照片 {event.photos.length}</span>
                   <span>封面 {event.cover_image_url ? "已设置" : "未设置"}</span>
                 </div>
-
-                <div className="admin-list-actions admin-event-list-actions">
-                  <button
-                    type="button"
-                    className="button"
-                    onClick={() => setSelectedEventId(event.id)}
-                  >
-                    查看活动详情
-                  </button>
-                  <Link href={`/admin/events/${event.id}`} className="button button-secondary">
-                    打开页面
-                  </Link>
-                </div>
-              </article>
+              </Link>
             ))}
           </div>
         ) : (
@@ -138,17 +126,6 @@ export function AdminEventsPageClient() {
           </div>
         )}
       </section>
-
-      <AdminEventDetailDialog
-        eventId={selectedEventId}
-        open={Boolean(selectedEventId)}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSelectedEventId(null);
-          }
-        }}
-        onEventMutated={reload}
-      />
     </div>
   );
 }

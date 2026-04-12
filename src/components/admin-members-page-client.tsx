@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
+import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminMembersData } from "@/lib/admin/members";
 import {
@@ -113,8 +115,6 @@ function AdminMemberQuickActions({
   detailHref: string;
   onChanged?: () => void;
 }) {
-  const [feedback, setFeedback] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const visibilityActionLabel = member.isPubliclyVisible ? "从成员页隐藏" : "公开到成员页";
 
@@ -134,7 +134,7 @@ function AdminMemberQuickActions({
       throw new Error(getAdminErrorMessage(result?.error) ?? "提交失败，请稍后再试。");
     }
 
-    setFeedback(getAdminSavedMessage(result?.saved ?? "member_profile"));
+    toast.success(getAdminSavedMessage(result?.saved ?? "member_profile") ?? "后台内容已更新。");
     onChanged?.();
   }
 
@@ -159,9 +159,6 @@ function AdminMemberQuickActions({
 
   return (
     <div className="admin-member-quick-actions">
-      {feedback ? <span className="admin-compact-note">{feedback}</span> : null}
-      {error ? <span className="admin-compact-note">{error}</span> : null}
-
       <form
         className="admin-member-quick-form"
         onSubmit={(formEvent) => {
@@ -169,15 +166,12 @@ function AdminMemberQuickActions({
           const formData = new FormData(formEvent.currentTarget);
 
           startTransition(async () => {
-            setFeedback(null);
-            setError(null);
-
             try {
               await submitPayload(
                 buildMemberPayload(String(formData.get("status") ?? member.status), member.isPubliclyVisible),
               );
             } catch (submitError) {
-              setError(
+              toast.error(
                 submitError instanceof Error ? submitError.message : "提交失败，请稍后再试。",
               );
             }
@@ -210,13 +204,10 @@ function AdminMemberQuickActions({
           formEvent.preventDefault();
 
           startTransition(async () => {
-            setFeedback(null);
-            setError(null);
-
             try {
               await submitPayload(buildMemberPayload(member.status, !member.isPubliclyVisible));
             } catch (submitError) {
-              setError(
+              toast.error(
                 submitError instanceof Error ? submitError.message : "提交失败，请稍后再试。",
               );
             }
@@ -335,6 +326,11 @@ export function AdminMembersPageClient() {
 
   return (
     <div className="admin-page-stack">
+      <AdminToastSignals
+        success={getAdminSavedMessage(saved)}
+        error={queryError ? getAdminErrorMessage(queryError) : null}
+      />
+
       <section className="surface admin-card">
         <div className="admin-toolbar">
           <div className="section-heading">
@@ -365,8 +361,6 @@ export function AdminMembersPageClient() {
         </div>
       </section>
 
-      {saved ? <div className="note-strip">{getAdminSavedMessage(saved)}</div> : null}
-      {queryError ? <div className="note-strip">{getAdminErrorMessage(queryError)}</div> : null}
       {error ? <div className="note-strip">后台数据读取出现问题：{error}</div> : null}
       {data && data.queryErrors.length > 0 ? (
         <div className="note-strip">后台数据读取出现问题：{data.queryErrors.join(" | ")}</div>

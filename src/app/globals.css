@@ -1537,8 +1537,7 @@ img {
   padding: 24px;
 }
 
-.admin-app-shell,
-.admin-dialog-content {
+.admin-app-shell {
   --admin-bg: #f3f5f7;
   --admin-bg-strong: #eef2f6;
   --admin-panel: rgba(255, 255, 255, 0.96);
@@ -1565,8 +1564,7 @@ img {
     linear-gradient(180deg, var(--admin-bg) 0%, var(--admin-bg-strong) 100%);
 }
 
-.admin-app-shell .surface,
-.admin-dialog-content .surface {
+.admin-app-shell .surface {
   border-color: var(--admin-border);
   border-radius: var(--admin-radius-lg);
   background: var(--admin-panel);
@@ -1574,9 +1572,7 @@ img {
 }
 
 .admin-app-shell .admin-shell,
-.admin-app-shell .admin-card,
-.admin-dialog-content .admin-shell,
-.admin-dialog-content .admin-card {
+.admin-app-shell .admin-card {
   padding: 18px;
 }
 
@@ -1655,31 +1651,23 @@ img {
 
 .admin-app-shell .eyebrow,
 .admin-app-shell .admin-card-label,
-.admin-app-shell .admin-filter-label,
-.admin-dialog-content .eyebrow,
-.admin-dialog-content .admin-card-label,
-.admin-dialog-content .admin-filter-label {
+.admin-app-shell .admin-filter-label {
   color: var(--admin-text-muted);
 }
 
-.admin-app-shell .eyebrow,
-.admin-dialog-content .eyebrow {
+.admin-app-shell .eyebrow {
   margin-bottom: 8px;
   font-size: 0.72rem;
   letter-spacing: 0.12em;
 }
 
-.admin-app-shell .section-heading,
-.admin-dialog-content .section-heading {
+.admin-app-shell .section-heading {
   max-width: none;
 }
 
 .admin-app-shell .section-heading h2,
 .admin-app-shell .admin-toolbar h2,
-.admin-app-shell .admin-sidebar-copy h2,
-.admin-dialog-content .section-heading h2,
-.admin-dialog-content .admin-toolbar h2,
-.admin-dialog-content .admin-sidebar-copy h2 {
+.admin-app-shell .admin-sidebar-copy h2 {
   margin: 0;
   font-family: inherit;
   font-size: clamp(1.32rem, 2vw, 1.72rem);
@@ -1696,17 +1684,7 @@ img {
 .admin-app-shell .admin-compact-note,
 .admin-app-shell .admin-event-summary,
 .admin-app-shell .admin-member-copy p,
-.admin-app-shell .admin-member-bio,
-.admin-dialog-content .section-heading p,
-.admin-dialog-content .admin-toolbar p,
-.admin-dialog-content .admin-sidebar-brand p,
-.admin-dialog-content .admin-sidebar-panel p,
-.admin-dialog-content .admin-sidebar-copy p,
-.admin-dialog-content .admin-list-cell span,
-.admin-dialog-content .admin-compact-note,
-.admin-dialog-content .admin-event-summary,
-.admin-dialog-content .admin-member-copy p,
-.admin-dialog-content .admin-member-bio {
+.admin-app-shell .admin-member-bio {
   color: var(--admin-text-muted);
 }
 
@@ -1941,8 +1919,7 @@ img {
     minmax(0, 1.3fr)
     minmax(220px, 0.95fr)
     minmax(120px, 0.5fr)
-    minmax(180px, 0.8fr)
-    minmax(170px, 0.9fr);
+    minmax(180px, 0.8fr);
 }
 
 .admin-join-request-list-grid {
@@ -2289,158 +2266,6 @@ img {
 
 .admin-list-actions {
   justify-items: start;
-}
-
-.admin-event-row {
-  align-items: center;
-}
-
-.admin-event-list-actions {
-  align-content: start;
-}
-
-.admin-dialog-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.36);
-  backdrop-filter: blur(3px);
-  z-index: 80;
-}
-
-.admin-dialog-content {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  width: min(1380px, calc(100vw - 32px));
-  max-height: min(92vh, 960px);
-  overflow: hidden;
-  border: 1px solid rgba(15, 23, 42, 0.12);
-  border-radius: 20px;
-  background: #f3f5f7;
-  box-shadow: 0 32px 80px rgba(15, 23, 42, 0.2);
-  transform: translate(-50%, -50%);
-  z-index: 81;
-}
-
-.admin-dialog-header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 18px;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
-  background: rgba(255, 255, 255, 0.92);
-}
-
-.admin-dialog-copy {
-  display: grid;
-  gap: 4px;
-}
-
-.admin-dialog-copy strong,
-.admin-dialog-copy p {
-  margin: 0;
-}
-
-.admin-dialog-copy p {
-  color: rgba(15, 23, 42, 0.58);
-  font-size: 0.9rem;
-}
-
-.admin-dialog-close {
-  flex-shrink: 0;
-}
-
-.admin-dialog-body {
-  overflow: auto;
-  padding: 18px;
-}
-
-.admin-detail-stack-modal {
-  padding-bottom: 4px;
-}
-
-.admin-dialog-content .account-form {
-  gap: 14px;
-  padding: 0;
-}
-
-.admin-dialog-content .form-grid {
-  gap: 12px;
-}
-
-.admin-dialog-content .form-field {
-  gap: 6px;
-}
-
-.admin-dialog-content .form-field > span,
-.admin-dialog-content .form-label-row {
-  font-size: 0.9rem;
-}
-
-.admin-dialog-content .form-field-help {
-  color: var(--admin-text-muted);
-  font-size: 0.84rem;
-  line-height: 1.5;
-}
-
-.admin-dialog-content .input,
-.admin-dialog-content .textarea,
-.admin-dialog-content select.input {
-  min-height: 40px;
-  padding: 0 12px;
-  border: 1px solid var(--admin-border-strong);
-  border-radius: var(--admin-radius-sm);
-  background: #ffffff;
-  color: var(--admin-text);
-}
-
-.admin-dialog-content .textarea {
-  min-height: 104px;
-  padding: 10px 12px;
-}
-
-.admin-dialog-content .input:focus,
-.admin-dialog-content .textarea:focus,
-.admin-dialog-content select.input:focus {
-  outline: 2px solid rgba(var(--accent-rgb), 0.1);
-  outline-offset: 0;
-  border-color: rgba(var(--accent-rgb), 0.26);
-}
-
-.admin-dialog-content .button {
-  min-height: 40px;
-  padding: 0 14px;
-  border-radius: var(--admin-radius-sm);
-  box-shadow: none;
-  font-size: 0.9rem;
-  font-weight: 700;
-}
-
-.admin-dialog-content .button:hover,
-.admin-dialog-content .button:focus-visible {
-  transform: none;
-}
-
-.admin-dialog-content .button-secondary {
-  background: var(--admin-panel-alt);
-  border-color: var(--admin-border-strong);
-  color: var(--admin-text);
-}
-
-.admin-dialog-content .button-secondary:hover,
-.admin-dialog-content .button-secondary:focus-visible {
-  background: #edf2f7;
-}
-
-.admin-dialog-content .pill,
-.admin-dialog-content .detail-pills span {
-  min-height: 28px;
-  padding: 0 10px;
-  border-radius: 999px;
-  font-size: 0.8rem;
 }
 
 .admin-list-cell strong {
@@ -3405,16 +3230,6 @@ img {
     min-height: auto;
     padding: 14px;
     position: static;
-  }
-
-  .admin-dialog-content {
-    width: calc(100vw - 20px);
-    max-height: 94vh;
-  }
-
-  .admin-dialog-header,
-  .admin-dialog-body {
-    padding: 14px;
   }
 
   .hero,

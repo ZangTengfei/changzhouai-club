@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
+import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { AdminEventEditorFormClient } from "@/components/admin-event-editor-form-client";
 import { AdminEventPhotosManagerClient } from "@/components/admin-event-photos-manager-client";
 import { useAdminResource } from "@/components/use-admin-resource";
@@ -22,17 +23,7 @@ type AdminEventDetailData = {
   queryErrors: string[];
 };
 
-export function AdminEventDetailPageClient({
-  eventId,
-  mode = "page",
-  onCloseRequest,
-  onEventMutated,
-}: {
-  eventId: string;
-  mode?: "page" | "modal";
-  onCloseRequest?: () => void;
-  onEventMutated?: () => void;
-}) {
+export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
   const searchParams = useSearchParams();
   const { data, error, isLoading, reload } = useAdminResource<AdminEventDetailData>(
     `/api/admin/events/${eventId}`,
@@ -40,26 +31,14 @@ export function AdminEventDetailPageClient({
   const saved = searchParams.get("saved") ?? undefined;
   const queryError = searchParams.get("error") ?? undefined;
   const eventDetail = data?.event;
-  const isModal = mode === "modal";
-
-  function handleEventMutated() {
-    reload();
-    onEventMutated?.();
-  }
-
-  function handleEventDeleted() {
-    onCloseRequest?.();
-    handleEventMutated();
-  }
 
   return (
-    <div
-      className={
-        isModal
-          ? "admin-page-stack admin-detail-stack admin-detail-stack-modal"
-          : "admin-page-stack admin-detail-stack"
-      }
-    >
+    <div className="admin-page-stack admin-detail-stack">
+      <AdminToastSignals
+        success={getAdminSavedMessage(saved)}
+        error={queryError ? getAdminErrorMessage(queryError) : null}
+      />
+
       {eventDetail ? (
         <section className="surface admin-card">
           <div className="admin-toolbar">
@@ -83,19 +62,9 @@ export function AdminEventDetailPageClient({
                 >
                   查看公开页
                 </Link>
-                {isModal ? (
-                  <button
-                    type="button"
-                    className="button button-secondary"
-                    onClick={onCloseRequest}
-                  >
-                    关闭详情
-                  </button>
-                ) : (
-                  <Link href="/admin/events" className="button button-secondary">
-                    返回活动列表
-                  </Link>
-                )}
+                <Link href="/admin/events" className="button button-secondary">
+                  返回活动列表
+                </Link>
               </div>
             </div>
           </div>
@@ -115,8 +84,6 @@ export function AdminEventDetailPageClient({
         </section>
       ) : null}
 
-      {saved ? <div className="note-strip">{getAdminSavedMessage(saved)}</div> : null}
-      {queryError ? <div className="note-strip">{getAdminErrorMessage(queryError)}</div> : null}
       {error ? <div className="note-strip">后台数据读取出现问题：{error}</div> : null}
       {data && data.queryErrors.length > 0 ? (
         <div className="note-strip">后台数据读取出现问题：{data.queryErrors.join(" | ")}</div>
@@ -126,11 +93,7 @@ export function AdminEventDetailPageClient({
 
       {eventDetail ? (
         <>
-          <AdminEventEditorFormClient
-            event={eventDetail}
-            onSaved={handleEventMutated}
-            onDeleted={handleEventDeleted}
-          />
+          <AdminEventEditorFormClient event={eventDetail} onSaved={reload} />
 
           <AdminEventPhotosManagerClient
             eventId={eventDetail.id}
@@ -138,7 +101,7 @@ export function AdminEventDetailPageClient({
             eventTitle={eventDetail.title}
             coverImageUrl={eventDetail.cover_image_url}
             photos={eventDetail.photos}
-            onChanged={handleEventMutated}
+            onChanged={reload}
           />
 
           <section className="surface admin-card">

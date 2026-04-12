@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
+import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminLeadsData } from "@/lib/admin/leads";
 import {
@@ -88,6 +89,11 @@ export function AdminLeadsPageClient() {
 
   return (
     <div className="admin-page-stack">
+      <AdminToastSignals
+        success={getAdminSavedMessage(saved)}
+        error={queryError ? getAdminErrorMessage(queryError) : null}
+      />
+
       <section className="surface admin-card">
         <div className="admin-toolbar">
           <div className="section-heading">
@@ -120,8 +126,6 @@ export function AdminLeadsPageClient() {
         </div>
       </section>
 
-      {saved ? <div className="note-strip">{getAdminSavedMessage(saved)}</div> : null}
-      {queryError ? <div className="note-strip">{getAdminErrorMessage(queryError)}</div> : null}
       {error ? <div className="note-strip">后台数据读取出现问题：{error}</div> : null}
       {data && data.queryErrors.length > 0 ? (
         <div className="note-strip">后台数据读取出现问题：{data.queryErrors.join(" | ")}</div>

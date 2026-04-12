@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
@@ -67,23 +68,16 @@ async function readApiResult(response: Response) {
 export function AdminEventEditorFormClient({
   event,
   onSaved,
-  onDeleted,
 }: {
   event?: EditableAdminEvent;
   onSaved?: () => void;
-  onDeleted?: () => void;
 }) {
   const router = useRouter();
-  const [feedback, setFeedback] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const isEditing = Boolean(event);
 
   function handleSubmit(formData: FormData) {
     startTransition(async () => {
-      setFeedback(null);
-      setError(null);
-
       try {
         const response = await fetch(
           isEditing ? `/api/admin/events/${event?.id}` : "/api/admin/events",
@@ -102,12 +96,10 @@ export function AdminEventEditorFormClient({
           return;
         }
 
-        setFeedback(getAdminSavedMessage(result?.saved ?? "event"));
+        toast.success(getAdminSavedMessage(result?.saved ?? "event") ?? "后台内容已更新。");
         onSaved?.();
       } catch (submitError) {
-        setError(
-          submitError instanceof Error ? submitError.message : "提交失败，请稍后再试。",
-        );
+        toast.error(submitError instanceof Error ? submitError.message : "提交失败，请稍后再试。");
       }
     });
   }
@@ -118,20 +110,14 @@ export function AdminEventEditorFormClient({
     }
 
     startTransition(async () => {
-      setFeedback(null);
-      setError(null);
-
       try {
         const response = await fetch(`/api/admin/events/${event.id}`, {
           method: "DELETE",
         });
         const result = await readApiResult(response);
-        onDeleted?.();
         router.push(`/admin/events?saved=${result?.saved ?? "deleted"}`);
       } catch (submitError) {
-        setError(
-          submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。",
-        );
+        toast.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
       }
     });
   }
@@ -142,9 +128,6 @@ export function AdminEventEditorFormClient({
         <p className="eyebrow">{isEditing ? "Edit Event" : "New Event"}</p>
         <h2>{isEditing ? `编辑：${event?.title}` : "新建活动"}</h2>
       </div>
-
-      {feedback ? <div className="note-strip">{feedback}</div> : null}
-      {error ? <div className="note-strip">{error}</div> : null}
 
       <form
         className="account-form"

@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
+import { toast } from "sonner";
 
+import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { ToneBadge } from "@/components/tone-badge";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
@@ -69,8 +71,6 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
   const { data, error, isLoading, reload } = useAdminResource<AdminLeadDetailData>(
     `/api/admin/leads/${leadId}`,
   );
-  const [feedback, setFeedback] = useState<string | null>(null);
-  const [submitError, setSubmitError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const lead = data?.lead;
   const staffOptions = data?.staffOptions ?? [];
@@ -81,9 +81,6 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
 
   function handleLeadSubmit(formData: FormData) {
     startTransition(async () => {
-      setFeedback(null);
-      setSubmitError(null);
-
       try {
         const response = await fetch(`/api/admin/leads/${leadId}`, {
           method: "PATCH",
@@ -100,21 +97,16 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
           }),
         });
         const result = await readApiResult(response);
-        setFeedback(getAdminSavedMessage(result?.saved ?? "lead_detail"));
+        toast.success(getAdminSavedMessage(result?.saved ?? "lead_detail") ?? "后台内容已更新。");
         reload();
       } catch (requestError) {
-        setSubmitError(
-          requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。",
-        );
+        toast.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
       }
     });
   }
 
   function handleCreateMatch(formData: FormData) {
     startTransition(async () => {
-      setFeedback(null);
-      setSubmitError(null);
-
       try {
         const response = await fetch(`/api/admin/leads/${leadId}/matches`, {
           method: "POST",
@@ -128,21 +120,16 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
           }),
         });
         const result = await readApiResult(response);
-        setFeedback(getAdminSavedMessage(result?.saved ?? "lead_match"));
+        toast.success(getAdminSavedMessage(result?.saved ?? "lead_match") ?? "后台内容已更新。");
         reload();
       } catch (requestError) {
-        setSubmitError(
-          requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。",
-        );
+        toast.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
       }
     });
   }
 
   function handleUpdateMatch(matchId: string, memberId: string, formData: FormData) {
     startTransition(async () => {
-      setFeedback(null);
-      setSubmitError(null);
-
       try {
         const response = await fetch(`/api/admin/leads/${leadId}/matches/${matchId}`, {
           method: "PATCH",
@@ -156,12 +143,10 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
           }),
         });
         const result = await readApiResult(response);
-        setFeedback(getAdminSavedMessage(result?.saved ?? "lead_match"));
+        toast.success(getAdminSavedMessage(result?.saved ?? "lead_match") ?? "后台内容已更新。");
         reload();
       } catch (requestError) {
-        setSubmitError(
-          requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。",
-        );
+        toast.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
       }
     });
   }
@@ -172,26 +157,28 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
     }
 
     startTransition(async () => {
-      setFeedback(null);
-      setSubmitError(null);
-
       try {
         const response = await fetch(`/api/admin/leads/${leadId}/matches/${matchId}`, {
           method: "DELETE",
         });
         const result = await readApiResult(response);
-        setFeedback(getAdminSavedMessage(result?.saved ?? "lead_match_deleted"));
+        toast.success(
+          getAdminSavedMessage(result?.saved ?? "lead_match_deleted") ?? "后台内容已更新。",
+        );
         reload();
       } catch (requestError) {
-        setSubmitError(
-          requestError instanceof Error ? requestError.message : "删除失败，请稍后再试。",
-        );
+        toast.error(requestError instanceof Error ? requestError.message : "删除失败，请稍后再试。");
       }
     });
   }
 
   return (
     <div className="admin-page-stack">
+      <AdminToastSignals
+        success={getAdminSavedMessage(querySaved)}
+        error={queryError ? getAdminErrorMessage(queryError) : null}
+      />
+
       {lead ? (
         <section className="surface admin-card">
           <div className="admin-toolbar">
@@ -227,10 +214,6 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
         </section>
       ) : null}
 
-      {querySaved ? <div className="note-strip">{getAdminSavedMessage(querySaved)}</div> : null}
-      {queryError ? <div className="note-strip">{getAdminErrorMessage(queryError)}</div> : null}
-      {feedback ? <div className="note-strip">{feedback}</div> : null}
-      {submitError ? <div className="note-strip">{submitError}</div> : null}
       {error ? <div className="note-strip">后台数据读取出现问题：{error}</div> : null}
       {data && data.queryErrors.length > 0 ? (
         <div className="note-strip">后台数据读取出现问题：{data.queryErrors.join(" | ")}</div>

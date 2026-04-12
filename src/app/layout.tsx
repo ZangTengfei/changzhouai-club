@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 
+import { AppToaster } from "@/components/app-toaster";
 import { AppShell } from "@/components/app-shell";
 import { ThemeQuerySync } from "@/components/theme-query-sync";
 import { SITE_THEME_STORAGE_KEY, THEME_QUERY_PARAM } from "@/lib/theme";
@@ -69,6 +70,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <ThemeQuerySync />
         </Suspense>
+        <AppToaster />
         <AppShell>{children}</AppShell>
       </body>
     </html>

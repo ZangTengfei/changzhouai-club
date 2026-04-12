@@ -5,6 +5,7 @@ import {
   updateAdminJoinRequest,
   updateAdminJoinRequestPipeline,
 } from "@/app/admin/actions";
+import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { ToneBadge } from "@/components/tone-badge";
 import {
   formatAdminJoinRequestStatus,
@@ -85,6 +86,11 @@ export default async function AdminJoinRequestDetailPage({
 
   return (
     <div className="admin-page-stack">
+      <AdminToastSignals
+        success={getAdminSavedMessage(query.saved)}
+        error={query.error ? getAdminErrorMessage(query.error) : null}
+      />
+
       <section className="surface admin-card">
         <div className="admin-toolbar">
           <div className="section-heading">
@@ -116,14 +122,6 @@ export default async function AdminJoinRequestDetailPage({
           <span className="pill">{joinRequest.monthlyTime ?? "未填写可投入时间"}</span>
         </div>
       </section>
-
-      {query.saved ? (
-        <div className="note-strip">{getAdminSavedMessage(query.saved)}</div>
-      ) : null}
-
-      {query.error ? (
-        <div className="note-strip">{getAdminErrorMessage(query.error)}</div>
-      ) : null}
 
       {queryErrors.length > 0 ? (
         <div className="note-strip">后台数据读取出现问题：{queryErrors.join(" | ")}</div>
