@@ -3,7 +3,26 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
+import {
+  AdminMetric,
+  AdminNotice,
+  AdminPageStack,
+  AdminPanel,
+  AdminPanelBody,
+  AdminPanelHeader,
+  AdminStatusBadge,
+  type AdminTone,
+} from "@/components/admin-ui";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminEventsData } from "@/lib/admin/events";
 import {
@@ -23,109 +42,123 @@ export function AdminEventsPageClient() {
   const showDebug = searchParams.get("debug") === "1";
 
   return (
-    <div className="admin-page-stack">
+    <AdminPageStack>
       <AdminToastSignals
         success={getAdminSavedMessage(saved)}
         error={queryError ? getAdminErrorMessage(queryError) : null}
       />
 
-      <section className="surface admin-card">
-        <div className="admin-toolbar">
-          <div className="section-heading">
-            <p className="eyebrow">Events</p>
-            <h2>活动列表</h2>
-          </div>
+      <AdminPanel>
+        <AdminPanelHeader
+          eyebrow="Events"
+          title="活动列表"
+          actions={
+            <>
+              <AdminMetric label="活动总数" value={data?.events.length ?? "..."} />
+              <Button asChild>
+                <Link href="/admin/events/new">新建活动</Link>
+              </Button>
+            </>
+          }
+        />
+      </AdminPanel>
 
-          <div className="admin-toolbar-side">
-            <div className="admin-mini-stat">
-              <strong>{data?.events.length ?? "..."}</strong>
-              <span>活动总数</span>
-            </div>
-
-            <Link href="/admin/events/new" className="button">
-              新建活动
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {error ? <div className="note-strip">后台数据读取出现问题：{error}</div> : null}
+      {error ? <AdminNotice>后台数据读取出现问题：{error}</AdminNotice> : null}
       {data && data.queryErrors.length > 0 ? (
-        <div className="note-strip">后台数据读取出现问题：{data.queryErrors.join(" | ")}</div>
+        <AdminNotice>后台数据读取出现问题：{data.queryErrors.join(" | ")}</AdminNotice>
       ) : null}
 
       {showDebug && data ? (
-        <section className="surface admin-card">
-          <div className="section-heading">
-            <p className="eyebrow">Diagnostics</p>
-            <h2>数据诊断信息</h2>
-          </div>
-
-          <pre className="debug-panel">{JSON.stringify(data.debugSnapshot, null, 2)}</pre>
-        </section>
+        <AdminPanel>
+          <AdminPanelHeader eyebrow="Diagnostics" title="数据诊断信息" />
+          <AdminPanelBody>
+            <pre className="overflow-x-auto rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 p-3 text-xs text-muted-foreground">
+              {JSON.stringify(data.debugSnapshot, null, 2)}
+            </pre>
+          </AdminPanelBody>
+        </AdminPanel>
       ) : null}
 
-      <section className="surface admin-card">
-        {isLoading ? (
-          <div className="note-strip">正在加载活动列表...</div>
-        ) : data && data.events.length > 0 ? (
-          <div className="admin-list">
-            <div className="admin-list-header admin-event-list-grid">
-              <span>活动</span>
-              <span>时间与地点</span>
-              <span>状态</span>
-              <span>数据概况</span>
+      <AdminPanel>
+        <AdminPanelHeader eyebrow="List" title="活动结果" />
+        <AdminPanelBody className="p-0">
+          {isLoading ? (
+            <div className="p-4">
+              <AdminNotice>正在加载活动列表...</AdminNotice>
             </div>
-
-            {data.events.map((event) => (
-              <Link
-                key={event.id}
-                href={`/admin/events/${event.id}`}
-                className="admin-list-row admin-event-list-grid admin-list-link"
-              >
-                <div className="admin-list-primary">
-                  <h3 className="admin-list-title">{event.title}</h3>
-                  <p className="admin-event-summary">{event.summary ?? "暂未填写活动简介。"}</p>
-                  <p className="admin-event-slug">{event.slug}</p>
-                </div>
-
-                <div className="admin-list-cell">
-                  <strong>{formatAdminEventDate(event.event_at)}</strong>
-                  <span>
-                    {event.venue ? `${event.city ?? "常州"} · ${event.venue}` : (event.city ?? "常州")}
-                  </span>
-                </div>
-
-                <div className="admin-list-cell">
-                  <span
-                    className={`pill admin-status-pill admin-status-pill-${getAdminEventStatusTone(
-                      event.status,
-                    )}`}
-                  >
-                    {formatAdminEventStatus(event.status)}
-                  </span>
-                </div>
-
-                <div className="admin-list-cell">
-                  <span>报名 {event.registrations.length}</span>
-                  <span>照片 {event.photos.length}</span>
-                  <span>封面 {event.cover_image_url ? "已设置" : "未设置"}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="admin-empty-state">
-            <h3>暂未创建活动</h3>
-            <p>创建活动后，即可继续补充详情、相册和报名信息。</p>
-            <div className="cta-row">
-              <Link href="/admin/events/new" className="button">
-                去创建活动
-              </Link>
+          ) : data && data.events.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>活动</TableHead>
+                  <TableHead>时间与地点</TableHead>
+                  <TableHead>状态</TableHead>
+                  <TableHead>数据概况</TableHead>
+                  <TableHead className="w-[96px] text-right">操作</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {data.events.map((event) => (
+                  <TableRow key={event.id}>
+                    <TableCell>
+                      <div className="grid gap-1">
+                        <Link
+                          href={`/admin/events/${event.id}`}
+                          className="font-semibold text-foreground transition-colors hover:text-primary"
+                        >
+                          {event.title}
+                        </Link>
+                        <p className="line-clamp-2 text-sm text-muted-foreground">
+                          {event.summary ?? "暂未填写活动简介。"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">{event.slug}</p>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      <div className="grid gap-1">
+                        <span className="font-medium text-foreground">
+                          {formatAdminEventDate(event.event_at)}
+                        </span>
+                        <span>
+                          {event.venue
+                            ? `${event.city ?? "常州"} · ${event.venue}`
+                            : (event.city ?? "常州")}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <AdminStatusBadge
+                        tone={getAdminEventStatusTone(event.status) as AdminTone}
+                      >
+                        {formatAdminEventStatus(event.status)}
+                      </AdminStatusBadge>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      <div className="grid gap-1">
+                        <span>报名 {event.registrations.length}</span>
+                        <span>照片 {event.photos.length}</span>
+                        <span>封面 {event.cover_image_url ? "已设置" : "未设置"}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button asChild size="sm" variant="secondary">
+                        <Link href={`/admin/events/${event.id}`}>查看</Link>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="space-y-3 p-4">
+              <AdminNotice>创建活动后，即可继续补充详情、相册和报名信息。</AdminNotice>
+              <Button asChild>
+                <Link href="/admin/events/new">去创建活动</Link>
+              </Button>
             </div>
-          </div>
-        )}
-      </section>
-    </div>
+          )}
+        </AdminPanelBody>
+      </AdminPanel>
+    </AdminPageStack>
   );
 }

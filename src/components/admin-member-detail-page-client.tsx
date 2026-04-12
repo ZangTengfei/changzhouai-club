@@ -5,9 +5,24 @@ import { useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
+import {
+  AdminCheckboxRow,
+  AdminField,
+  AdminNotice,
+  AdminPageStack,
+  AdminPanel,
+  AdminPanelBody,
+  AdminPanelHeader,
+  AdminStatusBadge,
+  type AdminTone,
+} from "@/components/admin-ui";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { MemberAvatar } from "@/components/member-avatar";
 import { ToneBadge } from "@/components/tone-badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
+import { Textarea } from "@/components/ui/textarea";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   formatAdminMemberStatus,
@@ -96,291 +111,280 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
   }
 
   return (
-    <div className="admin-page-stack">
+    <AdminPageStack>
       <AdminToastSignals
         success={getAdminSavedMessage(querySaved)}
         error={queryError ? getAdminErrorMessage(queryError) : null}
       />
 
       {member ? (
-        <section className="surface admin-card">
-          <div className="admin-toolbar">
-            <div className="section-heading">
-              <p className="eyebrow">Member Detail</p>
-              <h2>{member.displayName}</h2>
-            </div>
-
-            <div className="admin-toolbar-side">
-              <div className="admin-mini-stat">
-                <strong>{member.registrationCount}</strong>
-                <span>活动报名</span>
-              </div>
-
-              <Link href={backHref} className="button button-secondary">
-                返回成员列表
-              </Link>
-            </div>
-          </div>
-
-          <div className="pill-row">
-            <span
-              className={`pill admin-status-pill admin-status-pill-${getAdminMemberStatusTone(
-                member.status,
-              )}`}
-            >
+        <AdminPanel>
+          <AdminPanelHeader
+            eyebrow="Member Detail"
+            title={member.displayName}
+            actions={
+              <>
+                <div className="rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 px-3 py-2 text-sm">
+                  活动报名 {member.registrationCount} 次
+                </div>
+                <Button asChild variant="secondary">
+                  <Link href={backHref}>返回成员列表</Link>
+                </Button>
+              </>
+            }
+          />
+          <AdminPanelBody className="flex flex-wrap gap-2">
+            <AdminStatusBadge tone={getAdminMemberStatusTone(member.status) as AdminTone}>
               {formatAdminMemberStatus(member.status)}
-            </span>
-            <span className="pill">{member.city}</span>
-            <span className="pill">{member.isPubliclyVisible ? "公开展示中" : "未公开展示"}</span>
-          </div>
-        </section>
+            </AdminStatusBadge>
+            <AdminStatusBadge tone="neutral">{member.city}</AdminStatusBadge>
+            <AdminStatusBadge tone="neutral">
+              {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
+            </AdminStatusBadge>
+          </AdminPanelBody>
+        </AdminPanel>
       ) : null}
 
-      {error ? <div className="note-strip">后台数据读取出现问题：{error}</div> : null}
+      {error ? <AdminNotice>后台数据读取出现问题：{error}</AdminNotice> : null}
       {data && data.queryErrors.length > 0 ? (
-        <div className="note-strip">后台数据读取出现问题：{data.queryErrors.join(" | ")}</div>
+        <AdminNotice>后台数据读取出现问题：{data.queryErrors.join(" | ")}</AdminNotice>
       ) : null}
-
-      {isLoading ? <div className="note-strip">正在加载成员详情...</div> : null}
+      {isLoading ? <AdminNotice>正在加载成员详情...</AdminNotice> : null}
 
       {member ? (
-        <section className="surface admin-card admin-member-card">
-          <div className="admin-member-card-header">
-            <div className="admin-member-identity">
-              <MemberAvatar name={member.displayName} avatarUrl={member.avatarUrl} size="sm" />
+        <>
+          <AdminPanel>
+            <AdminPanelHeader eyebrow="Profile" title="成员概览" />
+            <AdminPanelBody className="space-y-4">
+              <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+                <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/20 p-4">
+                  <div className="flex items-start gap-3">
+                    <MemberAvatar name={member.displayName} avatarUrl={member.avatarUrl} size="sm" />
+                    <div className="grid gap-1">
+                      <h3 className="text-base font-semibold text-foreground">{member.displayName}</h3>
+                      <p className="text-sm text-muted-foreground">{member.email ?? "未提供邮箱"}</p>
+                      <p className="text-sm text-muted-foreground">{member.wechat ?? "未填写微信号"}</p>
+                      <p className="text-sm text-muted-foreground">{member.roleLabel ?? "未填写身份"}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {member.organization ?? "未填写公司 / 学校 / 团队"}
+                      </p>
+                      <p className="text-sm text-muted-foreground">{member.city}</p>
+                    </div>
+                  </div>
+                </div>
 
-              <div className="admin-member-copy">
-                <h3>{member.displayName}</h3>
-                <p>{member.email ?? "未提供邮箱"}</p>
-                <p>{member.wechat ?? "未填写微信号"}</p>
-                <p>{member.roleLabel ?? "未填写身份"}</p>
-                <p>{member.organization ?? "未填写公司 / 学校 / 团队"}</p>
-                <p>{member.city}</p>
+                <div className="grid gap-3">
+                  <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                      参与概况
+                    </p>
+                    <div className="mt-3 grid gap-2 text-sm text-muted-foreground">
+                      <p>加入时间：{formatDate(member.joinedAt)}</p>
+                      <p>最近活跃：{formatDate(member.lastActiveAt)}</p>
+                      <p>活动报名：{member.registrationCount} 次</p>
+                      <p>每月可投入时间：{member.monthlyTime ?? "未填写"}</p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                      参与意愿
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <AdminStatusBadge tone="neutral">
+                        {member.willingToAttend ? "愿意参加线下活动" : "暂不参加线下活动"}
+                      </AdminStatusBadge>
+                      <AdminStatusBadge tone="neutral">
+                        {member.willingToShare ? "愿意分享" : "暂不分享"}
+                      </AdminStatusBadge>
+                      <AdminStatusBadge tone="scheduled">
+                        {member.willingToJoinProjects ? "愿意共建" : "暂不共建"}
+                      </AdminStatusBadge>
+                      <AdminStatusBadge tone="neutral">
+                        {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
+                      </AdminStatusBadge>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <span
-              className={`pill admin-status-pill admin-status-pill-${getAdminMemberStatusTone(
-                member.status,
-              )}`}
-            >
-              {formatAdminMemberStatus(member.status)}
-            </span>
-          </div>
-
-          <div className="admin-member-card-meta">
-            <div className="admin-note-panel">
-              <span className="admin-card-label">参与概况</span>
-              <p className="admin-member-bio">加入时间：{formatDate(member.joinedAt)}</p>
-              <p className="admin-member-bio">最近活跃：{formatDate(member.lastActiveAt)}</p>
-              <p className="admin-member-bio">活动报名：{member.registrationCount} 次</p>
-              <p className="admin-member-bio">
-                每月可投入时间：{member.monthlyTime ?? "未填写"}
-              </p>
-            </div>
-
-            <div className="admin-note-panel">
-              <span className="admin-card-label">参与意愿</span>
-              <div className="pill-row">
-                <span className="pill member-signal-pill">
-                  {member.willingToAttend ? "愿意参加线下活动" : "暂不参加线下活动"}
-                </span>
-                <span className="pill member-signal-pill">
-                  {member.willingToShare ? "愿意分享" : "暂不分享"}
-                </span>
-                <span className="pill member-signal-pill member-signal-pill-warm">
-                  {member.willingToJoinProjects ? "愿意共建" : "暂不共建"}
-                </span>
-                <span className="pill member-signal-pill">
-                  {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
-                </span>
+              <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  个人介绍
+                </p>
+                <p className="mt-3 text-sm text-muted-foreground">
+                  {member.bio ?? "这位成员还没有补充个人介绍。"}
+                </p>
               </div>
-            </div>
-          </div>
 
-          <div className="admin-note-panel">
-            <span className="admin-card-label">个人介绍</span>
-            <p className="admin-member-bio">{member.bio ?? "这位成员还没有补充个人介绍。"}</p>
-          </div>
+              {member.skills.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {member.skills.map((skill) => (
+                    <ToneBadge key={`${member.id}-${skill}`} label={skill} />
+                  ))}
+                </div>
+              ) : (
+                <AdminNotice>这位成员尚未补充技能标签。</AdminNotice>
+              )}
 
-          {member.skills.length > 0 ? (
-            <div className="member-skill-list">
-              {member.skills.map((skill) => (
-                <ToneBadge key={`${member.id}-${skill}`} label={skill} />
-              ))}
-            </div>
-          ) : (
-            <div className="note-strip">这位成员尚未补充技能标签。</div>
-          )}
+              {member.interests.length > 0 ? (
+                <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                    感兴趣的主题
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {member.interests.map((interest) => (
+                      <ToneBadge key={`${member.id}-${interest}`} label={interest} />
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </AdminPanelBody>
+          </AdminPanel>
 
-          {member.interests.length > 0 ? (
-            <div className="admin-note-panel">
-              <span className="admin-card-label">感兴趣的主题</span>
-              <div className="member-skill-list">
-                {member.interests.map((interest) => (
-                  <ToneBadge key={`${member.id}-${interest}`} label={interest} />
-                ))}
-              </div>
-            </div>
-          ) : null}
+          <AdminPanel>
+            <AdminPanelHeader eyebrow="Edit Profile" title="成员基础资料" />
+            <AdminPanelBody>
+              <form
+                className="grid gap-4"
+                onSubmit={(formEvent) => {
+                  formEvent.preventDefault();
+                  handleSubmit(new FormData(formEvent.currentTarget));
+                }}
+              >
+                <div className="grid gap-4 md:grid-cols-2">
+                  <AdminField label="显示名">
+                    <Input
+                      name="display_name"
+                      defaultValue={member.displayName === "未填写显示名" ? "" : member.displayName}
+                      placeholder="比如：张三"
+                    />
+                  </AdminField>
 
-          <form
-            className="admin-inline-form"
-            onSubmit={(formEvent) => {
-              formEvent.preventDefault();
-              handleSubmit(new FormData(formEvent.currentTarget));
-            }}
-          >
-            <div className="section-heading">
-              <p className="eyebrow">Profile</p>
-              <h2>成员基础资料</h2>
-            </div>
+                  <AdminField label="微信号">
+                    <Input
+                      name="wechat"
+                      defaultValue={member.wechat ?? ""}
+                      placeholder="用于联系"
+                    />
+                  </AdminField>
 
-            <div className="form-grid">
-              <label className="form-field">
-                <span>显示名</span>
-                <input
-                  className="input"
-                  name="display_name"
-                  defaultValue={member.displayName === "未填写显示名" ? "" : member.displayName}
-                  placeholder="比如：张三"
-                />
-              </label>
+                  <AdminField label="城市">
+                    <Input name="city" defaultValue={member.city} placeholder="常州" />
+                  </AdminField>
 
-              <label className="form-field">
-                <span>微信号</span>
-                <input
-                  className="input"
-                  name="wechat"
-                  defaultValue={member.wechat ?? ""}
-                  placeholder="用于联系"
-                />
-              </label>
+                  <AdminField label="身份 / 角色">
+                    <Input
+                      name="role_label"
+                      defaultValue={member.roleLabel ?? ""}
+                      placeholder="例如：开发者 / 产品经理 / 创业者 / 学生"
+                    />
+                  </AdminField>
 
-              <label className="form-field">
-                <span>城市</span>
-                <input className="input" name="city" defaultValue={member.city} placeholder="常州" />
-              </label>
+                  <AdminField label="公司 / 学校 / 团队">
+                    <Input
+                      name="organization"
+                      defaultValue={member.organization ?? ""}
+                      placeholder="例如：SenseLeap.ai / 常州大学 / 独立开发"
+                    />
+                  </AdminField>
 
-              <label className="form-field">
-                <span>身份 / 角色</span>
-                <input
-                  className="input"
-                  name="role_label"
-                  defaultValue={member.roleLabel ?? ""}
-                  placeholder="例如：开发者 / 产品经理 / 创业者 / 学生"
-                />
-              </label>
+                  <AdminField label="每月可投入时间">
+                    <Input
+                      name="monthly_time"
+                      defaultValue={member.monthlyTime ?? ""}
+                      placeholder="例如：每周 2 小时 / 每月参加 1 次活动"
+                    />
+                  </AdminField>
 
-              <label className="form-field">
-                <span>公司 / 学校 / 团队</span>
-                <input
-                  className="input"
-                  name="organization"
-                  defaultValue={member.organization ?? ""}
-                  placeholder="例如：SenseLeap.ai / 常州大学 / 独立开发"
-                />
-              </label>
+                  <AdminField label="成员状态">
+                    <NativeSelect name="status" defaultValue={member.status}>
+                      <option value="pending">pending</option>
+                      <option value="active">active</option>
+                      <option value="organizer">organizer</option>
+                      <option value="admin">admin</option>
+                      <option value="paused">paused</option>
+                    </NativeSelect>
+                  </AdminField>
 
-              <label className="form-field">
-                <span>每月可投入时间</span>
-                <input
-                  className="input"
-                  name="monthly_time"
-                  defaultValue={member.monthlyTime ?? ""}
-                  placeholder="例如：每周 2 小时 / 每月参加 1 次活动"
-                />
-              </label>
+                  <AdminCheckboxRow className="self-end">
+                    <input
+                      type="checkbox"
+                      name="is_publicly_visible"
+                      defaultChecked={member.isPubliclyVisible}
+                      className="size-4 accent-[var(--primary)]"
+                    />
+                    <span>公开展示到成员页</span>
+                  </AdminCheckboxRow>
 
-              <label className="form-field">
-                <span>成员状态</span>
-                <select className="input" name="status" defaultValue={member.status}>
-                  <option value="pending">pending</option>
-                  <option value="active">active</option>
-                  <option value="organizer">organizer</option>
-                  <option value="admin">admin</option>
-                  <option value="paused">paused</option>
-                </select>
-              </label>
+                  <AdminField label="技能标签" className="md:col-span-2">
+                    <Input
+                      name="skills"
+                      defaultValue={member.skills.join("，")}
+                      placeholder="例如：Agent，RAG，前端工程，自动化工作流"
+                    />
+                  </AdminField>
 
-              <label className="checkbox-row admin-member-visibility-toggle">
-                <input
-                  type="checkbox"
-                  name="is_publicly_visible"
-                  defaultChecked={member.isPubliclyVisible}
-                />
-                <span>公开展示到成员页</span>
-              </label>
+                  <AdminField label="感兴趣的主题" className="md:col-span-2">
+                    <Input
+                      name="interests"
+                      defaultValue={member.interests.join("，")}
+                      placeholder="例如：LLM 应用，自动化工作流，项目交付"
+                    />
+                  </AdminField>
 
-              <label className="form-field form-field-wide">
-                <span>技能标签</span>
-                <input
-                  className="input"
-                  name="skills"
-                  defaultValue={member.skills.join("，")}
-                  placeholder="例如：Agent，RAG，前端工程，自动化工作流"
-                />
-              </label>
+                  <AdminField label="个人简介" className="md:col-span-2">
+                    <Textarea
+                      name="bio"
+                      defaultValue={member.bio ?? ""}
+                      rows={5}
+                      placeholder="简单介绍一下这位成员的方向、经验，或者你们在线下交流中形成的了解。"
+                    />
+                  </AdminField>
+                </div>
 
-              <label className="form-field form-field-wide">
-                <span>感兴趣的主题</span>
-                <input
-                  className="input"
-                  name="interests"
-                  defaultValue={member.interests.join("，")}
-                  placeholder="例如：LLM 应用，自动化工作流，项目交付"
-                />
-              </label>
+                <div className="grid gap-2 md:grid-cols-3">
+                  <AdminCheckboxRow>
+                    <input
+                      type="checkbox"
+                      name="willing_to_attend"
+                      defaultChecked={member.willingToAttend}
+                      className="size-4 accent-[var(--primary)]"
+                    />
+                    <span>愿意参加线下活动</span>
+                  </AdminCheckboxRow>
 
-              <label className="form-field form-field-wide">
-                <span>个人简介</span>
-                <textarea
-                  className="input textarea"
-                  name="bio"
-                  defaultValue={member.bio ?? ""}
-                  rows={5}
-                  placeholder="简单介绍一下这位成员的方向、经验，或者你们在线下交流中形成的了解。"
-                />
-              </label>
-            </div>
+                  <AdminCheckboxRow>
+                    <input
+                      type="checkbox"
+                      name="willing_to_share"
+                      defaultChecked={member.willingToShare}
+                      className="size-4 accent-[var(--primary)]"
+                    />
+                    <span>愿意在社区活动里做主题分享</span>
+                  </AdminCheckboxRow>
 
-            <div className="checkbox-list">
-              <label className="checkbox-row">
-                <input
-                  type="checkbox"
-                  name="willing_to_attend"
-                  defaultChecked={member.willingToAttend}
-                />
-                <span>愿意参加线下活动</span>
-              </label>
+                  <AdminCheckboxRow>
+                    <input
+                      type="checkbox"
+                      name="willing_to_join_projects"
+                      defaultChecked={member.willingToJoinProjects}
+                      className="size-4 accent-[var(--primary)]"
+                    />
+                    <span>如有合适项目，愿意参与协作</span>
+                  </AdminCheckboxRow>
+                </div>
 
-              <label className="checkbox-row">
-                <input
-                  type="checkbox"
-                  name="willing_to_share"
-                  defaultChecked={member.willingToShare}
-                />
-                <span>愿意在社区活动里做主题分享</span>
-              </label>
-
-              <label className="checkbox-row">
-                <input
-                  type="checkbox"
-                  name="willing_to_join_projects"
-                  defaultChecked={member.willingToJoinProjects}
-                />
-                <span>如有合适项目，愿意参与协作</span>
-              </label>
-            </div>
-
-            <div className="cta-row">
-              <button type="submit" className="button" disabled={isPending}>
-                {isPending ? "保存中..." : "保存成员资料"}
-              </button>
-            </div>
-          </form>
-        </section>
+                <div className="flex flex-wrap gap-2">
+                  <Button type="submit" disabled={isPending}>
+                    {isPending ? "保存中..." : "保存成员资料"}
+                  </Button>
+                </div>
+              </form>
+            </AdminPanelBody>
+          </AdminPanel>
+        </>
       ) : null}
-    </div>
+    </AdminPageStack>
   );
 }

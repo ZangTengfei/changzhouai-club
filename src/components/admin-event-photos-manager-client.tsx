@@ -3,7 +3,18 @@
 import { useTransition } from "react";
 import { toast } from "sonner";
 
+import {
+  AdminField,
+  AdminNotice,
+  AdminPageStack,
+  AdminPanel,
+  AdminPanelBody,
+  AdminPanelHeader,
+  AdminStatusBadge,
+} from "@/components/admin-ui";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
 
 type EventPhoto = {
@@ -131,174 +142,176 @@ export function AdminEventPhotosManagerClient({
   }
 
   return (
-    <section className="surface admin-card">
-      <div className="section-heading">
-        <p className="eyebrow">Gallery</p>
-        <h2>{eventTitle} 的照片管理</h2>
-      </div>
+    <AdminPageStack>
+      <AdminPanel>
+        <AdminPanelHeader eyebrow="Gallery" title={`${eventTitle} 的照片管理`} />
+        <AdminPanelBody className="space-y-4">
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/30 p-4">
+              <h3 className="text-sm font-semibold text-foreground">当前封面</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                封面图会优先用于活动列表展示。也可以直接把某张活动照片设成封面，减少重复维护。
+              </p>
+            </div>
 
-      <div className="admin-cover-panel">
-        <div>
-          <h3>当前封面</h3>
-          <p>
-            封面图会优先用于活动列表展示。你也可以直接把某张活动照片设成封面，减少重复维护。
-          </p>
-        </div>
-
-        {coverImageUrl ? (
-          <div className="admin-image-preview">
-            <img src={coverImageUrl} alt={`${eventTitle} 封面`} loading="lazy" />
-            <p className="admin-image-url">{coverImageUrl}</p>
+            {coverImageUrl ? (
+              <div className="overflow-hidden rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background">
+                <img
+                  src={coverImageUrl}
+                  alt={`${eventTitle} 封面`}
+                  loading="lazy"
+                  className="aspect-[16/10] w-full object-cover"
+                />
+                <p className="border-t border-border/70 px-3 py-2 text-xs text-muted-foreground">
+                  {coverImageUrl}
+                </p>
+              </div>
+            ) : (
+              <AdminNotice>暂未设置封面图。</AdminNotice>
+            )}
           </div>
-        ) : (
-          <div className="note-strip">暂未设置封面图。</div>
-        )}
-      </div>
 
-      {photos.length > 0 ? (
-        <div className="admin-photo-list">
-          {photos.map((photo) => {
-            const isCover = coverImageUrl === photo.image_url;
+          {photos.length > 0 ? (
+            <div className="grid gap-4">
+              {photos.map((photo) => {
+                const isCover = coverImageUrl === photo.image_url;
 
-            return (
-              <article className="admin-photo-card" key={photo.id}>
-                <div className="admin-image-preview">
-                  <img src={photo.image_url} alt={photo.caption ?? eventTitle} loading="lazy" />
-                  <p className="admin-image-url">{photo.image_url}</p>
-                </div>
-
-                <div className="admin-photo-body">
-                  <div className="pill-row admin-photo-meta">
-                    <span className="pill">排序 {photo.sort_order}</span>
-                    {isCover ? <span className="pill">当前封面</span> : null}
-                  </div>
-
-                  <form
-                    className="account-form admin-photo-form"
-                    onSubmit={(formEvent) => {
-                      formEvent.preventDefault();
-                      submitUpdate(photo.id, new FormData(formEvent.currentTarget));
-                    }}
+                return (
+                  <div
+                    key={photo.id}
+                    className="grid gap-4 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4 lg:grid-cols-[320px_minmax(0,1fr)]"
                   >
-                    <div className="form-grid admin-photo-form-grid">
-                      <label className="form-field form-field-wide">
-                        <span>图片路径</span>
-                        <StorageImageUrlField
-                          name="image_url"
-                          defaultValue={photo.image_url}
-                          eventSlug={eventSlug}
-                          placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
-                          uploadLabel="替换图片"
-                          required
-                        />
-                      </label>
-
-                      <label className="form-field">
-                        <span>排序</span>
-                        <input
-                          className="input"
-                          type="number"
-                          name="sort_order"
-                          defaultValue={photo.sort_order}
-                        />
-                      </label>
-
-                      <label className="form-field form-field-wide">
-                        <span>图片说明</span>
-                        <input
-                          className="input"
-                          name="caption"
-                          defaultValue={photo.caption ?? ""}
-                          placeholder="例如：现场自由交流 / 成员分享环节"
-                        />
-                      </label>
+                    <div className="overflow-hidden rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/30">
+                      <img
+                        src={photo.image_url}
+                        alt={photo.caption ?? eventTitle}
+                        loading="lazy"
+                        className="aspect-[4/3] w-full object-cover"
+                      />
+                      <p className="border-t border-border/70 px-3 py-2 text-xs text-muted-foreground">
+                        {photo.image_url}
+                      </p>
                     </div>
 
-                    <div className="cta-row admin-photo-actions">
-                      <button type="submit" className="button" disabled={isPending}>
-                        {isPending ? "提交中..." : "保存照片"}
-                      </button>
-                    </div>
-                  </form>
+                    <div className="grid gap-4">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <AdminStatusBadge tone="neutral">排序 {photo.sort_order}</AdminStatusBadge>
+                        {isCover ? <AdminStatusBadge tone="completed">当前封面</AdminStatusBadge> : null}
+                      </div>
 
-                  <div className="cta-row admin-photo-actions">
-                    {!isCover ? (
-                      <button
-                        type="button"
-                        className="button button-secondary"
-                        onClick={() => handleSetCover(photo.image_url)}
-                        disabled={isPending}
+                      <form
+                        className="grid gap-4"
+                        onSubmit={(formEvent) => {
+                          formEvent.preventDefault();
+                          submitUpdate(photo.id, new FormData(formEvent.currentTarget));
+                        }}
                       >
-                        设为封面
-                      </button>
-                    ) : null}
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <AdminField label="图片路径" className="md:col-span-2">
+                            <StorageImageUrlField
+                              name="image_url"
+                              defaultValue={photo.image_url}
+                              eventSlug={eventSlug}
+                              placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
+                              uploadLabel="替换图片"
+                              required
+                            />
+                          </AdminField>
 
-                    <button
-                      type="button"
-                      className="button button-secondary"
-                      onClick={() => handleDelete(photo.id)}
-                      disabled={isPending}
-                    >
-                      删除照片
-                    </button>
+                          <AdminField label="排序">
+                            <Input
+                              type="number"
+                              name="sort_order"
+                              defaultValue={photo.sort_order}
+                            />
+                          </AdminField>
+
+                          <AdminField label="图片说明" className="md:col-span-2">
+                            <Input
+                              name="caption"
+                              defaultValue={photo.caption ?? ""}
+                              placeholder="例如：现场自由交流 / 成员分享环节"
+                            />
+                          </AdminField>
+                        </div>
+
+                        <div className="flex flex-wrap gap-2">
+                          <Button type="submit" disabled={isPending}>
+                            {isPending ? "提交中..." : "保存照片"}
+                          </Button>
+                          {!isCover ? (
+                            <Button
+                              type="button"
+                              variant="secondary"
+                              onClick={() => handleSetCover(photo.image_url)}
+                              disabled={isPending}
+                            >
+                              设为封面
+                            </Button>
+                          ) : null}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={() => handleDelete(photo.id)}
+                            disabled={isPending}
+                          >
+                            删除照片
+                          </Button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      ) : (
-        <div className="note-strip">这场活动暂未添加相册照片，可先上传封面或现场照片。</div>
-      )}
+                );
+              })}
+            </div>
+          ) : (
+            <AdminNotice>这场活动暂未添加相册照片，可先上传封面或现场照片。</AdminNotice>
+          )}
+        </AdminPanelBody>
+      </AdminPanel>
 
-      <article className="admin-photo-create">
-        <div className="section-heading">
-          <p className="eyebrow">New Photo</p>
-          <h3>新增活动照片</h3>
-        </div>
+      <AdminPanel>
+        <AdminPanelHeader eyebrow="New Photo" title="新增活动照片" />
+        <AdminPanelBody>
+          <form
+            className="grid gap-4"
+            onSubmit={(formEvent) => {
+              formEvent.preventDefault();
+              submitCreate(new FormData(formEvent.currentTarget));
+              formEvent.currentTarget.reset();
+            }}
+          >
+            <div className="grid gap-4 md:grid-cols-2">
+              <AdminField label="图片路径" className="md:col-span-2">
+                <StorageImageUrlField
+                  name="image_url"
+                  eventSlug={eventSlug}
+                  placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
+                  uploadLabel="上传新图片"
+                  required
+                />
+              </AdminField>
 
-        <form
-          className="account-form admin-photo-form"
-          onSubmit={(formEvent) => {
-            formEvent.preventDefault();
-            submitCreate(new FormData(formEvent.currentTarget));
-            formEvent.currentTarget.reset();
-          }}
-        >
-          <div className="form-grid admin-photo-form-grid">
-            <label className="form-field form-field-wide">
-              <span>图片路径</span>
-              <StorageImageUrlField
-                name="image_url"
-                eventSlug={eventSlug}
-                placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
-                uploadLabel="上传新图片"
-                required
-              />
-            </label>
+              <AdminField label="排序">
+                <Input type="number" name="sort_order" defaultValue={0} />
+              </AdminField>
 
-            <label className="form-field">
-              <span>排序</span>
-              <input className="input" type="number" name="sort_order" defaultValue={0} />
-            </label>
+              <AdminField label="图片说明" className="md:col-span-2">
+                <Input
+                  name="caption"
+                  placeholder="例如：开场自我介绍 / 圆桌讨论 / 合影"
+                />
+              </AdminField>
+            </div>
 
-            <label className="form-field form-field-wide">
-              <span>图片说明</span>
-              <input
-                className="input"
-                name="caption"
-                placeholder="例如：开场自我介绍 / 圆桌讨论 / 合影"
-              />
-            </label>
-          </div>
-
-          <div className="cta-row">
-            <button type="submit" className="button" disabled={isPending}>
-              {isPending ? "提交中..." : "添加照片"}
-            </button>
-          </div>
-        </form>
-      </article>
-    </section>
+            <div className="flex flex-wrap gap-2">
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "提交中..." : "添加照片"}
+              </Button>
+            </div>
+          </form>
+        </AdminPanelBody>
+      </AdminPanel>
+    </AdminPageStack>
   );
 }

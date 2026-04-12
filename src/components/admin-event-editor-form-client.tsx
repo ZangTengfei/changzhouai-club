@@ -4,7 +4,19 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import {
+  AdminField,
+  AdminNotice,
+  AdminPageStack,
+  AdminPanel,
+  AdminPanelBody,
+  AdminPanelHeader,
+} from "@/components/admin-ui";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
+import { Textarea } from "@/components/ui/textarea";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
 
 type EditableAdminEvent = {
@@ -123,177 +135,157 @@ export function AdminEventEditorFormClient({
   }
 
   return (
-    <article className="surface admin-card">
-      <div className="section-heading">
-        <p className="eyebrow">{isEditing ? "Edit Event" : "New Event"}</p>
-        <h2>{isEditing ? `编辑：${event?.title}` : "新建活动"}</h2>
-      </div>
-
-      <form
-        className="account-form"
-        onSubmit={(formEvent) => {
-          formEvent.preventDefault();
-          handleSubmit(new FormData(formEvent.currentTarget));
-        }}
-      >
-        <div className="form-grid">
-          <label className="form-field">
-            <span>活动标题</span>
-            <input
-              className="input"
-              name="title"
-              defaultValue={event?.title ?? ""}
-              placeholder="例如：第 7 场线下交流"
-              required
-            />
-          </label>
-
-          <label className="form-field">
-            <span>活动 slug</span>
-            <input
-              className="input"
-              name="slug"
-              defaultValue={event?.slug ?? ""}
-              placeholder="例如：event-07-20260405"
-            />
-          </label>
-
-          <label className="form-field form-field-wide">
-            <span>活动简介</span>
-            <input
-              className="input"
-              name="summary"
-              defaultValue={event?.summary ?? ""}
-              placeholder="一句话说明这场活动的主题和形式"
-            />
-          </label>
-
-          <label className="form-field form-field-wide">
-            <span>详细说明</span>
-            <textarea
-              className="input textarea"
-              name="description"
-              defaultValue={event?.description ?? ""}
-              rows={4}
-              placeholder="可选：写更详细的活动内容、议题安排和适合人群。"
-            />
-          </label>
-
-          <label className="form-field form-field-wide">
-            <span>议程安排</span>
-            <textarea
-              className="input textarea"
-              name="agenda"
-              defaultValue={event?.agenda ?? ""}
-              rows={5}
-              placeholder={"一行一项，例如：\n19:30 签到与自由交流\n20:00 主题分享\n20:40 Demo 展示与问答"}
-            />
-          </label>
-
-          <label className="form-field form-field-wide">
-            <span>分享人与组织者</span>
-            <textarea
-              className="input textarea"
-              name="speaker_lineup"
-              defaultValue={event?.speaker_lineup ?? ""}
-              rows={4}
-              placeholder={"一行一项，例如：\n分享：某位社区成员 / AI Agent 工作流\n主持：社区组织者"}
-            />
-          </label>
-
-          <label className="form-field form-field-wide">
-            <span>报名提示</span>
-            <textarea
-              className="input textarea"
-              name="registration_note"
-              defaultValue={event?.registration_note ?? ""}
-              rows={3}
-              placeholder="例如：本场人数有限，请报名后按时参加；现场欢迎自带项目和问题来交流。"
-            />
-          </label>
-
-          <label className="form-field form-field-wide">
-            <span>活动回顾</span>
-            <textarea
-              className="input textarea"
-              name="recap"
-              defaultValue={event?.recap ?? ""}
-              rows={5}
-              placeholder={"适合用于活动结束后的内容沉淀。支持分段输入，例如：\n\n这场活动主要围绕...\n\n现场讨论比较集中的问题包括..."}
-            />
-          </label>
-
-          <label className="form-field">
-            <span>活动时间</span>
-            <input
-              className="input"
-              type="datetime-local"
-              name="event_at"
-              defaultValue={toDatetimeLocal(event?.event_at ?? null)}
-            />
-          </label>
-
-          <label className="form-field">
-            <span>活动状态</span>
-            <select className="input" name="status" defaultValue={event?.status ?? "draft"}>
-              <option value="draft">draft</option>
-              <option value="scheduled">scheduled</option>
-              <option value="completed">completed</option>
-              <option value="cancelled">cancelled</option>
-            </select>
-          </label>
-
-          <label className="form-field">
-            <span>地点</span>
-            <input
-              className="input"
-              name="venue"
-              defaultValue={event?.venue ?? ""}
-              placeholder="例如：常州某咖啡馆 / 共享空间"
-            />
-          </label>
-
-          <label className="form-field">
-            <span>城市</span>
-            <input
-              className="input"
-              name="city"
-              defaultValue={event?.city ?? "常州"}
-              placeholder="常州"
-            />
-          </label>
-
-          <label className="form-field form-field-wide">
-            <span>封面图路径</span>
-            <StorageImageUrlField
-              name="cover_image_url"
-              defaultValue={event?.cover_image_url ?? ""}
-              eventSlug={event?.slug ?? ""}
-              placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
-              uploadLabel="上传封面"
-            />
-          </label>
-        </div>
-
-        <div className="cta-row">
-          <button type="submit" className="button" disabled={isPending}>
-            {isPending ? "提交中..." : isEditing ? "保存活动" : "创建活动"}
-          </button>
-        </div>
-      </form>
-
-      {isEditing ? (
-        <div className="admin-delete-form">
-          <button
-            type="button"
-            className="button button-secondary"
-            onClick={handleDelete}
-            disabled={isPending}
+    <AdminPageStack>
+      <AdminPanel>
+        <AdminPanelHeader
+          eyebrow={isEditing ? "Edit Event" : "New Event"}
+          title={isEditing ? `编辑：${event?.title}` : "活动信息"}
+        />
+        <AdminPanelBody className="space-y-4">
+          <form
+            className="grid gap-4"
+            onSubmit={(formEvent) => {
+              formEvent.preventDefault();
+              handleSubmit(new FormData(formEvent.currentTarget));
+            }}
           >
-            删除这场活动
-          </button>
-        </div>
-      ) : null}
-    </article>
+            <div className="grid gap-4 md:grid-cols-2">
+              <AdminField label="活动标题">
+                <Input
+                  name="title"
+                  defaultValue={event?.title ?? ""}
+                  placeholder="例如：第 7 场线下交流"
+                  required
+                />
+              </AdminField>
+
+              <AdminField label="活动 slug">
+                <Input
+                  name="slug"
+                  defaultValue={event?.slug ?? ""}
+                  placeholder="例如：event-07-20260405"
+                />
+              </AdminField>
+
+              <AdminField label="活动简介" className="md:col-span-2">
+                <Input
+                  name="summary"
+                  defaultValue={event?.summary ?? ""}
+                  placeholder="一句话说明这场活动的主题和形式"
+                />
+              </AdminField>
+
+              <AdminField label="详细说明" className="md:col-span-2">
+                <Textarea
+                  name="description"
+                  defaultValue={event?.description ?? ""}
+                  rows={4}
+                  placeholder="可选：写更详细的活动内容、议题安排和适合人群。"
+                />
+              </AdminField>
+
+              <AdminField label="议程安排" className="md:col-span-2">
+                <Textarea
+                  name="agenda"
+                  defaultValue={event?.agenda ?? ""}
+                  rows={5}
+                  placeholder={"一行一项，例如：\n19:30 签到与自由交流\n20:00 主题分享\n20:40 Demo 展示与问答"}
+                />
+              </AdminField>
+
+              <AdminField label="分享人与组织者" className="md:col-span-2">
+                <Textarea
+                  name="speaker_lineup"
+                  defaultValue={event?.speaker_lineup ?? ""}
+                  rows={4}
+                  placeholder={"一行一项，例如：\n分享：某位社区成员 / AI Agent 工作流\n主持：社区组织者"}
+                />
+              </AdminField>
+
+              <AdminField label="报名提示" className="md:col-span-2">
+                <Textarea
+                  name="registration_note"
+                  defaultValue={event?.registration_note ?? ""}
+                  rows={3}
+                  placeholder="例如：本场人数有限，请报名后按时参加；现场欢迎自带项目和问题来交流。"
+                />
+              </AdminField>
+
+              <AdminField label="活动回顾" className="md:col-span-2">
+                <Textarea
+                  name="recap"
+                  defaultValue={event?.recap ?? ""}
+                  rows={5}
+                  placeholder={"适合用于活动结束后的内容沉淀。支持分段输入，例如：\n\n这场活动主要围绕...\n\n现场讨论比较集中的问题包括..."}
+                />
+              </AdminField>
+
+              <AdminField label="活动时间">
+                <Input
+                  type="datetime-local"
+                  name="event_at"
+                  defaultValue={toDatetimeLocal(event?.event_at ?? null)}
+                />
+              </AdminField>
+
+              <AdminField label="活动状态">
+                <NativeSelect name="status" defaultValue={event?.status ?? "draft"}>
+                  <option value="draft">draft</option>
+                  <option value="scheduled">scheduled</option>
+                  <option value="completed">completed</option>
+                  <option value="cancelled">cancelled</option>
+                </NativeSelect>
+              </AdminField>
+
+              <AdminField label="地点">
+                <Input
+                  name="venue"
+                  defaultValue={event?.venue ?? ""}
+                  placeholder="例如：常州某咖啡馆 / 共享空间"
+                />
+              </AdminField>
+
+              <AdminField label="城市">
+                <Input
+                  name="city"
+                  defaultValue={event?.city ?? "常州"}
+                  placeholder="常州"
+                />
+              </AdminField>
+
+              <AdminField label="封面图路径" className="md:col-span-2">
+                <StorageImageUrlField
+                  name="cover_image_url"
+                  defaultValue={event?.cover_image_url ?? ""}
+                  eventSlug={event?.slug ?? ""}
+                  placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
+                  uploadLabel="上传封面"
+                />
+              </AdminField>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              <Button type="submit" disabled={isPending}>
+                {isPending ? "提交中..." : isEditing ? "保存活动" : "创建活动"}
+              </Button>
+              {isEditing ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleDelete}
+                  disabled={isPending}
+                >
+                  删除这场活动
+                </Button>
+              ) : null}
+            </div>
+          </form>
+
+          {isEditing ? (
+            <AdminNotice>编辑完成后会直接刷新当前活动详情，无需跳转到新页面。</AdminNotice>
+          ) : null}
+        </AdminPanelBody>
+      </AdminPanel>
+    </AdminPageStack>
   );
 }

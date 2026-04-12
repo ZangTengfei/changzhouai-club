@@ -3,9 +3,28 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
+import {
+  AdminMetric,
+  AdminNotice,
+  AdminPageStack,
+  AdminPanel,
+  AdminPanelBody,
+  AdminPanelHeader,
+  AdminStatusBadge,
+  type AdminTone,
+} from "@/components/admin-ui";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { AdminEventEditorFormClient } from "@/components/admin-event-editor-form-client";
 import { AdminEventPhotosManagerClient } from "@/components/admin-event-photos-manager-client";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   formatAdminEventDate,
@@ -33,63 +52,51 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
   const eventDetail = data?.event;
 
   return (
-    <div className="admin-page-stack admin-detail-stack">
+    <AdminPageStack>
       <AdminToastSignals
         success={getAdminSavedMessage(saved)}
         error={queryError ? getAdminErrorMessage(queryError) : null}
       />
 
       {eventDetail ? (
-        <section className="surface admin-card">
-          <div className="admin-toolbar">
-            <div className="section-heading">
-              <p className="eyebrow">Event Detail</p>
-              <h2>{eventDetail.title}</h2>
-            </div>
-
-            <div className="admin-toolbar-side">
-              <div className="admin-mini-stat">
-                <strong>{eventDetail.registrations.length}</strong>
-                <span>当前报名</span>
-              </div>
-
-              <div className="cta-row">
-                <Link
-                  href={`/events/${eventDetail.slug}`}
-                  className="button"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  查看公开页
-                </Link>
-                <Link href="/admin/events" className="button button-secondary">
-                  返回活动列表
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          <div className="pill-row">
-            <span
-              className={`pill admin-status-pill admin-status-pill-${getAdminEventStatusTone(
-                eventDetail.status,
-              )}`}
-            >
+        <AdminPanel>
+          <AdminPanelHeader
+            eyebrow="Event Detail"
+            title={eventDetail.title}
+            actions={
+              <>
+                <AdminMetric label="当前报名" value={eventDetail.registrations.length} />
+                <Button asChild>
+                  <Link href={`/events/${eventDetail.slug}`} target="_blank" rel="noreferrer">
+                    查看公开页
+                  </Link>
+                </Button>
+                <Button asChild variant="secondary">
+                  <Link href="/admin/events">返回活动列表</Link>
+                </Button>
+              </>
+            }
+          />
+          <AdminPanelBody className="flex flex-wrap gap-2">
+            <AdminStatusBadge tone={getAdminEventStatusTone(eventDetail.status) as AdminTone}>
               {formatAdminEventStatus(eventDetail.status)}
-            </span>
-            <span className="pill">{formatAdminEventDate(eventDetail.event_at)}</span>
-            <span className="pill">照片 {eventDetail.photos.length}</span>
-            <span className="pill">报名 {eventDetail.registrations.length}</span>
-          </div>
-        </section>
+            </AdminStatusBadge>
+            <AdminStatusBadge tone="neutral">
+              {formatAdminEventDate(eventDetail.event_at)}
+            </AdminStatusBadge>
+            <AdminStatusBadge tone="neutral">照片 {eventDetail.photos.length}</AdminStatusBadge>
+            <AdminStatusBadge tone="neutral">
+              报名 {eventDetail.registrations.length}
+            </AdminStatusBadge>
+          </AdminPanelBody>
+        </AdminPanel>
       ) : null}
 
-      {error ? <div className="note-strip">后台数据读取出现问题：{error}</div> : null}
+      {error ? <AdminNotice>后台数据读取出现问题：{error}</AdminNotice> : null}
       {data && data.queryErrors.length > 0 ? (
-        <div className="note-strip">后台数据读取出现问题：{data.queryErrors.join(" | ")}</div>
+        <AdminNotice>后台数据读取出现问题：{data.queryErrors.join(" | ")}</AdminNotice>
       ) : null}
-
-      {isLoading ? <div className="note-strip">正在加载活动详情...</div> : null}
+      {isLoading ? <AdminNotice>正在加载活动详情...</AdminNotice> : null}
 
       {eventDetail ? (
         <>
@@ -104,65 +111,70 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
             onChanged={reload}
           />
 
-          <section className="surface admin-card">
-            <div className="section-heading">
-              <p className="eyebrow">Registrations</p>
-              <h2>{eventDetail.title} 的报名名单</h2>
-            </div>
-
-            {eventDetail.registrations.length > 0 ? (
-              <div className="admin-list">
-                <div className="admin-list-header admin-registration-list-grid">
-                  <span>成员</span>
-                  <span>联系信息</span>
-                  <span>状态</span>
-                  <span>报名时间</span>
-                  <span>备注</span>
+          <AdminPanel>
+            <AdminPanelHeader
+              eyebrow="Registrations"
+              title={`${eventDetail.title} 的报名名单`}
+            />
+            <AdminPanelBody className="p-0">
+              {eventDetail.registrations.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>成员</TableHead>
+                      <TableHead>联系信息</TableHead>
+                      <TableHead>状态</TableHead>
+                      <TableHead>报名时间</TableHead>
+                      <TableHead>备注</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {eventDetail.registrations.map((registration) => (
+                      <TableRow key={registration.id}>
+                        <TableCell>
+                          <div className="grid gap-1">
+                            <span className="font-semibold text-foreground">
+                              {registration.profile?.display_name ?? "未填写显示名"}
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                              用户 ID: {registration.user_id}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          <div className="grid gap-1">
+                            <span>{registration.profile?.email ?? "未提供邮箱"}</span>
+                            <span>{registration.profile?.city ?? "未填写城市"}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <AdminStatusBadge
+                            tone={
+                              getAdminRegistrationStatusTone(registration.status) as AdminTone
+                            }
+                          >
+                            {formatAdminRegistrationStatus(registration.status)}
+                          </AdminStatusBadge>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {new Date(registration.created_at).toLocaleString("zh-CN")}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {registration.note ?? "无备注"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="p-4">
+                  <AdminNotice>这场活动暂时还没有报名记录。</AdminNotice>
                 </div>
-
-                {eventDetail.registrations.map((registration) => (
-                  <article
-                    className="admin-list-row admin-registration-list-grid"
-                    key={registration.id}
-                  >
-                    <div className="admin-list-primary">
-                      <h3 className="admin-list-title">
-                        {registration.profile?.display_name ?? "未填写显示名"}
-                      </h3>
-                      <p className="admin-compact-note">用户 ID: {registration.user_id}</p>
-                    </div>
-
-                    <div className="admin-list-cell">
-                      <span>{registration.profile?.email ?? "未提供邮箱"}</span>
-                      <span>{registration.profile?.city ?? "未填写城市"}</span>
-                    </div>
-
-                    <div className="admin-list-cell">
-                      <span
-                        className={`pill admin-registration-pill admin-registration-pill-${getAdminRegistrationStatusTone(
-                          registration.status,
-                        )}`}
-                      >
-                        {formatAdminRegistrationStatus(registration.status)}
-                      </span>
-                    </div>
-
-                    <div className="admin-list-cell">
-                      <span>{new Date(registration.created_at).toLocaleString("zh-CN")}</span>
-                    </div>
-
-                    <div className="admin-list-cell">
-                      <span>{registration.note ?? "无备注"}</span>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            ) : (
-              <div className="note-strip">这场活动暂时还没有报名记录。</div>
-            )}
-          </section>
+              )}
+            </AdminPanelBody>
+          </AdminPanel>
         </>
       ) : null}
-    </div>
+    </AdminPageStack>
   );
 }

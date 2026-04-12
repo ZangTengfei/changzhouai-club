@@ -1,6 +1,11 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { UploadCloud } from "lucide-react";
+
+import { AdminNotice } from "@/components/admin-ui";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export function StorageImageUrlField({
   name,
@@ -62,9 +67,8 @@ export function StorageImageUrlField({
   }
 
   return (
-    <div className="storage-field">
-      <input
-        className="input"
+    <div className="grid gap-2">
+      <Input
         name={name}
         value={value}
         onChange={(event) => setValue(event.target.value)}
@@ -72,16 +76,18 @@ export function StorageImageUrlField({
         required={required}
       />
 
-      <div className="cta-row storage-field-actions">
-        <button
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
           type="button"
-          className="button button-secondary"
+          variant="secondary"
+          size="sm"
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
         >
+          <UploadCloud className="size-4" />
           {isUploading ? "上传中..." : uploadLabel}
-        </button>
-        {value ? <span className="storage-field-status">已填写图片地址</span> : null}
+        </Button>
+        {value ? <span className="text-xs text-muted-foreground">已填写图片地址</span> : null}
       </div>
 
       <input
@@ -92,7 +98,7 @@ export function StorageImageUrlField({
         onChange={(event) => handleUpload(event.target.files?.[0] ?? null)}
       />
 
-      {error ? <div className="note-strip">{error}</div> : null}
+      {error ? <AdminNotice>{error}</AdminNotice> : null}
     </div>
   );
 }

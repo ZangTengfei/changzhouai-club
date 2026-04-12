@@ -5,19 +5,39 @@ import { useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
+import {
+  AdminField,
+  AdminFilterLink,
+  AdminMetric,
+  AdminNotice,
+  AdminPageStack,
+  AdminPanel,
+  AdminPanelBody,
+  AdminPanelHeader,
+  AdminStatusBadge,
+  type AdminTone,
+} from "@/components/admin-ui";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminMembersData } from "@/lib/admin/members";
 import {
-  formatAdminJoinRequestStatus,
   formatAdminMemberStatus,
   getAdminErrorMessage,
-  getAdminJoinRequestStatusTone,
   getAdminMemberStatusTone,
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 
-const SHOW_JOIN_REQUESTS = false;
 const MEMBERS_PER_PAGE = 20;
 const MEMBER_STATUS_OPTIONS = ["pending", "active", "organizer", "admin", "paused"] as const;
 
@@ -51,9 +71,7 @@ function buildMembersFilterHref(
   status: string,
   visibility: string,
   intent: string,
-  requestStatus: string,
   memberQuery: string,
-  requestQuery: string,
   memberPage = 1,
 ) {
   const params = new URLSearchParams();
@@ -70,16 +88,8 @@ function buildMembersFilterHref(
     params.set("intent", intent);
   }
 
-  if (requestStatus !== "all") {
-    params.set("request_status", requestStatus);
-  }
-
   if (memberQuery.trim()) {
     params.set("member_query", memberQuery.trim());
-  }
-
-  if (requestQuery.trim()) {
-    params.set("request_query", requestQuery.trim());
   }
 
   if (memberPage > 1) {
@@ -158,9 +168,9 @@ function AdminMemberQuickActions({
   }
 
   return (
-    <div className="admin-member-quick-actions">
+    <div className="grid gap-2">
       <form
-        className="admin-member-quick-form"
+        className="grid gap-2"
         onSubmit={(formEvent) => {
           formEvent.preventDefault();
           const formData = new FormData(formEvent.currentTarget);
@@ -178,24 +188,21 @@ function AdminMemberQuickActions({
           });
         }}
       >
-        <label className="form-field">
-          <span>成员状态</span>
-          <select className="input" name="status" defaultValue={member.status}>
-            {MEMBER_STATUS_OPTIONS.map((status) => (
-              <option key={status} value={status}>
-                {formatAdminMemberStatus(status)}
-              </option>
-            ))}
-          </select>
-        </label>
+        <NativeSelect name="status" defaultValue={member.status} className="h-8 text-xs">
+          {MEMBER_STATUS_OPTIONS.map((status) => (
+            <option key={status} value={status}>
+              {formatAdminMemberStatus(status)}
+            </option>
+          ))}
+        </NativeSelect>
 
-        <div className="admin-member-quick-buttons">
-          <button type="submit" className="button button-secondary" disabled={isPending}>
+        <div className="flex flex-wrap gap-2">
+          <Button type="submit" size="sm" variant="secondary" disabled={isPending}>
             {isPending ? "保存中..." : "保存状态"}
-          </button>
-          <Link href={detailHref} className="button button-secondary">
-            查看详情
-          </Link>
+          </Button>
+          <Button asChild size="sm" variant="outline">
+            <Link href={detailHref}>查看详情</Link>
+          </Button>
         </div>
       </form>
 
@@ -214,13 +221,14 @@ function AdminMemberQuickActions({
           });
         }}
       >
-        <button
+        <Button
           type="submit"
-          className={member.isPubliclyVisible ? "button button-secondary" : "button"}
+          size="sm"
+          variant={member.isPubliclyVisible ? "secondary" : "default"}
           disabled={isPending}
         >
           {isPending ? "提交中..." : visibilityActionLabel}
-        </button>
+        </Button>
       </form>
     </div>
   );
@@ -233,12 +241,9 @@ export function AdminMembersPageClient() {
   const statusFilter = searchParams.get("status") ?? "all";
   const visibilityFilter = searchParams.get("visibility") ?? "all";
   const intentFilter = searchParams.get("intent") ?? "all";
-  const requestStatusFilter = searchParams.get("request_status") ?? "all";
   const memberQueryInput = (searchParams.get("member_query") ?? "").trim();
-  const requestQueryInput = (searchParams.get("request_query") ?? "").trim();
   const requestedMemberPage = parsePage(searchParams.get("member_page"));
   const memberKeyword = normalizeSearchText(memberQueryInput);
-  const requestKeyword = normalizeSearchText(requestQueryInput);
   const saved = searchParams.get("saved") ?? undefined;
   const queryError = searchParams.get("error") ?? undefined;
 
@@ -290,513 +295,317 @@ export function AdminMembersPageClient() {
     statusFilter,
     visibilityFilter,
     intentFilter,
-    requestStatusFilter,
     memberQueryInput,
-    requestQueryInput,
     currentMemberPage,
   );
-  const currentMemberRangeStart = filteredMembers.length === 0 ? 0 : memberPageStartIndex + 1;
-  const currentMemberRangeEnd =
-    filteredMembers.length === 0
-      ? 0
-      : Math.min(memberPageStartIndex + MEMBERS_PER_PAGE, filteredMembers.length);
-
-  const filteredJoinRequests =
-    data?.joinRequests.filter((request) => {
-      if (requestStatusFilter !== "all" && request.status !== requestStatusFilter) {
-        return false;
-      }
-
-      return matchesKeyword(
-        [
-          request.displayName,
-          request.wechat,
-          request.city,
-          request.roleLabel,
-          request.organization,
-          request.monthlyTime,
-          request.note,
-          request.adminNote,
-          request.skills,
-          request.interests,
-        ],
-        requestKeyword,
-      );
-    }) ?? [];
 
   return (
-    <div className="admin-page-stack">
+    <AdminPageStack>
       <AdminToastSignals
         success={getAdminSavedMessage(saved)}
         error={queryError ? getAdminErrorMessage(queryError) : null}
       />
 
-      <section className="surface admin-card">
-        <div className="admin-toolbar">
-          <div className="section-heading">
-            <p className="eyebrow">Members</p>
-            <h2>成员列表</h2>
-          </div>
+      <AdminPanel>
+        <AdminPanelHeader
+          eyebrow="Members"
+          title="成员列表"
+          actions={
+            <>
+              <AdminMetric label="成员总数" value={data?.stats.totalMembers ?? "..."} />
+              <AdminMetric label="愿意分享" value={data?.stats.willingToShare ?? "..."} />
+              <AdminMetric
+                label="愿意共建"
+                value={data?.stats.willingToJoinProjects ?? "..."}
+              />
+            </>
+          }
+        />
+      </AdminPanel>
 
-          <div className="admin-toolbar-side">
-            <div className="admin-mini-stat">
-              <strong>{data?.stats.totalMembers ?? "..."}</strong>
-              <span>成员总数</span>
-            </div>
-            <div className="admin-mini-stat">
-              <strong>{data?.stats.willingToShare ?? "..."}</strong>
-              <span>愿意分享</span>
-            </div>
-            <div className="admin-mini-stat">
-              <strong>{data?.stats.willingToJoinProjects ?? "..."}</strong>
-              <span>愿意共建</span>
-            </div>
-            {SHOW_JOIN_REQUESTS ? (
-              <div className="admin-mini-stat">
-                <strong>{data?.stats.joinRequests ?? "..."}</strong>
-                <span>加入申请</span>
-              </div>
-            ) : null}
-          </div>
-        </div>
-      </section>
-
-      {error ? <div className="note-strip">后台数据读取出现问题：{error}</div> : null}
+      {error ? <AdminNotice>后台数据读取出现问题：{error}</AdminNotice> : null}
       {data && data.queryErrors.length > 0 ? (
-        <div className="note-strip">后台数据读取出现问题：{data.queryErrors.join(" | ")}</div>
+        <AdminNotice>后台数据读取出现问题：{data.queryErrors.join(" | ")}</AdminNotice>
       ) : null}
 
-      <section className="surface admin-card">
-        <div className="section-heading">
-          <p className="eyebrow">Filters</p>
-          <h2>成员筛选</h2>
-        </div>
-
-        <div className="admin-filter-group">
-          <span className="admin-filter-label">状态</span>
-          <div className="admin-filter-row">
-            {[
-              ["all", "全部"],
-              ["pending", "待完善"],
-              ["active", "活跃成员"],
-              ["organizer", "组织者"],
-              ["admin", "管理员"],
-              ["paused", "暂停中"],
-            ].map(([value, label]) => (
-              <Link
-                key={value}
-                href={buildMembersFilterHref(
-                  value,
-                  visibilityFilter,
-                  intentFilter,
-                  requestStatusFilter,
-                  memberQueryInput,
-                  requestQueryInput,
-                  1,
-                )}
-                className={
-                  statusFilter === value
-                    ? "admin-filter-chip admin-filter-chip-active"
-                    : "admin-filter-chip"
-                }
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <div className="admin-filter-group">
-          <span className="admin-filter-label">公开展示</span>
-          <div className="admin-filter-row">
-            {[
-              ["all", "全部"],
-              ["public", "公开展示中"],
-              ["private", "未公开"],
-            ].map(([value, label]) => (
-              <Link
-                key={value}
-                href={buildMembersFilterHref(
-                  statusFilter,
-                  value,
-                  intentFilter,
-                  requestStatusFilter,
-                  memberQueryInput,
-                  requestQueryInput,
-                  1,
-                )}
-                className={
-                  visibilityFilter === value
-                    ? "admin-filter-chip admin-filter-chip-active"
-                    : "admin-filter-chip"
-                }
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <div className="admin-filter-group">
-          <span className="admin-filter-label">参与意愿</span>
-          <div className="admin-filter-row">
-            {[
-              ["all", "全部"],
-              ["share", "愿意分享"],
-              ["build", "愿意共建"],
-            ].map(([value, label]) => (
-              <Link
-                key={value}
-                href={buildMembersFilterHref(
-                  statusFilter,
-                  visibilityFilter,
-                  value,
-                  requestStatusFilter,
-                  memberQueryInput,
-                  requestQueryInput,
-                  1,
-                )}
-                className={
-                  intentFilter === value
-                    ? "admin-filter-chip admin-filter-chip-active"
-                    : "admin-filter-chip"
-                }
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <form action="/admin/members" className="admin-search-form">
-          <input type="hidden" name="status" value={statusFilter} />
-          <input type="hidden" name="visibility" value={visibilityFilter} />
-          <input type="hidden" name="intent" value={intentFilter} />
-          <input type="hidden" name="request_status" value={requestStatusFilter} />
-          <input type="hidden" name="request_query" value={requestQueryInput} />
-
-          <label className="form-field admin-search-field">
-            <span>成员搜索</span>
-            <input
-              className="input"
-              type="search"
-              name="member_query"
-              defaultValue={memberQueryInput}
-              placeholder="搜索姓名、邮箱、城市、技能"
-            />
-          </label>
-
-          <div className="admin-search-actions">
-            <button type="submit" className="button button-secondary">
-              搜索成员
-            </button>
-            {memberQueryInput ? (
-              <Link
-                href={buildMembersFilterHref(
-                  statusFilter,
-                  visibilityFilter,
-                  intentFilter,
-                  requestStatusFilter,
-                  "",
-                  requestQueryInput,
-                  1,
-                )}
-                className="button button-secondary"
-              >
-                清空搜索
-              </Link>
-            ) : null}
-          </div>
-        </form>
-      </section>
-
-      <section className="surface admin-card">
-        <div className="section-heading">
-          <p className="eyebrow">Members</p>
-          <h2>成员结果</h2>
-        </div>
-
-        {isLoading ? (
-          <div className="note-strip">正在加载成员列表...</div>
-        ) : paginatedMembers.length > 0 ? (
-          <div className="admin-list">
-            <div className="admin-pagination">
-              <p className="admin-pagination-summary">
-                第 {currentMemberPage} / {totalMemberPages} 页，每页 {MEMBERS_PER_PAGE} 位成员
+      <AdminPanel>
+        <AdminPanelHeader eyebrow="Filters" title="成员筛选" />
+        <AdminPanelBody className="space-y-4">
+          <div className="grid gap-3">
+            <div className="grid gap-2">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                状态
               </p>
-
-              <div className="admin-pagination-actions">
-                <Link
-                  href={buildMembersFilterHref(
-                    statusFilter,
-                    visibilityFilter,
-                    intentFilter,
-                    requestStatusFilter,
-                    memberQueryInput,
-                    requestQueryInput,
-                    1,
-                  )}
-                  className="button button-secondary"
-                >
-                  首页
-                </Link>
-                <Link
-                  href={buildMembersFilterHref(
-                    statusFilter,
-                    visibilityFilter,
-                    intentFilter,
-                    requestStatusFilter,
-                    memberQueryInput,
-                    requestQueryInput,
-                    Math.max(1, currentMemberPage - 1),
-                  )}
-                  className="button button-secondary"
-                >
-                  上一页
-                </Link>
-                <Link
-                  href={buildMembersFilterHref(
-                    statusFilter,
-                    visibilityFilter,
-                    intentFilter,
-                    requestStatusFilter,
-                    memberQueryInput,
-                    requestQueryInput,
-                    Math.min(totalMemberPages, currentMemberPage + 1),
-                  )}
-                  className="button button-secondary"
-                >
-                  下一页
-                </Link>
-                <Link
-                  href={buildMembersFilterHref(
-                    statusFilter,
-                    visibilityFilter,
-                    intentFilter,
-                    requestStatusFilter,
-                    memberQueryInput,
-                    requestQueryInput,
-                    totalMemberPages,
-                  )}
-                  className="button button-secondary"
-                >
-                  末页
-                </Link>
-              </div>
-            </div>
-
-            <div className="admin-list-header admin-member-list-grid">
-              <span>成员</span>
-              <span>城市与加入时间</span>
-              <span>状态</span>
-              <span>参与概况</span>
-              <span>意愿与技能</span>
-              <span>快捷操作</span>
-            </div>
-
-            {paginatedMembers.map((member) => (
-              <div
-                key={member.id}
-                className="admin-list-row admin-member-list-grid admin-member-row"
-              >
-                <div className="admin-list-primary">
-                  <h3 className="admin-list-title">{member.displayName}</h3>
-                  <p className="admin-compact-note">{member.email ?? "未提供邮箱"}</p>
-                </div>
-
-                <div className="admin-list-cell">
-                  <span>{member.city}</span>
-                  <span>加入于 {formatDate(member.joinedAt)}</span>
-                </div>
-
-                <div className="admin-list-cell">
-                  <span
-                    className={`pill admin-status-pill admin-status-pill-${getAdminMemberStatusTone(
-                      member.status,
-                    )}`}
+              <div className="flex flex-wrap gap-2">
+                {[
+                  ["all", "全部"],
+                  ["pending", "待完善"],
+                  ["active", "活跃成员"],
+                  ["organizer", "组织者"],
+                  ["admin", "管理员"],
+                  ["paused", "暂停中"],
+                ].map(([value, label]) => (
+                  <AdminFilterLink
+                    key={value}
+                    href={buildMembersFilterHref(
+                      value,
+                      visibilityFilter,
+                      intentFilter,
+                      memberQueryInput,
+                      1,
+                    )}
+                    active={statusFilter === value}
                   >
-                    {formatAdminMemberStatus(member.status)}
-                  </span>
-                  <span>{member.isPubliclyVisible ? "公开展示中" : "未公开展示"}</span>
-                </div>
-
-                <div className="admin-list-cell">
-                  <span>活动报名 {member.registrationCount} 次</span>
-                  <span>最近活跃 {formatDate(member.lastActiveAt)}</span>
-                </div>
-
-                <div className="admin-list-cell">
-                  <span>
-                    {member.willingToShare ? "愿意分享" : "暂不分享"} /{" "}
-                    {member.willingToJoinProjects ? "愿意共建" : "暂不共建"}
-                  </span>
-                  <span>{member.skills.slice(0, 3).join(" · ") || "未填写技能标签"}</span>
-                </div>
-
-                <div className="admin-list-actions">
-                  <AdminMemberQuickActions
-                    member={member}
-                    detailHref={buildDetailHref(`/admin/members/${member.id}`, currentMembersPath)}
-                    onChanged={reload}
-                  />
-                </div>
+                    {label}
+                  </AdminFilterLink>
+                ))}
               </div>
-            ))}
-          </div>
-        ) : (
-          <div className="note-strip">当前筛选条件下没有成员数据。</div>
-        )}
-      </section>
+            </div>
 
-      {SHOW_JOIN_REQUESTS ? (
-        <section className="surface admin-card">
-          <div className="section-heading">
-            <p className="eyebrow">Join Requests</p>
-            <h2>加入申请列表</h2>
-          </div>
+            <div className="grid gap-2">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                公开展示
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  ["all", "全部"],
+                  ["public", "公开展示中"],
+                  ["private", "未公开"],
+                ].map(([value, label]) => (
+                  <AdminFilterLink
+                    key={value}
+                    href={buildMembersFilterHref(
+                      statusFilter,
+                      value,
+                      intentFilter,
+                      memberQueryInput,
+                      1,
+                    )}
+                    active={visibilityFilter === value}
+                  >
+                    {label}
+                  </AdminFilterLink>
+                ))}
+              </div>
+            </div>
 
-          <div className="admin-filter-group">
-            <span className="admin-filter-label">申请状态</span>
-            <div className="admin-filter-row">
-              {[
-                ["all", "全部"],
-                ["new", "新申请"],
-                ["contacted", "已联系"],
-                ["approved", "已通过"],
-                ["archived", "已归档"],
-              ].map(([value, label]) => (
-                <Link
-                  key={value}
-                  href={buildMembersFilterHref(
-                    statusFilter,
-                    visibilityFilter,
-                    intentFilter,
-                    value,
-                    memberQueryInput,
-                    requestQueryInput,
-                    1,
-                  )}
-                  className={
-                    requestStatusFilter === value
-                      ? "admin-filter-chip admin-filter-chip-active"
-                      : "admin-filter-chip"
-                  }
-                >
-                  {label}
-                </Link>
-              ))}
+            <div className="grid gap-2">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                参与意愿
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  ["all", "全部"],
+                  ["share", "愿意分享"],
+                  ["build", "愿意共建"],
+                ].map(([value, label]) => (
+                  <AdminFilterLink
+                    key={value}
+                    href={buildMembersFilterHref(
+                      statusFilter,
+                      visibilityFilter,
+                      value,
+                      memberQueryInput,
+                      1,
+                    )}
+                    active={intentFilter === value}
+                  >
+                    {label}
+                  </AdminFilterLink>
+                ))}
+              </div>
             </div>
           </div>
 
-          <form action="/admin/members" className="admin-search-form">
+          <form action="/admin/members" className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
             <input type="hidden" name="status" value={statusFilter} />
             <input type="hidden" name="visibility" value={visibilityFilter} />
             <input type="hidden" name="intent" value={intentFilter} />
-            <input type="hidden" name="request_status" value={requestStatusFilter} />
-            <input type="hidden" name="member_query" value={memberQueryInput} />
 
-            <label className="form-field admin-search-field">
-              <span>申请搜索</span>
-              <input
-                className="input"
+            <AdminField label="成员搜索">
+              <Input
                 type="search"
-                name="request_query"
-                defaultValue={requestQueryInput}
-                placeholder="搜索姓名、微信号、机构、备注"
+                name="member_query"
+                defaultValue={memberQueryInput}
+                placeholder="搜索姓名、邮箱、城市、技能"
               />
-            </label>
+            </AdminField>
 
-            <div className="admin-search-actions">
-              <button type="submit" className="button button-secondary">
-                搜索申请
-              </button>
-              {requestQueryInput ? (
+            <div className="flex flex-wrap items-end gap-2">
+              <Button type="submit" variant="secondary">
+                搜索成员
+              </Button>
+              {memberQueryInput ? (
+                <Button asChild variant="outline">
+                  <Link
+                    href={buildMembersFilterHref(
+                      statusFilter,
+                      visibilityFilter,
+                      intentFilter,
+                      "",
+                      1,
+                    )}
+                  >
+                    清空搜索
+                  </Link>
+                </Button>
+              ) : null}
+            </div>
+          </form>
+        </AdminPanelBody>
+      </AdminPanel>
+
+      <AdminPanel>
+        <AdminPanelHeader
+          eyebrow="Results"
+          title="成员结果"
+          actions={
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                第 {currentMemberPage} / {totalMemberPages} 页
+              </span>
+              <Button asChild size="sm" variant="outline">
                 <Link
                   href={buildMembersFilterHref(
                     statusFilter,
                     visibilityFilter,
                     intentFilter,
-                    requestStatusFilter,
                     memberQueryInput,
-                    "",
                     1,
                   )}
-                  className="button button-secondary"
                 >
-                  清空搜索
+                  首页
                 </Link>
-              ) : null}
-            </div>
-          </form>
-
-          {isLoading ? (
-            <div className="note-strip">正在加载加入申请...</div>
-          ) : filteredJoinRequests.length > 0 ? (
-            <div className="admin-list">
-              <div className="admin-list-header admin-join-request-list-grid">
-                <span>申请者</span>
-                <span>联系与身份</span>
-                <span>状态</span>
-                <span>时间节点</span>
-                <span>意向与备注</span>
-              </div>
-
-              {filteredJoinRequests.map((request) => (
+              </Button>
+              <Button asChild size="sm" variant="outline">
                 <Link
-                  key={request.id}
-                  href={buildDetailHref(
-                    `/admin/members/requests/${request.id}`,
-                    currentMembersPath,
+                  href={buildMembersFilterHref(
+                    statusFilter,
+                    visibilityFilter,
+                    intentFilter,
+                    memberQueryInput,
+                    Math.max(1, currentMemberPage - 1),
                   )}
-                  className="admin-list-row admin-join-request-list-grid admin-list-link"
                 >
-                  <div className="admin-list-primary">
-                    <h3 className="admin-list-title">{request.displayName}</h3>
-                    <p className="admin-compact-note">微信：{request.wechat}</p>
-                  </div>
-
-                  <div className="admin-list-cell">
-                    <span>{request.city}</span>
-                    <span>{request.roleLabel ?? "未填写角色"}</span>
-                    <span>{request.organization ?? "未填写组织"}</span>
-                  </div>
-
-                  <div className="admin-list-cell">
-                    <span
-                      className={`pill admin-status-pill admin-status-pill-${getAdminJoinRequestStatusTone(
-                        request.status,
-                      )}`}
-                    >
-                      {formatAdminJoinRequestStatus(request.status)}
-                    </span>
-                    <span>
-                      {request.convertedMemberDisplayName
-                        ? `已转成员：${request.convertedMemberDisplayName}`
-                        : "尚未转为成员"}
-                    </span>
-                  </div>
-
-                  <div className="admin-list-cell">
-                    <span>申请于 {formatDate(request.createdAt)}</span>
-                    <span>已联系 {formatDate(request.contactedAt)}</span>
-                    <span>已通过 {formatDate(request.approvedAt)}</span>
-                  </div>
-
-                  <div className="admin-list-cell">
-                    <span>
-                      {request.willingToShare ? "愿意分享" : "暂不分享"} /{" "}
-                      {request.willingToJoinProjects ? "愿意共建" : "暂不共建"}
-                    </span>
-                    <span>{request.skills.slice(0, 3).join(" · ") || "未填写技能标签"}</span>
-                  </div>
+                  上一页
                 </Link>
-              ))}
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <Link
+                  href={buildMembersFilterHref(
+                    statusFilter,
+                    visibilityFilter,
+                    intentFilter,
+                    memberQueryInput,
+                    Math.min(totalMemberPages, currentMemberPage + 1),
+                  )}
+                >
+                  下一页
+                </Link>
+              </Button>
+              <Button asChild size="sm" variant="outline">
+                <Link
+                  href={buildMembersFilterHref(
+                    statusFilter,
+                    visibilityFilter,
+                    intentFilter,
+                    memberQueryInput,
+                    totalMemberPages,
+                  )}
+                >
+                  末页
+                </Link>
+              </Button>
             </div>
+          }
+        />
+        <AdminPanelBody className="space-y-3 p-0">
+          {isLoading ? (
+            <div className="p-4">
+              <AdminNotice>正在加载成员列表...</AdminNotice>
+            </div>
+          ) : paginatedMembers.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>成员</TableHead>
+                  <TableHead>城市与时间</TableHead>
+                  <TableHead>状态</TableHead>
+                  <TableHead>参与概况</TableHead>
+                  <TableHead>意愿与技能</TableHead>
+                  <TableHead className="min-w-[220px]">快捷操作</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paginatedMembers.map((member) => (
+                  <TableRow key={member.id}>
+                    <TableCell>
+                      <div className="grid gap-1">
+                        <Link
+                          href={buildDetailHref(`/admin/members/${member.id}`, currentMembersPath)}
+                          className="font-semibold text-foreground transition-colors hover:text-primary"
+                        >
+                          {member.displayName}
+                        </Link>
+                        <span className="text-sm text-muted-foreground">
+                          {member.email ?? "未提供邮箱"}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      <div className="grid gap-1">
+                        <span>{member.city}</span>
+                        <span>加入于 {formatDate(member.joinedAt)}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="grid gap-2">
+                        <AdminStatusBadge
+                          tone={getAdminMemberStatusTone(member.status) as AdminTone}
+                        >
+                          {formatAdminMemberStatus(member.status)}
+                        </AdminStatusBadge>
+                        <span className="text-xs text-muted-foreground">
+                          {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      <div className="grid gap-1">
+                        <span>活动报名 {member.registrationCount} 次</span>
+                        <span>最近活跃 {formatDate(member.lastActiveAt)}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      <div className="grid gap-1">
+                        <span>
+                          {member.willingToShare ? "愿意分享" : "暂不分享"} /{" "}
+                          {member.willingToJoinProjects ? "愿意共建" : "暂不共建"}
+                        </span>
+                        <span>{member.skills.slice(0, 3).join(" · ") || "未填写技能标签"}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <AdminMemberQuickActions
+                        member={member}
+                        detailHref={buildDetailHref(
+                          `/admin/members/${member.id}`,
+                          currentMembersPath,
+                        )}
+                        onChanged={reload}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           ) : (
-            <div className="note-strip">当前筛选条件下没有加入申请。</div>
+            <div className="p-4">
+              <AdminNotice>当前筛选条件下没有成员数据。</AdminNotice>
+            </div>
           )}
-        </section>
-      ) : null}
-    </div>
+        </AdminPanelBody>
+      </AdminPanel>
+    </AdminPageStack>
   );
 }

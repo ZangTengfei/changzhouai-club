@@ -2,27 +2,30 @@
 
 import Link from "next/link";
 
+import {
+  AdminPageStack,
+  AdminPanel,
+  AdminPanelHeader,
+} from "@/components/admin-ui";
 import { AdminEventEditorFormClient } from "@/components/admin-event-editor-form-client";
+import { Button } from "@/components/ui/button";
 
 export function AdminNewEventPageClient() {
   return (
-    <div className="admin-page-stack">
-      <section className="surface admin-card">
-        <div className="admin-toolbar">
-          <div className="section-heading">
-            <p className="eyebrow">New Event</p>
-            <h2>新建活动</h2>
-          </div>
-
-          <div className="cta-row">
-            <Link href="/admin/events" className="button button-secondary">
-              返回活动列表
-            </Link>
-          </div>
-        </div>
-      </section>
+    <AdminPageStack>
+      <AdminPanel>
+        <AdminPanelHeader
+          eyebrow="New Event"
+          title="新建活动"
+          actions={
+            <Button asChild variant="secondary">
+              <Link href="/admin/events">返回活动列表</Link>
+            </Button>
+          }
+        />
+      </AdminPanel>
 
       <AdminEventEditorFormClient />
-    </div>
+    </AdminPageStack>
   );
 }
