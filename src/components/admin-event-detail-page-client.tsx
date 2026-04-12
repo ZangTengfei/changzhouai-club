@@ -22,7 +22,17 @@ type AdminEventDetailData = {
   queryErrors: string[];
 };
 
-export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
+export function AdminEventDetailPageClient({
+  eventId,
+  mode = "page",
+  onCloseRequest,
+  onEventMutated,
+}: {
+  eventId: string;
+  mode?: "page" | "modal";
+  onCloseRequest?: () => void;
+  onEventMutated?: () => void;
+}) {
   const searchParams = useSearchParams();
   const { data, error, isLoading, reload } = useAdminResource<AdminEventDetailData>(
     `/api/admin/events/${eventId}`,
@@ -30,9 +40,26 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
   const saved = searchParams.get("saved") ?? undefined;
   const queryError = searchParams.get("error") ?? undefined;
   const eventDetail = data?.event;
+  const isModal = mode === "modal";
+
+  function handleEventMutated() {
+    reload();
+    onEventMutated?.();
+  }
+
+  function handleEventDeleted() {
+    onCloseRequest?.();
+    handleEventMutated();
+  }
 
   return (
-    <div className="admin-page-stack">
+    <div
+      className={
+        isModal
+          ? "admin-page-stack admin-detail-stack admin-detail-stack-modal"
+          : "admin-page-stack admin-detail-stack"
+      }
+    >
       {eventDetail ? (
         <section className="surface admin-card">
           <div className="admin-toolbar">
@@ -57,9 +84,19 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
                 >
                   查看公开页
                 </Link>
-                <Link href="/admin/events" className="button button-secondary">
-                  返回活动列表
-                </Link>
+                {isModal ? (
+                  <button
+                    type="button"
+                    className="button button-secondary"
+                    onClick={onCloseRequest}
+                  >
+                    关闭详情
+                  </button>
+                ) : (
+                  <Link href="/admin/events" className="button button-secondary">
+                    返回活动列表
+                  </Link>
+                )}
               </div>
             </div>
           </div>
@@ -90,7 +127,11 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
 
       {eventDetail ? (
         <>
-          <AdminEventEditorFormClient event={eventDetail} onSaved={reload} />
+          <AdminEventEditorFormClient
+            event={eventDetail}
+            onSaved={handleEventMutated}
+            onDeleted={handleEventDeleted}
+          />
 
           <AdminEventPhotosManagerClient
             eventId={eventDetail.id}
@@ -98,7 +139,7 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
             eventTitle={eventDetail.title}
             coverImageUrl={eventDetail.cover_image_url}
             photos={eventDetail.photos}
-            onChanged={reload}
+            onChanged={handleEventMutated}
           />
 
           <section className="surface admin-card">

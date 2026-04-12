@@ -67,9 +67,11 @@ async function readApiResult(response: Response) {
 export function AdminEventEditorFormClient({
   event,
   onSaved,
+  onDeleted,
 }: {
   event?: EditableAdminEvent;
   onSaved?: () => void;
+  onDeleted?: () => void;
 }) {
   const router = useRouter();
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -124,6 +126,7 @@ export function AdminEventEditorFormClient({
           method: "DELETE",
         });
         const result = await readApiResult(response);
+        onDeleted?.();
         router.push(`/admin/events?saved=${result?.saved ?? "deleted"}`);
       } catch (submitError) {
         setError(

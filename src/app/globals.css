@@ -1919,7 +1919,8 @@ img {
     minmax(0, 1.3fr)
     minmax(220px, 0.95fr)
     minmax(120px, 0.5fr)
-    minmax(180px, 0.8fr);
+    minmax(180px, 0.8fr)
+    minmax(170px, 0.9fr);
 }
 
 .admin-join-request-list-grid {
@@ -2266,6 +2267,77 @@ img {
 
 .admin-list-actions {
   justify-items: start;
+}
+
+.admin-event-row {
+  align-items: center;
+}
+
+.admin-event-list-actions {
+  align-content: start;
+}
+
+.admin-dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.36);
+  backdrop-filter: blur(3px);
+  z-index: 80;
+}
+
+.admin-dialog-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  width: min(1380px, calc(100vw - 32px));
+  max-height: min(92vh, 960px);
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  border-radius: 20px;
+  background: #f3f5f7;
+  box-shadow: 0 32px 80px rgba(15, 23, 42, 0.2);
+  transform: translate(-50%, -50%);
+  z-index: 81;
+}
+
+.admin-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 18px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.admin-dialog-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-dialog-copy strong,
+.admin-dialog-copy p {
+  margin: 0;
+}
+
+.admin-dialog-copy p {
+  color: rgba(15, 23, 42, 0.58);
+  font-size: 0.9rem;
+}
+
+.admin-dialog-close {
+  flex-shrink: 0;
+}
+
+.admin-dialog-body {
+  overflow: auto;
+  padding: 18px;
+}
+
+.admin-detail-stack-modal {
+  padding-bottom: 4px;
 }
 
 .admin-list-cell strong {
@@ -3230,6 +3302,16 @@ img {
     min-height: auto;
     padding: 14px;
     position: static;
+  }
+
+  .admin-dialog-content {
+    width: calc(100vw - 20px);
+    max-height: 94vh;
+  }
+
+  .admin-dialog-header,
+  .admin-dialog-body {
+    padding: 14px;
   }
 
   .hero,

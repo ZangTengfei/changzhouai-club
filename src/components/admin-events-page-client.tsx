@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 
+import { AdminEventDetailDialog } from "@/components/admin-event-detail-dialog";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminEventsData } from "@/lib/admin/events";
 import {
@@ -15,7 +17,8 @@ import {
 
 export function AdminEventsPageClient() {
   const searchParams = useSearchParams();
-  const { data, error, isLoading } = useAdminResource<AdminEventsData>("/api/admin/events");
+  const { data, error, isLoading, reload } = useAdminResource<AdminEventsData>("/api/admin/events");
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
 
   const saved = searchParams.get("saved") ?? undefined;
   const queryError = searchParams.get("error") ?? undefined;
@@ -73,13 +76,13 @@ export function AdminEventsPageClient() {
               <span>时间与地点</span>
               <span>状态</span>
               <span>数据概况</span>
+              <span>操作</span>
             </div>
 
             {data.events.map((event) => (
-              <Link
+              <article
                 key={event.id}
-                href={`/admin/events/${event.id}`}
-                className="admin-list-row admin-event-list-grid admin-list-link"
+                className="admin-list-row admin-event-list-grid admin-event-row"
               >
                 <div className="admin-list-primary">
                   <h3 className="admin-list-title">{event.title}</h3>
@@ -109,7 +112,20 @@ export function AdminEventsPageClient() {
                   <span>照片 {event.photos.length}</span>
                   <span>封面 {event.cover_image_url ? "已设置" : "未设置"}</span>
                 </div>
-              </Link>
+
+                <div className="admin-list-actions admin-event-list-actions">
+                  <button
+                    type="button"
+                    className="button"
+                    onClick={() => setSelectedEventId(event.id)}
+                  >
+                    查看活动详情
+                  </button>
+                  <Link href={`/admin/events/${event.id}`} className="button button-secondary">
+                    打开页面
+                  </Link>
+                </div>
+              </article>
             ))}
           </div>
         ) : (
@@ -124,6 +140,17 @@ export function AdminEventsPageClient() {
           </div>
         )}
       </section>
+
+      <AdminEventDetailDialog
+        eventId={selectedEventId}
+        open={Boolean(selectedEventId)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setSelectedEventId(null);
+          }
+        }}
+        onEventMutated={reload}
+      />
     </div>
   );
 }
