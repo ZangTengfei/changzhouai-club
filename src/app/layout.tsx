@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Suspense } from "react";
 
-import { SiteFooter } from "@/components/site-footer";
-import { SiteHeader } from "@/components/site-header";
+import { AppShell } from "@/components/app-shell";
 import { ThemeQuerySync } from "@/components/theme-query-sync";
 import { SITE_THEME_STORAGE_KEY, THEME_QUERY_PARAM } from "@/lib/theme";
 
@@ -70,11 +69,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <ThemeQuerySync />
         </Suspense>
-        <div className="site-shell">
-          <SiteHeader />
-          <main className="container site-main">{children}</main>
-          <SiteFooter />
-        </div>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
