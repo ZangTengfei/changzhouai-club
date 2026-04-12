@@ -53,22 +53,6 @@ export default async function AdminLayout({
       </aside>
 
       <main className="admin-workspace">
-        <header className="surface admin-shell admin-shell-compact">
-          <div className="admin-toolbar">
-            <div>
-              <p className="eyebrow">Workspace</p>
-              <h2>运营工作区</h2>
-            </div>
-
-            <div className="admin-toolbar-side">
-              <div className="admin-mini-stat">
-                <strong>{member?.status ?? "pending"}</strong>
-                <span>当前权限</span>
-              </div>
-            </div>
-          </div>
-        </header>
-
         <div className="admin-content">{children}</div>
       </main>
     </div>
