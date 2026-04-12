@@ -439,6 +439,7 @@ img {
 
 .docs-layout-shell {
   min-height: 100vh;
+  padding-bottom: 28px;
   --docs-bg: #f8fafc;
   --docs-bg-soft: #ffffff;
   --docs-surface: rgba(255, 255, 255, 0.96);
@@ -592,8 +593,8 @@ img {
 
 .docs-footer {
   width: min(1240px, calc(100% - 40px));
-  margin: 0 auto 28px;
-  padding: 0 0 20px;
+  margin: 0 auto;
+  padding: 0;
 }
 
 .docs-footer-grid {

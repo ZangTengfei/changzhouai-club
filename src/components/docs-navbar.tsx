@@ -3,7 +3,7 @@ import Link from "next/link";
 export function DocsNavbar() {
   return (
     <div className="docs-navbar-shell">
-      <Link href="/" className="docs-navbar-brand">
+      <Link href="/docs" className="docs-navbar-brand">
         <span className="docs-navbar-badge">Docs</span>
         <span className="docs-navbar-copy">
           <strong>常州 AI 社区知识库</strong>
