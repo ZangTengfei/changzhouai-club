@@ -33,10 +33,14 @@ export default async function AdminLayout({
     <div className="page-stack">
       <section className="surface admin-shell">
         <div className="admin-toolbar">
-          <div>
-            <p className="eyebrow">Admin</p>
-            <h1>社区后台</h1>
-            <p>统一管理社区活动、成员资料与合作线索，支持日常运营和内容维护。</p>
+          <div className="admin-shell-header">
+            <div>
+              <p className="eyebrow">Admin</p>
+              <h1>社区后台</h1>
+              <p>统一管理社区活动、成员资料与合作线索，支持日常运营和内容维护。</p>
+            </div>
+
+            <AdminNav />
           </div>
 
           <div className="admin-toolbar-side">
@@ -45,15 +49,6 @@ export default async function AdminLayout({
               <span>当前权限</span>
             </div>
           </div>
-        </div>
-
-        <div className="admin-shell-nav">
-          <div className="admin-sidebar-copy">
-            <p className="eyebrow">Workspace</p>
-            <h2>运营导航</h2>
-            <p>按活动、成员和合作线索分类管理，列表浏览与详情维护分开处理。</p>
-          </div>
-          <AdminNav />
         </div>
       </section>
 

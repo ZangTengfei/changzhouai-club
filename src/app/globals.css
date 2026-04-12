@@ -1381,18 +1381,14 @@ img {
   gap: 20px;
 }
 
-.admin-shell-nav {
+.admin-shell-header {
   display: grid;
   gap: 16px;
-  margin-top: 22px;
-  padding-top: 22px;
-  border-top: 1px solid rgba(var(--accent-rgb), 0.12);
 }
 
 .admin-sidebar {
   padding: 22px;
-  position: sticky;
-  top: 96px;
+  position: static;
 }
 
 .admin-sidebar-copy h2 {
@@ -1417,7 +1413,7 @@ img {
 .admin-nav-item {
   display: grid;
   gap: 4px;
-  padding: 14px 16px;
+  padding: 12px 14px;
   border: 1px solid rgba(var(--accent-rgb), 0.1);
   border-radius: 16px;
   background: rgba(var(--surface-alt-rgb), 0.8);
@@ -1435,12 +1431,12 @@ img {
 }
 
 .admin-nav-item strong {
-  font-size: 0.98rem;
+  font-size: 0.95rem;
 }
 
 .admin-nav-item span {
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.84rem;
 }
 
 .admin-nav-item-active {
@@ -2832,12 +2828,12 @@ img {
     grid-template-columns: 1fr;
   }
 
-  .admin-nav > * {
-    flex-basis: 100%;
+  .admin-shell-header {
+    gap: 14px;
   }
 
-  .admin-sidebar {
-    position: static;
+  .admin-nav > * {
+    flex-basis: 100%;
   }
 
   .hero,
