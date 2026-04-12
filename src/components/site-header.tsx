@@ -2,26 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { SVGProps } from "react";
 import { useEffect, useRef, useState } from "react";
 
 import { SiteAccountEntry } from "@/components/site-account-entry";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { navItems } from "@/lib/site-data";
-
-type IconProps = SVGProps<SVGSVGElement>;
-
-function KnowledgeBaseLinkIcon(props: IconProps) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" {...props}>
-      <path
-        d="M10 7.75H8.5a3.75 3.75 0 000 7.5H10M14 7.75h1.5a3.75 3.75 0 010 7.5H14M9.5 12h5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
 
 export function SiteHeader() {
   const pathname = usePathname();
@@ -82,17 +67,6 @@ export function SiteHeader() {
         </div>
 
         <div className="header-top-actions">
-          <Link
-            href="/docs"
-            className="header-icon-link"
-            target="_blank"
-            rel="noreferrer"
-            aria-label="在新标签页打开知识库"
-            title="在新标签页打开知识库"
-            onClick={() => setMenuOpen(false)}
-          >
-            <KnowledgeBaseLinkIcon />
-          </Link>
           <SiteAccountEntry />
           <button
             type="button"
