@@ -1,0 +1,20 @@
+.dark .docs-layout-shell {
+  --docs-bg: #020617;
+  --docs-bg-soft: #0f172a;
+  --docs-surface: rgba(15, 23, 42, 0.92);
+  --docs-line: rgba(148, 163, 184, 0.22);
+  --docs-line-strong: rgba(148, 163, 184, 0.34);
+  --docs-text: #e2e8f0;
+  --docs-text-soft: #94a3b8;
+  --docs-hover: rgba(148, 163, 184, 0.08);
+  --docs-shadow: 0 16px 36px rgba(2, 6, 23, 0.42);
+  --nextra-primary-hue: 214;
+  --nextra-primary-saturation: 90%;
+  --nextra-primary-lightness: 66%;
+  --nextra-bg: 2 6 23;
+  --logo-primary: #93c5fd;
+  --logo-secondary: #cbd5e1;
+  --logo-highlight: #f8fafc;
+  background:
+    linear-gradient(180deg, #020617 0%, #0f172a 100%);
+}

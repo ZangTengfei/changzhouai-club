@@ -7,6 +7,7 @@ import { DocsFooter } from "@/components/docs-footer";
 import { DocsNavbar } from "@/components/docs-navbar";
 
 import "nextra-theme-docs/style.css";
+import "./theme.css";
 
 export default async function DocsLayout({
   children,
@@ -33,14 +34,13 @@ export default async function DocsLayout({
           toggleButton: true,
         }}
         nextThemes={{
-          defaultTheme: "light",
-          forcedTheme: "light",
+          defaultTheme: "system",
         }}
         toc={{
           title: "本页目录",
           backToTop: "回到顶部",
         }}
-        darkMode={false}
+        darkMode={true}
       >
         {children}
       </Layout>
