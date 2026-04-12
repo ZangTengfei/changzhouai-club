@@ -524,6 +524,21 @@ img {
   min-width: 0;
 }
 
+.docs-navbar-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 30px;
+  flex-shrink: 0;
+}
+
+.docs-navbar-mark-icon {
+  display: block;
+  width: 54px;
+  height: auto;
+}
+
 .docs-navbar-copy {
   display: flex;
   flex-direction: column;
@@ -3103,6 +3118,15 @@ img {
   .docs-navbar-links a,
   .docs-footer-links a {
     font-size: 0.92rem;
+  }
+
+  .docs-navbar-mark,
+  .docs-navbar-mark-icon {
+    width: 46px;
+  }
+
+  .docs-navbar-mark {
+    height: 26px;
   }
 
   .nav-links {
