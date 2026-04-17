@@ -2,7 +2,7 @@
 
 import { useFormStatus } from "react-dom";
 
-import { updateAccountProfile } from "@/app/account/actions";
+import { updateAccountProfile } from "@/app/(site)/account/actions";
 import { AccountAvatarField } from "@/components/account-avatar-field";
 
 type AccountProfileFormProps = {

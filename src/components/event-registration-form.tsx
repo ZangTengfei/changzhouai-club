@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { registerForEvent } from "@/app/events/actions";
+import { registerForEvent } from "@/app/(site)/events/actions";
 
 type UpcomingEvent = {
   id: string;

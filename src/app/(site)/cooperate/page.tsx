@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { submitCooperationLead } from "@/app/cooperate/actions";
+import { submitCooperationLead } from "@/app/(site)/cooperate/actions";
 import { PageHero } from "@/components/page-hero";
 import { ToneBadge } from "@/components/tone-badge";
 import { cooperationAreas } from "@/lib/site-data";

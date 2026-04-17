@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { MemberDirectoryCard } from "@/components/member-directory-card";
@@ -196,7 +197,13 @@ export default async function HomePage() {
               >
                 <div className="event-media">
                   {item.imageUrl ? (
-                    <img src={item.imageUrl} alt={item.title} loading="lazy" />
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.title}
+                      width={720}
+                      height={540}
+                      sizes="(max-width: 820px) calc(100vw - 20px), (max-width: 1024px) calc((100vw - 32px - 18px) / 2), 349px"
+                    />
                   ) : (
                     <div className="event-image-fallback">活动图片待补充</div>
                   )}

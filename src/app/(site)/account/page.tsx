@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 
 import { AccountProfileForm } from "@/components/account-profile-form";
 import { SignOutButton } from "@/components/sign-out-button";
-import { cancelRegistration } from "@/app/account/actions";
+import { cancelRegistration } from "@/app/(site)/account/actions";
 import { hasSupabaseEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
