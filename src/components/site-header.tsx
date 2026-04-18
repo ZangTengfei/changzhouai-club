@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { MobileMenuToggle } from "@/components/mobile-menu-toggle";
 import { SiteAccountEntry } from "@/components/site-account-entry";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { navItems } from "@/lib/site-data";
@@ -18,13 +19,6 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <input
-          id="site-navigation-toggle"
-          type="checkbox"
-          className="mobile-menu-state"
-          aria-hidden="true"
-        />
-
         <nav id="site-navigation" className="nav-links" aria-label="主导航">
           {navItems.map((item) => (
             <Link key={item.href} href={item.href}>
@@ -41,15 +35,7 @@ export function SiteHeader() {
 
         <div className="header-top-actions">
           <SiteAccountEntry />
-          <label
-            htmlFor="site-navigation-toggle"
-            className="mobile-menu-toggle"
-            aria-label="展开主导航"
-          >
-            <span />
-            <span />
-            <span />
-          </label>
+          <MobileMenuToggle controlsId="site-navigation" />
         </div>
       </div>
     </header>
