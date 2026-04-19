@@ -17,6 +17,10 @@ export function GlobalRouteLoading() {
       <div className="route-progress-shell">
         <div className="route-progress-bar" />
       </div>
+      <div className="route-progress-pill">
+        <span className="route-progress-pill-dot" />
+        页面切换中
+      </div>
       <span className="sr-only">页面切换中</span>
     </div>
   );
@@ -27,6 +31,10 @@ export function SiteRouteLoading() {
     <div className="page-stack" aria-live="polite" aria-busy="true">
       <div className="route-progress-shell">
         <div className="route-progress-bar" />
+      </div>
+      <div className="route-progress-pill">
+        <span className="route-progress-pill-dot" />
+        页面切换中
       </div>
 
       <section className="surface flex flex-col gap-4 px-5 py-5 sm:px-6">
@@ -61,6 +69,10 @@ export function AdminRouteLoading() {
     <div className="flex flex-col gap-4" aria-live="polite" aria-busy="true">
       <div className="route-progress-shell">
         <div className="route-progress-bar route-progress-bar-admin" />
+      </div>
+      <div className="route-progress-pill route-progress-pill-admin">
+        <span className="route-progress-pill-dot route-progress-pill-dot-admin" />
+        正在切换后台内容
       </div>
 
       <section className="rounded-[var(--radius)] border border-border/70 bg-card/95 shadow-[0_10px_28px_rgba(15,23,42,0.05)]">

@@ -874,25 +874,70 @@ img {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 90;
-  height: 3px;
+  z-index: 100;
+  height: 5px;
   overflow: hidden;
   pointer-events: none;
-  background: rgba(var(--ink-rgb), 0.05);
+  background: rgba(var(--ink-rgb), 0.08);
+  box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .route-progress-bar {
-  width: 34%;
+  width: 42%;
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--accent), var(--accent-warm), var(--accent));
-  box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28);
-  animation: route-progress-slide 1.15s ease-in-out infinite;
+  box-shadow:
+    0 0 22px rgba(var(--accent-rgb), 0.38),
+    0 0 8px rgba(var(--accent-warm-rgb), 0.3);
+  animation: route-progress-slide 1.3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 .route-progress-bar-admin {
   background: linear-gradient(90deg, #175cd3, #4f8df6, #175cd3);
-  box-shadow: 0 0 18px rgba(23, 92, 211, 0.24);
+  box-shadow:
+    0 0 22px rgba(23, 92, 211, 0.34),
+    0 0 8px rgba(79, 141, 246, 0.28);
+}
+
+.route-progress-pill {
+  position: fixed;
+  top: 16px;
+  right: 18px;
+  z-index: 99;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(var(--accent-rgb), 0.14);
+  border-radius: 999px;
+  background: rgba(var(--surface-rgb), 0.92);
+  box-shadow: 0 12px 28px rgba(var(--ink-rgb), 0.1);
+  color: var(--ink);
+  font-size: 0.82rem;
+  font-weight: 700;
+  backdrop-filter: blur(16px);
+}
+
+.route-progress-pill-admin {
+  border-color: rgba(23, 92, 211, 0.14);
+  background: rgba(255, 255, 255, 0.94);
+  color: #16202b;
+}
+
+.route-progress-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.45);
+  animation: route-loading-pulse 1s ease-in-out infinite;
+}
+
+.route-progress-pill-dot-admin {
+  background: #175cd3;
+  box-shadow: 0 0 12px rgba(23, 92, 211, 0.42);
 }
 
 .route-skeleton-shimmer {
@@ -1020,11 +1065,11 @@ img {
 
 @keyframes route-progress-slide {
   0% {
-    transform: translateX(-120%);
+    transform: translateX(-115%);
   }
 
   100% {
-    transform: translateX(420%);
+    transform: translateX(335%);
   }
 }
 
