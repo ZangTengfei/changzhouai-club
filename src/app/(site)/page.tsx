@@ -192,7 +192,7 @@ export default async function HomePage() {
             {recentEvents.map((item) => (
               <Link
                 href={`/events/${item.slug}`}
-                className="event-card event-card-link"
+                className="event-card event-card-link event-card-link-home"
                 key={item.id}
               >
                 <div className="event-media">
