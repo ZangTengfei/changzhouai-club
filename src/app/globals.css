@@ -900,6 +900,118 @@ img {
     0 0 8px rgba(79, 141, 246, 0.28);
 }
 
+.route-progress-center {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 99;
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  width: min(320px, calc(100vw - 48px));
+  padding: 22px 20px 18px;
+  border: 1px solid rgba(var(--accent-rgb), 0.14);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(var(--surface-rgb), 0.97), rgba(var(--surface-rgb), 0.9));
+  box-shadow:
+    0 24px 70px rgba(var(--ink-rgb), 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  color: var(--ink);
+  backdrop-filter: blur(18px);
+  transform: translate(-50%, -50%);
+}
+
+.route-progress-center-admin {
+  border-color: rgba(23, 92, 211, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.93));
+  color: #16202b;
+}
+
+.route-progress-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 110px;
+  height: 58px;
+  border-radius: 20px;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(var(--accent-rgb), 0.12), transparent 45%),
+    linear-gradient(180deg, rgba(var(--surface-muted-rgb), 0.92), rgba(var(--surface-rgb), 0.85));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.route-progress-brand-icon {
+  width: 88px;
+  height: auto;
+}
+
+.route-progress-brand-copy {
+  display: grid;
+  gap: 4px;
+  justify-items: center;
+  text-align: center;
+}
+
+.route-progress-brand-copy small {
+  margin: 0;
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  opacity: 0.9;
+}
+
+.route-progress-brand-copy strong {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: inherit;
+}
+
+.route-progress-brand-copy span {
+  max-width: 24ch;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+.route-progress-brand-pulse {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.route-progress-brand-pulse span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.28);
+  animation: route-progress-dot-bounce 1.05s ease-in-out infinite;
+}
+
+.route-progress-center-admin .route-progress-brand-pulse span {
+  background: #175cd3;
+  box-shadow: 0 0 12px rgba(23, 92, 211, 0.24);
+}
+
+.route-progress-brand-pulse span:nth-child(2) {
+  animation-delay: 0.14s;
+}
+
+.route-progress-brand-pulse span:nth-child(3) {
+  animation-delay: 0.28s;
+}
+
+.route-progress-center-admin .route-progress-brand-mark {
+  background:
+    radial-gradient(circle at 30% 20%, rgba(23, 92, 211, 0.1), transparent 45%),
+    linear-gradient(180deg, rgba(243, 246, 250, 0.96), rgba(255, 255, 255, 0.9));
+}
+
 .route-progress-pill {
   position: fixed;
   top: 16px;
@@ -1109,6 +1221,20 @@ img {
 
   100% {
     transform: translateX(335%);
+  }
+}
+
+@keyframes route-progress-dot-bounce {
+  0%,
+  80%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0) scale(0.86);
+  }
+
+  40% {
+    opacity: 1;
+    transform: translateY(-4px) scale(1);
   }
 }
 

@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { SiteLogoMark } from "@/components/site-logo-mark";
 
 const siteCards = Array.from({ length: 3 });
 const adminRows = Array.from({ length: 6 });
@@ -11,19 +12,46 @@ function SkeletonBlock({
   return <div className={cn("route-skeleton-shimmer rounded-2xl", className)} />;
 }
 
+function RouteLoadingBrand({
+  mode = "site",
+  title,
+  caption,
+}: {
+  mode?: "site" | "admin";
+  title: string;
+  caption: string;
+}) {
+  return (
+    <div
+      className={cn(
+        "route-progress-center",
+        mode === "admin" ? "route-progress-center-admin" : null,
+      )}
+    >
+      <div className="route-progress-brand-mark">
+        <SiteLogoMark className="route-progress-brand-icon" />
+      </div>
+      <div className="route-progress-brand-copy">
+        <small>{mode === "admin" ? "Admin Loading" : "Changzhou AI Club"}</small>
+        <strong>{title}</strong>
+        <span>{caption}</span>
+      </div>
+      <div className="route-progress-brand-pulse" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </div>
+    </div>
+  );
+}
+
 export function GlobalRouteLoading() {
   return (
     <div aria-live="polite" aria-busy="true" className="min-h-screen">
       <div className="route-progress-shell">
         <div className="route-progress-bar" />
       </div>
-      <div className="route-progress-pill">
-        <span className="route-progress-pill-dot" />
-        <span className="route-progress-pill-copy">
-          <small>Loading</small>
-          <strong>页面切换中</strong>
-        </span>
-      </div>
+      <RouteLoadingBrand title="页面切换中" caption="正在准备新的页面内容" />
       <span className="sr-only">页面切换中</span>
     </div>
   );
@@ -35,13 +63,7 @@ export function SiteRouteLoading() {
       <div className="route-progress-shell">
         <div className="route-progress-bar" />
       </div>
-      <div className="route-progress-pill">
-        <span className="route-progress-pill-dot" />
-        <span className="route-progress-pill-copy">
-          <small>Loading</small>
-          <strong>页面切换中</strong>
-        </span>
-      </div>
+      <RouteLoadingBrand title="页面切换中" caption="正在载入新的社区内容" />
 
       <section className="surface flex flex-col gap-4 px-5 py-5 sm:px-6">
         <div className="flex items-center gap-3">
@@ -76,13 +98,11 @@ export function AdminRouteLoading() {
       <div className="route-progress-shell">
         <div className="route-progress-bar route-progress-bar-admin" />
       </div>
-      <div className="route-progress-pill route-progress-pill-admin">
-        <span className="route-progress-pill-dot route-progress-pill-dot-admin" />
-        <span className="route-progress-pill-copy">
-          <small>Admin</small>
-          <strong>正在切换后台内容</strong>
-        </span>
-      </div>
+      <RouteLoadingBrand
+        mode="admin"
+        title="正在切换后台内容"
+        caption="正在同步新的管理数据与页面结构"
+      />
 
       <section className="rounded-[var(--radius)] border border-border/70 bg-card/95 shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
         <div className="flex flex-col gap-3 border-b border-border/70 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
