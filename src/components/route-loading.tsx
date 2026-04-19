@@ -63,7 +63,6 @@ export function SiteRouteLoading() {
       <div className="route-progress-shell">
         <div className="route-progress-bar" />
       </div>
-      <RouteLoadingBrand title="页面切换中" caption="正在载入新的社区内容" />
 
       <section className="surface flex flex-col gap-4 px-5 py-5 sm:px-6">
         <div className="flex items-center gap-3">
@@ -98,11 +97,6 @@ export function AdminRouteLoading() {
       <div className="route-progress-shell">
         <div className="route-progress-bar route-progress-bar-admin" />
       </div>
-      <RouteLoadingBrand
-        mode="admin"
-        title="正在切换后台内容"
-        caption="正在同步新的管理数据与页面结构"
-      />
 
       <section className="rounded-[var(--radius)] border border-border/70 bg-card/95 shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
         <div className="flex flex-col gap-3 border-b border-border/70 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
