@@ -63,7 +63,7 @@ export default async function AccountPage({
       supabase
         .from("members")
         .select(
-          "status, willing_to_attend, willing_to_share, willing_to_join_projects, is_publicly_visible",
+          "status, willing_to_attend, willing_to_share, willing_to_join_projects, is_publicly_visible, is_featured_on_home",
         )
         .eq("id", user.id)
         .maybeSingle(),
@@ -143,6 +143,7 @@ export default async function AccountPage({
             <li>愿意参加线下活动：{member?.willing_to_attend ? "是" : "否"}</li>
             <li>愿意分享：{member?.willing_to_share ? "是" : "否"}</li>
             <li>公开展示到成员页：{member?.is_publicly_visible ? "是" : "否"}（仅管理员可设置）</li>
+            <li>展示到首页成员区：{member?.is_featured_on_home ? "是" : "否"}（仅管理员可设置）</li>
             <li>
               愿意参与社区共建：
               {member?.willing_to_join_projects ? "是" : "否"}

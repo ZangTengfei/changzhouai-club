@@ -22,6 +22,7 @@ export function revalidateAdminEventPaths(eventId?: string, eventSlug?: string) 
 
 export function revalidateAdminMemberPaths(memberId?: string) {
   revalidatePath(ADMIN_MEMBERS_PATH);
+  revalidatePath("/");
   revalidatePath("/members");
 
   if (memberId) {

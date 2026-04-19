@@ -75,6 +75,7 @@ export async function PATCH(
   const willingToShare = Boolean(payload.willing_to_share);
   const willingToJoinProjects = Boolean(payload.willing_to_join_projects);
   const isPubliclyVisible = Boolean(payload.is_publicly_visible);
+  const isFeaturedOnHome = isPubliclyVisible && Boolean(payload.is_featured_on_home);
 
   const [{ error: profileError }, { error: memberError }] = await Promise.all([
     staffContext.supabase
@@ -99,6 +100,7 @@ export async function PATCH(
         willing_to_share: willingToShare,
         willing_to_join_projects: willingToJoinProjects,
         is_publicly_visible: isPubliclyVisible,
+        is_featured_on_home: isFeaturedOnHome,
       })
       .eq("id", memberId),
   ]);

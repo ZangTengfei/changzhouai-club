@@ -17,6 +17,7 @@ type PublicMemberRow = {
   willing_to_share: boolean;
   willing_to_join_projects: boolean;
   is_publicly_visible: boolean;
+  is_featured_on_home: boolean;
   joined_at: string;
 };
 
@@ -38,6 +39,7 @@ export type PublicMember = {
   willingToShare: boolean;
   willingToJoinProjects: boolean;
   isPubliclyVisible: boolean;
+  isFeaturedOnHome: boolean;
   joinedAt: string;
 };
 
@@ -85,6 +87,7 @@ function mapPublicMember(row: PublicMemberRow): PublicMember {
     willingToShare: row.willing_to_share,
     willingToJoinProjects: row.willing_to_join_projects,
     isPubliclyVisible: row.is_publicly_visible,
+    isFeaturedOnHome: row.is_featured_on_home,
     joinedAt: row.joined_at,
   };
 }

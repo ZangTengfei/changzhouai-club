@@ -99,6 +99,7 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
             willing_to_share: formData.get("willing_to_share") === "on",
             willing_to_join_projects: formData.get("willing_to_join_projects") === "on",
             is_publicly_visible: formData.get("is_publicly_visible") === "on",
+            is_featured_on_home: formData.get("is_featured_on_home") === "on",
           }),
         });
         const result = await readApiResult(response);
@@ -202,6 +203,9 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                       </AdminStatusBadge>
                       <AdminStatusBadge tone="neutral">
                         {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
+                      </AdminStatusBadge>
+                      <AdminStatusBadge tone="scheduled">
+                        {member.isFeaturedOnHome ? "首页展示中" : "未在首页展示"}
                       </AdminStatusBadge>
                     </div>
                   </div>
@@ -315,6 +319,16 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                       className="size-4 accent-[var(--primary)]"
                     />
                     <span>公开展示到成员页</span>
+                  </AdminCheckboxRow>
+
+                  <AdminCheckboxRow className="self-end">
+                    <input
+                      type="checkbox"
+                      name="is_featured_on_home"
+                      defaultChecked={member.isFeaturedOnHome}
+                      className="size-4 accent-[var(--primary)]"
+                    />
+                    <span>展示到首页成员区</span>
                   </AdminCheckboxRow>
 
                   <AdminField label="技能标签" className="md:col-span-2">

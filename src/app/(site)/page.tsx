@@ -49,7 +49,9 @@ export default async function HomePage() {
   const primaryScheduledEvent = featuredScheduledEvents[0];
   const latestCompletedEvent = completedEvents[0];
   const recentEvents = completedEvents.slice(0, 3);
-  const featuredMembers = directory.members.slice(0, 8);
+  const featuredMembers = directory.members
+    .filter((member) => member.isFeaturedOnHome)
+    .slice(0, 8);
   const primaryEventHasCover = Boolean(primaryScheduledEvent?.cover_image_url);
   const primaryEventPanelStyle =
     primaryScheduledEvent?.cover_image_url

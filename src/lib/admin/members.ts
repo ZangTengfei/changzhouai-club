@@ -24,6 +24,7 @@ type AdminMemberRow = {
   willing_to_share: boolean;
   willing_to_join_projects: boolean;
   is_publicly_visible: boolean;
+  is_featured_on_home: boolean;
   joined_at: string;
   last_active_at: string | null;
 };
@@ -77,6 +78,7 @@ export type AdminMember = {
   willingToShare: boolean;
   willingToJoinProjects: boolean;
   isPubliclyVisible: boolean;
+  isFeaturedOnHome: boolean;
   joinedAt: string;
   lastActiveAt: string | null;
   registrationCount: number;
@@ -181,7 +183,7 @@ export async function loadAdminMembersData(
     supabase
       .from("members")
       .select(
-        "id, status, willing_to_attend, willing_to_share, willing_to_join_projects, is_publicly_visible, joined_at, last_active_at",
+        "id, status, willing_to_attend, willing_to_share, willing_to_join_projects, is_publicly_visible, is_featured_on_home, joined_at, last_active_at",
       ),
     supabase.from("event_registrations").select("user_id, status"),
     supabase
@@ -235,6 +237,7 @@ export async function loadAdminMembersData(
         willingToShare: member.willing_to_share,
         willingToJoinProjects: member.willing_to_join_projects,
         isPubliclyVisible: member.is_publicly_visible,
+        isFeaturedOnHome: member.is_featured_on_home,
         joinedAt: member.joined_at,
         lastActiveAt: member.last_active_at,
         registrationCount: registrationsByUserId.get(member.id) ?? 0,

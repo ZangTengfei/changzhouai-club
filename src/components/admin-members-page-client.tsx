@@ -127,6 +127,7 @@ function AdminMemberQuickActions({
 }) {
   const [isPending, startTransition] = useTransition();
   const visibilityActionLabel = member.isPubliclyVisible ? "从成员页隐藏" : "公开到成员页";
+  const homeFeatureActionLabel = member.isFeaturedOnHome ? "从首页移除" : "展示到首页";
 
   async function submitPayload(payload: Record<string, unknown>) {
     const response = await fetch(`/api/admin/members/${member.id}`, {
@@ -148,7 +149,11 @@ function AdminMemberQuickActions({
     onChanged?.();
   }
 
-  function buildMemberPayload(nextStatus: string, nextVisibility: boolean) {
+  function buildMemberPayload(
+    nextStatus: string,
+    nextVisibility: boolean,
+    nextHomeFeature = member.isFeaturedOnHome,
+  ) {
     return {
       display_name: member.displayName === "未填写显示名" ? "" : member.displayName,
       wechat: member.wechat ?? "",
@@ -164,6 +169,7 @@ function AdminMemberQuickActions({
       willing_to_share: member.willingToShare,
       willing_to_join_projects: member.willingToJoinProjects,
       is_publicly_visible: nextVisibility,
+      is_featured_on_home: nextVisibility && nextHomeFeature,
     };
   }
 
@@ -228,6 +234,37 @@ function AdminMemberQuickActions({
           disabled={isPending}
         >
           {isPending ? "提交中..." : visibilityActionLabel}
+        </Button>
+      </form>
+
+      <form
+        onSubmit={(formEvent) => {
+          formEvent.preventDefault();
+
+          startTransition(async () => {
+            try {
+              await submitPayload(
+                buildMemberPayload(
+                  member.status,
+                  member.isPubliclyVisible,
+                  !member.isFeaturedOnHome,
+                ),
+              );
+            } catch (submitError) {
+              toast.error(
+                submitError instanceof Error ? submitError.message : "提交失败，请稍后再试。",
+              );
+            }
+          });
+        }}
+      >
+        <Button
+          type="submit"
+          size="sm"
+          variant={member.isFeaturedOnHome ? "secondary" : "outline"}
+          disabled={isPending || !member.isPubliclyVisible}
+        >
+          {isPending ? "提交中..." : homeFeatureActionLabel}
         </Button>
       </form>
     </div>
@@ -567,6 +604,11 @@ export function AdminMembersPageClient() {
                         </AdminStatusBadge>
                         <span className="text-xs text-muted-foreground">
                           {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
+                          {member.isPubliclyVisible
+                            ? member.isFeaturedOnHome
+                              ? " · 首页展示中"
+                              : " · 未在首页展示"
+                            : ""}
                         </span>
                       </div>
                     </TableCell>
