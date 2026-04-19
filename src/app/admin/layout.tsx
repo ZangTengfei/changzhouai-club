@@ -79,6 +79,13 @@ export default async function AdminLayout({
           <div className="rounded-[var(--radius)] border border-border/70 bg-card px-3 py-3 shadow-sm">
             <AdminNav />
           </div>
+
+          <Button asChild variant="secondary" className="justify-start">
+            <Link href="/">
+              <Home className="size-4" />
+              返回首页
+            </Link>
+          </Button>
         </div>
       </aside>
 
