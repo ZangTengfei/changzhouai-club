@@ -12,11 +12,16 @@ const adminSavedMessageMap: Record<string, string> = {
   photo: "活动照片已保存。",
   photo_deleted: "活动照片已删除。",
   cover: "活动封面已更新。",
+  sponsor: "赞助者信息已保存。",
+  sponsor_deleted: "赞助者已删除。",
+  sponsor_image: "赞助者图片已保存。",
+  sponsor_image_deleted: "赞助者图片已删除。",
 };
 
 const adminErrorMessageMap: Record<string, string> = {
   missing_required_fields: "提交时缺少必要字段，请检查活动标题和 slug。",
   missing_photo_fields: "请至少填写活动照片路径，再提交。",
+  missing_sponsor_image_fields: "请至少填写赞助者图片路径，再提交。",
   database_write_failed: "保存失败，请稍后再试。",
 };
 

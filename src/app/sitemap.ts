@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 
+import { getPublicSponsors } from "@/lib/sponsors";
+
 const routes = [
   "",
   "/events",
@@ -17,9 +19,17 @@ const routes = [
   "/docs/contributing",
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return routes.map((route) => ({
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const sponsors = await getPublicSponsors();
+  const staticRoutes = routes.map((route) => ({
     url: `https://changzhouai.club${route}`,
     lastModified: new Date(),
   }));
+
+  const sponsorRoutes = sponsors.map((sponsor) => ({
+    url: `https://changzhouai.club/sponsors/${sponsor.slug}`,
+    lastModified: new Date(),
+  }));
+
+  return [...staticRoutes, ...sponsorRoutes];
 }

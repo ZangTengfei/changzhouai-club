@@ -21,6 +21,14 @@ export function buildEventAssetPath(eventSlug: string, fileName: string) {
   return `events/${safeEventSlug}/${timestamp}-${safeFileName}`;
 }
 
+export function buildSponsorAssetPath(sponsorSlug: string, fileName: string) {
+  const safeSponsorSlug = sanitizeSegment(sponsorSlug || "sponsor");
+  const safeFileName = sanitizeSegment(fileName || "upload.jpg");
+  const timestamp = Date.now();
+
+  return `sponsors/${safeSponsorSlug}/${timestamp}-${safeFileName}`;
+}
+
 export function buildMemberAvatarPath(userId: string) {
   const safeUserId = sanitizeSegment(userId || "member");
   return `${safeUserId}/avatar`;

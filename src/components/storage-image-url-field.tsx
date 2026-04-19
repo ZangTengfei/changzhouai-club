@@ -11,6 +11,7 @@ export function StorageImageUrlField({
   name,
   defaultValue = "",
   eventSlug,
+  uploadScope = "event",
   placeholder,
   uploadLabel = "上传图片",
   required = false,
@@ -18,6 +19,7 @@ export function StorageImageUrlField({
   name: string;
   defaultValue?: string;
   eventSlug: string;
+  uploadScope?: "event" | "sponsor";
   placeholder: string;
   uploadLabel?: string;
   required?: boolean;
@@ -40,10 +42,15 @@ export function StorageImageUrlField({
       payload.append("eventSlug", eventSlug);
       payload.append("file", file);
 
-      const response = await fetch("/api/admin/storage/event-assets", {
-        method: "POST",
-        body: payload,
-      });
+      const response = await fetch(
+        uploadScope === "sponsor"
+          ? "/api/admin/storage/sponsor-assets"
+          : "/api/admin/storage/event-assets",
+        {
+          method: "POST",
+          body: payload,
+        },
+      );
       const result = (await response.json().catch(() => null)) as
         | { publicUrl?: string; message?: string }
         | null;
