@@ -63,6 +63,19 @@ type CooperationLeadNotificationPayload = {
   desiredTimeline: string | null;
 };
 
+type EventRegistrationNotificationPayload = {
+  eventTitle: string;
+  eventSlug: string;
+  eventAt: string | null;
+  venue: string | null;
+  city: string | null;
+  registrantDisplayName: string;
+  registrantEmail: string | null;
+  registrantWechat: string | null;
+  registrantCity: string | null;
+  note: string | null;
+};
+
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -467,3 +480,34 @@ export async function sendAdminCooperationLeadNotification(
   return result.ok;
 }
 
+export async function sendAdminEventRegistrationNotification(
+  payload: EventRegistrationNotificationPayload,
+) {
+  const eventUrl = getAdminUrl("/admin/events");
+  const eventTime = payload.eventAt
+    ? new Date(payload.eventAt).toLocaleString("zh-CN", {
+        hour12: false,
+      })
+    : null;
+
+  const result = await dispatchAdminNotification({
+    subject: `新的活动报名：${payload.eventTitle} / ${payload.registrantDisplayName}`,
+    title: "有新的活动报名",
+    intro: "有成员刚完成活动报名，请按需查看报名备注和参与信息。",
+    adminUrl: eventUrl,
+    fields: [
+      { label: "活动标题", value: payload.eventTitle },
+      { label: "活动标识", value: payload.eventSlug },
+      { label: "活动时间", value: eventTime },
+      { label: "活动地点", value: payload.venue },
+      { label: "活动城市", value: payload.city },
+      { label: "报名成员", value: payload.registrantDisplayName },
+      { label: "成员邮箱", value: payload.registrantEmail },
+      { label: "成员微信", value: payload.registrantWechat },
+      { label: "成员城市", value: payload.registrantCity },
+      { label: "报名备注", value: payload.note },
+    ],
+  });
+
+  return result.ok;
+}

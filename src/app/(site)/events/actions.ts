@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { sendAdminEventRegistrationNotification } from "@/lib/email";
 import { createClient } from "@/lib/supabase/server";
 
 function resolveRedirectPath(raw: string | null, fallback: string) {
@@ -46,6 +47,28 @@ export async function registerForEvent(formData: FormData) {
     redirect(withQuery(redirectTo, { error: "missing_event" }));
   }
 
+  const [{ data: existingRegistration }, { data: eventData }, { data: profileData }] =
+    await Promise.all([
+      supabase
+        .from("event_registrations")
+        .select("status")
+        .eq("event_id", eventId)
+        .eq("user_id", user.id)
+        .maybeSingle(),
+      supabase
+        .from("events")
+        .select("title, slug, event_at, venue, city")
+        .eq("id", eventId)
+        .maybeSingle(),
+      supabase
+        .from("profiles")
+        .select("display_name, email, wechat, city")
+        .eq("id", user.id)
+        .maybeSingle(),
+    ]);
+
+  const shouldNotifyAdmin = existingRegistration?.status !== "registered";
+
   await supabase.from("event_registrations").upsert(
     {
       event_id: eventId,
@@ -58,6 +81,30 @@ export async function registerForEvent(formData: FormData) {
       ignoreDuplicates: false,
     },
   );
+
+  if (shouldNotifyAdmin && eventData) {
+    try {
+      await sendAdminEventRegistrationNotification({
+        eventTitle: eventData.title,
+        eventSlug: eventData.slug,
+        eventAt: eventData.event_at,
+        venue: eventData.venue,
+        city: eventData.city,
+        registrantDisplayName:
+          profileData?.display_name?.trim() || user.email || "未填写显示名",
+        registrantEmail: profileData?.email ?? user.email ?? null,
+        registrantWechat: profileData?.wechat?.trim() || null,
+        registrantCity: profileData?.city?.trim() || "常州",
+        note: note || null,
+      });
+    } catch (notificationError) {
+      console.error("Failed to send event registration notification.", {
+        notificationError,
+        eventId,
+        userId: user.id,
+      });
+    }
+  }
 
   revalidatePath("/events");
   revalidatePath(redirectTo);
