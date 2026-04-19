@@ -907,11 +907,11 @@ img {
   z-index: 99;
   display: grid;
   justify-items: center;
-  gap: 14px;
-  width: min(320px, calc(100vw - 48px));
-  padding: 22px 20px 18px;
+  gap: 12px;
+  width: min(264px, calc(100vw - 56px));
+  padding: 18px 16px 16px;
   border: 1px solid rgba(var(--accent-rgb), 0.14);
-  border-radius: 28px;
+  border-radius: 22px;
   background:
     linear-gradient(180deg, rgba(var(--surface-rgb), 0.97), rgba(var(--surface-rgb), 0.9));
   box-shadow:
@@ -932,9 +932,9 @@ img {
 .route-progress-brand-mark {
   display: grid;
   place-items: center;
-  width: 110px;
-  height: 58px;
-  border-radius: 20px;
+  width: 78px;
+  height: 44px;
+  border-radius: 14px;
   background:
     radial-gradient(circle at 30% 20%, rgba(var(--accent-rgb), 0.12), transparent 45%),
     linear-gradient(180deg, rgba(var(--surface-muted-rgb), 0.92), rgba(var(--surface-rgb), 0.85));
@@ -942,51 +942,54 @@ img {
 }
 
 .route-progress-brand-icon {
-  width: 88px;
+  width: 60px;
   height: auto;
 }
 
 .route-progress-brand-copy {
   display: grid;
-  gap: 4px;
+  gap: 3px;
   justify-items: center;
   text-align: center;
+  padding: 0 8px;
 }
 
 .route-progress-brand-copy small {
   margin: 0;
-  font-size: 0.64rem;
+  font-size: 0.58rem;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted);
-  opacity: 0.9;
+  opacity: 0.72;
 }
 
 .route-progress-brand-copy strong {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 800;
-  letter-spacing: 0.01em;
+  font-size: 0.94rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: inherit;
+  line-height: 1.15;
 }
 
 .route-progress-brand-copy span {
-  max-width: 24ch;
-  font-size: 0.82rem;
-  line-height: 1.45;
+  max-width: 20ch;
+  font-size: 0.72rem;
+  line-height: 1.35;
   color: var(--muted);
+  opacity: 0.92;
 }
 
 .route-progress-brand-pulse {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .route-progress-brand-pulse span {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 999px;
   background: var(--accent);
   box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.28);
