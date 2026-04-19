@@ -583,11 +583,24 @@ img {
   border-bottom: 1px solid var(--docs-line);
 }
 
-.docs-navbar-brand {
+.docs-navbar-identity {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   min-width: 0;
+}
+
+.docs-navbar-home-brand,
+.docs-navbar-docs-title {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.docs-navbar-home-brand {
+  gap: 10px;
+  padding-right: 14px;
+  border-right: 1px solid var(--docs-line-strong);
 }
 
 .docs-navbar-mark {
@@ -603,6 +616,13 @@ img {
   display: block;
   width: 54px;
   height: auto;
+}
+
+.docs-navbar-main-copy {
+  color: var(--docs-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .docs-navbar-copy {
@@ -3814,6 +3834,19 @@ img {
 
   .docs-navbar-shell {
     padding: 14px 20px 12px;
+  }
+
+  .docs-navbar-identity {
+    gap: 10px;
+  }
+
+  .docs-navbar-home-brand {
+    gap: 8px;
+    padding-right: 10px;
+  }
+
+  .docs-navbar-main-copy {
+    font-size: 0.88rem;
   }
 
   .docs-footer {
