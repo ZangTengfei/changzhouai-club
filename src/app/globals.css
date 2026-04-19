@@ -3255,6 +3255,7 @@ img {
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
   overflow: hidden;
+  min-width: 0;
 }
 
 .event-detail-copy {
@@ -3262,6 +3263,7 @@ img {
   align-content: start;
   gap: 18px;
   padding: 30px;
+  min-width: 0;
 }
 
 .event-detail-heading {
@@ -3283,13 +3285,17 @@ img {
 }
 
 .event-detail-media {
+  min-width: 0;
+  max-width: 100%;
   min-height: 320px;
+  overflow: hidden;
   background: rgba(var(--accent-rgb), 0.08);
 }
 
 .event-detail-media img {
   display: block;
   width: 100%;
+  max-width: 100%;
   height: 100%;
   object-fit: cover;
 }
@@ -3297,6 +3303,7 @@ img {
 .event-detail-panel {
   display: grid;
   gap: 16px;
+  min-width: 0;
 }
 
 .event-detail-panel h3 {
@@ -3325,6 +3332,11 @@ img {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
+}
+
+.gallery-card,
+.gallery-media {
+  min-width: 0;
 }
 
 .site-footer {
