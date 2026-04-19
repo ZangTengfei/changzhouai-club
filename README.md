@@ -89,6 +89,12 @@ npm run start
 - `ADMIN_NOTIFICATION_EMAILS`
 - `ADMIN_NOTIFICATION_FROM_EMAIL`
 - `RESEND_FROM_EMAIL`
+- `ADMIN_NOTIFICATION_WECOM_WEBHOOK`
+- `WECOM_BOT_WEBHOOK_URL`
+- `ADMIN_NOTIFICATION_FEISHU_WEBHOOK`
+- `FEISHU_BOT_WEBHOOK_URL`
+- `ADMIN_NOTIFICATION_FEISHU_SECRET`
+- `FEISHU_BOT_WEBHOOK_SECRET`
 - `NEXT_PUBLIC_SITE_URL`
 - `SITE_URL`
 
@@ -96,7 +102,14 @@ npm run start
 
 - 前两个用于站点登录、会话和公开数据读取
 - `SUPABASE_SERVICE_ROLE_KEY` 用于后台上传活动图片、脚本迁移等服务端能力
-- 邮件相关变量用于有人完成注册资料后的管理员通知
+- 邮件相关变量用于管理员通知邮件
+- 企业微信 / 飞书 webhook 变量用于把加入申请、成员资料完成、合作线索等动态同步到群机器人
+
+目前已接入的管理员通知场景包括：
+
+- 新成员完成加入资料
+- 新的加入申请提交
+- 新的合作线索提交
 
 ## Supabase 初始化
 
