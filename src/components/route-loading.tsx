@@ -19,7 +19,10 @@ export function GlobalRouteLoading() {
       </div>
       <div className="route-progress-pill">
         <span className="route-progress-pill-dot" />
-        页面切换中
+        <span className="route-progress-pill-copy">
+          <small>Loading</small>
+          <strong>页面切换中</strong>
+        </span>
       </div>
       <span className="sr-only">页面切换中</span>
     </div>
@@ -34,7 +37,10 @@ export function SiteRouteLoading() {
       </div>
       <div className="route-progress-pill">
         <span className="route-progress-pill-dot" />
-        页面切换中
+        <span className="route-progress-pill-copy">
+          <small>Loading</small>
+          <strong>页面切换中</strong>
+        </span>
       </div>
 
       <section className="surface flex flex-col gap-4 px-5 py-5 sm:px-6">
@@ -72,7 +78,10 @@ export function AdminRouteLoading() {
       </div>
       <div className="route-progress-pill route-progress-pill-admin">
         <span className="route-progress-pill-dot route-progress-pill-dot-admin" />
-        正在切换后台内容
+        <span className="route-progress-pill-copy">
+          <small>Admin</small>
+          <strong>正在切换后台内容</strong>
+        </span>
       </div>
 
       <section className="rounded-[var(--radius)] border border-border/70 bg-card/95 shadow-[0_10px_28px_rgba(15,23,42,0.05)]">
