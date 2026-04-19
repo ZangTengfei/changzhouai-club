@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 
 import { getStaffContextResult, requireStaffContext } from "@/lib/supabase/guards";
 
+export type AdminSponsorTier = "core" | "partner" | "supporter";
+
 export type AdminSponsorImageRow = {
   id: string;
   sponsor_id: string;
@@ -14,6 +16,7 @@ export type AdminSponsorRow = {
   id: string;
   slug: string;
   name: string;
+  tier: AdminSponsorTier;
   sponsor_label: string | null;
   logo_url: string | null;
   summary: string | null;
@@ -66,7 +69,7 @@ export async function loadAdminSponsorsData(
     supabase
       .from("sponsors")
       .select(
-        "id, slug, name, sponsor_label, logo_url, summary, description, website_url, display_order, is_active, created_at, updated_at",
+        "id, slug, name, tier, sponsor_label, logo_url, summary, description, website_url, display_order, is_active, created_at, updated_at",
       )
       .order("display_order", { ascending: true })
       .order("created_at", { ascending: true }),

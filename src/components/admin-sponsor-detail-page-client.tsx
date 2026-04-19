@@ -23,6 +23,12 @@ import {
 } from "@/lib/admin/event-feedback";
 import type { AdminSponsor, AdminSponsorsDebugSnapshot } from "@/lib/admin/sponsors";
 
+const sponsorTierLabelMap: Record<string, string> = {
+  core: "核心赞助者",
+  partner: "共建伙伴",
+  supporter: "支持伙伴",
+};
+
 type AdminSponsorDetailData = {
   sponsor: AdminSponsor;
   queryErrors: string[];
@@ -67,6 +73,9 @@ export function AdminSponsorDetailPageClient({ sponsorId }: { sponsorId: string 
           <AdminPanelBody className="flex flex-wrap gap-2">
             <AdminStatusBadge tone={sponsor.is_active ? "completed" : "neutral"}>
               {sponsor.is_active ? "公开展示" : "已隐藏"}
+            </AdminStatusBadge>
+            <AdminStatusBadge tone="neutral">
+              {sponsorTierLabelMap[sponsor.tier] ?? sponsor.tier}
             </AdminStatusBadge>
             <AdminStatusBadge tone="neutral">排序 {sponsor.display_order}</AdminStatusBadge>
             <AdminStatusBadge tone="neutral">图片 {sponsor.images.length}</AdminStatusBadge>

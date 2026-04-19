@@ -16,6 +16,7 @@ import {
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
 
@@ -23,6 +24,7 @@ type EditableAdminSponsor = {
   id: string;
   slug: string;
   name: string;
+  tier: "core" | "partner" | "supporter";
   sponsor_label: string | null;
   logo_url: string | null;
   summary: string | null;
@@ -36,6 +38,7 @@ function toPayload(formData: FormData) {
   return {
     name: String(formData.get("name") ?? "").trim(),
     slug: String(formData.get("slug") ?? "").trim(),
+    tier: String(formData.get("tier") ?? "supporter"),
     sponsor_label: String(formData.get("sponsor_label") ?? ""),
     logo_url: String(formData.get("logo_url") ?? ""),
     summary: String(formData.get("summary") ?? ""),
@@ -154,6 +157,14 @@ export function AdminSponsorEditorFormClient({
                   defaultValue={sponsor?.sponsor_label ?? ""}
                   placeholder="例如：首位赞助者 / 社区共建伙伴"
                 />
+              </AdminField>
+
+              <AdminField label="赞助等级">
+                <NativeSelect name="tier" defaultValue={sponsor?.tier ?? "supporter"}>
+                  <option value="core">核心赞助者：Logo + 名称 + 简介</option>
+                  <option value="partner">共建伙伴：Logo + 名称</option>
+                  <option value="supporter">支持伙伴：仅 Logo</option>
+                </NativeSelect>
               </AdminField>
 
               <AdminField label="展示排序">

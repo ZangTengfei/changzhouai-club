@@ -28,6 +28,11 @@ function getOptionalInteger(payload: Record<string, unknown>, key: string) {
   return Number.isNaN(parsed) ? 0 : parsed;
 }
 
+function getSponsorTier(payload: Record<string, unknown>) {
+  const tier = String(payload.tier ?? "supporter").trim();
+  return ["core", "partner", "supporter"].includes(tier) ? tier : "supporter";
+}
+
 export async function GET() {
   const context = await getStaffContextResult();
 
@@ -73,6 +78,7 @@ export async function POST(request: Request) {
     .insert({
       name,
       slug,
+      tier: getSponsorTier(payload),
       sponsor_label: getOptionalValue(payload, "sponsor_label"),
       logo_url: getOptionalValue(payload, "logo_url"),
       summary: getOptionalValue(payload, "summary"),

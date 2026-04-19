@@ -14,6 +14,7 @@ type SponsorRow = {
   id: string;
   slug: string;
   name: string;
+  tier: SponsorTier;
   sponsor_label: string | null;
   logo_url: string | null;
   summary: string | null;
@@ -30,10 +31,14 @@ export type PublicSponsorImage = {
   caption: string | null;
 };
 
+export type SponsorTier = "core" | "partner" | "supporter";
+
 export type PublicSponsor = {
   id: string;
   slug: string;
   name: string;
+  tier: SponsorTier;
+  tierLabel: string;
   sponsorLabel: string;
   logoUrl: string | null;
   summary: string;
@@ -45,11 +50,19 @@ export type PublicSponsor = {
 
 const PUBLIC_SPONSORS_REVALIDATE_SECONDS = 60;
 
+const sponsorTierLabels: Record<SponsorTier, string> = {
+  core: "核心赞助者",
+  partner: "共建伙伴",
+  supporter: "支持伙伴",
+};
+
 const fallbackSponsors: PublicSponsor[] = [
   {
     id: "fallback-changzhou-telecom",
     slug: "changzhou-telecom",
     name: "常州电信",
+    tier: "core",
+    tierLabel: sponsorTierLabels.core,
     sponsorLabel: "首位赞助者",
     logoUrl: "/china-telecom-logo.svg",
     summary: "为社区交流与活动连接提供支持，和我们一起把更多本地实践者聚在一起。",
@@ -64,6 +77,8 @@ const fallbackSponsors: PublicSponsor[] = [
     id: "fallback-caic-yuandian",
     slug: "caic-yuandian",
     name: "常州人工智能国际社区",
+    tier: "partner",
+    tierLabel: sponsorTierLabels.partner,
     sponsorLabel: "社区共建伙伴",
     logoUrl: "/caic-yuandian.png",
     summary: "以社区空间、资源连接与长期共建支持，陪伴常州 AI 生态持续成长。",
@@ -101,6 +116,8 @@ function mapSponsor(row: SponsorRow): PublicSponsor {
     id: row.id,
     slug: row.slug,
     name: row.name,
+    tier: row.tier,
+    tierLabel: sponsorTierLabels[row.tier] ?? sponsorTierLabels.supporter,
     sponsorLabel: row.sponsor_label ?? "赞助者",
     logoUrl: row.logo_url,
     summary:
@@ -144,7 +161,7 @@ const getCachedPublicSponsors = unstable_cache(
     const { data, error } = await supabase
       .from("sponsors")
       .select(
-        "id, slug, name, sponsor_label, logo_url, summary, description, website_url, display_order, is_active, sponsor_images(id, image_url, caption, sort_order)",
+        "id, slug, name, tier, sponsor_label, logo_url, summary, description, website_url, display_order, is_active, sponsor_images(id, image_url, caption, sort_order)",
       )
       .eq("is_active", true)
       .order("display_order", { ascending: true })
@@ -166,7 +183,7 @@ const getCachedPublicSponsorBySlug = unstable_cache(
     const { data, error } = await supabase
       .from("sponsors")
       .select(
-        "id, slug, name, sponsor_label, logo_url, summary, description, website_url, display_order, is_active, sponsor_images(id, image_url, caption, sort_order)",
+        "id, slug, name, tier, sponsor_label, logo_url, summary, description, website_url, display_order, is_active, sponsor_images(id, image_url, caption, sort_order)",
       )
       .eq("slug", slug)
       .eq("is_active", true)

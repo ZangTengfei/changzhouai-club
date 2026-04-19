@@ -29,6 +29,12 @@ import {
 } from "@/lib/admin/event-feedback";
 import type { AdminSponsorsData } from "@/lib/admin/sponsors";
 
+const sponsorTierLabelMap: Record<string, string> = {
+  core: "核心赞助者",
+  partner: "共建伙伴",
+  supporter: "支持伙伴",
+};
+
 export function AdminSponsorsPageClient() {
   const searchParams = useSearchParams();
   const { data, error, isLoading } = useAdminResource<AdminSponsorsData>("/api/admin/sponsors");
@@ -123,6 +129,7 @@ export function AdminSponsorsPageClient() {
                         <span className="font-medium text-foreground">
                           {sponsor.sponsor_label ?? "未设置赞助标签"}
                         </span>
+                        <span>{sponsorTierLabelMap[sponsor.tier] ?? sponsor.tier}</span>
                         <span className="line-clamp-2">
                           {sponsor.summary ?? "暂未填写一句话介绍。"}
                         </span>

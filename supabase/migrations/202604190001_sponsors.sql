@@ -2,6 +2,7 @@ create table if not exists public.sponsors (
   id uuid primary key default gen_random_uuid(),
   slug text not null unique,
   name text not null,
+  tier text not null default 'supporter',
   sponsor_label text,
   logo_url text,
   summary text,
@@ -12,6 +13,13 @@ create table if not exists public.sponsors (
   created_at timestamptz not null default timezone('utc', now()),
   updated_at timestamptz not null default timezone('utc', now())
 );
+
+alter table public.sponsors
+  drop constraint if exists sponsors_tier_check;
+
+alter table public.sponsors
+  add constraint sponsors_tier_check
+  check (tier in ('core', 'partner', 'supporter'));
 
 create table if not exists public.sponsor_images (
   id uuid primary key default gen_random_uuid(),
@@ -66,6 +74,7 @@ create policy "sponsor images are manageable by staff"
 insert into public.sponsors (
   slug,
   name,
+  tier,
   sponsor_label,
   logo_url,
   summary,
@@ -77,6 +86,7 @@ values
   (
     'changzhou-telecom',
     '常州电信',
+    'core',
     '首位赞助者',
     '/china-telecom-logo.svg',
     '为社区交流与活动连接提供支持，和我们一起把更多本地实践者聚在一起。',
@@ -87,6 +97,7 @@ values
   (
     'caic-yuandian',
     '常州人工智能国际社区',
+    'partner',
     '社区共建伙伴',
     '/caic-yuandian.png',
     '以社区空间、资源连接与长期共建支持，陪伴常州 AI 生态持续成长。',
@@ -97,6 +108,7 @@ values
 on conflict (slug) do update
 set
   name = excluded.name,
+  tier = excluded.tier,
   sponsor_label = excluded.sponsor_label,
   logo_url = excluded.logo_url,
   summary = excluded.summary,

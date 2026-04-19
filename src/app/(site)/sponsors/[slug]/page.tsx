@@ -42,6 +42,7 @@ export default async function SponsorDetailPage({
       <section className="surface sponsor-detail-hero">
         <div className="sponsor-detail-copy">
           <div className="pill-row">
+            <span className="pill">{sponsor.tierLabel}</span>
             <span className="pill">{sponsor.sponsorLabel}</span>
             <span className="pill">赞助者</span>
             <span className="pill">{sponsor.images.length} 张图片</span>
@@ -108,6 +109,7 @@ export default async function SponsorDetailPage({
 
           <ul className="detail-list">
             <li>展示名称：{sponsor.name}</li>
+            <li>赞助等级：{sponsor.tierLabel}</li>
             <li>赞助标签：{sponsor.sponsorLabel}</li>
             <li>展示排序：{sponsor.displayOrder}</li>
             <li>赞助者链接：/sponsors/{sponsor.slug}</li>
