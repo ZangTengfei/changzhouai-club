@@ -869,6 +869,52 @@ img {
   gap: 24px;
 }
 
+.route-progress-shell {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+  height: 3px;
+  overflow: hidden;
+  pointer-events: none;
+  background: rgba(var(--ink-rgb), 0.05);
+}
+
+.route-progress-bar {
+  width: 34%;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-warm), var(--accent));
+  box-shadow: 0 0 18px rgba(var(--accent-rgb), 0.28);
+  animation: route-progress-slide 1.15s ease-in-out infinite;
+}
+
+.route-progress-bar-admin {
+  background: linear-gradient(90deg, #175cd3, #4f8df6, #175cd3);
+  box-shadow: 0 0 18px rgba(23, 92, 211, 0.24);
+}
+
+.route-skeleton-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: rgba(var(--ink-rgb), 0.06);
+}
+
+.route-skeleton-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+  animation: route-skeleton-sweep 1.2s linear infinite;
+}
+
 .route-loading-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -969,6 +1015,22 @@ img {
   50% {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes route-progress-slide {
+  0% {
+    transform: translateX(-120%);
+  }
+
+  100% {
+    transform: translateX(420%);
+  }
+}
+
+@keyframes route-skeleton-sweep {
+  100% {
+    transform: translateX(100%);
   }
 }
 
