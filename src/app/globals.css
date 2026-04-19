@@ -3498,6 +3498,7 @@ img {
   grid-template-columns: minmax(0, 1fr) minmax(280px, 0.62fr);
   gap: 28px;
   align-items: stretch;
+  padding: 28px;
 }
 
 .sponsor-detail-copy {
@@ -3840,6 +3841,10 @@ img {
   .auth-card,
   .account-shell {
     padding: 18px;
+  }
+
+  .sponsor-detail-hero {
+    padding: 20px;
   }
 
   .brand {
