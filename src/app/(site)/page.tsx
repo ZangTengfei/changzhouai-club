@@ -11,6 +11,7 @@ import {
 } from "@/lib/community-events";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import {
+  communitySocialLinks,
   cooperationAreas,
   joinSteps,
   memberTags,
@@ -90,6 +91,29 @@ export default async function HomePage() {
             <Link href="/join" className="button">
               立即加入社区
             </Link>
+          </div>
+
+          <div className="community-social-panel" aria-label="社区外部平台入口">
+            <span className="community-social-kicker">也可以在这些平台找到我们</span>
+            <div className="community-social-links">
+              {communitySocialLinks.map((item) => (
+                <Link
+                  key={item.platform}
+                  href={item.href}
+                  className={`community-social-link community-social-link-${item.tone}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <span className="community-social-icon" aria-hidden="true">
+                    {item.platform.slice(0, 1)}
+                  </span>
+                  <span>
+                    <strong>{item.label}</strong>
+                    <small>{item.description}</small>
+                  </span>
+                </Link>
+              ))}
+            </div>
           </div>
 
           <div className="stat-grid">

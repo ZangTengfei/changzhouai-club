@@ -25,7 +25,7 @@ export function SiteFooter() {
               <Link href="/members">成员地图</Link>
             </li>
             <li>
-              <Link href="/docs">知识库</Link>
+              <Link href="/docs">文档</Link>
             </li>
             <li>
               <Link href="/join">加入社区</Link>
@@ -46,7 +46,7 @@ export function SiteFooter() {
               <Link href="/faq">常见问题</Link>
             </li>
             <li>
-              <Link href="/docs/getting-started">知识库开始使用</Link>
+              <Link href="/docs/getting-started">文档开始使用</Link>
             </li>
           </ul>
         </div>
@@ -64,7 +64,7 @@ export function SiteFooter() {
               <Link href="/events">查看近期活动</Link>
             </li>
             <li>
-              <Link href="/docs/contributing">参与知识库共建</Link>
+              <Link href="/docs/contributing">参与文档共建</Link>
             </li>
             <li>
               <Link href="/members">浏览成员地图</Link>

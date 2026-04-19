@@ -1,6 +1,6 @@
 const meta = {
   index: {
-    title: "知识库首页",
+    title: "文档首页",
     theme: {
       breadcrumb: false,
       toc: false,

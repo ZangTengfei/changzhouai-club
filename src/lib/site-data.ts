@@ -4,8 +4,41 @@ export const navItems = [
   { href: "/members", label: "成员地图" },
   { href: "/projects", label: "项目共建" },
   { href: "/cooperate", label: "合作联系" },
-  { href: "/docs", label: "知识库" },
+  { href: "/docs", label: "文档" },
 ];
+
+export const siteRepositoryUrl = "https://github.com/ZangTengfei/changzhouai-club";
+
+export const communitySocialLinks = [
+  {
+    platform: "GitHub",
+    label: "GitHub 仓库",
+    description: "查看代码与文档共建",
+    href: siteRepositoryUrl,
+    tone: "github",
+  },
+  {
+    platform: "小红书",
+    label: "小红书",
+    description: "搜索社区动态",
+    href: "https://www.xiaohongshu.com/search_result?keyword=%E5%B8%B8%E5%B7%9E%20AI%20%E7%A4%BE%E5%8C%BA",
+    tone: "rednote",
+  },
+  {
+    platform: "抖音",
+    label: "抖音",
+    description: "搜索短视频内容",
+    href: "https://www.douyin.com/search/%E5%B8%B8%E5%B7%9E%20AI%20%E7%A4%BE%E5%8C%BA",
+    tone: "douyin",
+  },
+  {
+    platform: "B站",
+    label: "B 站",
+    description: "搜索社区视频",
+    href: "https://search.bilibili.com/all?keyword=%E5%B8%B8%E5%B7%9E%20AI%20%E7%A4%BE%E5%8C%BA",
+    tone: "bilibili",
+  },
+] as const;
 
 export const homeHighlights = [
   {

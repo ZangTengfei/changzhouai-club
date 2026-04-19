@@ -652,7 +652,8 @@ img {
 
 .docs-navbar-links a,
 .docs-footer-links a {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   padding: 0;
   border: 0;
   background: transparent;
@@ -668,6 +669,24 @@ img {
 .docs-footer-links a:focus-visible {
   color: var(--docs-text);
   opacity: 1;
+}
+
+.docs-navbar-icon-link {
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+}
+
+.docs-navbar-icon-link:hover,
+.docs-navbar-icon-link:focus-visible {
+  background: var(--docs-hover);
+}
+
+.docs-navbar-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
 }
 
 .docs-footer {
@@ -813,6 +832,101 @@ img {
 .site-footer h3,
 .site-footer h4 {
   margin: 0;
+}
+
+.community-social-panel {
+  display: grid;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.community-social-kicker {
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.community-social-links {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.community-social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 168px;
+  min-height: 58px;
+  padding: 10px 12px;
+  border: 1px solid rgba(var(--accent-rgb), 0.12);
+  border-radius: 18px;
+  background: rgba(var(--surface-soft-rgb), 0.72);
+  box-shadow: 0 10px 24px rgba(var(--ink-rgb), 0.06);
+  color: var(--ink);
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.community-social-link:hover,
+.community-social-link:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(var(--accent-rgb), 0.24);
+  background: rgba(var(--surface-rgb), 0.92);
+}
+
+.community-social-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.community-social-link strong,
+.community-social-link small {
+  display: block;
+  line-height: 1.25;
+}
+
+.community-social-link strong {
+  font-size: 0.88rem;
+}
+
+.community-social-link small {
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.community-social-link-github .community-social-icon {
+  background: #111827;
+}
+
+.community-social-link-rednote .community-social-icon {
+  background: #df2f3f;
+}
+
+.community-social-link-douyin .community-social-icon {
+  background: linear-gradient(
+    135deg,
+    #111827 0%,
+    #111827 48%,
+    #10f0e8 49%,
+    #fe2c55 100%
+  );
+}
+
+.community-social-link-bilibili .community-social-icon {
+  background: #00a1d6;
 }
 
 .hero-note {
