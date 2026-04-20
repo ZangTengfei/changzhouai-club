@@ -73,6 +73,14 @@ export default async function HomePage() {
       label: "最近一次活动日期",
     },
   ];
+  const wechatQrExpiresLabel = wechatQrCode
+    ? new Intl.DateTimeFormat("zh-CN", {
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(new Date(wechatQrCode.expiresAt))
+    : null;
 
   return (
     <div className="page-stack">
@@ -99,68 +107,29 @@ export default async function HomePage() {
           <div className="community-social-panel" aria-label="社区外部平台入口">
             <div className="community-social-heading">
               <span className="community-social-kicker">社区入口</span>
-              <strong>关注动态，或扫码加入微信群</strong>
+              <strong>在公开平台关注社区动态</strong>
             </div>
-            <div className="community-social-layout">
-              <div className="community-social-links">
-                {communitySocialLinks.map((item) => (
-                  <Link
-                    key={item.platform}
-                    href={item.href}
-                    className={`community-social-link community-social-link-${item.tone}`}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    <span className="community-social-icon" aria-hidden="true">
-                      <SocialPlatformIcon
-                        tone={item.tone}
-                        className="community-social-icon-svg"
-                      />
-                    </span>
-                    <span>
-                      <strong>{item.label}</strong>
-                      <small>{item.description}</small>
-                    </span>
-                  </Link>
-                ))}
-              </div>
-
-              <div className="community-wechat-card">
-                {wechatQrCode ? (
-                  <>
-                    <div className="community-wechat-qr">
-                      <img
-                        src={wechatQrCode.imageUrl}
-                        alt={wechatQrCode.title}
-                        width={160}
-                        height={160}
-                      />
-                    </div>
-                    <div className="community-wechat-copy">
-                      <strong>{wechatQrCode.title}</strong>
-                      <small>
-                        扫码加入微信群，有效至{" "}
-                        {new Intl.DateTimeFormat("zh-CN", {
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }).format(new Date(wechatQrCode.expiresAt))}
-                      </small>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="community-wechat-qr-placeholder" aria-hidden="true">
-                      微信
-                    </div>
-                    <div className="community-wechat-copy">
-                      <strong>微信群二维码更新中</strong>
-                      <small>二维码 7 天过期，更新后会自动展示在这里。</small>
-                    </div>
-                  </>
-                )}
-              </div>
+            <div className="community-social-links">
+              {communitySocialLinks.map((item) => (
+                <Link
+                  key={item.platform}
+                  href={item.href}
+                  className={`community-social-link community-social-link-${item.tone}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <span className="community-social-icon" aria-hidden="true">
+                    <SocialPlatformIcon
+                      tone={item.tone}
+                      className="community-social-icon-svg"
+                    />
+                  </span>
+                  <span>
+                    <strong>{item.label}</strong>
+                    <small>{item.description}</small>
+                  </span>
+                </Link>
+              ))}
             </div>
           </div>
 
@@ -224,6 +193,36 @@ export default async function HomePage() {
               </div>
             </>
           )}
+          <div className="community-wechat-card hero-wechat-card">
+            {wechatQrCode ? (
+              <>
+                <div className="community-wechat-qr">
+                  <img
+                    src={wechatQrCode.imageUrl}
+                    alt={wechatQrCode.title}
+                    width={160}
+                    height={160}
+                  />
+                </div>
+                <div className="community-wechat-copy">
+                  <span className="community-social-kicker">微信群</span>
+                  <strong>{wechatQrCode.title}</strong>
+                  <small>扫码入群，活动通知和现场交流会同步在群里。有效至 {wechatQrExpiresLabel}</small>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="community-wechat-qr-placeholder" aria-hidden="true">
+                  微信
+                </div>
+                <div className="community-wechat-copy">
+                  <span className="community-social-kicker">微信群</span>
+                  <strong>二维码更新中</strong>
+                  <small>二维码 7 天过期，后台更新后会显示在活动区域。</small>
+                </div>
+              </>
+            )}
+          </div>
         </aside>
       </section>
 
