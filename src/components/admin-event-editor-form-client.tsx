@@ -258,8 +258,12 @@ export function AdminEventEditorFormClient({
                   name="cover_image_url"
                   defaultValue={event?.cover_image_url ?? ""}
                   eventSlug={event?.slug ?? ""}
+                  mode="upload-only"
                   placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
                   uploadLabel="上传封面"
+                  clearLabel="移除封面"
+                  filledStatusText="已设置封面"
+                  emptyStatusText="当前未设置封面"
                 />
               </AdminField>
             </div>

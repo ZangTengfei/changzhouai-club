@@ -212,8 +212,12 @@ export function AdminEventPhotosManagerClient({
                               name="image_url"
                               defaultValue={photo.image_url}
                               eventSlug={eventSlug}
+                              mode="upload-only"
                               placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
                               uploadLabel="替换图片"
+                              clearLabel="清空图片"
+                              filledStatusText="已设置图片"
+                              emptyStatusText="当前未设置图片"
                               required
                             />
                           </AdminField>
@@ -286,8 +290,12 @@ export function AdminEventPhotosManagerClient({
                 <StorageImageUrlField
                   name="image_url"
                   eventSlug={eventSlug}
+                  mode="upload-only"
                   placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
                   uploadLabel="上传新图片"
+                  clearLabel="清空图片"
+                  filledStatusText="已设置图片"
+                  emptyStatusText="当前未设置图片"
                   required
                 />
               </AdminField>

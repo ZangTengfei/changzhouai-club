@@ -201,8 +201,12 @@ export default async function AdminSocialPage({
                   name="image_url"
                   eventSlug="wechat-group"
                   uploadScope="community"
+                  mode="upload-only"
                   placeholder="上传图片后会自动填写，也可以粘贴 Supabase Storage 图片地址"
                   uploadLabel="上传微信群二维码"
+                  clearLabel="清空二维码"
+                  filledStatusText="已设置二维码"
+                  emptyStatusText="当前未设置二维码"
                   required
                 />
               </AdminField>
@@ -312,8 +316,12 @@ export default async function AdminSocialPage({
                             defaultValue={qrCode.image_url}
                             eventSlug="wechat-group"
                             uploadScope="community"
+                            mode="upload-only"
                             placeholder="微信群二维码图片地址"
                             uploadLabel="重新上传二维码"
+                            clearLabel="清空二维码"
+                            filledStatusText="已设置二维码"
+                            emptyStatusText="当前未设置二维码"
                             required
                           />
                         </AdminField>
