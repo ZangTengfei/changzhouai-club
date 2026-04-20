@@ -6,6 +6,7 @@ import { AccountProfileForm } from "@/components/account-profile-form";
 import { SignOutButton } from "@/components/sign-out-button";
 import { cancelRegistration } from "@/app/(site)/account/actions";
 import { hasSupabaseEnv } from "@/lib/env";
+import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
 import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
@@ -80,6 +81,12 @@ export default async function AccountPage({
   const profileComplete = Boolean(
     profile?.display_name?.trim() && profile?.wechat?.trim(),
   );
+  const publicProfilePath = member?.is_publicly_visible
+    ? getMemberPublicSlugPath({
+        id: user.id,
+        publicSlug: profile?.public_slug ?? null,
+      })
+    : null;
 
   return (
     <div className="page-stack">
@@ -134,41 +141,14 @@ export default async function AccountPage({
             </li>
           </ul>
         </article>
-
-        <article className="field-panel">
-          <h3>当前成员状态</h3>
-          <ul className="field-list">
-            <li>成员状态：{member?.status ?? "pending"}</li>
-            <li>头像：{profile?.avatar_url ? "已设置" : "未设置"}</li>
-            <li>微信号：{profile?.wechat ?? "未填写"}</li>
-            <li>
-              个人主页链接：
-              {profile?.public_slug ? `/members/${profile.public_slug}` : "未设置"}
-            </li>
-            <li>身份：{profile?.role_label ?? "未填写"}</li>
-            <li>公司 / 学校 / 团队：{profile?.organization ?? "未填写"}</li>
-            <li>每月可投入时间：{profile?.monthly_time ?? "未填写"}</li>
-            <li>愿意参加线下活动：{member?.willing_to_attend ? "是" : "否"}</li>
-            <li>愿意分享：{member?.willing_to_share ? "是" : "否"}</li>
-            <li>公开展示到成员页：{member?.is_publicly_visible ? "是" : "否"}（仅管理员可设置）</li>
-            <li>
-              公开访问地址：
-              {member?.is_publicly_visible
-                ? profile?.public_slug
-                  ? `/members/${profile.public_slug}`
-                  : `/members/${user.id}`
-                : "成员公开展示后可访问"}
-            </li>
-            <li>展示到首页成员区：{member?.is_featured_on_home ? "是" : "否"}（仅管理员可设置）</li>
-            <li>
-              愿意参与社区共建：
-              {member?.willing_to_join_projects ? "是" : "否"}
-            </li>
-          </ul>
-        </article>
       </section>
 
-      <AccountProfileForm userId={user.id} profile={profile} member={member} />
+      <AccountProfileForm
+        userId={user.id}
+        profile={profile}
+        member={member}
+        publicProfilePath={publicProfilePath}
+      />
 
       <section className="surface account-shell">
         <div className="section-heading">
