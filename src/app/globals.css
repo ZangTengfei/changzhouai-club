@@ -756,6 +756,16 @@ img {
   padding: 34px;
 }
 
+.hero-copy {
+  display: grid;
+  align-content: start;
+  gap: 24px;
+}
+
+.hero-copy .eyebrow {
+  margin-bottom: -8px;
+}
+
 .hero-copy h1,
 .page-hero h1,
 .section-heading h2 {
@@ -768,6 +778,14 @@ img {
 .hero-copy h1 {
   font-size: clamp(2.6rem, 5vw, 4.9rem);
   max-width: 11ch;
+}
+
+.hero-copy > p {
+  max-width: 58rem;
+  margin: 0;
+  font-size: clamp(1.08rem, 1.4vw, 1.24rem);
+  line-height: 1.8;
+  letter-spacing: 0.01em;
 }
 
 .hero-copy p,
@@ -4177,6 +4195,15 @@ img {
   .page-hero h1 {
     font-size: clamp(2rem, 12vw, 3rem);
     line-height: 1.06;
+  }
+
+  .hero-copy {
+    gap: 18px;
+  }
+
+  .hero-copy > p {
+    font-size: 1rem;
+    line-height: 1.68;
   }
 
   .route-loading-badge {
