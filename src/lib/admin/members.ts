@@ -6,6 +6,7 @@ type AdminProfileRow = {
   id: string;
   email: string | null;
   display_name: string | null;
+  public_slug: string | null;
   avatar_url: string | null;
   wechat: string | null;
   city: string | null;
@@ -64,6 +65,7 @@ export type AdminMember = {
   id: string;
   email: string | null;
   displayName: string;
+  publicSlug: string | null;
   avatarUrl: string | null;
   wechat: string | null;
   city: string;
@@ -178,7 +180,7 @@ export async function loadAdminMembersData(
     supabase
       .from("profiles")
       .select(
-        "id, email, display_name, avatar_url, wechat, city, role_label, organization, monthly_time, bio, skills, interests",
+        "id, email, display_name, public_slug, avatar_url, wechat, city, role_label, organization, monthly_time, bio, skills, interests",
       ),
     supabase
       .from("members")
@@ -223,6 +225,7 @@ export async function loadAdminMembersData(
         id: member.id,
         email: profile?.email ?? null,
         displayName: profile?.display_name?.trim() || "未填写显示名",
+        publicSlug: profile?.public_slug?.trim() || null,
         avatarUrl: profile?.avatar_url ?? null,
         wechat: profile?.wechat?.trim() || null,
         city: profile?.city?.trim() || "常州",

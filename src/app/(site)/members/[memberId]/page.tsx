@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 
 import { MemberAvatar } from "@/components/member-avatar";
 import { ToneBadge } from "@/components/tone-badge";
-import { getPublicMemberById } from "@/lib/community-members";
+import { getPublicMemberByHandle } from "@/lib/community-members";
+import { getMemberPublicSlugPath, isUuidLike } from "@/lib/member-public-slug";
 
 function formatMemberHeadline(member: {
   roleLabel: string | null;
@@ -46,7 +47,7 @@ export async function generateMetadata({
   params: Promise<{ memberId: string }>;
 }): Promise<Metadata> {
   const { memberId } = await params;
-  const member = await getPublicMemberById(memberId);
+  const member = await getPublicMemberByHandle(memberId);
 
   if (!member) {
     return {
@@ -70,10 +71,14 @@ export default async function MemberDetailPage({
   params: Promise<{ memberId: string }>;
 }) {
   const { memberId } = await params;
-  const member = await getPublicMemberById(memberId);
+  const member = await getPublicMemberByHandle(memberId);
 
   if (!member) {
     notFound();
+  }
+
+  if (isUuidLike(memberId) && member.publicSlug) {
+    permanentRedirect(getMemberPublicSlugPath(member));
   }
 
   const headline = formatMemberHeadline(member);

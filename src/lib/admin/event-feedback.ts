@@ -25,6 +25,8 @@ const adminErrorMessageMap: Record<string, string> = {
   missing_photo_fields: "请至少填写活动照片路径，再提交。",
   missing_sponsor_image_fields: "请至少填写赞助者图片路径，再提交。",
   invalid_qr_expiration: "二维码过期时间必须晚于开始展示时间。",
+  invalid_public_slug: "成员主页链接无效，请使用 3-32 位小写英文、数字或短横线。",
+  public_slug_taken: "成员主页链接已被占用，请换一个。",
   database_write_failed: "保存失败，请稍后再试。",
 };
 

@@ -87,6 +87,7 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
           body: JSON.stringify({
             display_name: String(formData.get("display_name") ?? ""),
             wechat: String(formData.get("wechat") ?? ""),
+            public_slug: String(formData.get("public_slug") ?? ""),
             city: String(formData.get("city") ?? ""),
             role_label: String(formData.get("role_label") ?? ""),
             organization: String(formData.get("organization") ?? ""),
@@ -165,6 +166,9 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                       <h3 className="text-base font-semibold text-foreground">{member.displayName}</h3>
                       <p className="text-sm text-muted-foreground">{member.email ?? "未提供邮箱"}</p>
                       <p className="text-sm text-muted-foreground">{member.wechat ?? "未填写微信号"}</p>
+                      <p className="text-sm text-muted-foreground">
+                        主页链接：{member.publicSlug ? `/members/${member.publicSlug}` : "未设置"}
+                      </p>
                       <p className="text-sm text-muted-foreground">{member.roleLabel ?? "未填写身份"}</p>
                       <p className="text-sm text-muted-foreground">
                         {member.organization ?? "未填写公司 / 学校 / 团队"}
@@ -270,6 +274,14 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                       name="wechat"
                       defaultValue={member.wechat ?? ""}
                       placeholder="用于联系"
+                    />
+                  </AdminField>
+
+                  <AdminField label="个人主页链接">
+                    <Input
+                      name="public_slug"
+                      defaultValue={member.publicSlug ?? ""}
+                      placeholder="例如：zhangsan-ai"
                     />
                   </AdminField>
 

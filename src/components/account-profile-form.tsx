@@ -9,6 +9,7 @@ type AccountProfileFormProps = {
   userId: string;
   profile: {
     display_name: string | null;
+    public_slug: string | null;
     avatar_url: string | null;
     wechat: string | null;
     city: string | null;
@@ -106,6 +107,23 @@ export function AccountProfileForm({
             placeholder="用于社区联系"
             required
           />
+        </label>
+
+        <label className="form-field">
+          <FieldLabel label="个人主页链接" required={false} />
+          <span className="input-group">
+            <span className="input-prefix">/members/</span>
+            <input
+              className="input input-group-field"
+              name="public_slug"
+              defaultValue={profile?.public_slug ?? ""}
+              placeholder="zhangsan-ai"
+              pattern="[a-z0-9][a-z0-9-]{1,30}[a-z0-9]"
+            />
+          </span>
+          <p className="form-field-help">
+            3-32 位小写英文、数字或短横线；公开展示后会优先使用这个链接。
+          </p>
         </label>
 
         <label className="form-field">

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { MemberAvatar } from "@/components/member-avatar";
 import { ToneBadge } from "@/components/tone-badge";
 import type { PublicMember } from "@/lib/community-members";
+import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
 
 type MemberDirectoryCardProps = {
   member: PublicMember;
@@ -31,7 +32,7 @@ export function MemberDirectoryCard({
   bioFallback,
 }: MemberDirectoryCardProps) {
   const visibleSkills = getVisibleSkills(member.skills);
-  const href = `/members/${member.id}`;
+  const href = getMemberPublicSlugPath(member);
 
   return (
     <Link

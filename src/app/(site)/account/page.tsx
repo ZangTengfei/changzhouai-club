@@ -56,7 +56,7 @@ export default async function AccountPage({
       supabase
         .from("profiles")
         .select(
-          "display_name, avatar_url, wechat, city, role_label, organization, monthly_time, bio, skills, interests",
+          "display_name, public_slug, avatar_url, wechat, city, role_label, organization, monthly_time, bio, skills, interests",
         )
         .eq("id", user.id)
         .maybeSingle(),
@@ -114,6 +114,10 @@ export default async function AccountPage({
             ? "请先填写显示名和微信号这两个必填项。"
             : params.error === "invalid_avatar_url"
               ? "头像地址格式无效，请填写以 http 或 https 开头的公开图片地址。"
+              : params.error === "invalid_public_slug"
+                ? "个人主页链接无效，请使用 3-32 位小写英文、数字或短横线，且不要使用保留词。"
+                : params.error === "public_slug_taken"
+                  ? "这个个人主页链接已经被占用，请换一个。"
               : "资料保存失败，请稍后再试。"}
         </div>
       ) : null}
@@ -137,12 +141,24 @@ export default async function AccountPage({
             <li>成员状态：{member?.status ?? "pending"}</li>
             <li>头像：{profile?.avatar_url ? "已设置" : "未设置"}</li>
             <li>微信号：{profile?.wechat ?? "未填写"}</li>
+            <li>
+              个人主页链接：
+              {profile?.public_slug ? `/members/${profile.public_slug}` : "未设置"}
+            </li>
             <li>身份：{profile?.role_label ?? "未填写"}</li>
             <li>公司 / 学校 / 团队：{profile?.organization ?? "未填写"}</li>
             <li>每月可投入时间：{profile?.monthly_time ?? "未填写"}</li>
             <li>愿意参加线下活动：{member?.willing_to_attend ? "是" : "否"}</li>
             <li>愿意分享：{member?.willing_to_share ? "是" : "否"}</li>
             <li>公开展示到成员页：{member?.is_publicly_visible ? "是" : "否"}（仅管理员可设置）</li>
+            <li>
+              公开访问地址：
+              {member?.is_publicly_visible
+                ? profile?.public_slug
+                  ? `/members/${profile.public_slug}`
+                  : `/members/${user.id}`
+                : "成员公开展示后可访问"}
+            </li>
             <li>展示到首页成员区：{member?.is_featured_on_home ? "是" : "否"}（仅管理员可设置）</li>
             <li>
               愿意参与社区共建：

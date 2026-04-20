@@ -1612,6 +1612,30 @@ img {
   font: inherit;
 }
 
+.input-group {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgba(var(--ink-rgb), 0.14);
+  border-radius: 14px;
+  background: rgba(var(--surface-soft-rgb), 0.95);
+}
+
+.input-prefix {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0 0 14px;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.input-group-field {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding-left: 2px;
+}
+
 .textarea {
   min-height: 120px;
   padding: 14px;

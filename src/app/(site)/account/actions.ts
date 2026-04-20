@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { sendAdminRegistrationNotification } from "@/lib/email";
+import {
+  getMemberPublicSlugPath,
+  isValidMemberPublicSlug,
+  normalizeMemberPublicSlug,
+} from "@/lib/member-public-slug";
 import { createClient } from "@/lib/supabase/server";
 
 function isMissingSchemaColumnError(error: { code?: string | null } | null | undefined) {
@@ -44,6 +49,10 @@ function normalizeAvatarUrl(raw: string) {
   }
 }
 
+function isUniqueViolationError(error: { code?: string | null } | null | undefined) {
+  return error?.code === "23505";
+}
+
 export async function updateAccountProfile(formData: FormData) {
   const supabase = await createClient();
   const {
@@ -57,7 +66,7 @@ export async function updateAccountProfile(formData: FormData) {
   const [{ data: existingProfile }, existingMemberResult] = await Promise.all([
     supabase
       .from("profiles")
-      .select("display_name, wechat, email")
+      .select("display_name, wechat, email, public_slug")
       .eq("id", user.id)
       .maybeSingle(),
     supabase
@@ -80,6 +89,7 @@ export async function updateAccountProfile(formData: FormData) {
 
   const displayName = String(formData.get("display_name") ?? "").trim();
   const rawAvatarUrl = String(formData.get("avatar_url") ?? "");
+  const rawPublicSlug = String(formData.get("public_slug") ?? "");
   const wechat = String(formData.get("wechat") ?? "").trim();
   const city = String(formData.get("city") ?? "").trim() || "常州";
   const roleLabel = String(formData.get("role_label") ?? "").trim();
@@ -92,6 +102,7 @@ export async function updateAccountProfile(formData: FormData) {
   const willingToShare = formData.get("willing_to_share") === "on";
   const willingToJoinProjects = formData.get("willing_to_join_projects") === "on";
   const avatarUrl = normalizeAvatarUrl(rawAvatarUrl);
+  const publicSlug = normalizeMemberPublicSlug(rawPublicSlug);
 
   if (!displayName || !wechat) {
     redirect("/account?error=missing_required_fields");
@@ -99,6 +110,10 @@ export async function updateAccountProfile(formData: FormData) {
 
   if (rawAvatarUrl.trim() && !avatarUrl) {
     redirect("/account?error=invalid_avatar_url");
+  }
+
+  if (publicSlug && !isValidMemberPublicSlug(publicSlug)) {
+    redirect("/account?error=invalid_public_slug");
   }
 
   const completedProfileNow = Boolean(displayName && wechat);
@@ -120,6 +135,7 @@ export async function updateAccountProfile(formData: FormData) {
       .from("profiles")
       .update({
         display_name: displayName || null,
+        public_slug: publicSlug,
         avatar_url: avatarUrl,
         wechat,
         city,
@@ -145,6 +161,10 @@ export async function updateAccountProfile(formData: FormData) {
   ]);
 
   if (profileError || memberError) {
+    if (isUniqueViolationError(profileError)) {
+      redirect("/account?error=public_slug_taken");
+    }
+
     console.error("Failed to update account profile.", {
       profileError,
       memberError,
@@ -198,6 +218,16 @@ export async function updateAccountProfile(formData: FormData) {
   revalidatePath("/account");
   revalidatePath("/");
   revalidatePath("/members");
+  revalidatePath(`/members/${user.id}`);
+
+  if (existingProfile?.public_slug) {
+    revalidatePath(`/members/${existingProfile.public_slug}`);
+  }
+
+  if (publicSlug) {
+    revalidatePath(getMemberPublicSlugPath({ id: user.id, publicSlug }));
+  }
+
   redirect("/account?updated=profile");
 }
 

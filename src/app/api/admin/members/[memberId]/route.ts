@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 
 import { loadAdminMembersData } from "@/lib/admin/members";
 import { revalidateAdminMemberPaths } from "@/lib/admin/revalidate";
+import {
+  isValidMemberPublicSlug,
+  normalizeMemberPublicSlug,
+} from "@/lib/member-public-slug";
 import { getStaffContextResult } from "@/lib/supabase/guards";
 
 function getOptionalValue(payload: Record<string, unknown>, key: string) {
@@ -76,12 +80,24 @@ export async function PATCH(
   const willingToJoinProjects = Boolean(payload.willing_to_join_projects);
   const isPubliclyVisible = Boolean(payload.is_publicly_visible);
   const isFeaturedOnHome = isPubliclyVisible && Boolean(payload.is_featured_on_home);
+  const publicSlug = normalizeMemberPublicSlug(String(payload.public_slug ?? ""));
+
+  if (publicSlug && !isValidMemberPublicSlug(publicSlug)) {
+    return NextResponse.json({ error: "invalid_public_slug" }, { status: 400 });
+  }
+
+  const { data: existingProfile } = await staffContext.supabase
+    .from("profiles")
+    .select("public_slug")
+    .eq("id", memberId)
+    .maybeSingle();
 
   const [{ error: profileError }, { error: memberError }] = await Promise.all([
     staffContext.supabase
       .from("profiles")
       .update({
         display_name: getOptionalValue(payload, "display_name"),
+        public_slug: publicSlug,
         wechat: getOptionalValue(payload, "wechat"),
         city: getOptionalValue(payload, "city") ?? "常州",
         role_label: getOptionalValue(payload, "role_label"),
@@ -106,9 +122,19 @@ export async function PATCH(
   ]);
 
   if (profileError || memberError) {
+    if (profileError?.code === "23505") {
+      return NextResponse.json({ error: "public_slug_taken" }, { status: 400 });
+    }
+
     return NextResponse.json({ error: "database_write_failed" }, { status: 400 });
   }
 
   revalidateAdminMemberPaths(memberId);
+  if (existingProfile?.public_slug) {
+    revalidateAdminMemberPaths(undefined, existingProfile.public_slug);
+  }
+  if (publicSlug) {
+    revalidateAdminMemberPaths(undefined, publicSlug);
+  }
   return NextResponse.json({ saved: "member_profile" });
 }

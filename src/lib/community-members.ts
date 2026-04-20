@@ -1,11 +1,13 @@
 import { unstable_cache } from "next/cache";
 
 import { hasSupabaseEnv } from "@/lib/env";
+import { isUuidLike } from "@/lib/member-public-slug";
 import { memberTags } from "@/lib/site-data";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 type PublicMemberRow = {
   id: string;
+  public_slug: string | null;
   display_name: string | null;
   avatar_url: string | null;
   city: string | null;
@@ -28,6 +30,7 @@ type PublicMemberStatsRow = {
 
 export type PublicMember = {
   id: string;
+  publicSlug: string | null;
   displayName: string;
   avatarUrl: string | null;
   city: string;
@@ -76,6 +79,7 @@ function pickMembers(
 function mapPublicMember(row: PublicMemberRow): PublicMember {
   return {
     id: row.id,
+    publicSlug: row.public_slug?.trim() || null,
     displayName: row.display_name?.trim() || "社区成员",
     avatarUrl: row.avatar_url,
     city: row.city?.trim() || "常州",
@@ -156,12 +160,12 @@ export async function getPublicMembersDirectory(): Promise<PublicMembersDirector
   return getCachedPublicMembersDirectory();
 }
 
-export async function getPublicMemberById(memberId: string) {
+export async function getPublicMemberByHandle(handle: string) {
   if (!hasSupabaseEnv()) {
     return null;
   }
 
-  return getCachedPublicMemberById(memberId);
+  return getCachedPublicMemberByHandle(handle);
 }
 
 const getCachedPublicMembersDirectory = unstable_cache(
@@ -225,16 +229,23 @@ const getCachedPublicMembersDirectory = unstable_cache(
   { revalidate: PUBLIC_MEMBERS_REVALIDATE_SECONDS },
 );
 
-const getCachedPublicMemberById = unstable_cache(
-  async (memberId: string) => {
+const getCachedPublicMemberByHandle = unstable_cache(
+  async (handle: string) => {
+    const normalizedHandle = handle.trim().toLowerCase();
+
+    if (!normalizedHandle) {
+      return null;
+    }
+
     const supabase = createPublicServerClient();
     const { data } = await supabase.rpc("list_public_members");
-    const member = ((data ?? []) as PublicMemberRow[])
-      .map(mapPublicMember)
-      .find((item) => item.id === memberId);
+    const members = ((data ?? []) as PublicMemberRow[]).map(mapPublicMember);
+    const member = isUuidLike(normalizedHandle)
+      ? members.find((item) => item.id === normalizedHandle)
+      : members.find((item) => item.publicSlug === normalizedHandle);
 
     return member ?? null;
   },
-  ["public-member-detail-by-id"],
+  ["public-member-detail-by-handle"],
   { revalidate: PUBLIC_MEMBERS_REVALIDATE_SECONDS },
 );
