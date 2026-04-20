@@ -252,8 +252,7 @@ export default async function HomePage() {
       <section className="section">
         <SectionHeading
           eyebrow="社区定位"
-          title="以活动为连接点，汇聚本地 AI 人才与合作机会"
-          description="社区围绕固定线下见面、成员分享与合作对接，帮助常州本地实践者建立长期交流网络。"
+          title="从活动到合作"
         />
         <div className="positioning-panel">
           <div className="positioning-summary">
