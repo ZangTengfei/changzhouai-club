@@ -735,7 +735,7 @@ export async function saveAdminWechatQrCode(formData: FormData) {
   const { supabase, user } = await requireStaffContext();
 
   const qrCodeId = String(formData.get("qr_code_id") ?? "").trim();
-  const title = String(formData.get("title") ?? "").trim() || "常州 AI 社区微信群";
+  const title = String(formData.get("title") ?? "").trim() || "常州 AI Club 微信群";
   const imageUrl = String(formData.get("image_url") ?? "").trim();
   const startsAt = toWechatQrDateTime(getOptionalValue(formData, "starts_at"));
   const expiresAt = toWechatQrDateTime(getOptionalValue(formData, "expires_at"));

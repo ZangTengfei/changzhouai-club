@@ -15,7 +15,7 @@ export async function generateMetadata({
   if (!sponsor) {
     return {
       title: "赞助者详情",
-      description: "查看常州 AI 社区赞助者信息。",
+      description: "查看常州 AI Club 赞助者信息。",
     };
   }
 

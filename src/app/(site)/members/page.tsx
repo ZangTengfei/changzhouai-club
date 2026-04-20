@@ -8,7 +8,7 @@ import { memberTags } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "成员地图",
-  description: "展示常州 AI 社区的成员技能分布和参与方向。",
+  description: "展示常州 AI Club 的成员技能分布和参与方向。",
 };
 
 function formatMemberHeadline(member: {

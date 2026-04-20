@@ -1,6 +1,6 @@
 create table if not exists public.community_wechat_qr_codes (
   id uuid primary key default gen_random_uuid(),
-  title text not null default '常州 AI 社区微信群',
+  title text not null default '常州 AI Club 微信群',
   image_url text not null,
   note text,
   starts_at timestamptz not null default timezone('utc', now()),

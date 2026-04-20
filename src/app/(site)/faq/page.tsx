@@ -5,7 +5,7 @@ import { faqItems } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "常见问题",
-  description: "查看常州 AI 社区的加入方式、活动形式和合作方向说明。",
+  description: "查看常州 AI Club 的加入方式、活动形式和合作方向说明。",
 };
 
 export default function FaqPage() {

@@ -7,7 +7,7 @@ import { cooperationAreas } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "合作联系",
-  description: "欢迎企业、机构、园区与高校与常州 AI 社区进行分享、培训、PoC 和项目合作。",
+  description: "欢迎企业、机构、园区与高校与常州 AI Club 进行分享、培训、PoC 和项目合作。",
 };
 
 type SearchParams = {

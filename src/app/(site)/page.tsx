@@ -87,7 +87,7 @@ export default async function HomePage() {
       <section className="hero surface">
         <div className="hero-copy">
           <p className="eyebrow">Changzhou AI Club</p>
-          <h1>常州 AI 社区</h1>
+          <h1>常州 AI Club</h1>
           <p>
             连接常州的开发者、OPC、产品人、创业者、高校同学与企业伙伴，持续组织线下交流、主题分享与合作对接。
             {latestCompletedEvent

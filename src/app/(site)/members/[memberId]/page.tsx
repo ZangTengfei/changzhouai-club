@@ -51,7 +51,7 @@ export async function generateMetadata({
   if (!member) {
     return {
       title: "成员主页",
-      description: "查看常州 AI 社区成员的公开资料。",
+      description: "查看常州 AI Club 成员的公开资料。",
     };
   }
 
@@ -60,7 +60,7 @@ export async function generateMetadata({
     description:
       member.bio?.trim() ||
       formatMemberHeadline(member) ||
-      "查看常州 AI 社区成员的公开资料。",
+      "查看常州 AI Club 成员的公开资料。",
   };
 }
 

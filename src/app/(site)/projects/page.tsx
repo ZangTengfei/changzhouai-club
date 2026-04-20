@@ -5,7 +5,7 @@ import { joinSteps, opcTracks, projectStatus } from "@/lib/site-data";
 
 export const metadata: Metadata = {
   title: "项目共建",
-  description: "了解常州 AI 社区的项目方向、共建状态与参与方式。",
+  description: "了解常州 AI Club 的项目方向、共建状态与参与方式。",
 };
 
 export default function ProjectsPage() {

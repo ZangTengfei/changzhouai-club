@@ -9,7 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = {
   title: "加入我们",
-  description: "了解如何加入常州 AI 社区，参与线下活动、项目共建和长期协作。",
+  description: "了解如何加入常州 AI Club，参与线下活动、项目共建和长期协作。",
 };
 
 const onboardingPath = "/account?onboarding=1";
@@ -35,7 +35,7 @@ export default async function JoinPage() {
     <div className="page-stack">
       <PageHero
         eyebrow="Join"
-        title="加入常州 AI 社区"
+        title="加入常州 AI Club"
         description="加入流程现在统一为“先登录，再完善资料”。这样你的社区身份、活动记录和个人资料都会沉淀在同一个账号里，后续也能持续更新。"
       >
         <div className="note-strip">

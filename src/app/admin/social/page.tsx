@@ -162,8 +162,8 @@ export default async function AdminSocialPage({
               <AdminField label="标题">
                 <Input
                   name="title"
-                  defaultValue="常州 AI 社区微信群"
-                  placeholder="例如：常州 AI 社区微信群"
+                  defaultValue="常州 AI Club 微信群"
+                  placeholder="例如：常州 AI Club 微信群"
                   required
                 />
               </AdminField>

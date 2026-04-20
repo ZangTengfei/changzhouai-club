@@ -5,7 +5,7 @@ export function DocsFooter() {
     <footer className="docs-footer">
       <div className="docs-footer-inner">
         <p className="docs-footer-copy">
-          常州 AI 社区文档，面向社区成员持续沉淀活动方法、工具实践、项目记录与协作规范。
+          常州 AI Club 文档，面向社区成员持续沉淀活动方法、工具实践、项目记录与协作规范。
         </p>
         <div className="docs-footer-links">
           <Link href="/docs/getting-started">开始使用</Link>

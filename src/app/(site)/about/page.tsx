@@ -4,7 +4,7 @@ import { PageHero } from "@/components/page-hero";
 
 export const metadata: Metadata = {
   title: "关于我们",
-  description: "了解常州 AI 社区的定位、初心和长期运营方向。",
+  description: "了解常州 AI Club 的定位、初心和长期运营方向。",
 };
 
 export default function AboutPage() {

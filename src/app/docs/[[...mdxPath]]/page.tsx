@@ -30,7 +30,7 @@ export async function generateMetadata(
   return {
     title: metadata.title,
     description:
-      metadata.description ?? "常州 AI 社区的文档与共建内容沉淀。",
+      metadata.description ?? "常州 AI Club 的文档与共建内容沉淀。",
   };
 }
 

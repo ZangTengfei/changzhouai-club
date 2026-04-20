@@ -15,7 +15,7 @@ export function SiteHeader() {
             <SiteLogoMark className="brand-mark-icon" />
           </span>
           <span className="brand-copy">
-            <strong>常州 AI 社区</strong>
+            <strong>常州 AI Club</strong>
             <small>Changzhou AI Club</small>
           </span>
         </Link>

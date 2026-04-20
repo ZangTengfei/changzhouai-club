@@ -7,7 +7,7 @@ import { getCompletedEventRecaps, getScheduledEvents } from "@/lib/community-eve
 
 export const metadata: Metadata = {
   title: "活动",
-  description: "浏览常州 AI 社区的近期活动与往期回顾。",
+  description: "浏览常州 AI Club 的近期活动与往期回顾。",
 };
 
 export default async function EventsPage({

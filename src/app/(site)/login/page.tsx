@@ -6,7 +6,7 @@ import { hasSupabaseEnv } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: "登录",
-  description: "使用 Google 登录常州 AI 社区账号。",
+  description: "使用 Google 登录常州 AI Club 账号。",
 };
 
 export default async function LoginPage({

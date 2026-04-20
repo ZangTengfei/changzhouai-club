@@ -9,7 +9,7 @@ import {
 
 export const metadata: Metadata = {
   title: "品牌视觉",
-  description: "查看常州 AI 社区当前标识的设计方向与应用展示。",
+  description: "查看常州 AI Club 当前标识的设计方向与应用展示。",
 };
 
 const logoDrafts = [
@@ -18,7 +18,7 @@ const logoDrafts = [
     eyebrow: "Direction 01",
     title: "城市节点",
     summary:
-      "把常州 AI 社区看作一个正在形成的本地节点网络，核心是连接人、活动、项目和需求。",
+      "把常州 AI Club 看作一个正在形成的本地节点网络，核心是连接人、活动、项目和需求。",
     note: "这一方向更强调社区连接和城市节点的关系，适合延展成图形化主标识。",
     Mark: LogoDraftCityNodes,
   },
@@ -88,7 +88,7 @@ export default function BrandLabPage() {
                     <Mark className="logo-draft-header-mark" />
                   </div>
                   <div className="logo-draft-header-copy">
-                    <strong>常州 AI 社区</strong>
+                    <strong>常州 AI Club</strong>
                     <small>Changzhou AI Club</small>
                   </div>
                 </div>

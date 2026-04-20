@@ -8,12 +8,12 @@ export function DocsNavbar() {
   return (
     <div className="docs-navbar-shell">
       <div className="docs-navbar-identity">
-        <Link href="/" className="docs-navbar-home-brand" aria-label="返回常州 AI 社区首页">
+        <Link href="/" className="docs-navbar-home-brand" aria-label="返回常州 AI Club 首页">
           <span className="docs-navbar-mark">
             <SiteLogoMark className="docs-navbar-mark-icon" />
           </span>
           <span className="docs-navbar-main-copy" aria-hidden="true">
-            常州 AI 社区
+            常州 AI Club
           </span>
         </Link>
         <Link href="/docs" className="docs-navbar-docs-title">
