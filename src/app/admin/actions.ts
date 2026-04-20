@@ -8,6 +8,7 @@ import { requireStaffContext } from "@/lib/supabase/guards";
 const ADMIN_EVENTS_PATH = "/admin/events";
 const ADMIN_LEADS_PATH = "/admin/leads";
 const ADMIN_MEMBERS_PATH = "/admin/members";
+const ADMIN_SOCIAL_PATH = "/admin/social";
 
 function normalizeSlug(raw: string) {
   return raw
@@ -88,6 +89,11 @@ function revalidateLeadPaths(leadId?: string) {
   if (leadId) {
     revalidatePath(`${ADMIN_LEADS_PATH}/${leadId}`);
   }
+}
+
+function revalidateSocialPaths() {
+  revalidatePath(ADMIN_SOCIAL_PATH);
+  revalidatePath("/");
 }
 
 export async function saveAdminEvent(formData: FormData) {
@@ -707,4 +713,92 @@ export async function deleteAdminLeadMatch(formData: FormData) {
       saved: "lead_match_deleted",
     }),
   );
+}
+
+function toWechatQrDateTime(value: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  const date = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)
+    ? new Date(`${value}:00+08:00`)
+    : new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date.toISOString();
+}
+
+export async function saveAdminWechatQrCode(formData: FormData) {
+  const { supabase, user } = await requireStaffContext();
+
+  const qrCodeId = String(formData.get("qr_code_id") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim() || "常州 AI 社区微信群";
+  const imageUrl = String(formData.get("image_url") ?? "").trim();
+  const startsAt = toWechatQrDateTime(getOptionalValue(formData, "starts_at"));
+  const expiresAt = toWechatQrDateTime(getOptionalValue(formData, "expires_at"));
+  const isActive = formData.get("is_active") === "on";
+
+  if (!imageUrl || !startsAt || !expiresAt) {
+    redirect(`${ADMIN_SOCIAL_PATH}?error=missing_required_fields`);
+  }
+
+  if (new Date(expiresAt).getTime() <= new Date(startsAt).getTime()) {
+    redirect(`${ADMIN_SOCIAL_PATH}?error=invalid_qr_expiration`);
+  }
+
+  const payload = {
+    title,
+    image_url: imageUrl,
+    note: getOptionalValue(formData, "note"),
+    starts_at: startsAt,
+    expires_at: expiresAt,
+    is_active: isActive,
+  };
+
+  if (qrCodeId) {
+    const { error } = await supabase
+      .from("community_wechat_qr_codes")
+      .update(payload)
+      .eq("id", qrCodeId);
+
+    if (error) {
+      redirect(`${ADMIN_SOCIAL_PATH}?error=database_write_failed`);
+    }
+  } else {
+    const { error } = await supabase.from("community_wechat_qr_codes").insert({
+      ...payload,
+      created_by: user.id,
+    });
+
+    if (error) {
+      redirect(`${ADMIN_SOCIAL_PATH}?error=database_write_failed`);
+    }
+  }
+
+  revalidateSocialPaths();
+  redirect(`${ADMIN_SOCIAL_PATH}?saved=wechat_qr`);
+}
+
+export async function deleteAdminWechatQrCode(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+  const qrCodeId = String(formData.get("qr_code_id") ?? "").trim();
+
+  if (!qrCodeId) {
+    redirect(`${ADMIN_SOCIAL_PATH}?error=missing_required_fields`);
+  }
+
+  const { error } = await supabase
+    .from("community_wechat_qr_codes")
+    .delete()
+    .eq("id", qrCodeId);
+
+  if (error) {
+    redirect(`${ADMIN_SOCIAL_PATH}?error=database_write_failed`);
+  }
+
+  revalidateSocialPaths();
+  redirect(`${ADMIN_SOCIAL_PATH}?saved=wechat_qr_deleted`);
 }

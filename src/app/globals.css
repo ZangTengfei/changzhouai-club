@@ -279,6 +279,36 @@ img {
   justify-content: flex-end;
 }
 
+.github-nav-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid rgba(var(--accent-rgb), 0.16);
+  border-radius: 999px;
+  background: rgba(var(--surface-soft-rgb), 0.72);
+  color: var(--ink);
+  font-weight: 700;
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background-color 0.18s ease;
+}
+
+.github-nav-button:hover,
+.github-nav-button:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(var(--accent-rgb), 0.28);
+  background: rgba(var(--surface-rgb), 0.92);
+}
+
+.github-nav-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
 .mobile-menu-toggle {
   display: none;
   flex-direction: column;
@@ -836,8 +866,32 @@ img {
 
 .community-social-panel {
   display: grid;
-  gap: 10px;
-  margin-top: 4px;
+  gap: 14px;
+  margin-top: 6px;
+  padding: 16px;
+  border: 1px solid rgba(var(--accent-rgb), 0.12);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at top left, rgba(var(--accent-rgb), 0.1), transparent 38%),
+    rgba(var(--surface-soft-rgb), 0.5);
+  box-shadow: 0 16px 36px rgba(var(--ink-rgb), 0.06);
+}
+
+.community-social-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.community-social-heading strong {
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.community-social-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(188px, 0.56fr);
+  gap: 12px;
+  align-items: stretch;
 }
 
 .community-social-kicker {
@@ -847,17 +901,15 @@ img {
 }
 
 .community-social-links {
-  display: flex;
-  align-items: stretch;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  flex-wrap: wrap;
 }
 
 .community-social-link {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  flex: 1 1 168px;
   min-height: 58px;
   padding: 10px 12px;
   border: 1px solid rgba(var(--accent-rgb), 0.12);
@@ -889,6 +941,11 @@ img {
   color: #ffffff;
   font-size: 0.88rem;
   font-weight: 800;
+}
+
+.community-social-icon-svg {
+  width: 20px;
+  height: 20px;
 }
 
 .community-social-link strong,
@@ -927,6 +984,65 @@ img {
 
 .community-social-link-bilibili .community-social-icon {
   background: #00a1d6;
+}
+
+.community-wechat-card {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  min-height: 118px;
+  padding: 10px;
+  border: 1px solid rgba(var(--accent-rgb), 0.14);
+  border-radius: 22px;
+  background: rgba(var(--surface-rgb), 0.86);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.54);
+}
+
+.community-wechat-qr,
+.community-wechat-qr-placeholder {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  overflow: hidden;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.community-wechat-qr img {
+  width: 100%;
+  height: 100%;
+  padding: 6px;
+  object-fit: contain;
+}
+
+.community-wechat-qr-placeholder {
+  background:
+    linear-gradient(135deg, rgba(var(--accent-rgb), 0.14), rgba(var(--accent-rgb), 0.05)),
+    rgba(var(--surface-soft-rgb), 0.96);
+  color: var(--accent-strong);
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.community-wechat-copy {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+}
+
+.community-wechat-copy strong {
+  color: var(--ink);
+  font-size: 0.94rem;
+  line-height: 1.25;
+}
+
+.community-wechat-copy small {
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.45;
 }
 
 .hero-note {
@@ -3751,6 +3867,11 @@ img {
     font-size: 0.95rem;
   }
 
+  .github-nav-button {
+    padding: 0 12px;
+    font-size: 0.95rem;
+  }
+
   .header-inner {
     border-radius: 28px;
     align-items: center;
@@ -3758,6 +3879,10 @@ img {
 
   .member-directory-grid-home {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .community-social-layout {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -3829,9 +3954,19 @@ img {
     font-size: 0.95rem;
   }
 
+  .github-nav-button {
+    justify-content: center;
+    width: 100%;
+    min-height: 46px;
+  }
+
   .account-dropdown {
     right: 0;
     min-width: 168px;
+  }
+
+  .community-social-links {
+    grid-template-columns: 1fr;
   }
 
   .card-grid,
@@ -4091,8 +4226,25 @@ img {
   }
 
   .button,
-  .header-actions .button {
+  .header-actions .button,
+  .github-nav-button {
     min-height: 46px;
+  }
+
+  .community-social-panel {
+    padding: 14px;
+    border-radius: 22px;
+  }
+
+  .community-wechat-card {
+    grid-template-columns: 82px minmax(0, 1fr);
+  }
+
+  .community-wechat-qr,
+  .community-wechat-qr-placeholder {
+    width: 82px;
+    height: 82px;
+    border-radius: 16px;
   }
 
   .member-directory-bio {

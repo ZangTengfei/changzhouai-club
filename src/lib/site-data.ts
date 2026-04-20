@@ -11,13 +11,6 @@ export const siteRepositoryUrl = "https://github.com/ZangTengfei/changzhouai-clu
 
 export const communitySocialLinks = [
   {
-    platform: "GitHub",
-    label: "GitHub 仓库",
-    description: "查看代码与文档共建",
-    href: siteRepositoryUrl,
-    tone: "github",
-  },
-  {
     platform: "小红书",
     label: "小红书",
     description: "搜索社区动态",

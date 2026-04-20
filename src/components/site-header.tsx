@@ -3,7 +3,8 @@ import Link from "next/link";
 import { MobileMenuToggle } from "@/components/mobile-menu-toggle";
 import { SiteAccountEntry } from "@/components/site-account-entry";
 import { SiteLogoMark } from "@/components/site-logo-mark";
-import { navItems } from "@/lib/site-data";
+import { SocialPlatformIcon } from "@/components/social-platform-icon";
+import { navItems, siteRepositoryUrl } from "@/lib/site-data";
 
 export function SiteHeader() {
   return (
@@ -28,6 +29,17 @@ export function SiteHeader() {
         </nav>
 
         <div className="header-actions">
+          <Link
+            href={siteRepositoryUrl}
+            className="github-nav-button"
+            target="_blank"
+            rel="noreferrer"
+            aria-label="打开 GitHub 仓库"
+            title="GitHub 仓库"
+          >
+            <SocialPlatformIcon tone="github" className="github-nav-icon" />
+            <span>GitHub</span>
+          </Link>
           <Link href="/join" className="button button-secondary">
             加入社区
           </Link>

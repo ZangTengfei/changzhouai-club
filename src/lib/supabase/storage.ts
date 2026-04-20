@@ -29,6 +29,13 @@ export function buildSponsorAssetPath(sponsorSlug: string, fileName: string) {
   return `sponsors/${safeSponsorSlug}/${timestamp}-${safeFileName}`;
 }
 
+export function buildCommunityQrCodePath(fileName: string) {
+  const safeFileName = sanitizeSegment(fileName || "wechat-qr.jpg");
+  const timestamp = Date.now();
+
+  return `community/wechat-qr/${timestamp}-${safeFileName}`;
+}
+
 export function buildMemberAvatarPath(userId: string) {
   const safeUserId = sanitizeSegment(userId || "member");
   return `${safeUserId}/avatar`;
