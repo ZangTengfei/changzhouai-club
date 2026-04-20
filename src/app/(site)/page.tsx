@@ -104,37 +104,6 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="community-social-panel" aria-label="社区外部平台入口">
-            <div className="community-social-heading">
-              <span className="community-social-kicker">社区入口</span>
-              <strong>在公开平台关注社区动态</strong>
-            </div>
-            <div className="community-social-links">
-              {communitySocialLinks.map((item) => (
-                <Link
-                  key={item.platform}
-                  href={item.href}
-                  className={`community-social-link community-social-link-${item.tone}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <span className="community-social-icon" aria-hidden="true">
-                    <SocialPlatformIcon
-                      tone={item.tone}
-                      src={item.iconSrc}
-                      alt=""
-                      className="community-social-icon-svg"
-                    />
-                  </span>
-                  <span>
-                    <strong>{item.label}</strong>
-                    <small>{item.description}</small>
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </div>
-
           <div className="stat-grid">
             {communityStats.map((item) => (
               <div className="metric-card" key={item.label}>
@@ -226,6 +195,37 @@ export default async function HomePage() {
             )}
           </div>
         </aside>
+      </section>
+
+      <section className="community-social-panel" aria-label="社区外部平台入口">
+        <div className="community-social-heading">
+          <span className="community-social-kicker">社区入口</span>
+          <strong>在公开平台关注常州 AI Club 动态</strong>
+        </div>
+        <div className="community-social-links">
+          {communitySocialLinks.map((item) => (
+            <Link
+              key={item.platform}
+              href={item.href}
+              className={`community-social-link community-social-link-${item.tone}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span className="community-social-icon" aria-hidden="true">
+                <SocialPlatformIcon
+                  tone={item.tone}
+                  src={item.iconSrc}
+                  alt=""
+                  className="community-social-icon-svg"
+                />
+              </span>
+              <span>
+                <strong>{item.label}</strong>
+                <small>{item.description}</small>
+              </span>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <section className="section">
