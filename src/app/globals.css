@@ -930,15 +930,19 @@ img {
   height: 34px;
   flex-shrink: 0;
   border-radius: 12px;
-  background: var(--accent);
-  color: #ffffff;
+  background: #ffffff;
+  color: var(--ink);
   font-size: 0.88rem;
   font-weight: 800;
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--ink-rgb), 0.06),
+    0 6px 14px rgba(var(--ink-rgb), 0.08);
 }
 
 .community-social-icon-svg {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
 }
 
 .community-social-link strong,
@@ -955,28 +959,6 @@ img {
   margin-top: 2px;
   color: var(--muted);
   font-size: 0.74rem;
-}
-
-.community-social-link-github .community-social-icon {
-  background: #111827;
-}
-
-.community-social-link-rednote .community-social-icon {
-  background: #df2f3f;
-}
-
-.community-social-link-douyin .community-social-icon {
-  background: linear-gradient(
-    135deg,
-    #111827 0%,
-    #111827 48%,
-    #10f0e8 49%,
-    #fe2c55 100%
-  );
-}
-
-.community-social-link-bilibili .community-social-icon {
-  background: #00a1d6;
 }
 
 .community-wechat-card {

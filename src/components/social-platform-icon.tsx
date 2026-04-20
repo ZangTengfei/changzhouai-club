@@ -1,9 +1,23 @@
 type SocialPlatformIconProps = {
   tone: "github" | "rednote" | "douyin" | "bilibili";
   className?: string;
+  src?: string;
+  alt?: string;
 };
 
-export function SocialPlatformIcon({ tone, className }: SocialPlatformIconProps) {
+export function SocialPlatformIcon({ tone, className, src, alt = "" }: SocialPlatformIconProps) {
+  if (src) {
+    return (
+      <img
+        src={src}
+        alt={alt}
+        width={24}
+        height={24}
+        className={className}
+      />
+    );
+  }
+
   if (tone === "github") {
     return (
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" className={className}>

@@ -121,6 +121,8 @@ export default async function HomePage() {
                   <span className="community-social-icon" aria-hidden="true">
                     <SocialPlatformIcon
                       tone={item.tone}
+                      src={item.iconSrc}
+                      alt=""
                       className="community-social-icon-svg"
                     />
                   </span>

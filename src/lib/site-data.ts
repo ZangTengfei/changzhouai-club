@@ -16,6 +16,7 @@ export const communitySocialLinks = [
     description: "搜索社区动态",
     href: "https://www.xiaohongshu.com/search_result?keyword=%E5%B8%B8%E5%B7%9E%20AI%20%E7%A4%BE%E5%8C%BA",
     tone: "rednote",
+    iconSrc: "/xiaohongshu.png",
   },
   {
     platform: "抖音",
@@ -23,6 +24,7 @@ export const communitySocialLinks = [
     description: "搜索短视频内容",
     href: "https://www.douyin.com/search/%E5%B8%B8%E5%B7%9E%20AI%20%E7%A4%BE%E5%8C%BA",
     tone: "douyin",
+    iconSrc: "/douyin.png",
   },
   {
     platform: "B站",
@@ -30,6 +32,7 @@ export const communitySocialLinks = [
     description: "搜索社区视频",
     href: "https://search.bilibili.com/all?keyword=%E5%B8%B8%E5%B7%9E%20AI%20%E7%A4%BE%E5%8C%BA",
     tone: "bilibili",
+    iconSrc: "/bilibili.png",
   },
 ] as const;
 
