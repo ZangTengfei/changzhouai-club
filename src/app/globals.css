@@ -4137,6 +4137,14 @@ img {
     grid-template-columns: 1fr;
   }
 
+  .positioning-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .positioning-summary {
+    min-height: auto;
+  }
+
 }
 
 @media (max-width: 820px) {
@@ -4510,6 +4518,49 @@ img {
   .community-wechat-qr-placeholder {
     width: 82px;
     height: 82px;
+    border-radius: 16px;
+  }
+
+  .positioning-panel {
+    padding: 14px;
+    border-radius: 24px;
+  }
+
+  .positioning-summary,
+  .positioning-step {
+    padding: 18px;
+  }
+
+  .positioning-formula {
+    gap: 8px;
+  }
+
+  .positioning-formula span {
+    min-height: 40px;
+    padding: 0 13px;
+  }
+
+  .positioning-formula i {
+    width: 18px;
+  }
+
+  .positioning-proof {
+    grid-template-columns: 1fr;
+  }
+
+  .positioning-step {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .positioning-step + .positioning-step::before {
+    display: none;
+  }
+
+  .positioning-step-node {
+    width: 100%;
+    height: auto;
+    min-height: 48px;
     border-radius: 16px;
   }
 

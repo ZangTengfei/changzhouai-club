@@ -44,6 +44,27 @@ function formatMemberHeadline(member: {
   return member.roleLabel ?? member.organization;
 }
 
+const communityPositionSteps = [
+  {
+    step: "01",
+    title: "线下活动",
+    action: "先见面",
+    description: "固定组织交流和主题分享，让本地 AI 实践者有稳定碰面的场域。",
+  },
+  {
+    step: "02",
+    title: "成员连接",
+    action: "再认识",
+    description: "通过成员地图和资料沉淀，帮助大家找到相近方向的人。",
+  },
+  {
+    step: "03",
+    title: "合作对接",
+    action: "再共创",
+    description: "面向企业、园区、高校和实践者开放合作入口，承接真实需求。",
+  },
+];
+
 export default async function HomePage() {
   const scheduledEvents = await getScheduledEvents();
   const completedEvents = await getCompletedEventRecaps();
@@ -234,25 +255,45 @@ export default async function HomePage() {
           title="以活动为连接点，汇聚本地 AI 人才与合作机会"
           description="社区围绕固定线下见面、成员分享与合作对接，帮助常州本地实践者建立长期交流网络。"
         />
-        <div className="card-grid">
-          <article className="card">
-            <h3>线下活动</h3>
+        <div className="positioning-panel">
+          <div className="positioning-summary">
+            <p className="eyebrow">社区如何运转</p>
+            <div className="positioning-formula" aria-label="社区运转路径">
+              <span>活动</span>
+              <i aria-hidden="true" />
+              <span>连接</span>
+              <i aria-hidden="true" />
+              <span>合作</span>
+            </div>
             <p>
-              持续组织线下交流和主题分享，让本地开发者、产品人、创业者和高校同学有稳定碰面的场域。
+              不把社区做成信息流，而是先创造真实碰面，再沉淀可信关系，最后让合作机会自然发生。
             </p>
-          </article>
-          <article className="card">
-            <h3>成员连接</h3>
-            <p>
-              通过成员地图和资料沉淀，让大家更容易找到相近方向的人，建立长期的交流与互助关系。
-            </p>
-          </article>
-          <article className="card">
-            <h3>合作对接</h3>
-            <p>
-              面向企业、园区、高校与独立实践者开放合作入口，支持主题分享、PoC、项目协作和人才连接。
-            </p>
-          </article>
+            <div className="positioning-proof">
+              <span>
+                <strong>{completedEvents.length}</strong>
+                已办线下活动
+              </span>
+              <span>
+                <strong>200+</strong>
+                全网群成员
+              </span>
+            </div>
+          </div>
+
+          <div className="positioning-flow">
+            {communityPositionSteps.map((item) => (
+              <article className="positioning-step" key={item.title}>
+                <span className="positioning-step-index">{item.step}</span>
+                <div className="positioning-step-node" aria-hidden="true">
+                  {item.action}
+                </div>
+                <div>
+                  <h3>{item.title}</h3>
+                  <p>{item.description}</p>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
