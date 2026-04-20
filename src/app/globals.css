@@ -3083,15 +3083,32 @@ img {
 
 .account-avatar-field {
   display: grid;
-  grid-template-columns: 96px minmax(0, 1fr);
-  gap: 18px;
-  align-items: start;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
 }
 
 .account-avatar-preview {
   display: grid;
-  gap: 10px;
   justify-items: start;
+}
+
+.account-avatar-panel {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.account-avatar-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.account-avatar-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 700;
 }
 
 .account-avatar-hint {
