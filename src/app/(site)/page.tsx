@@ -327,8 +327,10 @@ export default async function HomePage() {
                   <div className="pill-row">
                     <span className="pill">{item.dateLabel}</span>
                   </div>
-                  <h3>{item.title}</h3>
-                  <p>{item.summary}</p>
+                  <div className="event-card-copy">
+                    <h3 className="event-card-title">{item.title}</h3>
+                    <p className="event-card-summary">{item.summary}</p>
+                  </div>
                   <div className="detail-pills">
                     {item.highlights.map((highlight) => (
                       <span key={highlight}>{highlight}</span>

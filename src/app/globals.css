@@ -3679,6 +3679,30 @@ img {
   margin-top: 16px;
 }
 
+.event-card-copy {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.event-card-title {
+  margin: 0;
+  color: var(--ink);
+  font-size: clamp(1.12rem, 2vw, 1.34rem);
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.event-card-summary {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--ink-secondary);
+  font-size: 0.97rem;
+  line-height: 1.72;
+}
+
 .event-media,
 .gallery-media,
 .event-feature-media {
@@ -3705,6 +3729,15 @@ img {
 
 .event-card-link-home .event-card-body {
   padding: 22px;
+}
+
+.event-card-link-home .pill-row {
+  margin-bottom: 2px;
+}
+
+.event-card-link-home .detail-pills {
+  padding-top: 14px;
+  border-top: 1px solid rgba(var(--line-rgb), 0.72);
 }
 
 .gallery-media img,
@@ -4611,6 +4644,17 @@ img {
   .gallery-copy,
   .event-feature-copy {
     padding: 18px;
+  }
+
+  .event-card-copy {
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .event-card-summary {
+    max-width: none;
+    font-size: 0.94rem;
+    line-height: 1.64;
   }
 
   .event-image-fallback {
