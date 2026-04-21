@@ -74,7 +74,12 @@ export default async function SponsorDetailPage({
 
         <div className="sponsor-logo-panel">
           {sponsor.logoUrl ? (
-            <img src={sponsor.logoUrl} alt={`${sponsor.name} Logo`} />
+            <img
+              src={sponsor.logoUrl}
+              alt={`${sponsor.name} Logo`}
+              loading="eager"
+              fetchPriority="high"
+            />
           ) : (
             <div className="sponsor-logo-fallback">Logo 待补充</div>
           )}

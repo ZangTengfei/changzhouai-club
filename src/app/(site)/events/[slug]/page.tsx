@@ -95,7 +95,12 @@ export default async function EventDetailPage({
 
         <div className="event-detail-media">
           {event.imageUrl ? (
-            <img src={event.imageUrl} alt={event.title} />
+            <img
+              src={event.imageUrl}
+              alt={event.title}
+              loading="eager"
+              fetchPriority="high"
+            />
           ) : (
             <div className="event-image-fallback">活动图片待补充</div>
           )}
