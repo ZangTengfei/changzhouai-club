@@ -3681,26 +3681,27 @@ img {
 
 .event-card-copy {
   display: grid;
-  gap: 10px;
-  margin-top: 16px;
+  gap: 12px;
+  margin-top: 18px;
 }
 
 .event-card-title {
   margin: 0;
   color: var(--ink);
-  font-size: clamp(1.12rem, 2vw, 1.34rem);
-  font-weight: 800;
-  line-height: 1.22;
-  letter-spacing: -0.03em;
+  font-family: "Iowan Old Style", "Source Han Serif SC", "Songti SC", serif;
+  font-size: clamp(1.26rem, 2.2vw, 1.54rem);
+  font-weight: 900;
+  line-height: 1.16;
+  letter-spacing: -0.045em;
   text-wrap: balance;
 }
 
 .event-card-summary {
   margin: 0;
   max-width: 34ch;
-  color: var(--ink-secondary);
-  font-size: 0.97rem;
-  line-height: 1.72;
+  color: rgba(var(--ink-rgb), 0.62);
+  font-size: 0.94rem;
+  line-height: 1.76;
 }
 
 .event-media,
@@ -3736,8 +3737,8 @@ img {
 }
 
 .event-card-link-home .detail-pills {
-  padding-top: 14px;
-  border-top: 1px solid rgba(var(--line-rgb), 0.72);
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
 }
 
 .gallery-media img,
