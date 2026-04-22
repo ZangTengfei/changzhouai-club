@@ -1,6 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import {
+  DoodleSmile,
+  DoodleSparkles,
+  EventHostIllustration,
+  FlowPeopleIllustration,
+  HandDrawnArrow,
+  JoinCommunityIllustration,
+} from "@/components/home-visual-assets";
 import { SiteSponsors } from "@/components/site-sponsors";
 import { SocialPlatformIcon } from "@/components/social-platform-icon";
 import {
@@ -44,22 +52,37 @@ const homeFlowSteps = [
     step: "01",
     title: "参与活动",
     summary: "线下交流、主题分享、拓展你的 AI 视野",
-    illustration: "见",
     tone: "green",
+    assetNeed: "可替换为：两位成员在桌边交流的 SVG 插画",
   },
   {
     step: "02",
     title: "认识成员",
     summary: "通过交流发现更合拍的伙伴，建立信任连接",
-    illustration: "识",
     tone: "orange",
+    assetNeed: "可替换为：握手/交换想法的人物 SVG 插画",
   },
   {
     step: "03",
     title: "合作共建",
     summary: "项目合作、资源对接，让想法真正落地",
-    illustration: "创",
     tone: "blue",
+    assetNeed: "可替换为：拼图/项目共创人物 SVG 插画",
+  },
+] as const;
+
+const homeAssetGaps = [
+  {
+    title: "人物插画源文件",
+    detail: "首页流程、下一场活动、加入社群这三类人物，最好补同一套 Figma/SVG。",
+  },
+  {
+    title: "装饰图案规范",
+    detail: "星星、笑脸、手绘箭头、贴纸胶带、对勾等小元素需要统一笔触和颜色。",
+  },
+  {
+    title: "活动照片精选",
+    detail: "需要 1 张横向主视觉照片和 3 张缩略图，建议统一裁切比例和明暗风格。",
   },
 ];
 
@@ -150,6 +173,7 @@ export default async function HomePage() {
             连接常州的开发者、产品人、创业者和 AI 爱好者，一起探索 AI、
             落地创新，推动本地 AI 生态发展。
           </p>
+          <HandDrawnArrow className="home-hero-arrow" />
 
           <div className="home-hero-actions">
             <Link href="/join" className="button home-primary-button">
@@ -234,6 +258,8 @@ export default async function HomePage() {
               {note.text}
             </p>
           ))}
+          <DoodleSparkles className="home-doodle home-doodle-hero-sparkles" />
+          <DoodleSmile className="home-doodle home-doodle-hero-smile" />
         </div>
       </section>
 
@@ -266,8 +292,15 @@ export default async function HomePage() {
                 <span>{item.step}</span>
                 <h3>{item.title}</h3>
                 <p>{item.summary}</p>
-                <div className="home-flow-illustration" aria-hidden="true">
-                  {item.illustration}
+                <div
+                  className="home-flow-illustration"
+                  aria-hidden="true"
+                  title={item.assetNeed}
+                >
+                  <FlowPeopleIllustration
+                    tone={item.tone}
+                    className="home-flow-illustration-svg"
+                  />
                 </div>
                 {index < homeFlowSteps.length - 1 ? (
                   <i className="home-flow-arrow" aria-hidden="true" />
@@ -306,7 +339,8 @@ export default async function HomePage() {
               查看活动详情
               <span aria-hidden="true">→</span>
             </Link>
-            <div className="home-event-person" aria-hidden="true" />
+            <EventHostIllustration className="home-event-person" />
+            <DoodleSparkles className="home-doodle home-doodle-event-sparkles" />
           </article>
         </div>
       </section>
@@ -386,7 +420,23 @@ export default async function HomePage() {
               </small>
             </div>
           </div>
+          <JoinCommunityIllustration className="home-join-illustration" />
         </article>
+      </section>
+
+      <section className="home-asset-plan" aria-labelledby="home-asset-plan-title">
+        <div>
+          <p className="home-kicker">视觉资产还原计划</p>
+          <h2 id="home-asset-plan-title">下一步需要补齐这些素材</h2>
+        </div>
+        <div className="home-asset-gap-grid">
+          {homeAssetGaps.map((item) => (
+            <article key={item.title}>
+              <h3>{item.title}</h3>
+              <p>{item.detail}</p>
+            </article>
+          ))}
+        </div>
       </section>
 
       <section className="home-social-section" aria-labelledby="home-social-title">

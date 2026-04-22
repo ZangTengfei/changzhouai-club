@@ -1400,6 +1400,14 @@ img {
   line-height: 1.8;
 }
 
+.home-hero-arrow {
+  width: 190px;
+  height: auto;
+  margin: -12px 0 -8px 55%;
+  color: var(--accent);
+  transform: rotate(-4deg);
+}
+
 .home-hero-actions {
   display: flex;
   flex-wrap: wrap;
@@ -1612,6 +1620,27 @@ img {
   transform: rotate(8deg);
 }
 
+.home-doodle {
+  position: absolute;
+  z-index: 4;
+  width: 84px;
+  height: auto;
+  pointer-events: none;
+}
+
+.home-doodle-hero-sparkles {
+  right: 122px;
+  top: 104px;
+  color: #f4c75d;
+}
+
+.home-doodle-hero-smile {
+  right: -12px;
+  bottom: 142px;
+  width: 54px;
+  color: #4ba4e8;
+}
+
 .home-stats-panel {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1788,12 +1817,22 @@ img {
 .home-flow-card {
   position: relative;
   display: grid;
-  min-height: 220px;
-  padding: 26px 22px 16px;
+  min-height: 252px;
+  padding: 26px 22px 12px;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.72);
   box-shadow: 0 14px 32px rgba(var(--ink-rgb), 0.05);
+  overflow: hidden;
+}
+
+.home-flow-card::before {
+  content: "";
+  position: absolute;
+  inset: auto 18px 12px;
+  height: 58px;
+  border-radius: 999px;
+  background: rgba(var(--accent-rgb), 0.06);
 }
 
 .home-flow-card span {
@@ -1816,33 +1855,31 @@ img {
 .home-flow-illustration {
   align-self: end;
   justify-self: end;
-  display: grid;
-  place-items: center;
-  width: 74px;
-  height: 74px;
-  margin-top: 16px;
-  border-radius: 24px;
-  background: rgba(var(--accent-rgb), 0.1);
-  color: var(--accent);
-  font-size: 2rem;
-  font-weight: 900;
+  position: relative;
+  z-index: 1;
+  width: min(100%, 176px);
+  margin: 8px -14px -10px 0;
 }
 
-.home-flow-card-orange span,
-.home-flow-card-orange .home-flow-illustration {
+.home-flow-illustration-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.home-flow-card-orange span {
   color: #ee7f18;
 }
 
-.home-flow-card-blue span,
-.home-flow-card-blue .home-flow-illustration {
+.home-flow-card-blue span {
   color: #2a7bd3;
 }
 
-.home-flow-card-orange .home-flow-illustration {
+.home-flow-card-orange::before {
   background: rgba(238, 127, 24, 0.11);
 }
 
-.home-flow-card-blue .home-flow-illustration {
+.home-flow-card-blue::before {
   background: rgba(42, 123, 211, 0.1);
 }
 
@@ -1897,16 +1934,17 @@ img {
 
 .home-event-person {
   position: absolute;
-  right: 28px;
+  right: 12px;
   bottom: 0;
-  width: 150px;
-  height: 190px;
-  border-radius: 72px 72px 0 0;
-  background:
-    radial-gradient(circle at 50% 24%, #332218 0 21px, transparent 22px),
-    radial-gradient(circle at 55% 38%, #f4bd89 0 30px, transparent 31px),
-    linear-gradient(90deg, transparent 0 38%, #f0a552 39% 62%, transparent 63%),
-    linear-gradient(180deg, transparent 0 48%, #ffd76d 49%);
+  width: 180px;
+  height: auto;
+}
+
+.home-doodle-event-sparkles {
+  right: 118px;
+  top: 24px;
+  width: 50px;
+  color: #f4c75d;
 }
 
 .home-lower-grid {
@@ -2005,10 +2043,12 @@ img {
 }
 
 .home-join-card {
+  position: relative;
   display: grid;
   grid-template-columns: minmax(0, 0.8fr) minmax(280px, 1fr);
   gap: 26px;
   align-items: center;
+  overflow: hidden;
   background:
     radial-gradient(circle at 92% 20%, rgba(255, 204, 82, 0.18), transparent 20%),
     rgba(255, 255, 255, 0.76);
@@ -2065,6 +2105,70 @@ img {
 .home-wechat-row small {
   margin-top: 14px;
   color: rgba(var(--ink-rgb), 0.62);
+  line-height: 1.7;
+}
+
+.home-join-illustration {
+  position: absolute;
+  right: 8px;
+  bottom: -18px;
+  width: 184px;
+  height: auto;
+  opacity: 0.92;
+  pointer-events: none;
+}
+
+.home-asset-plan {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.38fr) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+  padding: 26px;
+  border: 1px dashed rgba(var(--accent-rgb), 0.24);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 96% 16%, rgba(244, 199, 93, 0.18), transparent 20%),
+    rgba(255, 255, 255, 0.62);
+}
+
+.home-asset-plan h2,
+.home-asset-gap-grid h3,
+.home-asset-gap-grid p {
+  margin: 0;
+}
+
+.home-asset-plan h2 {
+  margin-top: 12px;
+  color: var(--ink);
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  line-height: 1.18;
+  letter-spacing: -0.04em;
+}
+
+.home-asset-gap-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.home-asset-gap-grid article {
+  min-height: 132px;
+  padding: 18px;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 12px 28px rgba(var(--ink-rgb), 0.04);
+}
+
+.home-asset-gap-grid h3 {
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+.home-asset-gap-grid p {
+  margin-top: 10px;
+  color: rgba(var(--ink-rgb), 0.62);
+  font-size: 0.9rem;
   line-height: 1.7;
 }
 
@@ -5206,7 +5310,9 @@ img {
   }
 
   .home-flow-cards,
-  .home-social-grid {
+  .home-social-grid,
+  .home-asset-plan,
+  .home-asset-gap-grid {
     grid-template-columns: 1fr;
   }
 
@@ -5224,6 +5330,11 @@ img {
 
   .home-event-person {
     display: none;
+  }
+
+  .home-join-illustration {
+    width: 132px;
+    opacity: 0.36;
   }
 
   .account-dropdown {
@@ -5401,6 +5512,11 @@ img {
     line-height: 1.72;
   }
 
+  .home-hero-arrow {
+    width: 142px;
+    margin-left: 42%;
+  }
+
   .home-hero-actions {
     display: grid;
     grid-template-columns: 1fr;
@@ -5471,6 +5587,16 @@ img {
     bottom: 0;
   }
 
+  .home-doodle-hero-sparkles {
+    top: 86px;
+    right: 72px;
+    width: 54px;
+  }
+
+  .home-doodle-hero-smile {
+    display: none;
+  }
+
   .home-stats-panel {
     grid-template-columns: 1fr;
     gap: 0;
@@ -5501,6 +5627,10 @@ img {
     padding: 22px;
   }
 
+  .home-flow-illustration {
+    width: 156px;
+  }
+
   .home-next-event-card {
     min-height: auto;
   }
@@ -5518,6 +5648,18 @@ img {
   .home-wechat-placeholder {
     width: 160px;
     height: 160px;
+  }
+
+  .home-join-illustration {
+    display: none;
+  }
+
+  .home-asset-plan {
+    padding: 20px;
+  }
+
+  .home-asset-gap-grid article {
+    min-height: auto;
   }
 
   .home-footer-socials {
