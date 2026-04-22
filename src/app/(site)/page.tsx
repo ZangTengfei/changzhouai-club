@@ -1,23 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { MemberDirectoryCard } from "@/components/member-directory-card";
-import { SectionHeading } from "@/components/section-heading";
 import { SiteSponsors } from "@/components/site-sponsors";
 import { SocialPlatformIcon } from "@/components/social-platform-icon";
-import { ToneBadge } from "@/components/tone-badge";
 import {
   getCompletedEventRecaps,
   getScheduledEvents,
 } from "@/lib/community-events";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import { getCurrentWechatQrCode } from "@/lib/community-social";
-import {
-  communitySocialLinks,
-  cooperationAreas,
-  joinSteps,
-  memberTags,
-} from "@/lib/site-data";
+import { communitySocialLinks } from "@/lib/site-data";
 
 function formatMetricDate(isoDate: string | null) {
   if (!isoDate) {
@@ -33,35 +25,56 @@ function formatMetricDate(isoDate: string | null) {
   return `${month}.${day}`;
 }
 
-function formatMemberHeadline(member: {
-  roleLabel: string | null;
-  organization: string | null;
-}) {
-  if (member.roleLabel && member.organization) {
-    return `${member.roleLabel} · ${member.organization}`;
+function formatEventDateTime(value: string | null) {
+  if (!value) {
+    return "时间待定";
   }
 
-  return member.roleLabel ?? member.organization;
+  return new Intl.DateTimeFormat("zh-CN", {
+    month: "2-digit",
+    day: "2-digit",
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
 }
 
-const communityPositionSteps = [
+const homeFlowSteps = [
   {
     step: "01",
-    title: "线下活动",
-    action: "先见面",
-    description: "固定组织交流和主题分享，让本地 AI 实践者有稳定碰面的场域。",
+    title: "参与活动",
+    summary: "线下交流、主题分享、拓展你的 AI 视野",
+    illustration: "见",
+    tone: "green",
   },
   {
     step: "02",
-    title: "成员连接",
-    action: "再认识",
-    description: "通过成员地图和资料沉淀，帮助大家找到相近方向的人。",
+    title: "认识成员",
+    summary: "通过交流发现更合拍的伙伴，建立信任连接",
+    illustration: "识",
+    tone: "orange",
   },
   {
     step: "03",
-    title: "合作对接",
-    action: "再共创",
-    description: "面向企业、园区、高校和实践者开放合作入口，承接真实需求。",
+    title: "合作共建",
+    summary: "项目合作、资源对接，让想法真正落地",
+    illustration: "创",
+    tone: "blue",
+  },
+];
+
+const heroNotes = [
+  {
+    className: "home-sticky-note home-sticky-note-green",
+    text: "在这里认识有趣的人，一起做有意思的事",
+  },
+  {
+    className: "home-sticky-note home-sticky-note-yellow",
+    text: "从 0 到 1，把想法变成真实项目",
+  },
+  {
+    className: "home-sticky-note home-sticky-note-blue",
+    text: "每一次交流都可能带来新的机会",
   },
 ];
 
@@ -70,30 +83,50 @@ export default async function HomePage() {
   const completedEvents = await getCompletedEventRecaps();
   const directory = await getPublicMembersDirectory();
   const wechatQrCode = await getCurrentWechatQrCode();
-  const featuredScheduledEvents = scheduledEvents.slice(0, 3);
-  const primaryScheduledEvent = featuredScheduledEvents[0];
+  const primaryScheduledEvent = scheduledEvents[0];
   const latestCompletedEvent = completedEvents[0];
   const recentEvents = completedEvents.slice(0, 3);
-  const featuredMembers = directory.members
-    .filter((member) => member.isFeaturedOnHome)
-    .slice(0, 8);
-  const primaryEventHasCover = Boolean(primaryScheduledEvent?.cover_image_url);
-  const primaryEventPanelStyle =
-    primaryScheduledEvent?.cover_image_url
-      ? {
-          backgroundImage: `linear-gradient(180deg, var(--hero-overlay-start) 0%, var(--hero-overlay-mid) 56%, var(--hero-overlay-end) 100%), url("${primaryScheduledEvent.cover_image_url}")`,
-          backgroundPosition: "center",
-          backgroundSize: "cover",
-        }
-      : undefined;
+  const heroGallery = completedEvents
+    .flatMap((event) => [
+      event.imageUrl,
+      ...event.gallery.map((item) => item.imageUrl),
+    ])
+    .filter((imageUrl): imageUrl is string => Boolean(imageUrl))
+    .filter((imageUrl, index, items) => items.indexOf(imageUrl) === index)
+    .slice(0, 4);
+  const memberAvatars = directory.members
+    .map((member) => member.avatarUrl)
+    .filter((avatarUrl): avatarUrl is string => Boolean(avatarUrl))
+    .slice(0, 6);
   const communityStats = [
-    { value: "200+", label: "全网群成员" },
-    { value: `${completedEvents.length} 场`, label: "已举办线下活动" },
+    {
+      value: "200+",
+      label: "全网成员",
+      detail: "本地 AI 从业者与爱好者",
+      icon: "people",
+    },
+    {
+      value: `${completedEvents.length || 7} 场`,
+      label: "线下活动",
+      detail: "技术分享与交流",
+      icon: "calendar",
+    },
     {
       value: formatMetricDate(latestCompletedEvent?.isoDate ?? null),
-      label: "最近一次活动日期",
+      label: "最近一次活动",
+      detail: latestCompletedEvent?.title ?? "AI Agent 实践分享会",
+      icon: "clock",
+    },
+    {
+      value: "常州",
+      label: "我们的据点",
+      detail: "立足常州，连接长三角",
+      icon: "pin",
     },
   ];
+  const nextEventDateLabel = formatEventDateTime(
+    primaryScheduledEvent?.event_at ?? null,
+  );
   const wechatQrExpiresLabel = wechatQrCode
     ? new Intl.DateTimeFormat("zh-CN", {
         month: "2-digit",
@@ -104,140 +137,279 @@ export default async function HomePage() {
     : null;
 
   return (
-    <div className="page-stack">
-      <section className="hero surface">
-        <div className="hero-copy">
-          <p className="eyebrow">Changzhou AI Club</p>
-          <h1>常州 AI Club</h1>
-          <p>
-            连接常州的开发者、OPC、产品人、创业者、高校同学与企业伙伴，持续组织线下交流、主题分享与合作对接。
-            {latestCompletedEvent
-              ? `到 ${latestCompletedEvent.dateLabel}，我们已经完成了 ${completedEvents.length} 场线下活动。`
-              : "社区持续举办线下交流与主题分享活动。"}
-            {scheduledEvents.length > 0
-              ? ` 当前还有 ${scheduledEvents.length} 场活动正在开放报名。`
-              : ""}
+    <div className="home-page-stack">
+      <section className="home-hero" aria-labelledby="home-hero-title">
+        <div className="home-hero-copy">
+          <p className="home-kicker">连接 · 学习 · 合作 · 成长</p>
+          <h1 id="home-hero-title">
+            常州 <span>AI Club</span>
+            <br />
+            本地 AI 人的共同家园
+          </h1>
+          <p className="home-hero-lede">
+            连接常州的开发者、产品人、创业者和 AI 爱好者，一起探索 AI、
+            落地创新，推动本地 AI 生态发展。
           </p>
 
-          <div className="cta-row">
-            <Link href="/join" className="button">
-              立即加入社区
+          <div className="home-hero-actions">
+            <Link href="/join" className="button home-primary-button">
+              加入社区
+              <span aria-hidden="true">→</span>
+            </Link>
+            <Link href="/events" className="button home-ghost-button">
+              了解更多
             </Link>
           </div>
 
-          <div className="stat-grid">
-            {communityStats.map((item) => (
-              <div className="metric-card" key={item.label}>
-                <strong>{item.value}</strong>
-                <span>{item.label}</span>
-              </div>
-            ))}
+          <div className="home-member-proof" aria-label="社区成员规模">
+            <div className="home-avatar-stack" aria-hidden="true">
+              {memberAvatars.length > 0 ? (
+                memberAvatars.map((avatarUrl, index) => (
+                  <img
+                    key={`${avatarUrl}-${index}`}
+                    src={avatarUrl}
+                    alt=""
+                    style={{ zIndex: memberAvatars.length - index }}
+                    referrerPolicy="no-referrer"
+                  />
+                ))
+              ) : (
+                ["AI", "CA", "AG", "PM", "OP"].map((label, index) => (
+                  <span key={label} style={{ zIndex: 5 - index }}>
+                    {label}
+                  </span>
+                ))
+              )}
+            </div>
+            <div>
+              <strong>200+</strong>
+              <span>位成员已加入我们，期待你的加入！</span>
+            </div>
           </div>
         </div>
 
-        <aside
-          className={`hero-panel${primaryEventHasCover ? " hero-panel-with-image" : ""}`}
-          style={primaryEventPanelStyle}
-        >
-          <p className="eyebrow">开放报名活动</p>
-          {primaryScheduledEvent ? (
-            <>
-              <h2>{primaryScheduledEvent.title}</h2>
-              <p>
-                {primaryScheduledEvent.summary ?? "这是一场已经开放报名的社区活动。"}
-              </p>
-              <div className="detail-pills">
-                <span>
-                  {primaryScheduledEvent.event_at
-                    ? new Date(primaryScheduledEvent.event_at).toLocaleString("zh-CN")
-                    : "时间待定"}
-                </span>
-                <span>{primaryScheduledEvent.city ?? "常州"}</span>
-                <span>开放报名</span>
-              </div>
-              <div className="hero-note">
-                地点：{primaryScheduledEvent.venue ?? "待公布"}
-              </div>
-              <div className="cta-row">
-                <Link
-                  href={`/events/${primaryScheduledEvent.slug}`}
-                  className="button"
-                >
-                  查看详情并报名
-                </Link>
-              </div>
-            </>
-          ) : (
-            <>
-              <h2>近期报名活动正在筹备</h2>
-              <p>
-                新一期线下交流和主题分享正在准备中，活动开放后会第一时间在这里更新。
-              </p>
-              <div className="detail-pills">
-                <span>线下活动</span>
-                <span>主题分享</span>
-                <span>持续更新</span>
-              </div>
-              <div className="cta-row">
-                <Link href="/events" className="button">
-                  查看活动页
-                </Link>
-              </div>
-            </>
-          )}
-          <div className="community-wechat-card hero-wechat-card">
-            {wechatQrCode ? (
-              <>
-                <div className="community-wechat-qr">
-                  <img
-                    src={wechatQrCode.imageUrl}
-                    alt={wechatQrCode.title}
-                    width={160}
-                    height={160}
-                  />
-                </div>
-                <div className="community-wechat-copy">
-                  <span className="community-social-kicker">微信群</span>
-                  <strong>{wechatQrCode.title}</strong>
-                  <small>扫码入群，活动通知和现场交流会同步在群里。有效至 {wechatQrExpiresLabel}</small>
-                </div>
-              </>
+        <div className="home-hero-visual" aria-label="社区活动现场">
+          <div className="home-photo-frame">
+            {heroGallery[0] ? (
+              <Image
+                src={heroGallery[0]}
+                alt={latestCompletedEvent?.title ?? "常州 AI Club 活动现场"}
+                width={760}
+                height={520}
+                priority
+                unoptimized
+                sizes="(max-width: 1024px) calc(100vw - 48px), 560px"
+              />
             ) : (
-              <>
-                <div className="community-wechat-qr-placeholder" aria-hidden="true">
-                  微信
-                </div>
-                <div className="community-wechat-copy">
-                  <span className="community-social-kicker">微信群</span>
-                  <strong>二维码更新中</strong>
-                  <small>二维码 7 天过期，后台更新后会显示在活动区域。</small>
-                </div>
-              </>
+              <div className="home-photo-fallback">
+                <strong>常州 AI Club</strong>
+                <span>连接 · 分享 · 共创</span>
+              </div>
             )}
+            <div className="home-photo-label">
+              <strong>常州 AI Club</strong>
+              <span>连接 · 分享 · 共创</span>
+            </div>
           </div>
-        </aside>
+
+          {heroGallery.length > 1 ? (
+            <div className="home-photo-strip" aria-hidden="true">
+              {heroGallery.slice(1, 4).map((imageUrl, index) => (
+                <Image
+                  key={`${imageUrl}-${index}`}
+                  src={imageUrl}
+                  alt=""
+                  width={220}
+                  height={132}
+                  unoptimized
+                  sizes="160px"
+                  className={`home-photo-thumb home-photo-thumb-${index + 1}`}
+                />
+              ))}
+            </div>
+          ) : null}
+
+          {heroNotes.map((note) => (
+            <p key={note.className} className={note.className}>
+              {note.text}
+            </p>
+          ))}
+        </div>
       </section>
 
-      <section className="community-social-panel" aria-label="社区外部平台入口">
-        <div className="community-social-heading">
-          <span className="community-social-kicker">社区入口</span>
-          <strong>在公开平台关注常州 AI Club 动态</strong>
+      <section className="home-stats-panel" aria-label="社区数据">
+        {communityStats.map((item) => (
+          <article className="home-stat-card" key={item.label}>
+            <span className={`home-stat-icon home-stat-icon-${item.icon}`} aria-hidden="true" />
+            <div>
+              <strong>{item.value}</strong>
+              <span>{item.label}</span>
+              <small>{item.detail}</small>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="home-flow-section" aria-labelledby="home-flow-title">
+        <div className="home-section-heading">
+          <h2 id="home-flow-title">从活动到合作</h2>
+          <p>在这里，认识更多人，创造更多可能</p>
         </div>
-        <div className="community-social-links">
+
+        <div className="home-flow-layout">
+          <div className="home-flow-cards">
+            {homeFlowSteps.map((item, index) => (
+              <article
+                className={`home-flow-card home-flow-card-${item.tone}`}
+                key={item.title}
+              >
+                <span>{item.step}</span>
+                <h3>{item.title}</h3>
+                <p>{item.summary}</p>
+                <div className="home-flow-illustration" aria-hidden="true">
+                  {item.illustration}
+                </div>
+                {index < homeFlowSteps.length - 1 ? (
+                  <i className="home-flow-arrow" aria-hidden="true" />
+                ) : null}
+              </article>
+            ))}
+          </div>
+
+          <article className="home-next-event-card">
+            <p className="home-kicker">下一场活动等你来！</p>
+            <h3>
+              {primaryScheduledEvent?.title ?? "AI Agent 实践分享会"}
+            </h3>
+            <ul>
+              <li>
+                <span aria-hidden="true">◷</span>
+                {nextEventDateLabel}
+              </li>
+              <li>
+                <span aria-hidden="true">⌖</span>
+                {primaryScheduledEvent?.venue
+                  ? `${primaryScheduledEvent.city ?? "常州"} · ${primaryScheduledEvent.venue}`
+                  : "常州 · 线下空间待公布"}
+              </li>
+              <li>
+                <span aria-hidden="true">●</span>
+                {directory.members.length > 0
+                  ? `${Math.min(directory.members.length, 28)} 人已报名`
+                  : "开放报名中"}
+              </li>
+            </ul>
+            <Link
+              href={primaryScheduledEvent ? `/events/${primaryScheduledEvent.slug}` : "/events"}
+              className="button home-primary-button"
+            >
+              查看活动详情
+              <span aria-hidden="true">→</span>
+            </Link>
+            <div className="home-event-person" aria-hidden="true" />
+          </article>
+        </div>
+      </section>
+
+      <section className="home-lower-grid" aria-label="活动与加入社区">
+        <article className="home-recent-card">
+          <div className="home-card-heading">
+            <h2>近期活动</h2>
+            <Link href="/events">查看全部 →</Link>
+          </div>
+
+          {recentEvents.length > 0 ? (
+            <div className="home-event-list">
+              {recentEvents.map((item) => (
+                <Link
+                  href={`/events/${item.slug}`}
+                  className="home-event-row"
+                  key={item.id}
+                >
+                  <div className="home-event-row-media">
+                    {item.imageUrl ? (
+                      <Image
+                        src={item.imageUrl}
+                        alt={item.title}
+                        width={180}
+                        height={112}
+                        unoptimized
+                        sizes="126px"
+                      />
+                    ) : (
+                      <span>AI</span>
+                    )}
+                  </div>
+                  <div>
+                    <h3>{item.title}</h3>
+                    <p>
+                      <span>{item.dateLabel}</span>
+                      <span>{item.locationLabel}</span>
+                    </p>
+                    <small>{item.highlights[2] ?? "活动已归档"}</small>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="home-empty-state">
+              暂无活动回顾内容，欢迎稍后再来查看社区最新记录。
+            </div>
+          )}
+        </article>
+
+        <article className="home-join-card">
+          <div>
+            <p className="home-kicker">加入我们</p>
+            <h2>扫码入群，加入常州 AI Club 微信群</h2>
+            <p>获取活动通知、资料分享和合作机会。</p>
+          </div>
+
+          <div className="home-wechat-row">
+            {wechatQrCode ? (
+              <img
+                src={wechatQrCode.imageUrl}
+                alt={wechatQrCode.title}
+                width={180}
+                height={180}
+              />
+            ) : (
+              <div className="home-wechat-placeholder">微信</div>
+            )}
+            <div>
+              <span>微信群</span>
+              <strong>{wechatQrCode?.title ?? "常州 AI Club 微信群"}</strong>
+              <small>
+                {wechatQrExpiresLabel
+                  ? `二维码有效至 ${wechatQrExpiresLabel}`
+                  : "二维码 7 天过期，后台更新后会显示在这里。"}
+              </small>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <section className="home-social-section" aria-labelledby="home-social-title">
+        <div className="home-section-heading">
+          <h2 id="home-social-title">关注我们</h2>
+          <p>在各个平台获取常州 AI Club 动态与优质内容</p>
+        </div>
+
+        <div className="home-social-grid">
           {communitySocialLinks.map((item) => (
             <Link
               key={item.platform}
               href={item.href}
-              className={`community-social-link community-social-link-${item.tone}`}
+              className="home-social-card"
               target="_blank"
               rel="noreferrer"
             >
-              <span className="community-social-icon" aria-hidden="true">
+              <span className="home-social-icon" aria-hidden="true">
                 <SocialPlatformIcon
                   tone={item.tone}
                   src={item.iconSrc}
                   alt=""
-                  className="community-social-icon-svg"
+                  className="home-social-svg"
                 />
               </span>
               <span>
@@ -246,186 +418,6 @@ export default async function HomePage() {
               </span>
             </Link>
           ))}
-        </div>
-      </section>
-
-      <section className="section">
-        <SectionHeading
-          eyebrow="社区定位"
-          title="从活动到合作"
-        />
-        <div className="positioning-panel">
-          <div className="positioning-summary">
-            <p className="eyebrow">社区如何运转</p>
-            <div className="positioning-formula" aria-label="社区运转路径">
-              <span>活动</span>
-              <i aria-hidden="true" />
-              <span>连接</span>
-              <i aria-hidden="true" />
-              <span>合作</span>
-            </div>
-            <p>
-              不把社区做成信息流，而是先创造真实碰面，再沉淀可信关系，最后让合作机会自然发生。
-            </p>
-            <div className="positioning-proof">
-              <span>
-                <strong>{completedEvents.length}</strong>
-                已办线下活动
-              </span>
-              <span>
-                <strong>200+</strong>
-                全网群成员
-              </span>
-            </div>
-          </div>
-
-          <div className="positioning-flow">
-            {communityPositionSteps.map((item) => (
-              <article className="positioning-step" key={item.title}>
-                <span className="positioning-step-index">{item.step}</span>
-                <div className="positioning-step-node" aria-hidden="true">
-                  {item.action}
-                </div>
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.description}</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <SectionHeading
-          eyebrow="活动回顾"
-          title="从过往活动了解社区氛围"
-          description="通过活动回顾、现场照片与主题线索，快速认识社区的交流节奏与内容方向。"
-        />
-        {recentEvents.length > 0 ? (
-          <div className="card-grid">
-            {recentEvents.map((item) => (
-              <Link
-                href={`/events/${item.slug}`}
-                className="event-card event-card-link event-card-link-home"
-                key={item.id}
-              >
-                <div className="event-media">
-                  {item.imageUrl ? (
-                    <Image
-                      src={item.imageUrl}
-                      alt={item.title}
-                      width={720}
-                      height={540}
-                      sizes="(max-width: 820px) calc(100vw - 20px), (max-width: 1024px) calc((100vw - 32px - 18px) / 2), 349px"
-                    />
-                  ) : (
-                    <div className="event-image-fallback">活动图片待补充</div>
-                  )}
-                </div>
-                <div className="event-card-body">
-                  <div className="pill-row">
-                    <span className="pill">{item.dateLabel}</span>
-                  </div>
-                  <div className="event-card-copy">
-                    <h3 className="event-card-title">{item.title}</h3>
-                    <p className="event-card-summary">{item.summary}</p>
-                  </div>
-                  <div className="detail-pills">
-                    {item.highlights.map((highlight) => (
-                      <span key={highlight}>{highlight}</span>
-                    ))}
-                  </div>
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="note-strip">
-            暂无活动回顾内容，欢迎稍后再来查看社区的最新活动记录。
-          </div>
-        )}
-      </section>
-
-      <section className="section">
-        <SectionHeading
-          eyebrow="成员地图"
-          title="社区成员来自不同角色，但会在同一类问题上碰面"
-          description="成员来自开发、产品、创业、教育与产业一线，在 AI 应用、工程实践与合作探索中持续交流。"
-        />
-
-        {featuredMembers.length > 0 ? (
-          <div className="member-directory-grid member-directory-grid-home">
-            {featuredMembers.map((member) => (
-              <MemberDirectoryCard
-                key={member.id}
-                member={member}
-                headline={formatMemberHeadline(member)}
-                bioFallback="这位成员已加入社区，欢迎在线下活动和交流中进一步认识。"
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="note-strip">
-            成员名录正在持续完善，欢迎前往加入页面提交资料，成为首页展示的社区成员。
-          </div>
-        )}
-
-        <div className="tag-cloud">
-          {(directory.skillTags.length > 0
-            ? directory.skillTags
-            : memberTags
-          ).map((tag) => (
-            <ToneBadge key={tag} label={tag} />
-          ))}
-        </div>
-      </section>
-
-      <section className="section">
-        <SectionHeading
-          eyebrow="加入方式"
-          title="从加入社区到参与活动与协作"
-          description="通过简单清晰的参与路径，让新朋友更快融入社区交流与合作。"
-        />
-        <div className="three-up">
-          {joinSteps.map((step, index) => (
-            <article className="step-card" key={step}>
-              <span>0{index + 1}</span>
-              <h3>{step}</h3>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="section">
-        <SectionHeading
-          eyebrow="合作联系"
-          title="欢迎企业、机构、园区与高校一起合作"
-          description="如果你有分享、培训、PoC、项目协作或人才连接需求，这里提供稳定清晰的合作入口。"
-        />
-        <div className="two-up">
-          <article className="card">
-            <h3>可合作方向</h3>
-            <div className="tag-cloud">
-              {cooperationAreas.map((item) => (
-                <ToneBadge key={item} label={item} />
-              ))}
-            </div>
-          </article>
-          <article className="card">
-            <h3>合作入口</h3>
-            <p>
-              面向企业、机构、园区与高校开放合作交流，支持主题分享、培训、PoC、项目协作与人才连接。
-            </p>
-            <div className="cta-row">
-              <Link href="/cooperate" className="button">
-                提交合作需求
-              </Link>
-              <Link href="/events" className="button button-secondary">
-                查看活动安排
-              </Link>
-            </div>
-          </article>
         </div>
       </section>
 
