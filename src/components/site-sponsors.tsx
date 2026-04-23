@@ -36,7 +36,6 @@ export async function SiteSponsors() {
                     </div>
                   ) : <span className="home-sponsor-logo-fallback">{sponsor.name}</span>}
                 </div>
-                <p className="home-sponsor-summary">{sponsor.summary}</p>
               </Link>
             ))}
           </div>
