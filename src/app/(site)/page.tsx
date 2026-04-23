@@ -354,7 +354,7 @@ export default async function HomePage() {
               </Link>
             </div>
             <Image
-              src="/event-card-character.png"
+              src="/event-card-character-v2.png"
               alt=""
               width={1024}
               height={1536}
