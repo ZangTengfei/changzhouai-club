@@ -1534,7 +1534,7 @@ img {
 .home-photo-frame {
   position: relative;
   overflow: hidden;
-  margin-top: 34px;
+  margin-top: 58px;
   border-radius: 6px;
   background: #e8efe7;
   box-shadow:
@@ -1682,9 +1682,9 @@ img {
 
 .home-sticky-note-blue {
   right: -4px;
-  bottom: 8px;
+  bottom: -8px;
   background: #cbeaff;
-  transform: translateY(12px) rotate(11deg);
+  transform: translateY(18px) rotate(12deg);
 }
 
 .home-doodle {
