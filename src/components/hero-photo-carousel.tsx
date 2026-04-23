@@ -69,10 +69,6 @@ export function HeroPhotoCarousel({
             <span>连接 · 分享 · 共创</span>
           </div>
         )}
-        <div className="home-photo-label">
-          <strong>常州 AI Club</strong>
-          <span>连接 · 分享 · 共创</span>
-        </div>
       </div>
 
       {visibleImages.length > 0 ? (
