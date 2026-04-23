@@ -54,10 +54,10 @@
   --accent-warm-strong: #a7602f;
   --status-muted-strong: #48605c;
   --status-muted: #4c6663;
-  --body-glow-start: rgba(var(--accent-rgb), 0.15);
-  --body-glow-end: rgba(var(--accent-warm-rgb), 0.18);
-  --body-gradient-start: #f6f1e9;
-  --body-gradient-end: #f2ebdf;
+  --body-glow-start: rgba(var(--accent-rgb), 0.08);
+  --body-glow-end: rgba(var(--accent-warm-rgb), 0.09);
+  --body-gradient-start: #f7f3ed;
+  --body-gradient-end: #f4efe7;
   --hero-overlay-start: rgba(18, 37, 36, 0.22);
   --hero-overlay-mid: rgba(18, 37, 36, 0.66);
   --hero-overlay-end: rgba(18, 37, 36, 0.92);
@@ -158,8 +158,8 @@ body {
   margin: 0;
   color: var(--ink);
   background:
-    radial-gradient(circle at top left, var(--body-glow-start), transparent 30%),
-    radial-gradient(circle at 85% 12%, var(--body-glow-end), transparent 26%),
+    radial-gradient(circle at top left, var(--body-glow-start), transparent 34%),
+    radial-gradient(circle at 85% 12%, var(--body-glow-end), transparent 30%),
     linear-gradient(
       180deg,
       var(--body-gradient-start) 0%,
@@ -191,10 +191,10 @@ img {
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(var(--ink-rgb), 0.02) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(var(--ink-rgb), 0.02) 1px, transparent 1px);
+    linear-gradient(rgba(var(--ink-rgb), 0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(var(--ink-rgb), 0.012) 1px, transparent 1px);
   background-size: 32px 32px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.55), transparent 75%);
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.4), transparent 72%);
 }
 
 .container {
@@ -1156,9 +1156,9 @@ img {
   border: 1px solid rgba(var(--accent-rgb), 0.13);
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(circle at 10% 0%, rgba(var(--accent-rgb), 0.1), transparent 32%),
-    radial-gradient(circle at 92% 12%, rgba(var(--accent-warm-rgb), 0.13), transparent 30%),
-    rgba(var(--surface-rgb), 0.78);
+    radial-gradient(circle at 10% 0%, rgba(var(--accent-rgb), 0.05), transparent 34%),
+    radial-gradient(circle at 92% 12%, rgba(var(--accent-warm-rgb), 0.07), transparent 32%),
+    rgba(var(--surface-rgb), 0.76);
   box-shadow: 0 16px 40px rgba(var(--ink-rgb), 0.07);
 }
 
@@ -1189,7 +1189,7 @@ img {
   border: 1px solid rgba(var(--accent-rgb), 0.14);
   border-radius: 50%;
   background:
-    radial-gradient(circle, rgba(var(--accent-warm-rgb), 0.16), transparent 58%);
+    radial-gradient(circle, rgba(var(--accent-warm-rgb), 0.1), transparent 60%);
   pointer-events: none;
 }
 
@@ -1554,8 +1554,8 @@ img {
   gap: 10px;
   height: 386px;
   background:
-    radial-gradient(circle at 18% 18%, rgba(var(--accent-rgb), 0.16), transparent 28%),
-    linear-gradient(135deg, #e8f1df, #f8edcf);
+    radial-gradient(circle at 18% 18%, rgba(var(--accent-rgb), 0.1), transparent 30%),
+    linear-gradient(135deg, #edf3e7, #faf3df);
   color: var(--accent-strong);
   text-align: center;
 }
@@ -2001,8 +2001,8 @@ img {
   padding: 34px 210px 30px 32px;
   border-radius: 26px;
   background:
-    radial-gradient(circle at 90% 18%, rgba(255, 199, 81, 0.28), transparent 16%),
-    linear-gradient(135deg, rgba(235, 248, 239, 0.96), rgba(244, 250, 246, 0.9));
+    radial-gradient(circle at 90% 18%, rgba(255, 199, 81, 0.12), transparent 18%),
+    linear-gradient(135deg, rgba(240, 249, 243, 0.94), rgba(247, 250, 247, 0.9));
   box-shadow: 0 18px 40px rgba(var(--ink-rgb), 0.07);
 }
 
@@ -2056,7 +2056,7 @@ img {
   padding: 28px;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
   border-radius: 24px;
-  background: rgba(255, 255, 255, 0.76);
+  background: rgba(255, 255, 255, 0.82);
   box-shadow: 0 16px 36px rgba(var(--ink-rgb), 0.06);
 }
 
@@ -2148,8 +2148,8 @@ img {
   align-items: center;
   overflow: hidden;
   background:
-    radial-gradient(circle at 92% 20%, rgba(255, 204, 82, 0.18), transparent 20%),
-    rgba(255, 255, 255, 0.76);
+    radial-gradient(circle at 92% 20%, rgba(255, 204, 82, 0.1), transparent 22%),
+    rgba(255, 255, 255, 0.82);
 }
 
 .home-wechat-row {
@@ -2225,8 +2225,8 @@ img {
   border: 1px dashed rgba(var(--accent-rgb), 0.24);
   border-radius: 24px;
   background:
-    radial-gradient(circle at 96% 16%, rgba(244, 199, 93, 0.18), transparent 20%),
-    rgba(255, 255, 255, 0.62);
+    radial-gradient(circle at 96% 16%, rgba(244, 199, 93, 0.1), transparent 22%),
+    rgba(255, 255, 255, 0.74);
 }
 
 .home-asset-plan h2,
