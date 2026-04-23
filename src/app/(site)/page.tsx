@@ -9,14 +9,12 @@ import {
 } from "@/components/home-visual-assets";
 import { HeroPhotoCarousel } from "@/components/hero-photo-carousel";
 import { SiteSponsors } from "@/components/site-sponsors";
-import { SocialPlatformIcon } from "@/components/social-platform-icon";
 import {
   getCompletedEventRecaps,
   getScheduledEvents,
 } from "@/lib/community-events";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import { getCurrentWechatQrCode } from "@/lib/community-social";
-import { communitySocialLinks } from "@/lib/site-data";
 
 function formatMetricDate(isoDate: string | null) {
   if (!isoDate) {
@@ -554,38 +552,6 @@ export default async function HomePage() {
           <Link href="/join" className="button home-primary-button home-join-banner-button">
             加入社区
           </Link>
-        </div>
-      </section>
-
-      <section className="home-social-section" aria-labelledby="home-social-title">
-        <div className="home-section-heading">
-          <h2 id="home-social-title">关注我们</h2>
-          <p>在各个平台获取常州 AI Club 动态与优质内容</p>
-        </div>
-
-        <div className="home-social-grid">
-          {communitySocialLinks.map((item) => (
-            <Link
-              key={item.platform}
-              href={item.href}
-              className="home-social-card"
-              target="_blank"
-              rel="noreferrer"
-            >
-              <span className="home-social-icon" aria-hidden="true">
-                <SocialPlatformIcon
-                  tone={item.tone}
-                  src={item.iconSrc}
-                  alt=""
-                  className="home-social-svg"
-                />
-              </span>
-              <span>
-                <strong>{item.label}</strong>
-                <small>{item.description}</small>
-              </span>
-            </Link>
-          ))}
         </div>
       </section>
 
