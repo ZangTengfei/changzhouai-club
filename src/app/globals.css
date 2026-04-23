@@ -1868,6 +1868,53 @@ img {
   color: rgba(var(--ink-rgb), 0.62);
 }
 
+.home-flow-heading {
+  position: relative;
+}
+
+.home-flow-heading h2 {
+  color: #111a1d;
+  font-size: clamp(2rem, 3.4vw, 2.55rem);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.055em;
+}
+
+.home-flow-heading p {
+  position: relative;
+  width: fit-content;
+  margin-top: 8px;
+  padding-left: 30px;
+  color: rgba(var(--ink-rgb), 0.7);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.home-flow-heading p::before,
+.home-flow-heading p::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  border-radius: 999px;
+}
+
+.home-flow-heading p::before {
+  top: 0.78em;
+  width: 18px;
+  height: 4px;
+  background: linear-gradient(90deg, #f1ba46, #ef8f2d);
+  transform: rotate(-12deg);
+}
+
+.home-flow-heading p::after {
+  top: calc(0.78em + 6px);
+  left: 8px;
+  width: 12px;
+  height: 3px;
+  background: linear-gradient(90deg, #74c686, #2b82dd);
+  transform: rotate(8deg);
+}
+
 .home-flow-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.9fr);
@@ -2148,8 +2195,8 @@ img {
 .home-event-person {
   position: absolute;
   right: 0;
-  bottom: -18px;
-  width: 202px;
+  bottom: -2px;
+  width: 194px;
   height: auto;
   filter: drop-shadow(0 18px 20px rgba(var(--ink-rgb), 0.12));
   object-fit: contain;

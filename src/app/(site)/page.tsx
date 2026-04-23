@@ -264,7 +264,7 @@ export default async function HomePage() {
       </section>
 
       <section className="home-flow-section" aria-labelledby="home-flow-title">
-        <div className="home-section-heading">
+        <div className="home-section-heading home-flow-heading">
           <h2 id="home-flow-title">从活动到合作</h2>
           <p>在这里，认识更多人，创造更多可能</p>
         </div>
