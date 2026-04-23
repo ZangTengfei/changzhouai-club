@@ -1845,6 +1845,22 @@ img {
   color: #7d63f1;
 }
 
+.home-stat-card-people strong {
+  color: #0b8a69;
+}
+
+.home-stat-card-calendar strong {
+  color: #f27c22;
+}
+
+.home-stat-card-clock strong {
+  color: #2f82ed;
+}
+
+.home-stat-card-pin strong {
+  color: #7d63f1;
+}
+
 .home-flow-section,
 .home-social-section {
   display: grid;

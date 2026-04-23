@@ -318,7 +318,7 @@ export default async function HomePage() {
           const StatIcon = statIcons[item.icon];
 
           return (
-            <article className="home-stat-card" key={item.label}>
+            <article className={`home-stat-card home-stat-card-${item.icon}`} key={item.label}>
               <span className={`home-stat-icon home-stat-icon-${item.icon}`} aria-hidden="true">
                 <StatIcon strokeWidth={1.9} />
               </span>
