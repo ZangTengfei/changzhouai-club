@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CalendarDays, Clock3, MapPin, UsersRound } from "lucide-react";
 
 import {
   DoodleSparkles,
@@ -100,6 +101,15 @@ const heroNotes = [
   },
 ] as const;
 
+const statIcons = {
+  people: UsersRound,
+  calendar: CalendarDays,
+  clock: Clock3,
+  pin: MapPin,
+} as const;
+
+type StatIconKey = keyof typeof statIcons;
+
 export default async function HomePage() {
   const scheduledEvents = await getScheduledEvents();
   const completedEvents = await getCompletedEventRecaps();
@@ -145,7 +155,12 @@ export default async function HomePage() {
       detail: "立足常州，连接长三角",
       icon: "pin",
     },
-  ];
+  ] satisfies Array<{
+    value: string;
+    label: string;
+    detail: string;
+    icon: StatIconKey;
+  }>;
   const nextEventDateLabel = formatEventDateTime(
     primaryScheduledEvent?.event_at ?? null,
   );
@@ -224,18 +239,22 @@ export default async function HomePage() {
       </section>
 
       <section className="home-stats-panel" aria-label="社区数据">
-        {communityStats.map((item) => (
-          <article className="home-stat-card" key={item.label}>
-            <span className={`home-stat-icon home-stat-icon-${item.icon}`} aria-hidden="true" />
-            <div>
-              <div className="home-stat-heading">
+        {communityStats.map((item) => {
+          const StatIcon = statIcons[item.icon];
+
+          return (
+            <article className="home-stat-card" key={item.label}>
+              <span className={`home-stat-icon home-stat-icon-${item.icon}`} aria-hidden="true">
+                <StatIcon strokeWidth={1.9} />
+              </span>
+              <div>
                 <strong>{item.value}</strong>
                 <span>{item.label}</span>
+                <small>{item.detail}</small>
               </div>
-              <small>{item.detail}</small>
-            </div>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </section>
 
       <section className="home-flow-section" aria-labelledby="home-flow-title">
