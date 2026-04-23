@@ -525,11 +525,9 @@ export default async function HomePage() {
 
       <section className="home-join-banner" aria-labelledby="home-join-banner-title">
         <div className="home-join-banner-illustration" aria-hidden="true">
-          <Image
-            src="/join-card.png"
+          <img
+            src="/join-card.png?v=20260424-join"
             alt=""
-            width={420}
-            height={280}
             className="home-join-banner-illustration-image"
           />
         </div>
