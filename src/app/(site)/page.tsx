@@ -558,7 +558,7 @@ export default async function HomePage() {
           <div className="home-join-banner-info">
             <span>微信交流群</span>
             <strong>{wechatQrCode?.title ?? "常州 AI Club 微信群"}</strong>
-            <small>400+ 位成员</small>
+            <small>200+ 位成员</small>
             <p>活动・学习・合作・成长</p>
             <Link href="/join" className="button home-primary-button home-join-banner-button">
               扫码加入

@@ -2586,7 +2586,7 @@ img {
 
 .home-join-banner {
   position: relative;
-  overflow: visible;
+  overflow: hidden;
   display: grid;
   grid-template-columns: 176px minmax(0, 1.08fr) minmax(340px, 0.9fr);
   gap: 18px;
@@ -2602,17 +2602,7 @@ img {
 }
 
 .home-join-banner::after {
-  content: "";
-  position: absolute;
-  left: 18px;
-  bottom: -18px;
-  width: 214px;
-  height: 44px;
-  border-radius: 0 0 28px 28px;
-  background:
-    radial-gradient(circle at 18% 34%, rgba(73, 182, 128, 0.1), transparent 34%),
-    linear-gradient(180deg, rgba(242, 242, 234, 0.98), rgba(239, 239, 231, 0.96));
-  z-index: -1;
+  display: none;
 }
 
 .home-join-banner-illustration {
@@ -2621,6 +2611,8 @@ img {
   justify-content: flex-start;
   align-self: end;
   position: relative;
+  overflow: hidden;
+  min-height: 150px;
 }
 
 .home-join-banner-illustration::before,
@@ -2647,11 +2639,13 @@ img {
 }
 
 .home-join-banner-illustration-image {
-  width: min(100%, 174px);
+  width: min(100%, 188px);
   height: auto;
   object-fit: contain;
   object-position: left bottom;
   filter: none;
+  margin-left: -6px;
+  margin-bottom: -22px;
 }
 
 .home-join-banner-copy h2,
