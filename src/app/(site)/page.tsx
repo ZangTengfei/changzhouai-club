@@ -232,9 +232,6 @@ export default async function HomePage() {
         id: member.id,
         href: member.publicSlug ? `/members/${member.publicSlug}` : "/members",
         avatarUrl: member.avatarUrl,
-        title: member.roleLabel
-          ? `从 ${member.roleLabel} 走进 AI 社区`
-          : `在社区里找到第 ${index + 1} 次灵感碰撞`,
         name: member.displayName,
         meta: metaParts.join(" @ ") || member.city,
         story:
@@ -461,7 +458,6 @@ export default async function HomePage() {
                   )}
                 </div>
                 <div>
-                  <h3>{item.title}</h3>
                   <strong>{item.name}</strong>
                   <small>{item.meta}</small>
                 </div>
