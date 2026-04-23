@@ -243,19 +243,43 @@ export default async function HomePage() {
           </div>
 
           {heroThumbs.length > 0 ? (
-            <div className="home-photo-strip" aria-hidden="true">
-              {heroThumbs.map((imageUrl, index) => (
-                <Image
-                  key={`${imageUrl}-${index}`}
-                  src={imageUrl}
-                  alt=""
-                  width={220}
-                  height={132}
-                  unoptimized
-                  sizes="160px"
-                  className={`home-photo-thumb home-photo-thumb-${index + 1}`}
-                />
-              ))}
+            <div className="home-photo-carousel" aria-hidden="true">
+              <div className="home-photo-carousel-track">
+                {heroThumbs.map((imageUrl, index) => {
+                  const activeIndex = heroThumbs.length > 1 ? 1 : 0;
+                  const stateClass =
+                    index === activeIndex
+                      ? "is-active"
+                      : index < activeIndex
+                        ? "is-prev"
+                        : "is-next";
+
+                  return (
+                    <div
+                      key={`${imageUrl}-${index}`}
+                      className={`home-photo-carousel-item ${stateClass}`}
+                    >
+                      <Image
+                        src={imageUrl}
+                        alt=""
+                        width={220}
+                        height={132}
+                        unoptimized
+                        sizes="160px"
+                        className="home-photo-thumb"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="home-photo-carousel-dots">
+                {heroThumbs.map((imageUrl, index) => (
+                  <span
+                    key={`${imageUrl}-dot-${index}`}
+                    className={index === (heroThumbs.length > 1 ? 1 : 0) ? "is-active" : undefined}
+                  />
+                ))}
+              </div>
             </div>
           ) : null}
 
