@@ -228,8 +228,10 @@ export default async function HomePage() {
           <article className="home-stat-card" key={item.label}>
             <span className={`home-stat-icon home-stat-icon-${item.icon}`} aria-hidden="true" />
             <div>
-              <strong>{item.value}</strong>
-              <span>{item.label}</span>
+              <div className="home-stat-heading">
+                <strong>{item.value}</strong>
+                <span>{item.label}</span>
+              </div>
               <small>{item.detail}</small>
             </div>
           </article>
