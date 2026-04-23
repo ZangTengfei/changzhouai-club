@@ -88,17 +88,17 @@ const homeAssetGaps = [
 const heroNotes = [
   {
     className: "home-sticky-note home-sticky-note-green",
-    text: "在这里认识有趣的人，一起做有意思的事",
+    lines: ["在这里", "认识有趣的人", "一起做有意思的事"],
   },
   {
     className: "home-sticky-note home-sticky-note-yellow",
-    text: "从 0 到 1，把想法变成真实项目",
+    lines: ["从 0 到 1", "把想法变成", "真实项目"],
   },
   {
     className: "home-sticky-note home-sticky-note-blue",
-    text: "每一次交流都可能带来新的机会",
+    lines: ["每一次交流", "都可能带来", "新的机会"],
   },
-];
+] as const;
 
 export default async function HomePage() {
   const scheduledEvents = await getScheduledEvents();
@@ -157,20 +157,26 @@ export default async function HomePage() {
         minute: "2-digit",
       }).format(new Date(wechatQrCode.expiresAt))
     : null;
+  const heroPrimaryImage = heroGallery[0] ?? null;
+  const heroThumbs = [
+    heroGallery[1] ?? heroPrimaryImage,
+    heroGallery[2] ?? heroPrimaryImage,
+    heroGallery[3] ?? heroPrimaryImage,
+  ].filter((imageUrl): imageUrl is string => Boolean(imageUrl));
 
   return (
     <div className="home-page-stack">
       <section className="home-hero" aria-labelledby="home-hero-title">
         <div className="home-hero-copy">
-          <p className="home-kicker">连接 · 学习 · 合作 · 成长</p>
+          <p className="home-kicker">连接・分享・共创 👋</p>
           <h1 id="home-hero-title">
             常州 <span>AI Club</span>
             <br />
             本地 AI 人的共同家园
           </h1>
           <p className="home-hero-lede">
-            连接常州的开发者、产品人、创业者和 AI 爱好者，一起探索 AI、
-            落地创新，推动本地 AI 生态发展。
+            连接常州的开发者、产品人、创业者和 AI 爱好者，
+            一起探索 AI，落地创新，推动本地 AI 生态发展。
           </p>
           <HandDrawnArrow className="home-hero-arrow" />
 
@@ -204,18 +210,19 @@ export default async function HomePage() {
                 ))
               )}
             </div>
-            <div>
+            <div className="home-member-proof-copy">
               <strong>200+</strong>
-              <span>位成员已加入我们，期待你的加入！</span>
+              <span>位成员已加入我们</span>
+              <small>期待你的加入！</small>
             </div>
           </div>
         </div>
 
         <div className="home-hero-visual" aria-label="社区活动现场">
           <div className="home-photo-frame">
-            {heroGallery[0] ? (
+            {heroPrimaryImage ? (
               <Image
-                src={heroGallery[0]}
+                src={heroPrimaryImage}
                 alt={latestCompletedEvent?.title ?? "常州 AI Club 活动现场"}
                 width={760}
                 height={520}
@@ -235,9 +242,9 @@ export default async function HomePage() {
             </div>
           </div>
 
-          {heroGallery.length > 1 ? (
+          {heroThumbs.length > 0 ? (
             <div className="home-photo-strip" aria-hidden="true">
-              {heroGallery.slice(1, 4).map((imageUrl, index) => (
+              {heroThumbs.map((imageUrl, index) => (
                 <Image
                   key={`${imageUrl}-${index}`}
                   src={imageUrl}
@@ -254,7 +261,9 @@ export default async function HomePage() {
 
           {heroNotes.map((note) => (
             <p key={note.className} className={note.className}>
-              {note.text}
+              {note.lines.map((line) => (
+                <span key={line}>{line}</span>
+              ))}
             </p>
           ))}
           <DoodleSparkles className="home-doodle home-doodle-hero-sparkles" />
