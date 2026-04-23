@@ -2434,8 +2434,7 @@ img {
 
 .home-member-story-head strong,
 .home-member-story-head small,
-.home-member-story-card > p,
-.home-member-story-card > span {
+.home-member-story-card > p {
   display: block;
 }
 
@@ -2458,11 +2457,26 @@ img {
   line-height: 1.68;
 }
 
-.home-member-story-card > span {
+.home-member-story-tags {
+  align-self: end;
+  display: flex;
+  gap: 8px;
+  overflow: hidden;
+  flex-wrap: nowrap;
+}
+
+.home-member-story-tags span {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border: 1px solid rgba(188, 207, 197, 0.72);
+  border-radius: 999px;
+  background: rgba(241, 248, 243, 0.9);
   align-self: end;
   color: #20a06d;
-  font-size: 0.9rem;
+  font-size: 0.84rem;
   font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .home-event-review-grid {

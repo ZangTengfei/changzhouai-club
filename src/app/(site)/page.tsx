@@ -115,35 +115,31 @@ const heroNotes = [
 const fallbackMemberStories = [
   {
     id: "story-1",
-    title: "从产品视角走进 AI 社区",
     name: "社区成员",
     meta: "AI 爱好者",
     story: "在这里认识更多同行者，把零散想法变成一次次具体的交流和实践。",
-    tag: "# 找到方向",
+    tags: ["# 找到方向", "# 真实交流", "# 本地连接"],
   },
   {
     id: "story-2",
-    title: "从学习者到实践者",
     name: "社区成员",
     meta: "技术探索者",
     story: "通过活动里的真实案例和分享，把抽象概念慢慢变成自己能上手的能力。",
-    tag: "# 学习成长",
+    tags: ["# 学习成长", "# AI 实践", "# 知识分享"],
   },
   {
     id: "story-3",
-    title: "从交流里找到合作线索",
     name: "社区成员",
     meta: "项目参与者",
     story: "一次线下碰面可能带来新的伙伴、资源连接，甚至一次项目的开始。",
-    tag: "# 项目落地",
+    tags: ["# 项目落地", "# 资源对接", "# 合作共建"],
   },
   {
     id: "story-4",
-    title: "从常州出发连接更多人",
     name: "社区成员",
     meta: "本地 AI 连接者",
     story: "社区让本地开发者、产品人和创业者有了更稳定的相遇和协作场景。",
-    tag: "# 灵感碰撞",
+    tags: ["# 灵感碰撞", "# 常州 AI", "# 社区成长"],
   },
 ] as const;
 
@@ -218,15 +214,26 @@ export default async function HomePage() {
   const storyMembers = directory.members
     .filter((member) => member.avatarUrl || member.bio || member.roleLabel)
     .slice(0, 4)
-    .map((member, index) => {
+    .map((member) => {
       const metaParts = [member.roleLabel, member.organization].filter(Boolean);
-      const storyTag = member.skills[0]
-        ? `# ${member.skills[0]}`
-        : member.willingToJoinProjects
-          ? "# 项目共建"
-          : member.willingToShare
-            ? "# 乐于分享"
-            : "# 社区成员";
+      const storyTags = member.skills
+        .filter((skill) => skill.trim())
+        .slice(0, 3)
+        .map((skill) => `# ${skill}`);
+
+      if (storyTags.length === 0) {
+        if (member.willingToJoinProjects) {
+          storyTags.push("# 项目共建");
+        }
+
+        if (member.willingToShare) {
+          storyTags.push("# 乐于分享");
+        }
+
+        if (storyTags.length === 0) {
+          storyTags.push("# 社区成员");
+        }
+      }
 
       return {
         id: member.id,
@@ -237,7 +244,7 @@ export default async function HomePage() {
         story:
           extractShortBio(member.bio) ??
           "在这里认识伙伴、交换经验，也让更多想法从交流逐步走向行动。",
-        tag: storyTag,
+        tags: storyTags,
       };
     });
   const memberStories = storyMembers.length > 0 ? storyMembers : fallbackMemberStories;
@@ -463,7 +470,11 @@ export default async function HomePage() {
                 </div>
               </div>
               <p>{item.story}</p>
-              <span>{item.tag}</span>
+              <div className="home-member-story-tags" aria-label="成员技能标签">
+                {item.tags.map((tag) => (
+                  <span key={`${item.id}-${tag}`}>{tag}</span>
+                ))}
+              </div>
             </Link>
           ))}
         </div>
