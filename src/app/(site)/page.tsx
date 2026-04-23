@@ -2,11 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { CalendarDays, Clock3, MapPin, UsersRound } from "lucide-react";
 
-import {
-  DoodleSparkles,
-  HandDrawnArrow,
-  JoinCommunityIllustration,
-} from "@/components/home-visual-assets";
+import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { HeroPhotoCarousel } from "@/components/hero-photo-carousel";
 import { SiteSponsors } from "@/components/site-sponsors";
 import {
@@ -528,37 +524,46 @@ export default async function HomePage() {
 
       <section className="home-join-banner" aria-labelledby="home-join-banner-title">
         <div className="home-join-banner-illustration" aria-hidden="true">
-          <JoinCommunityIllustration className="home-join-banner-illustration-svg" />
+          <Image
+            src="/join-card.png"
+            alt=""
+            width={420}
+            height={280}
+            className="home-join-banner-illustration-image"
+          />
         </div>
 
         <div className="home-join-banner-copy">
+          <span className="home-join-banner-eyebrow">加入我们</span>
           <h2 id="home-join-banner-title">加入我们，成为常州 AI 生态的一部分</h2>
           <p>
             扫描二维码，加入常州 AI Club 微信群，获取活动通知、资料分享和合作机会。
           </p>
         </div>
 
-        <div className="home-join-banner-qr">
-          {wechatQrCode ? (
-            <img
-              src={wechatQrCode.imageUrl}
-              alt={wechatQrCode.title}
-              width={180}
-              height={180}
-            />
-          ) : (
-            <div className="home-wechat-placeholder">微信</div>
-          )}
-        </div>
+        <div className="home-join-banner-side">
+          <div className="home-join-banner-qr">
+            {wechatQrCode ? (
+              <img
+                src={wechatQrCode.imageUrl}
+                alt={wechatQrCode.title}
+                width={180}
+                height={180}
+              />
+            ) : (
+              <div className="home-wechat-placeholder">微信</div>
+            )}
+          </div>
 
-        <div className="home-join-banner-info">
-          <span>微信交流群</span>
-          <strong>{wechatQrCode?.title ?? "常州 AI Club 微信群"}</strong>
-          <small>400+ 位成员</small>
-          <p>活动・学习・合作・成长</p>
-          <Link href="/join" className="button home-primary-button home-join-banner-button">
-            加入社区
-          </Link>
+          <div className="home-join-banner-info">
+            <span>微信交流群</span>
+            <strong>{wechatQrCode?.title ?? "常州 AI Club 微信群"}</strong>
+            <small>400+ 位成员</small>
+            <p>活动・学习・合作・成长</p>
+            <Link href="/join" className="button home-primary-button home-join-banner-button">
+              扫码加入
+            </Link>
+          </div>
         </div>
       </section>
 
