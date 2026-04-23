@@ -522,6 +522,8 @@ export default async function HomePage() {
         )}
       </section>
 
+      <SiteSponsors />
+
       <section className="home-join-banner" aria-labelledby="home-join-banner-title">
         <div className="home-join-banner-illustration" aria-hidden="true">
           <Image
@@ -566,8 +568,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-
-      <SiteSponsors />
     </div>
   );
 }
