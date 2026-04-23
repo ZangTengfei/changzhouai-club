@@ -208,16 +208,16 @@ img {
   z-index: 40;
   padding: 0;
   border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(18px);
+  background: rgba(255, 252, 248, 0.94);
+  backdrop-filter: blur(14px);
 }
 
 .header-inner {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto auto;
   align-items: center;
-  gap: 20px;
-  min-height: 72px;
+  gap: 26px;
+  min-height: 78px;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -228,42 +228,47 @@ img {
 .header-top-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   min-width: 0;
 }
 
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 54px;
-  height: 30px;
+  width: 58px;
+  height: 32px;
   flex-shrink: 0;
 }
 
 .brand-mark-icon {
   display: block;
-  width: 54px;
+  width: 58px;
   height: auto;
 }
 
 .brand-copy {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .brand-copy strong {
-  font-size: 0.95rem;
+  color: #111b1f;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.1;
 }
 
 .brand-copy small {
-  color: var(--muted);
-  font-size: 0.78rem;
+  color: rgba(var(--ink-rgb), 0.5);
+  font-size: 0.8rem;
+  line-height: 1.1;
 }
 
 .nav-links,
@@ -279,22 +284,25 @@ img {
 
 .nav-links {
   justify-content: center;
+  gap: 6px;
 }
 
 .header-actions {
   justify-content: flex-end;
+  gap: 12px;
 }
 
 .github-nav-button {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 44px;
-  padding: 0 14px;
-  border: 1px solid rgba(var(--accent-rgb), 0.16);
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(var(--ink-rgb), 0.12);
   border-radius: 999px;
-  background: rgba(var(--surface-soft-rgb), 0.72);
-  color: var(--ink);
+  background: rgba(255, 255, 255, 0.82);
+  color: #111b1f;
+  font-size: 0.96rem;
   font-weight: 700;
   transition:
     transform 0.18s ease,
@@ -305,14 +313,27 @@ img {
 .github-nav-button:hover,
 .github-nav-button:focus-visible {
   transform: translateY(-1px);
-  border-color: rgba(var(--accent-rgb), 0.28);
-  background: rgba(var(--surface-rgb), 0.92);
+  border-color: rgba(var(--ink-rgb), 0.22);
+  background: #ffffff;
 }
 
 .github-nav-icon {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   flex-shrink: 0;
+}
+
+.header-join-button {
+  min-height: 42px;
+  padding: 0 20px;
+  border-radius: 14px;
+  background: #0b9966;
+  box-shadow: none;
+}
+
+.header-join-button:hover,
+.header-join-button:focus-visible {
+  background: #087a52;
 }
 
 .mobile-menu-toggle {
@@ -372,10 +393,11 @@ img {
 
 .nav-links a {
   position: relative;
-  padding: 24px 12px 22px;
+  padding: 28px 12px 24px;
   border-radius: 0;
-  color: var(--ink);
-  font-weight: 600;
+  color: #111b1f;
+  font-size: 0.97rem;
+  font-weight: 700;
   text-align: center;
   transition:
     color 0.2s ease;
@@ -384,9 +406,9 @@ img {
 .nav-links a::after {
   content: "";
   position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 16px;
+  left: 15px;
+  right: 15px;
+  bottom: 14px;
   height: 3px;
   border-radius: 999px;
   background: transparent;
@@ -396,13 +418,13 @@ img {
 .nav-links a:hover,
 .nav-links a:focus-visible,
 .nav-links a.nav-link-active {
-  color: var(--accent-strong);
+  color: #111b1f;
 }
 
 .nav-links a:hover::after,
 .nav-links a:focus-visible::after,
 .nav-links a.nav-link-active::after {
-  background: var(--accent);
+  background: #16a085;
 }
 
 .button {
@@ -5141,12 +5163,12 @@ img {
 
   .nav-links {
     flex-wrap: nowrap;
-    gap: 4px;
+    gap: 0;
   }
 
   .nav-links a {
-    padding: 10px 8px;
-    font-size: 0.95rem;
+    padding: 24px 8px 20px;
+    font-size: 0.9rem;
     white-space: nowrap;
   }
 
@@ -5160,11 +5182,6 @@ img {
     font-size: 0.95rem;
   }
 
-  .header-inner {
-    border-radius: 28px;
-    align-items: center;
-  }
-
   .site-header {
     position: static;
     padding: 14px 0 0;
@@ -5176,6 +5193,7 @@ img {
     min-height: auto;
     padding: 14px 18px;
     border: 1px solid var(--line);
+    border-radius: 24px;
     background: rgba(var(--surface-muted-rgb), 0.88);
     box-shadow: 0 10px 30px rgba(var(--ink-rgb), 0.08);
   }
@@ -5273,7 +5291,7 @@ img {
   .nav-links a {
     display: block;
     min-height: 0;
-    padding: 8px 2px;
+    padding: 10px 2px;
     border-radius: 0;
     border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
     background: transparent;
@@ -5303,6 +5321,10 @@ img {
     width: 100%;
     padding: 0 14px;
     font-size: 0.95rem;
+  }
+
+  .header-join-button {
+    border-radius: 12px;
   }
 
   .github-nav-button {
@@ -5714,19 +5736,19 @@ img {
 
   .brand-mark,
   .brand-mark-icon {
-    width: 46px;
+    width: 52px;
   }
 
   .brand-mark {
-    height: 26px;
+    height: 28px;
   }
 
   .brand-copy strong {
-    font-size: 0.9rem;
+    font-size: 0.94rem;
   }
 
   .brand-copy small {
-    font-size: 0.74rem;
+    font-size: 0.76rem;
   }
 
   .docs-navbar-links a,

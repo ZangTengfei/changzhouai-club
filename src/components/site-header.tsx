@@ -57,7 +57,7 @@ export function SiteHeader() {
             <SocialPlatformIcon tone="github" className="github-nav-icon" />
             <span>GitHub</span>
           </Link>
-          <Link href="/join" className="button button-secondary">
+          <Link href="/join" className="button header-join-button">
             加入社区
           </Link>
         </div>
