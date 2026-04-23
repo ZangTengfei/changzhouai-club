@@ -250,8 +250,9 @@ img {
 
 .brand-mark-icon {
   display: block;
-  width: 58px;
-  height: auto;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .brand-copy {
@@ -690,8 +691,9 @@ img {
 
 .docs-navbar-mark-icon {
   display: block;
-  width: 54px;
-  height: auto;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .docs-navbar-main-copy {
@@ -2483,9 +2485,8 @@ img {
 .home-member-story-tags span {
   flex: 0 0 auto;
   padding: 6px 10px;
-  border: 1px solid rgba(188, 207, 197, 0.72);
   border-radius: 999px;
-  background: rgba(241, 248, 243, 0.9);
+  background: rgba(241, 248, 243, 0.72);
   align-self: end;
   color: #20a06d;
   font-size: 0.84rem;
@@ -2573,21 +2574,34 @@ img {
 
 .home-join-banner {
   position: relative;
-  overflow: hidden;
+  overflow: visible;
   display: grid;
   grid-template-columns: minmax(180px, 220px) minmax(0, 1fr) minmax(310px, 0.92fr);
   gap: 26px;
   align-items: center;
   padding: 30px 34px 28px;
-  border: 1px solid rgba(210, 215, 208, 0.66);
   border-radius: 24px;
   background:
     radial-gradient(circle at 11% 78%, rgba(68, 179, 126, 0.11), transparent 22%),
     radial-gradient(circle at 88% 20%, rgba(255, 203, 95, 0.12), transparent 20%),
     linear-gradient(180deg, rgba(245, 246, 238, 0.96), rgba(241, 243, 235, 0.9));
-  box-shadow:
-    0 14px 30px rgba(var(--ink-rgb), 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.48);
+  box-shadow: 0 10px 24px rgba(var(--ink-rgb), 0.025);
+  isolation: isolate;
+}
+
+.home-join-banner::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  bottom: -24px;
+  width: 178px;
+  height: 62px;
+  border-radius: 0 0 30px 30px;
+  background:
+    radial-gradient(circle at 24% 40%, rgba(68, 179, 126, 0.14), transparent 34%),
+    linear-gradient(180deg, rgba(244, 245, 237, 0.98), rgba(239, 241, 233, 0.96));
+  box-shadow: 0 10px 22px rgba(var(--ink-rgb), 0.02);
+  z-index: -1;
 }
 
 .home-join-banner-illustration {
@@ -3013,8 +3027,9 @@ img {
 }
 
 .route-progress-brand-icon {
-  width: 60px;
-  height: auto;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .route-progress-brand-copy {

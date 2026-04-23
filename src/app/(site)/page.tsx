@@ -467,9 +467,7 @@ export default async function HomePage() {
               </div>
               <p>{item.story}</p>
               <div className="home-member-story-tags" aria-label="成员技能标签">
-                {item.tags.map((tag) => (
-                  <span key={`${item.id}-${tag}`}>{tag}</span>
-                ))}
+                {item.tags[0] ? <span>{item.tags[0]}</span> : null}
               </div>
             </Link>
           ))}
@@ -499,7 +497,7 @@ export default async function HomePage() {
                       src={item.imageUrl}
                       alt={item.title}
                       width={640}
-                      height={360}
+                      height={320}
                       unoptimized
                       sizes="(max-width: 820px) 100vw, 25vw"
                     />
