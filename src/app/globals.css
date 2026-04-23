@@ -1750,7 +1750,7 @@ img {
 }
 
 .home-stat-card strong,
-.home-stat-card span,
+.home-stat-card > div > span,
 .home-stat-card small {
   display: block;
 }
@@ -1764,7 +1764,7 @@ img {
   white-space: nowrap;
 }
 
-.home-stat-card span {
+.home-stat-card > div > span {
   margin-top: 7px;
   color: #152524;
   font-size: 0.92rem;
