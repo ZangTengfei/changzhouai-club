@@ -243,8 +243,8 @@ img {
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 58px;
-  height: 32px;
+  width: 46px;
+  height: 34px;
   flex-shrink: 0;
 }
 
@@ -684,8 +684,8 @@ img {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 54px;
-  height: 30px;
+  width: 46px;
+  height: 34px;
   flex-shrink: 0;
 }
 
@@ -6749,11 +6749,11 @@ img {
 
   .brand-mark,
   .brand-mark-icon {
-    width: 52px;
+    width: 42px;
   }
 
   .brand-mark {
-    height: 28px;
+    height: 31px;
   }
 
   .brand-copy strong {
@@ -6771,11 +6771,11 @@ img {
 
   .docs-navbar-mark,
   .docs-navbar-mark-icon {
-    width: 46px;
+    width: 40px;
   }
 
   .docs-navbar-mark {
-    height: 26px;
+    height: 30px;
   }
 
   .nav-links {
