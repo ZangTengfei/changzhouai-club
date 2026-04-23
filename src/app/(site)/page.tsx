@@ -175,6 +175,10 @@ export default async function HomePage() {
       }).format(new Date(wechatQrCode.expiresAt))
     : null;
   const heroCarouselImages = heroGallery.slice(0, 3);
+  const nextEventAttendeeAvatars = memberAvatars.slice(0, 4);
+  const nextEventAttendeeCount = directory.members.length > 0
+    ? Math.min(directory.members.length, 28)
+    : null;
 
   return (
     <div className="home-page-stack">
@@ -296,35 +300,59 @@ export default async function HomePage() {
           </div>
 
           <article className="home-next-event-card">
-            <p className="home-kicker">下一场活动等你来！</p>
-            <h3>
-              {primaryScheduledEvent?.title ?? "AI Agent 实践分享会"}
-            </h3>
-            <ul>
-              <li>
-                <span aria-hidden="true">◷</span>
-                {nextEventDateLabel}
-              </li>
-              <li>
-                <span aria-hidden="true">⌖</span>
-                {primaryScheduledEvent?.venue
-                  ? `${primaryScheduledEvent.city ?? "常州"} · ${primaryScheduledEvent.venue}`
-                  : "常州 · 线下空间待公布"}
-              </li>
-              <li>
-                <span aria-hidden="true">●</span>
-                {directory.members.length > 0
-                  ? `${Math.min(directory.members.length, 28)} 人已报名`
-                  : "开放报名中"}
-              </li>
-            </ul>
-            <Link
-              href={primaryScheduledEvent ? `/events/${primaryScheduledEvent.slug}` : "/events"}
-              className="button home-primary-button"
-            >
-              查看活动详情
-              <span aria-hidden="true">→</span>
-            </Link>
+            <div className="home-next-event-copy">
+              <p className="home-next-event-kicker">下一场活动等你来！</p>
+              <h3>
+                {primaryScheduledEvent?.title ?? "AI Agent 实践分享会"}
+              </h3>
+              <ul className="home-next-event-meta">
+                <li>
+                  <CalendarDays aria-hidden="true" strokeWidth={1.9} />
+                  <span>{nextEventDateLabel}</span>
+                </li>
+                <li>
+                  <MapPin aria-hidden="true" strokeWidth={1.9} />
+                  <span>
+                    {primaryScheduledEvent?.venue
+                      ? `${primaryScheduledEvent.city ?? "常州"} · ${primaryScheduledEvent.venue}`
+                      : "常州 · 线下空间待公布"}
+                  </span>
+                </li>
+              </ul>
+              <div className="home-next-event-attendance">
+                <div className="home-next-event-avatars" aria-hidden="true">
+                  {nextEventAttendeeAvatars.length > 0 ? (
+                    nextEventAttendeeAvatars.map((avatarUrl, index) => (
+                      <img
+                        key={`${avatarUrl}-${index}`}
+                        src={avatarUrl}
+                        alt=""
+                        referrerPolicy="no-referrer"
+                        style={{ zIndex: nextEventAttendeeAvatars.length - index }}
+                      />
+                    ))
+                  ) : (
+                    ["AI", "CL", "UB", "CZ"].map((label, index) => (
+                      <span key={label} style={{ zIndex: 4 - index }}>
+                        {label}
+                      </span>
+                    ))
+                  )}
+                </div>
+                <span className="home-next-event-attendance-label">
+                  {nextEventAttendeeCount
+                    ? `${nextEventAttendeeCount} 人已报名`
+                    : "开放报名中"}
+                </span>
+              </div>
+              <Link
+                href={primaryScheduledEvent ? `/events/${primaryScheduledEvent.slug}` : "/events"}
+                className="button home-primary-button home-next-event-button"
+              >
+                查看活动详情
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
             <Image
               src="/event-card-character.png"
               alt=""
