@@ -2311,6 +2311,20 @@ img {
   padding-top: 6px;
 }
 
+.home-member-stories {
+  padding: 24px 18px 18px;
+  border: 1px solid rgba(207, 214, 210, 0.72);
+  border-radius: 24px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.86),
+    rgba(251, 251, 248, 0.82)
+  );
+  box-shadow:
+    0 12px 28px rgba(var(--ink-rgb), 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
 .home-event-review-section {
   padding: 24px 18px 18px;
   border: 1px solid rgba(207, 214, 210, 0.8);
