@@ -1360,11 +1360,11 @@ img {
   display: inline-flex;
   width: fit-content;
   margin: 0;
-  padding: 7px 14px;
+  padding: 6px 13px;
   border-radius: 999px;
   background: rgba(244, 240, 225, 0.96);
   color: var(--accent-strong);
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 800;
   letter-spacing: 0.02em;
 }
@@ -1381,7 +1381,7 @@ img {
 .home-hero-copy {
   display: grid;
   align-content: start;
-  gap: 20px;
+  gap: 18px;
   padding-top: 44px;
 }
 
@@ -1391,10 +1391,10 @@ img {
   font-family:
     "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
     sans-serif;
-  font-size: clamp(3.2rem, 7.1vw, 5.5rem);
+  font-size: clamp(2.95rem, 6.4vw, 5rem);
   font-weight: 900;
-  line-height: 1.06;
-  letter-spacing: -0.085em;
+  line-height: 1.05;
+  letter-spacing: -0.072em;
 }
 
 .home-hero-copy h1 span {
@@ -1405,9 +1405,9 @@ img {
 .home-hero-copy h1::after {
   content: "";
   display: block;
-  width: min(214px, 42vw);
-  height: 14px;
-  margin: -8px 0 0 56%;
+  width: min(196px, 42vw);
+  height: 13px;
+  margin: -8px 0 0 54%;
   border: 3px solid rgba(244, 190, 75, 0.78);
   border-color: rgba(244, 190, 75, 0.78) transparent transparent transparent;
   border-radius: 50%;
@@ -1415,17 +1415,17 @@ img {
 }
 
 .home-hero-lede {
-  max-width: 33rem;
+  max-width: 31rem;
   margin: 0;
   color: rgba(var(--ink-rgb), 0.72);
-  font-size: clamp(1.01rem, 1.28vw, 1.14rem);
-  line-height: 1.9;
+  font-size: clamp(0.97rem, 1.18vw, 1.07rem);
+  line-height: 1.84;
 }
 
 .home-hero-arrow {
-  width: 176px;
+  width: 162px;
   height: auto;
-  margin: -14px 0 -6px 60%;
+  margin: -14px 0 -6px 57%;
   color: var(--accent);
   transform: rotate(-2deg);
 }
@@ -1435,7 +1435,7 @@ img {
   flex-wrap: wrap;
   gap: 18px;
   align-items: center;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .home-primary-button,
