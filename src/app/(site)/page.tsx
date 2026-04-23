@@ -46,6 +46,32 @@ function formatEventDateTime(value: string | null) {
   }).format(new Date(value));
 }
 
+function formatReviewDate(value: string | null) {
+  if (!value) {
+    return "时间待定";
+  }
+
+  return value.replaceAll("-", ".");
+}
+
+function extractShortBio(value: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  const normalized = value
+    .replace(/\s+/g, " ")
+    .split(/(?<=[。！？])/)
+    .map((item) => item.trim())
+    .find(Boolean);
+
+  if (!normalized) {
+    return null;
+  }
+
+  return normalized.length > 42 ? `${normalized.slice(0, 42)}...` : normalized;
+}
+
 const homeFlowSteps = [
   {
     step: "01",
@@ -73,21 +99,6 @@ const homeFlowSteps = [
   },
 ] as const;
 
-const homeAssetGaps = [
-  {
-    title: "人物插画源文件",
-    detail: "首页流程、下一场活动、加入社群这三类人物，最好补同一套 Figma/SVG。",
-  },
-  {
-    title: "装饰图案规范",
-    detail: "星星、笑脸、手绘箭头、贴纸胶带、对勾等小元素需要统一笔触和颜色。",
-  },
-  {
-    title: "活动照片精选",
-    detail: "需要 1 张横向主视觉照片和 3 张缩略图，建议统一裁切比例和明暗风格。",
-  },
-];
-
 const heroNotes = [
   {
     className: "home-sticky-note home-sticky-note-green",
@@ -100,6 +111,41 @@ const heroNotes = [
   {
     className: "home-sticky-note home-sticky-note-blue",
     lines: ["每一次交流", "都可能带来", "新的机会"],
+  },
+] as const;
+
+const fallbackMemberStories = [
+  {
+    id: "story-1",
+    title: "从产品视角走进 AI 社区",
+    name: "社区成员",
+    meta: "AI 爱好者",
+    story: "在这里认识更多同行者，把零散想法变成一次次具体的交流和实践。",
+    tag: "# 找到方向",
+  },
+  {
+    id: "story-2",
+    title: "从学习者到实践者",
+    name: "社区成员",
+    meta: "技术探索者",
+    story: "通过活动里的真实案例和分享，把抽象概念慢慢变成自己能上手的能力。",
+    tag: "# 学习成长",
+  },
+  {
+    id: "story-3",
+    title: "从交流里找到合作线索",
+    name: "社区成员",
+    meta: "项目参与者",
+    story: "一次线下碰面可能带来新的伙伴、资源连接，甚至一次项目的开始。",
+    tag: "# 项目落地",
+  },
+  {
+    id: "story-4",
+    title: "从常州出发连接更多人",
+    name: "社区成员",
+    meta: "本地 AI 连接者",
+    story: "社区让本地开发者、产品人和创业者有了更稳定的相遇和协作场景。",
+    tag: "# 灵感碰撞",
   },
 ] as const;
 
@@ -119,7 +165,7 @@ export default async function HomePage() {
   const wechatQrCode = await getCurrentWechatQrCode();
   const primaryScheduledEvent = scheduledEvents[0];
   const latestCompletedEvent = completedEvents[0];
-  const recentEvents = completedEvents.slice(0, 3);
+  const recentEvents = completedEvents.slice(0, 4);
   const heroGallery = completedEvents
     .flatMap((event) => [
       event.imageUrl,
@@ -166,19 +212,40 @@ export default async function HomePage() {
   const nextEventDateLabel = formatEventDateTime(
     primaryScheduledEvent?.event_at ?? null,
   );
-  const wechatQrExpiresLabel = wechatQrCode
-    ? new Intl.DateTimeFormat("zh-CN", {
-        month: "2-digit",
-        day: "2-digit",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(new Date(wechatQrCode.expiresAt))
-    : null;
   const heroCarouselImages = heroGallery.slice(0, 3);
   const nextEventAttendeeAvatars = memberAvatars.slice(0, 4);
   const nextEventAttendeeCount = directory.members.length > 0
     ? Math.min(directory.members.length, 28)
     : null;
+  const storyMembers = directory.members
+    .filter((member) => member.avatarUrl || member.bio || member.roleLabel)
+    .slice(0, 4)
+    .map((member, index) => {
+      const metaParts = [member.roleLabel, member.organization].filter(Boolean);
+      const storyTag = member.skills[0]
+        ? `# ${member.skills[0]}`
+        : member.willingToJoinProjects
+          ? "# 项目共建"
+          : member.willingToShare
+            ? "# 乐于分享"
+            : "# 社区成员";
+
+      return {
+        id: member.id,
+        href: member.publicSlug ? `/members/${member.publicSlug}` : "/members",
+        avatarUrl: member.avatarUrl,
+        title: member.roleLabel
+          ? `从 ${member.roleLabel} 走进 AI 社区`
+          : `在社区里找到第 ${index + 1} 次灵感碰撞`,
+        name: member.displayName,
+        meta: metaParts.join(" @ ") || member.city,
+        story:
+          extractShortBio(member.bio) ??
+          "在这里认识伙伴、交换经验，也让更多想法从交流逐步走向行动。",
+        tag: storyTag,
+      };
+    });
+  const memberStories = storyMembers.length > 0 ? storyMembers : fallbackMemberStories;
 
   return (
     <div className="home-page-stack">
@@ -367,97 +434,126 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="home-lower-grid" aria-label="活动与加入社区">
-        <article className="home-recent-card">
-          <div className="home-card-heading">
-            <h2>近期活动</h2>
-            <Link href="/events">查看全部 →</Link>
-          </div>
-
-          {recentEvents.length > 0 ? (
-            <div className="home-event-list">
-              {recentEvents.map((item) => (
-                <Link
-                  href={`/events/${item.slug}`}
-                  className="home-event-row"
-                  key={item.id}
-                >
-                  <div className="home-event-row-media">
-                    {item.imageUrl ? (
-                      <Image
-                        src={item.imageUrl}
-                        alt={item.title}
-                        width={180}
-                        height={112}
-                        unoptimized
-                        sizes="126px"
-                      />
-                    ) : (
-                      <span>AI</span>
-                    )}
-                  </div>
-                  <div>
-                    <h3>{item.title}</h3>
-                    <p>
-                      <span>{item.dateLabel}</span>
-                      <span>{item.locationLabel}</span>
-                    </p>
-                    <small>{item.highlights[2] ?? "活动已归档"}</small>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="home-empty-state">
-              暂无活动回顾内容，欢迎稍后再来查看社区最新记录。
-            </div>
-          )}
-        </article>
-
-        <article className="home-join-card">
+      <section className="home-member-stories" aria-labelledby="home-member-stories-title">
+        <div className="home-card-heading home-showcase-heading">
           <div>
-            <p className="home-kicker">加入我们</p>
-            <h2>扫码入群，加入常州 AI Club 微信群</h2>
-            <p>获取活动通知、资料分享和合作机会。</p>
+            <h2 id="home-member-stories-title">成员故事</h2>
+            <p>他们在这里找到方向、伙伴和机会</p>
           </div>
+          <Link href="/members">查看更多故事 →</Link>
+        </div>
 
-          <div className="home-wechat-row">
-            {wechatQrCode ? (
-              <img
-                src={wechatQrCode.imageUrl}
-                alt={wechatQrCode.title}
-                width={180}
-                height={180}
-              />
-            ) : (
-              <div className="home-wechat-placeholder">微信</div>
-            )}
-            <div>
-              <span>微信群</span>
-              <strong>{wechatQrCode?.title ?? "常州 AI Club 微信群"}</strong>
-              <small>
-                {wechatQrExpiresLabel
-                  ? `二维码有效至 ${wechatQrExpiresLabel}`
-                  : "二维码 7 天过期，后台更新后会显示在这里。"}
-              </small>
-            </div>
-          </div>
-          <JoinCommunityIllustration className="home-join-illustration" />
-        </article>
+        <div className="home-member-story-grid">
+          {memberStories.map((item) => (
+            <Link
+              href={"href" in item ? item.href : "/members"}
+              className="home-member-story-card"
+              key={item.id}
+            >
+              <div className="home-member-story-head">
+                <div className="home-member-story-avatar" aria-hidden="true">
+                  {"avatarUrl" in item && item.avatarUrl ? (
+                    <img
+                      src={item.avatarUrl}
+                      alt=""
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <span>{item.name.slice(0, 1)}</span>
+                  )}
+                </div>
+                <div>
+                  <h3>{item.title}</h3>
+                  <strong>{item.name}</strong>
+                  <small>{item.meta}</small>
+                </div>
+              </div>
+              <p>{item.story}</p>
+              <span>{item.tag}</span>
+            </Link>
+          ))}
+        </div>
       </section>
 
-      <section className="home-asset-plan" aria-labelledby="home-asset-plan-title">
-        <div>
-          <p className="home-kicker">视觉资产还原计划</p>
-          <h2 id="home-asset-plan-title">下一步需要补齐这些素材</h2>
+      <section className="home-event-review-section" aria-labelledby="home-event-review-title">
+        <div className="home-card-heading home-showcase-heading">
+          <div>
+            <h2 id="home-event-review-title">近期活动回顾</h2>
+            <p>看看最近几场线下活动的现场氛围</p>
+          </div>
+          <Link href="/events">查看更多 →</Link>
         </div>
-        <div className="home-asset-gap-grid">
-          {homeAssetGaps.map((item) => (
-            <article key={item.title}>
-              <h3>{item.title}</h3>
-              <p>{item.detail}</p>
-            </article>
-          ))}
+
+        {recentEvents.length > 0 ? (
+          <div className="home-event-review-grid">
+            {recentEvents.map((item) => (
+              <Link
+                href={`/events/${item.slug}`}
+                className="home-event-review-card"
+                key={item.id}
+              >
+                <div className="home-event-review-media">
+                  {item.imageUrl ? (
+                    <Image
+                      src={item.imageUrl}
+                      alt={item.title}
+                      width={640}
+                      height={360}
+                      unoptimized
+                      sizes="(max-width: 820px) 100vw, 25vw"
+                    />
+                  ) : (
+                    <span>AI</span>
+                  )}
+                </div>
+                <div className="home-event-review-copy">
+                  <small>{formatReviewDate(item.isoDate)}</small>
+                  <h3>{item.title}</h3>
+                  <p>{item.locationLabel}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="home-empty-state">
+            暂无活动回顾内容，欢迎稍后再来查看社区最新记录。
+          </div>
+        )}
+      </section>
+
+      <section className="home-join-banner" aria-labelledby="home-join-banner-title">
+        <div className="home-join-banner-illustration" aria-hidden="true">
+          <JoinCommunityIllustration className="home-join-banner-illustration-svg" />
+        </div>
+
+        <div className="home-join-banner-copy">
+          <h2 id="home-join-banner-title">加入我们，成为常州 AI 生态的一部分</h2>
+          <p>
+            扫描二维码，加入常州 AI Club 微信群，获取活动通知、资料分享和合作机会。
+          </p>
+        </div>
+
+        <div className="home-join-banner-qr">
+          {wechatQrCode ? (
+            <img
+              src={wechatQrCode.imageUrl}
+              alt={wechatQrCode.title}
+              width={180}
+              height={180}
+            />
+          ) : (
+            <div className="home-wechat-placeholder">微信</div>
+          )}
+        </div>
+
+        <div className="home-join-banner-info">
+          <span>微信交流群</span>
+          <strong>{wechatQrCode?.title ?? "常州 AI Club 微信群"}</strong>
+          <small>400+ 位成员</small>
+          <p>活动・学习・合作・成长</p>
+          <Link href="/join" className="button home-primary-button home-join-banner-button">
+            加入社区
+          </Link>
         </div>
       </section>
 
