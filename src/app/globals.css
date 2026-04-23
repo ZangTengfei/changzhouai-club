@@ -1534,6 +1534,7 @@ img {
 .home-photo-frame {
   position: relative;
   overflow: hidden;
+  margin-top: 34px;
   border-radius: 6px;
   background: #e8efe7;
   box-shadow:
@@ -1681,9 +1682,9 @@ img {
 
 .home-sticky-note-blue {
   right: -4px;
-  bottom: 18px;
+  bottom: 8px;
   background: #cbeaff;
-  transform: rotate(8deg);
+  transform: translateY(12px) rotate(11deg);
 }
 
 .home-doodle {
@@ -5623,6 +5624,10 @@ img {
     padding: 38px 0 74px;
   }
 
+  .home-photo-frame {
+    margin-top: 0;
+  }
+
   .home-photo-frame img,
   .home-photo-fallback {
     height: 280px;
@@ -5661,6 +5666,7 @@ img {
   .home-sticky-note-blue {
     right: 4px;
     bottom: 0;
+    transform: rotate(8deg);
   }
 
   .home-doodle-hero-sparkles {
