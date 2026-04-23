@@ -46,11 +46,7 @@ export function HeroPhotoCarousel({
   }, [activeIndex, images.length]);
 
   const activeImage = images[activeIndex] ?? null;
-  const thumbnailImages = images.slice(1, 4);
-  const visibleImages = thumbnailImages.length > 0 ? thumbnailImages : images.slice(0, 3);
-  const activeThumbnailIndex = visibleImages.findIndex(
-    (imageUrl) => imageUrl === activeImage,
-  );
+  const visibleImages = images.slice(0, 3);
 
   return (
     <div className="home-hero-visual" aria-label="社区活动现场">
@@ -87,12 +83,12 @@ export function HeroPhotoCarousel({
                 key={`${imageUrl}-${index}`}
                 type="button"
                 role="tab"
-                aria-selected={index === activeThumbnailIndex}
+                aria-selected={index === activeIndex}
                 aria-label={`查看第 ${index + 1} 张活动照片`}
                 className={`home-photo-carousel-item ${
-                  index === activeThumbnailIndex ? "is-active" : ""
+                  index === activeIndex ? "is-active" : ""
                 }`}
-                onClick={() => setActiveIndex(images.indexOf(imageUrl))}
+                onClick={() => setActiveIndex(index)}
               >
                 <Image
                   src={imageUrl}
