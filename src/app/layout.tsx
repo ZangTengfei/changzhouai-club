@@ -15,6 +15,10 @@ export const metadata: Metadata = {
     default: "常州 AI Club",
     template: "%s | 常州 AI Club",
   },
+  icons: {
+    icon: "/logo.ico",
+    shortcut: "/logo.ico",
+  },
   description:
     "连接常州的开发者、产品人、创业者、高校同学与企业伙伴，持续组织线下交流、主题分享与合作对接。",
   openGraph: {
