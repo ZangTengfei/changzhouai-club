@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 
 import { EventDetailRegistrationPanel } from "@/components/event-detail-registration-panel";
 import { getPublicEventBySlug } from "@/lib/community-events";
+import { getEventImageUrl } from "@/lib/public-image-url";
 
 type EventDetailSearchParams = {
   registered?: string;
@@ -96,7 +97,7 @@ export default async function EventDetailPage({
         <div className="event-detail-media">
           {event.imageUrl ? (
             <img
-              src={event.imageUrl}
+              src={getEventImageUrl(event.imageUrl, "event-detail-hero") ?? event.imageUrl}
               alt={event.title}
               loading="eager"
               fetchPriority="high"
@@ -238,7 +239,11 @@ export default async function EventDetailPage({
             {event.gallery.map((image) => (
               <article className="gallery-card" key={image.id}>
                 <div className="gallery-media">
-                  <img src={image.imageUrl} alt={image.caption ?? event.title} loading="lazy" />
+                  <img
+                    src={getEventImageUrl(image.imageUrl, "gallery") ?? image.imageUrl}
+                    alt={image.caption ?? event.title}
+                    loading="lazy"
+                  />
                 </div>
                 <div className="gallery-copy">
                   <h3>{event.title}</h3>

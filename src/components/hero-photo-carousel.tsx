@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 
 import { DoodleSmile, DoodleSparkles } from "@/components/home-visual-assets";
+import { getEventImageUrl } from "@/lib/public-image-url";
 
 type HeroNote = {
   className: string;
@@ -47,14 +48,15 @@ export function HeroPhotoCarousel({
 
   const activeImage = images[activeIndex] ?? null;
   const visibleImages = images.slice(0, 3);
+  const activeImageSrc = getEventImageUrl(activeImage, "hero-main") ?? activeImage;
 
   return (
     <div className="home-hero-visual" aria-label="社区活动现场">
       <div className="home-photo-frame">
-        {activeImage ? (
+        {activeImage && activeImageSrc ? (
           <Image
-            key={activeImage}
-            src={activeImage}
+            key={activeImageSrc}
+            src={activeImageSrc}
             alt={alt}
             width={760}
             height={520}
@@ -87,7 +89,7 @@ export function HeroPhotoCarousel({
                 onClick={() => setActiveIndex(index)}
               >
                 <Image
-                  src={imageUrl}
+                  src={getEventImageUrl(imageUrl, "hero-thumb") ?? imageUrl}
                   alt=""
                   width={220}
                   height={132}

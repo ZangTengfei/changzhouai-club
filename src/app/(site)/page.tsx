@@ -10,6 +10,7 @@ import {
   getScheduledEvents,
 } from "@/lib/community-events";
 import { getPublicMembersDirectory } from "@/lib/community-members";
+import { getEventImageUrl } from "@/lib/public-image-url";
 import { getCurrentWechatQrCode } from "@/lib/community-social";
 
 function formatMetricDate(isoDate: string | null) {
@@ -494,7 +495,7 @@ export default async function HomePage() {
                 <div className="home-event-review-media">
                   {item.imageUrl ? (
                     <Image
-                      src={item.imageUrl}
+                      src={getEventImageUrl(item.imageUrl, "review-card") ?? item.imageUrl}
                       alt={item.title}
                       width={640}
                       height={320}

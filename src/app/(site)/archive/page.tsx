@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { PageHero } from "@/components/page-hero";
 import { getCompletedEventRecaps } from "@/lib/community-events";
+import { getEventImageUrl } from "@/lib/public-image-url";
 import { archiveItems } from "@/lib/site-data";
 
 export const metadata: Metadata = {
@@ -45,7 +46,11 @@ export default async function ArchivePage() {
           {galleryItems.map((item) => (
             <article className="gallery-card" key={item.id}>
               <div className="gallery-media">
-                <img src={item.imageUrl} alt={item.caption ?? item.eventTitle} loading="lazy" />
+                <img
+                  src={getEventImageUrl(item.imageUrl, "archive") ?? item.imageUrl}
+                  alt={item.caption ?? item.eventTitle}
+                  loading="lazy"
+                />
               </div>
               <div className="gallery-copy">
                 <h3>

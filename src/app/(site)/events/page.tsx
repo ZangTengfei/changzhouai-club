@@ -4,6 +4,7 @@ import Link from "next/link";
 import { EventsRegistrationGrid } from "@/components/events-registration-grid";
 import { PageHero } from "@/components/page-hero";
 import { getCompletedEventRecaps, getScheduledEvents } from "@/lib/community-events";
+import { getEventImageUrl } from "@/lib/public-image-url";
 
 export const metadata: Metadata = {
   title: "活动",
@@ -61,11 +62,16 @@ export default async function EventsPage({
 
       <section className="event-list">
         {completedEvents.length > 0 ? (
-          completedEvents.map((item) => (
+          completedEvents.map((item, index) => (
             <article className="event-feature" key={item.id}>
               <div className="event-feature-media">
                 {item.imageUrl ? (
-                  <img src={item.imageUrl} alt={item.title} loading="lazy" />
+                  <img
+                    src={getEventImageUrl(item.imageUrl, "event-feature") ?? item.imageUrl}
+                    alt={item.title}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    fetchPriority={index === 0 ? "high" : "auto"}
+                  />
                 ) : (
                   <div className="event-image-fallback">活动图片待补充</div>
                 )}
