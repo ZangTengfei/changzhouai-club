@@ -1796,22 +1796,24 @@ img {
 .home-stat-icon svg {
   width: 42px;
   height: 42px;
+  color: inherit;
+  stroke: currentColor;
 }
 
 .home-stat-icon-people {
-  color: #0f8a6c;
+  color: #0b8a69;
 }
 
 .home-stat-icon-calendar {
-  color: #f07d24;
+  color: #f27c22;
 }
 
 .home-stat-icon-clock {
-  color: #2f87ed;
+  color: #2f82ed;
 }
 
 .home-stat-icon-pin {
-  color: #8062f0;
+  color: #7d63f1;
 }
 
 .home-flow-section,
