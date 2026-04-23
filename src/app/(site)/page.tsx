@@ -2,12 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 
 import {
-  DoodleSmile,
   DoodleSparkles,
   FlowPeopleIllustration,
   HandDrawnArrow,
   JoinCommunityIllustration,
 } from "@/components/home-visual-assets";
+import { HeroPhotoCarousel } from "@/components/hero-photo-carousel";
 import { SiteSponsors } from "@/components/site-sponsors";
 import { SocialPlatformIcon } from "@/components/social-platform-icon";
 import {
@@ -157,12 +157,7 @@ export default async function HomePage() {
         minute: "2-digit",
       }).format(new Date(wechatQrCode.expiresAt))
     : null;
-  const heroPrimaryImage = heroGallery[0] ?? null;
-  const heroThumbs = [
-    heroGallery[1] ?? heroPrimaryImage,
-    heroGallery[2] ?? heroPrimaryImage,
-    heroGallery[3] ?? heroPrimaryImage,
-  ].filter((imageUrl): imageUrl is string => Boolean(imageUrl));
+  const heroCarouselImages = heroGallery.slice(0, 3);
 
   return (
     <div className="home-page-stack">
@@ -218,81 +213,14 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <div className="home-hero-visual" aria-label="社区活动现场">
-          <div className="home-photo-frame">
-            {heroPrimaryImage ? (
-              <Image
-                src={heroPrimaryImage}
-                alt={latestCompletedEvent?.title ?? "常州 AI Club 活动现场"}
-                width={760}
-                height={520}
-                priority
-                unoptimized
-                sizes="(max-width: 1024px) calc(100vw - 48px), 560px"
-              />
-            ) : (
-              <div className="home-photo-fallback">
-                <strong>常州 AI Club</strong>
-                <span>连接 · 分享 · 共创</span>
-              </div>
-            )}
-            <div className="home-photo-label">
-              <strong>常州 AI Club</strong>
-              <span>连接 · 分享 · 共创</span>
-            </div>
-          </div>
-
-          {heroThumbs.length > 0 ? (
-            <div className="home-photo-carousel" aria-hidden="true">
-              <div className="home-photo-carousel-track">
-                {heroThumbs.map((imageUrl, index) => {
-                  const activeIndex = heroThumbs.length > 1 ? 1 : 0;
-                  const stateClass =
-                    index === activeIndex
-                      ? "is-active"
-                      : index < activeIndex
-                        ? "is-prev"
-                        : "is-next";
-
-                  return (
-                    <div
-                      key={`${imageUrl}-${index}`}
-                      className={`home-photo-carousel-item ${stateClass}`}
-                    >
-                      <Image
-                        src={imageUrl}
-                        alt=""
-                        width={220}
-                        height={132}
-                        unoptimized
-                        sizes="160px"
-                        className="home-photo-thumb"
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="home-photo-carousel-dots">
-                {heroThumbs.map((imageUrl, index) => (
-                  <span
-                    key={`${imageUrl}-dot-${index}`}
-                    className={index === (heroThumbs.length > 1 ? 1 : 0) ? "is-active" : undefined}
-                  />
-                ))}
-              </div>
-            </div>
-          ) : null}
-
-          {heroNotes.map((note) => (
-            <p key={note.className} className={note.className}>
-              {note.lines.map((line) => (
-                <span key={line}>{line}</span>
-              ))}
-            </p>
-          ))}
-          <DoodleSparkles className="home-doodle home-doodle-hero-sparkles" />
-          <DoodleSmile className="home-doodle home-doodle-hero-smile" />
-        </div>
+        <HeroPhotoCarousel
+          images={heroCarouselImages}
+          alt={latestCompletedEvent?.title ?? "常州 AI Club 活动现场"}
+          notes={heroNotes.map((note) => ({
+            className: note.className,
+            lines: [...note.lines],
+          }))}
+        />
       </section>
 
       <section className="home-stats-panel" aria-label="社区数据">
