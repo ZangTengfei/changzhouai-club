@@ -535,7 +535,6 @@ export default async function HomePage() {
         </div>
 
         <div className="home-join-banner-copy">
-          <span className="home-join-banner-eyebrow">加入我们</span>
           <h2 id="home-join-banner-title">加入我们，成为常州 AI 生态的一部分</h2>
           <p>
             扫描二维码，加入常州 AI Club 微信群，获取活动通知、资料分享和合作机会。
