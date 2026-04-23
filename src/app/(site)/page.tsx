@@ -4,7 +4,6 @@ import Link from "next/link";
 import {
   DoodleSmile,
   DoodleSparkles,
-  EventHostIllustration,
   FlowPeopleIllustration,
   HandDrawnArrow,
   JoinCommunityIllustration,
@@ -339,7 +338,15 @@ export default async function HomePage() {
               查看活动详情
               <span aria-hidden="true">→</span>
             </Link>
-            <EventHostIllustration className="home-event-person" />
+            <Image
+              src="/event-card-character.png"
+              alt=""
+              width={1024}
+              height={1536}
+              className="home-event-person"
+              aria-hidden="true"
+              priority={false}
+            />
             <DoodleSparkles className="home-doodle home-doodle-event-sparkles" />
           </article>
         </div>
