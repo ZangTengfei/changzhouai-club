@@ -4,7 +4,6 @@ import { CalendarDays, Clock3, MapPin, UsersRound } from "lucide-react";
 
 import {
   DoodleSparkles,
-  FlowPeopleIllustration,
   HandDrawnArrow,
   JoinCommunityIllustration,
 } from "@/components/home-visual-assets";
@@ -53,21 +52,24 @@ const homeFlowSteps = [
     title: "参与活动",
     summary: "线下交流、主题分享、拓展你的 AI 视野",
     tone: "green",
-    assetNeed: "可替换为：两位成员在桌边交流的 SVG 插画",
+    illustrationSrc: "/home-flow-participate.png",
+    illustrationAlt: "",
   },
   {
     step: "02",
     title: "认识成员",
     summary: "通过交流发现更合拍的伙伴，建立信任连接",
     tone: "orange",
-    assetNeed: "可替换为：握手/交换想法的人物 SVG 插画",
+    illustrationSrc: "/home-flow-connect.png",
+    illustrationAlt: "",
   },
   {
     step: "03",
     title: "合作共建",
     summary: "项目合作、资源对接，让想法真正落地",
     tone: "blue",
-    assetNeed: "可替换为：拼图/项目共创人物 SVG 插画",
+    illustrationSrc: "/home-flow-build.png",
+    illustrationAlt: "",
   },
 ] as const;
 
@@ -276,11 +278,14 @@ export default async function HomePage() {
                 <div
                   className="home-flow-illustration"
                   aria-hidden="true"
-                  title={item.assetNeed}
                 >
-                  <FlowPeopleIllustration
-                    tone={item.tone}
-                    className="home-flow-illustration-svg"
+                  <Image
+                    src={item.illustrationSrc}
+                    alt={item.illustrationAlt}
+                    width={1124}
+                    height={1400}
+                    className="home-flow-illustration-image"
+                    aria-hidden="true"
                   />
                 </div>
                 {index < homeFlowSteps.length - 1 ? (

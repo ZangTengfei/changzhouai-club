@@ -1842,68 +1842,77 @@ img {
 .home-flow-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.9fr);
-  gap: 28px;
+  gap: 24px;
   align-items: stretch;
 }
 
 .home-flow-cards {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 34px;
+  gap: 22px;
   align-content: start;
 }
 
 .home-flow-card {
   position: relative;
   display: grid;
-  min-height: 252px;
-  padding: 26px 22px 12px;
+  grid-template-rows: auto auto auto 1fr;
+  min-height: 258px;
+  padding: 22px 20px 10px;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.72);
-  box-shadow: 0 14px 32px rgba(var(--ink-rgb), 0.05);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.84);
+  box-shadow: 0 14px 30px rgba(var(--ink-rgb), 0.045);
   overflow: hidden;
 }
 
 .home-flow-card::before {
   content: "";
   position: absolute;
-  inset: auto 18px 12px;
-  height: 58px;
-  border-radius: 999px;
-  background: rgba(var(--accent-rgb), 0.06);
+  inset: auto 12px 10px;
+  height: 86px;
+  border-radius: 20px;
+  background: rgba(var(--accent-rgb), 0.07);
 }
 
 .home-flow-card span {
   color: var(--accent);
+  font-size: 2rem;
   font-weight: 900;
+  line-height: 1;
 }
 
 .home-flow-card h3 {
-  margin: 14px 0 8px;
-  font-size: 1.18rem;
+  margin: 10px 0 8px;
+  font-size: 1.26rem;
+  line-height: 1.18;
 }
 
 .home-flow-card p {
   margin: 0;
   color: rgba(var(--ink-rgb), 0.64);
-  font-size: 0.92rem;
-  line-height: 1.7;
+  font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 .home-flow-illustration {
   align-self: end;
-  justify-self: end;
+  justify-self: stretch;
   position: relative;
   z-index: 1;
-  width: min(100%, 176px);
-  margin: 8px -14px -10px 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 128px;
+  margin: 8px -6px 0;
 }
 
-.home-flow-illustration-svg {
+.home-flow-illustration-image {
   display: block;
-  width: 100%;
-  height: auto;
+  width: min(100%, 220px);
+  height: 128px;
+  object-fit: contain;
+  object-position: center bottom;
 }
 
 .home-flow-card-orange span {
@@ -1922,15 +1931,30 @@ img {
   background: rgba(42, 123, 211, 0.1);
 }
 
+.home-flow-card-green {
+  border-color: rgba(19, 147, 102, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 251, 247, 0.96));
+}
+
+.home-flow-card-orange {
+  border-color: rgba(238, 127, 24, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 248, 240, 0.96));
+}
+
+.home-flow-card-blue {
+  border-color: rgba(42, 123, 211, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 249, 255, 0.96));
+}
+
 .home-flow-arrow {
   position: absolute;
-  top: 50%;
-  right: -26px;
+  top: 52%;
+  right: -18px;
   z-index: 2;
-  width: 18px;
-  height: 18px;
-  border-top: 2px solid rgba(var(--ink-rgb), 0.78);
-  border-right: 2px solid rgba(var(--ink-rgb), 0.78);
+  width: 16px;
+  height: 16px;
+  border-top: 2px solid rgba(var(--ink-rgb), 0.84);
+  border-right: 2px solid rgba(var(--ink-rgb), 0.84);
   transform: translateY(-50%) rotate(45deg);
 }
 
