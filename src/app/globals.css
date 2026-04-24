@@ -2612,7 +2612,7 @@ img {
   align-self: end;
   position: relative;
   overflow: hidden;
-  min-height: 150px;
+  min-height: 138px;
 }
 
 .home-join-banner-illustration::before,
@@ -2639,13 +2639,13 @@ img {
 }
 
 .home-join-banner-illustration-image {
-  width: min(100%, 188px);
+  width: min(100%, 190px);
   height: auto;
   object-fit: contain;
   object-position: left bottom;
   filter: none;
   margin-left: -6px;
-  margin-bottom: -22px;
+  margin-bottom: 0;
 }
 
 .home-join-banner-copy h2,
