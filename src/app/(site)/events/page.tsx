@@ -14,6 +14,8 @@ import { EventsRegistrationGrid } from "@/components/events-registration-grid";
 import { getCompletedEventRecaps, getScheduledEvents } from "@/lib/community-events";
 import { getEventImageUrl } from "@/lib/public-image-url";
 
+import styles from "./events-page.module.css";
+
 export const metadata: Metadata = {
   title: "活动",
   description: "浏览常州 AI Club 的近期活动与往期回顾。",
@@ -65,6 +67,12 @@ const eventFlowSteps = [
   },
 ] as const;
 
+const eventFlowToneClassName = {
+  green: "",
+  orange: styles.flowCardOrange,
+  blue: styles.flowCardBlue,
+} satisfies Record<(typeof eventFlowSteps)[number]["tone"], string>;
+
 export default async function EventsPage({
   searchParams,
 }: {
@@ -114,17 +122,19 @@ export default async function EventsPage({
   ];
 
   return (
-    <div className="events-page-stack">
+    <div className={styles.pageStack}>
       {params.registered ? (
-        <div className="events-status-note">报名成功，已经写入你的社区账号记录。</div>
+        <div className={styles.statusNote}>报名成功，已经写入你的社区账号记录。</div>
       ) : null}
 
       {params.error ? (
-        <div className="events-status-note events-status-note-error">报名失败，请稍后再试。</div>
+        <div className={`${styles.statusNote} ${styles.statusNoteError}`}>
+          报名失败，请稍后再试。
+        </div>
       ) : null}
 
-      <section className="events-hero" aria-labelledby="events-hero-title">
-        <div className="events-hero-copy">
+      <section className={styles.hero} aria-labelledby="events-hero-title">
+        <div className={styles.heroCopy}>
           <p className="home-kicker">Events · 线下相遇</p>
           <h1 id="events-hero-title">
             把每一次相遇，
@@ -135,7 +145,7 @@ export default async function EventsPage({
             活动是常州 AI Club 最稳定的连接方式。
           </p>
 
-          <div className="events-hero-actions">
+          <div className={styles.heroActions}>
             <Link href="#upcoming" className="button home-primary-button">
               查看报名
               <ArrowRight aria-hidden="true" strokeWidth={2} />
@@ -145,7 +155,7 @@ export default async function EventsPage({
             </Link>
           </div>
 
-          <div className="events-hero-proof">
+          <div className={styles.heroProof}>
             {eventStats.map((item) => {
               const Icon = item.icon;
 
@@ -161,8 +171,8 @@ export default async function EventsPage({
           </div>
         </div>
 
-        <div className="events-hero-visual">
-          <div className="events-hero-photo">
+        <div className={styles.heroVisual}>
+          <div className={styles.heroPhoto}>
             {heroImageUrl ? (
               <img
                 src={heroImageUrl}
@@ -171,14 +181,14 @@ export default async function EventsPage({
                 fetchPriority="high"
               />
             ) : (
-              <div className="events-hero-photo-fallback">
+              <div className={styles.heroPhotoFallback}>
                 <span>AI</span>
                 <strong>下一张现场照片，等你入镜</strong>
               </div>
             )}
           </div>
 
-          <article className="events-next-card">
+          <article className={styles.nextCard}>
             <p>下一场活动</p>
             <h2>{nextEvent?.title ?? "新的线下活动正在筹备"}</h2>
             <div>
@@ -198,18 +208,21 @@ export default async function EventsPage({
             </Link>
           </article>
 
-          <div className="events-sticky-note">
+          <div className={styles.stickyNote}>
             <span>活动现场</span>
             <strong>见面聊，比群里聊更快一步</strong>
           </div>
-          <DoodleSparkles className="events-hero-doodle" />
-          <HandDrawnArrow className="events-hero-arrow" />
+          <DoodleSparkles className={styles.heroDoodle} />
+          <HandDrawnArrow className={styles.heroArrow} />
         </div>
       </section>
 
-      <section className="events-flow-strip" aria-label="活动参与方式">
+      <section className={styles.flowStrip} aria-label="活动参与方式">
         {eventFlowSteps.map((item, index) => (
-          <article className={`events-flow-card events-flow-card-${item.tone}`} key={item.title}>
+          <article
+            className={`${styles.flowCard} ${eventFlowToneClassName[item.tone]}`}
+            key={item.title}
+          >
             <span>{String(index + 1).padStart(2, "0")}</span>
             <h2>{item.title}</h2>
             <p>{item.summary}</p>
@@ -217,8 +230,8 @@ export default async function EventsPage({
         ))}
       </section>
 
-      <section className="events-upcoming-section" id="upcoming">
-        <div className="events-section-heading">
+      <section className={styles.upcomingSection} id="upcoming">
+        <div className={styles.sectionHeading}>
           <p className="home-kicker">Upcoming</p>
           <div>
             <h2>近期活动报名</h2>
@@ -229,15 +242,15 @@ export default async function EventsPage({
         {scheduledEvents.length > 0 ? (
           <EventsRegistrationGrid events={scheduledEvents} />
         ) : (
-          <div className="events-empty-panel">
+          <div className={styles.emptyPanel}>
             <strong>暂无开放报名的活动</strong>
             <p>新的线下安排确认后会发布在这里，也会同步到社区通知。</p>
           </div>
         )}
       </section>
 
-      <section className="events-recap-section" id="reviews">
-        <div className="events-section-heading">
+      <section className={styles.recapSection} id="reviews">
+        <div className={styles.sectionHeading}>
           <p className="home-kicker">Recap</p>
           <div>
             <h2>往期活动回顾</h2>
@@ -248,15 +261,15 @@ export default async function EventsPage({
         </div>
 
         {completedEvents.length > 0 ? (
-          <div className="events-recap-list">
+          <div className={styles.recapList}>
             {completedEvents.map((item, index) => (
-              <article className="events-recap-card" key={item.id}>
-                <Link className="events-recap-media" href={`/events/${item.slug}`}>
+              <article className={styles.recapCard} key={item.id}>
+                <Link className={styles.recapMedia} href={`/events/${item.slug}`}>
                   <span>{item.dateLabel}</span>
                   <strong>{String(index + 1).padStart(2, "0")}</strong>
                   <ArrowRight aria-hidden="true" strokeWidth={2} />
                 </Link>
-                <div className="events-recap-image">
+                <div className={styles.recapImage}>
                   {item.imageUrl ? (
                     <img
                       src={getEventImageUrl(item.imageUrl, "event-feature") ?? item.imageUrl}
@@ -265,12 +278,12 @@ export default async function EventsPage({
                       fetchPriority={index === 0 ? "high" : "auto"}
                     />
                   ) : (
-                    <div className="events-recap-image-fallback">活动图片待补充</div>
+                    <div className={styles.recapImageFallback}>活动图片待补充</div>
                   )}
                 </div>
 
-                <div className="events-recap-copy">
-                  <div className="events-recap-meta">
+                <div className={styles.recapCopy}>
+                  <div className={styles.recapMeta}>
                     <span>{item.locationLabel}</span>
                     <span>
                       {item.gallery.length > 0
@@ -280,12 +293,12 @@ export default async function EventsPage({
                   </div>
                   <h2>{item.title}</h2>
                   <p>{item.summary}</p>
-                  <div className="events-recap-tags">
+                  <div className={styles.recapTags}>
                     {item.highlights.map((highlight) => (
                       <span key={highlight}>{highlight}</span>
                     ))}
                   </div>
-                  <Link href={`/events/${item.slug}`} className="events-recap-link">
+                  <Link href={`/events/${item.slug}`} className={styles.recapLink}>
                     查看活动详情
                     <ArrowRight aria-hidden="true" strokeWidth={2} />
                   </Link>
@@ -294,7 +307,7 @@ export default async function EventsPage({
             ))}
           </div>
         ) : (
-          <div className="events-empty-panel">
+          <div className={styles.emptyPanel}>
             <strong>暂无往期活动回顾</strong>
             <p>第一场活动完成后，现场照片与内容摘要会在这里归档。</p>
           </div>
