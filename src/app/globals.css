@@ -1462,7 +1462,7 @@ img {
 
 .home-hero-arrow {
   position: absolute;
-  right: -132px;
+  right: -92px;
   bottom: -8px;
   width: 126px;
   height: auto;
@@ -6604,7 +6604,7 @@ img {
   }
 
   .home-hero-arrow {
-    right: -10px;
+    right: 18px;
     bottom: -52px;
     width: 104px;
   }
