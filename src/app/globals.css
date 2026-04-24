@@ -3715,6 +3715,81 @@ img {
   gap: 28px;
 }
 
+.login-page-focused {
+  align-content: center;
+  min-height: calc(100vh - 156px);
+  padding: 14px 0 34px;
+}
+
+.login-focus-shell {
+  display: grid;
+  justify-items: center;
+  gap: 22px;
+  width: min(100%, 980px);
+  margin: 0 auto;
+}
+
+.login-focus-intro {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  max-width: 680px;
+  text-align: center;
+}
+
+.login-focus-logo {
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-radius: 24px;
+  background: rgba(255, 252, 247, 0.78);
+  box-shadow: 0 16px 34px rgba(var(--ink-rgb), 0.065);
+}
+
+.login-focus-logo-mark {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+}
+
+.login-focus-intro h1 {
+  margin: 0;
+  color: #111b1f;
+  font-size: 2.64rem;
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.login-focus-intro > p:not(.home-kicker) {
+  max-width: 42rem;
+  margin: 0;
+  color: rgba(var(--ink-rgb), 0.72);
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.78;
+}
+
+.login-focus-shell .login-panel-grid {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  width: 100%;
+  max-width: 980px;
+}
+
+.login-focus-shell .login-primary-card {
+  width: min(100%, 640px);
+}
+
+.login-focus-shell .login-side-stack {
+  width: 100%;
+  max-width: 900px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 2px;
+}
+
 .login-hero {
   display: grid;
   grid-template-columns: minmax(0, 0.96fr) minmax(320px, 0.72fr);
@@ -9207,6 +9282,34 @@ img {
 
   .login-google-button {
     width: 100%;
+  }
+
+  .login-page-focused {
+    min-height: auto;
+    padding: 0 0 24px;
+  }
+
+  .login-focus-shell {
+    gap: 20px;
+  }
+
+  .login-focus-logo {
+    width: 66px;
+    height: 66px;
+    border-radius: 20px;
+  }
+
+  .login-focus-logo-mark {
+    width: 46px;
+    height: 46px;
+  }
+
+  .login-focus-intro h1 {
+    font-size: 2.32rem;
+  }
+
+  .login-focus-shell .login-side-stack {
+    grid-template-columns: 1fr;
   }
 
   .site-route-loading {
