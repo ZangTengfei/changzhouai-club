@@ -1422,7 +1422,7 @@ img {
   margin: 0;
   color: #111b1f;
   font-family: var(--font-display);
-  font-size: clamp(2.8rem, 4.9vw, 3.95rem);
+  font-size: clamp(2.65rem, 4.45vw, 3.68rem);
   font-weight: 820;
   line-height: 1.12;
   letter-spacing: -0.038em;
