@@ -303,88 +303,7 @@
   color: var(--status-muted-strong);
 }
 
-.joinSignalsPanel {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0;
-  padding: 25px 28px 24px;
-  border: 1px solid rgba(212, 216, 209, 0.7);
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(246, 244, 238, 0.94), rgba(241, 239, 232, 0.88));
-  box-shadow:
-    0 12px 28px rgba(var(--ink-rgb), 0.04),
-    0 1px 0 rgba(255, 255, 255, 0.5) inset;
-}
-
-.joinSignalCard {
-  display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
-  gap: 7px 16px;
-  align-items: center;
-  min-width: 0;
-  min-height: 82px;
-  padding: 0 22px;
-  border-right: 1px solid rgba(var(--ink-rgb), 0.075);
-}
-
-.joinSignalCard:last-child {
-  border-right: 0;
-}
-
-.joinSignalCard svg {
-  grid-row: 1 / span 3;
-  width: 42px;
-  height: 42px;
-  color: #0b8a69;
-}
-
-.joinSignalCard:nth-child(2) svg,
-.joinSignalCard:nth-child(2) strong {
-  color: #f27c22;
-}
-
-.joinSignalCard:nth-child(3) svg,
-.joinSignalCard:nth-child(3) strong {
-  color: #2f82ed;
-}
-
-.joinSignalCard:nth-child(4) svg,
-.joinSignalCard:nth-child(4) strong {
-  color: #7d63f1;
-}
-
-.joinSignalCard strong,
-.joinSignalCard span,
-.joinSignalCard small {
-  overflow: hidden;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.joinSignalCard strong {
-  color: #0b8a69;
-  font-family: var(--font-latin-rounded);
-  font-size: clamp(1.8rem, 2.5vw, 2.32rem);
-  font-weight: 850;
-  letter-spacing: 0;
-}
-
-.joinSignalCard span {
-  color: #152524;
-  font-size: 0.92rem;
-  font-weight: 850;
-}
-
-.joinSignalCard small {
-  color: rgba(var(--ink-rgb), 0.56);
-  font-size: 0.82rem;
-  font-weight: 650;
-}
-
-.joinFlowSection,
-.joinProfileSection,
-.interestsSection {
+.joinProfileSection {
   display: grid;
   gap: 20px;
   padding-top: 12px;
@@ -415,80 +334,6 @@
   margin-top: 8px;
   color: rgba(var(--ink-rgb), 0.66);
   font-weight: 600;
-}
-
-.joinFlowGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.joinFlowCard {
-  position: relative;
-  overflow: hidden;
-  display: grid;
-  grid-template-rows: auto auto 1fr;
-  gap: 10px;
-  min-height: 196px;
-  padding: 22px;
-  border: 1px solid rgba(208, 214, 207, 0.7);
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(245, 244, 238, 0.92), rgba(240, 239, 232, 0.9));
-  box-shadow: 0 12px 28px rgba(var(--ink-rgb), 0.035);
-}
-
-.joinFlowCard::after {
-  content: "";
-  position: absolute;
-  right: -24px;
-  bottom: -30px;
-  width: 118px;
-  height: 118px;
-  border-radius: 999px;
-  background: rgba(var(--accent-rgb), 0.08);
-}
-
-.joinFlowCard:nth-child(2)::after {
-  background: rgba(238, 127, 24, 0.11);
-}
-
-.joinFlowCard:nth-child(3)::after {
-  background: rgba(42, 123, 211, 0.1);
-}
-
-.joinFlowCard span {
-  color: var(--accent);
-  font-size: 2rem;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.joinFlowCard svg {
-  position: relative;
-  z-index: 1;
-  width: 36px;
-  height: 36px;
-  margin-top: 14px;
-  color: var(--accent);
-}
-
-.joinFlowCard:nth-child(2) span,
-.joinFlowCard:nth-child(2) svg {
-  color: #ee7f18;
-}
-
-.joinFlowCard:nth-child(3) span,
-.joinFlowCard:nth-child(3) svg {
-  color: #2a7bd3;
-}
-
-.joinFlowCard h3 {
-  position: relative;
-  z-index: 1;
-  margin: 0;
-  color: #111a1d;
-  font-size: 1.18rem;
-  line-height: 1.34;
 }
 
 .profileGrid {
@@ -566,8 +411,7 @@
   line-height: 1.45;
 }
 
-.optionalList,
-.tagCloud {
+.optionalList {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -583,14 +427,6 @@
   background: rgba(255, 252, 247, 0.78);
   color: rgba(var(--ink-rgb), 0.72);
   font-weight: 750;
-}
-
-.tagCloud {
-  padding: 22px;
-  border: 1px solid rgba(212, 216, 209, 0.7);
-  border-radius: 22px;
-  background: rgba(255, 252, 247, 0.64);
-  box-shadow: 0 12px 28px rgba(var(--ink-rgb), 0.035);
 }
 
 .joinCtaPanel {
@@ -644,29 +480,6 @@
 
   .joinHeroCopy {
     padding-top: 10px;
-  }
-
-  .joinSignalsPanel {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 20px 22px;
-  }
-
-  .joinSignalCard {
-    padding: 18px 24px;
-    border-right: 0;
-    border-bottom: 1px solid rgba(var(--ink-rgb), 0.07);
-  }
-
-  .joinSignalCard:nth-child(odd) {
-    border-right: 1px solid rgba(var(--ink-rgb), 0.07);
-  }
-
-  .joinSignalCard:nth-last-child(-n + 2) {
-    border-bottom: 0;
-  }
-
-  .joinFlowGrid {
-    grid-template-columns: 1fr;
   }
 
   .joinCtaActions {
@@ -747,35 +560,14 @@
     width: 100%;
   }
 
-  .joinSignalsPanel {
-    grid-template-columns: 1fr;
-    padding: 6px 18px;
-  }
-
-  .joinSignalCard,
-  .joinSignalCard:nth-child(odd),
-  .joinSignalCard:nth-last-child(-n + 2) {
-    grid-template-columns: 52px minmax(0, 1fr);
-    min-height: 78px;
-    padding: 18px 0;
-    border-right: 0;
-    border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
-  }
-
-  .joinSignalCard:last-child {
-    border-bottom: 0;
-  }
-
   .joinSectionHeading {
     grid-template-columns: 1fr;
     gap: 12px;
   }
 
   .joinBoard,
-  .joinFlowCard,
   .requiredPanel,
   .optionalPanel,
-  .tagCloud,
   .joinCtaPanel {
     padding: 20px;
   }

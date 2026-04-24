@@ -4,21 +4,15 @@ import Link from "next/link";
 import {
   ArrowRight,
   BadgeCheck,
-  CalendarDays,
   CheckCircle2,
-  ClipboardCheck,
   Clock3,
-  Handshake,
   IdCard,
   MessageCircle,
-  Sparkles,
-  UserRoundCheck,
 } from "lucide-react";
 
 import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
-import { ToneBadge } from "@/components/tone-badge";
 import { hasSupabaseEnv } from "@/lib/env";
-import { joinSteps, memberTags } from "@/lib/site-data";
+import { joinSteps } from "@/lib/site-data";
 import { createClient } from "@/lib/supabase/server";
 
 import styles from "./join-page.module.css";
@@ -52,33 +46,6 @@ const optionalFields = [
   "是否愿意参加线下活动",
   "是否愿意分享",
   "是否愿意参与项目",
-] as const;
-
-const joinSignals = [
-  {
-    value: "2 项",
-    label: "必填信息",
-    detail: "先快速建立社区身份",
-    icon: ClipboardCheck,
-  },
-  {
-    value: "长期",
-    label: "资料维护",
-    detail: "活动、项目和主页共用",
-    icon: UserRoundCheck,
-  },
-  {
-    value: "线下",
-    label: "活动连接",
-    detail: "报名后持续沉淀记录",
-    icon: CalendarDays,
-  },
-  {
-    value: "共创",
-    label: "协作机会",
-    detail: "分享、项目和合作都能被看见",
-    icon: Handshake,
-  },
 ] as const;
 
 export default async function JoinPage() {
@@ -180,41 +147,6 @@ export default async function JoinPage() {
         </div>
       ) : null}
 
-      <section className={styles.joinSignalsPanel} aria-label="加入后的社区连接">
-        {joinSignals.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <article className={styles.joinSignalCard} key={item.label}>
-              <Icon aria-hidden="true" strokeWidth={1.9} />
-              <strong>{item.value}</strong>
-              <span>{item.label}</span>
-              <small>{item.detail}</small>
-            </article>
-          );
-        })}
-      </section>
-
-      <section className={styles.joinFlowSection}>
-        <div className={styles.joinSectionHeading}>
-          <p className="home-kicker">How It Works</p>
-          <div>
-            <h2>现在的加入方式</h2>
-            <p>登录后会直接进入资料完善页，必填信息更少，后续也不需要再重复填写第二套表单。</p>
-          </div>
-        </div>
-
-        <div className={styles.joinFlowGrid}>
-          {joinSteps.map((step, index) => (
-            <article className={styles.joinFlowCard} key={step}>
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <Sparkles aria-hidden="true" strokeWidth={1.8} />
-              <h3>{step}</h3>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <section className={styles.joinProfileSection}>
         <div className={styles.joinSectionHeading}>
           <p className="home-kicker">Profile</p>
@@ -258,22 +190,6 @@ export default async function JoinPage() {
               ))}
             </div>
           </article>
-        </div>
-      </section>
-
-      <section className={styles.interestsSection}>
-        <div className={styles.joinSectionHeading}>
-          <p className="home-kicker">Signals</p>
-          <div>
-            <h2>社区常见关注方向</h2>
-            <p>这些标签帮助你更快找到同频成员、活动主题和可能的共建线索。</p>
-          </div>
-        </div>
-
-        <div className={styles.tagCloud}>
-          {memberTags.map((tag) => (
-            <ToneBadge key={tag} label={tag} />
-          ))}
         </div>
       </section>
 
