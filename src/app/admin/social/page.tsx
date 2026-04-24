@@ -15,6 +15,7 @@ import {
   AdminPanelHeader,
   AdminStatusBadge,
 } from "@/components/admin-ui";
+import { AdminModal } from "@/components/admin-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
 import { Button } from "@/components/ui/button";
@@ -149,90 +150,91 @@ export default async function AdminSocialPage({
       ) : null}
 
       <AdminPanel>
-        <AdminPanelHeader eyebrow="WeChat QR" title="发布新的微信群二维码" />
-        <AdminPanelBody>
-          <form action={saveAdminWechatQrCode} className="grid gap-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <AdminField label="标题">
-                <Input
-                  name="title"
-                  defaultValue="常州 AI Club 微信群"
-                  placeholder="例如：常州 AI Club 微信群"
-                  required
-                />
-              </AdminField>
+        <AdminPanelHeader
+          eyebrow="History"
+          title="二维码历史"
+          actions={
+            <AdminModal title="发布新的微信群二维码" triggerLabel="上传二维码">
+              <form action={saveAdminWechatQrCode} className="grid gap-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <AdminField label="标题">
+                    <Input
+                      name="title"
+                      defaultValue="常州 AI Club 微信群"
+                      placeholder="例如：常州 AI Club 微信群"
+                      required
+                    />
+                  </AdminField>
 
-              <AdminField label="二维码图片" className="md:col-span-2">
-                <StorageImageUrlField
-                  name="image_url"
-                  eventSlug="wechat-group"
-                  uploadScope="community"
-                  mode="upload-only"
-                  placeholder="上传图片后会自动填写，也可以粘贴 Supabase Storage 图片地址"
-                  uploadLabel="上传微信群二维码"
-                  clearLabel="清空二维码"
-                  filledStatusText="已设置二维码"
-                  emptyStatusText="当前未设置二维码"
-                  required
-                />
-              </AdminField>
-            </div>
+                  <AdminField label="二维码图片" className="md:col-span-2">
+                    <StorageImageUrlField
+                      name="image_url"
+                      eventSlug="wechat-group"
+                      uploadScope="community"
+                      mode="upload-only"
+                      placeholder="上传图片后会自动填写，也可以粘贴 Supabase Storage 图片地址"
+                      uploadLabel="上传微信群二维码"
+                      clearLabel="清空二维码"
+                      filledStatusText="已设置二维码"
+                      emptyStatusText="当前未设置二维码"
+                      required
+                    />
+                  </AdminField>
+                </div>
 
-            <details className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/30 p-3">
-              <summary className="cursor-pointer text-sm font-medium text-foreground">
-                高级设置
-              </summary>
-              <div className="mt-3 grid gap-4 md:grid-cols-2">
-                <AdminCheckboxRow className="self-end">
-                  <input
-                    type="checkbox"
-                    name="is_active"
-                    defaultChecked
-                    className="size-4"
-                  />
-                  <span>立即启用</span>
-                </AdminCheckboxRow>
+                <details className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/30 p-3">
+                  <summary className="cursor-pointer text-sm font-medium text-foreground">
+                    高级设置
+                  </summary>
+                  <div className="mt-3 grid gap-4 md:grid-cols-2">
+                    <AdminCheckboxRow className="self-end">
+                      <input
+                        type="checkbox"
+                        name="is_active"
+                        defaultChecked
+                        className="size-4"
+                      />
+                      <span>立即启用</span>
+                    </AdminCheckboxRow>
 
-                <div aria-hidden="true" />
+                    <div aria-hidden="true" />
 
-                <AdminField label="开始展示时间">
-                  <Input
-                    type="datetime-local"
-                    name="starts_at"
-                    defaultValue={toDatetimeLocal(startsAt)}
-                    required
-                  />
-                </AdminField>
+                    <AdminField label="开始展示时间">
+                      <Input
+                        type="datetime-local"
+                        name="starts_at"
+                        defaultValue={toDatetimeLocal(startsAt)}
+                        required
+                      />
+                    </AdminField>
 
-                <AdminField label="过期时间">
-                  <Input
-                    type="datetime-local"
-                    name="expires_at"
-                    defaultValue={toDatetimeLocal(expiresAt)}
-                    required
-                  />
-                </AdminField>
+                    <AdminField label="过期时间">
+                      <Input
+                        type="datetime-local"
+                        name="expires_at"
+                        defaultValue={toDatetimeLocal(expiresAt)}
+                        required
+                      />
+                    </AdminField>
 
-                <AdminField label="备注" className="md:col-span-2">
-                  <Textarea
-                    name="note"
-                    rows={3}
-                    placeholder="可选：例如这张二维码对应哪个群、何时从微信生成。备注只在后台显示。"
-                  />
-                </AdminField>
-              </div>
-            </details>
+                    <AdminField label="备注" className="md:col-span-2">
+                      <Textarea
+                        name="note"
+                        rows={3}
+                        placeholder="可选：例如这张二维码对应哪个群、何时从微信生成。备注只在后台显示。"
+                      />
+                    </AdminField>
+                  </div>
+                </details>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <Button type="submit">保存并发布二维码</Button>
-              <span className="text-sm text-muted-foreground">默认有效期 7 天。</span>
-            </div>
-          </form>
-        </AdminPanelBody>
-      </AdminPanel>
-
-      <AdminPanel>
-        <AdminPanelHeader eyebrow="History" title="二维码历史" />
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button type="submit">保存并发布二维码</Button>
+                  <span className="text-sm text-muted-foreground">默认有效期 7 天。</span>
+                </div>
+              </form>
+            </AdminModal>
+          }
+        />
         <AdminPanelBody className="space-y-2">
           {qrCodes.length > 0 ? (
             qrCodes.map((qrCode) => {
