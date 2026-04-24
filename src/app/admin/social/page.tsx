@@ -112,37 +112,6 @@ export default async function AdminSocialPage({
             </>
           }
         />
-        <AdminPanelBody className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-center">
-          <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/30 p-3">
-            {currentQrCode ? (
-              <div className="grid grid-cols-[64px_minmax(0,1fr)] items-center gap-3">
-                <div className="relative size-16 overflow-hidden rounded-lg border border-border/70 bg-background">
-                  <img
-                    src={currentQrCode.image_url}
-                    alt={currentQrCode.title}
-                    width={64}
-                    height={64}
-                    className="h-full w-full object-contain p-1.5"
-                  />
-                </div>
-                <div className="min-w-0 space-y-1">
-                  <p className="text-sm font-semibold text-foreground">
-                    {currentQrCode.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    有效至 {formatDateTime(currentQrCode.expires_at)}
-                  </p>
-                </div>
-              </div>
-            ) : (
-              <AdminNotice>当前没有可公开展示的微信群二维码，请上传新二维码。</AdminNotice>
-            )}
-          </div>
-
-          <AdminNotice>
-            微信群二维码默认有效期 7 天；小红书、抖音、B 站等公开平台入口仍从代码配置读取。
-          </AdminNotice>
-        </AdminPanelBody>
       </AdminPanel>
 
       {queryErrors.length > 0 ? (
