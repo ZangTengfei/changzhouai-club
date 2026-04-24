@@ -255,9 +255,9 @@ export default async function HomePage() {
         <div className="home-hero-copy">
           <p className="home-kicker">连接・分享・共创 👋</p>
           <h1 id="home-hero-title">
-            常州 <span>AI Club</span>
+            常州 <span className="home-hero-title-accent">AI Club</span>
             <br />
-            本地 AI 人的共同家园
+            <span className="home-hero-title-line">本地 AI 人的共同家园</span>
           </h1>
           <p className="home-hero-lede">
             连接常州的开发者、产品人、创业者和 AI 爱好者，

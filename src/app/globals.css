@@ -1422,17 +1422,22 @@ img {
   margin: 0;
   color: #111b1f;
   font-family: var(--font-display);
-  font-size: clamp(2.8rem, 5.25vw, 4.2rem);
+  font-size: clamp(2.8rem, 4.9vw, 3.95rem);
   font-weight: 820;
   line-height: 1.12;
   letter-spacing: -0.038em;
 }
 
-.home-hero-copy h1 span {
+.home-hero-title-accent {
   color: var(--accent);
   font-family: var(--font-latin-rounded);
   font-weight: 800;
   letter-spacing: -0.012em;
+}
+
+.home-hero-title-line {
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .home-hero-copy h1::after {
@@ -6561,6 +6566,10 @@ img {
 
   .home-hero-copy h1 {
     font-size: clamp(2.5rem, 14vw, 3.55rem);
+  }
+
+  .home-hero-title-line {
+    white-space: normal;
   }
 
   .home-hero-copy h1::after {
