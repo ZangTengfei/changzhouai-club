@@ -8,7 +8,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
+import { DoodleSparkles } from "@/components/home-visual-assets";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 
 import styles from "./about-page.module.css";
@@ -104,7 +104,6 @@ export default function AboutPage() {
             <strong>节点连接形成 CZ，也形成社区关系网</strong>
           </div>
           <DoodleSparkles className={styles.aboutHeroDoodle} />
-          <HandDrawnArrow className={styles.aboutHeroArrow} />
         </div>
       </section>
 
