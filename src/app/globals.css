@@ -6090,12 +6090,19 @@ img {
   color: var(--accent);
 }
 
-.events-recap-card > img,
+.events-recap-image {
+  align-self: center;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: rgba(var(--accent-rgb), 0.08);
+}
+
+.events-recap-image img,
 .events-recap-image-fallback {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 278px;
   object-fit: cover;
 }
 
@@ -7038,9 +7045,8 @@ img {
     display: none;
   }
 
-  .events-recap-card > img,
-  .events-recap-image-fallback {
-    min-height: 240px;
+  .events-recap-image {
+    aspect-ratio: 16 / 10;
   }
 
   .home-flow-card {

@@ -256,16 +256,18 @@ export default async function EventsPage({
                   <strong>{String(index + 1).padStart(2, "0")}</strong>
                   <ArrowRight aria-hidden="true" strokeWidth={2} />
                 </Link>
-                {item.imageUrl ? (
-                  <img
-                    src={getEventImageUrl(item.imageUrl, "event-feature") ?? item.imageUrl}
-                    alt={item.title}
-                    loading={index === 0 ? "eager" : "lazy"}
-                    fetchPriority={index === 0 ? "high" : "auto"}
-                  />
-                ) : (
-                  <div className="events-recap-image-fallback">活动图片待补充</div>
-                )}
+                <div className="events-recap-image">
+                  {item.imageUrl ? (
+                    <img
+                      src={getEventImageUrl(item.imageUrl, "event-feature") ?? item.imageUrl}
+                      alt={item.title}
+                      loading={index === 0 ? "eager" : "lazy"}
+                      fetchPriority={index === 0 ? "high" : "auto"}
+                    />
+                  ) : (
+                    <div className="events-recap-image-fallback">活动图片待补充</div>
+                  )}
+                </div>
 
                 <div className="events-recap-copy">
                   <div className="events-recap-meta">
