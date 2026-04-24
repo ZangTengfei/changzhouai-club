@@ -131,7 +131,7 @@ export const memberTags = [
 ];
 
 export const joinSteps = [
-  "使用 Google 登录，创建你的社区账号",
+  "使用邮箱或 Google 登录，创建你的社区账号",
   "先完成显示名和微信号这两个必填项",
   "在个人页持续补充资料、报名活动和参与协作",
 ];

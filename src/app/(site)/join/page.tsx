@@ -96,7 +96,7 @@ export default async function JoinPage() {
   const primaryHref = isLoggedIn
     ? onboardingPath
     : `/login?next=${encodeURIComponent(onboardingPath)}`;
-  const primaryLabel = isLoggedIn ? "前往完善资料" : "使用 Google 登录后加入";
+  const primaryLabel = isLoggedIn ? "前往完善资料" : "登录或注册后加入";
 
   return (
     <div className={styles.joinPageStack}>
