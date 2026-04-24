@@ -1462,8 +1462,8 @@ img {
 
 .home-hero-arrow {
   position: absolute;
-  right: -92px;
-  bottom: -8px;
+  right: -51px;
+  bottom: -22px;
   width: 126px;
   height: auto;
   color: var(--accent);
@@ -2174,7 +2174,11 @@ img {
       rgba(255, 199, 81, 0.16),
       transparent 18%
     ),
-    linear-gradient(180deg, rgba(242, 249, 245, 0.96), rgba(248, 251, 248, 0.92));
+    linear-gradient(
+      180deg,
+      rgba(242, 249, 245, 0.96),
+      rgba(248, 251, 248, 0.92)
+    );
   box-shadow:
     0 18px 36px rgba(var(--ink-rgb), 0.055),
     inset 0 1px 0 rgba(255, 255, 255, 0.72);
@@ -2520,7 +2524,11 @@ img {
   height: 56px;
   border-radius: 999px;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.2), rgba(var(--accent-warm-rgb), 0.16));
+  background: linear-gradient(
+    135deg,
+    rgba(var(--accent-rgb), 0.2),
+    rgba(var(--accent-warm-rgb), 0.16)
+  );
   box-shadow: 0 8px 18px rgba(var(--ink-rgb), 0.08);
 }
 
@@ -2680,8 +2688,16 @@ img {
   padding: 16px 28px 0 24px;
   border-radius: 24px;
   background:
-    radial-gradient(circle at 10% 78%, rgba(73, 182, 128, 0.08), transparent 24%),
-    radial-gradient(circle at 84% 24%, rgba(255, 204, 96, 0.08), transparent 18%),
+    radial-gradient(
+      circle at 10% 78%,
+      rgba(73, 182, 128, 0.08),
+      transparent 24%
+    ),
+    radial-gradient(
+      circle at 84% 24%,
+      rgba(255, 204, 96, 0.08),
+      transparent 18%
+    ),
     linear-gradient(180deg, rgba(243, 243, 235, 0.92), rgba(240, 240, 232, 0.9));
   box-shadow: none;
   isolation: isolate;
