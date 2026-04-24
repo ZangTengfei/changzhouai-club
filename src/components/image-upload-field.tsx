@@ -12,6 +12,8 @@ import {
   MEMBER_AVATARS_BUCKET,
 } from "@/lib/supabase/storage";
 
+import styles from "./image-upload-field.module.css";
+
 type UploadMode = "upload-only" | "upload-or-url";
 type UploadAppearance = "site" | "admin";
 type StorageUploadScope = "event" | "sponsor" | "community";
@@ -55,6 +57,16 @@ function getStorageUploadUrl(scope: StorageUploadScope) {
     default:
       return "/api/admin/storage/event-assets";
   }
+}
+
+function cx(...classes: Array<string | false | null | undefined>) {
+  return classes
+    .flatMap((className) =>
+      typeof className === "string" ? className.split(/\s+/) : [],
+    )
+    .filter(Boolean)
+    .map((className) => styles[className as keyof typeof styles] ?? className)
+    .join(" ");
 }
 
 export function ImageUploadField({
@@ -149,18 +161,25 @@ export function ImageUploadField({
 
   return (
     <div
-      className={`image-upload-field ${
-        resolvedPreview && appearance === "site" ? "image-upload-field-split" : ""
-      }`}
+      className={cx(
+        "image-upload-field",
+        Boolean(resolvedPreview) &&
+          appearance === "site" &&
+          "image-upload-field-split",
+      )}
     >
-      {resolvedPreview ? <div className="image-upload-preview">{resolvedPreview}</div> : null}
+      {resolvedPreview ? (
+        <div className={cx("image-upload-preview")}>{resolvedPreview}</div>
+      ) : null}
 
-      <div className="image-upload-body">
+      <div className={cx("image-upload-body")}>
         {panelTitle || panelDescription ? (
-          <div className="image-upload-copy">
-            {panelTitle ? <p className="image-upload-title">{panelTitle}</p> : null}
+          <div className={cx("image-upload-copy")}>
+            {panelTitle ? (
+              <p className={cx("image-upload-title")}>{panelTitle}</p>
+            ) : null}
             {panelDescription ? (
-              <p className="image-upload-description">{panelDescription}</p>
+              <p className={cx("image-upload-description")}>{panelDescription}</p>
             ) : null}
           </div>
         ) : null}
@@ -189,11 +208,10 @@ export function ImageUploadField({
         )}
 
         <div
-          className={
-            appearance === "admin"
-              ? "image-upload-actions image-upload-actions-admin"
-              : "image-upload-actions"
-          }
+          className={cx(
+            "image-upload-actions",
+            appearance === "admin" && "image-upload-actions-admin",
+          )}
         >
           {appearance === "admin" ? (
             <Button
@@ -240,7 +258,7 @@ export function ImageUploadField({
               )
             : null}
 
-          <span className="image-upload-status">{statusText}</span>
+          <span className={cx("image-upload-status")}>{statusText}</span>
         </div>
       </div>
 
