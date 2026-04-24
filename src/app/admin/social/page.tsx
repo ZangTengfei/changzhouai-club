@@ -111,30 +111,24 @@ export default async function AdminSocialPage({
             </>
           }
         />
-        <AdminPanelBody className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="space-y-3">
-            <p className="text-sm leading-6 text-muted-foreground">
-              微信群二维码通常 7 天过期。上传新二维码时，默认从当前时间开始展示，并在
-              7 天后自动从首页隐藏，避免用户扫到失效入口。
-            </p>
-            <AdminNotice>
-              小红书、抖音、B 站等公开平台入口目前仍从代码配置读取；微信群二维码已经接入后台管理。
-            </AdminNotice>
-          </div>
+        <AdminPanelBody className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)] lg:items-center">
+          <AdminNotice>
+            微信群二维码默认有效期 7 天；小红书、抖音、B 站等公开平台入口仍从代码配置读取。
+          </AdminNotice>
 
           <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/30 p-3">
             {currentQrCode ? (
-              <div className="grid gap-3">
-                <div className="relative aspect-square overflow-hidden rounded-xl border border-border/70 bg-background">
+              <div className="grid grid-cols-[64px_minmax(0,1fr)] items-center gap-3">
+                <div className="relative size-16 overflow-hidden rounded-lg border border-border/70 bg-background">
                   <img
                     src={currentQrCode.image_url}
                     alt={currentQrCode.title}
-                    width={288}
-                    height={288}
-                    className="h-full w-full object-contain p-3"
+                    width={64}
+                    height={64}
+                    className="h-full w-full object-contain p-1.5"
                   />
                 </div>
-                <div className="space-y-1">
+                <div className="min-w-0 space-y-1">
                   <p className="text-sm font-semibold text-foreground">
                     {currentQrCode.title}
                   </p>
