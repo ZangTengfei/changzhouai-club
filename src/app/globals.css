@@ -28,6 +28,11 @@
 }
 
 :root {
+  --font-display:
+    "Avenir Next", "Nunito Sans", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", sans-serif;
+  --font-latin-rounded:
+    "Avenir Next", "Nunito Sans", "Helvetica Neue", Arial, sans-serif;
   --bg: #f4efe6;
   --bg-strong: #efe7da;
   --ink-rgb: 24, 54, 52;
@@ -169,9 +174,7 @@ body {
       var(--body-gradient-start) 0%,
       var(--body-gradient-end) 100%
     );
-  font-family:
-    "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
-    sans-serif;
+  font-family: var(--font-display);
   line-height: 1.6;
 }
 
@@ -263,14 +266,17 @@ img {
 
 .brand-copy strong {
   color: #111b1f;
+  font-family: var(--font-display);
   font-size: 1rem;
-  font-weight: 800;
+  font-weight: 760;
   line-height: 1.1;
 }
 
 .brand-copy small {
   color: rgba(var(--ink-rgb), 0.5);
+  font-family: var(--font-latin-rounded);
   font-size: 0.8rem;
+  font-weight: 500;
   line-height: 1.1;
 }
 
@@ -1415,18 +1421,18 @@ img {
 .home-hero-copy h1 {
   margin: 0;
   color: #111b1f;
-  font-family:
-    "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
-    sans-serif;
+  font-family: var(--font-display);
   font-size: clamp(2.8rem, 5.25vw, 4.2rem);
-  font-weight: 900;
+  font-weight: 820;
   line-height: 1.12;
-  letter-spacing: -0.052em;
+  letter-spacing: -0.038em;
 }
 
 .home-hero-copy h1 span {
   color: var(--accent);
-  letter-spacing: 0.01em;
+  font-family: var(--font-latin-rounded);
+  font-weight: 800;
+  letter-spacing: -0.012em;
 }
 
 .home-hero-copy h1::after {
@@ -1532,8 +1538,11 @@ img {
 
 .home-member-proof strong {
   color: var(--accent-strong);
+  font-family: var(--font-latin-rounded);
   font-size: 1.72rem;
+  font-weight: 800;
   line-height: 1;
+  letter-spacing: -0.018em;
 }
 
 .home-member-proof-copy span,
@@ -1842,10 +1851,11 @@ img {
 
 .home-stat-card strong {
   color: #0c2a2b;
+  font-family: var(--font-latin-rounded);
   font-size: clamp(1.85rem, 2.5vw, 2.35rem);
-  font-weight: 900;
+  font-weight: 800;
   line-height: 0.98;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.022em;
   white-space: nowrap;
 }
 
@@ -1853,7 +1863,7 @@ img {
   margin-top: 7px;
   color: #152524;
   font-size: 0.92rem;
-  font-weight: 900;
+  font-weight: 800;
   line-height: 1.18;
   white-space: nowrap;
 }
