@@ -4,6 +4,12 @@ import { notFound } from "next/navigation";
 
 import { getPublicSponsorBySlug } from "@/lib/sponsors";
 
+import styles from "./sponsor-detail-page.module.css";
+
+function cx(...classNames: Array<string | false | null | undefined>) {
+  return classNames.filter(Boolean).join(" ");
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -39,8 +45,8 @@ export default async function SponsorDetailPage({
 
   return (
     <div className="page-stack">
-      <section className="surface sponsor-detail-hero">
-        <div className="sponsor-detail-copy">
+      <section className={cx("surface", styles["sponsor-detail-hero"])}>
+        <div className={styles["sponsor-detail-copy"]}>
           <div className="pill-row">
             <span className="pill">{sponsor.tierLabel}</span>
             <span className="pill">{sponsor.sponsorLabel}</span>
@@ -53,7 +59,7 @@ export default async function SponsorDetailPage({
             <h1>{sponsor.name}</h1>
           </div>
 
-          <p className="sponsor-detail-summary">{sponsor.summary}</p>
+          <p className={styles["sponsor-detail-summary"]}>{sponsor.summary}</p>
 
           <div className="cta-row">
             <Link href="/" className="button button-secondary">
@@ -72,7 +78,7 @@ export default async function SponsorDetailPage({
           </div>
         </div>
 
-        <div className="sponsor-logo-panel">
+        <div className={styles["sponsor-logo-panel"]}>
           {sponsor.logoUrl ? (
             <img
               src={sponsor.logoUrl}
@@ -81,20 +87,20 @@ export default async function SponsorDetailPage({
               fetchPriority="high"
             />
           ) : (
-            <div className="sponsor-logo-fallback">Logo 待补充</div>
+            <div className={styles["sponsor-logo-fallback"]}>Logo 待补充</div>
           )}
         </div>
       </section>
 
       <section className="two-up">
-        <article className="card sponsor-detail-panel">
+        <article className={cx("card", styles["sponsor-detail-panel"])}>
           <div className="section-heading">
             <p className="eyebrow">Profile</p>
             <h2>赞助者信息</h2>
           </div>
 
           {sponsor.descriptionParagraphs.length > 0 ? (
-            <div className="sponsor-detail-richtext">
+            <div className={styles["sponsor-detail-richtext"]}>
               {sponsor.descriptionParagraphs.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}
@@ -106,7 +112,7 @@ export default async function SponsorDetailPage({
           )}
         </article>
 
-        <article className="card sponsor-detail-panel">
+        <article className={cx("card", styles["sponsor-detail-panel"])}>
           <div className="section-heading">
             <p className="eyebrow">Support</p>
             <h2>共建关系</h2>
