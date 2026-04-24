@@ -79,7 +79,7 @@ export default async function EventsPage({
   const latestCompletedEvent = completedEvents[0];
   const heroImageUrl =
     latestCompletedEvent?.imageUrl
-      ? getEventImageUrl(latestCompletedEvent.imageUrl, "event-feature") ??
+      ? getEventImageUrl(latestCompletedEvent.imageUrl, "event-detail-hero") ??
         latestCompletedEvent.imageUrl
       : null;
   const totalPhotoCount = completedEvents.reduce(
