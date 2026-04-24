@@ -2,20 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
-  Boxes,
-  CalendarDays,
   CircleDot,
-  MapPin,
   Network,
   Palette,
   Sparkles,
-  UsersRound,
 } from "lucide-react";
 
 import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { SiteLogoMark } from "@/components/site-logo-mark";
-import { getCompletedEventRecaps } from "@/lib/community-events";
-import { getPublicMembersDirectory } from "@/lib/community-members";
 
 import styles from "./about-page.module.css";
 
@@ -57,46 +51,7 @@ const longTermDirections = [
   },
 ] as const;
 
-const brandColors = [
-  { name: "Growth Green", value: "#16A34A" },
-  { name: "Fresh Green", value: "#22C55E" },
-  { name: "Soft Mint", value: "#E8F5EE" },
-  { name: "Warm Orange", value: "#F59E0B" },
-  { name: "Soft Yellow", value: "#FFF3C4" },
-] as const;
-
-export default async function AboutPage() {
-  const [directory, completedEvents] = await Promise.all([
-    getPublicMembersDirectory(),
-    getCompletedEventRecaps(),
-  ]);
-  const aboutStats = [
-    {
-      value: directory.stats.registeredMembers || "200+",
-      label: "社区成员",
-      detail: "本地 AI 从业者与爱好者",
-      icon: UsersRound,
-    },
-    {
-      value: completedEvents.length || 7,
-      label: "线下活动",
-      detail: "持续建立真实连接",
-      icon: CalendarDays,
-    },
-    {
-      value: directory.stats.willingToJoinProjects || "共建中",
-      label: "共建意愿",
-      detail: "项目试点与协作线索",
-      icon: Boxes,
-    },
-    {
-      value: "常州",
-      label: "我们的据点",
-      detail: "立足本地，连接长三角",
-      icon: MapPin,
-    },
-  ];
-
+export default function AboutPage() {
   return (
     <div className={styles.aboutPageStack}>
       <section className={styles.aboutHero} aria-labelledby="about-hero-title">
@@ -153,21 +108,6 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className={styles.aboutStatsPanel} aria-label="社区概览">
-        {aboutStats.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <article className={styles.aboutStatCard} key={item.label}>
-              <Icon aria-hidden="true" strokeWidth={1.9} />
-              <strong>{item.value}</strong>
-              <span>{item.label}</span>
-              <small>{item.detail}</small>
-            </article>
-          );
-        })}
-      </section>
-
       <section className={styles.identitySection}>
         <div className={styles.aboutSectionHeading}>
           <p className="home-kicker">Identity</p>
@@ -190,38 +130,6 @@ export default async function AboutPage() {
               </article>
             );
           })}
-        </div>
-      </section>
-
-      <section className={styles.brandSystemSection}>
-        <div className={styles.brandCombination}>
-          <div className={styles.brandCombinationMark}>
-            <SiteLogoMark className={styles.brandCombinationImage} />
-          </div>
-          <i aria-hidden="true" />
-          <div>
-            <strong>常州 AI Club</strong>
-            <span>CHANGZHOU AI CLUB</span>
-          </div>
-          <i aria-hidden="true" />
-          <p>连接・分享・共创</p>
-        </div>
-
-        <div className={styles.brandColorPanel}>
-          <div>
-            <p className="home-kicker">Colors</p>
-            <h2>品牌色彩</h2>
-          </div>
-
-          <div className={styles.brandColorList}>
-            {brandColors.map((color) => (
-              <article key={color.value}>
-                <span style={{ backgroundColor: color.value }} />
-                <strong>{color.value}</strong>
-                <small>{color.name}</small>
-              </article>
-            ))}
-          </div>
         </div>
       </section>
 

@@ -232,85 +232,6 @@
   transform: rotate(18deg);
 }
 
-.aboutStatsPanel {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0;
-  padding: 25px 28px 24px;
-  border: 1px solid rgba(212, 216, 209, 0.7);
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(246, 244, 238, 0.94), rgba(241, 239, 232, 0.88));
-  box-shadow:
-    0 12px 28px rgba(var(--ink-rgb), 0.04),
-    0 1px 0 rgba(255, 255, 255, 0.5) inset;
-}
-
-.aboutStatCard {
-  display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
-  gap: 7px 16px;
-  align-items: center;
-  min-width: 0;
-  min-height: 82px;
-  padding: 0 22px;
-  border-right: 1px solid rgba(var(--ink-rgb), 0.075);
-}
-
-.aboutStatCard:last-child {
-  border-right: 0;
-}
-
-.aboutStatCard svg {
-  grid-row: 1 / span 3;
-  width: 42px;
-  height: 42px;
-  color: #0b8a69;
-}
-
-.aboutStatCard:nth-child(2) svg,
-.aboutStatCard:nth-child(2) strong {
-  color: #f27c22;
-}
-
-.aboutStatCard:nth-child(3) svg,
-.aboutStatCard:nth-child(3) strong {
-  color: #2f82ed;
-}
-
-.aboutStatCard:nth-child(4) svg,
-.aboutStatCard:nth-child(4) strong {
-  color: #7d63f1;
-}
-
-.aboutStatCard strong,
-.aboutStatCard span,
-.aboutStatCard small {
-  overflow: hidden;
-  line-height: 1.2;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.aboutStatCard strong {
-  color: #0b8a69;
-  font-family: var(--font-latin-rounded);
-  font-size: 2.32rem;
-  font-weight: 850;
-  letter-spacing: 0;
-}
-
-.aboutStatCard span {
-  color: #152524;
-  font-size: 0.92rem;
-  font-weight: 850;
-}
-
-.aboutStatCard small {
-  color: rgba(var(--ink-rgb), 0.56);
-  font-size: 0.82rem;
-  font-weight: 650;
-}
-
 .identitySection,
 .longTermSection {
   display: grid;
@@ -441,136 +362,6 @@
   line-height: 1.68;
 }
 
-.brandSystemSection {
-  display: grid;
-  gap: 18px;
-}
-
-.brandCombination {
-  display: grid;
-  grid-template-columns: auto auto minmax(0, 1fr) auto auto;
-  gap: 22px;
-  align-items: center;
-  padding: 22px 26px;
-  border: 1px solid rgba(212, 216, 209, 0.7);
-  border-radius: 22px;
-  background: rgba(255, 252, 247, 0.72);
-  box-shadow: 0 12px 28px rgba(var(--ink-rgb), 0.035);
-}
-
-.brandCombinationMark {
-  display: grid;
-  place-items: center;
-  width: 76px;
-  height: 76px;
-}
-
-.brandCombinationImage {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.brandCombination i {
-  width: 1px;
-  height: 54px;
-  background: rgba(var(--ink-rgb), 0.14);
-}
-
-.brandCombination strong,
-.brandCombination span {
-  display: block;
-}
-
-.brandCombination strong {
-  color: #111b1f;
-  font-size: 2.5rem;
-  font-weight: 900;
-  line-height: 1.08;
-  letter-spacing: 0;
-}
-
-.brandCombination span {
-  margin-top: 5px;
-  color: rgba(var(--ink-rgb), 0.62);
-  font-family: var(--font-latin-rounded);
-  font-size: 0.78rem;
-  font-weight: 850;
-  letter-spacing: 0;
-}
-
-.brandCombination p {
-  margin: 0;
-  color: var(--accent);
-  font-size: 1.08rem;
-  font-weight: 900;
-  white-space: nowrap;
-}
-
-.brandColorPanel {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 24px;
-  align-items: center;
-  padding: 22px;
-  border: 1px solid rgba(212, 216, 209, 0.7);
-  border-radius: 22px;
-  background: rgba(255, 252, 247, 0.64);
-  box-shadow: 0 12px 28px rgba(var(--ink-rgb), 0.035);
-}
-
-.brandColorPanel h2,
-.brandColorPanel p {
-  margin: 0;
-}
-
-.brandColorPanel h2 {
-  margin-top: 8px;
-  color: #111a1d;
-  font-size: 1.54rem;
-  line-height: 1.16;
-}
-
-.brandColorList {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.brandColorList article {
-  display: grid;
-  gap: 7px;
-  min-width: 0;
-}
-
-.brandColorList article > span {
-  display: block;
-  height: 34px;
-  border-radius: 999px;
-  box-shadow: inset 0 0 0 1px rgba(var(--ink-rgb), 0.06);
-}
-
-.brandColorList strong,
-.brandColorList small {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.brandColorList strong {
-  color: var(--ink);
-  font-family: var(--font-latin-rounded);
-  font-size: 0.9rem;
-  font-weight: 850;
-}
-
-.brandColorList small {
-  color: rgba(var(--ink-rgb), 0.58);
-  font-size: 0.78rem;
-  font-weight: 650;
-}
-
 .aboutJoinPanel {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
@@ -625,31 +416,8 @@
     font-size: 3.35rem;
   }
 
-  .brandCombination strong {
-    font-size: 2.15rem;
-  }
-
   .aboutHeroCopy {
     padding-top: 10px;
-  }
-
-  .aboutStatsPanel {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    padding: 20px 22px;
-  }
-
-  .aboutStatCard {
-    padding: 18px 24px;
-    border-right: 0;
-    border-bottom: 1px solid rgba(var(--ink-rgb), 0.07);
-  }
-
-  .aboutStatCard:nth-child(odd) {
-    border-right: 1px solid rgba(var(--ink-rgb), 0.07);
-  }
-
-  .aboutStatCard:nth-last-child(-n + 2) {
-    border-bottom: 0;
   }
 
   .identityGrid,
@@ -687,23 +455,8 @@
   }
 
   .identityGrid,
-  .longTermGrid,
-  .brandColorPanel {
+  .longTermGrid {
     grid-template-columns: 1fr;
-  }
-
-  .brandCombination {
-    grid-template-columns: auto minmax(0, 1fr);
-    gap: 16px;
-  }
-
-  .brandCombination i,
-  .brandCombination p {
-    display: none;
-  }
-
-  .brandColorList {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
@@ -747,25 +500,6 @@
     width: 100%;
   }
 
-  .aboutStatsPanel {
-    grid-template-columns: 1fr;
-    padding: 6px 18px;
-  }
-
-  .aboutStatCard,
-  .aboutStatCard:nth-child(odd),
-  .aboutStatCard:nth-last-child(-n + 2) {
-    grid-template-columns: 52px minmax(0, 1fr);
-    min-height: 78px;
-    padding: 18px 0;
-    border-right: 0;
-    border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
-  }
-
-  .aboutStatCard:last-child {
-    border-bottom: 0;
-  }
-
   .aboutSectionHeading {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -774,7 +508,6 @@
   .brandLogoStage,
   .identityCard,
   .longTermCard,
-  .brandColorPanel,
   .aboutJoinPanel {
     padding: 20px;
   }
@@ -787,9 +520,5 @@
   .brandLogoStage span {
     font-size: 0.72rem;
     letter-spacing: 0;
-  }
-
-  .brandColorList {
-    grid-template-columns: 1fr;
   }
 }
