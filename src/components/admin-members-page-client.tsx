@@ -35,7 +35,7 @@ import {
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 
-const MEMBERS_PER_PAGE = 20;
+const MEMBERS_PER_PAGE = 10;
 
 function formatDate(value: string | null) {
   if (!value) {
