@@ -48,7 +48,7 @@ export function GoogleSignInButton({
   return (
     <button
       type="button"
-      className="button auth-button"
+      className="button auth-button login-google-button"
       onClick={handleSignIn}
       disabled={!enabled || pending}
     >
