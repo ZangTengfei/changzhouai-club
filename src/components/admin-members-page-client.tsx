@@ -2,12 +2,9 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useTransition } from "react";
-import { toast } from "sonner";
 
 import {
   AdminField,
-  AdminFilterLink,
   AdminMetric,
   AdminNotice,
   AdminPageStack,
@@ -39,7 +36,6 @@ import {
 } from "@/lib/admin/event-feedback";
 
 const MEMBERS_PER_PAGE = 20;
-const MEMBER_STATUS_OPTIONS = ["pending", "active", "organizer", "admin", "paused"] as const;
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -116,164 +112,9 @@ function buildDetailHref(basePath: string, currentPath: string) {
   return `${basePath}?${params.toString()}`;
 }
 
-function AdminMemberQuickActions({
-  member,
-  detailHref,
-  onChanged,
-}: {
-  member: AdminMembersData["members"][number];
-  detailHref: string;
-  onChanged?: () => void;
-}) {
-  const [isPending, startTransition] = useTransition();
-  const visibilityActionLabel = member.isPubliclyVisible ? "从成员页隐藏" : "公开到成员页";
-  const homeFeatureActionLabel = member.isFeaturedOnHome ? "从首页移除" : "展示到首页";
-
-  async function submitPayload(payload: Record<string, unknown>) {
-    const response = await fetch(`/api/admin/members/${member.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-    const result = (await response.json().catch(() => null)) as
-      | { error?: string; saved?: string }
-      | null;
-
-    if (!response.ok) {
-      throw new Error(getAdminErrorMessage(result?.error) ?? "提交失败，请稍后再试。");
-    }
-
-    toast.success(getAdminSavedMessage(result?.saved ?? "member_profile") ?? "后台内容已更新。");
-    onChanged?.();
-  }
-
-  function buildMemberPayload(
-    nextStatus: string,
-    nextVisibility: boolean,
-    nextHomeFeature = member.isFeaturedOnHome,
-  ) {
-    return {
-      display_name: member.displayName === "未填写显示名" ? "" : member.displayName,
-      wechat: member.wechat ?? "",
-      city: member.city,
-      role_label: member.roleLabel ?? "",
-      organization: member.organization ?? "",
-      monthly_time: member.monthlyTime ?? "",
-      skills: member.skills.join("，"),
-      interests: member.interests.join("，"),
-      bio: member.bio ?? "",
-      status: nextStatus,
-      willing_to_attend: member.willingToAttend,
-      willing_to_share: member.willingToShare,
-      willing_to_join_projects: member.willingToJoinProjects,
-      is_publicly_visible: nextVisibility,
-      is_featured_on_home: nextVisibility && nextHomeFeature,
-    };
-  }
-
-  return (
-    <div className="grid gap-2">
-      <form
-        className="grid gap-2"
-        onSubmit={(formEvent) => {
-          formEvent.preventDefault();
-          const formData = new FormData(formEvent.currentTarget);
-
-          startTransition(async () => {
-            try {
-              await submitPayload(
-                buildMemberPayload(String(formData.get("status") ?? member.status), member.isPubliclyVisible),
-              );
-            } catch (submitError) {
-              toast.error(
-                submitError instanceof Error ? submitError.message : "提交失败，请稍后再试。",
-              );
-            }
-          });
-        }}
-      >
-        <NativeSelect name="status" defaultValue={member.status} className="h-8 text-xs">
-          {MEMBER_STATUS_OPTIONS.map((status) => (
-            <option key={status} value={status}>
-              {formatAdminMemberStatus(status)}
-            </option>
-          ))}
-        </NativeSelect>
-
-        <div className="flex flex-wrap gap-2">
-          <Button type="submit" size="sm" variant="secondary" disabled={isPending}>
-            {isPending ? "保存中..." : "保存状态"}
-          </Button>
-          <Button asChild size="sm" variant="outline">
-            <Link href={detailHref}>查看详情</Link>
-          </Button>
-        </div>
-      </form>
-
-      <form
-        onSubmit={(formEvent) => {
-          formEvent.preventDefault();
-
-          startTransition(async () => {
-            try {
-              await submitPayload(buildMemberPayload(member.status, !member.isPubliclyVisible));
-            } catch (submitError) {
-              toast.error(
-                submitError instanceof Error ? submitError.message : "提交失败，请稍后再试。",
-              );
-            }
-          });
-        }}
-      >
-        <Button
-          type="submit"
-          size="sm"
-          variant={member.isPubliclyVisible ? "secondary" : "default"}
-          disabled={isPending}
-        >
-          {isPending ? "提交中..." : visibilityActionLabel}
-        </Button>
-      </form>
-
-      <form
-        onSubmit={(formEvent) => {
-          formEvent.preventDefault();
-
-          startTransition(async () => {
-            try {
-              await submitPayload(
-                buildMemberPayload(
-                  member.status,
-                  member.isPubliclyVisible,
-                  !member.isFeaturedOnHome,
-                ),
-              );
-            } catch (submitError) {
-              toast.error(
-                submitError instanceof Error ? submitError.message : "提交失败，请稍后再试。",
-              );
-            }
-          });
-        }}
-      >
-        <Button
-          type="submit"
-          size="sm"
-          variant={member.isFeaturedOnHome ? "secondary" : "outline"}
-          disabled={isPending || !member.isPubliclyVisible}
-        >
-          {isPending ? "提交中..." : homeFeatureActionLabel}
-        </Button>
-      </form>
-    </div>
-  );
-}
-
 export function AdminMembersPageClient() {
   const searchParams = useSearchParams();
-  const { data, error, isLoading, reload } = useAdminResource<AdminMembersData>("/api/admin/members");
+  const { data, error, isLoading } = useAdminResource<AdminMembersData>("/api/admin/members");
 
   const statusFilter = searchParams.get("status") ?? "all";
   const visibilityFilter = searchParams.get("visibility") ?? "all";
@@ -367,98 +208,11 @@ export function AdminMembersPageClient() {
 
       <AdminPanel>
         <AdminPanelHeader eyebrow="Filters" title="成员筛选" />
-        <AdminPanelBody className="space-y-4">
-          <div className="grid gap-3">
-            <div className="grid gap-2">
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                状态
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  ["all", "全部"],
-                  ["pending", "待完善"],
-                  ["active", "活跃成员"],
-                  ["organizer", "组织者"],
-                  ["admin", "管理员"],
-                  ["paused", "暂停中"],
-                ].map(([value, label]) => (
-                  <AdminFilterLink
-                    key={value}
-                    href={buildMembersFilterHref(
-                      value,
-                      visibilityFilter,
-                      intentFilter,
-                      memberQueryInput,
-                      1,
-                    )}
-                    active={statusFilter === value}
-                  >
-                    {label}
-                  </AdminFilterLink>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid gap-2">
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                公开展示
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  ["all", "全部"],
-                  ["public", "公开展示中"],
-                  ["private", "未公开"],
-                ].map(([value, label]) => (
-                  <AdminFilterLink
-                    key={value}
-                    href={buildMembersFilterHref(
-                      statusFilter,
-                      value,
-                      intentFilter,
-                      memberQueryInput,
-                      1,
-                    )}
-                    active={visibilityFilter === value}
-                  >
-                    {label}
-                  </AdminFilterLink>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid gap-2">
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                参与意愿
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  ["all", "全部"],
-                  ["share", "愿意分享"],
-                  ["build", "愿意共建"],
-                ].map(([value, label]) => (
-                  <AdminFilterLink
-                    key={value}
-                    href={buildMembersFilterHref(
-                      statusFilter,
-                      visibilityFilter,
-                      value,
-                      memberQueryInput,
-                      1,
-                    )}
-                    active={intentFilter === value}
-                  >
-                    {label}
-                  </AdminFilterLink>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <form action="/admin/members" className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
-            <input type="hidden" name="status" value={statusFilter} />
-            <input type="hidden" name="visibility" value={visibilityFilter} />
-            <input type="hidden" name="intent" value={intentFilter} />
-
+        <AdminPanelBody>
+          <form
+            action="/admin/members"
+            className="grid gap-3 lg:grid-cols-[1.1fr_0.8fr_0.8fr_0.8fr_auto]"
+          >
             <AdminField label="成员搜索">
               <Input
                 type="search"
@@ -468,23 +222,43 @@ export function AdminMembersPageClient() {
               />
             </AdminField>
 
+            <AdminField label="状态">
+              <NativeSelect name="status" defaultValue={statusFilter}>
+                <option value="all">全部状态</option>
+                <option value="pending">待完善</option>
+                <option value="active">活跃成员</option>
+                <option value="organizer">组织者</option>
+                <option value="admin">管理员</option>
+                <option value="paused">暂停中</option>
+              </NativeSelect>
+            </AdminField>
+
+            <AdminField label="公开展示">
+              <NativeSelect name="visibility" defaultValue={visibilityFilter}>
+                <option value="all">全部</option>
+                <option value="public">公开展示中</option>
+                <option value="private">未公开</option>
+              </NativeSelect>
+            </AdminField>
+
+            <AdminField label="参与意愿">
+              <NativeSelect name="intent" defaultValue={intentFilter}>
+                <option value="all">全部</option>
+                <option value="share">愿意分享</option>
+                <option value="build">愿意共建</option>
+              </NativeSelect>
+            </AdminField>
+
             <div className="flex flex-wrap items-end gap-2">
               <Button type="submit" variant="secondary">
-                搜索成员
+                筛选
               </Button>
-              {memberQueryInput ? (
+              {memberQueryInput ||
+              statusFilter !== "all" ||
+              visibilityFilter !== "all" ||
+              intentFilter !== "all" ? (
                 <Button asChild variant="outline">
-                  <Link
-                    href={buildMembersFilterHref(
-                      statusFilter,
-                      visibilityFilter,
-                      intentFilter,
-                      "",
-                      1,
-                    )}
-                  >
-                    清空搜索
-                  </Link>
+                  <Link href="/admin/members">重置</Link>
                 </Button>
               ) : null}
             </div>
@@ -565,12 +339,13 @@ export function AdminMembersPageClient() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>成员</TableHead>
-                  <TableHead>城市与时间</TableHead>
+                  <TableHead className="min-w-[220px]">成员</TableHead>
                   <TableHead>状态</TableHead>
-                  <TableHead>参与概况</TableHead>
-                  <TableHead>意愿与技能</TableHead>
-                  <TableHead className="min-w-[220px]">快捷操作</TableHead>
+                  <TableHead>公开</TableHead>
+                  <TableHead>加入时间</TableHead>
+                  <TableHead>活动</TableHead>
+                  <TableHead>意愿</TableHead>
+                  <TableHead className="text-right">操作</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -587,55 +362,43 @@ export function AdminMembersPageClient() {
                         <span className="text-sm text-muted-foreground">
                           {member.email ?? "未提供邮箱"}
                         </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      <div className="grid gap-1">
-                        <span>{member.city}</span>
-                        <span>加入于 {formatDate(member.joinedAt)}</span>
+                        <span className="text-xs text-muted-foreground">{member.city}</span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="grid gap-2">
-                        <AdminStatusBadge
-                          tone={getAdminMemberStatusTone(member.status) as AdminTone}
+                      <AdminStatusBadge tone={getAdminMemberStatusTone(member.status) as AdminTone}>
+                        {formatAdminMemberStatus(member.status)}
+                      </AdminStatusBadge>
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {member.isPubliclyVisible
+                        ? member.isFeaturedOnHome
+                          ? "公开 / 首页"
+                          : "公开"
+                        : "未公开"}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+                      {formatDate(member.joinedAt)}
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {member.registrationCount} 次
+                    </TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {[
+                        member.willingToShare ? "分享" : null,
+                        member.willingToJoinProjects ? "共建" : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" / ") || "暂无"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button asChild size="sm" variant="outline">
+                        <Link
+                          href={buildDetailHref(`/admin/members/${member.id}`, currentMembersPath)}
                         >
-                          {formatAdminMemberStatus(member.status)}
-                        </AdminStatusBadge>
-                        <span className="text-xs text-muted-foreground">
-                          {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
-                          {member.isPubliclyVisible
-                            ? member.isFeaturedOnHome
-                              ? " · 首页展示中"
-                              : " · 未在首页展示"
-                            : ""}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      <div className="grid gap-1">
-                        <span>活动报名 {member.registrationCount} 次</span>
-                        <span>最近活跃 {formatDate(member.lastActiveAt)}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      <div className="grid gap-1">
-                        <span>
-                          {member.willingToShare ? "愿意分享" : "暂不分享"} /{" "}
-                          {member.willingToJoinProjects ? "愿意共建" : "暂不共建"}
-                        </span>
-                        <span>{member.skills.slice(0, 3).join(" · ") || "未填写技能标签"}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <AdminMemberQuickActions
-                        member={member}
-                        detailHref={buildDetailHref(
-                          `/admin/members/${member.id}`,
-                          currentMembersPath,
-                        )}
-                        onChanged={reload}
-                      />
+                          详情
+                        </Link>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
