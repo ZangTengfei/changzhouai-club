@@ -1550,19 +1550,31 @@ img {
   letter-spacing: -0.018em;
 }
 
-.home-member-proof-copy span,
+.home-member-proof-copy {
+  display: grid;
+  gap: 3px;
+}
+
+.home-member-proof-line {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.home-member-proof-line span,
 .home-member-proof-copy small {
   display: block;
   color: rgba(var(--ink-rgb), 0.72);
   font-weight: 700;
 }
 
-.home-member-proof-copy span {
+.home-member-proof-line span {
   font-size: 1rem;
 }
 
 .home-member-proof-copy small {
-  margin-top: 2px;
+  margin-top: 0;
   font-size: 0.95rem;
 }
 

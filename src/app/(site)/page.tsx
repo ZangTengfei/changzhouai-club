@@ -296,8 +296,10 @@ export default async function HomePage() {
               )}
             </div>
             <div className="home-member-proof-copy">
-              <strong>200+</strong>
-              <span>位成员已加入我们</span>
+              <span className="home-member-proof-line">
+                <strong>200+</strong>
+                <span>位成员已加入我们</span>
+              </span>
               <small>期待你的加入！</small>
             </div>
           </div>
