@@ -3469,6 +3469,48 @@ img {
   width: fit-content;
 }
 
+.email-auth-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.auth-mode-tabs {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(86px, 1fr));
+  width: fit-content;
+  padding: 4px;
+  border: 1px solid rgba(var(--accent-rgb), 0.14);
+  border-radius: 999px;
+  background: rgba(var(--surface-muted-rgb), 0.86);
+}
+
+.auth-mode-tab {
+  min-height: 38px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.auth-mode-tab.active {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.auth-mode-tab:focus-visible {
+  outline: 2px solid rgba(var(--accent-rgb), 0.36);
+  outline-offset: 2px;
+}
+
+.auth-message {
+  padding: 12px 14px;
+}
+
 .auth-hint {
   margin-top: 12px;
   color: var(--muted);

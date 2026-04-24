@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { EmailAuthForm } from "@/components/email-auth-form";
 import { GoogleSignInButton } from "@/components/google-sign-in-button";
 
 type LoginPanelProps = {
@@ -28,12 +29,23 @@ export function LoginPanel({
       ) : null}
 
       <div className="auth-card">
-        <h2>{isOnboardingFlow ? "先登录，再完善加入资料" : "使用 Google 登录"}</h2>
+        <h2>{isOnboardingFlow ? "先登录，再完善加入资料" : "登录或注册社区账号"}</h2>
         <p>
           {isOnboardingFlow
             ? "登录后会直接进入资料完善页。显示名和微信号是必填项，其他内容可以稍后继续补充。"
             : "登录后可进入社区账号中心，完善资料、查看活动报名记录，并参与社区活动与协作。"}
         </p>
+        <EmailAuthForm enabled={enabled} nextPath={nextPath} />
+        {!enabled ? (
+          <p className="auth-hint">
+            当前登录服务暂未启用，请稍后再试。
+          </p>
+        ) : null}
+      </div>
+
+      <div className="auth-card">
+        <h2>使用 Google 登录</h2>
+        <p>如果你已经通过 Google 登录过，也可以继续使用同一个社区账号。</p>
         <GoogleSignInButton enabled={enabled} nextPath={nextPath} />
         {!enabled ? (
           <p className="auth-hint">
