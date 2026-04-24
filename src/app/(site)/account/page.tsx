@@ -1,18 +1,79 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import {
+  ArrowRight,
+  BadgeCheck,
+  CalendarDays,
+  CircleAlert,
+  ClipboardList,
+  Eye,
+  EyeOff,
+  Mail,
+  MapPin,
+  ShieldCheck,
+  Sparkles,
+  Ticket,
+  UserRound,
+} from "lucide-react";
 
-import { AccountProfileForm } from "@/components/account-profile-form";
-import { SignOutButton } from "@/components/sign-out-button";
 import { cancelRegistration } from "@/app/(site)/account/actions";
+import { AccountProfileForm } from "@/components/account-profile-form";
+import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
+import { MemberAvatar } from "@/components/member-avatar";
+import { SignOutButton } from "@/components/sign-out-button";
 import { hasSupabaseEnv } from "@/lib/env";
 import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
 import { createClient } from "@/lib/supabase/server";
+
+import styles from "./account-page.module.css";
 
 export const metadata: Metadata = {
   title: "账号",
   description: "查看当前登录账号、成员资料状态和活动报名记录。",
 };
+
+function formatProviderList(providers: string[]) {
+  return providers.length > 0 ? providers.join(", ") : "Google";
+}
+
+function formatEventDate(value: string | null | undefined) {
+  if (!value) {
+    return "时间待定";
+  }
+
+  return new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+function getStatusMessage(error?: string) {
+  if (!error) {
+    return null;
+  }
+
+  if (error === "missing_required_fields") {
+    return "请先填写显示名和微信号这两个必填项。";
+  }
+
+  if (error === "invalid_avatar_url") {
+    return "头像地址格式无效，请填写以 http 或 https 开头的公开图片地址。";
+  }
+
+  if (error === "invalid_public_slug") {
+    return "个人主页链接无效，请使用 3-32 位小写英文、数字或短横线，且不要使用保留词。";
+  }
+
+  if (error === "public_slug_taken") {
+    return "这个个人主页链接已经被占用，请换一个。";
+  }
+
+  return "资料保存失败，请稍后再试。";
+}
 
 export default async function AccountPage({
   searchParams,
@@ -24,16 +85,15 @@ export default async function AccountPage({
 
   if (!enabled) {
     return (
-      <div className="page-stack">
-        <section className="surface account-shell">
-          <p className="eyebrow">Account</p>
+      <div className={styles.accountPage}>
+        <section className={styles.disabledPanel}>
+          <p className="home-kicker">Account · 账号</p>
           <h1>账号服务暂未开放</h1>
           <p>当前账号服务暂未启用，请稍后再试。</p>
-          <div className="cta-row">
-            <Link href="/login" className="button">
-              返回登录页
-            </Link>
-          </div>
+          <Link href="/login" className="button home-primary-button">
+            返回登录页
+            <ArrowRight aria-hidden="true" strokeWidth={2} />
+          </Link>
         </section>
       </div>
     );
@@ -78,6 +138,9 @@ export default async function AccountPage({
     ]);
 
   const identities = identityData?.identities ?? [];
+  const providers = identities.map((item) => item.provider);
+  const displayName =
+    profile?.display_name?.trim() || user.email?.split("@")[0] || "社区成员";
   const profileComplete = Boolean(
     profile?.display_name?.trim() && profile?.wechat?.trim(),
   );
@@ -87,78 +150,205 @@ export default async function AccountPage({
         publicSlug: profile?.public_slug ?? null,
       })
     : null;
+  const registrationCount = registrations?.length ?? 0;
+  const activeRegistrationCount =
+    registrations?.filter((item) => item.status !== "cancelled").length ?? 0;
+  const statusMessage = getStatusMessage(params.error);
+  const accountStats = [
+    {
+      label: "资料状态",
+      value: profileComplete ? "已完成" : "待完善",
+      detail: profileComplete ? "可以继续补充公开资料" : "显示名和微信号为必填",
+      icon: BadgeCheck,
+    },
+    {
+      label: "公开主页",
+      value: publicProfilePath ? "已开启" : "未公开",
+      detail: publicProfilePath ?? "成员公开展示后可访问",
+      icon: member?.is_publicly_visible ? Eye : EyeOff,
+    },
+    {
+      label: "活动报名",
+      value: `${activeRegistrationCount} / ${registrationCount}`,
+      detail: "进行中 / 全部记录",
+      icon: Ticket,
+    },
+    {
+      label: "登录方式",
+      value: formatProviderList(providers),
+      detail: user.email ?? "未提供邮箱",
+      icon: ShieldCheck,
+    },
+  ];
 
   return (
-    <div className="page-stack">
-      <section className="surface account-shell">
-        <p className="eyebrow">Account</p>
-        <h1>社区账号中心</h1>
-        <p>
-          在这里维护成员资料、查看活动报名记录，并持续沉淀你在社区中的参与信息。
-        </p>
-        <div className="cta-row">
-          <SignOutButton enabled />
+    <div className={styles.accountPage}>
+      <section className={styles.accountHero} aria-labelledby="account-hero-title">
+        <div className={styles.accountHeroCopy}>
+          <p className="home-kicker">Account · 账号中心</p>
+          <h1 id="account-hero-title">
+            管理你的
+            <span>社区身份和活动记录</span>
+          </h1>
+          <p>
+            在这里维护成员资料、查看活动报名记录，并持续沉淀你在常州 AI Club
+            中的参与信息。
+          </p>
+
+          <div className={styles.accountHeroActions}>
+            <Link href="/events" className="button home-primary-button">
+              查看活动
+              <ArrowRight aria-hidden="true" strokeWidth={2} />
+            </Link>
+            {publicProfilePath ? (
+              <Link href={publicProfilePath} className="button home-ghost-button">
+                查看公开主页
+              </Link>
+            ) : (
+              <Link href="#profile" className="button home-ghost-button">
+                完善资料
+              </Link>
+            )}
+          </div>
+        </div>
+
+        <div className={styles.accountIdentityPanel}>
+          <div className={styles.accountAvatarStage}>
+            <MemberAvatar
+              name={displayName}
+              avatarUrl={profile?.avatar_url ?? null}
+            />
+            <strong>{displayName}</strong>
+            <span>{profile?.role_label ?? "常州 AI Club 成员"}</span>
+          </div>
+
+          <div className={styles.accountConnectionStrip}>
+            <span>资料</span>
+            <i aria-hidden="true" />
+            <span>活动</span>
+            <i aria-hidden="true" />
+            <span>共建</span>
+          </div>
+
+          <div className={styles.accountStickyNote}>
+            <span>账号中心</span>
+            <strong>把一次加入，整理成可持续连接的社区身份</strong>
+          </div>
+          <DoodleSparkles className={styles.accountHeroDoodle} />
+          <HandDrawnArrow className={styles.accountHeroArrow} />
         </div>
       </section>
 
+      <section className={styles.accountStatsPanel} aria-label="账号概览">
+        {accountStats.map((item, index) => {
+          const Icon = item.icon;
+
+          return (
+            <article className={styles.accountStatCard} key={item.label}>
+              <Icon aria-hidden="true" strokeWidth={1.9} />
+              <strong>{item.value}</strong>
+              <span>{item.label}</span>
+              <small>{item.detail}</small>
+              <em>{String(index + 1).padStart(2, "0")}</em>
+            </article>
+          );
+        })}
+      </section>
+
       {params.onboarding || !profileComplete ? (
-        <div className="note-strip">
-          先补完显示名和微信号这两个必填项，就可以完成加入；其他资料都可以稍后继续完善。
+        <div className={styles.statusNote}>
+          <Sparkles aria-hidden="true" strokeWidth={1.9} />
+          <span>
+            先补完显示名和微信号这两个必填项，就可以完成加入；其他资料都可以稍后继续完善。
+          </span>
         </div>
       ) : null}
 
       {params.updated ? (
-        <div className="note-strip">
-          {params.updated === "profile"
-            ? "成员资料已保存。"
-            : "活动报名状态已更新。"}
+        <div className={styles.statusNote}>
+          <BadgeCheck aria-hidden="true" strokeWidth={1.9} />
+          <span>
+            {params.updated === "profile"
+              ? "成员资料已保存。"
+              : "活动报名状态已更新。"}
+          </span>
         </div>
       ) : null}
 
-      {params.error ? (
-        <div className="note-strip">
-          {params.error === "missing_required_fields"
-            ? "请先填写显示名和微信号这两个必填项。"
-            : params.error === "invalid_avatar_url"
-              ? "头像地址格式无效，请填写以 http 或 https 开头的公开图片地址。"
-              : params.error === "invalid_public_slug"
-                ? "个人主页链接无效，请使用 3-32 位小写英文、数字或短横线，且不要使用保留词。"
-                : params.error === "public_slug_taken"
-                  ? "这个个人主页链接已经被占用，请换一个。"
-              : "资料保存失败，请稍后再试。"}
+      {statusMessage ? (
+        <div className={`${styles.statusNote} ${styles.statusNoteError}`}>
+          <CircleAlert aria-hidden="true" strokeWidth={1.9} />
+          <span>{statusMessage}</span>
         </div>
       ) : null}
 
-      <section className="two-up">
-        <article className="field-panel">
-          <h3>基础账号</h3>
-          <ul className="field-list">
-            <li>用户 ID：{user.id}</li>
-            <li>邮箱：{user.email ?? "未提供"}</li>
+      <section className={styles.accountInfoGrid}>
+        <article className={styles.accountInfoPanel}>
+          <div className={styles.accountSectionHeading}>
+            <p className="home-kicker">Login</p>
+            <div>
+              <h2>基础账号</h2>
+              <p>这里展示当前登录账号的基础信息，方便确认登录身份。</p>
+            </div>
+          </div>
+
+          <ul className={styles.accountDetailList}>
             <li>
-              当前登录方式：
-              {identities.map((item) => item.provider).join(", ") || "Google"}
+              <UserRound aria-hidden="true" strokeWidth={1.8} />
+              <span>用户 ID</span>
+              <strong>{user.id}</strong>
+            </li>
+            <li>
+              <Mail aria-hidden="true" strokeWidth={1.8} />
+              <span>邮箱</span>
+              <strong>{user.email ?? "未提供"}</strong>
+            </li>
+            <li>
+              <ShieldCheck aria-hidden="true" strokeWidth={1.8} />
+              <span>登录方式</span>
+              <strong>{formatProviderList(providers)}</strong>
+            </li>
+            <li>
+              <MapPin aria-hidden="true" strokeWidth={1.8} />
+              <span>城市</span>
+              <strong>{profile?.city?.trim() || "常州"}</strong>
             </li>
           </ul>
         </article>
+
+        <article className={styles.accountExitPanel}>
+          <div className={styles.accountSectionHeading}>
+            <p className="home-kicker">Session</p>
+            <div>
+              <h2>当前会话</h2>
+              <p>退出后仍可通过登录页重新进入账号中心。</p>
+            </div>
+          </div>
+          <SignOutButton enabled />
+        </article>
       </section>
 
-      <AccountProfileForm
-        userId={user.id}
-        profile={profile}
-        member={member}
-        publicProfilePath={publicProfilePath}
-      />
+      <div id="profile">
+        <AccountProfileForm
+          className={styles.accountProfileForm}
+          userId={user.id}
+          profile={profile}
+          member={member}
+          publicProfilePath={publicProfilePath}
+        />
+      </div>
 
-      <section className="surface account-shell">
-        <div className="section-heading">
-          <p className="eyebrow">Registrations</p>
-          <h2>我报名过的活动</h2>
-          <p>这里汇总你的活动报名记录，方便随时查看参与状态与活动信息。</p>
+      <section className={styles.registrationSection}>
+        <div className={styles.accountSectionHeading}>
+          <p className="home-kicker">Registrations</p>
+          <div>
+            <h2>我报名过的活动</h2>
+            <p>这里汇总你的活动报名记录，方便随时查看参与状态与活动信息。</p>
+          </div>
         </div>
 
         {registrations && registrations.length > 0 ? (
-          <div className="registration-list">
+          <div className={styles.registrationList}>
             {registrations.map((registration) => {
               const rawEvent = registration.events as
                 | {
@@ -183,8 +373,12 @@ export default async function AccountPage({
               const eventHref = event?.slug ? `/events/${event.slug}` : null;
 
               return (
-                <article className="registration-card" key={registration.id}>
+                <article className={styles.registrationCard} key={registration.id}>
+                  <div className={styles.registrationCardIcon}>
+                    <CalendarDays aria-hidden="true" strokeWidth={1.9} />
+                  </div>
                   <div>
+                    <span>{registration.status}</span>
                     <h3>
                       {eventHref ? (
                         <Link href={eventHref}>{event?.title ?? "未找到活动"}</Link>
@@ -192,14 +386,9 @@ export default async function AccountPage({
                         (event?.title ?? "未找到活动")
                       )}
                     </h3>
+                    <p>{formatEventDate(event?.event_at)}</p>
                     <p>
-                      报名状态：{registration.status}
-                      {event?.event_at
-                        ? ` · 活动时间：${new Date(event.event_at).toLocaleString("zh-CN")}`
-                        : ""}
-                    </p>
-                    <p>
-                      地点：{event?.city ?? "常州"}
+                      {event?.city ?? "常州"}
                       {event?.venue ? ` · ${event.venue}` : ""}
                     </p>
                     {registration.note ? <p>报名备注：{registration.note}</p> : null}
@@ -212,7 +401,7 @@ export default async function AccountPage({
                         name="registration_id"
                         value={registration.id}
                       />
-                      <button type="submit" className="button button-secondary">
+                      <button type="submit" className="button home-ghost-button">
                         取消报名
                       </button>
                     </form>
@@ -222,8 +411,16 @@ export default async function AccountPage({
             })}
           </div>
         ) : (
-          <div className="note-strip">
-            你还没有报名任何活动，可以前往活动页查看正在开放报名的社区活动。
+          <div className={styles.emptyRegistrationPanel}>
+            <ClipboardList aria-hidden="true" strokeWidth={1.8} />
+            <div>
+              <strong>你还没有报名任何活动</strong>
+              <p>可以前往活动页查看正在开放报名的社区活动。</p>
+            </div>
+            <Link href="/events" className="button home-primary-button">
+              查看活动
+              <ArrowRight aria-hidden="true" strokeWidth={2} />
+            </Link>
           </div>
         )}
       </section>

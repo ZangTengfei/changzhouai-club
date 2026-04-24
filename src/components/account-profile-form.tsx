@@ -6,6 +6,7 @@ import { updateAccountProfile } from "@/app/(site)/account/actions";
 import { AccountAvatarField } from "@/components/account-avatar-field";
 
 type AccountProfileFormProps = {
+  className?: string;
   userId: string;
   profile: {
     display_name: string | null;
@@ -68,13 +69,17 @@ function AccountProfileSubmitButton() {
 }
 
 export function AccountProfileForm({
+  className,
   userId,
   profile,
   member,
   publicProfilePath,
 }: AccountProfileFormProps) {
   return (
-    <form action={updateAccountProfile} className="account-form surface">
+    <form
+      action={updateAccountProfile}
+      className={`account-form surface ${className ?? ""}`}
+    >
       <div className="section-heading">
         <p className="eyebrow">Profile</p>
         <h2>完善加入资料</h2>
