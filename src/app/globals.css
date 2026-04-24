@@ -1594,7 +1594,7 @@ img {
   box-shadow:
     0 24px 56px rgba(var(--ink-rgb), 0.16),
     0 0 0 1px rgba(255, 255, 255, 0.8);
-  transform: translate(10px, -5px) rotate(1.4deg);
+  transform: translate(10px, -5px) rotate(-1.4deg);
   transform-origin: 56% 38%;
 }
 
