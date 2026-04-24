@@ -4232,17 +4232,6 @@ img {
   background: rgba(var(--surface-soft-rgb), 0.86);
 }
 
-.join-form-shell {
-  display: grid;
-  gap: 20px;
-  padding: 26px;
-}
-
-.join-form {
-  display: grid;
-  gap: 20px;
-}
-
 .admin-filter-group,
 .admin-inline-form {
   display: grid;

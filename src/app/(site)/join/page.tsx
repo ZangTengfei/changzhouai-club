@@ -7,12 +7,18 @@ import { hasSupabaseEnv } from "@/lib/env";
 import { joinSteps, memberTags } from "@/lib/site-data";
 import { createClient } from "@/lib/supabase/server";
 
+import styles from "./join-page.module.css";
+
 export const metadata: Metadata = {
   title: "加入我们",
   description: "了解如何加入常州 AI Club，参与线下活动、项目共建和长期协作。",
 };
 
 const onboardingPath = "/account?onboarding=1";
+
+function cx(...classNames: Array<string | false | null | undefined>) {
+  return classNames.filter(Boolean).join(" ");
+}
 
 export default async function JoinPage() {
   const enabled = hasSupabaseEnv();
@@ -52,7 +58,7 @@ export default async function JoinPage() {
         ))}
       </section>
 
-      <section className="surface join-form-shell">
+      <section className={cx("surface", styles.joinFormShell)}>
         <div className="section-heading">
           <p className="eyebrow">How It Works</p>
           <h2>现在的加入方式</h2>
