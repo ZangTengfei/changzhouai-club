@@ -13,6 +13,18 @@ import { getPublicMembersDirectory } from "@/lib/community-members";
 import { getEventImageUrl } from "@/lib/public-image-url";
 import { getCurrentWechatQrCode } from "@/lib/community-social";
 
+import styles from "./home-page.module.css";
+
+function cx(...classes: Array<string | false | null | undefined>) {
+  return classes
+    .flatMap((className) =>
+      typeof className === "string" ? className.split(/\s+/) : [],
+    )
+    .filter(Boolean)
+    .map((className) => styles[className as keyof typeof styles] ?? className)
+    .join(" ");
+}
+
 function formatMetricDate(isoDate: string | null) {
   if (!isoDate) {
     return "待更新";
@@ -250,32 +262,32 @@ export default async function HomePage() {
   const memberStories = storyMembers.length > 0 ? storyMembers : fallbackMemberStories;
 
   return (
-    <div className="home-page-stack">
-      <section className="home-hero" aria-labelledby="home-hero-title">
-        <div className="home-hero-copy">
-          <p className="home-kicker">连接・分享・共创 👋</p>
+    <div className={cx("home-page-stack")}>
+      <section className={cx("home-hero")} aria-labelledby="home-hero-title">
+        <div className={cx("home-hero-copy")}>
+          <p className={cx("home-kicker")}>连接・分享・共创 👋</p>
           <h1 id="home-hero-title">
-            常州 <span className="home-hero-title-accent">AI Club</span>
+            常州 <span className={cx("home-hero-title-accent")}>AI Club</span>
             <br />
-            <span className="home-hero-title-line">本地 AI 人的共同家园</span>
+            <span className={cx("home-hero-title-line")}>本地 AI 人的共同家园</span>
           </h1>
-          <p className="home-hero-lede">
+          <p className={cx("home-hero-lede")}>
             连接常州的开发者、产品人、创业者和 AI 爱好者，
             一起探索 AI，落地创新，推动本地 AI 生态发展。
           </p>
 
-          <div className="home-hero-actions">
-            <Link href="/join" className="button home-primary-button">
+          <div className={cx("home-hero-actions")}>
+            <Link href="/join" className={cx("button home-primary-button")}>
               加入社区
               <span aria-hidden="true">→</span>
             </Link>
-            <Link href="/events" className="button home-ghost-button">
+            <Link href="/events" className={cx("button home-ghost-button")}>
               了解更多
             </Link>
           </div>
 
-          <div className="home-member-proof" aria-label="社区成员规模">
-            <div className="home-avatar-stack" aria-hidden="true">
+          <div className={cx("home-member-proof")} aria-label="社区成员规模">
+            <div className={cx("home-avatar-stack")} aria-hidden="true">
               {memberAvatars.length > 0 ? (
                 memberAvatars.map((avatarUrl, index) => (
                   <img
@@ -294,14 +306,14 @@ export default async function HomePage() {
                 ))
               )}
             </div>
-            <div className="home-member-proof-copy">
-              <span className="home-member-proof-line">
+            <div className={cx("home-member-proof-copy")}>
+              <span className={cx("home-member-proof-line")}>
                 <strong>200+</strong>
                 <span>位成员已加入我们</span>
               </span>
               <small>期待你的加入！</small>
             </div>
-            <HandDrawnArrow className="home-hero-arrow" />
+            <HandDrawnArrow className={cx("home-hero-arrow")} />
           </div>
         </div>
 
@@ -315,13 +327,19 @@ export default async function HomePage() {
         />
       </section>
 
-      <section className="home-stats-panel" aria-label="社区数据">
+      <section className={cx("home-stats-panel")} aria-label="社区数据">
         {communityStats.map((item) => {
           const StatIcon = statIcons[item.icon];
 
           return (
-            <article className={`home-stat-card home-stat-card-${item.icon}`} key={item.label}>
-              <span className={`home-stat-icon home-stat-icon-${item.icon}`} aria-hidden="true">
+            <article
+              className={cx("home-stat-card", `home-stat-card-${item.icon}`)}
+              key={item.label}
+            >
+              <span
+                className={cx("home-stat-icon", `home-stat-icon-${item.icon}`)}
+                aria-hidden="true"
+              >
                 <StatIcon strokeWidth={1.9} />
               </span>
               <div>
@@ -334,24 +352,24 @@ export default async function HomePage() {
         })}
       </section>
 
-      <section className="home-flow-section" aria-labelledby="home-flow-title">
-        <div className="home-section-heading home-flow-heading">
+      <section className={cx("home-flow-section")} aria-labelledby="home-flow-title">
+        <div className={cx("home-section-heading home-flow-heading")}>
           <h2 id="home-flow-title">从活动到合作</h2>
           <p>在这里，认识更多人，创造更多可能</p>
         </div>
 
-        <div className="home-flow-layout">
-          <div className="home-flow-cards">
+        <div className={cx("home-flow-layout")}>
+          <div className={cx("home-flow-cards")}>
             {homeFlowSteps.map((item, index) => (
               <article
-                className={`home-flow-card home-flow-card-${item.tone}`}
+                className={cx("home-flow-card", `home-flow-card-${item.tone}`)}
                 key={item.title}
               >
                 <span>{item.step}</span>
                 <h3>{item.title}</h3>
                 <p>{item.summary}</p>
                 <div
-                  className="home-flow-illustration"
+                  className={cx("home-flow-illustration")}
                   aria-hidden="true"
                 >
                   <Image
@@ -359,24 +377,24 @@ export default async function HomePage() {
                     alt={item.illustrationAlt}
                     width={1124}
                     height={1400}
-                    className="home-flow-illustration-image"
+                    className={cx("home-flow-illustration-image")}
                     aria-hidden="true"
                   />
                 </div>
                 {index < homeFlowSteps.length - 1 ? (
-                  <i className="home-flow-arrow" aria-hidden="true" />
+                  <i className={cx("home-flow-arrow")} aria-hidden="true" />
                 ) : null}
               </article>
             ))}
           </div>
 
-          <article className="home-next-event-card">
-            <div className="home-next-event-copy">
-              <p className="home-next-event-kicker">下一场活动等你来！</p>
+          <article className={cx("home-next-event-card")}>
+            <div className={cx("home-next-event-copy")}>
+              <p className={cx("home-next-event-kicker")}>下一场活动等你来！</p>
               <h3>
                 {primaryScheduledEvent?.title ?? "AI Agent 实践分享会"}
               </h3>
-              <ul className="home-next-event-meta">
+              <ul className={cx("home-next-event-meta")}>
                 <li>
                   <CalendarDays aria-hidden="true" strokeWidth={1.9} />
                   <span>{nextEventDateLabel}</span>
@@ -390,8 +408,8 @@ export default async function HomePage() {
                   </span>
                 </li>
               </ul>
-              <div className="home-next-event-attendance">
-                <div className="home-next-event-avatars" aria-hidden="true">
+              <div className={cx("home-next-event-attendance")}>
+                <div className={cx("home-next-event-avatars")} aria-hidden="true">
                   {nextEventAttendeeAvatars.length > 0 ? (
                     nextEventAttendeeAvatars.map((avatarUrl, index) => (
                       <img
@@ -410,7 +428,7 @@ export default async function HomePage() {
                     ))
                   )}
                 </div>
-                <span className="home-next-event-attendance-label">
+                <span className={cx("home-next-event-attendance-label")}>
                   {nextEventAttendeeCount
                     ? `${nextEventAttendeeCount} 人已报名`
                     : "开放报名中"}
@@ -418,7 +436,7 @@ export default async function HomePage() {
               </div>
               <Link
                 href={primaryScheduledEvent ? `/events/${primaryScheduledEvent.slug}` : "/events"}
-                className="button home-primary-button home-next-event-button"
+                className={cx("button home-primary-button home-next-event-button")}
               >
                 查看活动详情
                 <span aria-hidden="true">→</span>
@@ -429,17 +447,17 @@ export default async function HomePage() {
               alt=""
               width={1024}
               height={1536}
-              className="home-event-person"
+              className={cx("home-event-person")}
               aria-hidden="true"
               priority={false}
             />
-            <DoodleSparkles className="home-doodle home-doodle-event-sparkles" />
+            <DoodleSparkles className={cx("home-doodle home-doodle-event-sparkles")} />
           </article>
         </div>
       </section>
 
-      <section className="home-member-stories" aria-labelledby="home-member-stories-title">
-        <div className="home-card-heading home-showcase-heading">
+      <section className={cx("home-member-stories")} aria-labelledby="home-member-stories-title">
+        <div className={cx("home-card-heading home-showcase-heading")}>
           <div>
             <h2 id="home-member-stories-title">成员故事</h2>
             <p>他们在这里找到方向、伙伴和机会</p>
@@ -447,15 +465,15 @@ export default async function HomePage() {
           <Link href="/members">查看更多故事 →</Link>
         </div>
 
-        <div className="home-member-story-grid">
+        <div className={cx("home-member-story-grid")}>
           {memberStories.map((item) => (
             <Link
               href={"href" in item ? item.href : "/members"}
-              className="home-member-story-card"
+              className={cx("home-member-story-card")}
               key={item.id}
             >
-              <div className="home-member-story-head">
-                <div className="home-member-story-avatar" aria-hidden="true">
+              <div className={cx("home-member-story-head")}>
+                <div className={cx("home-member-story-avatar")} aria-hidden="true">
                   {"avatarUrl" in item && item.avatarUrl ? (
                     <img
                       src={item.avatarUrl}
@@ -472,7 +490,7 @@ export default async function HomePage() {
                 </div>
               </div>
               <p>{item.story}</p>
-              <div className="home-member-story-tags" aria-label="成员技能标签">
+              <div className={cx("home-member-story-tags")} aria-label="成员技能标签">
                 {item.tags[0] ? <span>{item.tags[0]}</span> : null}
               </div>
             </Link>
@@ -480,8 +498,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="home-event-review-section" aria-labelledby="home-event-review-title">
-        <div className="home-card-heading home-showcase-heading">
+      <section className={cx("home-event-review-section")} aria-labelledby="home-event-review-title">
+        <div className={cx("home-card-heading home-showcase-heading")}>
           <div>
             <h2 id="home-event-review-title">近期活动回顾</h2>
             <p>看看最近几场线下活动的现场氛围</p>
@@ -490,14 +508,14 @@ export default async function HomePage() {
         </div>
 
         {recentEvents.length > 0 ? (
-          <div className="home-event-review-grid">
+          <div className={cx("home-event-review-grid")}>
             {recentEvents.map((item) => (
               <Link
                 href={`/events/${item.slug}`}
-                className="home-event-review-card"
+                className={cx("home-event-review-card")}
                 key={item.id}
               >
-                <div className="home-event-review-media">
+                <div className={cx("home-event-review-media")}>
                   {item.imageUrl ? (
                     <Image
                       src={getEventImageUrl(item.imageUrl, "review-card") ?? item.imageUrl}
@@ -511,7 +529,7 @@ export default async function HomePage() {
                     <span>AI</span>
                   )}
                 </div>
-                <div className="home-event-review-copy">
+                <div className={cx("home-event-review-copy")}>
                   <small>{formatReviewDate(item.isoDate)}</small>
                   <h3>{item.title}</h3>
                   <p>{item.locationLabel}</p>
@@ -520,7 +538,7 @@ export default async function HomePage() {
             ))}
           </div>
         ) : (
-          <div className="home-empty-state">
+          <div className={cx("home-empty-state")}>
             暂无活动回顾内容，欢迎稍后再来查看社区最新记录。
           </div>
         )}
@@ -528,24 +546,24 @@ export default async function HomePage() {
 
       <SiteSponsors />
 
-      <section className="home-join-banner" aria-labelledby="home-join-banner-title">
-        <div className="home-join-banner-illustration" aria-hidden="true">
+      <section className={cx("home-join-banner")} aria-labelledby="home-join-banner-title">
+        <div className={cx("home-join-banner-illustration")} aria-hidden="true">
           <img
             src="/join-card.png?v=20260424-join-crop"
             alt=""
-            className="home-join-banner-illustration-image"
+            className={cx("home-join-banner-illustration-image")}
           />
         </div>
 
-        <div className="home-join-banner-copy">
+        <div className={cx("home-join-banner-copy")}>
           <h2 id="home-join-banner-title">加入我们，成为常州 AI 生态的一部分</h2>
           <p>
             扫描二维码，加入常州 AI Club 微信群，获取活动通知、资料分享和合作机会。
           </p>
         </div>
 
-        <div className="home-join-banner-side">
-          <div className="home-join-banner-qr">
+        <div className={cx("home-join-banner-side")}>
+          <div className={cx("home-join-banner-qr")}>
             {wechatQrCode ? (
               <img
                 src={wechatQrCode.imageUrl}
@@ -554,18 +572,18 @@ export default async function HomePage() {
                 height={180}
               />
             ) : (
-              <div className="home-wechat-placeholder">微信</div>
+              <div className={cx("home-wechat-placeholder")}>微信</div>
             )}
           </div>
 
-          <div className="home-join-banner-info">
+          <div className={cx("home-join-banner-info")}>
             <span>微信交流群</span>
             <strong>{wechatQrCode?.title ?? "常州 AI Club 微信群"}</strong>
             <small>200+ 位成员</small>
             <p>活动・学习・合作・成长</p>
           </div>
         </div>
-        <Link href="/join" className="button home-primary-button home-join-banner-button">
+        <Link href="/join" className={cx("button home-primary-button home-join-banner-button")}>
           扫码加入
         </Link>
       </section>
