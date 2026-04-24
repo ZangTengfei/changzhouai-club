@@ -77,6 +77,7 @@ export function EventsRegistrationGrid({
           authState={authState}
           isRegistered={registeredEventIds.has(event.id)}
           redirectTo={`/events/${event.slug}`}
+          showEventSlug={false}
         />
       ))}
     </div>

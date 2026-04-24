@@ -19,12 +19,14 @@ export function EventRegistrationForm({
   isRegistered,
   redirectTo,
   showDetailLink = true,
+  showEventSlug = true,
 }: {
   event: UpcomingEvent;
   authState: "loading" | "logged_out" | "logged_in";
   isRegistered: boolean;
   redirectTo?: string;
   showDetailLink?: boolean;
+  showEventSlug?: boolean;
 }) {
   const detailHref = `/events/${event.slug}`;
   const nextPath = redirectTo ?? detailHref;
@@ -39,7 +41,7 @@ export function EventRegistrationForm({
       <p>{event.summary ?? "这是一场已经开放报名的社区活动。"}</p>
       <ul className="detail-list">
         <li>地点：{event.venue ?? "待公布"}</li>
-        <li>活动标识：{event.slug}</li>
+        {showEventSlug ? <li>活动标识：{event.slug}</li> : null}
       </ul>
       {event.registration_note ? <div className="note-strip">{event.registration_note}</div> : null}
 
