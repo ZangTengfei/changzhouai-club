@@ -21,7 +21,7 @@ export function SiteHeader() {
           </span>
           <span className="brand-copy">
             <strong>常州 AI Club</strong>
-            <small>Changzhou AI Club</small>
+            <small>ChangzhouAI.Club</small>
           </span>
         </Link>
 
