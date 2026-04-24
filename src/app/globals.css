@@ -3780,7 +3780,7 @@ img {
 }
 
 .login-focus-shell .login-primary-card {
-  width: min(100%, 640px);
+  width: min(100%, 560px);
 }
 
 .login-focus-shell .login-side-stack {
@@ -3988,14 +3988,14 @@ img {
 
 .login-primary-card {
   display: grid;
-  gap: 18px;
-  padding: 26px;
-  border-radius: 28px;
+  gap: 16px;
+  padding: 22px;
+  border-radius: 24px;
 }
 
 .login-card-heading {
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .login-card-heading h2,
@@ -4024,13 +4024,13 @@ img {
 }
 
 .login-primary-card .input {
-  min-height: 50px;
+  min-height: 46px;
   border-radius: 16px;
   background: rgba(255, 252, 247, 0.94);
 }
 
 .login-primary-card .auth-button {
-  min-height: 46px;
+  min-height: 44px;
 }
 
 .login-oauth-divider {
@@ -4051,17 +4051,12 @@ img {
 }
 
 .login-google-panel {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 14px;
+  display: flex;
   align-items: center;
-  padding: 16px;
-  border: 1px dashed rgba(var(--accent-rgb), 0.18);
-  border-radius: 20px;
-  background: rgba(var(--accent-rgb), 0.055);
 }
 
 .login-google-button {
+  width: 100%;
   white-space: nowrap;
 }
 

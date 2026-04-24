@@ -46,8 +46,10 @@ export function EmailAuthForm({
   nextPath = "/account",
 }: EmailAuthFormProps) {
   const [mode, setMode] = useState<EmailAuthMode>("sign-in");
+  const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +73,7 @@ export function EmailAuthForm({
     }
 
     const trimmedEmail = email.trim();
+    const trimmedDisplayName = displayName.trim();
 
     if (!trimmedEmail || !password) {
       setError("请输入邮箱和密码。");
@@ -82,6 +85,20 @@ export function EmailAuthForm({
       setError("密码至少需要 6 位字符。");
       setMessage(null);
       return;
+    }
+
+    if (mode === "sign-up") {
+      if (!trimmedDisplayName) {
+        setError("请输入社区昵称。");
+        setMessage(null);
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        setError("两次输入的密码不一致，请重新确认。");
+        setMessage(null);
+        return;
+      }
     }
 
     setPending(true);
@@ -110,6 +127,11 @@ export function EmailAuthForm({
       email: trimmedEmail,
       password,
       options: {
+        data: {
+          display_name: trimmedDisplayName,
+          full_name: trimmedDisplayName,
+          name: trimmedDisplayName,
+        },
         emailRedirectTo: redirectTo,
       },
     });
@@ -126,6 +148,7 @@ export function EmailAuthForm({
     }
 
     setPassword("");
+    setConfirmPassword("");
     setPending(false);
     setMessage("注册确认邮件已发送，请打开邮箱完成确认后再登录。");
   }
@@ -147,6 +170,7 @@ export function EmailAuthForm({
           className={mode === "sign-in" ? "auth-mode-tab active" : "auth-mode-tab"}
           onClick={() => {
             setMode("sign-in");
+            setConfirmPassword("");
             setError(null);
             setMessage(null);
           }}
@@ -167,6 +191,23 @@ export function EmailAuthForm({
           注册
         </button>
       </div>
+
+      {mode === "sign-up" ? (
+        <label className="form-field">
+          <span>昵称</span>
+          <input
+            className="input"
+            type="text"
+            name="display_name"
+            value={displayName}
+            onChange={(event) => setDisplayName(event.target.value)}
+            autoComplete="name"
+            placeholder="你希望大家怎么称呼你"
+            disabled={!enabled || pending}
+            required
+          />
+        </label>
+      ) : null}
 
       <label className="form-field">
         <span>邮箱</span>
@@ -198,6 +239,24 @@ export function EmailAuthForm({
           required
         />
       </label>
+
+      {mode === "sign-up" ? (
+        <label className="form-field">
+          <span>确认密码</span>
+          <input
+            className="input"
+            type="password"
+            name="confirm_password"
+            value={confirmPassword}
+            onChange={(event) => setConfirmPassword(event.target.value)}
+            autoComplete="new-password"
+            placeholder="再输入一次密码"
+            disabled={!enabled || pending}
+            minLength={6}
+            required
+          />
+        </label>
+      ) : null}
 
       {error ? <div className="note-strip auth-message">{error}</div> : null}
       {message ? <div className="note-strip auth-message">{message}</div> : null}

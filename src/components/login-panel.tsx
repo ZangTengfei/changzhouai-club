@@ -51,10 +51,6 @@ export function LoginPanel({
         </div>
 
         <div className="login-google-panel">
-          <div>
-            <h3>使用 Google 继续</h3>
-            <p>如果你已经通过 Google 登录过，也可以继续使用同一个社区账号。</p>
-          </div>
           <GoogleSignInButton enabled={enabled} nextPath={nextPath} />
         </div>
 
