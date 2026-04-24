@@ -1686,18 +1686,32 @@ img {
   box-shadow: 0 16px 34px rgba(var(--ink-rgb), 0.14);
 }
 
+.home-sticky-note::before {
+  position: absolute;
+  display: none;
+  color: var(--accent);
+  font-size: 1.12rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
 .home-sticky-note-line {
   display: block;
 }
 
 .home-sticky-note-mark {
   position: absolute;
-  right: 17px;
+  right: 15px;
   bottom: 12px;
   display: block;
   color: var(--accent);
-  font-size: 1.25rem;
   line-height: 1;
+}
+
+.home-sticky-note-mark svg {
+  display: block;
+  width: 22px;
+  height: 22px;
 }
 
 .home-sticky-note-green {
@@ -1707,9 +1721,22 @@ img {
   transform: rotate(-11deg);
 }
 
+.home-sticky-note-green::before {
+  content: "↙";
+  left: 16px;
+  bottom: 14px;
+  display: block;
+  color: #0d956c;
+  transform: rotate(-18deg);
+}
+
 .home-sticky-note-green .home-sticky-note-mark {
   right: 18px;
   color: #0d956c;
+}
+
+.home-sticky-note-green .home-sticky-note-mark svg {
+  fill: rgba(13, 149, 108, 0.08);
 }
 
 .home-sticky-note-yellow {
@@ -1721,7 +1748,13 @@ img {
 
 .home-sticky-note-yellow .home-sticky-note-mark {
   right: 18px;
+  bottom: 13px;
   color: #e77f2f;
+}
+
+.home-sticky-note-mark-arrow svg {
+  width: 20px;
+  height: 20px;
 }
 
 .home-sticky-note-blue {
@@ -1732,7 +1765,14 @@ img {
 }
 
 .home-sticky-note-blue .home-sticky-note-mark {
+  right: 16px;
+  bottom: 13px;
   color: #2d8ce8;
+}
+
+.home-sticky-note-mark-smile svg {
+  width: 24px;
+  height: 24px;
 }
 
 .home-doodle {
@@ -6585,7 +6625,11 @@ img {
   .home-sticky-note-mark {
     right: 12px;
     bottom: 10px;
-    font-size: 1rem;
+  }
+
+  .home-sticky-note-mark svg {
+    width: 18px;
+    height: 18px;
   }
 
   .home-sticky-note-green {

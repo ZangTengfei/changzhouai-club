@@ -2,14 +2,17 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { ArrowUpRight, Heart, Smile } from "lucide-react";
 
 import { DoodleSparkles } from "@/components/home-visual-assets";
 import { getEventImageUrl } from "@/lib/public-image-url";
 
+type HeroNoteIcon = "arrow" | "heart" | "smile";
+
 type HeroNote = {
   className: string;
   lines: readonly string[];
-  mark?: string;
+  icon?: HeroNoteIcon;
 };
 
 type HeroPhotoCarouselProps = {
@@ -19,6 +22,24 @@ type HeroPhotoCarouselProps = {
 };
 
 const AUTO_ADVANCE_DELAY = 4200;
+const heroNoteIcons = {
+  arrow: ArrowUpRight,
+  heart: Heart,
+  smile: Smile,
+} satisfies Record<HeroNoteIcon, typeof Heart>;
+
+function HeroNoteMark({ icon }: { icon: HeroNoteIcon }) {
+  const NoteIcon = heroNoteIcons[icon];
+
+  return (
+    <span
+      className={`home-sticky-note-mark home-sticky-note-mark-${icon}`}
+      aria-hidden="true"
+    >
+      <NoteIcon strokeWidth={2.25} />
+    </span>
+  );
+}
 
 export function HeroPhotoCarousel({
   images,
@@ -111,11 +132,7 @@ export function HeroPhotoCarousel({
               {line}
             </span>
           ))}
-          {note.mark ? (
-            <span className="home-sticky-note-mark" aria-hidden="true">
-              {note.mark}
-            </span>
-          ) : null}
+          {note.icon ? <HeroNoteMark icon={note.icon} /> : null}
         </p>
       ))}
       <DoodleSparkles className="home-doodle home-doodle-hero-sparkles" />
