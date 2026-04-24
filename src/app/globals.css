@@ -4148,90 +4148,6 @@ img {
   font-weight: 600;
 }
 
-.member-profile-hero {
-  display: grid;
-  gap: 22px;
-  padding: 28px;
-}
-
-.member-profile-identity {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 18px;
-  align-items: start;
-}
-
-.member-profile-copy {
-  display: grid;
-  gap: 12px;
-  min-width: 0;
-}
-
-.member-profile-copy h1,
-.member-profile-copy h2 {
-  margin: 0;
-}
-
-.member-profile-copy p {
-  margin: 0;
-}
-
-.member-profile-summary {
-  color: var(--ink-secondary);
-  line-height: 1.75;
-}
-
-.member-detail-grid {
-  display: grid;
-  gap: 18px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.member-spotlight-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.member-spotlight-card {
-  display: grid;
-  gap: 18px;
-  padding: 22px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background:
-    radial-gradient(
-      circle at top right,
-      rgba(var(--accent-warm-rgb), 0.08),
-      transparent 30%
-    ),
-    rgba(var(--surface-muted-rgb), 0.9);
-  box-shadow: var(--shadow);
-}
-
-.member-spotlight-card .section-heading {
-  max-width: none;
-}
-
-.member-spotlight-card h3 {
-  margin: 0;
-  font-size: 1.2rem;
-}
-
-.member-spotlight-list {
-  display: grid;
-  gap: 14px;
-}
-
-.member-spotlight-item {
-  display: grid;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: var(--radius-md);
-  background: rgba(var(--surface-soft-rgb), 0.86);
-}
-
 .admin-filter-group,
 .admin-inline-form {
   display: grid;
@@ -6125,83 +6041,6 @@ img {
   font-family: "Iowan Old Style", "Source Han Serif SC", "Songti SC", serif;
 }
 
-.event-detail-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
-  overflow: hidden;
-  min-width: 0;
-}
-
-.event-detail-copy {
-  display: grid;
-  align-content: start;
-  gap: 18px;
-  padding: 30px;
-  min-width: 0;
-}
-
-.event-detail-heading {
-  display: grid;
-  gap: 12px;
-}
-
-.event-detail-heading h1 {
-  margin: 0;
-  font-size: clamp(2.3rem, 4.1vw, 4rem);
-  line-height: 1.02;
-  font-family: "Iowan Old Style", "Source Han Serif SC", "Songti SC", serif;
-}
-
-.event-detail-summary {
-  margin: 0;
-  color: var(--muted);
-  font-size: 1.02rem;
-}
-
-.event-detail-media {
-  min-width: 0;
-  max-width: 100%;
-  min-height: 320px;
-  overflow: hidden;
-  background: rgba(var(--accent-rgb), 0.08);
-}
-
-.event-detail-media img {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.event-detail-panel {
-  display: grid;
-  gap: 16px;
-  min-width: 0;
-}
-
-.event-detail-panel h3 {
-  margin: 0 0 10px;
-}
-
-.event-detail-richtext {
-  display: grid;
-  gap: 14px;
-}
-
-.event-detail-richtext p {
-  margin: 0;
-  color: var(--muted);
-}
-
-.event-detail-list {
-  display: grid;
-  gap: 10px;
-  margin: 0;
-  padding-left: 18px;
-  color: var(--muted);
-}
-
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -6642,8 +6481,7 @@ img {
   .route-loading-hero,
   .site-route-loading-hero,
   .footer-grid,
-  .event-feature,
-  .event-detail-hero {
+  .event-feature {
     grid-template-columns: 1fr;
   }
 
@@ -6655,8 +6493,7 @@ img {
   .gallery-grid,
   .logo-lab-grid,
   .route-loading-grid,
-  .site-route-loading-grid,
-  .member-spotlight-grid {
+  .site-route-loading-grid {
     grid-template-columns: 1fr 1fr;
   }
 
@@ -6946,8 +6783,7 @@ img {
   .faq-grid,
   .gallery-grid,
   .logo-lab-grid,
-  .route-loading-grid,
-  .member-spotlight-grid {
+  .route-loading-grid {
     grid-template-columns: 1fr;
   }
 
@@ -7387,8 +7223,7 @@ img {
   .hero,
   .page-hero,
   .route-loading-hero,
-  .footer-grid,
-  .event-detail-copy {
+  .footer-grid {
     gap: 18px;
     padding: 20px;
   }
@@ -7405,7 +7240,6 @@ img {
   .faq-item,
   .field-panel,
   .member-directory-card,
-  .member-spotlight-card,
   .auth-card,
   .account-shell {
     padding: 18px;
@@ -7473,8 +7307,7 @@ img {
   }
 
   .section-heading h2,
-  .event-feature-copy h2,
-  .event-detail-heading h1 {
+  .event-feature-copy h2 {
     font-size: clamp(1.75rem, 9vw, 2.4rem);
     line-height: 1.08;
   }
@@ -7489,7 +7322,6 @@ img {
   .step-list li,
   .faq-item p,
   .field-list li,
-  .event-detail-summary,
   .member-directory-copy p {
     font-size: 0.98rem;
   }
@@ -7579,11 +7411,6 @@ img {
     line-clamp: 4;
   }
 
-  .member-profile-identity,
-  .member-detail-grid {
-    grid-template-columns: 1fr;
-  }
-
   .member-skill-list-capped {
     min-height: auto;
     gap: 10px;
@@ -7640,8 +7467,7 @@ img {
   .detail-list,
   .step-list,
   .field-list,
-  .footer-list,
-  .event-detail-list {
+  .footer-list {
     padding-left: 16px;
   }
 }
