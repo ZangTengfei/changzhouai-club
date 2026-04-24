@@ -94,25 +94,11 @@
   box-shadow: 0 10px 24px rgba(var(--ink-rgb), 0.045);
 }
 .admin-sidebar-brand-card {
-  position: relative;
   overflow: hidden;
   display: flex;
   gap: 12px;
   align-items: center;
   padding: 14px;
-}
-.admin-sidebar-brand-card::after {
-  content: "";
-  position: absolute;
-  right: 14px;
-  top: 12px;
-  width: 46px;
-  height: 34px;
-  border: 1px solid rgba(var(--accent-warm-rgb), 0.22);
-  border-radius: 4px 10px 10px 10px;
-  background: #fff2b8;
-  opacity: 0.82;
-  transform: rotate(7deg);
 }
 .admin-sidebar-logo,
 .admin-access-mark {
