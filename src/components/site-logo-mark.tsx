@@ -2,7 +2,7 @@ type SiteLogoMarkProps = {
   className?: string;
 };
 
-const SITE_LOGO_SRC = "/logo.png?v=20260424";
+const SITE_LOGO_SRC = "/logo.png?v=20260424-squircle";
 
 export function SiteLogoMark({ className }: SiteLogoMarkProps) {
   return (

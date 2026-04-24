@@ -246,8 +246,8 @@ img {
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 46px;
-  height: 34px;
+  width: 42px;
+  height: 42px;
   flex-shrink: 0;
 }
 
@@ -6856,11 +6856,11 @@ img {
 
   .brand-mark,
   .brand-mark-icon {
-    width: 42px;
+    width: 38px;
   }
 
   .brand-mark {
-    height: 31px;
+    height: 38px;
   }
 
   .brand-copy strong {
