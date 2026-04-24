@@ -1,11 +1,7 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import type { ReactNode } from "react";
-import { Suspense } from "react";
 
 import { AppToaster } from "@/components/app-toaster";
-import { ThemeQuerySync } from "@/components/theme-query-sync";
-import { SITE_THEME_STORAGE_KEY, THEME_QUERY_PARAM } from "@/lib/theme";
 
 import "./globals.css";
 
@@ -32,31 +28,6 @@ export const metadata: Metadata = {
   },
 };
 
-const themeInitScript = `
-  (function() {
-    var defaultTheme = "warm";
-
-    try {
-      var params = new URLSearchParams(window.location.search);
-      var urlTheme = params.get("${THEME_QUERY_PARAM}");
-
-      if (urlTheme === "warm" || urlTheme === "blue") {
-        document.documentElement.dataset.theme = urlTheme;
-        window.localStorage.setItem("${SITE_THEME_STORAGE_KEY}", urlTheme);
-        return;
-      }
-
-      var storedTheme = window.localStorage.getItem("${SITE_THEME_STORAGE_KEY}");
-      document.documentElement.dataset.theme =
-        storedTheme === "warm" || storedTheme === "blue"
-          ? storedTheme
-          : defaultTheme;
-    } catch {
-      document.documentElement.dataset.theme = defaultTheme;
-    }
-  })();
-`;
-
 export default function RootLayout({
   children,
 }: {
@@ -70,12 +41,6 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
-        <Script id="theme-init" strategy="beforeInteractive">
-          {themeInitScript}
-        </Script>
-        <Suspense fallback={null}>
-          <ThemeQuerySync />
-        </Suspense>
         <AppToaster />
         {children}
       </body>
