@@ -183,19 +183,19 @@
 }
 
 .aboutStickyNote {
-  position: absolute;
-  right: 32px;
-  top: 28px;
-  z-index: 3;
+  position: relative;
+  z-index: 2;
   display: grid;
   gap: 6px;
-  max-width: 178px;
-  padding: 16px 16px 28px;
+  width: fit-content;
+  max-width: min(100%, 320px);
+  margin: 16px auto 0;
+  padding: 12px 16px 14px;
   border: 1px solid rgba(229, 175, 70, 0.32);
-  border-radius: 5px 18px 18px 18px;
-  background: #fff2b8;
-  box-shadow: 0 16px 30px rgba(var(--ink-rgb), 0.12);
-  transform: rotate(6deg);
+  border-radius: 16px;
+  background: rgba(255, 242, 184, 0.78);
+  box-shadow: 0 10px 22px rgba(var(--ink-rgb), 0.06);
+  transform: rotate(-1deg);
 }
 
 .aboutStickyNote span {
