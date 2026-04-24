@@ -7,11 +7,13 @@ import { createClient } from "@/lib/supabase/client";
 type GoogleSignInButtonProps = {
   nextPath?: string;
   enabled: boolean;
+  className?: string;
 };
 
 export function GoogleSignInButton({
   nextPath = "/account",
   enabled,
+  className,
 }: GoogleSignInButtonProps) {
   const [pending, setPending] = useState(false);
   const redirectTo = useMemo(() => {
@@ -48,7 +50,7 @@ export function GoogleSignInButton({
   return (
     <button
       type="button"
-      className="button auth-button login-google-button"
+      className={`button auth-button ${className ?? ""}`}
       onClick={handleSignIn}
       disabled={!enabled || pending}
     >

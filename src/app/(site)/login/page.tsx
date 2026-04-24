@@ -4,6 +4,8 @@ import { LoginPanel } from "@/components/login-panel";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { hasSupabaseEnv } from "@/lib/env";
 
+import styles from "./login-page.module.css";
+
 export const metadata: Metadata = {
   title: "登录",
   description: "使用邮箱或 Google 登录常州 AI Club 账号。",
@@ -18,11 +20,11 @@ export default async function LoginPage({
   const params = await searchParams;
 
   return (
-    <div className="login-page login-page-focused">
-      <section className="login-focus-shell">
-        <div className="login-focus-intro">
-          <div className="login-focus-logo" aria-hidden="true">
-            <SiteLogoMark className="login-focus-logo-mark" />
+    <div className={styles.page}>
+      <section className={styles.shell}>
+        <div className={styles.intro}>
+          <div className={styles.logo} aria-hidden="true">
+            <SiteLogoMark className={styles.logoMark} />
           </div>
           <p className="home-kicker">Login · 社区账号</p>
           <h1>登录社区账号</h1>

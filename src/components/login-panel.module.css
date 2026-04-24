@@ -1,0 +1,170 @@
+.grid {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  width: 100%;
+  max-width: 980px;
+  align-items: start;
+  gap: 22px;
+}
+
+.errorNote {
+  grid-column: 1 / -1;
+}
+
+.primaryCard,
+.infoCard,
+.accountCard {
+  border: 1px solid rgba(var(--ink-rgb), 0.12);
+  background:
+    radial-gradient(circle at 92% 8%, rgba(var(--accent-warm-rgb), 0.12), transparent 24%),
+    rgba(var(--surface-rgb), 0.9);
+  box-shadow: 0 18px 42px rgba(var(--ink-rgb), 0.07);
+}
+
+.primaryCard {
+  display: grid;
+  gap: 16px;
+  width: min(100%, 560px);
+  padding: 22px;
+  border-radius: 24px;
+}
+
+.cardHeading {
+  display: grid;
+  gap: 10px;
+}
+
+.cardHeading h2,
+.infoCard h2,
+.accountCard h2 {
+  margin: 0;
+  color: var(--ink);
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.cardHeading p,
+.infoCard p,
+.accountCard p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.72;
+}
+
+.primaryCard :global(.input) {
+  min-height: 46px;
+  border-radius: 16px;
+  background: rgba(255, 252, 247, 0.94);
+}
+
+.primaryCard :global(.auth-button) {
+  min-height: 44px;
+}
+
+.oauthDivider {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  color: rgba(var(--ink-rgb), 0.46);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.oauthDivider::before,
+.oauthDivider::after {
+  content: "";
+  height: 1px;
+  background: rgba(var(--ink-rgb), 0.1);
+}
+
+.googlePanel {
+  display: flex;
+  align-items: center;
+}
+
+.googleButton {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.hint {
+  margin-top: 12px;
+  color: var(--muted);
+}
+
+.sideStack {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  width: 100%;
+  max-width: 900px;
+  margin-top: 2px;
+}
+
+.infoCard,
+.accountCard {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+  border-radius: 24px;
+}
+
+.infoCard > svg {
+  width: 34px;
+  height: 34px;
+  padding: 8px;
+  border-radius: 13px;
+  background: rgba(var(--accent-rgb), 0.11);
+  color: var(--accent);
+}
+
+.capabilityList {
+  display: grid;
+  gap: 10px;
+  margin: 2px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.capabilityList li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  color: var(--ink);
+  font-size: 0.92rem;
+  font-weight: 750;
+  line-height: 1.5;
+}
+
+.capabilityList svg {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  color: var(--accent);
+}
+
+.accountCard {
+  background:
+    radial-gradient(circle at 92% 12%, rgba(var(--accent-warm-rgb), 0.16), transparent 34%),
+    rgba(255, 251, 245, 0.92);
+}
+
+.accountCard :global(.auth-link) {
+  margin-top: 2px;
+}
+
+@media (max-width: 640px) {
+  .primaryCard,
+  .infoCard,
+  .accountCard {
+    padding: 20px;
+  }
+
+  .sideStack {
+    grid-template-columns: 1fr;
+  }
+}

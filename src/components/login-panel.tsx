@@ -6,6 +6,8 @@ import { ArrowRight, BadgeCheck, CalendarDays, Sparkles } from "lucide-react";
 import { EmailAuthForm } from "@/components/email-auth-form";
 import { GoogleSignInButton } from "@/components/google-sign-in-button";
 
+import styles from "./login-panel.module.css";
+
 type LoginPanelProps = {
   enabled: boolean;
   nextPath?: string;
@@ -24,15 +26,15 @@ export function LoginPanel({
   const isOnboardingFlow = nextPath.startsWith("/account?onboarding=1");
 
   return (
-    <div className="auth-stack login-panel-grid">
+    <div className={`auth-stack ${styles.grid}`}>
       {error ? (
-        <div className="note-strip login-error-note">
+        <div className={`note-strip ${styles.errorNote}`}>
           {errorMap[error] ?? "登录过程中出现了未知错误。"}
         </div>
       ) : null}
 
-      <div className="auth-card login-primary-card">
-        <div className="login-card-heading">
+      <div className={`auth-card ${styles.primaryCard}`}>
+        <div className={styles.cardHeading}>
           <p className="home-kicker">Account</p>
           <div>
             <h2>{isOnboardingFlow ? "先登录，再完善加入资料" : "登录或注册社区账号"}</h2>
@@ -46,23 +48,27 @@ export function LoginPanel({
 
         <EmailAuthForm enabled={enabled} nextPath={nextPath} />
 
-        <div className="login-oauth-divider">
+        <div className={styles.oauthDivider}>
           <span>或</span>
         </div>
 
-        <div className="login-google-panel">
-          <GoogleSignInButton enabled={enabled} nextPath={nextPath} />
+        <div className={styles.googlePanel}>
+          <GoogleSignInButton
+            className={styles.googleButton}
+            enabled={enabled}
+            nextPath={nextPath}
+          />
         </div>
 
         {!enabled ? (
-          <p className="auth-hint">
+          <p className={styles.hint}>
             当前登录服务暂未启用，请稍后再试。
           </p>
         ) : null}
       </div>
 
-      <aside className="login-side-stack">
-        <div className="auth-card login-info-card">
+      <aside className={styles.sideStack}>
+        <div className={`auth-card ${styles.infoCard}`}>
           <Sparkles aria-hidden="true" strokeWidth={1.9} />
           <h2>{isOnboardingFlow ? "加入后你可以做什么" : "账号能力"}</h2>
           <p>
@@ -70,7 +76,7 @@ export function LoginPanel({
               ? "社区账号会承载你的成员资料、活动参与记录与协作信息，后续都在同一个个人页里持续更新。"
               : "社区账号会承载成员资料、活动参与记录与协作信息，帮助你在社区内持续积累个人档案。"}
           </p>
-          <ul className="login-capability-list">
+          <ul className={styles.capabilityList}>
             <li>
               <BadgeCheck aria-hidden="true" strokeWidth={1.9} />
               {isOnboardingFlow ? "完成加入资料并持续更新" : "完善个人资料与技能方向"}
@@ -86,7 +92,7 @@ export function LoginPanel({
           </ul>
         </div>
 
-        <div className="auth-card login-account-card">
+        <div className={`auth-card ${styles.accountCard}`}>
           <h2>{isOnboardingFlow ? "资料提交后还能继续更新" : "登录后将进入账号中心"}</h2>
           <p>
             {isOnboardingFlow

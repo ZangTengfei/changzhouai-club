@@ -1,0 +1,94 @@
+.form {
+  display: grid;
+  gap: 16px;
+  margin-top: 0;
+}
+
+.modeTabs {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(86px, 1fr));
+  width: fit-content;
+  padding: 4px;
+  border: 1px solid rgba(var(--accent-rgb), 0.14);
+  border-radius: 999px;
+  background: rgba(var(--surface-muted-rgb), 0.86);
+}
+
+.modeTab {
+  min-height: 38px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.modeTabActive {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.modeTab:focus-visible {
+  outline: 2px solid rgba(var(--accent-rgb), 0.36);
+  outline-offset: 2px;
+}
+
+.message {
+  padding: 12px 14px;
+}
+
+.passwordField {
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+
+.passwordField :global(.input) {
+  padding-right: 50px;
+}
+
+.passwordToggle {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: rgba(var(--ink-rgb), 0.58);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.passwordToggle:hover,
+.passwordToggle:focus-visible {
+  border-color: rgba(var(--accent-rgb), 0.16);
+  background: rgba(var(--accent-rgb), 0.08);
+  color: var(--accent);
+}
+
+.passwordToggle:focus-visible {
+  outline: 2px solid rgba(var(--accent-rgb), 0.26);
+  outline-offset: 2px;
+}
+
+.passwordToggle:disabled {
+  cursor: not-allowed;
+  opacity: 0.46;
+}
+
+.passwordToggle svg {
+  width: 18px;
+  height: 18px;
+}

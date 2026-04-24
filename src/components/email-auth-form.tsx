@@ -5,6 +5,8 @@ import { Eye, EyeOff } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 
+import styles from "./email-auth-form.module.css";
+
 type EmailAuthMode = "sign-in" | "sign-up";
 
 type EmailAuthFormProps = {
@@ -169,7 +171,7 @@ export function EmailAuthForm({
   const renderPasswordToggle = () => (
     <button
       type="button"
-      className="auth-password-toggle"
+      className={styles.passwordToggle}
       onClick={() => setShowPassword((current) => !current)}
       disabled={!enabled || pending}
       aria-label={passwordToggleLabel}
@@ -180,11 +182,11 @@ export function EmailAuthForm({
   );
 
   return (
-    <form className="email-auth-form" onSubmit={handleSubmit}>
-      <div className="auth-mode-tabs" role="tablist" aria-label="邮箱认证方式">
+    <form className={styles.form} onSubmit={handleSubmit}>
+      <div className={styles.modeTabs} role="tablist" aria-label="邮箱认证方式">
         <button
           type="button"
-          className={mode === "sign-in" ? "auth-mode-tab active" : "auth-mode-tab"}
+          className={`${styles.modeTab} ${mode === "sign-in" ? styles.modeTabActive : ""}`}
           onClick={() => {
             setMode("sign-in");
             setConfirmPassword("");
@@ -197,7 +199,7 @@ export function EmailAuthForm({
         </button>
         <button
           type="button"
-          className={mode === "sign-up" ? "auth-mode-tab active" : "auth-mode-tab"}
+          className={`${styles.modeTab} ${mode === "sign-up" ? styles.modeTabActive : ""}`}
           onClick={() => {
             setMode("sign-up");
             setError(null);
@@ -243,7 +245,7 @@ export function EmailAuthForm({
 
       <label className="form-field">
         <span>密码</span>
-        <span className="auth-password-field">
+        <span className={styles.passwordField}>
           <input
             className="input"
             type={passwordInputType}
@@ -263,7 +265,7 @@ export function EmailAuthForm({
       {mode === "sign-up" ? (
         <label className="form-field">
           <span>确认密码</span>
-          <span className="auth-password-field">
+          <span className={styles.passwordField}>
             <input
               className="input"
               type={passwordInputType}
@@ -281,8 +283,8 @@ export function EmailAuthForm({
         </label>
       ) : null}
 
-      {error ? <div className="note-strip auth-message">{error}</div> : null}
-      {message ? <div className="note-strip auth-message">{message}</div> : null}
+      {error ? <div className={`note-strip ${styles.message}`}>{error}</div> : null}
+      {message ? <div className={`note-strip ${styles.message}`}>{message}</div> : null}
 
       <button
         type="submit"

@@ -1,0 +1,83 @@
+.page {
+  display: grid;
+  align-content: center;
+  min-height: calc(100vh - 156px);
+  padding: 14px 0 34px;
+}
+
+.shell {
+  display: grid;
+  justify-items: center;
+  gap: 22px;
+  width: min(100%, 980px);
+  margin: 0 auto;
+}
+
+.intro {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  max-width: 680px;
+  text-align: center;
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 78px;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-radius: 24px;
+  background: rgba(255, 252, 247, 0.78);
+  box-shadow: 0 16px 34px rgba(var(--ink-rgb), 0.065);
+}
+
+.logoMark {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+}
+
+.intro h1 {
+  margin: 0;
+  color: #111b1f;
+  font-size: 2.64rem;
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.intro > p:not(:global(.home-kicker)) {
+  max-width: 42rem;
+  margin: 0;
+  color: rgba(var(--ink-rgb), 0.72);
+  font-size: 1rem;
+  font-weight: 650;
+  line-height: 1.78;
+}
+
+@media (max-width: 640px) {
+  .page {
+    min-height: auto;
+    padding: 0 0 24px;
+  }
+
+  .shell {
+    gap: 20px;
+  }
+
+  .logo {
+    width: 66px;
+    height: 66px;
+    border-radius: 20px;
+  }
+
+  .logoMark {
+    width: 46px;
+    height: 46px;
+  }
+
+  .intro h1 {
+    font-size: 2.32rem;
+  }
+}
