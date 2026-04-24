@@ -9,17 +9,13 @@ import {
   ClipboardList,
   Eye,
   EyeOff,
-  Mail,
-  MapPin,
   ShieldCheck,
   Sparkles,
   Ticket,
-  UserRound,
 } from "lucide-react";
 
 import { cancelRegistration } from "@/app/(site)/account/actions";
 import { AccountProfileForm } from "@/components/account-profile-form";
-import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { MemberAvatar } from "@/components/member-avatar";
 import { SignOutButton } from "@/components/sign-out-button";
 import { hasSupabaseEnv } from "@/lib/env";
@@ -34,7 +30,7 @@ export const metadata: Metadata = {
 };
 
 function formatProviderList(providers: string[]) {
-  return providers.length > 0 ? providers.join(", ") : "Google";
+  return providers.length > 0 ? providers.join(", ") : "邮箱登录";
 }
 
 function formatEventDate(value: string | null | undefined) {
@@ -154,7 +150,7 @@ export default async function AccountPage({
   const activeRegistrationCount =
     registrations?.filter((item) => item.status !== "cancelled").length ?? 0;
   const statusMessage = getStatusMessage(params.error);
-  const accountStats = [
+  const accountSummaryItems = [
     {
       label: "资料状态",
       value: profileComplete ? "已完成" : "待完善",
@@ -168,7 +164,7 @@ export default async function AccountPage({
       icon: member?.is_publicly_visible ? Eye : EyeOff,
     },
     {
-      label: "活动报名",
+      label: "报名记录",
       value: `${activeRegistrationCount} / ${registrationCount}`,
       detail: "进行中 / 全部记录",
       icon: Ticket,
@@ -183,76 +179,61 @@ export default async function AccountPage({
 
   return (
     <div className={styles.accountPage}>
-      <section className={styles.accountHero} aria-labelledby="account-hero-title">
-        <div className={styles.accountHeroCopy}>
-          <p className="home-kicker">Account · 账号中心</p>
-          <h1 id="account-hero-title">
-            管理你的
-            <span>社区身份和活动记录</span>
-          </h1>
-          <p>
-            在这里维护成员资料、查看活动报名记录，并持续沉淀你在常州 AI Club
-            中的参与信息。
-          </p>
+      <section className={styles.accountSummary} aria-labelledby="account-title">
+        <div className={styles.accountAvatarCard}>
+          <MemberAvatar
+            name={displayName}
+            avatarUrl={profile?.avatar_url ?? null}
+          />
+          <div>
+            <strong>{displayName}</strong>
+            <span>{profile?.role_label ?? "常州 AI Club 成员"}</span>
+          </div>
+        </div>
 
-          <div className={styles.accountHeroActions}>
-            <Link href="/events" className="button home-primary-button">
+        <div className={styles.accountSummaryCopy}>
+          <p className="home-kicker">Account · 账号中心</p>
+          <h1 id="account-title">管理社区身份</h1>
+          <p>维护成员资料、查看活动报名记录，并更新你在社区中的公开信息。</p>
+
+          <div className={styles.accountSummaryActions}>
+            {profileComplete ? (
+              <Link href="#registrations" className="button home-primary-button">
+                查看报名记录
+                <ArrowRight aria-hidden="true" strokeWidth={2} />
+              </Link>
+            ) : (
+              <Link href="#profile" className="button home-primary-button">
+                完善资料
+                <ArrowRight aria-hidden="true" strokeWidth={2} />
+              </Link>
+            )}
+            <Link href="/events" className="button home-ghost-button">
               查看活动
-              <ArrowRight aria-hidden="true" strokeWidth={2} />
             </Link>
             {publicProfilePath ? (
               <Link href={publicProfilePath} className="button home-ghost-button">
                 查看公开主页
               </Link>
-            ) : (
-              <Link href="#profile" className="button home-ghost-button">
-                完善资料
-              </Link>
-            )}
+            ) : null}
+            <SignOutButton enabled />
           </div>
         </div>
 
-        <div className={styles.accountIdentityPanel}>
-          <div className={styles.accountAvatarStage}>
-            <MemberAvatar
-              name={displayName}
-              avatarUrl={profile?.avatar_url ?? null}
-            />
-            <strong>{displayName}</strong>
-            <span>{profile?.role_label ?? "常州 AI Club 成员"}</span>
-          </div>
+        <div className={styles.accountMetaGrid} aria-label="账号概览">
+          {accountSummaryItems.map((item) => {
+            const Icon = item.icon;
 
-          <div className={styles.accountConnectionStrip}>
-            <span>资料</span>
-            <i aria-hidden="true" />
-            <span>活动</span>
-            <i aria-hidden="true" />
-            <span>共建</span>
-          </div>
-
-          <div className={styles.accountStickyNote}>
-            <span>账号中心</span>
-            <strong>把一次加入，整理成可持续连接的社区身份</strong>
-          </div>
-          <DoodleSparkles className={styles.accountHeroDoodle} />
-          <HandDrawnArrow className={styles.accountHeroArrow} />
+            return (
+              <article className={styles.accountMetaItem} key={item.label}>
+                <Icon aria-hidden="true" strokeWidth={1.9} />
+                <span>{item.label}</span>
+                <strong>{item.value}</strong>
+                <small>{item.detail}</small>
+              </article>
+            );
+          })}
         </div>
-      </section>
-
-      <section className={styles.accountStatsPanel} aria-label="账号概览">
-        {accountStats.map((item, index) => {
-          const Icon = item.icon;
-
-          return (
-            <article className={styles.accountStatCard} key={item.label}>
-              <Icon aria-hidden="true" strokeWidth={1.9} />
-              <strong>{item.value}</strong>
-              <span>{item.label}</span>
-              <small>{item.detail}</small>
-              <em>{String(index + 1).padStart(2, "0")}</em>
-            </article>
-          );
-        })}
       </section>
 
       {params.onboarding || !profileComplete ? (
@@ -282,52 +263,6 @@ export default async function AccountPage({
         </div>
       ) : null}
 
-      <section className={styles.accountInfoGrid}>
-        <article className={styles.accountInfoPanel}>
-          <div className={styles.accountSectionHeading}>
-            <p className="home-kicker">Login</p>
-            <div>
-              <h2>基础账号</h2>
-              <p>这里展示当前登录账号的基础信息，方便确认登录身份。</p>
-            </div>
-          </div>
-
-          <ul className={styles.accountDetailList}>
-            <li>
-              <UserRound aria-hidden="true" strokeWidth={1.8} />
-              <span>用户 ID</span>
-              <strong>{user.id}</strong>
-            </li>
-            <li>
-              <Mail aria-hidden="true" strokeWidth={1.8} />
-              <span>邮箱</span>
-              <strong>{user.email ?? "未提供"}</strong>
-            </li>
-            <li>
-              <ShieldCheck aria-hidden="true" strokeWidth={1.8} />
-              <span>登录方式</span>
-              <strong>{formatProviderList(providers)}</strong>
-            </li>
-            <li>
-              <MapPin aria-hidden="true" strokeWidth={1.8} />
-              <span>城市</span>
-              <strong>{profile?.city?.trim() || "常州"}</strong>
-            </li>
-          </ul>
-        </article>
-
-        <article className={styles.accountExitPanel}>
-          <div className={styles.accountSectionHeading}>
-            <p className="home-kicker">Session</p>
-            <div>
-              <h2>当前会话</h2>
-              <p>退出后仍可通过登录页重新进入账号中心。</p>
-            </div>
-          </div>
-          <SignOutButton enabled />
-        </article>
-      </section>
-
       <div id="profile">
         <AccountProfileForm
           className={styles.accountProfileForm}
@@ -338,7 +273,7 @@ export default async function AccountPage({
         />
       </div>
 
-      <section className={styles.registrationSection}>
+      <section className={styles.registrationSection} id="registrations">
         <div className={styles.accountSectionHeading}>
           <p className="home-kicker">Registrations</p>
           <div>
