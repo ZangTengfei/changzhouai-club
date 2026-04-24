@@ -168,34 +168,6 @@ export default async function AdminSocialPage({
                 />
               </AdminField>
 
-              <AdminCheckboxRow className="self-end">
-                <input
-                  type="checkbox"
-                  name="is_active"
-                  defaultChecked
-                  className="size-4"
-                />
-                <span>立即作为可展示二维码启用</span>
-              </AdminCheckboxRow>
-
-              <AdminField label="开始展示时间">
-                <Input
-                  type="datetime-local"
-                  name="starts_at"
-                  defaultValue={toDatetimeLocal(startsAt)}
-                  required
-                />
-              </AdminField>
-
-              <AdminField label="过期时间">
-                <Input
-                  type="datetime-local"
-                  name="expires_at"
-                  defaultValue={toDatetimeLocal(expiresAt)}
-                  required
-                />
-              </AdminField>
-
               <AdminField label="二维码图片" className="md:col-span-2">
                 <StorageImageUrlField
                   name="image_url"
@@ -210,24 +182,64 @@ export default async function AdminSocialPage({
                   required
                 />
               </AdminField>
-
-              <AdminField label="备注" className="md:col-span-2">
-                <Textarea
-                  name="note"
-                  rows={3}
-                  placeholder="可选：例如这张二维码对应哪个群、何时从微信生成。备注只在后台显示。"
-                />
-              </AdminField>
             </div>
 
-            <Button type="submit">保存并发布二维码</Button>
+            <details className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/30 p-3">
+              <summary className="cursor-pointer text-sm font-medium text-foreground">
+                高级设置
+              </summary>
+              <div className="mt-3 grid gap-4 md:grid-cols-2">
+                <AdminCheckboxRow className="self-end">
+                  <input
+                    type="checkbox"
+                    name="is_active"
+                    defaultChecked
+                    className="size-4"
+                  />
+                  <span>立即启用</span>
+                </AdminCheckboxRow>
+
+                <div aria-hidden="true" />
+
+                <AdminField label="开始展示时间">
+                  <Input
+                    type="datetime-local"
+                    name="starts_at"
+                    defaultValue={toDatetimeLocal(startsAt)}
+                    required
+                  />
+                </AdminField>
+
+                <AdminField label="过期时间">
+                  <Input
+                    type="datetime-local"
+                    name="expires_at"
+                    defaultValue={toDatetimeLocal(expiresAt)}
+                    required
+                  />
+                </AdminField>
+
+                <AdminField label="备注" className="md:col-span-2">
+                  <Textarea
+                    name="note"
+                    rows={3}
+                    placeholder="可选：例如这张二维码对应哪个群、何时从微信生成。备注只在后台显示。"
+                  />
+                </AdminField>
+              </div>
+            </details>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <Button type="submit">保存并发布二维码</Button>
+              <span className="text-sm text-muted-foreground">默认有效期 7 天。</span>
+            </div>
           </form>
         </AdminPanelBody>
       </AdminPanel>
 
       <AdminPanel>
         <AdminPanelHeader eyebrow="History" title="二维码历史" />
-        <AdminPanelBody className="space-y-3">
+        <AdminPanelBody className="space-y-2">
           {qrCodes.length > 0 ? (
             qrCodes.map((qrCode) => {
               const status = getQrCodeStatus(
@@ -239,38 +251,33 @@ export default async function AdminSocialPage({
               return (
                 <article
                   key={qrCode.id}
-                  className="grid gap-4 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-3 lg:grid-cols-[120px_minmax(0,1fr)]"
+                  className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background"
                 >
-                  <div className="relative aspect-square overflow-hidden rounded-xl border border-border/70 bg-muted/30">
-                    <img
-                      src={qrCode.image_url}
-                      alt={qrCode.title}
-                      width={120}
-                      height={120}
-                      className="h-full w-full object-contain p-2"
-                    />
-                  </div>
+                  <div className="grid gap-3 p-3 lg:grid-cols-[72px_minmax(0,1fr)_auto] lg:items-center">
+                    <div className="relative size-[72px] overflow-hidden rounded-lg border border-border/70 bg-muted/30">
+                      <img
+                        src={qrCode.image_url}
+                        alt={qrCode.title}
+                        width={72}
+                        height={72}
+                        className="h-full w-full object-contain p-1.5"
+                      />
+                    </div>
 
-                  <div className="grid gap-3">
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <h2 className="text-base font-semibold text-foreground">
-                            {qrCode.title}
-                          </h2>
-                          <AdminStatusBadge tone={status.tone}>
-                            {status.label}
-                          </AdminStatusBadge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {formatDateTime(qrCode.starts_at)} 至{" "}
-                          {formatDateTime(qrCode.expires_at)}
-                        </p>
-                        {qrCode.note ? (
-                          <p className="text-sm text-muted-foreground">{qrCode.note}</p>
-                        ) : null}
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-base font-semibold text-foreground">{qrCode.title}</h2>
+                        <AdminStatusBadge tone={status.tone}>{status.label}</AdminStatusBadge>
                       </div>
+                      <p className="text-sm text-muted-foreground">
+                        {formatDateTime(qrCode.starts_at)} 至 {formatDateTime(qrCode.expires_at)}
+                      </p>
+                      {qrCode.note ? (
+                        <p className="line-clamp-1 text-sm text-muted-foreground">{qrCode.note}</p>
+                      ) : null}
+                    </div>
 
+                    <div className="flex flex-wrap gap-2 lg:justify-end">
                       <form action={deleteAdminWechatQrCode}>
                         <input type="hidden" name="qr_code_id" value={qrCode.id} />
                         <Button type="submit" variant="outline" size="sm">
@@ -278,8 +285,13 @@ export default async function AdminSocialPage({
                         </Button>
                       </form>
                     </div>
+                  </div>
 
-                    <form action={saveAdminWechatQrCode} className="grid gap-3">
+                  <details className="border-t border-border/70">
+                    <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-muted-foreground">
+                      展开编辑表单
+                    </summary>
+                    <form action={saveAdminWechatQrCode} className="grid gap-3 p-3 pt-1">
                       <input type="hidden" name="qr_code_id" value={qrCode.id} />
                       <div className="grid gap-3 md:grid-cols-2">
                         <AdminField label="标题">
@@ -337,7 +349,7 @@ export default async function AdminSocialPage({
                         保存这张二维码
                       </Button>
                     </form>
-                  </div>
+                  </details>
                 </article>
               );
             })
