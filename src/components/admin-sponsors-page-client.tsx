@@ -12,6 +12,7 @@ import {
   AdminPanelHeader,
   AdminStatusBadge,
 } from "@/components/admin-ui";
+import { AdminSponsorEditorModal } from "@/components/admin-sponsor-editor-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,7 +38,9 @@ const sponsorTierLabelMap: Record<string, string> = {
 
 export function AdminSponsorsPageClient() {
   const searchParams = useSearchParams();
-  const { data, error, isLoading } = useAdminResource<AdminSponsorsData>("/api/admin/sponsors");
+  const { data, error, isLoading, reload } = useAdminResource<AdminSponsorsData>(
+    "/api/admin/sponsors",
+  );
 
   const saved = searchParams.get("saved") ?? undefined;
   const queryError = searchParams.get("error") ?? undefined;
@@ -57,9 +60,7 @@ export function AdminSponsorsPageClient() {
           actions={
             <>
               <AdminMetric label="赞助者" value={data?.sponsors.length ?? "..."} />
-              <Button asChild>
-                <Link href="/admin/sponsors/new">新增赞助者</Link>
-              </Button>
+              <AdminSponsorEditorModal triggerLabel="新增赞助者" onChanged={reload} />
             </>
           }
         />
@@ -145,9 +146,16 @@ export function AdminSponsorsPageClient() {
                       图片 {sponsor.images.length}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button asChild size="sm" variant="secondary">
-                        <Link href={`/admin/sponsors/${sponsor.id}`}>查看</Link>
-                      </Button>
+                      <div className="flex justify-end gap-2">
+                        <AdminSponsorEditorModal
+                          sponsorId={sponsor.id}
+                          triggerLabel="编辑"
+                          onChanged={reload}
+                        />
+                        <Button asChild size="sm" variant="secondary">
+                          <Link href={`/admin/sponsors/${sponsor.id}`}>查看</Link>
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -156,9 +164,7 @@ export function AdminSponsorsPageClient() {
           ) : (
             <div className="space-y-3 p-4">
               <AdminNotice>创建赞助者后，即可在首页和赞助者详情页展示。</AdminNotice>
-              <Button asChild>
-                <Link href="/admin/sponsors/new">去创建赞助者</Link>
-              </Button>
+              <AdminSponsorEditorModal triggerLabel="去创建赞助者" onChanged={reload} />
             </div>
           )}
         </AdminPanelBody>

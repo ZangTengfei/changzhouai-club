@@ -14,6 +14,7 @@ import {
   AdminStatusBadge,
   type AdminTone,
 } from "@/components/admin-ui";
+import { AdminEventEditorModal } from "@/components/admin-event-editor-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,7 +91,9 @@ function buildEventsFilterHref(
 
 export function AdminEventsPageClient() {
   const searchParams = useSearchParams();
-  const { data, error, isLoading } = useAdminResource<AdminEventsData>("/api/admin/events");
+  const { data, error, isLoading, reload } = useAdminResource<AdminEventsData>(
+    "/api/admin/events",
+  );
 
   const statusFilter = searchParams.get("status") ?? "all";
   const timingFilter = searchParams.get("timing") ?? "all";
@@ -150,9 +153,7 @@ export function AdminEventsPageClient() {
           actions={
             <>
               <AdminMetric label="活动总数" value={data?.events.length ?? "..."} />
-              <Button asChild>
-                <Link href="/admin/events/new">新建活动</Link>
-              </Button>
+              <AdminEventEditorModal triggerLabel="新建活动" onChanged={reload} />
             </>
           }
         />
@@ -284,9 +285,16 @@ export function AdminEventsPageClient() {
                         {event.registrations.length} 人
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button asChild size="sm" variant="outline">
-                          <Link href={`/admin/events/${event.id}`}>详情</Link>
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <AdminEventEditorModal
+                            eventId={event.id}
+                            triggerLabel="编辑"
+                            onChanged={reload}
+                          />
+                          <Button asChild size="sm" variant="outline">
+                            <Link href={`/admin/events/${event.id}`}>详情</Link>
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -352,9 +360,7 @@ export function AdminEventsPageClient() {
                   : "创建活动后，即可继续补充详情、相册和报名信息。"}
               </AdminNotice>
               {data && data.events.length > 0 ? null : (
-                <Button asChild>
-                  <Link href="/admin/events/new">去创建活动</Link>
-                </Button>
+                <AdminEventEditorModal triggerLabel="去创建活动" onChanged={reload} />
               )}
             </div>
           )}

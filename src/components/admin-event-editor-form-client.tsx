@@ -80,9 +80,13 @@ async function readApiResult(response: Response) {
 export function AdminEventEditorFormClient({
   event,
   onSaved,
+  onCreated,
+  onDeleted,
 }: {
   event?: EditableAdminEvent;
   onSaved?: () => void;
+  onCreated?: (eventId: string) => void;
+  onDeleted?: () => void;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -104,7 +108,12 @@ export function AdminEventEditorFormClient({
         const result = await readApiResult(response);
 
         if (!isEditing && result?.eventId) {
-          router.push(`/admin/events/${result.eventId}`);
+          if (onCreated) {
+            toast.success(getAdminSavedMessage(result?.saved ?? "event") ?? "后台内容已更新。");
+            onCreated(result.eventId);
+          } else {
+            router.push(`/admin/events/${result.eventId}`);
+          }
           return;
         }
 
@@ -127,6 +136,12 @@ export function AdminEventEditorFormClient({
           method: "DELETE",
         });
         const result = await readApiResult(response);
+        if (onDeleted) {
+          toast.success(getAdminSavedMessage(result?.saved ?? "deleted") ?? "后台内容已更新。");
+          onDeleted();
+          return;
+        }
+
         router.push(`/admin/events?saved=${result?.saved ?? "deleted"}`);
       } catch (submitError) {
         toast.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
