@@ -6,6 +6,8 @@ import { BadgeCheck, CalendarDays, Handshake, Share2, Users } from "lucide-react
 
 import { cn } from "@/lib/utils";
 
+import styles from "@/app/admin/admin-layout.module.css";
+
 const adminNavItems = [
   {
     href: "/admin/events",
@@ -39,11 +41,25 @@ const adminNavItems = [
   },
 ];
 
+function cx(...classes: Array<string | false | null | undefined>) {
+  return classes
+    .flatMap((className) =>
+      typeof className === "string" ? className.split(/\s+/) : [],
+    )
+    .filter(Boolean)
+    .map((className) =>
+      styles[className as keyof typeof styles]
+        ? `${styles[className as keyof typeof styles]} ${className}`
+        : className,
+    )
+    .join(" ");
+}
+
 export function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="admin-nav">
+    <nav className={cx("admin-nav")}>
       {adminNavItems.map((item) => {
         const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
         const Icon = item.icon;
@@ -53,14 +69,14 @@ export function AdminNav() {
             key={item.href}
             href={item.href}
             className={cn(
-              "admin-nav-item group flex items-start gap-3 rounded-xl border px-3 py-3 transition-colors",
-              isActive ? "admin-nav-item-active" : null,
+              cx("admin-nav-item group flex items-start gap-3 rounded-xl border px-3 py-3 transition-colors"),
+              isActive ? cx("admin-nav-item-active") : null,
             )}
           >
             <span
               className={cn(
-                "admin-nav-icon mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg",
-                isActive ? "admin-nav-icon-active" : null,
+                cx("admin-nav-icon mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg"),
+                isActive ? cx("admin-nav-icon-active") : null,
               )}
             >
               <Icon className="size-4" />

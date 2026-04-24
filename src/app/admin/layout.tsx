@@ -8,6 +8,22 @@ import { SiteLogoMark } from "@/components/site-logo-mark";
 import { Button } from "@/components/ui/button";
 import { getStaffContext } from "@/lib/supabase/guards";
 
+import styles from "./admin-layout.module.css";
+
+function cx(...classes: Array<string | false | null | undefined>) {
+  return classes
+    .flatMap((className) =>
+      typeof className === "string" ? className.split(/\s+/) : [],
+    )
+    .filter(Boolean)
+    .map((className) =>
+      styles[className as keyof typeof styles]
+        ? `${styles[className as keyof typeof styles]} ${className}`
+        : className,
+    )
+    .join(" ");
+}
+
 export default async function AdminLayout({
   children,
 }: {
@@ -17,12 +33,12 @@ export default async function AdminLayout({
 
   if (!isStaff) {
     return (
-      <div className="admin-access-state mx-auto flex min-h-screen w-full max-w-3xl items-center px-4 py-8">
+      <div className={cx("admin-access-state mx-auto flex min-h-screen w-full max-w-3xl items-center px-4 py-8")}>
         <AdminPanel className="w-full">
           <AdminPanelBody className="space-y-4 p-6">
             <div className="flex items-start gap-4">
-              <span className="admin-access-mark">
-                <SiteLogoMark className="admin-access-logo" />
+              <span className={cx("admin-access-mark")}>
+                <SiteLogoMark className={cx("admin-access-logo")} />
               </span>
               <div className="space-y-2">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
@@ -58,21 +74,21 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="admin-app-shell" data-admin-ui="compact">
-      <aside className="admin-desktop-sidebar hidden lg:block">
-        <div className="admin-sidebar-inner">
-          <div className="admin-sidebar-brand-card">
-            <span className="admin-sidebar-logo">
-              <SiteLogoMark className="admin-sidebar-logo-mark" />
+    <div className={cx("admin-app-shell")} data-admin-ui="compact">
+      <aside className={cx("admin-desktop-sidebar hidden lg:block")}>
+        <div className={cx("admin-sidebar-inner")}>
+          <div className={cx("admin-sidebar-brand-card")}>
+            <span className={cx("admin-sidebar-logo")}>
+              <SiteLogoMark className={cx("admin-sidebar-logo-mark")} />
             </span>
-            <div className="admin-sidebar-brand-copy">
+            <div className={cx("admin-sidebar-brand-copy")}>
               <p>Changzhou AI Club</p>
               <h1>社区后台</h1>
             </div>
           </div>
 
-          <div className="admin-sidebar-panel admin-sidebar-role">
-            <div className="admin-sidebar-role-icon">
+          <div className={cx("admin-sidebar-panel admin-sidebar-role")}>
+            <div className={cx("admin-sidebar-role-icon")}>
               <ShieldCheck className="size-5" />
             </div>
             <div>
@@ -81,16 +97,16 @@ export default async function AdminLayout({
             </div>
           </div>
 
-          <div className="admin-sidebar-nav-card">
+          <div className={cx("admin-sidebar-nav-card")}>
             <AdminNav />
           </div>
 
-          <div className="admin-sidebar-footer">
+          <div className={cx("admin-sidebar-footer")}>
             <p>连接・分享・共创</p>
             <small>后台操作会同步影响前台展示内容。</small>
           </div>
 
-          <Button asChild variant="secondary" className="admin-back-home-button justify-start">
+          <Button asChild variant="secondary" className={cx("admin-back-home-button justify-start")}>
             <Link href="/">
               <Home className="size-4" />
               返回首页
@@ -99,10 +115,10 @@ export default async function AdminLayout({
         </div>
       </aside>
 
-      <main className="admin-main min-w-0">
-        <header className="admin-mobile-topbar lg:hidden">
-          <Link href="/" className="admin-mobile-brand">
-            <SiteLogoMark className="admin-mobile-logo" />
+      <main className={cx("admin-main min-w-0")}>
+        <header className={cx("admin-mobile-topbar lg:hidden")}>
+          <Link href="/" className={cx("admin-mobile-brand")}>
+            <SiteLogoMark className={cx("admin-mobile-logo")} />
             <span>
               <strong>常州 AI Club</strong>
               <small>社区后台</small>
@@ -116,11 +132,11 @@ export default async function AdminLayout({
           </Button>
         </header>
 
-        <div className="admin-mobile-nav lg:hidden">
+        <div className={cx("admin-mobile-nav lg:hidden")}>
           <AdminNav />
         </div>
 
-        <div className="admin-main-inner mx-auto flex min-h-screen w-full max-w-[1400px] flex-col gap-4 px-4 py-4 lg:px-6">
+        <div className={cx("admin-main-inner mx-auto flex min-h-screen w-full max-w-[1400px] flex-col gap-4 px-4 py-4 lg:px-6")}>
           {children}
         </div>
       </main>
