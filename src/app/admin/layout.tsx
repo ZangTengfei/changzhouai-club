@@ -4,6 +4,7 @@ import { Home, ShieldCheck } from "lucide-react";
 
 import { AdminNav } from "@/components/admin-nav";
 import { AdminNotice, AdminPanel, AdminPanelBody } from "@/components/admin-ui";
+import { SiteLogoMark } from "@/components/site-logo-mark";
 import { Button } from "@/components/ui/button";
 import { getStaffContext } from "@/lib/supabase/guards";
 
@@ -16,22 +17,27 @@ export default async function AdminLayout({
 
   if (!isStaff) {
     return (
-      <div className="mx-auto flex min-h-screen w-full max-w-3xl items-center px-4 py-8">
+      <div className="admin-access-state mx-auto flex min-h-screen w-full max-w-3xl items-center px-4 py-8">
         <AdminPanel className="w-full">
           <AdminPanelBody className="space-y-4 p-6">
-            <div className="space-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Admin
-              </p>
-              <h1 className="text-2xl font-semibold text-foreground">当前账号还没有后台权限</h1>
-              <p className="text-sm text-muted-foreground">
-                你的当前成员状态是 `{member?.status ?? "pending"}`。社区后台仅对
-                `organizer` 或 `admin` 角色开放。
-              </p>
+            <div className="flex items-start gap-4">
+              <span className="admin-access-mark">
+                <SiteLogoMark className="admin-access-logo" />
+              </span>
+              <div className="space-y-2">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  Admin
+                </p>
+                <h1 className="text-2xl font-semibold text-foreground">当前账号还没有后台权限</h1>
+                <p className="text-sm text-muted-foreground">
+                  你的当前成员状态是 `{member?.status ?? "pending"}`。社区后台仅对
+                  `organizer` 或 `admin` 角色开放。
+                </p>
+              </div>
             </div>
 
             <AdminNotice>
-            如需开通后台权限，请联系站点管理员处理。当前账号 ID：
+              如需开通后台权限，请联系站点管理员处理。当前账号 ID：
               <code className="ml-1 rounded bg-background px-1.5 py-0.5 text-xs text-foreground">
                 {user.id}
               </code>
@@ -53,34 +59,38 @@ export default async function AdminLayout({
 
   return (
     <div className="admin-app-shell" data-admin-ui="compact">
-      <aside className="hidden min-h-screen border-r border-border/70 bg-card/80 backdrop-blur lg:block">
-        <div className="sticky top-0 flex h-screen w-[272px] flex-col gap-4 p-4">
-          <div className="rounded-[var(--radius)] border border-border/70 bg-background/90 px-4 py-4 shadow-sm">
-            <div className="flex items-center gap-3">
-              <span className="flex size-10 items-center justify-center rounded-xl bg-primary/12 text-primary">
-                <ShieldCheck className="size-5" />
-              </span>
-              <div className="grid gap-0.5">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Admin
-                </p>
-                <h1 className="text-lg font-semibold text-foreground">社区后台</h1>
-              </div>
+      <aside className="admin-desktop-sidebar hidden lg:block">
+        <div className="admin-sidebar-inner">
+          <div className="admin-sidebar-brand-card">
+            <span className="admin-sidebar-logo">
+              <SiteLogoMark className="admin-sidebar-logo-mark" />
+            </span>
+            <div className="admin-sidebar-brand-copy">
+              <p>Changzhou AI Club</p>
+              <h1>社区后台</h1>
             </div>
           </div>
 
-          <div className="rounded-[var(--radius)] border border-border/70 bg-card px-4 py-3 shadow-sm">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-              当前角色
-            </p>
-            <p className="mt-2 text-sm font-semibold text-foreground">{member?.status ?? "pending"}</p>
+          <div className="admin-sidebar-panel admin-sidebar-role">
+            <div className="admin-sidebar-role-icon">
+              <ShieldCheck className="size-5" />
+            </div>
+            <div>
+              <p>当前角色</p>
+              <strong>{member?.status ?? "pending"}</strong>
+            </div>
           </div>
 
-          <div className="rounded-[var(--radius)] border border-border/70 bg-card px-3 py-3 shadow-sm">
+          <div className="admin-sidebar-nav-card">
             <AdminNav />
           </div>
 
-          <Button asChild variant="secondary" className="justify-start">
+          <div className="admin-sidebar-footer">
+            <p>连接・分享・共创</p>
+            <small>后台操作会同步影响前台展示内容。</small>
+          </div>
+
+          <Button asChild variant="secondary" className="admin-back-home-button justify-start">
             <Link href="/">
               <Home className="size-4" />
               返回首页
@@ -89,8 +99,28 @@ export default async function AdminLayout({
         </div>
       </aside>
 
-      <main className="min-w-0">
-        <div className="mx-auto flex min-h-screen w-full max-w-[1400px] flex-col gap-4 px-4 py-4 lg:px-6">
+      <main className="admin-main min-w-0">
+        <header className="admin-mobile-topbar lg:hidden">
+          <Link href="/" className="admin-mobile-brand">
+            <SiteLogoMark className="admin-mobile-logo" />
+            <span>
+              <strong>常州 AI Club</strong>
+              <small>社区后台</small>
+            </span>
+          </Link>
+          <Button asChild variant="secondary" size="sm">
+            <Link href="/">
+              <Home className="size-4" />
+              首页
+            </Link>
+          </Button>
+        </header>
+
+        <div className="admin-mobile-nav lg:hidden">
+          <AdminNav />
+        </div>
+
+        <div className="admin-main-inner mx-auto flex min-h-screen w-full max-w-[1400px] flex-col gap-4 px-4 py-4 lg:px-6">
           {children}
         </div>
       </main>

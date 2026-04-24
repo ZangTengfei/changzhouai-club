@@ -53,18 +53,14 @@ export function AdminNav() {
             key={item.href}
             href={item.href}
             className={cn(
-              "group flex items-start gap-3 rounded-xl border px-3 py-3 transition-colors",
-              isActive
-                ? "border-primary/20 bg-primary/8 text-foreground"
-                : "border-border/70 bg-background/80 text-foreground hover:border-border hover:bg-muted/50",
+              "admin-nav-item group flex items-start gap-3 rounded-xl border px-3 py-3 transition-colors",
+              isActive ? "admin-nav-item-active" : null,
             )}
           >
             <span
               className={cn(
-                "mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg",
-                isActive
-                  ? "bg-primary/12 text-primary"
-                  : "bg-muted text-muted-foreground group-hover:text-foreground",
+                "admin-nav-icon mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg",
+                isActive ? "admin-nav-icon-active" : null,
               )}
             >
               <Icon className="size-4" />
