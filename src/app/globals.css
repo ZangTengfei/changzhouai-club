@@ -450,6 +450,33 @@ img {
   background: rgba(var(--accent-rgb), 0.08);
 }
 
+.account-entry-login {
+  width: auto;
+  height: 42px;
+  min-width: 68px;
+  padding: 0 18px;
+  border-color: rgba(var(--accent-rgb), 0.2);
+  background: rgba(var(--surface-soft-rgb), 0.9);
+  color: var(--accent-strong);
+  font-size: 0.94rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    0 10px 22px rgba(var(--ink-rgb), 0.07);
+  overflow: visible;
+}
+
+.account-entry-login:hover,
+.account-entry-login:focus-visible {
+  border-color: rgba(var(--accent-rgb), 0.34);
+  background: rgba(var(--accent-rgb), 0.1);
+  color: var(--accent-strong);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.62),
+    0 12px 24px rgba(var(--accent-rgb), 0.11);
+}
+
 .account-menu {
   position: relative;
   z-index: 210;

@@ -164,14 +164,11 @@ export function SiteAccountEntry() {
     return (
       <Link
         href={account.href}
-        className="account-entry"
+        className="account-entry account-entry-login"
         aria-label={account.label}
         title={account.label}
       >
-        <span className="account-avatar-fallback">
-          {getAccountInitials(account.name)}
-        </span>
-        <span className="sr-only">{account.label}</span>
+        <span>{account.label}</span>
       </Link>
     );
   }
