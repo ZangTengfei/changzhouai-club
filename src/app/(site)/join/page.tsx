@@ -1,7 +1,21 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import {
+  ArrowRight,
+  BadgeCheck,
+  CalendarDays,
+  CheckCircle2,
+  ClipboardCheck,
+  Clock3,
+  Handshake,
+  IdCard,
+  MessageCircle,
+  Sparkles,
+  UserRoundCheck,
+} from "lucide-react";
 
-import { PageHero } from "@/components/page-hero";
+import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { ToneBadge } from "@/components/tone-badge";
 import { hasSupabaseEnv } from "@/lib/env";
 import { joinSteps, memberTags } from "@/lib/site-data";
@@ -16,9 +30,56 @@ export const metadata: Metadata = {
 
 const onboardingPath = "/account?onboarding=1";
 
-function cx(...classNames: Array<string | false | null | undefined>) {
-  return classNames.filter(Boolean).join(" ");
-}
+const requiredFields = [
+  {
+    title: "显示名",
+    summary: "会出现在社区账号、报名记录和成员资料里。",
+    icon: IdCard,
+  },
+  {
+    title: "微信号",
+    summary: "用于活动通知、入群邀请和后续沟通确认。",
+    icon: MessageCircle,
+  },
+] as const;
+
+const optionalFields = [
+  "所在城市",
+  "身份 / 公司 / 学校",
+  "每月可投入时间",
+  "技能方向",
+  "感兴趣的 AI 主题",
+  "是否愿意参加线下活动",
+  "是否愿意分享",
+  "是否愿意参与项目",
+] as const;
+
+const joinSignals = [
+  {
+    value: "2 项",
+    label: "必填信息",
+    detail: "先快速建立社区身份",
+    icon: ClipboardCheck,
+  },
+  {
+    value: "长期",
+    label: "资料维护",
+    detail: "活动、项目和主页共用",
+    icon: UserRoundCheck,
+  },
+  {
+    value: "线下",
+    label: "活动连接",
+    detail: "报名后持续沉淀记录",
+    icon: CalendarDays,
+  },
+  {
+    value: "共创",
+    label: "协作机会",
+    detail: "分享、项目和合作都能被看见",
+    icon: Handshake,
+  },
+] as const;
 
 export default async function JoinPage() {
   const enabled = hasSupabaseEnv();
@@ -38,78 +99,199 @@ export default async function JoinPage() {
   const primaryLabel = isLoggedIn ? "前往完善资料" : "使用 Google 登录后加入";
 
   return (
-    <div className="page-stack">
-      <PageHero
-        eyebrow="Join"
-        title="加入常州 AI Club"
-        description="加入流程现在统一为“先登录，再完善资料”。这样你的社区身份、活动记录和个人资料都会沉淀在同一个账号里，后续也能持续更新。"
-      >
-        <div className="note-strip">
-          无论你是开发者、产品人、创业者、高校同学、企业从业者，还是正在尝试一人产品与独立业务的实践者，都欢迎加入社区交流。
-        </div>
-      </PageHero>
+    <div className={styles.joinPageStack}>
+      <section className={styles.joinHero} aria-labelledby="join-hero-title">
+        <div className={styles.joinHeroCopy}>
+          <p className="home-kicker">Join · 加入社区</p>
+          <h1 id="join-hero-title">
+            先建立身份，
+            <span>再走进真实连接</span>
+          </h1>
+          <p>
+            加入流程已经统一为“先登录，再完善资料”。你的社区身份、活动记录和个人资料
+            会沉淀在同一个账号里，后续也能持续更新。
+          </p>
 
-      <section className="three-up">
-        {joinSteps.map((step, index) => (
-          <article className="step-card" key={step}>
-            <span>0{index + 1}</span>
-            <h3>{step}</h3>
-          </article>
-        ))}
-      </section>
-
-      <section className={cx("surface", styles.joinFormShell)}>
-        <div className="section-heading">
-          <p className="eyebrow">How It Works</p>
-          <h2>现在的加入方式</h2>
-          <p>登录后会直接进入资料完善页，必填信息更少，后续也不需要再重复填写第二套表单。</p>
-        </div>
-
-        {!enabled ? (
-          <div className="note-strip">
-            当前账号服务暂未启用，请稍后再试。
+          <div className={styles.joinHeroActions}>
+            <Link href={primaryHref} className="button home-primary-button">
+              {primaryLabel}
+              <ArrowRight aria-hidden="true" strokeWidth={2} />
+            </Link>
+            <Link href="/members" className="button home-ghost-button">
+              先看看社区成员
+            </Link>
           </div>
-        ) : null}
 
-        <div className="cta-row">
-          <Link href={primaryHref} className="button">
-            {primaryLabel}
-          </Link>
-          <Link href="/members" className="button button-secondary">
-            先看看社区成员
-          </Link>
+          <div className={styles.joinHeroProof}>
+            <CheckCircle2 aria-hidden="true" strokeWidth={1.9} />
+            <span>
+              开发者、产品人、创业者、高校同学、企业从业者，以及正在尝试独立业务的实践者，
+              都可以从这里加入。
+            </span>
+          </div>
+        </div>
+
+        <div className={styles.joinBoard} aria-label="加入流程板">
+          <div className={styles.joinBoardHeader}>
+            <span>Member Pass</span>
+            <strong>把你的社区身份接入同一个账号</strong>
+          </div>
+
+          <div className={styles.joinPassCard}>
+            <div>
+              <span>Changzhou AI Club</span>
+              <strong>Community Member</strong>
+            </div>
+            <BadgeCheck aria-hidden="true" strokeWidth={1.8} />
+          </div>
+
+          <div className={styles.joinBoardSteps}>
+            {joinSteps.map((step, index) => (
+              <article className={styles.joinBoardStep} key={step}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <p>{step}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className={styles.joinBoardIllustration} aria-hidden="true">
+            <Image
+              src="/join-card.png"
+              alt=""
+              width={1000}
+              height={1000}
+              priority
+            />
+          </div>
+
+          <div className={styles.joinStickyNote}>
+            <span>加入原则</span>
+            <strong>少填一次表，多沉淀一次真实身份</strong>
+          </div>
+          <DoodleSparkles className={styles.joinHeroDoodle} />
+          <HandDrawnArrow className={styles.joinHeroArrow} />
         </div>
       </section>
 
-      <section className="field-grid">
-        <article className="field-panel">
-          <h3>登录后必填</h3>
-          <ul className="field-list">
-            <li>显示名</li>
-            <li>微信号</li>
-          </ul>
-        </article>
-        <article className="field-panel">
-          <h3>可稍后补充</h3>
-          <ul className="field-list">
-            <li>所在城市</li>
-            <li>身份 / 公司 / 学校</li>
-            <li>每月可投入时间</li>
-            <li>技能方向</li>
-            <li>感兴趣的 AI 主题</li>
-            <li>是否愿意参加线下活动</li>
-            <li>是否愿意分享</li>
-            <li>是否愿意参与项目</li>
-          </ul>
-        </article>
+      {!enabled ? (
+        <div className={`${styles.statusNote} ${styles.statusNoteMuted}`}>
+          <Clock3 aria-hidden="true" strokeWidth={1.9} />
+          <span>当前账号服务暂未启用，请稍后再试。</span>
+        </div>
+      ) : null}
+
+      <section className={styles.joinSignalsPanel} aria-label="加入后的社区连接">
+        {joinSignals.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <article className={styles.joinSignalCard} key={item.label}>
+              <Icon aria-hidden="true" strokeWidth={1.9} />
+              <strong>{item.value}</strong>
+              <span>{item.label}</span>
+              <small>{item.detail}</small>
+            </article>
+          );
+        })}
       </section>
 
-      <section className="card">
-        <h3>社区常见关注方向</h3>
-        <div className="tag-cloud">
+      <section className={styles.joinFlowSection}>
+        <div className={styles.joinSectionHeading}>
+          <p className="home-kicker">How It Works</p>
+          <div>
+            <h2>现在的加入方式</h2>
+            <p>登录后会直接进入资料完善页，必填信息更少，后续也不需要再重复填写第二套表单。</p>
+          </div>
+        </div>
+
+        <div className={styles.joinFlowGrid}>
+          {joinSteps.map((step, index) => (
+            <article className={styles.joinFlowCard} key={step}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <Sparkles aria-hidden="true" strokeWidth={1.8} />
+              <h3>{step}</h3>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.joinProfileSection}>
+        <div className={styles.joinSectionHeading}>
+          <p className="home-kicker">Profile</p>
+          <div>
+            <h2>资料先轻后完整</h2>
+            <p>先完成进入社区必需的信息，其他资料可以随着活动、分享和项目逐步补上。</p>
+          </div>
+        </div>
+
+        <div className={styles.profileGrid}>
+          <article className={styles.requiredPanel}>
+            <div>
+              <p className="home-kicker">Required</p>
+              <h3>登录后必填</h3>
+            </div>
+
+            <div className={styles.requiredList}>
+              {requiredFields.map((item) => {
+                const Icon = item.icon;
+
+                return (
+                  <div className={styles.requiredItem} key={item.title}>
+                    <Icon aria-hidden="true" strokeWidth={1.8} />
+                    <strong>{item.title}</strong>
+                    <span>{item.summary}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </article>
+
+          <article className={styles.optionalPanel}>
+            <div>
+              <p className="home-kicker">Later</p>
+              <h3>可稍后补充</h3>
+            </div>
+
+            <div className={styles.optionalList}>
+              {optionalFields.map((item) => (
+                <span key={item}>{item}</span>
+              ))}
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section className={styles.interestsSection}>
+        <div className={styles.joinSectionHeading}>
+          <p className="home-kicker">Signals</p>
+          <div>
+            <h2>社区常见关注方向</h2>
+            <p>这些标签帮助你更快找到同频成员、活动主题和可能的共建线索。</p>
+          </div>
+        </div>
+
+        <div className={styles.tagCloud}>
           {memberTags.map((tag) => (
             <ToneBadge key={tag} label={tag} />
           ))}
+        </div>
+      </section>
+
+      <section className={styles.joinCtaPanel}>
+        <div>
+          <p className="home-kicker">Next</p>
+          <h2>准备好加入常州 AI Club 了吗？</h2>
+          <p>从登录和完善资料开始，之后就可以持续报名活动、展示主页、参与分享和共建。</p>
+        </div>
+
+        <div className={styles.joinCtaActions}>
+          <Link href={primaryHref} className="button home-primary-button">
+            {primaryLabel}
+            <ArrowRight aria-hidden="true" strokeWidth={2} />
+          </Link>
+          <Link href="/events" className="button home-ghost-button">
+            查看近期活动
+          </Link>
         </div>
       </section>
     </div>
