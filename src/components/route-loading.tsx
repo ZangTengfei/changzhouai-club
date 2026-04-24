@@ -3,6 +3,7 @@ import { SiteLogoMark } from "@/components/site-logo-mark";
 
 const siteCards = Array.from({ length: 3 });
 const adminRows = Array.from({ length: 6 });
+const siteLoadingSteps = ["资料", "活动", "共建"];
 
 function SkeletonBlock({
   className,
@@ -59,31 +60,49 @@ export function GlobalRouteLoading() {
 
 export function SiteRouteLoading() {
   return (
-    <div className="page-stack" aria-live="polite" aria-busy="true">
+    <div className="site-route-loading" aria-live="polite" aria-busy="true">
       <div className="route-progress-shell">
         <div className="route-progress-bar" />
       </div>
 
-      <section className="surface flex flex-col gap-4 px-5 py-5 sm:px-6">
-        <div className="flex items-center gap-3">
-          <span className="inline-flex rounded-full border border-[rgba(var(--accent-rgb),0.12)] bg-[rgba(var(--surface-rgb),0.84)] px-3 py-1 text-xs font-semibold tracking-[0.14em] text-[var(--muted)]">
-            正在切换页面
-          </span>
+      <section className="site-route-loading-hero">
+        <div className="site-route-loading-copy">
+          <p className="home-kicker">Loading · 页面切换</p>
+          <h1>
+            正在整理
+            <span>新的社区内容</span>
+          </h1>
+          <p>稍等一下，正在准备页面数据、图片和交互状态。</p>
+
+          <div className="site-route-loading-proof">
+            <span className="site-route-loading-dot" aria-hidden="true" />
+            <strong>连接・分享・共创</strong>
+            <small>让页面切换也保持常州 AI Club 的节奏</small>
+          </div>
         </div>
-        <div className="grid gap-3">
-          <SkeletonBlock className="h-7 w-40" />
-          <SkeletonBlock className="h-4 w-full max-w-xl" />
-          <SkeletonBlock className="h-4 w-52" />
+
+        <div className="site-route-loading-brand">
+          <div className="site-route-loading-mark">
+            <SiteLogoMark className="site-route-loading-logo" />
+          </div>
+          <strong>常州 AI Club</strong>
+          <span>CHANGZHOU AI CLUB</span>
+
+          <div className="site-route-loading-steps" aria-hidden="true">
+            {siteLoadingSteps.map((step) => (
+              <span key={step}>{step}</span>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3" aria-hidden="true">
+      <section className="site-route-loading-grid" aria-hidden="true">
         {siteCards.map((_, index) => (
-          <article key={index} className="card flex flex-col gap-4 p-5">
-            <SkeletonBlock className="aspect-[16/10] w-full" />
-            <SkeletonBlock className="h-5 w-2/3" />
-            <SkeletonBlock className="h-4 w-full" />
-            <SkeletonBlock className="h-4 w-5/6" />
+          <article key={index} className="site-route-loading-card">
+            <SkeletonBlock className="site-route-loading-card-media" />
+            <SkeletonBlock className="site-route-loading-card-title" />
+            <SkeletonBlock className="site-route-loading-card-line" />
+            <SkeletonBlock className="site-route-loading-card-line site-route-loading-card-line-short" />
           </article>
         ))}
       </section>
