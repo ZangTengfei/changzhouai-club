@@ -6,6 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
+import styles from "./admin-ui.module.css";
+
 export type AdminTone =
   | "neutral"
   | "draft"
@@ -47,6 +49,20 @@ const toneClassName: Record<AdminTone, string> = {
   attended: "border-emerald-200 bg-emerald-100 text-emerald-700",
 };
 
+function cx(...classes: Array<string | false | null | undefined>) {
+  return classes
+    .flatMap((className) =>
+      typeof className === "string" ? className.split(/\s+/) : [],
+    )
+    .filter(Boolean)
+    .map((className) =>
+      styles[className as keyof typeof styles]
+        ? `${styles[className as keyof typeof styles]} ${className}`
+        : className,
+    )
+    .join(" ");
+}
+
 export function AdminPageStack({
   className,
   children,
@@ -67,7 +83,9 @@ export function AdminPanel({
   return (
     <Card
       className={cn(
-        "admin-panel border-border/70 bg-card/95 shadow-[0_10px_28px_rgba(15,23,42,0.05)] backdrop-blur",
+        cx(
+          "admin-panel border-border/70 bg-card/95 shadow-[0_10px_28px_rgba(15,23,42,0.05)] backdrop-blur",
+        ),
         className,
       )}
     >
@@ -90,7 +108,9 @@ export function AdminPanelHeader({
   return (
     <CardHeader
       className={cn(
-        "admin-panel-header flex flex-col gap-3 border-b border-border/70 px-4 py-4 sm:flex-row sm:items-start sm:justify-between",
+        cx(
+          "admin-panel-header flex flex-col gap-3 border-b border-border/70 px-4 py-4 sm:flex-row sm:items-start sm:justify-between",
+        ),
         className,
       )}
     >
@@ -100,7 +120,9 @@ export function AdminPanelHeader({
             {eyebrow}
           </p>
         ) : null}
-        <CardTitle className="admin-panel-title text-lg text-foreground">{title}</CardTitle>
+        <CardTitle className={cx("admin-panel-title text-lg text-foreground")}>
+          {title}
+        </CardTitle>
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
     </CardHeader>
@@ -115,7 +137,9 @@ export function AdminPanelBody({
   children: ReactNode;
 }) {
   return (
-    <CardContent className={cn("admin-panel-body px-4 pb-4 pt-4", className)}>
+    <CardContent
+      className={cn(cx("admin-panel-body px-4 pb-4 pt-4"), className)}
+    >
       {children}
     </CardContent>
   );
@@ -133,7 +157,9 @@ export function AdminMetric({
   return (
     <div
       className={cn(
-        "admin-metric min-w-[88px] rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 px-3 py-2",
+        cx(
+          "admin-metric min-w-[88px] rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 px-3 py-2",
+        ),
         className,
       )}
     >
@@ -155,7 +181,9 @@ export function AdminNotice({
   return (
     <div
       className={cn(
-        "admin-notice rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/50 px-3 py-2 text-sm text-muted-foreground",
+        cx(
+          "admin-notice rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/50 px-3 py-2 text-sm text-muted-foreground",
+        ),
         className,
       )}
     >
@@ -197,7 +225,7 @@ export function AdminField({
   className?: string;
 }) {
   return (
-    <label className={cn("admin-field grid gap-2", className)}>
+    <label className={cn(cx("admin-field grid gap-2"), className)}>
       <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
         {label}
       </span>
@@ -216,7 +244,9 @@ export function AdminCheckboxRow({
   return (
     <label
       className={cn(
-        "admin-checkbox-row flex items-center gap-2 rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/30 px-3 py-2 text-sm text-foreground",
+        cx(
+          "admin-checkbox-row flex items-center gap-2 rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/30 px-3 py-2 text-sm text-foreground",
+        ),
         className,
       )}
     >

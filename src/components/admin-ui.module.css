@@ -1,0 +1,55 @@
+/* Shared admin UI primitive styles extracted from globals.css. */
+
+
+.admin-panel {
+  overflow: hidden;
+  border-color: var(--admin-border);
+  border-radius: var(--admin-radius-lg);
+  background:
+    radial-gradient(circle at 96% 0%, rgba(var(--accent-warm-rgb), 0.08), transparent 20%),
+    var(--admin-panel);
+  box-shadow: var(--admin-shadow);
+}
+
+.admin-panel-header {
+  border-color: var(--admin-border);
+  background: linear-gradient(180deg, rgba(255, 252, 247, 0.72), rgba(255, 249, 239, 0.28));
+}
+
+.admin-panel-title {
+  color: var(--admin-text);
+  font-size: 1.08rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.admin-panel-body {
+  background: rgba(255, 251, 245, 0.2);
+}
+
+.admin-metric {
+  border-color: rgba(var(--accent-rgb), 0.12);
+  background: rgba(255, 250, 242, 0.72);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.66);
+}
+
+.admin-metric div:first-child {
+  color: var(--accent);
+  font-weight: 900;
+}
+
+.admin-notice {
+  border-color: rgba(var(--accent-rgb), 0.14);
+  background: rgba(var(--accent-rgb), 0.055);
+  color: var(--admin-text-muted);
+}
+
+.admin-field > span,
+.admin-checkbox-row {
+  color: var(--admin-text-muted);
+}
+
+.admin-checkbox-row {
+  border-color: var(--admin-border);
+  background: rgba(255, 250, 242, 0.72);
+}
