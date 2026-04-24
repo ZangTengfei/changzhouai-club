@@ -247,6 +247,12 @@ export async function loadAdminMembersData(
       };
     })
     .sort((a, b) => {
+      const joinedAtDiff = new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime();
+
+      if (joinedAtDiff !== 0) {
+        return joinedAtDiff;
+      }
+
       const weightDiff = getMemberSortWeight(a.status) - getMemberSortWeight(b.status);
 
       if (weightDiff !== 0) {
