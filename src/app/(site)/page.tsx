@@ -263,7 +263,6 @@ export default async function HomePage() {
             连接常州的开发者、产品人、创业者和 AI 爱好者，
             一起探索 AI，落地创新，推动本地 AI 生态发展。
           </p>
-          <HandDrawnArrow className="home-hero-arrow" />
 
           <div className="home-hero-actions">
             <Link href="/join" className="button home-primary-button">
@@ -302,6 +301,7 @@ export default async function HomePage() {
               </span>
               <small>期待你的加入！</small>
             </div>
+            <HandDrawnArrow className="home-hero-arrow" />
           </div>
         </div>
 
