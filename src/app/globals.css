@@ -2588,9 +2588,9 @@ img {
   position: relative;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 184px minmax(0, 1.08fr) minmax(340px, 0.9fr);
-  gap: 16px;
-  align-items: end;
+  grid-template-columns: 184px minmax(300px, 1.1fr) minmax(300px, 0.92fr) auto;
+  gap: 18px;
+  align-items: center;
   padding: 16px 28px 0 24px;
   border-radius: 24px;
   background:
@@ -2645,14 +2645,14 @@ img {
 
 .home-join-banner-copy h2 {
   color: #152022;
-  max-width: 18ch;
+  max-width: 24ch;
   font-size: clamp(1.45rem, 2.1vw, 1.9rem);
   line-height: 1.14;
   letter-spacing: -0.05em;
 }
 
 .home-join-banner-copy p {
-  max-width: 30ch;
+  max-width: 42ch;
   color: rgba(var(--ink-rgb), 0.56);
   font-size: 0.9rem;
   line-height: 1.7;
@@ -2717,10 +2717,13 @@ img {
 
 .home-join-banner-button {
   width: fit-content;
-  margin-top: 10px;
+  align-self: center;
+  justify-self: end;
+  margin-top: 0;
   border-radius: 12px;
   min-height: 42px;
-  padding-inline: 16px;
+  padding-inline: 18px;
+  white-space: nowrap;
 }
 
 .home-join-card {
@@ -6126,6 +6129,11 @@ img {
     justify-self: end;
   }
 
+  .home-join-banner-button {
+    grid-column: 2;
+    justify-self: start;
+  }
+
   .home-hero {
     gap: 24px;
     min-height: auto;
@@ -6315,6 +6323,12 @@ img {
   .home-join-banner-info {
     order: 4;
     grid-column: auto;
+  }
+
+  .home-join-banner-button {
+    order: 5;
+    grid-column: auto;
+    justify-self: start;
   }
 
   .home-join-illustration {
