@@ -22,13 +22,10 @@ type AccountProfileFormProps = {
     interests: string[] | null;
   } | null;
   member: {
-    status: string | null;
     willing_to_attend: boolean | null;
     willing_to_share: boolean | null;
     willing_to_join_projects: boolean | null;
-    is_publicly_visible?: boolean | null;
   } | null;
-  publicProfilePath: string | null;
 };
 
 function FieldTag({ required }: { required: boolean }) {
@@ -73,7 +70,6 @@ export function AccountProfileForm({
   userId,
   profile,
   member,
-  publicProfilePath,
 }: AccountProfileFormProps) {
   return (
     <form
@@ -86,12 +82,6 @@ export function AccountProfileForm({
         <p>
           标记为必填的项目用于完成社区加入；其余内容都可以稍后再回来补充或更新。
         </p>
-      </div>
-
-      <div className="note-strip">
-        当前成员状态：{member?.status ?? "pending"} · 公开展示到成员页：
-        {member?.is_publicly_visible ? "是" : "否"} · 公开访问地址：
-        {member?.is_publicly_visible ? publicProfilePath ?? "生成中" : "成员公开展示后可访问"}
       </div>
 
       <div className="form-grid">

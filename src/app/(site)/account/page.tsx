@@ -269,7 +269,6 @@ export default async function AccountPage({
           userId={user.id}
           profile={profile}
           member={member}
-          publicProfilePath={publicProfilePath}
         />
       </div>
 
