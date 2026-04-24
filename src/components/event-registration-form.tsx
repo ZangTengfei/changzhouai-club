@@ -30,7 +30,7 @@ export function EventRegistrationForm({
   const nextPath = redirectTo ?? detailHref;
 
   return (
-    <article className="card">
+    <article className="card event-registration-card">
       <div className="pill-row">
         <span className="pill">{event.event_at ? new Date(event.event_at).toLocaleString("zh-CN") : "时间待定"}</span>
         <span className="pill">{event.city ?? "常州"}</span>
