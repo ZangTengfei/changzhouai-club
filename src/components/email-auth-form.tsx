@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -50,6 +51,7 @@ export function EmailAuthForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -161,6 +163,21 @@ export function EmailAuthForm({
       : pending
         ? "正在注册..."
         : "邮箱注册";
+  const passwordInputType = showPassword ? "text" : "password";
+  const PasswordIcon = showPassword ? EyeOff : Eye;
+  const passwordToggleLabel = showPassword ? "隐藏密码" : "显示密码";
+  const renderPasswordToggle = () => (
+    <button
+      type="button"
+      className="auth-password-toggle"
+      onClick={() => setShowPassword((current) => !current)}
+      disabled={!enabled || pending}
+      aria-label={passwordToggleLabel}
+      title={passwordToggleLabel}
+    >
+      <PasswordIcon aria-hidden="true" strokeWidth={1.9} />
+    </button>
+  );
 
   return (
     <form className="email-auth-form" onSubmit={handleSubmit}>
@@ -226,35 +243,41 @@ export function EmailAuthForm({
 
       <label className="form-field">
         <span>密码</span>
-        <input
-          className="input"
-          type="password"
-          name="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
-          placeholder="至少 6 位字符"
-          disabled={!enabled || pending}
-          minLength={6}
-          required
-        />
+        <span className="auth-password-field">
+          <input
+            className="input"
+            type={passwordInputType}
+            name="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
+            placeholder="至少 6 位字符"
+            disabled={!enabled || pending}
+            minLength={6}
+            required
+          />
+          {renderPasswordToggle()}
+        </span>
       </label>
 
       {mode === "sign-up" ? (
         <label className="form-field">
           <span>确认密码</span>
-          <input
-            className="input"
-            type="password"
-            name="confirm_password"
-            value={confirmPassword}
-            onChange={(event) => setConfirmPassword(event.target.value)}
-            autoComplete="new-password"
-            placeholder="再输入一次密码"
-            disabled={!enabled || pending}
-            minLength={6}
-            required
-          />
+          <span className="auth-password-field">
+            <input
+              className="input"
+              type={passwordInputType}
+              name="confirm_password"
+              value={confirmPassword}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              autoComplete="new-password"
+              placeholder="再输入一次密码"
+              disabled={!enabled || pending}
+              minLength={6}
+              required
+            />
+            {renderPasswordToggle()}
+          </span>
         </label>
       ) : null}
 
