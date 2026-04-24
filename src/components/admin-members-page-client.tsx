@@ -271,63 +271,9 @@ export function AdminMembersPageClient() {
           eyebrow="Results"
           title="成员结果"
           actions={
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-sm text-muted-foreground">
-                第 {currentMemberPage} / {totalMemberPages} 页
-              </span>
-              <Button asChild size="sm" variant="outline">
-                <Link
-                  href={buildMembersFilterHref(
-                    statusFilter,
-                    visibilityFilter,
-                    intentFilter,
-                    memberQueryInput,
-                    1,
-                  )}
-                >
-                  首页
-                </Link>
-              </Button>
-              <Button asChild size="sm" variant="outline">
-                <Link
-                  href={buildMembersFilterHref(
-                    statusFilter,
-                    visibilityFilter,
-                    intentFilter,
-                    memberQueryInput,
-                    Math.max(1, currentMemberPage - 1),
-                  )}
-                >
-                  上一页
-                </Link>
-              </Button>
-              <Button asChild size="sm" variant="outline">
-                <Link
-                  href={buildMembersFilterHref(
-                    statusFilter,
-                    visibilityFilter,
-                    intentFilter,
-                    memberQueryInput,
-                    Math.min(totalMemberPages, currentMemberPage + 1),
-                  )}
-                >
-                  下一页
-                </Link>
-              </Button>
-              <Button asChild size="sm" variant="outline">
-                <Link
-                  href={buildMembersFilterHref(
-                    statusFilter,
-                    visibilityFilter,
-                    intentFilter,
-                    memberQueryInput,
-                    totalMemberPages,
-                  )}
-                >
-                  末页
-                </Link>
-              </Button>
-            </div>
+            <span className="text-sm text-muted-foreground">
+              共 {filteredMembers.length} 位 · 第 {currentMemberPage} / {totalMemberPages} 页
+            </span>
           }
         />
         <AdminPanelBody className="space-y-3 p-0">
@@ -336,74 +282,144 @@ export function AdminMembersPageClient() {
               <AdminNotice>正在加载成员列表...</AdminNotice>
             </div>
           ) : paginatedMembers.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="min-w-[220px]">成员</TableHead>
-                  <TableHead>状态</TableHead>
-                  <TableHead>公开</TableHead>
-                  <TableHead>加入时间</TableHead>
-                  <TableHead>活动</TableHead>
-                  <TableHead>意愿</TableHead>
-                  <TableHead className="text-right">操作</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedMembers.map((member) => (
-                  <TableRow key={member.id}>
-                    <TableCell>
-                      <div className="grid gap-1">
-                        <Link
-                          href={buildDetailHref(`/admin/members/${member.id}`, currentMembersPath)}
-                          className="font-semibold text-foreground transition-colors hover:text-primary"
-                        >
-                          {member.displayName}
-                        </Link>
-                        <span className="text-sm text-muted-foreground">
-                          {member.email ?? "未提供邮箱"}
-                        </span>
-                        <span className="text-xs text-muted-foreground">{member.city}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <AdminStatusBadge tone={getAdminMemberStatusTone(member.status) as AdminTone}>
-                        {formatAdminMemberStatus(member.status)}
-                      </AdminStatusBadge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {member.isPubliclyVisible
-                        ? member.isFeaturedOnHome
-                          ? "公开 / 首页"
-                          : "公开"
-                        : "未公开"}
-                    </TableCell>
-                    <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                      {formatDate(member.joinedAt)}
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {member.registrationCount} 次
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      {[
-                        member.willingToShare ? "分享" : null,
-                        member.willingToJoinProjects ? "共建" : null,
-                      ]
-                        .filter(Boolean)
-                        .join(" / ") || "暂无"}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button asChild size="sm" variant="outline">
-                        <Link
-                          href={buildDetailHref(`/admin/members/${member.id}`, currentMembersPath)}
-                        >
-                          详情
-                        </Link>
-                      </Button>
-                    </TableCell>
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="min-w-[220px]">成员</TableHead>
+                    <TableHead>状态</TableHead>
+                    <TableHead>公开</TableHead>
+                    <TableHead>加入时间</TableHead>
+                    <TableHead>活动</TableHead>
+                    <TableHead>意愿</TableHead>
+                    <TableHead className="text-right">操作</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {paginatedMembers.map((member) => (
+                    <TableRow key={member.id}>
+                      <TableCell>
+                        <div className="grid gap-1">
+                          <Link
+                            href={buildDetailHref(
+                              `/admin/members/${member.id}`,
+                              currentMembersPath,
+                            )}
+                            className="font-semibold text-foreground transition-colors hover:text-primary"
+                          >
+                            {member.displayName}
+                          </Link>
+                          <span className="text-sm text-muted-foreground">
+                            {member.email ?? "未提供邮箱"}
+                          </span>
+                          <span className="text-xs text-muted-foreground">{member.city}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <AdminStatusBadge
+                          tone={getAdminMemberStatusTone(member.status) as AdminTone}
+                        >
+                          {formatAdminMemberStatus(member.status)}
+                        </AdminStatusBadge>
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {member.isPubliclyVisible
+                          ? member.isFeaturedOnHome
+                            ? "公开 / 首页"
+                            : "公开"
+                          : "未公开"}
+                      </TableCell>
+                      <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+                        {formatDate(member.joinedAt)}
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {member.registrationCount} 次
+                      </TableCell>
+                      <TableCell className="text-sm text-muted-foreground">
+                        {[
+                          member.willingToShare ? "分享" : null,
+                          member.willingToJoinProjects ? "共建" : null,
+                        ]
+                          .filter(Boolean)
+                          .join(" / ") || "暂无"}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button asChild size="sm" variant="outline">
+                          <Link
+                            href={buildDetailHref(
+                              `/admin/members/${member.id}`,
+                              currentMembersPath,
+                            )}
+                          >
+                            详情
+                          </Link>
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+
+              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/70 px-4 py-3">
+                <span className="text-sm text-muted-foreground">
+                  第 {currentMemberPage} / {totalMemberPages} 页
+                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <Button asChild size="sm" variant="outline">
+                    <Link
+                      href={buildMembersFilterHref(
+                        statusFilter,
+                        visibilityFilter,
+                        intentFilter,
+                        memberQueryInput,
+                        1,
+                      )}
+                    >
+                      首页
+                    </Link>
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
+                    <Link
+                      href={buildMembersFilterHref(
+                        statusFilter,
+                        visibilityFilter,
+                        intentFilter,
+                        memberQueryInput,
+                        Math.max(1, currentMemberPage - 1),
+                      )}
+                    >
+                      上一页
+                    </Link>
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
+                    <Link
+                      href={buildMembersFilterHref(
+                        statusFilter,
+                        visibilityFilter,
+                        intentFilter,
+                        memberQueryInput,
+                        Math.min(totalMemberPages, currentMemberPage + 1),
+                      )}
+                    >
+                      下一页
+                    </Link>
+                  </Button>
+                  <Button asChild size="sm" variant="outline">
+                    <Link
+                      href={buildMembersFilterHref(
+                        statusFilter,
+                        visibilityFilter,
+                        intentFilter,
+                        memberQueryInput,
+                        totalMemberPages,
+                      )}
+                    >
+                      末页
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </>
           ) : (
             <div className="p-4">
               <AdminNotice>当前筛选条件下没有成员数据。</AdminNotice>
