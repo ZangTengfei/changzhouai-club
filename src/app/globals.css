@@ -1418,10 +1418,10 @@ img {
   font-family:
     "Avenir Next", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei",
     sans-serif;
-  font-size: clamp(2.95rem, 6.4vw, 5rem);
+  font-size: clamp(2.8rem, 5.25vw, 4.2rem);
   font-weight: 900;
-  line-height: 1.05;
-  letter-spacing: -0.072em;
+  line-height: 1.12;
+  letter-spacing: -0.052em;
 }
 
 .home-hero-copy h1 span {
@@ -1554,14 +1554,14 @@ img {
 
 .home-hero-visual {
   position: relative;
-  min-height: 528px;
-  padding: 28px 0 10px 34px;
+  min-height: 520px;
+  padding: 26px 0 10px 34px;
 }
 
 .home-photo-frame {
   position: relative;
   overflow: hidden;
-  margin-top: 58px;
+  margin-top: 52px;
   border-radius: 6px;
   background: #e8efe7;
   box-shadow:
@@ -1573,7 +1573,7 @@ img {
 .home-photo-frame img {
   display: block;
   width: 100%;
-  height: 410px;
+  height: 396px;
   object-fit: cover;
 }
 
@@ -1603,8 +1603,8 @@ img {
 
 .home-photo-carousel {
   display: grid;
-  width: 74%;
-  margin: 12px 0 0 10px;
+  width: 78%;
+  margin: 12px 0 0 0;
 }
 
 .home-photo-carousel-track {
@@ -1635,7 +1635,7 @@ img {
 .home-photo-thumb {
   display: block;
   width: 100%;
-  height: 82px;
+  height: 72px;
   border-radius: 10px;
   object-fit: cover;
   border: 2px solid rgba(255, 255, 255, 0.78);
@@ -1677,45 +1677,62 @@ img {
   z-index: 3;
   max-width: 168px;
   margin: 0;
-  padding: 18px 18px 16px;
+  padding: 17px 18px 38px;
   border-radius: 4px;
   color: #26322f;
+  font-size: 0.93rem;
   font-weight: 800;
-  line-height: 1.66;
+  line-height: 1.58;
   box-shadow: 0 16px 34px rgba(var(--ink-rgb), 0.14);
 }
 
-.home-sticky-note span {
+.home-sticky-note-line {
   display: block;
 }
 
-.home-sticky-note::after {
-  content: "✓";
+.home-sticky-note-mark {
+  position: absolute;
+  right: 17px;
+  bottom: 12px;
   display: block;
-  margin-top: 8px;
   color: var(--accent);
-  font-size: 1.2rem;
+  font-size: 1.25rem;
+  line-height: 1;
 }
 
 .home-sticky-note-green {
-  top: 12px;
-  left: -12px;
+  top: 16px;
+  left: 8px;
   background: #e4f5b3;
-  transform: rotate(-12deg);
+  transform: rotate(-11deg);
+}
+
+.home-sticky-note-green .home-sticky-note-mark {
+  right: 18px;
+  color: #0d956c;
 }
 
 .home-sticky-note-yellow {
-  top: 2px;
-  right: -8px;
+  top: 8px;
+  right: -10px;
   background: #ffe59b;
-  transform: rotate(13deg);
+  transform: rotate(12deg);
+}
+
+.home-sticky-note-yellow .home-sticky-note-mark {
+  right: 18px;
+  color: #e77f2f;
 }
 
 .home-sticky-note-blue {
   right: -4px;
-  bottom: -8px;
+  bottom: 18px;
   background: #cbeaff;
-  transform: translateY(18px) rotate(12deg);
+  transform: rotate(9deg);
+}
+
+.home-sticky-note-blue .home-sticky-note-mark {
+  color: #2d8ce8;
 }
 
 .home-doodle {
@@ -1727,16 +1744,9 @@ img {
 }
 
 .home-doodle-hero-sparkles {
-  right: 146px;
-  top: 78px;
+  right: 150px;
+  top: 70px;
   color: #f4c75d;
-}
-
-.home-doodle-hero-smile {
-  right: -6px;
-  bottom: 126px;
-  width: 46px;
-  color: #4ba4e8;
 }
 
 @keyframes home-photo-fade-in {
@@ -6568,8 +6578,14 @@ img {
 
   .home-sticky-note {
     max-width: 132px;
-    padding: 12px;
+    padding: 12px 12px 32px;
     font-size: 0.78rem;
+  }
+
+  .home-sticky-note-mark {
+    right: 12px;
+    bottom: 10px;
+    font-size: 1rem;
   }
 
   .home-sticky-note-green {
@@ -6591,10 +6607,6 @@ img {
     top: 86px;
     right: 72px;
     width: 54px;
-  }
-
-  .home-doodle-hero-smile {
-    display: none;
   }
 
   .home-stats-panel {

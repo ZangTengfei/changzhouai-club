@@ -98,14 +98,17 @@ const heroNotes = [
   {
     className: "home-sticky-note home-sticky-note-green",
     lines: ["在这里", "认识有趣的人", "一起做有意思的事"],
+    mark: "♡",
   },
   {
     className: "home-sticky-note home-sticky-note-yellow",
     lines: ["从 0 到 1", "把想法变成", "真实项目"],
+    mark: "↗",
   },
   {
     className: "home-sticky-note home-sticky-note-blue",
     lines: ["每一次交流", "都可能带来", "新的机会"],
+    mark: "☺",
   },
 ] as const;
 

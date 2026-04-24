@@ -3,18 +3,19 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 
-import { DoodleSmile, DoodleSparkles } from "@/components/home-visual-assets";
+import { DoodleSparkles } from "@/components/home-visual-assets";
 import { getEventImageUrl } from "@/lib/public-image-url";
 
 type HeroNote = {
   className: string;
-  lines: string[];
+  lines: readonly string[];
+  mark?: string;
 };
 
 type HeroPhotoCarouselProps = {
   images: string[];
   alt: string;
-  notes: HeroNote[];
+  notes: readonly HeroNote[];
 };
 
 const AUTO_ADVANCE_DELAY = 4200;
@@ -106,12 +107,18 @@ export function HeroPhotoCarousel({
       {notes.map((note) => (
         <p key={note.className} className={note.className}>
           {note.lines.map((line) => (
-            <span key={line}>{line}</span>
+            <span key={line} className="home-sticky-note-line">
+              {line}
+            </span>
           ))}
+          {note.mark ? (
+            <span className="home-sticky-note-mark" aria-hidden="true">
+              {note.mark}
+            </span>
+          ) : null}
         </p>
       ))}
       <DoodleSparkles className="home-doodle home-doodle-hero-sparkles" />
-      <DoodleSmile className="home-doodle home-doodle-hero-smile" />
     </div>
   );
 }
