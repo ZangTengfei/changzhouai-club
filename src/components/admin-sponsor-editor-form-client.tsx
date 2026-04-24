@@ -64,9 +64,13 @@ async function readApiResult(response: Response) {
 export function AdminSponsorEditorFormClient({
   sponsor,
   onSaved,
+  onCreated,
+  onDeleted,
 }: {
   sponsor?: EditableAdminSponsor;
   onSaved?: () => void;
+  onCreated?: (sponsorId: string) => void;
+  onDeleted?: () => void;
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -88,7 +92,12 @@ export function AdminSponsorEditorFormClient({
         const result = await readApiResult(response);
 
         if (!isEditing && result?.sponsorId) {
-          router.push(`/admin/sponsors/${result.sponsorId}`);
+          if (onCreated) {
+            toast.success(getAdminSavedMessage(result?.saved ?? "sponsor") ?? "后台内容已更新。");
+            onCreated(result.sponsorId);
+          } else {
+            router.push(`/admin/sponsors/${result.sponsorId}`);
+          }
           return;
         }
 
@@ -111,6 +120,14 @@ export function AdminSponsorEditorFormClient({
           method: "DELETE",
         });
         const result = await readApiResult(response);
+        if (onDeleted) {
+          toast.success(
+            getAdminSavedMessage(result?.saved ?? "sponsor_deleted") ?? "后台内容已更新。",
+          );
+          onDeleted();
+          return;
+        }
+
         router.push(`/admin/sponsors?saved=${result?.saved ?? "sponsor_deleted"}`);
       } catch (submitError) {
         toast.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");

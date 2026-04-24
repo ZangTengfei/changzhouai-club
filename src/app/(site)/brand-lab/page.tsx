@@ -7,6 +7,18 @@ import {
   LogoDraftCityNodes,
 } from "@/components/logo-drafts";
 
+import styles from "./brand-lab-page.module.css";
+
+function cx(...classes: Array<string | false | null | undefined>) {
+  return classes
+    .flatMap((className) =>
+      typeof className === "string" ? className.split(/\s+/) : [],
+    )
+    .filter(Boolean)
+    .map((className) => styles[className as keyof typeof styles] ?? className)
+    .join(" ");
+}
+
 export const metadata: Metadata = {
   title: "品牌视觉",
   description: "查看常州 AI Club 当前标识的设计方向与应用展示。",
@@ -64,30 +76,30 @@ export default function BrandLabPage() {
         </div>
       </section>
 
-      <section className="logo-lab-grid">
+      <section className={cx("logo-lab-grid")}>
         {logoDrafts.map(({ id, eyebrow, title, summary, note, Mark }) => (
-          <article key={id} className="surface logo-draft-card">
+          <article key={id} className={cx("surface logo-draft-card")}>
             <div className="section-heading">
               <p className="eyebrow">{eyebrow}</p>
               <h2>{title}</h2>
               <p>{summary}</p>
             </div>
 
-            <div className="logo-draft-preview">
-              <div className="logo-draft-mark-shell">
-                <Mark className="logo-draft-mark" />
+            <div className={cx("logo-draft-preview")}>
+              <div className={cx("logo-draft-mark-shell")}>
+                <Mark className={cx("logo-draft-mark")} />
               </div>
 
-              <div className="logo-draft-meta">
-                <div className="logo-draft-favicon">
-                  <Mark className="logo-draft-favicon-mark" />
+              <div className={cx("logo-draft-meta")}>
+                <div className={cx("logo-draft-favicon")}>
+                  <Mark className={cx("logo-draft-favicon-mark")} />
                 </div>
 
-                <div className="logo-draft-header-demo">
-                  <div className="logo-draft-header-badge">
-                    <Mark className="logo-draft-header-mark" />
+                <div className={cx("logo-draft-header-demo")}>
+                  <div className={cx("logo-draft-header-badge")}>
+                    <Mark className={cx("logo-draft-header-mark")} />
                   </div>
-                  <div className="logo-draft-header-copy">
+                  <div className={cx("logo-draft-header-copy")}>
                     <strong>常州 AI Club</strong>
                     <small>Changzhou AI Club</small>
                   </div>
