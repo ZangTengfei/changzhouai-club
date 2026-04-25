@@ -1,10 +1,9 @@
 import Link from "next/link";
 
+import { cssModuleCx } from "@/lib/utils";
 import styles from "./docs-footer.module.css";
 
-function cx(...classes: string[]) {
-  return classes.map((className) => styles[className as keyof typeof styles]).join(" ");
-}
+const cx = cssModuleCx.bind(null, styles);
 
 export function DocsFooter() {
   return (

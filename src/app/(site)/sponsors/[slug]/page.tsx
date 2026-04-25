@@ -4,12 +4,9 @@ import { notFound } from "next/navigation";
 
 import galleryStyles from "@/components/content-gallery.module.css";
 import { getPublicSponsorBySlug } from "@/lib/sponsors";
+import { cn } from "@/lib/utils";
 
 import styles from "./sponsor-detail-page.module.css";
-
-function cx(...classNames: Array<string | false | null | undefined>) {
-  return classNames.filter(Boolean).join(" ");
-}
 
 export async function generateMetadata({
   params,
@@ -46,7 +43,7 @@ export default async function SponsorDetailPage({
 
   return (
     <div className="page-stack">
-      <section className={cx("surface", styles["sponsor-detail-hero"])}>
+      <section className={cn("surface", styles["sponsor-detail-hero"])}>
         <div className={styles["sponsor-detail-copy"]}>
           <div className="pill-row">
             <span className="pill">{sponsor.tierLabel}</span>
@@ -94,7 +91,7 @@ export default async function SponsorDetailPage({
       </section>
 
       <section className="two-up">
-        <article className={cx("card", styles["sponsor-detail-panel"])}>
+        <article className={cn("card", styles["sponsor-detail-panel"])}>
           <div className="section-heading">
             <p className="eyebrow">Profile</p>
             <h2>赞助者信息</h2>
@@ -113,7 +110,7 @@ export default async function SponsorDetailPage({
           )}
         </article>
 
-        <article className={cx("card", styles["sponsor-detail-panel"])}>
+        <article className={cn("card", styles["sponsor-detail-panel"])}>
           <div className="section-heading">
             <p className="eyebrow">Support</p>
             <h2>共建关系</h2>

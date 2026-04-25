@@ -11,6 +11,7 @@ import {
   buildMemberAvatarPath,
   MEMBER_AVATARS_BUCKET,
 } from "@/lib/supabase/storage";
+import { cssModuleCx } from "@/lib/utils";
 
 import styles from "./image-upload-field.module.css";
 
@@ -59,15 +60,7 @@ function getStorageUploadUrl(scope: StorageUploadScope) {
   }
 }
 
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes
-    .flatMap((className) =>
-      typeof className === "string" ? className.split(/\s+/) : [],
-    )
-    .filter(Boolean)
-    .map((className) => styles[className as keyof typeof styles] ?? className)
-    .join(" ");
-}
+const cx = cssModuleCx.bind(null, styles);
 
 export function ImageUploadField({
   name,

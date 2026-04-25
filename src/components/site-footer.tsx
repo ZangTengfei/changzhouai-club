@@ -2,17 +2,10 @@ import Link from "next/link";
 
 import { SocialPlatformIcon } from "@/components/social-platform-icon";
 import { communitySocialLinks, siteRepositoryUrl } from "@/lib/site-data";
+import { cssModuleCx } from "@/lib/utils";
 import styles from "./site-footer.module.css";
 
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes
-    .flatMap((className) =>
-      typeof className === "string" ? className.split(/\s+/) : [],
-    )
-    .filter(Boolean)
-    .map((className) => styles[className as keyof typeof styles] ?? className)
-    .join(" ");
-}
+const cx = cssModuleCx.bind(null, styles);
 
 export function SiteFooter() {
   return (

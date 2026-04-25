@@ -3,11 +3,10 @@ import Link from "next/link";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { SocialPlatformIcon } from "@/components/social-platform-icon";
 import { siteRepositoryUrl } from "@/lib/site-data";
+import { cssModuleCx } from "@/lib/utils";
 import styles from "./docs-navbar.module.css";
 
-function cx(...classes: string[]) {
-  return classes.map((className) => styles[className as keyof typeof styles]).join(" ");
-}
+const cx = cssModuleCx.bind(null, styles);
 
 export function DocsNavbar() {
   return (

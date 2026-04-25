@@ -8,17 +8,10 @@ import { SiteAccountEntry } from "@/components/site-account-entry";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { SocialPlatformIcon } from "@/components/social-platform-icon";
 import { navItems, siteRepositoryUrl } from "@/lib/site-data";
+import { cssModuleCx } from "@/lib/utils";
 import styles from "./site-header.module.css";
 
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes
-    .flatMap((className) =>
-      typeof className === "string" ? className.split(/\s+/) : [],
-    )
-    .filter(Boolean)
-    .map((className) => styles[className as keyof typeof styles] ?? className)
-    .join(" ");
-}
+const cx = cssModuleCx.bind(null, styles);
 
 export function SiteHeader() {
   const pathname = usePathname();

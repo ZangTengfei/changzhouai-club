@@ -4,17 +4,10 @@ import {
   setAdminEventCoverImage,
 } from "@/app/admin/actions";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
+import { cssModuleCx } from "@/lib/utils";
 import styles from "./admin-event-photos-manager.module.css";
 
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes
-    .flatMap((className) =>
-      typeof className === "string" ? className.split(/\s+/) : [],
-    )
-    .filter(Boolean)
-    .map((className) => styles[className as keyof typeof styles] ?? className)
-    .join(" ");
-}
+const cx = cssModuleCx.bind(null, styles);
 
 type EventPhoto = {
   id: string;

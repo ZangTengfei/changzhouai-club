@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn, cssModuleCxWithGlobals } from "@/lib/utils";
 
 import styles from "./admin-ui.module.css";
 
@@ -49,19 +49,7 @@ const toneClassName: Record<AdminTone, string> = {
   attended: "border-emerald-200 bg-emerald-100 text-emerald-700",
 };
 
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes
-    .flatMap((className) =>
-      typeof className === "string" ? className.split(/\s+/) : [],
-    )
-    .filter(Boolean)
-    .map((className) =>
-      styles[className as keyof typeof styles]
-        ? `${styles[className as keyof typeof styles]} ${className}`
-        : className,
-    )
-    .join(" ");
-}
+const cx = cssModuleCxWithGlobals.bind(null, styles);
 
 export function AdminPageStack({
   className,

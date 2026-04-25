@@ -14,6 +14,7 @@ import {
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 import { loadAdminJoinRequestOrThrow } from "@/lib/admin/members";
+import { cssModuleCxWithGlobals } from "@/lib/utils";
 
 import styles from "./join-request-detail-page.module.css";
 
@@ -28,19 +29,7 @@ type SearchParams = {
   error?: string;
 };
 
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes
-    .flatMap((className) =>
-      typeof className === "string" ? className.split(/\s+/) : [],
-    )
-    .filter(Boolean)
-    .map((className) =>
-      styles[className as keyof typeof styles]
-        ? `${styles[className as keyof typeof styles]} ${className}`
-        : className,
-    )
-    .join(" ");
-}
+const cx = cssModuleCxWithGlobals.bind(null, styles);
 
 function formatDate(value: string | null) {
   if (!value) {

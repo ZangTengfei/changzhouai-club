@@ -12,18 +12,11 @@ import {
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import { getEventImageUrl } from "@/lib/public-image-url";
 import { getCurrentWechatQrCode } from "@/lib/community-social";
+import { cssModuleCx } from "@/lib/utils";
 
 import styles from "./home-page.module.css";
 
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes
-    .flatMap((className) =>
-      typeof className === "string" ? className.split(/\s+/) : [],
-    )
-    .filter(Boolean)
-    .map((className) => styles[className as keyof typeof styles] ?? className)
-    .join(" ");
-}
+const cx = cssModuleCx.bind(null, styles);
 
 function formatMetricDate(isoDate: string | null) {
   if (!isoDate) {

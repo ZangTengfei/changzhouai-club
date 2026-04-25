@@ -1,4 +1,5 @@
 import { SiteLogoMark } from "@/components/site-logo-mark";
+import { cssModuleCx } from "@/lib/utils";
 
 import styles from "./route-loading.module.css";
 
@@ -6,15 +7,7 @@ const siteCards = Array.from({ length: 3 });
 const adminRows = Array.from({ length: 6 });
 const siteLoadingSteps = ["资料", "活动", "共建"];
 
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes
-    .flatMap((className) =>
-      typeof className === "string" ? className.split(/\s+/) : [],
-    )
-    .filter(Boolean)
-    .map((className) => styles[className as keyof typeof styles] ?? className)
-    .join(" ");
-}
+const cx = cssModuleCx.bind(null, styles);
 
 function SkeletonBlock({
   className,

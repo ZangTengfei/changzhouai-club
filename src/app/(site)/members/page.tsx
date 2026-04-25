@@ -16,6 +16,7 @@ import { ToneBadge } from "@/components/tone-badge";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
 import { memberTags } from "@/lib/site-data";
+import { cn } from "@/lib/utils";
 
 import styles from "./members-page.module.css";
 
@@ -67,10 +68,6 @@ const memberMapNodeClassName = [
   styles["members-map-node-6"],
   styles["members-map-node-7"],
 ];
-
-function cx(...classNames: Array<string | false | null | undefined>) {
-  return classNames.filter(Boolean).join(" ");
-}
 
 export default async function MembersPage() {
   const directory = await getPublicMembersDirectory();
@@ -180,7 +177,7 @@ export default async function MembersPage() {
               ? mapMembers.map((member, index) => (
                   <Link
                     href={getMemberPublicSlugPath(member)}
-                    className={cx(
+                    className={cn(
                       styles["members-map-node"],
                       memberMapNodeClassName[index],
                     )}
@@ -196,7 +193,7 @@ export default async function MembersPage() {
                 ))
               : ["开发者", "产品人", "创业者", "设计师", "运营"].map((label, index) => (
                   <div
-                    className={cx(
+                    className={cn(
                       styles["members-map-node"],
                       memberMapNodeClassName[index],
                     )}
@@ -235,7 +232,7 @@ export default async function MembersPage() {
       <section className={styles["members-flow-strip"]} aria-label="成员连接路径">
         {memberFlowSteps.map((item, index) => (
           <article
-            className={cx(styles["members-flow-card"], memberFlowToneClassName[item.tone])}
+            className={cn(styles["members-flow-card"], memberFlowToneClassName[item.tone])}
             key={item.title}
           >
             <span>{String(index + 1).padStart(2, "0")}</span>
@@ -258,7 +255,7 @@ export default async function MembersPage() {
           <div className={styles["members-featured-grid"]}>
             {featuredGroups.map((group, index) => (
               <article
-                className={cx(
+                className={cn(
                   styles["members-featured-card"],
                   styles[`members-featured-card-${index + 1}`],
                 )}

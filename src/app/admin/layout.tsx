@@ -7,22 +7,11 @@ import { AdminNotice, AdminPanel, AdminPanelBody } from "@/components/admin-ui";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { Button } from "@/components/ui/button";
 import { getStaffContext } from "@/lib/supabase/guards";
+import { cssModuleCxWithGlobals } from "@/lib/utils";
 
 import styles from "./admin-layout.module.css";
 
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes
-    .flatMap((className) =>
-      typeof className === "string" ? className.split(/\s+/) : [],
-    )
-    .filter(Boolean)
-    .map((className) =>
-      styles[className as keyof typeof styles]
-        ? `${styles[className as keyof typeof styles]} ${className}`
-        : className,
-    )
-    .join(" ");
-}
+const cx = cssModuleCxWithGlobals.bind(null, styles);
 
 export default async function AdminLayout({
   children,

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BadgeCheck, CalendarDays, Handshake, Share2, Users } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn, cssModuleCxWithGlobals } from "@/lib/utils";
 
 import styles from "@/app/admin/admin-layout.module.css";
 
@@ -41,19 +41,7 @@ const adminNavItems = [
   },
 ];
 
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes
-    .flatMap((className) =>
-      typeof className === "string" ? className.split(/\s+/) : [],
-    )
-    .filter(Boolean)
-    .map((className) =>
-      styles[className as keyof typeof styles]
-        ? `${styles[className as keyof typeof styles]} ${className}`
-        : className,
-    )
-    .join(" ");
-}
+const cx = cssModuleCxWithGlobals.bind(null, styles);
 
 export function AdminNav() {
   const pathname = usePathname();

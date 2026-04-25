@@ -1,11 +1,10 @@
 import Link from "next/link";
 
 import { getPublicSponsors } from "@/lib/sponsors";
+import { cssModuleCx } from "@/lib/utils";
 import styles from "./site-sponsors.module.css";
 
-function cx(...classes: string[]) {
-  return classes.map((className) => styles[className as keyof typeof styles]).join(" ");
-}
+const cx = cssModuleCx.bind(null, styles);
 
 export async function SiteSponsors() {
   const sponsors = await getPublicSponsors();

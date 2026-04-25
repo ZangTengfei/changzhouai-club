@@ -6,6 +6,7 @@ import { ArrowUpRight, Heart, Smile } from "lucide-react";
 
 import { DoodleSparkles } from "@/components/home-visual-assets";
 import { getEventImageUrl } from "@/lib/public-image-url";
+import { cssModuleCx } from "@/lib/utils";
 
 import styles from "@/app/(site)/home-page.module.css";
 
@@ -30,15 +31,7 @@ const heroNoteIcons = {
   smile: Smile,
 } satisfies Record<HeroNoteIcon, typeof Heart>;
 
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes
-    .flatMap((className) =>
-      typeof className === "string" ? className.split(/\s+/) : [],
-    )
-    .filter(Boolean)
-    .map((className) => styles[className as keyof typeof styles] ?? className)
-    .join(" ");
-}
+const cx = cssModuleCx.bind(null, styles);
 
 function HeroNoteMark({ icon }: { icon: HeroNoteIcon }) {
   const NoteIcon = heroNoteIcons[icon];

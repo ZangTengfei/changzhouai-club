@@ -4,17 +4,10 @@ import { MemberAvatar } from "@/components/member-avatar";
 import { ToneBadge } from "@/components/tone-badge";
 import type { PublicMember } from "@/lib/community-members";
 import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
+import { cssModuleCx } from "@/lib/utils";
 import styles from "./member-directory-card.module.css";
 
-function cx(...classes: Array<string | false | null | undefined>) {
-  return classes
-    .flatMap((className) =>
-      typeof className === "string" ? className.split(/\s+/) : [],
-    )
-    .filter(Boolean)
-    .map((className) => styles[className as keyof typeof styles] ?? className)
-    .join(" ");
-}
+const cx = cssModuleCx.bind(null, styles);
 
 type MemberDirectoryCardProps = {
   member: PublicMember;
