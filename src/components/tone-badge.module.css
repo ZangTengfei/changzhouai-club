@@ -1,0 +1,46 @@
+.tone-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 9px 12px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.tone-badge-0 {
+  border-color: rgba(var(--accent-rgb), 0.16);
+  background: rgba(var(--accent-rgb), 0.08);
+  color: var(--accent-strong);
+}
+
+.tone-badge-1 {
+  border-color: rgba(var(--accent-warm-rgb), 0.18);
+  background: rgba(var(--accent-warm-rgb), 0.12);
+  color: var(--accent-warm-strong);
+}
+
+.tone-badge-2 {
+  border-color: rgba(56, 118, 195, 0.18);
+  background: rgba(56, 118, 195, 0.11);
+  color: #325f97;
+}
+
+.tone-badge-3 {
+  border-color: rgba(190, 82, 82, 0.16);
+  background: rgba(190, 82, 82, 0.1);
+  color: #9c4545;
+}
+
+.tone-badge-4 {
+  border-color: rgba(111, 129, 58, 0.16);
+  background: rgba(111, 129, 58, 0.11);
+  color: #5f7130;
+}
+
+.tone-badge-5 {
+  border-color: rgba(92, 99, 112, 0.16);
+  background: rgba(92, 99, 112, 0.1);
+  color: #4c5260;
+}
