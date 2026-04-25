@@ -1,0 +1,152 @@
+.docs-navbar-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  width: 100%;
+  margin: 0;
+  padding: 14px 24px 12px;
+  border-bottom: 1px solid var(--docs-line);
+}
+
+.docs-navbar-identity {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.docs-navbar-home-brand,
+.docs-navbar-docs-title {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.docs-navbar-home-brand {
+  gap: 10px;
+  padding-right: 14px;
+  border-right: 1px solid var(--docs-line-strong);
+}
+
+.docs-navbar-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 34px;
+  flex-shrink: 0;
+}
+
+.docs-navbar-mark-icon {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.docs-navbar-main-copy {
+  color: var(--docs-text);
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.docs-navbar-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.docs-navbar-copy strong {
+  font-size: 0.98rem;
+  color: var(--docs-text);
+  font-weight: 600;
+}
+
+.docs-navbar-copy small {
+  color: var(--docs-text-soft);
+  font-size: 0.78rem;
+}
+
+.docs-navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.docs-navbar-links a {
+  display: inline-flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--docs-text-soft);
+  transition:
+    color 0.18s ease,
+    opacity 0.18s ease;
+}
+
+.docs-navbar-links a:hover,
+.docs-navbar-links a:focus-visible {
+  color: var(--docs-text);
+  opacity: 1;
+}
+
+.docs-navbar-icon-link {
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+}
+
+.docs-navbar-icon-link:hover,
+.docs-navbar-icon-link:focus-visible {
+  background: var(--docs-hover);
+}
+
+.docs-navbar-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 1024px) {
+  .docs-navbar-shell {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .docs-navbar-shell {
+    padding: 14px 20px 12px;
+  }
+
+  .docs-navbar-identity {
+    gap: 10px;
+  }
+
+  .docs-navbar-home-brand {
+    gap: 8px;
+    padding-right: 10px;
+  }
+
+  .docs-navbar-main-copy {
+    font-size: 0.88rem;
+  }
+
+  .docs-navbar-links a {
+    font-size: 0.92rem;
+  }
+
+  .docs-navbar-mark,
+  .docs-navbar-mark-icon {
+    width: 40px;
+  }
+
+  .docs-navbar-mark {
+    height: 30px;
+  }
+}

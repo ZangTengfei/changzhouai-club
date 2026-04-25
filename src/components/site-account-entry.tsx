@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { hasSupabaseEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/client";
+import styles from "./site-account-entry.module.css";
 
 type AccountState = {
   href: string;
@@ -164,7 +165,7 @@ export function SiteAccountEntry() {
     return (
       <Link
         href={account.href}
-        className="account-entry account-entry-login"
+        className={`${styles["account-entry"]} ${styles["account-entry-login"]}`}
         aria-label={account.label}
         title={account.label}
       >
@@ -174,10 +175,12 @@ export function SiteAccountEntry() {
   }
 
   return (
-    <div className="account-menu" ref={menuRef}>
+    <div className={styles["account-menu"]} ref={menuRef}>
       <button
         type="button"
-        className={`account-entry${menuOpen ? " account-entry-active" : ""}`}
+        className={`${styles["account-entry"]}${
+          menuOpen ? ` ${styles["account-entry-active"]}` : ""
+        }`}
         aria-label={account.label}
         aria-haspopup="menu"
         aria-expanded={menuOpen}
@@ -188,11 +191,11 @@ export function SiteAccountEntry() {
           <img
             src={account.avatarUrl}
             alt={account.name}
-            className="account-avatar-image"
+            className={styles["account-avatar-image"]}
             referrerPolicy="no-referrer"
           />
         ) : (
-          <span className="account-avatar-fallback">
+          <span className={styles["account-avatar-fallback"]}>
             {getAccountInitials(account.name)}
           </span>
         )}
@@ -200,10 +203,10 @@ export function SiteAccountEntry() {
       </button>
 
       {menuOpen ? (
-        <div className="account-dropdown" role="menu" aria-label="账号菜单">
+        <div className={styles["account-dropdown"]} role="menu" aria-label="账号菜单">
           <Link
             href="/account"
-            className="account-dropdown-item"
+            className={styles["account-dropdown-item"]}
             role="menuitem"
             onClick={() => setMenuOpen(false)}
           >
@@ -213,7 +216,7 @@ export function SiteAccountEntry() {
           {account.isStaff ? (
             <Link
               href="/admin"
-              className="account-dropdown-item"
+              className={styles["account-dropdown-item"]}
               role="menuitem"
               onClick={() => setMenuOpen(false)}
             >
@@ -223,7 +226,7 @@ export function SiteAccountEntry() {
 
           <button
             type="button"
-            className="account-dropdown-item"
+            className={styles["account-dropdown-item"]}
             role="menuitem"
             onClick={handleSignOut}
             disabled={pending}

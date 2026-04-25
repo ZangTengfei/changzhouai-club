@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PageHero } from "@/components/page-hero";
+import galleryStyles from "@/components/content-gallery.module.css";
 import { getCompletedEventRecaps } from "@/lib/community-events";
 import { getEventImageUrl } from "@/lib/public-image-url";
 import { archiveItems } from "@/lib/site-data";
@@ -42,17 +43,17 @@ export default async function ArchivePage() {
       </section>
 
       {galleryItems.length > 0 ? (
-        <section className="gallery-grid">
+        <section className={galleryStyles["gallery-grid"]}>
           {galleryItems.map((item) => (
-            <article className="gallery-card" key={item.id}>
-              <div className="gallery-media">
+            <article className={galleryStyles["gallery-card"]} key={item.id}>
+              <div className={galleryStyles["gallery-media"]}>
                 <img
                   src={getEventImageUrl(item.imageUrl, "archive") ?? item.imageUrl}
                   alt={item.caption ?? item.eventTitle}
                   loading="lazy"
                 />
               </div>
-              <div className="gallery-copy">
+              <div className={galleryStyles["gallery-copy"]}>
                 <h3>
                   <Link href={`/events/${item.eventSlug}`}>{item.eventTitle}</Link>
                 </h3>

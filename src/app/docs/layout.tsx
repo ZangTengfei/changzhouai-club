@@ -5,6 +5,7 @@ import { Layout } from "nextra-theme-docs";
 
 import { DocsFooter } from "@/components/docs-footer";
 import { DocsNavbar } from "@/components/docs-navbar";
+import styles from "./docs-layout.module.css";
 
 import "nextra-theme-docs/style.css";
 import "./theme.css";
@@ -17,7 +18,7 @@ export default async function DocsLayout({
   const pageMap = await getPageMap("/docs");
 
   return (
-    <div className="docs-layout-shell">
+    <div className={styles["docs-layout-shell"]}>
       <Layout
         pageMap={pageMap}
         navbar={<DocsNavbar />}

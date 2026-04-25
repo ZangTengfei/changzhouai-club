@@ -1,6 +1,11 @@
 import Link from "next/link";
 
 import { getPublicSponsors } from "@/lib/sponsors";
+import styles from "./site-sponsors.module.css";
+
+function cx(...classes: string[]) {
+  return classes.map((className) => styles[className as keyof typeof styles]).join(" ");
+}
 
 export async function SiteSponsors() {
   const sponsors = await getPublicSponsors();
@@ -8,8 +13,8 @@ export async function SiteSponsors() {
   const compactSponsors = sponsors.filter((sponsor) => sponsor.tier !== "core");
 
   return (
-    <section className="site-sponsors" aria-labelledby="site-sponsors-title">
-      <div className="home-sponsor-showcase">
+    <section className={cx("site-sponsors")} aria-labelledby="site-sponsors-title">
+      <div className={cx("home-sponsor-showcase")}>
         <div className="home-card-heading home-showcase-heading">
           <div>
             <h2 id="site-sponsors-title">赞助者</h2>
@@ -18,23 +23,23 @@ export async function SiteSponsors() {
         </div>
 
         {featuredSponsors.length > 0 ? (
-          <div className="home-sponsor-featured-grid">
+          <div className={cx("home-sponsor-featured-grid")}>
             {featuredSponsors.map((sponsor) => (
               <Link
                 key={sponsor.id}
                 href={`/sponsors/${sponsor.slug}`}
-                className="home-sponsor-featured-card"
+                className={cx("home-sponsor-featured-card")}
               >
-                <div className="home-sponsor-card-head">
+                <div className={cx("home-sponsor-card-head")}>
                   <div>
-                    <p className="home-sponsor-label">{sponsor.tierLabel}</p>
+                    <p className={cx("home-sponsor-label")}>{sponsor.tierLabel}</p>
                     <h3>{sponsor.name}</h3>
                   </div>
                   {sponsor.logoUrl ? (
-                    <div className="home-sponsor-logo-mark" aria-label={`${sponsor.name} Logo`}>
+                    <div className={cx("home-sponsor-logo-mark")} aria-label={`${sponsor.name} Logo`}>
                       <img src={sponsor.logoUrl} alt={`${sponsor.name} Logo`} loading="lazy" />
                     </div>
-                  ) : <span className="home-sponsor-logo-fallback">{sponsor.name}</span>}
+                  ) : <span className={cx("home-sponsor-logo-fallback")}>{sponsor.name}</span>}
                 </div>
               </Link>
             ))}
@@ -42,23 +47,23 @@ export async function SiteSponsors() {
         ) : null}
 
         {compactSponsors.length > 0 ? (
-          <div className="home-sponsor-compact-grid" aria-label="更多赞助者">
+          <div className={cx("home-sponsor-compact-grid")} aria-label="更多赞助者">
             {compactSponsors.map((sponsor) => (
               <Link
                 key={sponsor.id}
                 href={`/sponsors/${sponsor.slug}`}
-                className="home-sponsor-compact-card"
+                className={cx("home-sponsor-compact-card")}
                 aria-label={`${sponsor.name}，${sponsor.tierLabel}`}
                 title={`${sponsor.name} · ${sponsor.tierLabel}`}
               >
-                <div className="home-sponsor-compact-logo">
+                <div className={cx("home-sponsor-compact-logo")}>
                   {sponsor.logoUrl ? (
                     <img src={sponsor.logoUrl} alt={`${sponsor.name} Logo`} loading="lazy" />
                   ) : (
                     <span>{sponsor.name}</span>
                   )}
                 </div>
-                <div className="home-sponsor-compact-copy">
+                <div className={cx("home-sponsor-compact-copy")}>
                   <strong>{sponsor.name}</strong>
                   <small>{sponsor.tierLabel}</small>
                 </div>

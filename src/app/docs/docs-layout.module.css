@@ -1,0 +1,67 @@
+.docs-layout-shell {
+  min-height: 100vh;
+  padding-bottom: 28px;
+  --docs-bg: #f8fafc;
+  --docs-bg-soft: #ffffff;
+  --docs-surface: rgba(255, 255, 255, 0.96);
+  --docs-line: rgba(15, 23, 42, 0.1);
+  --docs-line-strong: rgba(15, 23, 42, 0.16);
+  --docs-text: #0f172a;
+  --docs-text-soft: #475569;
+  --docs-hover: rgba(15, 23, 42, 0.04);
+  --docs-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+  --nextra-primary-hue: 221;
+  --nextra-primary-saturation: 16%;
+  --nextra-primary-lightness: 42%;
+  --nextra-bg: 248 250 252;
+  background: linear-gradient(180deg, #ffffff 0%, var(--docs-bg) 100%);
+  color: var(--docs-text);
+  font-family:
+    "PingFang SC", "Helvetica Neue", Helvetica, Arial, "Microsoft YaHei",
+    sans-serif;
+}
+
+.docs-layout-shell :global(.nextra-sidebar-container),
+.docs-layout-shell :global(.nextra-nav-container),
+.docs-layout-shell :global(.nextra-toc),
+.docs-layout-shell :global(.nextra-card) {
+  background: transparent;
+}
+
+.docs-layout-shell :global(.nextra-sidebar),
+.docs-layout-shell :global(.nextra-toc nav) {
+  border-color: var(--docs-line);
+}
+
+.docs-layout-shell :global(.nextra-content),
+.docs-layout-shell :global(.nextra-breadcrumb),
+.docs-layout-shell :global(.nextra-sidebar),
+.docs-layout-shell :global(.nextra-toc),
+.docs-layout-shell :global(.nextra-navbar) {
+  color: var(--docs-text);
+}
+
+.docs-layout-shell :global(.nextra-sidebar a),
+.docs-layout-shell :global(.nextra-toc a),
+.docs-layout-shell :global(.nextra-content p),
+.docs-layout-shell :global(.nextra-content li) {
+  color: var(--docs-text-soft);
+}
+
+.docs-layout-shell :global(.nextra-content h1),
+.docs-layout-shell :global(.nextra-content h2),
+.docs-layout-shell :global(.nextra-content h3),
+.docs-layout-shell :global(.nextra-content h4),
+.docs-layout-shell :global(.nextra-content strong),
+.docs-layout-shell :global(.nextra-content a) {
+  color: var(--docs-text);
+}
+
+.docs-layout-shell :global(.nextra-sidebar a:hover),
+.docs-layout-shell :global(.nextra-sidebar a:focus-visible),
+.docs-layout-shell :global(.nextra-toc a:hover),
+.docs-layout-shell :global(.nextra-toc a:focus-visible),
+.docs-layout-shell :global(.nextra-content a:hover),
+.docs-layout-shell :global(.nextra-content a:focus-visible) {
+  color: var(--docs-text);
+}

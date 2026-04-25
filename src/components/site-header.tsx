@@ -8,24 +8,35 @@ import { SiteAccountEntry } from "@/components/site-account-entry";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { SocialPlatformIcon } from "@/components/social-platform-icon";
 import { navItems, siteRepositoryUrl } from "@/lib/site-data";
+import styles from "./site-header.module.css";
+
+function cx(...classes: Array<string | false | null | undefined>) {
+  return classes
+    .flatMap((className) =>
+      typeof className === "string" ? className.split(/\s+/) : [],
+    )
+    .filter(Boolean)
+    .map((className) => styles[className as keyof typeof styles] ?? className)
+    .join(" ");
+}
 
 export function SiteHeader() {
   const pathname = usePathname();
 
   return (
-    <header className="site-header">
-      <div className="container header-inner">
-        <Link href="/" className="brand">
-          <span className="brand-mark">
-            <SiteLogoMark className="brand-mark-icon" />
+    <header className={cx("site-header")}>
+      <div className={cx("container header-inner")}>
+        <Link href="/" className={cx("brand")}>
+          <span className={cx("brand-mark")}>
+            <SiteLogoMark className={cx("brand-mark-icon")} />
           </span>
-          <span className="brand-copy">
+          <span className={cx("brand-copy")}>
             <strong>常州 AI Club</strong>
             <small>ChangzhouAI.Club</small>
           </span>
         </Link>
 
-        <nav id="site-navigation" className="nav-links" aria-label="主导航">
+        <nav id="site-navigation" className={cx("nav-links")} aria-label="主导航">
           {navItems.map((item) => {
             const isActive =
               item.href === "/"
@@ -36,7 +47,7 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
-                className={isActive ? "nav-link-active" : undefined}
+                className={isActive ? styles["nav-link-active"] : undefined}
                 aria-current={isActive ? "page" : undefined}
               >
                 {item.label}
@@ -45,24 +56,24 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className="header-actions">
+        <div className={cx("header-actions")}>
           <Link
             href={siteRepositoryUrl}
-            className="github-nav-button"
+            className={cx("github-nav-button")}
             target="_blank"
             rel="noreferrer"
             aria-label="打开 GitHub 仓库"
             title="GitHub 仓库"
           >
-            <SocialPlatformIcon tone="github" className="github-nav-icon" />
+            <SocialPlatformIcon tone="github" className={cx("github-nav-icon")} />
             <span>GitHub</span>
           </Link>
-          <Link href="/join" className="button header-join-button">
+          <Link href="/join" className={cx("button header-join-button")}>
             加入社区
           </Link>
         </div>
 
-        <div className="header-top-actions">
+        <div className={cx("header-top-actions")}>
           <SiteAccountEntry />
           <MobileMenuToggle controlsId="site-navigation" />
         </div>

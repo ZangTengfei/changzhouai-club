@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import galleryStyles from "@/components/content-gallery.module.css";
 import { getPublicSponsorBySlug } from "@/lib/sponsors";
 
 import styles from "./sponsor-detail-page.module.css";
@@ -136,13 +137,13 @@ export default async function SponsorDetailPage({
             <p>展示赞助者相关图片、空间、活动支持或共建现场。</p>
           </div>
 
-          <div className="gallery-grid">
+          <div className={galleryStyles["gallery-grid"]}>
             {sponsor.images.map((image) => (
-              <article className="gallery-card" key={image.id}>
-                <div className="gallery-media">
+              <article className={galleryStyles["gallery-card"]} key={image.id}>
+                <div className={galleryStyles["gallery-media"]}>
                   <img src={image.imageUrl} alt={image.caption ?? sponsor.name} loading="lazy" />
                 </div>
-                <div className="gallery-copy">
+                <div className={galleryStyles["gallery-copy"]}>
                   <h3>{sponsor.name}</h3>
                   {image.caption ? <p>{image.caption}</p> : null}
                 </div>
