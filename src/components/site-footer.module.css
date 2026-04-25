@@ -1,0 +1,126 @@
+.site-footer {
+  padding: 0 0 28px;
+}
+
+.home-footer-shell {
+  display: grid;
+  gap: 18px;
+  padding-top: 14px;
+}
+
+.home-footer-brand h3,
+.home-footer-brand p {
+  margin: 0;
+}
+
+.home-footer-brand h3 {
+  color: var(--ink);
+  font-size: 1.35rem;
+}
+
+.home-footer-brand p {
+  margin-top: 4px;
+  color: rgba(var(--ink-rgb), 0.62);
+}
+
+.home-footer-socials {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.home-footer-social {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  min-height: 70px;
+  padding: 14px 18px;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--ink);
+  box-shadow: 0 12px 28px rgba(var(--ink-rgb), 0.05);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.home-footer-social:hover,
+.home-footer-social:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(var(--accent-rgb), 0.22);
+  box-shadow: 0 18px 34px rgba(var(--ink-rgb), 0.08);
+}
+
+.home-footer-social-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+}
+
+.home-footer-social-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.home-footer-social strong,
+.home-footer-social small {
+  display: block;
+}
+
+.home-footer-social strong {
+  font-size: 1rem;
+}
+
+.home-footer-social small {
+  margin-top: 2px;
+  color: rgba(var(--ink-rgb), 0.56);
+  font-size: 0.82rem;
+}
+
+.home-footer-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 16px;
+  color: rgba(var(--ink-rgb), 0.62);
+  font-size: 0.9rem;
+}
+
+.home-footer-bottom nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px;
+}
+
+.home-footer-bottom a:hover,
+.home-footer-bottom a:focus-visible {
+  color: var(--accent-strong);
+}
+
+@media (max-width: 1024px) {
+  .home-footer-socials {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .home-footer-socials {
+    grid-template-columns: 1fr;
+  }
+
+  .home-footer-bottom {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .home-footer-bottom nav {
+    gap: 18px;
+  }
+}
