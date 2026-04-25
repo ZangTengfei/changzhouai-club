@@ -1,3 +1,5 @@
+import styles from "./member-avatar.module.css";
+
 type MemberAvatarProps = {
   name: string;
   avatarUrl?: string | null;
@@ -29,7 +31,10 @@ export function MemberAvatar({
   avatarUrl,
   size = "lg",
 }: MemberAvatarProps) {
-  const className = size === "sm" ? "member-avatar member-avatar-sm" : "member-avatar";
+  const className =
+    size === "sm"
+      ? `${styles["member-avatar"]} ${styles["member-avatar-sm"]}`
+      : styles["member-avatar"];
 
   if (avatarUrl) {
     return (
@@ -37,7 +42,7 @@ export function MemberAvatar({
         <img
           src={avatarUrl}
           alt={name}
-          className="member-avatar-image"
+          className={styles["member-avatar-image"]}
           loading="lazy"
           referrerPolicy="no-referrer"
         />
@@ -47,7 +52,7 @@ export function MemberAvatar({
 
   return (
     <span className={className}>
-      <span className="member-avatar-fallback">{getAvatarInitials(name)}</span>
+      <span className={styles["member-avatar-fallback"]}>{getAvatarInitials(name)}</span>
     </span>
   );
 }

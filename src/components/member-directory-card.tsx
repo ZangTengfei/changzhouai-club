@@ -4,6 +4,17 @@ import { MemberAvatar } from "@/components/member-avatar";
 import { ToneBadge } from "@/components/tone-badge";
 import type { PublicMember } from "@/lib/community-members";
 import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
+import styles from "./member-directory-card.module.css";
+
+function cx(...classes: Array<string | false | null | undefined>) {
+  return classes
+    .flatMap((className) =>
+      typeof className === "string" ? className.split(/\s+/) : [],
+    )
+    .filter(Boolean)
+    .map((className) => styles[className as keyof typeof styles] ?? className)
+    .join(" ");
+}
 
 type MemberDirectoryCardProps = {
   member: PublicMember;
@@ -37,36 +48,40 @@ export function MemberDirectoryCard({
   return (
     <Link
       href={href}
-      className="member-directory-card member-directory-card-link"
+      className={cx("member-directory-card member-directory-card-link")}
       aria-label={`查看 ${member.displayName} 的成员主页`}
     >
-      <div className="member-directory-header">
+      <div className={cx("member-directory-header")}>
         <MemberAvatar name={member.displayName} avatarUrl={member.avatarUrl} />
 
-        <div className="member-directory-copy">
-          <h3 className="member-directory-name" title={member.displayName}>
+        <div className={cx("member-directory-copy")}>
+          <h3 className={cx("member-directory-name")} title={member.displayName}>
             {member.displayName}
           </h3>
           {headline ? (
-            <p className="member-directory-headline" title={headline}>
+            <p className={cx("member-directory-headline")} title={headline}>
               {headline}
             </p>
           ) : null}
         </div>
       </div>
 
-      <p className="member-directory-bio">
+      <p className={cx("member-directory-bio")}>
         {formatMemberBioPreview(member.bio, bioFallback)}
       </p>
 
       {visibleSkills.length > 0 ? (
-        <div className="member-skill-list member-skill-list-capped">
+        <div className={cx("member-skill-list member-skill-list-capped")}>
           {visibleSkills.map((skill) => (
-            <ToneBadge key={`${member.id}-${skill}`} label={skill} />
+            <ToneBadge
+              key={`${member.id}-${skill}`}
+              label={skill}
+              className={styles["member-skill-badge"]}
+            />
           ))}
         </div>
       ) : (
-        <p className="member-directory-tags-empty">技能标签待补充</p>
+        <p className={cx("member-directory-tags-empty")}>技能标签待补充</p>
       )}
     </Link>
   );

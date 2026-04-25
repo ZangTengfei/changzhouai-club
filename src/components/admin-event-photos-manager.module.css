@@ -1,0 +1,84 @@
+.admin-photo-list,
+.admin-photo-card,
+.admin-photo-create,
+.admin-cover-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-cover-panel h3,
+.admin-photo-create h3 {
+  margin: 0;
+}
+
+.admin-image-preview p,
+.admin-photo-body p {
+  margin: 0;
+}
+
+.admin-photo-card {
+  padding: 16px;
+  border: 1px solid rgba(var(--ink-rgb), 0.1);
+  border-radius: var(--radius-md);
+}
+
+.admin-photo-body {
+  display: grid;
+  gap: 14px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: rgba(var(--surface-muted-rgb), 0.6);
+}
+
+.admin-photo-body > * {
+  min-width: 0;
+}
+
+.admin-photo-actions {
+  align-items: center;
+}
+
+.admin-image-preview {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border-radius: var(--radius-md);
+  background: rgba(var(--surface-rgb), 0.94);
+}
+
+.admin-image-preview img {
+  width: min(100%, 420px);
+  max-height: 280px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  background: #f5f7fb;
+}
+
+.admin-image-url {
+  color: var(--muted);
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.admin-photo-meta {
+  gap: 8px;
+}
+
+.admin-photo-form {
+  gap: 12px;
+}
+
+.admin-photo-form-grid {
+  gap: 12px;
+}
+
+.admin-photo-actions form {
+  margin: 0;
+}
+
+@media (max-width: 820px) {
+  .admin-photo-card {
+    grid-template-columns: 1fr;
+  }
+}

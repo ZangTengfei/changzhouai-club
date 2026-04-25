@@ -1,5 +1,8 @@
+import styles from "./tone-badge.module.css";
+
 type ToneBadgeProps = {
   label: string;
+  className?: string;
 };
 
 const TONE_BADGE_COUNT = 6;
@@ -17,13 +20,15 @@ function getToneBadgeIndex(label: string) {
   return codePoint % TONE_BADGE_COUNT;
 }
 
-export function ToneBadge({ label }: ToneBadgeProps) {
+export function ToneBadge({ label, className }: ToneBadgeProps) {
   const toneIndex = getToneBadgeIndex(label);
   const normalizedLabel = label.trim();
 
   return (
     <span
-      className={`tone-badge tone-badge-${toneIndex}`}
+      className={[styles["tone-badge"], styles[`tone-badge-${toneIndex}`], className]
+        .filter(Boolean)
+        .join(" ")}
       title={normalizedLabel}
     >
       {normalizedLabel}
