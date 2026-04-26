@@ -7,7 +7,8 @@ import { HeroPhotoCarousel } from "@/components/hero-photo-carousel";
 import { SiteSponsors } from "@/components/site-sponsors";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import {
-  getCompletedEventRecaps,
+  getCompletedEventsCount,
+  getHomeCompletedEventRecaps,
   getScheduledEvents,
 } from "@/lib/community-events";
 import { getPublicMembersDirectory } from "@/lib/community-members";
@@ -18,6 +19,7 @@ import { cssModuleCx } from "@/lib/utils";
 import styles from "./home-page.module.css";
 
 const cx = cssModuleCx.bind(null, styles);
+const HERO_CAROUSEL_IMAGE_LIMIT = 3;
 
 function formatMetricDate(isoDate: string | null) {
   if (!isoDate) {
@@ -159,15 +161,24 @@ const statIcons = {
 type StatIconKey = keyof typeof statIcons;
 
 export default async function HomePage() {
-  const scheduledEvents = await getScheduledEvents();
-  const completedEvents = await getCompletedEventRecaps();
-  const directory = await getPublicMembersDirectory();
-  const wechatQrCode = await getCurrentWechatQrCode();
+  const [
+    scheduledEvents,
+    recentCompletedEvents,
+    completedEventsCount,
+    directory,
+    wechatQrCode,
+  ] = await Promise.all([
+    getScheduledEvents(),
+    getHomeCompletedEventRecaps(),
+    getCompletedEventsCount(),
+    getPublicMembersDirectory(),
+    getCurrentWechatQrCode(),
+  ]);
   const primaryScheduledEvent = scheduledEvents[0];
   const hasUpcomingEvent = Boolean(primaryScheduledEvent);
-  const latestCompletedEvent = completedEvents[0];
-  const recentEvents = completedEvents.slice(0, 4);
-  const heroCarouselImages = completedEvents
+  const latestCompletedEvent = recentCompletedEvents[0];
+  const recentEvents = recentCompletedEvents;
+  const heroCarouselImages = recentCompletedEvents
     .map((event) => {
       const imageUrl = event.imageUrl ?? event.gallery[0]?.imageUrl ?? null;
 
@@ -181,7 +192,8 @@ export default async function HomePage() {
     .filter((item): item is { src: string; alt: string } => Boolean(item))
     .filter((item, index, items) => (
       items.findIndex((candidate) => candidate.src === item.src) === index
-    ));
+    ))
+    .slice(0, HERO_CAROUSEL_IMAGE_LIMIT);
   const memberAvatars = directory.members
     .map((member) => member.avatarUrl)
     .filter((avatarUrl): avatarUrl is string => Boolean(avatarUrl))
@@ -194,7 +206,7 @@ export default async function HomePage() {
       icon: "people",
     },
     {
-      value: `${completedEvents.length || 7} 场`,
+      value: `${completedEventsCount || 7} 场`,
       label: "线下活动",
       detail: "技术分享与交流",
       icon: "calendar",

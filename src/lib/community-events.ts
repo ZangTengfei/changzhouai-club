@@ -30,6 +30,20 @@ type EventRow = {
   event_photos: EventPhotoRow[] | null;
 };
 
+type CompletedEventPreviewRow = Pick<
+  EventRow,
+  | "id"
+  | "slug"
+  | "title"
+  | "summary"
+  | "description"
+  | "event_at"
+  | "venue"
+  | "city"
+  | "cover_image_url"
+  | "status"
+>;
+
 export type PublicScheduledEvent = {
   id: string;
   title: string;
@@ -211,6 +225,38 @@ function mapCompletedEvent(row: EventRow): PublicEventRecap {
   };
 }
 
+function mapCompletedEventPreview(row: CompletedEventPreviewRow): PublicEventRecap {
+  const gallery = row.cover_image_url
+    ? [
+        {
+          id: `${row.id}-cover`,
+          imageUrl: row.cover_image_url,
+          caption: row.title,
+        },
+      ]
+    : [];
+
+  return {
+    id: row.id,
+    slug: row.slug,
+    title: row.title,
+    summary:
+      row.summary ??
+      row.description ??
+      "这场活动已经完成，欢迎通过活动记录了解现场主题、分享内容与交流氛围。",
+    dateLabel: row.event_at ? formatEventDateLabel(row.event_at) : "时间待定",
+    isoDate: row.event_at ? formatChangzhouIsoDate(row.event_at) ?? row.id : row.id,
+    locationLabel: buildLocationLabel(row.city, row.venue),
+    imageUrl: row.cover_image_url ?? null,
+    highlights: [
+      row.city ?? "常州",
+      row.venue ?? "线下交流",
+      row.cover_image_url ? "活动图片已归档" : "活动已归档",
+    ],
+    gallery,
+  };
+}
+
 function mapPublicEventDetail(row: EventRow): PublicEventDetail {
   const gallery = buildEventGallery(row);
 
@@ -249,6 +295,22 @@ export async function getCompletedEventRecaps() {
   return getCachedCompletedEventRecaps();
 }
 
+export async function getHomeCompletedEventRecaps() {
+  if (!hasSupabaseEnv()) {
+    return [] as PublicEventRecap[];
+  }
+
+  return getCachedHomeCompletedEventRecaps();
+}
+
+export async function getCompletedEventsCount() {
+  if (!hasSupabaseEnv()) {
+    return 0;
+  }
+
+  return getCachedCompletedEventsCount();
+}
+
 export async function getScheduledEvents() {
   if (!hasSupabaseEnv()) {
     return [] as PublicScheduledEvent[];
@@ -283,6 +345,40 @@ const getCachedCompletedEventRecaps = unstable_cache(
     return (data as EventRow[]).map(mapCompletedEvent);
   },
   ["public-completed-event-recaps"],
+  { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
+);
+
+const getCachedHomeCompletedEventRecaps = unstable_cache(
+  async () => {
+    const supabase = createPublicServerClient();
+    const { data } = await supabase
+      .from("events")
+      .select(
+        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, status",
+      )
+      .eq("status", "completed")
+      .order("event_at", { ascending: false, nullsFirst: false })
+      .limit(4);
+
+    return ((data ?? []) as CompletedEventPreviewRow[]).map(
+      mapCompletedEventPreview,
+    );
+  },
+  ["public-home-completed-event-recaps"],
+  { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
+);
+
+const getCachedCompletedEventsCount = unstable_cache(
+  async () => {
+    const supabase = createPublicServerClient();
+    const { count } = await supabase
+      .from("events")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "completed");
+
+    return count ?? 0;
+  },
+  ["public-completed-events-count"],
   { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
 );
 
