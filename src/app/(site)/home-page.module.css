@@ -206,17 +206,16 @@
 }
 
 .home-photo-carousel-track {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-  padding: 2px 2px 8px;
-  scrollbar-width: thin;
+  overflow: visible;
+  padding: 0;
 }
 
 .home-photo-carousel-item {
   appearance: none;
-  flex: 0 0 clamp(96px, 31%, 150px);
+  min-width: 0;
   padding: 0;
   border: 0;
   background: transparent;
@@ -239,27 +238,21 @@
   height: 70px;
   border-radius: 10px;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.78);
+  border: 0;
   opacity: 0.72;
-  box-shadow: 0 10px 24px rgba(var(--ink-rgb), 0.12);
   transition:
-    border-color 220ms ease,
-    box-shadow 220ms ease,
     opacity 220ms ease,
     transform 220ms ease;
 }
 
 .home-photo-carousel-item.is-active .home-photo-thumb {
   opacity: 1;
-  border-color: rgba(var(--accent-rgb), 0.42);
-  box-shadow: 0 16px 32px rgba(var(--ink-rgb), 0.16);
   transform: scale(1.02);
 }
 
 .home-photo-carousel-item:hover .home-photo-thumb,
 .home-photo-carousel-item:focus-visible .home-photo-thumb {
   opacity: 0.96;
-  border-color: rgba(var(--accent-rgb), 0.28);
 }
 
 .home-photo-carousel-item:focus-visible {
@@ -267,10 +260,8 @@
 }
 
 .home-photo-carousel-item:focus-visible .home-photo-thumb {
-  box-shadow:
-    0 0 0 3px rgba(var(--surface-rgb), 0.95),
-    0 0 0 6px rgba(var(--accent-rgb), 0.18),
-    0 14px 28px rgba(var(--ink-rgb), 0.14);
+  outline: 3px solid rgba(var(--accent-rgb), 0.2);
+  outline-offset: 3px;
 }
 
 .home-sticky-note {
@@ -1669,13 +1660,12 @@
   }
 
   .home-photo-thumb {
-    width: 104px;
+    width: 100%;
     height: 58px;
   }
 
   .home-photo-carousel-item.is-active .home-photo-thumb {
-    width: 118px;
-    height: 66px;
+    height: 58px;
   }
 
   .home-sticky-note {

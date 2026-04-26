@@ -32,6 +32,7 @@ type HeroPhotoCarouselProps = {
 };
 
 const AUTO_ADVANCE_DELAY = 4200;
+const MAX_CAROUSEL_IMAGES = 3;
 const heroNoteIcons = {
   arrow: ArrowUpRight,
   heart: Heart,
@@ -59,28 +60,31 @@ export function HeroPhotoCarousel({
   notes,
 }: HeroPhotoCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const visibleImages = images.slice(0, MAX_CAROUSEL_IMAGES);
 
   useEffect(() => {
-    if (images.length <= 1) {
+    if (visibleImages.length <= 1) {
       return undefined;
     }
 
     const timer = window.setInterval(() => {
-      setActiveIndex((currentIndex) => (currentIndex + 1) % images.length);
+      setActiveIndex(
+        (currentIndex) => (currentIndex + 1) % visibleImages.length,
+      );
     }, AUTO_ADVANCE_DELAY);
 
     return () => window.clearInterval(timer);
-  }, [images.length]);
+  }, [visibleImages.length]);
 
   useEffect(() => {
-    if (activeIndex < images.length) {
+    if (activeIndex < visibleImages.length) {
       return;
     }
 
     setActiveIndex(0);
-  }, [activeIndex, images.length]);
+  }, [activeIndex, visibleImages.length]);
 
-  const activeImage = images[activeIndex] ?? null;
+  const activeImage = visibleImages[activeIndex] ?? null;
   const activeImageSrc = activeImage
     ? getEventImageUrl(activeImage.src, "hero-main") ?? activeImage.src
     : null;
@@ -114,10 +118,10 @@ export function HeroPhotoCarousel({
         )}
       </div>
 
-      {images.length > 0 ? (
+      {visibleImages.length > 0 ? (
         <div className={cx("home-photo-carousel")} aria-label="活动照片切换">
           <div className={cx("home-photo-carousel-track")} role="tablist" aria-label="活动照片">
-            {images.map((image, index) => (
+            {visibleImages.map((image, index) => (
               <button
                 key={`${image.src}-${index}`}
                 type="button"
