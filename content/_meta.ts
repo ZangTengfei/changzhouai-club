@@ -16,9 +16,6 @@ const meta = {
   events: {
     title: "活动沉淀",
   },
-  tools: {
-    title: "工具与选型",
-  },
   contributing: {
     title: "参与贡献",
   },

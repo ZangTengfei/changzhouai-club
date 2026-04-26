@@ -17,7 +17,6 @@ const routes = [
   "/docs",
   "/docs/getting-started",
   "/docs/guides/co-build-workflow",
-  "/docs/tools/nextra-vs-mintlify",
   "/docs/contributing",
 ];
 
