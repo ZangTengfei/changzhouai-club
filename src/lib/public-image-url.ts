@@ -1,5 +1,4 @@
 type PublicImageTransformOptions = {
-  transform?: boolean;
   width?: number;
   height?: number;
   quality?: number;
@@ -32,19 +31,19 @@ const eventImageVariantMap: Record<EventImageVariant, PublicImageTransformOption
     resize: "cover",
   },
   "review-card": {
-    transform: false,
+    quality: 74,
   },
   "event-feature": {
-    transform: false,
+    quality: 78,
   },
   "event-detail-hero": {
-    transform: false,
+    quality: 82,
   },
   gallery: {
-    transform: false,
+    quality: 76,
   },
   archive: {
-    transform: false,
+    quality: 74,
   },
 };
 
@@ -66,24 +65,6 @@ export function getPublicImageUrl(
 
   if (!url.hostname.endsWith(".supabase.co")) {
     return imageUrl;
-  }
-
-  if (options.transform === false) {
-    if (url.pathname.startsWith(SUPABASE_RENDER_PUBLIC_PATH)) {
-      url.pathname = url.pathname.replace(
-        SUPABASE_RENDER_PUBLIC_PATH,
-        SUPABASE_OBJECT_PUBLIC_PATH,
-      );
-    } else if (!url.pathname.startsWith(SUPABASE_OBJECT_PUBLIC_PATH)) {
-      return imageUrl;
-    }
-
-    url.searchParams.delete("width");
-    url.searchParams.delete("height");
-    url.searchParams.delete("quality");
-    url.searchParams.delete("resize");
-
-    return url.toString();
   }
 
   if (url.pathname.startsWith(SUPABASE_OBJECT_PUBLIC_PATH)) {
