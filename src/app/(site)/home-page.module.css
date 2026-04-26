@@ -1587,7 +1587,7 @@
 @media (max-width: 640px) {
 
   .home-page-stack {
-    gap: 22px;
+    gap: 18px;
   }
 
   .home-hero {
@@ -1746,15 +1746,10 @@
     height: 48px;
   }
 
-  .home-flow-card,
   .home-next-event-card,
   .home-recent-card,
   .home-join-card {
     padding: 22px;
-  }
-
-  .home-flow-illustration {
-    width: 156px;
   }
 
   .home-next-event-card {
@@ -1956,6 +1951,240 @@
 
   .home-asset-gap-grid article {
     min-height: auto;
+  }
+
+  .home-flow-section,
+  .home-social-section {
+    gap: 14px;
+    padding-top: 4px;
+  }
+
+  .home-flow-heading h2 {
+    font-size: 1.9rem;
+    letter-spacing: 0;
+  }
+
+  .home-flow-heading p {
+    margin-top: 6px;
+    padding-left: 24px;
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+
+  .home-flow-heading p::before {
+    width: 15px;
+    height: 3px;
+  }
+
+  .home-flow-heading p::after {
+    left: 7px;
+    width: 10px;
+  }
+
+  .home-flow-cards {
+    gap: 10px;
+  }
+
+  .home-flow-card {
+    grid-template-columns: 42px minmax(0, 1fr) 74px;
+    grid-template-rows: auto auto;
+    gap: 4px 10px;
+    align-items: center;
+    min-height: 104px;
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .home-flow-card::before {
+    inset: auto 8px 8px auto;
+    width: 76px;
+    height: 56px;
+    border-radius: 16px;
+  }
+
+  .home-flow-card span {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: start;
+    font-size: 1.45rem;
+  }
+
+  .home-flow-card h3 {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+    font-size: 1.04rem;
+    line-height: 1.2;
+  }
+
+  .home-flow-card p {
+    display: -webkit-box;
+    grid-column: 2;
+    grid-row: 2;
+    overflow: hidden;
+    font-size: 0.84rem;
+    line-height: 1.42;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .home-flow-illustration {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    align-self: end;
+    justify-self: end;
+    width: 74px;
+    min-height: 70px;
+    margin: 0;
+  }
+
+  .home-flow-illustration-image {
+    width: 74px;
+    height: 70px;
+  }
+
+  .home-next-event-card {
+    padding: 18px 16px;
+    border-radius: 18px;
+  }
+
+  .home-next-event-card::before,
+  .home-doodle-event-sparkles {
+    display: none;
+  }
+
+  .home-next-event-copy {
+    gap: 10px;
+  }
+
+  .home-next-event-kicker {
+    font-size: 0.86rem;
+  }
+
+  .home-next-event-card h3 {
+    font-size: 1.48rem;
+    letter-spacing: 0;
+  }
+
+  .home-next-event-meta {
+    gap: 7px;
+  }
+
+  .home-next-event-meta li {
+    gap: 8px;
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+
+  .home-next-event-note {
+    font-size: 0.86rem;
+    line-height: 1.45;
+  }
+
+  .home-next-event-button {
+    justify-content: center;
+    width: 100%;
+    min-height: 44px;
+    padding: 0 16px;
+  }
+
+  .home-member-stories,
+  .home-event-review-section {
+    gap: 12px;
+    padding: 16px 14px 14px;
+  }
+
+  .home-member-stories :global(.home-card-heading),
+  .home-event-review-section :global(.home-card-heading) {
+    gap: 10px;
+  }
+
+  .home-member-story-card {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .home-member-story-head {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .home-member-story-avatar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .home-event-review-card {
+    grid-template-columns: 104px minmax(0, 1fr);
+    min-height: 104px;
+  }
+
+  .home-event-review-media {
+    min-height: 104px;
+  }
+
+  .home-event-review-copy {
+    gap: 4px;
+    padding: 10px;
+  }
+
+  .home-join-banner {
+    gap: 12px;
+    padding: 20px 16px 18px;
+  }
+
+  .home-join-banner-copy {
+    gap: 8px;
+  }
+
+  .home-join-banner-copy h2 {
+    max-width: 17ch;
+    font-size: 1.34rem;
+    line-height: 1.18;
+  }
+
+  .home-join-banner-copy p {
+    max-width: 30ch;
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+
+  .home-join-banner-side {
+    grid-template-columns: 124px minmax(0, 1fr);
+    gap: 12px;
+    align-items: center;
+    justify-self: center;
+    max-width: 320px;
+    text-align: left;
+  }
+
+  .home-join-banner-qr img,
+  .home-join-banner .home-wechat-placeholder {
+    width: 124px;
+    height: 124px;
+  }
+
+  .home-join-banner-info {
+    gap: 4px;
+    justify-items: start;
+    text-align: left;
+  }
+
+  .home-join-banner-info strong {
+    font-size: 0.96rem;
+  }
+
+  .home-join-banner-info small,
+  .home-join-banner-info p {
+    font-size: 0.8rem;
+  }
+
+  .home-join-banner-button {
+    width: min(100%, 200px);
+    min-height: 44px;
+  }
+
+  .home-join-banner-illustration {
+    display: none;
   }
 }
 

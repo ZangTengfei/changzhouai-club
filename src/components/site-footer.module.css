@@ -111,16 +111,58 @@
 }
 
 @media (max-width: 640px) {
+  .site-footer {
+    padding-bottom: 18px;
+  }
+
+  .home-footer-shell {
+    gap: 12px;
+    padding-top: 4px;
+  }
+
+  .home-footer-brand h3 {
+    font-size: 1.2rem;
+  }
+
+  .home-footer-brand p {
+    font-size: 0.88rem;
+    line-height: 1.45;
+  }
+
   .home-footer-socials {
     grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .home-footer-social {
+    gap: 10px;
+    min-height: 56px;
+    padding: 10px 12px;
+    border-radius: 10px;
+  }
+
+  .home-footer-social-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .home-footer-social strong {
+    font-size: 0.95rem;
+  }
+
+  .home-footer-social small {
+    font-size: 0.78rem;
   }
 
   .home-footer-bottom {
     align-items: flex-start;
     flex-direction: column;
+    gap: 8px;
+    padding-top: 8px;
+    font-size: 0.8rem;
   }
 
   .home-footer-bottom nav {
-    gap: 18px;
+    gap: 12px 16px;
   }
 }
