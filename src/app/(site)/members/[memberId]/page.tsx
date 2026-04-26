@@ -9,14 +9,12 @@ import {
   CalendarDays,
   MapPin,
   MessageCircle,
-  Network,
   Sparkles,
   Tags,
   UserRound,
   Wrench,
 } from "lucide-react";
 
-import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { MemberAvatar } from "@/components/member-avatar";
 import { ToneBadge } from "@/components/tone-badge";
 import { getPublicMemberByHandle } from "@/lib/community-members";
@@ -176,12 +174,12 @@ export default async function MemberDetailPage({
           <div className={styles.memberHeroActions}>
             <Link href="/members" className="button home-ghost-button">
               <ArrowLeft aria-hidden="true" strokeWidth={2} />
-            返回成员地图
-          </Link>
+              返回成员地图
+            </Link>
             <Link href="/cooperate" className="button home-primary-button">
-            发起合作意向
+              发起合作意向
               <ArrowRight aria-hidden="true" strokeWidth={2} />
-          </Link>
+            </Link>
           </div>
         </div>
 
@@ -195,94 +193,79 @@ export default async function MemberDetailPage({
             <span>{headline || "常州 AI Club 成员"}</span>
           </div>
 
-          <div className={styles.memberConnectionStrip}>
-            <span>活动</span>
-            <i aria-hidden="true" />
-            <span>分享</span>
-            <i aria-hidden="true" />
-            <span>共建</span>
-          </div>
+          <div className={styles.memberProfileFacts} aria-label="公开资料">
+            {profileFacts.map((item) => {
+              const Icon = item.icon;
 
-          <div className={styles.memberStickyNote}>
-            <span>成员线索</span>
-            <strong>先看方向，再把一次交流变成真实合作</strong>
-          </div>
-          <DoodleSparkles className={styles.memberHeroDoodle} />
-          <HandDrawnArrow className={styles.memberHeroArrow} />
-        </div>
-      </section>
-
-      <section className={styles.memberFactsPanel} aria-label="公开资料">
-        {profileFacts.map((item, index) => {
-          const Icon = item.icon;
-
-          return (
-            <article className={styles.memberFactCard} key={item.label}>
-              <Icon aria-hidden="true" strokeWidth={1.9} />
-              <strong>{item.value}</strong>
-              <span>{item.label}</span>
-              <small>{String(index + 1).padStart(2, "0")}</small>
-            </article>
-          );
-        })}
-      </section>
-
-      <section className={styles.memberSignalsSection}>
-        <div className={styles.memberSectionHeading}>
-          <p className="home-kicker">Signals</p>
-          <div>
-            <h2>参与信号</h2>
-            <p>公开资料不直接展示联系方式，先用这些信号判断适合怎样继续对话。</p>
-          </div>
-        </div>
-
-        <div className={styles.memberSignalGrid}>
-          {signalCards.map((item, index) => {
-            const Icon = item.icon;
-
-            return (
-              <article
-                className={`${styles.memberSignalCard} ${styles[`memberSignalCard${item.tone}`]}`}
-                key={item.title}
-              >
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <Icon aria-hidden="true" strokeWidth={1.8} />
-                <div>
-                  <h3>{item.title}</h3>
+              return (
+                <article key={item.label}>
+                  <Icon aria-hidden="true" strokeWidth={1.9} />
+                  <span>{item.label}</span>
                   <strong>{item.value}</strong>
-                </div>
-                <p>{item.summary}</p>
-              </article>
-            );
-          })}
+                </article>
+              );
+            })}
+          </div>
         </div>
       </section>
 
-      <section className={styles.memberSkillsSection}>
-        <div className={styles.memberSectionHeading}>
-          <p className="home-kicker">Skills</p>
-          <div>
-            <h2>技能与方向</h2>
-            <p>这里展示成员主动公开的技能标签，便于活动邀约和协作匹配。</p>
+      <div className={styles.memberContentGrid}>
+        <section className={styles.memberSkillsSection}>
+          <div className={styles.memberSectionHeading}>
+            <p className="home-kicker">Skills</p>
+            <div>
+              <h2>技能与方向</h2>
+              <p>成员主动公开的技能标签，便于活动邀约和协作匹配。</p>
+            </div>
           </div>
-        </div>
 
-        {member.skills.length > 0 ? (
-          <div className={styles.memberSkillCloud}>
-            {member.skills.map((skill) => (
-              <ToneBadge key={`${member.id}-${skill}`} label={skill} />
-            ))}
+          {member.skills.length > 0 ? (
+            <div className={styles.memberSkillCloud}>
+              {member.skills.map((skill) => (
+                <ToneBadge key={`${member.id}-${skill}`} label={skill} />
+              ))}
+            </div>
+          ) : (
+            <div className={styles.memberSoftNote}>
+              <Tags aria-hidden="true" strokeWidth={1.9} />
+              <span>这位成员暂未补充技能标签。</span>
+            </div>
+          )}
+        </section>
+
+        <section className={styles.memberSignalsSection}>
+          <div className={styles.memberSectionHeading}>
+            <p className="home-kicker">Signals</p>
+            <div>
+              <h2>参与信号</h2>
+              <p>公开资料不展示联系方式，先判断适合怎样继续对话。</p>
+            </div>
           </div>
-        ) : (
-          <div className={styles.memberSoftNote}>
-            <Tags aria-hidden="true" strokeWidth={1.9} />
-            <span>这位成员暂未补充技能标签。</span>
+
+          <div className={styles.memberSignalList}>
+            {signalCards.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <article
+                  className={`${styles.memberSignalCard} ${styles[`memberSignalCard${item.tone}`]}`}
+                  key={item.title}
+                >
+                  <Icon aria-hidden="true" strokeWidth={1.8} />
+                  <div>
+                    <h3>{item.title}</h3>
+                    <p>{item.summary}</p>
+                  </div>
+                  <strong>{item.value}</strong>
+                </article>
+              );
+            })}
           </div>
-        )}
-      </section>
+        </section>
+      </div>
 
       <section className={styles.memberJoinPanel}>
-        <Network aria-hidden="true" strokeWidth={1.8} />
+        <Sparkles aria-hidden="true" strokeWidth={1.8} />
         <div>
           <p className="home-kicker">Next</p>
           <h2>想和这位成员进一步连接？</h2>
