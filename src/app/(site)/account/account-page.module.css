@@ -231,6 +231,23 @@
   align-items: start;
 }
 
+.accountSectionHeadingMain {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.accountSectionHeadingMain > div {
+  min-width: 0;
+}
+
+.accountSectionAction {
+  flex: 0 0 auto;
+  min-height: 44px;
+}
+
 .accountSectionHeading h2,
 .accountSectionHeading p {
   margin: 0;
@@ -254,15 +271,13 @@
 
 .accountProfileForm {
   display: grid;
-  gap: 22px;
+  gap: 20px;
   min-width: 0;
-  padding: 24px;
-  border: 1px solid rgba(208, 214, 207, 0.7) !important;
-  border-radius: 24px !important;
-  background:
-    radial-gradient(circle at 94% 12%, rgba(255, 199, 81, 0.12), transparent 20%),
-    linear-gradient(180deg, rgba(245, 244, 238, 0.92), rgba(240, 239, 232, 0.9)) !important;
-  box-shadow: 0 12px 28px rgba(var(--ink-rgb), 0.035) !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .accountProfileForm :global(.section-heading) {
@@ -346,26 +361,16 @@
   gap: 18px;
 }
 
-.accountWorkEditor,
 .accountWorkCard {
   border: 1px solid rgba(var(--ink-rgb), 0.08);
   border-radius: 20px;
   background: rgba(255, 252, 247, 0.72);
 }
 
-.accountWorkEditor {
-  padding: 0;
-}
-
-.accountWorkEditor > summary,
 .accountWorkInlineEditor > summary {
   cursor: pointer;
   color: #132321;
   font-weight: 900;
-}
-
-.accountWorkEditor > summary {
-  padding: 16px 18px;
 }
 
 .accountWorkForm {
@@ -373,6 +378,10 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
   padding: 0 18px 18px;
+}
+
+.accountWorkDialogForm {
+  padding: 0;
 }
 
 .accountWorkForm label {
@@ -659,6 +668,15 @@
     gap: 12px;
   }
 
+  .accountSectionHeadingMain {
+    display: grid;
+    gap: 14px;
+  }
+
+  .accountSectionAction {
+    width: fit-content;
+  }
+
   .registrationCard {
     grid-template-columns: 48px minmax(0, 1fr);
   }
@@ -705,6 +723,7 @@
 
   .accountSummaryActions :global(.button),
   .accountSummaryActions :global(.auth-button),
+  .accountSectionAction,
   .accountWorkFormFooter :global(.button),
   .accountWorkCard :global(.button),
   .emptyRegistrationPanel :global(.button) {

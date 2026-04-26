@@ -10,6 +10,8 @@ import {
   ClipboardList,
   Eye,
   EyeOff,
+  PencilLine,
+  Plus,
   ShieldCheck,
   Sparkles,
   Ticket,
@@ -20,6 +22,7 @@ import {
   deleteAccountMemberWork,
   saveAccountMemberWork,
 } from "@/app/(site)/account/actions";
+import { AccountActionModal } from "@/components/account-action-modal";
 import { AccountProfileForm } from "@/components/account-profile-form";
 import { MemberAvatar } from "@/components/member-avatar";
 import { SignOutButton } from "@/components/sign-out-button";
@@ -132,6 +135,20 @@ function getReviewTone(status: PublicWorkReviewStatus, isPublic: boolean) {
   return styles.workReviewPending;
 }
 
+const profileModalErrorCodes = new Set([
+  "missing_required_fields",
+  "invalid_avatar_url",
+  "invalid_public_slug",
+  "public_slug_taken",
+  "save_failed",
+]);
+
+const workModalErrorCodes = new Set([
+  "missing_work_fields",
+  "invalid_work_url",
+  "work_save_failed",
+]);
+
 export default async function AccountPage({
   searchParams,
 }: {
@@ -222,6 +239,9 @@ export default async function AccountPage({
   const activeRegistrationCount =
     registrations?.filter((item) => item.status !== "cancelled").length ?? 0;
   const statusMessage = getStatusMessage(params.error);
+  const shouldOpenProfileModal =
+    Boolean(params.onboarding) || profileModalErrorCodes.has(params.error ?? "");
+  const shouldOpenWorkModal = workModalErrorCodes.has(params.error ?? "");
   const accountSummaryItems = [
     {
       label: "资料状态",
@@ -269,17 +289,33 @@ export default async function AccountPage({
           <p>维护成员资料、查看活动报名记录，并更新你在社区中的公开信息。</p>
 
           <div className={styles.accountSummaryActions}>
+            <AccountActionModal
+              title={profileComplete ? "编辑个人资料" : "完善加入资料"}
+              description={
+                profileComplete
+                  ? "更新头像、公开主页链接、城市、技能标签和协作偏好。"
+                  : "先填写显示名和微信号，其他公开资料可以稍后继续补充。"
+              }
+              defaultOpen={shouldOpenProfileModal}
+              trigger={
+                <button type="button" className="button home-primary-button">
+                  {profileComplete ? "编辑资料" : "完善资料"}
+                  <PencilLine aria-hidden="true" strokeWidth={2} />
+                </button>
+              }
+            >
+              <AccountProfileForm
+                className={styles.accountProfileForm}
+                userId={user.id}
+                profile={profile}
+                member={member}
+              />
+            </AccountActionModal>
             {profileComplete ? (
-              <Link href="#registrations" className="button home-primary-button">
+              <Link href="#registrations" className="button home-ghost-button">
                 查看报名记录
-                <ArrowRight aria-hidden="true" strokeWidth={2} />
               </Link>
-            ) : (
-              <Link href="#profile" className="button home-primary-button">
-                完善资料
-                <ArrowRight aria-hidden="true" strokeWidth={2} />
-              </Link>
-            )}
+            ) : null}
             <Link href="/events" className="button home-ghost-button">
               查看活动
             </Link>
@@ -339,113 +375,120 @@ export default async function AccountPage({
         </div>
       ) : null}
 
-      <div id="profile">
-        <AccountProfileForm
-          className={styles.accountProfileForm}
-          userId={user.id}
-          profile={profile}
-          member={member}
-        />
-      </div>
-
       <section className={styles.accountWorksSection} id="works">
         <div className={styles.accountSectionHeading}>
           <p className="home-kicker">Works</p>
-          <div>
-            <h2>我的作品</h2>
-            <p>
-              可以提交你做过的产品、工具、开源项目、案例或 Demo。提交后先进入待审核状态，
-              管理员通过后会展示到作品墙和你的成员主页。
-            </p>
+          <div className={styles.accountSectionHeadingMain}>
+            <div>
+              <h2>我的作品</h2>
+              <p>
+                可以提交你做过的产品、工具、开源项目、案例或 Demo。提交后先进入待审核状态，
+                管理员通过后会展示到作品墙和你的成员主页。
+              </p>
+            </div>
+            <AccountActionModal
+              title="提交作品"
+              description="补充作品名称、链接、标签和你的参与角色，提交后会进入管理员审核。"
+              defaultOpen={shouldOpenWorkModal}
+              trigger={
+                <button
+                  type="button"
+                  className={`button home-primary-button ${styles.accountSectionAction}`}
+                >
+                  <Plus aria-hidden="true" strokeWidth={2} />
+                  提交作品
+                </button>
+              }
+            >
+              <form
+                action={saveAccountMemberWork}
+                className={`${styles.accountWorkForm} ${styles.accountWorkDialogForm}`}
+              >
+                <label>
+                  <span>作品名称</span>
+                  <input className="input" name="title" required />
+                </label>
+
+                <label>
+                  <span>作品类型</span>
+                  <select className="input" name="work_type" defaultValue="product">
+                    {Object.entries(workTypeLabels).map(([value, label]) => (
+                      <option value={value} key={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label>
+                  <span>当前状态</span>
+                  <select className="input" name="status" defaultValue="building">
+                    {Object.entries(workStatusLabels).map(([value, label]) => (
+                      <option value={value} key={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label>
+                  <span>我在其中的角色</span>
+                  <input
+                    className="input"
+                    name="role_label"
+                    placeholder="例如：发起人 / 开发者 / 产品负责人"
+                  />
+                </label>
+
+                <label className={styles.accountWorkWideField}>
+                  <span>一句话介绍</span>
+                  <textarea className="input textarea" name="summary" rows={2} required />
+                </label>
+
+                <label className={styles.accountWorkWideField}>
+                  <span>详细说明</span>
+                  <textarea className="input textarea" name="description" rows={4} />
+                </label>
+
+                <label>
+                  <span>封面图链接</span>
+                  <input className="input" name="cover_image_url" placeholder="https://..." />
+                </label>
+
+                <label>
+                  <span>官网 / 产品链接</span>
+                  <input className="input" name="website_url" placeholder="https://..." />
+                </label>
+
+                <label>
+                  <span>Demo 链接</span>
+                  <input className="input" name="demo_url" placeholder="https://..." />
+                </label>
+
+                <label>
+                  <span>代码仓库</span>
+                  <input className="input" name="repo_url" placeholder="https://..." />
+                </label>
+
+                <label className={styles.accountWorkWideField}>
+                  <span>标签</span>
+                  <input
+                    className="input"
+                    name="tags"
+                    placeholder="例如：AI 工具、OPC、自动化"
+                  />
+                </label>
+
+                <div className={styles.accountWorkFormFooter}>
+                  <button type="submit" className="button home-primary-button">
+                    提交审核
+                  </button>
+                  <span>提交后会暂时隐藏，审核通过后才会公开展示。</span>
+                </div>
+              </form>
+            </AccountActionModal>
           </div>
         </div>
-
-        <details className={styles.accountWorkEditor} open={memberWorks.length === 0}>
-          <summary>提交一个新作品</summary>
-          <form action={saveAccountMemberWork} className={styles.accountWorkForm}>
-            <label>
-              <span>作品名称</span>
-              <input className="input" name="title" required />
-            </label>
-
-            <label>
-              <span>作品类型</span>
-              <select className="input" name="work_type" defaultValue="product">
-                {Object.entries(workTypeLabels).map(([value, label]) => (
-                  <option value={value} key={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              <span>当前状态</span>
-              <select className="input" name="status" defaultValue="building">
-                {Object.entries(workStatusLabels).map(([value, label]) => (
-                  <option value={value} key={value}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              <span>我在其中的角色</span>
-              <input
-                className="input"
-                name="role_label"
-                placeholder="例如：发起人 / 开发者 / 产品负责人"
-              />
-            </label>
-
-            <label className={styles.accountWorkWideField}>
-              <span>一句话介绍</span>
-              <textarea className="input textarea" name="summary" rows={2} required />
-            </label>
-
-            <label className={styles.accountWorkWideField}>
-              <span>详细说明</span>
-              <textarea className="input textarea" name="description" rows={4} />
-            </label>
-
-            <label>
-              <span>封面图链接</span>
-              <input className="input" name="cover_image_url" placeholder="https://..." />
-            </label>
-
-            <label>
-              <span>官网 / 产品链接</span>
-              <input className="input" name="website_url" placeholder="https://..." />
-            </label>
-
-            <label>
-              <span>Demo 链接</span>
-              <input className="input" name="demo_url" placeholder="https://..." />
-            </label>
-
-            <label>
-              <span>代码仓库</span>
-              <input className="input" name="repo_url" placeholder="https://..." />
-            </label>
-
-            <label className={styles.accountWorkWideField}>
-              <span>标签</span>
-              <input
-                className="input"
-                name="tags"
-                placeholder="例如：AI 工具、OPC、自动化"
-              />
-            </label>
-
-            <div className={styles.accountWorkFormFooter}>
-              <button type="submit" className="button home-primary-button">
-                提交审核
-              </button>
-              <span>提交后会暂时隐藏，审核通过后才会公开展示。</span>
-            </div>
-          </form>
-        </details>
 
         {memberWorks.length > 0 ? (
           <div className={styles.accountWorkList}>

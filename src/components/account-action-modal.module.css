@@ -1,0 +1,43 @@
+.accountModalContent {
+  border: 1px solid rgba(208, 214, 207, 0.76);
+  background:
+    radial-gradient(circle at 94% 8%, rgba(255, 199, 81, 0.12), transparent 22%),
+    linear-gradient(180deg, rgba(248, 247, 241, 0.98), rgba(240, 239, 232, 0.98));
+  color: #111a1d;
+  box-shadow: 0 24px 70px rgba(var(--ink-rgb), 0.18);
+}
+
+.accountModalHeader {
+  gap: 8px;
+  padding: 22px 24px 18px;
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
+  text-align: left;
+}
+
+.accountModalTitle {
+  color: #111a1d;
+  font-size: 1.28rem;
+  font-weight: 900;
+  line-height: 1.16;
+  letter-spacing: 0;
+}
+
+.accountModalDescription {
+  max-width: 48rem;
+  color: rgba(var(--ink-rgb), 0.64);
+  font-size: 0.94rem;
+  font-weight: 650;
+  line-height: 1.62;
+}
+
+.accountModalBody {
+  padding: 22px 24px 24px;
+}
+
+@media (max-width: 640px) {
+  .accountModalHeader,
+  .accountModalBody {
+    padding-right: 18px;
+    padding-left: 18px;
+  }
+}
