@@ -159,8 +159,24 @@
   object-fit: cover;
 }
 
+.home-photo-main-link {
+  display: block;
+  color: inherit;
+}
+
+.home-photo-main-link:focus-visible {
+  outline: 3px solid rgba(var(--accent-rgb), 0.72);
+  outline-offset: -6px;
+}
+
 .home-photo-main-image {
   animation: home-photo-fade-in 420ms ease;
+  transition: transform 220ms ease;
+}
+
+.home-photo-main-link:hover .home-photo-main-image,
+.home-photo-main-link:focus-visible .home-photo-main-image {
+  transform: scale(1.015);
 }
 
 .home-photo-fallback {

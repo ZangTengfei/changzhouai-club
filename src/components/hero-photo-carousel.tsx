@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { ArrowUpRight, Heart, Smile } from "lucide-react";
 
 import { DoodleSparkles } from "@/components/home-visual-assets";
@@ -21,6 +22,7 @@ type HeroNote = {
 type HeroPhotoCarouselImage = {
   src: string;
   alt: string;
+  href: string;
 };
 
 type HeroPhotoCarouselProps = {
@@ -87,17 +89,23 @@ export function HeroPhotoCarousel({
     <div className={cx("home-hero-visual")} aria-label="社区活动现场">
       <div className={cx("home-photo-frame")}>
         {activeImage && activeImageSrc ? (
-          <Image
-            key={activeImageSrc}
-            src={activeImageSrc}
-            alt={activeImage.alt || fallbackAlt}
-            width={760}
-            height={520}
-            priority
-            unoptimized
-            sizes="(max-width: 1024px) calc(100vw - 48px), 560px"
-            className={cx("home-photo-main-image")}
-          />
+          <Link
+            href={activeImage.href}
+            className={cx("home-photo-main-link")}
+            aria-label={`查看${activeImage.alt || fallbackAlt}详情`}
+          >
+            <Image
+              key={activeImageSrc}
+              src={activeImageSrc}
+              alt={activeImage.alt || fallbackAlt}
+              width={760}
+              height={520}
+              priority
+              unoptimized
+              sizes="(max-width: 1024px) calc(100vw - 48px), 560px"
+              className={cx("home-photo-main-image")}
+            />
+          </Link>
         ) : (
           <div className={cx("home-photo-fallback")}>
             <strong>常州 AI Club</strong>

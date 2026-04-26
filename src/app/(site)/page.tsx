@@ -186,10 +186,11 @@ export default async function HomePage() {
         ? {
             src: imageUrl,
             alt: `${event.title} 活动现场`,
+            href: `/events/${event.slug}`,
           }
         : null;
     })
-    .filter((item): item is { src: string; alt: string } => Boolean(item))
+    .filter((item): item is { src: string; alt: string; href: string } => Boolean(item))
     .filter((item, index, items) => (
       items.findIndex((candidate) => candidate.src === item.src) === index
     ))
