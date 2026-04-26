@@ -24,6 +24,7 @@ type EventRow = {
   speaker_lineup: string | null;
   registration_note: string | null;
   recap: string | null;
+  docs_url: string | null;
   status: string;
   event_photos: EventPhotoRow[] | null;
 };
@@ -78,6 +79,7 @@ export type PublicEventDetail = {
   speakerItems: string[];
   registrationNote: string | null;
   recapParagraphs: string[];
+  docsUrl: string | null;
   gallery: PublicGalleryImage[];
 };
 
@@ -233,6 +235,7 @@ function mapPublicEventDetail(row: EventRow): PublicEventDetail {
     speakerItems: parseLineList(row.speaker_lineup),
     registrationNote: row.registration_note,
     recapParagraphs: parseParagraphs(row.recap),
+    docsUrl: row.docs_url,
     gallery,
   };
 }
@@ -267,7 +270,7 @@ const getCachedCompletedEventRecaps = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, recap, status, event_photos(id, image_url, caption, sort_order)",
+        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, recap, docs_url, status, event_photos(id, image_url, caption, sort_order)",
       )
       .eq("status", "completed")
       .order("event_at", { ascending: false, nullsFirst: false });
@@ -305,7 +308,7 @@ const getCachedPublicEventBySlug = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, recap, status, event_photos(id, image_url, caption, sort_order)",
+        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, recap, docs_url, status, event_photos(id, image_url, caption, sort_order)",
       )
       .eq("slug", slug)
       .in("status", ["scheduled", "completed", "cancelled"])

@@ -29,6 +29,7 @@ type EditableAdminEvent = {
   speaker_lineup: string | null;
   registration_note: string | null;
   recap: string | null;
+  docs_url: string | null;
   event_at: string | null;
   venue: string | null;
   city: string | null;
@@ -57,6 +58,7 @@ function toPayload(formData: FormData) {
     speaker_lineup: String(formData.get("speaker_lineup") ?? ""),
     registration_note: String(formData.get("registration_note") ?? ""),
     recap: String(formData.get("recap") ?? ""),
+    docs_url: String(formData.get("docs_url") ?? ""),
     event_at: String(formData.get("event_at") ?? "").trim(),
     venue: String(formData.get("venue") ?? ""),
     city: String(formData.get("city") ?? ""),
@@ -232,6 +234,14 @@ export function AdminEventEditorFormClient({
                   defaultValue={event?.recap ?? ""}
                   rows={5}
                   placeholder={"适合用于活动结束后的内容沉淀。支持分段输入，例如：\n\n这场活动主要围绕...\n\n现场讨论比较集中的问题包括..."}
+                />
+              </AdminField>
+
+              <AdminField label="活动文档链接" className="md:col-span-2">
+                <Input
+                  name="docs_url"
+                  defaultValue={event?.docs_url ?? ""}
+                  placeholder="/docs/events/2026-04-25-ai-salon 或飞书文档链接"
                 />
               </AdminField>
 

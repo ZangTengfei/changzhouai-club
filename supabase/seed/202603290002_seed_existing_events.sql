@@ -8,6 +8,7 @@ insert into public.events (
   event_at,
   city,
   cover_image_url,
+  docs_url,
   status
 )
 values
@@ -19,6 +20,7 @@ values
     '2026-01-24 14:00:00+08',
     '常州',
     'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-01-20260124.jpg',
+    null,
     'completed'
   ),
   (
@@ -29,6 +31,7 @@ values
     '2026-02-08 14:00:00+08',
     '常州',
     'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-02-20260208.jpg',
+    null,
     'completed'
   ),
   (
@@ -39,6 +42,7 @@ values
     '2026-03-08 14:00:00+08',
     '常州',
     'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-03-20260308.jpg',
+    null,
     'completed'
   ),
   (
@@ -49,6 +53,7 @@ values
     '2026-03-14 14:00:00+08',
     '常州',
     'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-04-20260314.jpeg',
+    null,
     'completed'
   ),
   (
@@ -59,6 +64,7 @@ values
     '2026-03-21 14:00:00+08',
     '常州',
     'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-05-20260321.jpeg',
+    '/docs/events/2026-03-21-ai-salon',
     'completed'
   ),
   (
@@ -69,6 +75,7 @@ values
     '2026-03-28 14:00:00+08',
     '常州',
     'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-06-20260328.jpg',
+    null,
     'completed'
   )
 on conflict (slug) do update set
@@ -78,6 +85,7 @@ on conflict (slug) do update set
   event_at = excluded.event_at,
   city = excluded.city,
   cover_image_url = excluded.cover_image_url,
+  docs_url = coalesce(excluded.docs_url, events.docs_url),
   status = excluded.status,
   updated_at = timezone('utc', now());
 

@@ -78,6 +78,7 @@ export async function PATCH(
       speaker_lineup: getOptionalValue(payload, "speaker_lineup"),
       registration_note: getOptionalValue(payload, "registration_note"),
       recap: getOptionalValue(payload, "recap"),
+      docs_url: getOptionalValue(payload, "docs_url"),
       event_at: getOptionalValue(payload, "event_at"),
       venue: getOptionalValue(payload, "venue"),
       city: getOptionalValue(payload, "city") ?? "常州",

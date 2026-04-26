@@ -32,20 +32,6 @@ const statusToneMap: Record<string, string> = {
   cancelled: "blue",
 };
 
-const eventDocsByDate: Record<string, string> = {
-  "2026-03-21": "/docs/events/2026-03-21-ai-salon",
-  "2026-04-11": "/docs/events/2026-04-11-gov-ai-salon",
-  "2026-04-25": "/docs/events/2026-04-25-ai-salon",
-};
-
-function getEventDocsHref(eventAt: string | null) {
-  if (!eventAt) {
-    return null;
-  }
-
-  return eventDocsByDate[eventAt.slice(0, 10)] ?? null;
-}
-
 export async function generateMetadata({
   params,
 }: {
@@ -87,7 +73,8 @@ export default async function EventDetailPage({
   const hasSpeakers = event.speakerItems.length > 0;
   const hasRecap = event.recapParagraphs.length > 0;
   const statusTone = statusToneMap[event.status] ?? "green";
-  const eventDocsHref = getEventDocsHref(event.eventAt);
+  const eventDocsHref = event.docsUrl;
+  const isExternalDocsHref = eventDocsHref?.startsWith("http") ?? false;
   const eventHighlights = [
     {
       label: "活动状态",
@@ -318,10 +305,22 @@ export default async function EventDetailPage({
                 返回活动列表
               </Link>
               {eventDocsHref ? (
-                <Link href={eventDocsHref} className="button home-primary-button">
-                  阅读完整纪要
-                  <ArrowRight aria-hidden="true" strokeWidth={2} />
-                </Link>
+                isExternalDocsHref ? (
+                  <a
+                    href={eventDocsHref}
+                    className="button home-primary-button"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    阅读完整纪要
+                    <ArrowRight aria-hidden="true" strokeWidth={2} />
+                  </a>
+                ) : (
+                  <Link href={eventDocsHref} className="button home-primary-button">
+                    阅读完整纪要
+                    <ArrowRight aria-hidden="true" strokeWidth={2} />
+                  </Link>
+                )
               ) : null}
               {event.status === "completed" ? (
                 <Link href="/archive" className="button home-ghost-button">

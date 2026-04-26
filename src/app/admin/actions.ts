@@ -118,6 +118,7 @@ export async function saveAdminEvent(formData: FormData) {
     speaker_lineup: getOptionalValue(formData, "speaker_lineup"),
     registration_note: getOptionalValue(formData, "registration_note"),
     recap: getOptionalValue(formData, "recap"),
+    docs_url: getOptionalValue(formData, "docs_url"),
     event_at: getOptionalValue(formData, "event_at"),
     venue: getOptionalValue(formData, "venue"),
     city: getOptionalValue(formData, "city") ?? "常州",
