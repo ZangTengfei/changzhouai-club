@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Analytics } from "@vercel/analytics/next";
 
 import { AppToaster } from "@/components/app-toaster";
 
@@ -43,6 +44,7 @@ export default function RootLayout({
       <body>
         <AppToaster />
         {children}
+        <Analytics />
       </body>
     </html>
   );
