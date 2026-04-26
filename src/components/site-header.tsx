@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useState } from "react";
+import { BookOpen, ChevronDown } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { MobileMenuToggle } from "@/components/mobile-menu-toggle";
 import { SiteAccountEntry } from "@/components/site-account-entry";
@@ -19,11 +20,45 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [authReady, setAuthReady] = useState(!hasSupabaseEnv());
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [docsMenuOpen, setDocsMenuOpen] = useState(false);
+  const docsDropdownRef = useRef<HTMLDivElement>(null);
+  const docsTriggerRef = useRef<HTMLButtonElement>(null);
   const shouldShowJoinButton = authReady && !isAuthenticated;
   const handleAuthStateChange = useCallback((nextIsAuthenticated: boolean) => {
     setIsAuthenticated(nextIsAuthenticated);
     setAuthReady(true);
   }, []);
+
+  useEffect(() => {
+    setDocsMenuOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!docsMenuOpen) {
+      return;
+    }
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!docsDropdownRef.current?.contains(event.target as Node)) {
+        setDocsMenuOpen(false);
+      }
+    };
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setDocsMenuOpen(false);
+        docsTriggerRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [docsMenuOpen]);
 
   return (
     <header className={cx("site-header")}>
@@ -45,6 +80,59 @@ export function SiteHeader() {
                 ? pathname === "/"
                 : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
+            if (item.href === "/docs") {
+              return (
+                <div
+                  key={item.href}
+                  className={cx("nav-dropdown", docsMenuOpen && "nav-dropdown-open")}
+                  ref={docsDropdownRef}
+                >
+                  <button
+                    type="button"
+                    ref={docsTriggerRef}
+                    className={cx(
+                      "nav-dropdown-trigger",
+                      isActive && "nav-link-active",
+                    )}
+                    aria-expanded={docsMenuOpen}
+                    aria-controls="docs-navigation-menu"
+                    onClick={() => setDocsMenuOpen((current) => !current)}
+                  >
+                    <span>{item.label}</span>
+                    <ChevronDown aria-hidden="true" className={cx("nav-dropdown-chevron")} />
+                  </button>
+                  <div
+                    id="docs-navigation-menu"
+                    className={cx("nav-dropdown-menu")}
+                    aria-label="文档相关链接"
+                  >
+                    <Link
+                      href={siteRepositoryUrl}
+                      className={cx("nav-dropdown-item")}
+                      target="_blank"
+                      rel="noreferrer"
+                      onClick={() => setDocsMenuOpen(false)}
+                    >
+                      <SocialPlatformIcon
+                        tone="github"
+                        className={cx("nav-dropdown-item-icon")}
+                      />
+                      <span>开源仓库</span>
+                    </Link>
+                    <Link
+                      href="/docs"
+                      className={cx("nav-dropdown-item")}
+                      aria-current={isActive ? "page" : undefined}
+                      onClick={() => setDocsMenuOpen(false)}
+                    >
+                      <BookOpen aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
+                      <span>文档链接</span>
+                    </Link>
+                  </div>
+                </div>
+              );
+            }
+
             return (
               <Link
                 key={item.href}
@@ -58,24 +146,13 @@ export function SiteHeader() {
           })}
         </nav>
 
-        <div className={cx("header-actions")}>
-          <Link
-            href={siteRepositoryUrl}
-            className={cx("github-nav-button")}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="打开 GitHub 仓库"
-            title="GitHub 仓库"
-          >
-            <SocialPlatformIcon tone="github" className={cx("github-nav-icon")} />
-            <span>GitHub</span>
-          </Link>
-          {shouldShowJoinButton ? (
+        {shouldShowJoinButton ? (
+          <div className={cx("header-actions")}>
             <Link href="/join" className={cx("button header-join-button")}>
               加入社区
             </Link>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
 
         <div className={cx("header-top-actions")}>
           <SiteAccountEntry onAuthStateChange={handleAuthStateChange} />
