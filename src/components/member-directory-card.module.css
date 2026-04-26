@@ -74,9 +74,15 @@
 }
 
 .member-directory-bio {
+  display: -webkit-box;
   flex: 1;
   min-height: calc(1.7em * 4);
+  overflow: hidden;
   color: var(--ink-secondary);
+  line-height: 1.7;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
 }
 
 .member-skill-list-capped {
