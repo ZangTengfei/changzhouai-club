@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { normalizeAdminEventDateTime } from "@/lib/admin/event-datetime";
 import { requireStaffContext } from "@/lib/supabase/guards";
 
 const ADMIN_EVENTS_PATH = "/admin/events";
@@ -119,7 +120,7 @@ export async function saveAdminEvent(formData: FormData) {
     registration_note: getOptionalValue(formData, "registration_note"),
     recap: getOptionalValue(formData, "recap"),
     docs_url: getOptionalValue(formData, "docs_url"),
-    event_at: getOptionalValue(formData, "event_at"),
+    event_at: normalizeAdminEventDateTime(getOptionalValue(formData, "event_at")),
     venue: getOptionalValue(formData, "venue"),
     city: getOptionalValue(formData, "city") ?? "常州",
     cover_image_url: getOptionalValue(formData, "cover_image_url"),

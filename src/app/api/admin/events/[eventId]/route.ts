@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { normalizeAdminEventDateTime } from "@/lib/admin/event-datetime";
 import { loadAdminEventsData } from "@/lib/admin/events";
 import { revalidateAdminEventPaths } from "@/lib/admin/revalidate";
 import { getStaffContextResult } from "@/lib/supabase/guards";
@@ -79,7 +80,7 @@ export async function PATCH(
       registration_note: getOptionalValue(payload, "registration_note"),
       recap: getOptionalValue(payload, "recap"),
       docs_url: getOptionalValue(payload, "docs_url"),
-      event_at: getOptionalValue(payload, "event_at"),
+      event_at: normalizeAdminEventDateTime(getOptionalValue(payload, "event_at")),
       venue: getOptionalValue(payload, "venue"),
       city: getOptionalValue(payload, "city") ?? "常州",
       cover_image_url: getOptionalValue(payload, "cover_image_url"),
