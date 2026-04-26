@@ -76,6 +76,19 @@ function pickMembers(
   return members.filter(predicate).slice(0, limit);
 }
 
+function pickMembersExcluding(
+  members: PublicMember[],
+  predicate: (member: PublicMember) => boolean,
+  excludedMemberIds: Set<string>,
+  limit: number,
+) {
+  return pickMembers(
+    members,
+    (member) => !excludedMemberIds.has(member.id) && predicate(member),
+    limit,
+  );
+}
+
 function mapPublicMember(row: PublicMemberRow): PublicMember {
   return {
     id: row.id,
@@ -187,8 +200,19 @@ const getCachedPublicMembersDirectory = unstable_cache(
       (member) => ["admin", "organizer"].includes(member.status),
       4,
     );
-    const sharers = pickMembers(members, (member) => member.willingToShare, 4);
-    const builders = pickMembers(members, (member) => member.willingToJoinProjects, 4);
+    const organizerIds = new Set(organizers.map((member) => member.id));
+    const sharers = pickMembersExcluding(
+      members,
+      (member) => member.willingToShare,
+      organizerIds,
+      4,
+    );
+    const builders = pickMembersExcluding(
+      members,
+      (member) => member.willingToJoinProjects,
+      organizerIds,
+      4,
+    );
 
     return {
       members,
