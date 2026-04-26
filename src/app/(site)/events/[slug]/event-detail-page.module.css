@@ -29,10 +29,10 @@
 
 .eventHero {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(440px, 1.08fr);
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.82fr);
   gap: 32px;
-  align-items: start;
-  padding: 24px 0 8px;
+  align-items: center;
+  padding: 18px 0 0;
 }
 
 .eventHeroCopy {
@@ -85,7 +85,7 @@
 .eventHeroHeading h1 {
   margin: 0;
   color: #111b1f;
-  font-size: 3.7rem;
+  font-size: 3.45rem;
   font-weight: 900;
   line-height: 1.08;
   letter-spacing: 0;
@@ -111,57 +111,17 @@
   line-height: 1.82;
 }
 
-.eventHeroProof {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 12px;
-  align-items: center;
-  width: fit-content;
-  max-width: 35rem;
-  padding: 14px 16px;
-  border: 1px solid rgba(var(--accent-rgb), 0.12);
-  border-radius: 18px;
-  background: rgba(255, 252, 247, 0.7);
-  box-shadow: 0 10px 22px rgba(var(--ink-rgb), 0.04);
-}
-
-.eventHeroProof svg {
-  width: 28px;
-  height: 28px;
-  color: #f4c75d;
-}
-
-.eventHeroProof span {
-  color: rgba(var(--ink-rgb), 0.64);
-  font-size: 0.92rem;
-  font-weight: 700;
-  line-height: 1.48;
-}
-
-.eventHeroActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 14px;
-  align-items: center;
-}
-
-.eventHeroActions svg {
-  width: 18px;
-  height: 18px;
-}
-
 .eventHeroVisual {
   position: relative;
-  min-height: 548px;
   overflow: hidden;
-  padding: 28px;
+  padding: 16px;
   border: 1px solid rgba(212, 216, 209, 0.7);
-  border-radius: 34px;
+  border-radius: 28px;
   background:
     radial-gradient(circle at 86% 16%, rgba(255, 199, 81, 0.16), transparent 18%),
     linear-gradient(180deg, rgba(246, 244, 238, 0.94), rgba(241, 239, 232, 0.88));
   box-shadow:
-    0 24px 54px rgba(var(--ink-rgb), 0.12),
+    0 18px 38px rgba(var(--ink-rgb), 0.08),
     0 1px 0 rgba(255, 255, 255, 0.7) inset;
 }
 
@@ -170,18 +130,17 @@
   z-index: 2;
   overflow: hidden;
   width: 100%;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 4 / 3;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 28px;
+  border-radius: 22px;
   background: rgba(255, 252, 247, 0.78);
-  box-shadow: 0 16px 34px rgba(var(--ink-rgb), 0.08);
 }
 
 .eventHeroMedia img {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .eventImageFallback {
@@ -200,107 +159,6 @@
 
 .eventImageFallback strong {
   color: rgba(var(--ink-rgb), 0.68);
-}
-
-.eventGlanceCard {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  gap: 12px;
-  max-width: 420px;
-  margin: -46px 0 0 auto;
-  padding: 20px;
-  border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 22px;
-  background: rgba(255, 252, 247, 0.92);
-  box-shadow: 0 18px 36px rgba(var(--ink-rgb), 0.12);
-}
-
-.eventGlanceCard p,
-.eventGlanceCard h2 {
-  margin: 0;
-}
-
-.eventGlanceCard p {
-  color: #a7602f;
-  font-size: 0.82rem;
-  font-weight: 900;
-}
-
-.eventGlanceCard h2 {
-  color: #111b1f;
-  font-size: 1.35rem;
-  line-height: 1.18;
-}
-
-.eventGlanceCard div {
-  display: grid;
-  gap: 8px;
-}
-
-.eventGlanceCard span {
-  display: grid;
-  grid-template-columns: 18px minmax(0, 1fr);
-  gap: 8px;
-  align-items: center;
-  color: rgba(var(--ink-rgb), 0.62);
-  font-size: 0.9rem;
-  font-weight: 700;
-  line-height: 1.45;
-}
-
-.eventGlanceCard svg {
-  width: 18px;
-  height: 18px;
-  color: var(--accent);
-}
-
-.eventStickyNote {
-  position: absolute;
-  right: 32px;
-  top: 28px;
-  z-index: 3;
-  display: grid;
-  gap: 6px;
-  max-width: 178px;
-  padding: 16px 16px 28px;
-  border: 1px solid rgba(229, 175, 70, 0.32);
-  border-radius: 5px 18px 18px 18px;
-  background: #fff2b8;
-  box-shadow: 0 16px 30px rgba(var(--ink-rgb), 0.12);
-  transform: rotate(6deg);
-}
-
-.eventStickyNote span {
-  color: #a7602f;
-  font-size: 0.78rem;
-  font-weight: 900;
-}
-
-.eventStickyNote strong {
-  color: #24322d;
-  font-size: 0.95rem;
-  line-height: 1.42;
-}
-
-.eventHeroDoodle {
-  position: absolute;
-  top: 128px;
-  right: 218px;
-  z-index: 3;
-  width: 54px;
-  color: #f4c75d;
-  transform: rotate(12deg);
-}
-
-.eventHeroArrow {
-  position: absolute;
-  right: 78px;
-  bottom: 48px;
-  z-index: 3;
-  width: 128px;
-  color: var(--accent);
-  transform: rotate(18deg);
 }
 
 .eventQuickFacts {
@@ -387,19 +245,32 @@
   font-weight: 850;
 }
 
-.eventPrimaryGrid,
-.eventContentGrid {
+.eventBodyLayout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(340px, 0.75fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 340px);
+  gap: 22px;
   align-items: start;
 }
 
+.eventMainFlow {
+  display: grid;
+  gap: 22px;
+  min-width: 0;
+}
+
+.eventSidebar {
+  position: sticky;
+  top: 92px;
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
 .eventInfoPanel,
-.eventStatusPanel,
 .eventContentPanel,
 .eventRecapPanel,
-.eventGallerySection {
+.eventGallerySection,
+.eventSidebarCard {
   display: grid;
   gap: 20px;
   min-width: 0;
@@ -408,6 +279,24 @@
   border-radius: 24px;
   background: linear-gradient(180deg, rgba(245, 244, 238, 0.92), rgba(240, 239, 232, 0.9));
   box-shadow: 0 12px 28px rgba(var(--ink-rgb), 0.035);
+}
+
+.eventSidebarCard {
+  gap: 18px;
+  padding: 20px;
+}
+
+.eventSidebarHeading {
+  display: grid;
+  gap: 12px;
+}
+
+.eventSidebarHeading h2 {
+  margin: 0;
+  color: #111a1d;
+  font-size: 1.45rem;
+  font-weight: 900;
+  line-height: 1.12;
 }
 
 .eventSectionHeading {
@@ -448,11 +337,11 @@
 
 .eventDetailList li {
   display: grid;
-  grid-template-columns: 38px 86px minmax(0, 1fr);
-  gap: 12px;
-  align-items: center;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 6px 12px;
+  align-items: start;
   min-width: 0;
-  min-height: 58px;
+  min-height: 56px;
   padding: 12px;
   border: 1px solid rgba(var(--ink-rgb), 0.06);
   border-radius: 16px;
@@ -460,8 +349,9 @@
 }
 
 .eventDetailList svg {
-  width: 24px;
-  height: 24px;
+  grid-row: 1 / span 2;
+  width: 22px;
+  height: 22px;
   color: var(--accent);
 }
 
@@ -472,11 +362,63 @@
 }
 
 .eventDetailList strong {
+  grid-column: 2;
   overflow: hidden;
   color: #132321;
   font-size: 0.94rem;
   line-height: 1.45;
   text-overflow: ellipsis;
+}
+
+.eventSidebarActions {
+  display: grid;
+  gap: 10px;
+}
+
+.eventSidebarActions :global(.button) {
+  width: 100%;
+  justify-content: center;
+}
+
+.eventSidebarActions svg {
+  width: 18px;
+  height: 18px;
+}
+
+.eventStatusPanel {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px dashed rgba(var(--accent-rgb), 0.24);
+  border-radius: 20px;
+  background: rgba(var(--accent-rgb), 0.07);
+}
+
+.eventStatusPanel svg {
+  width: 28px;
+  height: 28px;
+  color: #f4c75d;
+}
+
+.eventStatusPanel h2,
+.eventStatusPanel p {
+  margin: 0;
+}
+
+.eventStatusPanel h2 {
+  color: #111a1d;
+  font-size: 1.12rem;
+  font-weight: 900;
+}
+
+.eventStatusPanel p {
+  margin-top: 6px;
+  color: rgba(var(--ink-rgb), 0.64);
+  font-size: 0.92rem;
+  font-weight: 650;
+  line-height: 1.58;
 }
 
 .eventSoftNote {
@@ -623,7 +565,7 @@
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .eventGalleryCopy {
@@ -654,9 +596,12 @@
 
 @media (max-width: 1024px) {
   .eventHero,
-  .eventPrimaryGrid,
-  .eventContentGrid {
+  .eventBodyLayout {
     grid-template-columns: 1fr;
+  }
+
+  .eventSidebar {
+    position: static;
   }
 
   .eventHeroCopy {
@@ -693,31 +638,7 @@
 
 @media (max-width: 820px) {
   .eventHeroVisual {
-    min-height: auto;
-    padding: 22px;
-  }
-
-  .eventStickyNote {
-    position: relative;
-    top: auto;
-    right: auto;
-    max-width: none;
-    margin-bottom: 18px;
-    transform: none;
-  }
-
-  .eventHeroArrow {
-    display: none;
-  }
-
-  .eventHeroDoodle {
-    top: 34px;
-    right: 28px;
-  }
-
-  .eventGlanceCard {
-    max-width: none;
-    margin: 14px 0 0;
+    padding: 14px;
   }
 
   .eventSectionHeading {
@@ -749,21 +670,6 @@
     margin-left: 34%;
   }
 
-  .eventHeroActions {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .eventHeroActions :global(.button) {
-    width: 100%;
-  }
-
-  .eventHeroProof {
-    grid-template-columns: 1fr;
-    width: 100%;
-  }
-
   .eventQuickFacts,
   .eventGalleryGrid {
     grid-template-columns: 1fr;
@@ -792,6 +698,7 @@
   .eventContentPanel,
   .eventRecapPanel,
   .eventGallerySection,
+  .eventSidebarCard,
   .eventRegistrationPanel :global(.event-registration-card) {
     padding: 20px;
   }

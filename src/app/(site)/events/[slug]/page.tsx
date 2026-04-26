@@ -11,13 +11,11 @@ import {
   FileText,
   ListChecks,
   MapPin,
-  Mic2,
   Sparkles,
   Ticket,
 } from "lucide-react";
 
 import { EventDetailRegistrationPanel } from "@/components/event-detail-registration-panel";
-import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { getPublicEventBySlug } from "@/lib/community-events";
 import { getEventImageUrl } from "@/lib/public-image-url";
 
@@ -33,6 +31,20 @@ const statusToneMap: Record<string, string> = {
   completed: "orange",
   cancelled: "blue",
 };
+
+const eventDocsByDate: Record<string, string> = {
+  "2026-03-21": "/docs/events/2026-03-21-ai-salon",
+  "2026-04-11": "/docs/events/2026-04-11-gov-ai-salon",
+  "2026-04-25": "/docs/events/2026-04-25-ai-salon",
+};
+
+function getEventDocsHref(eventAt: string | null) {
+  if (!eventAt) {
+    return null;
+  }
+
+  return eventDocsByDate[eventAt.slice(0, 10)] ?? null;
+}
 
 export async function generateMetadata({
   params,
@@ -75,7 +87,13 @@ export default async function EventDetailPage({
   const hasSpeakers = event.speakerItems.length > 0;
   const hasRecap = event.recapParagraphs.length > 0;
   const statusTone = statusToneMap[event.status] ?? "green";
+  const eventDocsHref = getEventDocsHref(event.eventAt);
   const eventHighlights = [
+    {
+      label: "活动状态",
+      value: event.statusLabel,
+      icon: Ticket,
+    },
     {
       label: "活动时间",
       value: event.dateTimeLabel,
@@ -90,11 +108,6 @@ export default async function EventDetailPage({
       label: "现场照片",
       value: event.gallery.length > 0 ? `${event.gallery.length} 张` : "待补充",
       icon: Camera,
-    },
-    {
-      label: "议程安排",
-      value: hasAgenda ? `${event.agendaItems.length} 项` : "待补充",
-      icon: ListChecks,
     },
   ];
 
@@ -129,28 +142,6 @@ export default async function EventDetailPage({
             <h1 id="event-detail-title">{event.title}</h1>
             <p>{event.summary}</p>
           </div>
-
-          <div className={styles.eventHeroProof}>
-            <Sparkles aria-hidden="true" strokeWidth={1.9} />
-            <span>
-              {event.status === "completed"
-                ? "把现场讨论、照片和回顾沉淀下来，让一次活动变成可继续连接的线索。"
-                : "活动详情页会同步时间、地点、报名状态和现场议程，方便你决定是否参加。"}
-            </span>
-          </div>
-
-          <div className={styles.eventHeroActions}>
-            <Link href="/events" className="button home-ghost-button">
-              <ArrowLeft aria-hidden="true" strokeWidth={2} />
-              返回活动列表
-            </Link>
-            {event.status === "completed" ? (
-              <Link href="/archive" className="button home-primary-button">
-                查看更多往期回顾
-                <ArrowRight aria-hidden="true" strokeWidth={2} />
-              </Link>
-            ) : null}
-          </div>
         </div>
 
         <div className={styles.eventHeroVisual}>
@@ -169,30 +160,6 @@ export default async function EventDetailPage({
               </div>
             )}
           </div>
-
-          <article className={styles.eventGlanceCard}>
-            <p>活动现场</p>
-            <h2>{event.venue ?? "线下空间待补充"}</h2>
-            <div>
-              <span>
-                <CalendarDays aria-hidden="true" strokeWidth={1.9} />
-                {event.dateTimeLabel}
-              </span>
-              <span>
-                <MapPin aria-hidden="true" strokeWidth={1.9} />
-                {event.locationLabel}
-              </span>
-            </div>
-          </article>
-
-          <div className={styles.eventStickyNote}>
-            <span>{event.status === "completed" ? "活动回顾" : "开放报名"}</span>
-            <strong>
-              {event.status === "completed" ? "现场发生过的连接，继续留在这里" : "报名后可在账号页查看记录"}
-            </strong>
-          </div>
-          <DoodleSparkles className={styles.eventHeroDoodle} />
-          <HandDrawnArrow className={styles.eventHeroArrow} />
         </div>
       </section>
 
@@ -211,73 +178,8 @@ export default async function EventDetailPage({
         })}
       </section>
 
-      <section className={styles.eventPrimaryGrid}>
-        <article className={styles.eventInfoPanel}>
-          <div className={styles.eventSectionHeading}>
-            <p className="home-kicker">Overview</p>
-            <div>
-              <h2>活动信息</h2>
-              <p>把到场前最需要确认的信息集中放在这里。</p>
-            </div>
-          </div>
-
-          <ul className={styles.eventDetailList}>
-            <li>
-              <CalendarDays aria-hidden="true" strokeWidth={1.8} />
-              <span>活动时间</span>
-              <strong>{event.dateTimeLabel}</strong>
-            </li>
-            <li>
-              <MapPin aria-hidden="true" strokeWidth={1.8} />
-              <span>活动地点</span>
-              <strong>{event.locationLabel}</strong>
-            </li>
-            <li>
-              <Ticket aria-hidden="true" strokeWidth={1.8} />
-              <span>活动状态</span>
-              <strong>{event.statusLabel}</strong>
-            </li>
-            <li>
-              <FileText aria-hidden="true" strokeWidth={1.8} />
-              <span>活动链接</span>
-              <strong>{detailHref}</strong>
-            </li>
-          </ul>
-
-          {!hasOverview && !hasAgenda && !hasSpeakers ? (
-            <div className={styles.eventSoftNote}>
-              活动基本信息已发布，详细介绍与议程内容将陆续补充。
-            </div>
-          ) : null}
-        </article>
-
-        {event.status === "scheduled" ? (
-          <div className={styles.eventRegistrationPanel}>
-            <EventDetailRegistrationPanel event={event} redirectTo={detailHref} />
-          </div>
-        ) : (
-          <article className={styles.eventStatusPanel}>
-            <div className={styles.eventSectionHeading}>
-              <p className="home-kicker">{event.status === "completed" ? "Recap" : "Status"}</p>
-              <div>
-                <h2>{event.status === "completed" ? "活动已结束" : "当前状态"}</h2>
-                <p>
-                  {event.status === "completed"
-                    ? "欢迎继续查看回顾内容、现场照片和后续沉淀。"
-                    : "相关信息以页面发布内容为准。"}
-                </p>
-              </div>
-            </div>
-
-            {event.registrationNote ? (
-              <div className={styles.eventSoftNote}>{event.registrationNote}</div>
-            ) : null}
-          </article>
-        )}
-      </section>
-
-      {hasOverview || hasAgenda || hasSpeakers ? (
-        <section className={styles.eventContentGrid}>
+      <div className={styles.eventBodyLayout}>
+        <main className={styles.eventMainFlow}>
           <article className={styles.eventContentPanel}>
             <div className={styles.eventSectionHeading}>
               <p className="home-kicker">Story</p>
@@ -300,63 +202,154 @@ export default async function EventDetailPage({
             )}
           </article>
 
-          <article className={styles.eventContentPanel}>
-            <div className={styles.eventSectionHeading}>
-              <p className="home-kicker">Flow</p>
-              <div>
-                <h2>议程与分享</h2>
-                <p>从议程安排到分享人信息，帮助你提前进入状态。</p>
+          {hasAgenda || hasSpeakers ? (
+            <article className={styles.eventContentPanel}>
+              <div className={styles.eventSectionHeading}>
+                <p className="home-kicker">Flow</p>
+                <div>
+                  <h2>议程与分享</h2>
+                  <p>从议程安排到分享人信息，帮助你提前进入状态。</p>
+                </div>
               </div>
-            </div>
 
-            {hasAgenda ? (
-              <div className={styles.eventListBlock}>
-                <h3>议程安排</h3>
-                <ul className={styles.eventStepList}>
-                  {event.agendaItems.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
+              {hasAgenda ? (
+                <div className={styles.eventListBlock}>
+                  <h3>议程安排</h3>
+                  <ul className={styles.eventStepList}>
+                    {event.agendaItems.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+
+              {hasSpeakers ? (
+                <div className={styles.eventListBlock}>
+                  <h3>分享人与组织者</h3>
+                  <ul className={styles.eventStepList}>
+                    {event.speakerItems.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </article>
+          ) : (
+            <article className={styles.eventContentPanel}>
+              <div className={styles.eventSectionHeading}>
+                <p className="home-kicker">Flow</p>
+                <div>
+                  <h2>议程与分享</h2>
+                  <p>议程安排与分享信息将在确认后更新到本页。</p>
+                </div>
               </div>
-            ) : null}
 
-            {hasSpeakers ? (
-              <div className={styles.eventListBlock}>
-                <h3>分享人与组织者</h3>
-                <ul className={styles.eventStepList}>
-                  {event.speakerItems.map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-            ) : null}
-
-            {!hasAgenda && !hasSpeakers ? (
               <div className={styles.eventSoftNote}>
-                议程安排与分享信息将在确认后更新到本页。
+                活动基本信息已发布，详细介绍与议程内容将陆续补充。
               </div>
-            ) : null}
-          </article>
-        </section>
-      ) : null}
+            </article>
+          )}
 
-      {hasRecap ? (
-        <section className={styles.eventRecapPanel}>
-          <div className={styles.eventSectionHeading}>
-            <p className="home-kicker">After Event</p>
-            <div>
-              <h2>活动回顾</h2>
-              <p>这里记录活动中的重点内容、交流线索与值得沉淀的现场观察。</p>
+          {hasRecap ? (
+            <section className={styles.eventRecapPanel}>
+              <div className={styles.eventSectionHeading}>
+                <p className="home-kicker">After Event</p>
+                <div>
+                  <h2>活动回顾</h2>
+                  <p>这里记录活动中的重点内容、交流线索与值得沉淀的现场观察。</p>
+                </div>
+              </div>
+
+              <div className={styles.eventRichtext}>
+                {event.recapParagraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </main>
+
+        <aside className={styles.eventSidebar} aria-label="活动侧栏">
+          <article className={styles.eventSidebarCard}>
+            <div className={styles.eventSidebarHeading}>
+              <span className={`${styles.eventStatusPill} ${styles[`eventStatusPill${statusTone}`]}`}>
+                {event.statusLabel}
+              </span>
+              <h2>活动信息</h2>
             </div>
-          </div>
 
-          <div className={styles.eventRichtext}>
-            {event.recapParagraphs.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </div>
-        </section>
-      ) : null}
+            <ul className={styles.eventDetailList}>
+              <li>
+                <CalendarDays aria-hidden="true" strokeWidth={1.8} />
+                <span>活动时间</span>
+                <strong>{event.dateTimeLabel}</strong>
+              </li>
+              <li>
+                <MapPin aria-hidden="true" strokeWidth={1.8} />
+                <span>活动地点</span>
+                <strong>{event.locationLabel}</strong>
+              </li>
+              <li>
+                <Camera aria-hidden="true" strokeWidth={1.8} />
+                <span>现场照片</span>
+                <strong>{event.gallery.length > 0 ? `${event.gallery.length} 张` : "待补充"}</strong>
+              </li>
+              <li>
+                <ListChecks aria-hidden="true" strokeWidth={1.8} />
+                <span>议程安排</span>
+                <strong>{hasAgenda ? `${event.agendaItems.length} 项` : "待补充"}</strong>
+              </li>
+              {eventDocsHref ? (
+                <li>
+                  <FileText aria-hidden="true" strokeWidth={1.8} />
+                  <span>完整纪要</span>
+                  <strong>已整理到文档</strong>
+                </li>
+              ) : null}
+            </ul>
+
+            {event.registrationNote ? (
+              <div className={styles.eventSoftNote}>{event.registrationNote}</div>
+            ) : null}
+
+            <div className={styles.eventSidebarActions}>
+              <Link href="/events" className="button home-ghost-button">
+                <ArrowLeft aria-hidden="true" strokeWidth={2} />
+                返回活动列表
+              </Link>
+              {eventDocsHref ? (
+                <Link href={eventDocsHref} className="button home-primary-button">
+                  阅读完整纪要
+                  <ArrowRight aria-hidden="true" strokeWidth={2} />
+                </Link>
+              ) : null}
+              {event.status === "completed" ? (
+                <Link href="/archive" className="button home-ghost-button">
+                  更多往期回顾
+                </Link>
+              ) : null}
+            </div>
+          </article>
+
+          {event.status === "scheduled" ? (
+            <div className={styles.eventRegistrationPanel}>
+              <EventDetailRegistrationPanel event={event} redirectTo={detailHref} />
+            </div>
+          ) : (
+            <article className={styles.eventStatusPanel}>
+              <Sparkles aria-hidden="true" strokeWidth={1.9} />
+              <div>
+                <h2>{event.status === "completed" ? "活动已结束" : "当前状态"}</h2>
+                <p>
+                  {event.status === "completed"
+                    ? "回顾内容、完整纪要和现场照片会在这里持续沉淀。"
+                    : "相关信息以页面发布内容为准。"}
+                </p>
+              </div>
+            </article>
+          )}
+        </aside>
+      </div>
 
       {event.gallery.length > 0 ? (
         <section className={styles.eventGallerySection}>
