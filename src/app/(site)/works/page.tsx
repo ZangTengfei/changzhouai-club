@@ -5,6 +5,7 @@ import {
   Boxes,
   ExternalLink,
   Layers3,
+  Plus,
   Sparkles,
   Tags,
   UsersRound,
@@ -73,6 +74,10 @@ export default async function WorksPage() {
               浏览作品
               <ArrowRight aria-hidden="true" strokeWidth={2} />
             </Link>
+            <Link href="/account?submit=work#works" className="button home-ghost-button">
+              <Plus aria-hidden="true" strokeWidth={2} />
+              提交个人作品
+            </Link>
             <Link href="/members" className="button home-ghost-button">
               找到创作者
             </Link>
@@ -99,7 +104,7 @@ export default async function WorksPage() {
             <div className={styles.worksHeroEmpty}>
               <Layers3 aria-hidden="true" strokeWidth={1.8} />
               <strong>等待第一批成员作品</strong>
-              <span>后台发布后会自动汇总到这里</span>
+              <span>成员提交并通过审核后会汇总到这里</span>
             </div>
           )}
         </div>
@@ -170,9 +175,10 @@ export default async function WorksPage() {
         ) : (
           <div className={styles.worksEmptyPanel}>
             <strong>还没有公开作品</strong>
-            <p>后台添加成员作品并设为公开后，会在这里形成社区作品墙。</p>
-            <Link href="/members" className="button home-ghost-button">
-              先浏览成员地图
+            <p>成员提交作品并通过审核后，会在这里形成社区作品墙。</p>
+            <Link href="/account?submit=work#works" className="button home-primary-button">
+              <Plus aria-hidden="true" strokeWidth={2} />
+              提交个人作品
             </Link>
           </div>
         )}

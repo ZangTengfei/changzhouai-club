@@ -152,7 +152,12 @@ const workModalErrorCodes = new Set([
 export default async function AccountPage({
   searchParams,
 }: {
-  searchParams: Promise<{ updated?: string; error?: string; onboarding?: string }>;
+  searchParams: Promise<{
+    updated?: string;
+    error?: string;
+    onboarding?: string;
+    submit?: string;
+  }>;
 }) {
   const enabled = hasSupabaseEnv();
   const params = await searchParams;
@@ -182,7 +187,11 @@ export default async function AccountPage({
   const user = userData.user;
 
   if (!user) {
-    const nextPath = params.onboarding ? "/account?onboarding=1" : "/account";
+    const nextPath = params.onboarding
+      ? "/account?onboarding=1"
+      : params.submit === "work"
+        ? "/account?submit=work#works"
+        : "/account";
     redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   }
 
@@ -241,7 +250,8 @@ export default async function AccountPage({
   const statusMessage = getStatusMessage(params.error);
   const shouldOpenProfileModal =
     Boolean(params.onboarding) || profileModalErrorCodes.has(params.error ?? "");
-  const shouldOpenWorkModal = workModalErrorCodes.has(params.error ?? "");
+  const shouldOpenWorkModal =
+    params.submit === "work" || workModalErrorCodes.has(params.error ?? "");
   const accountSummaryItems = [
     {
       label: "资料状态",
