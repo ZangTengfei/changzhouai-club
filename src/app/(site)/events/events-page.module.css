@@ -208,8 +208,8 @@
 
 .nextCard {
   position: absolute;
-  left: 0;
-  bottom: 28px;
+  right: clamp(-22px, -2vw, -8px);
+  bottom: -6px;
   z-index: 2;
   display: grid;
   gap: 14px;
@@ -650,6 +650,11 @@
     padding: 28px 0 82px 20px;
   }
 
+  .nextCard {
+    right: 0;
+    bottom: 8px;
+  }
+
   .recapCard {
     grid-template-columns: minmax(120px, 0.32fr) minmax(0, 0.68fr);
   }
@@ -677,6 +682,7 @@
   .nextCard {
     position: relative;
     left: auto;
+    right: auto;
     bottom: auto;
     width: 100%;
     margin-top: -42px;
