@@ -80,7 +80,7 @@
 
 .nav-links {
   justify-content: center;
-  gap: 0;
+  gap: 4px;
   flex-wrap: nowrap;
 }
 
@@ -105,7 +105,7 @@
 .nav-links > a,
 .nav-dropdown-trigger {
   position: relative;
-  padding: 28px 8px 24px;
+  padding: 28px 13px 24px;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -129,8 +129,8 @@
 .nav-dropdown-trigger::after {
   content: "";
   position: absolute;
-  left: 15px;
-  right: 15px;
+  left: 16px;
+  right: 16px;
   bottom: 14px;
   height: 3px;
   border-radius: 999px;
