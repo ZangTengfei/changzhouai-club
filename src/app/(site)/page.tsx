@@ -165,14 +165,21 @@ export default async function HomePage() {
   const primaryScheduledEvent = scheduledEvents[0];
   const latestCompletedEvent = completedEvents[0];
   const recentEvents = completedEvents.slice(0, 4);
-  const heroGallery = completedEvents
-    .flatMap((event) => [
-      event.imageUrl,
-      ...event.gallery.map((item) => item.imageUrl),
-    ])
-    .filter((imageUrl): imageUrl is string => Boolean(imageUrl))
-    .filter((imageUrl, index, items) => items.indexOf(imageUrl) === index)
-    .slice(0, 4);
+  const heroCarouselImages = completedEvents
+    .map((event) => {
+      const imageUrl = event.imageUrl ?? event.gallery[0]?.imageUrl ?? null;
+
+      return imageUrl
+        ? {
+            src: imageUrl,
+            alt: `${event.title} 活动现场`,
+          }
+        : null;
+    })
+    .filter((item): item is { src: string; alt: string } => Boolean(item))
+    .filter((item, index, items) => (
+      items.findIndex((candidate) => candidate.src === item.src) === index
+    ));
   const memberAvatars = directory.members
     .map((member) => member.avatarUrl)
     .filter((avatarUrl): avatarUrl is string => Boolean(avatarUrl))
@@ -211,7 +218,6 @@ export default async function HomePage() {
   const nextEventDateLabel = formatEventDateTime(
     primaryScheduledEvent?.event_at ?? null,
   );
-  const heroCarouselImages = heroGallery.slice(0, 3);
   const nextEventAttendeeAvatars = memberAvatars.slice(0, 4);
   const nextEventAttendeeCount = directory.members.length > 0
     ? Math.min(directory.members.length, 28)
@@ -312,7 +318,7 @@ export default async function HomePage() {
 
         <HeroPhotoCarousel
           images={heroCarouselImages}
-          alt={latestCompletedEvent?.title ?? "常州 AI Club 活动现场"}
+          fallbackAlt={latestCompletedEvent?.title ?? "常州 AI Club 活动现场"}
           notes={heroNotes.map((note) => ({
             className: note.className,
             lines: [...note.lines],

@@ -190,14 +190,17 @@
 }
 
 .home-photo-carousel-track {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
   gap: 10px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding: 2px 2px 8px;
+  scrollbar-width: thin;
 }
 
 .home-photo-carousel-item {
   appearance: none;
-  width: 100%;
+  flex: 0 0 clamp(96px, 31%, 150px);
   padding: 0;
   border: 0;
   background: transparent;

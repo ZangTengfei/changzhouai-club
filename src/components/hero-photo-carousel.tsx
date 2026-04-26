@@ -18,9 +18,14 @@ type HeroNote = {
   icon?: HeroNoteIcon;
 };
 
-type HeroPhotoCarouselProps = {
-  images: string[];
+type HeroPhotoCarouselImage = {
+  src: string;
   alt: string;
+};
+
+type HeroPhotoCarouselProps = {
+  images: HeroPhotoCarouselImage[];
+  fallbackAlt: string;
   notes: readonly HeroNote[];
 };
 
@@ -48,7 +53,7 @@ function HeroNoteMark({ icon }: { icon: HeroNoteIcon }) {
 
 export function HeroPhotoCarousel({
   images,
-  alt,
+  fallbackAlt,
   notes,
 }: HeroPhotoCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -74,8 +79,9 @@ export function HeroPhotoCarousel({
   }, [activeIndex, images.length]);
 
   const activeImage = images[activeIndex] ?? null;
-  const visibleImages = images.slice(0, 3);
-  const activeImageSrc = getEventImageUrl(activeImage, "hero-main") ?? activeImage;
+  const activeImageSrc = activeImage
+    ? getEventImageUrl(activeImage.src, "hero-main") ?? activeImage.src
+    : null;
 
   return (
     <div className={cx("home-hero-visual")} aria-label="社区活动现场">
@@ -84,7 +90,7 @@ export function HeroPhotoCarousel({
           <Image
             key={activeImageSrc}
             src={activeImageSrc}
-            alt={alt}
+            alt={activeImage.alt || fallbackAlt}
             width={760}
             height={520}
             priority
@@ -100,16 +106,16 @@ export function HeroPhotoCarousel({
         )}
       </div>
 
-      {visibleImages.length > 0 ? (
+      {images.length > 0 ? (
         <div className={cx("home-photo-carousel")} aria-label="活动照片切换">
           <div className={cx("home-photo-carousel-track")} role="tablist" aria-label="活动照片">
-            {visibleImages.map((imageUrl, index) => (
+            {images.map((image, index) => (
               <button
-                key={`${imageUrl}-${index}`}
+                key={`${image.src}-${index}`}
                 type="button"
                 role="tab"
                 aria-selected={index === activeIndex}
-                aria-label={`查看第 ${index + 1} 张活动照片`}
+                aria-label={`查看${image.alt}`}
                 className={cx(
                   "home-photo-carousel-item",
                   index === activeIndex && "is-active",
@@ -117,7 +123,7 @@ export function HeroPhotoCarousel({
                 onClick={() => setActiveIndex(index)}
               >
                 <Image
-                  src={getEventImageUrl(imageUrl, "hero-thumb") ?? imageUrl}
+                  src={getEventImageUrl(image.src, "hero-thumb") ?? image.src}
                   alt=""
                   width={220}
                   height={132}
