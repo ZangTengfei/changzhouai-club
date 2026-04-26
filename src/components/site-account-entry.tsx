@@ -44,7 +44,11 @@ const defaultState: AccountState = {
   isStaff: false,
 };
 
-export function SiteAccountEntry() {
+export function SiteAccountEntry({
+  onAuthStateChange,
+}: {
+  onAuthStateChange?: (isAuthenticated: boolean) => void;
+}) {
   const pathname = usePathname();
   const [account, setAccount] = useState<AccountState>(defaultState);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -53,6 +57,7 @@ export function SiteAccountEntry() {
 
   useEffect(() => {
     if (!hasSupabaseEnv()) {
+      onAuthStateChange?.(false);
       return;
     }
 
@@ -76,6 +81,7 @@ export function SiteAccountEntry() {
       if (!user) {
         if (!cancelled) {
           setAccount(defaultState);
+          onAuthStateChange?.(false);
         }
         return;
       }
@@ -109,6 +115,7 @@ export function SiteAccountEntry() {
           avatarUrl,
           isStaff: ["organizer", "admin"].includes(member?.status ?? ""),
         });
+        onAuthStateChange?.(true);
       }
     }
 
@@ -124,7 +131,7 @@ export function SiteAccountEntry() {
       cancelled = true;
       subscription.unsubscribe();
     };
-  }, [pathname]);
+  }, [onAuthStateChange, pathname]);
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {

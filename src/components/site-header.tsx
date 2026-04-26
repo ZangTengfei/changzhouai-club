@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCallback, useState } from "react";
 
 import { MobileMenuToggle } from "@/components/mobile-menu-toggle";
 import { SiteAccountEntry } from "@/components/site-account-entry";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { SocialPlatformIcon } from "@/components/social-platform-icon";
+import { hasSupabaseEnv } from "@/lib/env";
 import { navItems, siteRepositoryUrl } from "@/lib/site-data";
 import { cssModuleCx } from "@/lib/utils";
 import styles from "./site-header.module.css";
@@ -15,6 +17,13 @@ const cx = cssModuleCx.bind(null, styles);
 
 export function SiteHeader() {
   const pathname = usePathname();
+  const [authReady, setAuthReady] = useState(!hasSupabaseEnv());
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const shouldShowJoinButton = authReady && !isAuthenticated;
+  const handleAuthStateChange = useCallback((nextIsAuthenticated: boolean) => {
+    setIsAuthenticated(nextIsAuthenticated);
+    setAuthReady(true);
+  }, []);
 
   return (
     <header className={cx("site-header")}>
@@ -61,13 +70,15 @@ export function SiteHeader() {
             <SocialPlatformIcon tone="github" className={cx("github-nav-icon")} />
             <span>GitHub</span>
           </Link>
-          <Link href="/join" className={cx("button header-join-button")}>
-            加入社区
-          </Link>
+          {shouldShowJoinButton ? (
+            <Link href="/join" className={cx("button header-join-button")}>
+              加入社区
+            </Link>
+          ) : null}
         </div>
 
         <div className={cx("header-top-actions")}>
-          <SiteAccountEntry />
+          <SiteAccountEntry onAuthStateChange={handleAuthStateChange} />
           <MobileMenuToggle controlsId="site-navigation" />
         </div>
       </div>
