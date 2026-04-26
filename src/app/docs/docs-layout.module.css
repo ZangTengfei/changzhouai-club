@@ -24,6 +24,8 @@
 .docs-layout-shell :global(.nextra-sidebar-container),
 .docs-layout-shell :global(.nextra-nav-container),
 .docs-layout-shell :global(.nextra-toc),
+.docs-layout-shell :global(.nextra-body),
+.docs-layout-shell :global(main),
 .docs-layout-shell :global(.nextra-card) {
   background: transparent;
 }

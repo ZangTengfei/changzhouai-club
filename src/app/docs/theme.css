@@ -1,4 +1,4 @@
-.dark .docs-layout-shell {
+:where(.dark, [data-theme="dark"]) .docs-layout-shell {
   --docs-bg: #020617;
   --docs-bg-soft: #0f172a;
   --docs-surface: rgba(15, 23, 42, 0.92);

@@ -18,7 +18,7 @@ export default async function DocsLayout({
   const pageMap = await getPageMap("/docs");
 
   return (
-    <div className={styles["docs-layout-shell"]}>
+    <div className={`${styles["docs-layout-shell"]} docs-layout-shell`}>
       <Layout
         pageMap={pageMap}
         navbar={<DocsNavbar />}
