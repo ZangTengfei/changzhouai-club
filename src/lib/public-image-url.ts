@@ -32,9 +32,7 @@ const eventImageVariantMap: Record<EventImageVariant, PublicImageTransformOption
   },
   "review-card": {
     width: 640,
-    height: 320,
     quality: 74,
-    resize: "cover",
   },
   "event-feature": {
     width: 1080,
@@ -42,9 +40,7 @@ const eventImageVariantMap: Record<EventImageVariant, PublicImageTransformOption
   },
   "event-detail-hero": {
     width: 1440,
-    height: 960,
     quality: 82,
-    resize: "cover",
   },
   gallery: {
     width: 960,
