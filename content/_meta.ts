@@ -13,6 +13,9 @@ const meta = {
   guides: {
     title: "共建指南",
   },
+  events: {
+    title: "活动沉淀",
+  },
   tools: {
     title: "工具与选型",
   },
