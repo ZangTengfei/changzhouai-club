@@ -1,3 +1,5 @@
+import { formatChangzhouDateTime } from "@/lib/changzhou-time";
+
 type NotificationChannelStatus = {
   channel: "email" | "wecom" | "feishu";
   ok: boolean;
@@ -485,7 +487,12 @@ export async function sendAdminEventRegistrationNotification(
 ) {
   const eventUrl = getAdminUrl("/admin/events");
   const eventTime = payload.eventAt
-    ? new Date(payload.eventAt).toLocaleString("zh-CN", {
+    ? formatChangzhouDateTime(payload.eventAt, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
         hour12: false,
       })
     : null;

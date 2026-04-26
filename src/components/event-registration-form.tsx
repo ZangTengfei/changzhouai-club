@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { registerForEvent } from "@/app/(site)/events/actions";
+import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 
 type UpcomingEvent = {
   id: string;
@@ -12,6 +13,21 @@ type UpcomingEvent = {
   slug: string;
   registration_note?: string | null;
 };
+
+function formatEventDateTime(value: string | null) {
+  if (!value) {
+    return "时间待定";
+  }
+
+  return formatChangzhouDateTime(value, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
 
 export function EventRegistrationForm({
   event,
@@ -34,7 +50,7 @@ export function EventRegistrationForm({
   return (
     <article className="card event-registration-card">
       <div className="pill-row">
-        <span className="pill">{event.event_at ? new Date(event.event_at).toLocaleString("zh-CN") : "时间待定"}</span>
+        <span className="pill">{formatEventDateTime(event.event_at)}</span>
         <span className="pill">{event.city ?? "常州"}</span>
       </div>
       <h3>{event.title}</h3>

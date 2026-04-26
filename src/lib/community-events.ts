@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 
+import { formatChangzhouDateTime, formatChangzhouIsoDate } from "@/lib/changzhou-time";
 import { hasSupabaseEnv } from "@/lib/env";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
@@ -93,11 +94,11 @@ const publicEventStatusLabelMap: Record<string, string> = {
 };
 
 function formatEventDateLabel(value: string) {
-  return new Intl.DateTimeFormat("zh-CN", {
+  return formatChangzhouDateTime(value, {
     year: "numeric",
     month: "long",
     day: "numeric",
-  }).format(new Date(value));
+  });
 }
 
 function buildLocationLabel(city: string | null, venue: string | null) {
@@ -172,13 +173,13 @@ function formatEventDateTimeLabel(value: string | null) {
     return "时间待定";
   }
 
-  return new Intl.DateTimeFormat("zh-CN", {
+  return formatChangzhouDateTime(value, {
     year: "numeric",
     month: "long",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(value));
+  });
 }
 
 function formatPublicEventStatus(status: string) {
@@ -198,7 +199,7 @@ function mapCompletedEvent(row: EventRow): PublicEventRecap {
       row.description ??
       "这场活动已经完成，欢迎通过活动记录了解现场主题、分享内容与交流氛围。",
     dateLabel: row.event_at ? formatEventDateLabel(row.event_at) : "时间待定",
-    isoDate: row.event_at ? row.event_at.slice(0, 10) : row.id,
+    isoDate: row.event_at ? formatChangzhouIsoDate(row.event_at) ?? row.id : row.id,
     locationLabel: buildLocationLabel(row.city, row.venue),
     imageUrl: row.cover_image_url ?? gallery[0]?.imageUrl ?? null,
     highlights: [

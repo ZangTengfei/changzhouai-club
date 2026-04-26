@@ -18,6 +18,7 @@ import { cancelRegistration } from "@/app/(site)/account/actions";
 import { AccountProfileForm } from "@/components/account-profile-form";
 import { MemberAvatar } from "@/components/member-avatar";
 import { SignOutButton } from "@/components/sign-out-button";
+import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import { hasSupabaseEnv } from "@/lib/env";
 import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
 import { createClient } from "@/lib/supabase/server";
@@ -38,13 +39,13 @@ function formatEventDate(value: string | null | undefined) {
     return "时间待定";
   }
 
-  return new Intl.DateTimeFormat("zh-CN", {
+  return formatChangzhouDateTime(value, {
     year: "numeric",
     month: "long",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(value));
+  });
 }
 
 function getStatusMessage(error?: string) {

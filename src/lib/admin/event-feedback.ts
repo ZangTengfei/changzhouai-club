@@ -1,3 +1,5 @@
+import { formatChangzhouDateTime } from "@/lib/changzhou-time";
+
 const adminSavedMessageMap: Record<string, string> = {
   event: "活动信息已保存。",
   deleted: "活动已删除。",
@@ -96,7 +98,7 @@ export function formatAdminEventDate(value: string | null, withTime = true) {
     return "待定";
   }
 
-  return new Intl.DateTimeFormat("zh-CN", {
+  return formatChangzhouDateTime(value, {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -106,7 +108,7 @@ export function formatAdminEventDate(value: string | null, withTime = true) {
           minute: "2-digit",
         }
       : {}),
-  }).format(new Date(value));
+  });
 }
 
 export function formatAdminEventStatus(status: string) {

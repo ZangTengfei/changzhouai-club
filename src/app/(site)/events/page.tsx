@@ -11,6 +11,7 @@ import {
 
 import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { EventsRegistrationGrid } from "@/components/events-registration-grid";
+import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import { getCompletedEventRecaps, getScheduledEvents } from "@/lib/community-events";
 import { getEventImageUrl } from "@/lib/public-image-url";
 
@@ -40,13 +41,13 @@ function formatEventDateTime(value: string | null) {
     return "时间待定";
   }
 
-  return new Intl.DateTimeFormat("zh-CN", {
+  return formatChangzhouDateTime(value, {
     month: "2-digit",
     day: "2-digit",
     weekday: "short",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(new Date(value));
+  });
 }
 
 const eventFlowSteps = [
