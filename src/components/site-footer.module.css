@@ -130,28 +130,37 @@
   }
 
   .home-footer-socials {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
 
   .home-footer-social {
-    gap: 10px;
-    min-height: 56px;
-    padding: 10px 12px;
+    gap: 8px;
+    min-height: 64px;
+    padding: 10px;
     border-radius: 10px;
   }
 
   .home-footer-social-icon {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
   }
 
   .home-footer-social strong {
-    font-size: 0.95rem;
+    overflow: hidden;
+    font-size: 0.9rem;
+    line-height: 1.15;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .home-footer-social small {
-    font-size: 0.78rem;
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 0.72rem;
+    line-height: 1.28;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   .home-footer-bottom {
