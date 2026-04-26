@@ -16,8 +16,10 @@ import {
 } from "lucide-react";
 
 import { MemberAvatar } from "@/components/member-avatar";
+import { MemberWorkCard } from "@/components/member-work-card";
 import { ToneBadge } from "@/components/tone-badge";
 import { getPublicMemberByHandle } from "@/lib/community-members";
+import { getPublicWorksByMemberId } from "@/lib/community-works";
 import { getMemberPublicSlugPath, isUuidLike } from "@/lib/member-public-slug";
 
 import styles from "./member-detail-page.module.css";
@@ -96,6 +98,7 @@ export default async function MemberDetailPage({
     permanentRedirect(getMemberPublicSlugPath(member));
   }
 
+  const works = await getPublicWorksByMemberId(member.id);
   const headline = formatMemberHeadline(member);
   const signals = buildParticipationSignals(member);
   const profileFacts = [
@@ -263,6 +266,24 @@ export default async function MemberDetailPage({
           </div>
         </section>
       </div>
+
+      {works.length > 0 ? (
+        <section className={styles.memberWorksSection}>
+          <div className={styles.memberSectionHeading}>
+            <p className="home-kicker">Works</p>
+            <div>
+              <h2>作品与产品</h2>
+              <p>这位成员公开展示的产品、工具、项目或案例。</p>
+            </div>
+          </div>
+
+          <div className={styles.memberWorksGrid}>
+            {works.map((work) => (
+              <MemberWorkCard key={work.id} work={work} compact />
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className={styles.memberJoinPanel}>
         <Sparkles aria-hidden="true" strokeWidth={1.8} />

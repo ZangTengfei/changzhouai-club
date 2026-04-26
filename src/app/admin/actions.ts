@@ -10,6 +10,17 @@ const ADMIN_EVENTS_PATH = "/admin/events";
 const ADMIN_LEADS_PATH = "/admin/leads";
 const ADMIN_MEMBERS_PATH = "/admin/members";
 const ADMIN_SOCIAL_PATH = "/admin/social";
+const ADMIN_WORKS_PATH = "/admin/works";
+const WORK_TYPES = new Set([
+  "product",
+  "project",
+  "tool",
+  "open_source",
+  "case",
+  "demo",
+  "service",
+]);
+const WORK_STATUSES = new Set(["idea", "building", "launched", "paused", "archived"]);
 
 function normalizeSlug(raw: string) {
   return raw
@@ -40,6 +51,16 @@ function normalizeSkills(raw: string) {
     .split(/[,，\n]/)
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function getWorkType(value: string) {
+  const normalized = value.trim();
+  return WORK_TYPES.has(normalized) ? normalized : "product";
+}
+
+function getWorkStatus(value: string) {
+  const normalized = value.trim();
+  return WORK_STATUSES.has(normalized) ? normalized : "launched";
 }
 
 function buildRedirectPath(basePath: string, redirectTo: string | null, params: Record<string, string>) {
@@ -95,6 +116,17 @@ function revalidateLeadPaths(leadId?: string) {
 function revalidateSocialPaths() {
   revalidatePath(ADMIN_SOCIAL_PATH);
   revalidatePath("/");
+}
+
+function revalidateWorkPaths(memberId?: string) {
+  revalidatePath(ADMIN_WORKS_PATH);
+  revalidatePath("/");
+  revalidatePath("/works");
+  revalidatePath("/members");
+
+  if (memberId) {
+    revalidatePath(`/members/${memberId}`);
+  }
 }
 
 export async function saveAdminEvent(formData: FormData) {
@@ -715,6 +747,79 @@ export async function deleteAdminLeadMatch(formData: FormData) {
       saved: "lead_match_deleted",
     }),
   );
+}
+
+export async function saveAdminMemberWork(formData: FormData) {
+  const { supabase, user } = await requireStaffContext();
+
+  const workId = String(formData.get("work_id") ?? "").trim();
+  const memberId = String(formData.get("member_id") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const summary = String(formData.get("summary") ?? "").trim();
+
+  if (!memberId || !title || !summary) {
+    redirect(`${ADMIN_WORKS_PATH}?error=missing_work_fields`);
+  }
+
+  const payload = {
+    member_id: memberId,
+    title,
+    summary,
+    description: getOptionalValue(formData, "description"),
+    work_type: getWorkType(String(formData.get("work_type") ?? "")),
+    status: getWorkStatus(String(formData.get("status") ?? "")),
+    role_label: getOptionalValue(formData, "role_label"),
+    cover_image_url: getOptionalValue(formData, "cover_image_url"),
+    website_url: getOptionalValue(formData, "website_url"),
+    repo_url: getOptionalValue(formData, "repo_url"),
+    demo_url: getOptionalValue(formData, "demo_url"),
+    tags: normalizeSkills(String(formData.get("tags") ?? "")),
+    sort_order: getOptionalInteger(formData, "sort_order"),
+    is_public: formData.get("is_public") === "on",
+    is_featured: formData.get("is_featured") === "on",
+  };
+
+  if (workId) {
+    const { error } = await supabase
+      .from("member_works")
+      .update(payload)
+      .eq("id", workId);
+
+    if (error) {
+      redirect(`${ADMIN_WORKS_PATH}?error=database_write_failed`);
+    }
+  } else {
+    const { error } = await supabase.from("member_works").insert({
+      ...payload,
+      created_by: user.id,
+    });
+
+    if (error) {
+      redirect(`${ADMIN_WORKS_PATH}?error=database_write_failed`);
+    }
+  }
+
+  revalidateWorkPaths(memberId);
+  redirect(`${ADMIN_WORKS_PATH}?saved=work`);
+}
+
+export async function deleteAdminMemberWork(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+  const workId = String(formData.get("work_id") ?? "").trim();
+  const memberId = String(formData.get("member_id") ?? "").trim();
+
+  if (!workId) {
+    redirect(`${ADMIN_WORKS_PATH}?error=missing_required_fields`);
+  }
+
+  const { error } = await supabase.from("member_works").delete().eq("id", workId);
+
+  if (error) {
+    redirect(`${ADMIN_WORKS_PATH}?error=database_write_failed`);
+  }
+
+  revalidateWorkPaths(memberId);
+  redirect(`${ADMIN_WORKS_PATH}?saved=work_deleted`);
 }
 
 function toWechatQrDateTime(value: string | null) {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BadgeCheck, CalendarDays, Handshake, Share2, Users } from "lucide-react";
+import { BadgeCheck, Boxes, CalendarDays, Handshake, Share2, Users } from "lucide-react";
 
 import { cn, cssModuleCxWithGlobals } from "@/lib/utils";
 
@@ -26,6 +26,12 @@ const adminNavItems = [
     label: "合作线索",
     description: "需求线索与合作跟进",
     icon: Handshake,
+  },
+  {
+    href: "/admin/works",
+    label: "成员作品",
+    description: "产品、工具、项目和案例",
+    icon: Boxes,
   },
   {
     href: "/admin/sponsors",

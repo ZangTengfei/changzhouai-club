@@ -20,12 +20,15 @@ const adminSavedMessageMap: Record<string, string> = {
   sponsor_image_deleted: "赞助者图片已删除。",
   wechat_qr: "官方微信二维码已保存。",
   wechat_qr_deleted: "官方微信二维码已删除。",
+  work: "成员作品已保存。",
+  work_deleted: "成员作品已删除。",
 };
 
 const adminErrorMessageMap: Record<string, string> = {
   missing_required_fields: "提交时缺少必要字段，请检查活动标题和 slug。",
   missing_photo_fields: "请至少填写活动照片路径，再提交。",
   missing_sponsor_image_fields: "请至少填写赞助者图片路径，再提交。",
+  missing_work_fields: "请至少选择成员，并填写作品名称和一句话介绍。",
   invalid_qr_expiration: "二维码过期时间必须晚于开始展示时间。",
   invalid_public_slug: "成员主页链接无效，请使用 3-32 位小写英文、数字或短横线。",
   public_slug_taken: "成员主页链接已被占用，请换一个。",

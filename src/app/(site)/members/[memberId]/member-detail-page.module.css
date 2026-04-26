@@ -88,6 +88,7 @@
 .memberIdentityPanel,
 .memberSkillsSection,
 .memberSignalsSection,
+.memberWorksSection,
 .memberJoinPanel {
   border: 1px solid rgba(208, 214, 207, 0.72);
   border-radius: 18px;
@@ -202,7 +203,8 @@
 }
 
 .memberSignalsSection,
-.memberSkillsSection {
+.memberSkillsSection,
+.memberWorksSection {
   display: grid;
   gap: 16px;
   padding: 20px;
@@ -322,6 +324,12 @@
   color: var(--accent);
 }
 
+.memberWorksGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
 .memberJoinPanel {
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr) auto;
@@ -362,6 +370,7 @@
 @media (max-width: 1024px) {
   .memberHero,
   .memberContentGrid,
+  .memberWorksGrid,
   .memberJoinPanel {
     grid-template-columns: 1fr;
   }
@@ -411,6 +420,7 @@
   .memberIdentityPanel,
   .memberSignalsSection,
   .memberSkillsSection,
+  .memberWorksSection,
   .memberJoinPanel {
     padding: 16px;
   }
