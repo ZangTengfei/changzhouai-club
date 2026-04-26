@@ -280,8 +280,8 @@
 
 .members-sticky-note {
   position: absolute;
-  left: 32px;
-  top: 24px;
+  left: -8px;
+  top: -12px;
   z-index: 4;
   display: grid;
   gap: 6px;
