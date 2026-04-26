@@ -3,6 +3,7 @@ import { unstable_cache } from "next/cache";
 import { type PublicMember } from "@/lib/community-members";
 import { hasSupabaseEnv } from "@/lib/env";
 import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 export const workTypeLabels = {
@@ -198,8 +199,12 @@ function buildTags(works: PublicMemberWork[]) {
     .map(([tag]) => tag);
 }
 
+function createPublicWorksReadClient() {
+  return createSupabaseAdminClient() ?? createPublicServerClient();
+}
+
 async function loadPublicWorks() {
-  const supabase = createPublicServerClient();
+  const supabase = createPublicWorksReadClient();
   const [{ data: worksData }, { data: membersData }] = await Promise.all([
     supabase
       .from("member_works")
