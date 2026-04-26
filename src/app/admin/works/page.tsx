@@ -32,7 +32,11 @@ import {
   type AdminWorkMemberOption,
   loadAdminWorksData,
 } from "@/lib/admin/works";
-import { workStatusLabels, workTypeLabels } from "@/lib/community-works";
+import {
+  workReviewStatusLabels,
+  workStatusLabels,
+  workTypeLabels,
+} from "@/lib/community-works";
 
 export const metadata: Metadata = {
   title: "成员作品管理",
@@ -104,6 +108,16 @@ function WorkForm({
         <AdminField label="当前状态">
           <NativeSelect name="status" defaultValue={work?.status ?? "launched"}>
             {Object.entries(workStatusLabels).map(([value, label]) => (
+              <option value={value} key={value}>
+                {label}
+              </option>
+            ))}
+          </NativeSelect>
+        </AdminField>
+
+        <AdminField label="审核状态">
+          <NativeSelect name="review_status" defaultValue={work?.review_status ?? "pending"}>
+            {Object.entries(workReviewStatusLabels).map(([value, label]) => (
               <option value={value} key={value}>
                 {label}
               </option>
@@ -207,6 +221,22 @@ function WorkForm({
   );
 }
 
+function getReviewTone(status: string, isPublic: boolean) {
+  if (isPublic || status === "approved") {
+    return "completed" as const;
+  }
+
+  if (status === "changes_requested") {
+    return "scheduled" as const;
+  }
+
+  if (status === "rejected") {
+    return "cancelled" as const;
+  }
+
+  return "pending" as const;
+}
+
 export default async function AdminWorksPage({
   searchParams,
 }: AdminWorksPageProps) {
@@ -272,6 +302,11 @@ export default async function AdminWorksPage({
                       <h2 className="text-base font-semibold text-foreground">{work.title}</h2>
                       <AdminStatusBadge tone={work.is_public ? "completed" : "neutral"}>
                         {work.is_public ? "公开" : "隐藏"}
+                      </AdminStatusBadge>
+                      <AdminStatusBadge
+                        tone={getReviewTone(work.review_status, work.is_public)}
+                      >
+                        {workReviewStatusLabels[work.review_status]}
                       </AdminStatusBadge>
                       {work.is_featured ? (
                         <AdminStatusBadge tone="scheduled">精选</AdminStatusBadge>

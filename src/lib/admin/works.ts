@@ -10,6 +10,7 @@ export type AdminWorkType =
   | "service";
 
 export type AdminWorkStatus = "idea" | "building" | "launched" | "paused" | "archived";
+export type AdminWorkReviewStatus = "pending" | "approved" | "changes_requested" | "rejected";
 
 export type AdminMemberWorkRow = {
   id: string;
@@ -19,6 +20,7 @@ export type AdminMemberWorkRow = {
   description: string | null;
   work_type: AdminWorkType;
   status: AdminWorkStatus;
+  review_status: AdminWorkReviewStatus;
   role_label: string | null;
   cover_image_url: string | null;
   website_url: string | null;
@@ -70,7 +72,7 @@ export async function loadAdminWorksData(): Promise<AdminWorksData> {
     supabase
       .from("member_works")
       .select(
-        "id, member_id, title, summary, description, work_type, status, role_label, cover_image_url, website_url, repo_url, demo_url, tags, sort_order, is_public, is_featured, created_at, updated_at",
+        "id, member_id, title, summary, description, work_type, status, review_status, role_label, cover_image_url, website_url, repo_url, demo_url, tags, sort_order, is_public, is_featured, created_at, updated_at",
       )
       .order("is_featured", { ascending: false })
       .order("sort_order", { ascending: true })

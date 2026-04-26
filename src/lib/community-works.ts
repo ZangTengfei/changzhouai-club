@@ -1,12 +1,8 @@
 import { unstable_cache } from "next/cache";
 
+import { type PublicMember } from "@/lib/community-members";
 import { hasSupabaseEnv } from "@/lib/env";
-import {
-  getMemberPublicSlugPath,
-} from "@/lib/member-public-slug";
-import {
-  type PublicMember,
-} from "@/lib/community-members";
+import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 export const workTypeLabels = {
@@ -27,8 +23,16 @@ export const workStatusLabels = {
   archived: "已归档",
 } as const;
 
+export const workReviewStatusLabels = {
+  pending: "待审核",
+  approved: "已通过",
+  changes_requested: "需修改",
+  rejected: "已拒绝",
+} as const;
+
 export type PublicWorkType = keyof typeof workTypeLabels;
 export type PublicWorkStatus = keyof typeof workStatusLabels;
+export type PublicWorkReviewStatus = keyof typeof workReviewStatusLabels;
 
 type PublicMemberWorkRow = {
   id: string;

@@ -21,6 +21,12 @@ const WORK_TYPES = new Set([
   "service",
 ]);
 const WORK_STATUSES = new Set(["idea", "building", "launched", "paused", "archived"]);
+const WORK_REVIEW_STATUSES = new Set([
+  "pending",
+  "approved",
+  "changes_requested",
+  "rejected",
+]);
 
 function normalizeSlug(raw: string) {
   return raw
@@ -61,6 +67,11 @@ function getWorkType(value: string) {
 function getWorkStatus(value: string) {
   const normalized = value.trim();
   return WORK_STATUSES.has(normalized) ? normalized : "launched";
+}
+
+function getWorkReviewStatus(value: string) {
+  const normalized = value.trim();
+  return WORK_REVIEW_STATUSES.has(normalized) ? normalized : "pending";
 }
 
 function buildRedirectPath(basePath: string, redirectTo: string | null, params: Record<string, string>) {
@@ -768,6 +779,7 @@ export async function saveAdminMemberWork(formData: FormData) {
     description: getOptionalValue(formData, "description"),
     work_type: getWorkType(String(formData.get("work_type") ?? "")),
     status: getWorkStatus(String(formData.get("status") ?? "")),
+    review_status: getWorkReviewStatus(String(formData.get("review_status") ?? "")),
     role_label: getOptionalValue(formData, "role_label"),
     cover_image_url: getOptionalValue(formData, "cover_image_url"),
     website_url: getOptionalValue(formData, "website_url"),
@@ -778,11 +790,21 @@ export async function saveAdminMemberWork(formData: FormData) {
     is_public: formData.get("is_public") === "on",
     is_featured: formData.get("is_featured") === "on",
   };
+  const nextReviewStatus = payload.is_public ? "approved" : payload.review_status;
+  const nextIsPublic = ["changes_requested", "rejected"].includes(nextReviewStatus)
+    ? false
+    : payload.is_public;
+  const reviewedPayload = {
+    ...payload,
+    review_status: nextReviewStatus,
+    is_public: nextIsPublic,
+    is_featured: nextIsPublic ? payload.is_featured : false,
+  };
 
   if (workId) {
     const { error } = await supabase
       .from("member_works")
-      .update(payload)
+      .update(reviewedPayload)
       .eq("id", workId);
 
     if (error) {
@@ -790,7 +812,7 @@ export async function saveAdminMemberWork(formData: FormData) {
     }
   } else {
     const { error } = await supabase.from("member_works").insert({
-      ...payload,
+      ...reviewedPayload,
       created_by: user.id,
     });
 

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import {
   ArrowRight,
   BadgeCheck,
+  Boxes,
   CalendarDays,
   CircleAlert,
   ClipboardList,
@@ -14,11 +15,23 @@ import {
   Ticket,
 } from "lucide-react";
 
-import { cancelRegistration } from "@/app/(site)/account/actions";
+import {
+  cancelRegistration,
+  deleteAccountMemberWork,
+  saveAccountMemberWork,
+} from "@/app/(site)/account/actions";
 import { AccountProfileForm } from "@/components/account-profile-form";
 import { MemberAvatar } from "@/components/member-avatar";
 import { SignOutButton } from "@/components/sign-out-button";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
+import {
+  workReviewStatusLabels,
+  workStatusLabels,
+  workTypeLabels,
+  type PublicWorkReviewStatus,
+  type PublicWorkStatus,
+  type PublicWorkType,
+} from "@/lib/community-works";
 import { hasSupabaseEnv } from "@/lib/env";
 import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
 import { createClient } from "@/lib/supabase/server";
@@ -69,7 +82,54 @@ function getStatusMessage(error?: string) {
     return "这个个人主页链接已经被占用，请换一个。";
   }
 
+  if (error === "missing_work_fields") {
+    return "请至少填写作品名称和一句话介绍。";
+  }
+
+  if (error === "invalid_work_url") {
+    return "作品链接格式无效，请填写以 http 或 https 开头的公开链接。";
+  }
+
+  if (error === "work_save_failed") {
+    return "作品保存失败，请稍后再试。";
+  }
+
   return "资料保存失败，请稍后再试。";
+}
+
+type AccountMemberWork = {
+  id: string;
+  title: string;
+  summary: string;
+  description: string | null;
+  work_type: PublicWorkType;
+  status: PublicWorkStatus;
+  review_status: PublicWorkReviewStatus;
+  role_label: string | null;
+  cover_image_url: string | null;
+  website_url: string | null;
+  repo_url: string | null;
+  demo_url: string | null;
+  tags: string[] | null;
+  is_public: boolean;
+  is_featured: boolean;
+  updated_at: string;
+};
+
+function getReviewTone(status: PublicWorkReviewStatus, isPublic: boolean) {
+  if (isPublic) {
+    return styles.workReviewApproved;
+  }
+
+  if (status === "rejected") {
+    return styles.workReviewRejected;
+  }
+
+  if (status === "changes_requested") {
+    return styles.workReviewChanges;
+  }
+
+  return styles.workReviewPending;
 }
 
 export default async function AccountPage({
@@ -109,7 +169,7 @@ export default async function AccountPage({
     redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   }
 
-  const [{ data: profile }, { data: member }, { data: registrations }] =
+  const [{ data: profile }, { data: member }, { data: registrations }, { data: works }] =
     await Promise.all([
       supabase
         .from("profiles")
@@ -132,6 +192,13 @@ export default async function AccountPage({
         )
         .eq("user_id", user.id)
         .order("created_at", { ascending: false }),
+      supabase
+        .from("member_works")
+        .select(
+          "id, title, summary, description, work_type, status, review_status, role_label, cover_image_url, website_url, repo_url, demo_url, tags, is_public, is_featured, updated_at",
+        )
+        .eq("member_id", user.id)
+        .order("updated_at", { ascending: false }),
     ]);
 
   const identities = identityData?.identities ?? [];
@@ -148,6 +215,10 @@ export default async function AccountPage({
       })
     : null;
   const registrationCount = registrations?.length ?? 0;
+  const memberWorks = ((works ?? []) as AccountMemberWork[]).map((work) => ({
+    ...work,
+    tags: work.tags ?? [],
+  }));
   const activeRegistrationCount =
     registrations?.filter((item) => item.status !== "cancelled").length ?? 0;
   const statusMessage = getStatusMessage(params.error);
@@ -252,7 +323,11 @@ export default async function AccountPage({
           <span>
             {params.updated === "profile"
               ? "成员资料已保存。"
-              : "活动报名状态已更新。"}
+              : params.updated === "work"
+                ? "作品已提交，等待管理员审核。"
+                : params.updated === "work_deleted"
+                  ? "作品已删除。"
+                  : "活动报名状态已更新。"}
           </span>
         </div>
       ) : null}
@@ -272,6 +347,264 @@ export default async function AccountPage({
           member={member}
         />
       </div>
+
+      <section className={styles.accountWorksSection} id="works">
+        <div className={styles.accountSectionHeading}>
+          <p className="home-kicker">Works</p>
+          <div>
+            <h2>我的作品</h2>
+            <p>
+              可以提交你做过的产品、工具、开源项目、案例或 Demo。提交后先进入待审核状态，
+              管理员通过后会展示到作品墙和你的成员主页。
+            </p>
+          </div>
+        </div>
+
+        <details className={styles.accountWorkEditor} open={memberWorks.length === 0}>
+          <summary>提交一个新作品</summary>
+          <form action={saveAccountMemberWork} className={styles.accountWorkForm}>
+            <label>
+              <span>作品名称</span>
+              <input className="input" name="title" required />
+            </label>
+
+            <label>
+              <span>作品类型</span>
+              <select className="input" name="work_type" defaultValue="product">
+                {Object.entries(workTypeLabels).map(([value, label]) => (
+                  <option value={value} key={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              <span>当前状态</span>
+              <select className="input" name="status" defaultValue="building">
+                {Object.entries(workStatusLabels).map(([value, label]) => (
+                  <option value={value} key={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              <span>我在其中的角色</span>
+              <input
+                className="input"
+                name="role_label"
+                placeholder="例如：发起人 / 开发者 / 产品负责人"
+              />
+            </label>
+
+            <label className={styles.accountWorkWideField}>
+              <span>一句话介绍</span>
+              <textarea className="input textarea" name="summary" rows={2} required />
+            </label>
+
+            <label className={styles.accountWorkWideField}>
+              <span>详细说明</span>
+              <textarea className="input textarea" name="description" rows={4} />
+            </label>
+
+            <label>
+              <span>封面图链接</span>
+              <input className="input" name="cover_image_url" placeholder="https://..." />
+            </label>
+
+            <label>
+              <span>官网 / 产品链接</span>
+              <input className="input" name="website_url" placeholder="https://..." />
+            </label>
+
+            <label>
+              <span>Demo 链接</span>
+              <input className="input" name="demo_url" placeholder="https://..." />
+            </label>
+
+            <label>
+              <span>代码仓库</span>
+              <input className="input" name="repo_url" placeholder="https://..." />
+            </label>
+
+            <label className={styles.accountWorkWideField}>
+              <span>标签</span>
+              <input
+                className="input"
+                name="tags"
+                placeholder="例如：AI 工具、OPC、自动化"
+              />
+            </label>
+
+            <div className={styles.accountWorkFormFooter}>
+              <button type="submit" className="button home-primary-button">
+                提交审核
+              </button>
+              <span>提交后会暂时隐藏，审核通过后才会公开展示。</span>
+            </div>
+          </form>
+        </details>
+
+        {memberWorks.length > 0 ? (
+          <div className={styles.accountWorkList}>
+            {memberWorks.map((work) => (
+              <article className={styles.accountWorkCard} key={work.id}>
+                <div className={styles.accountWorkCardHead}>
+                  <div>
+                    <span
+                      className={`${styles.workReviewBadge} ${getReviewTone(
+                        work.review_status,
+                        work.is_public,
+                      )}`}
+                    >
+                      {work.is_public
+                        ? "已公开"
+                        : workReviewStatusLabels[work.review_status]}
+                    </span>
+                    <h3>{work.title}</h3>
+                    <p>
+                      {workTypeLabels[work.work_type]} · {workStatusLabels[work.status]}
+                      {work.role_label ? ` · ${work.role_label}` : ""}
+                    </p>
+                  </div>
+                  {work.cover_image_url ? (
+                    <img src={work.cover_image_url} alt="" loading="lazy" />
+                  ) : (
+                    <Boxes aria-hidden="true" strokeWidth={1.8} />
+                  )}
+                </div>
+
+                <p>{work.summary}</p>
+                {(work.tags ?? []).length > 0 ? (
+                  <div className={styles.accountWorkTags}>
+                    {(work.tags ?? []).map((tag) => (
+                      <span key={`${work.id}-${tag}`}>{tag}</span>
+                    ))}
+                  </div>
+                ) : null}
+
+                <details className={styles.accountWorkInlineEditor}>
+                  <summary>修改后重新提交审核</summary>
+                  <form action={saveAccountMemberWork} className={styles.accountWorkForm}>
+                    <input type="hidden" name="work_id" value={work.id} />
+
+                    <label>
+                      <span>作品名称</span>
+                      <input className="input" name="title" defaultValue={work.title} required />
+                    </label>
+                    <label>
+                      <span>作品类型</span>
+                      <select className="input" name="work_type" defaultValue={work.work_type}>
+                        {Object.entries(workTypeLabels).map(([value, label]) => (
+                          <option value={value} key={value}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      <span>当前状态</span>
+                      <select className="input" name="status" defaultValue={work.status}>
+                        {Object.entries(workStatusLabels).map(([value, label]) => (
+                          <option value={value} key={value}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label>
+                      <span>我在其中的角色</span>
+                      <input
+                        className="input"
+                        name="role_label"
+                        defaultValue={work.role_label ?? ""}
+                      />
+                    </label>
+                    <label className={styles.accountWorkWideField}>
+                      <span>一句话介绍</span>
+                      <textarea
+                        className="input textarea"
+                        name="summary"
+                        defaultValue={work.summary}
+                        rows={2}
+                        required
+                      />
+                    </label>
+                    <label className={styles.accountWorkWideField}>
+                      <span>详细说明</span>
+                      <textarea
+                        className="input textarea"
+                        name="description"
+                        defaultValue={work.description ?? ""}
+                        rows={4}
+                      />
+                    </label>
+                    <label>
+                      <span>封面图链接</span>
+                      <input
+                        className="input"
+                        name="cover_image_url"
+                        defaultValue={work.cover_image_url ?? ""}
+                      />
+                    </label>
+                    <label>
+                      <span>官网 / 产品链接</span>
+                      <input
+                        className="input"
+                        name="website_url"
+                        defaultValue={work.website_url ?? ""}
+                      />
+                    </label>
+                    <label>
+                      <span>Demo 链接</span>
+                      <input className="input" name="demo_url" defaultValue={work.demo_url ?? ""} />
+                    </label>
+                    <label>
+                      <span>代码仓库</span>
+                      <input className="input" name="repo_url" defaultValue={work.repo_url ?? ""} />
+                    </label>
+                    <label className={styles.accountWorkWideField}>
+                      <span>标签</span>
+                      <input
+                        className="input"
+                        name="tags"
+                        defaultValue={(work.tags ?? []).join("，")}
+                      />
+                    </label>
+                    <div className={styles.accountWorkFormFooter}>
+                      <button type="submit" className="button home-primary-button">
+                        重新提交
+                      </button>
+                    </div>
+                  </form>
+                </details>
+
+                {!work.is_public ? (
+                  <form action={deleteAccountMemberWork}>
+                    <input type="hidden" name="work_id" value={work.id} />
+                    <button type="submit" className="button home-ghost-button">
+                      删除这个作品
+                    </button>
+                  </form>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className={styles.emptyRegistrationPanel}>
+            <Boxes aria-hidden="true" strokeWidth={1.8} />
+            <div>
+              <strong>你还没有提交作品</strong>
+              <p>可以先把自己的产品、工具、开源项目或案例补充进来，审核后进入作品墙。</p>
+            </div>
+            <Link href="/works" className="button home-ghost-button">
+              查看作品墙
+            </Link>
+          </div>
+        )}
+      </section>
 
       <section className={styles.registrationSection} id="registrations">
         <div className={styles.accountSectionHeading}>

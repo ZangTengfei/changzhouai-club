@@ -11,6 +11,17 @@ import {
 } from "@/lib/member-public-slug";
 import { createClient } from "@/lib/supabase/server";
 
+const WORK_TYPES = new Set([
+  "product",
+  "project",
+  "tool",
+  "open_source",
+  "case",
+  "demo",
+  "service",
+]);
+const WORK_STATUSES = new Set(["idea", "building", "launched", "paused", "archived"]);
+
 function isMissingSchemaColumnError(error: { code?: string | null } | null | undefined) {
   return error?.code === "PGRST204";
 }
@@ -47,6 +58,36 @@ function normalizeAvatarUrl(raw: string) {
   } catch {
     return null;
   }
+}
+
+function normalizeOptionalUrl(raw: string) {
+  const value = raw.trim();
+
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const url = new URL(value);
+
+    if (!["http:", "https:"].includes(url.protocol)) {
+      return null;
+    }
+
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+function getWorkType(value: string) {
+  const normalized = value.trim();
+  return WORK_TYPES.has(normalized) ? normalized : "product";
+}
+
+function getWorkStatus(value: string) {
+  const normalized = value.trim();
+  return WORK_STATUSES.has(normalized) ? normalized : "building";
 }
 
 function isUniqueViolationError(error: { code?: string | null } | null | undefined) {
@@ -229,6 +270,128 @@ export async function updateAccountProfile(formData: FormData) {
   }
 
   redirect("/account?updated=profile");
+}
+
+export async function saveAccountMemberWork(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?next=/account");
+  }
+
+  const workId = String(formData.get("work_id") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const summary = String(formData.get("summary") ?? "").trim();
+  const websiteUrl = normalizeOptionalUrl(String(formData.get("website_url") ?? ""));
+  const demoUrl = normalizeOptionalUrl(String(formData.get("demo_url") ?? ""));
+  const repoUrl = normalizeOptionalUrl(String(formData.get("repo_url") ?? ""));
+  const coverImageUrl = normalizeOptionalUrl(String(formData.get("cover_image_url") ?? ""));
+  const hasInvalidUrl =
+    (String(formData.get("website_url") ?? "").trim() && !websiteUrl) ||
+    (String(formData.get("demo_url") ?? "").trim() && !demoUrl) ||
+    (String(formData.get("repo_url") ?? "").trim() && !repoUrl) ||
+    (String(formData.get("cover_image_url") ?? "").trim() && !coverImageUrl);
+
+  if (!title || !summary) {
+    redirect("/account?error=missing_work_fields#works");
+  }
+
+  if (hasInvalidUrl) {
+    redirect("/account?error=invalid_work_url#works");
+  }
+
+  const payload = {
+    member_id: user.id,
+    title,
+    summary,
+    description: String(formData.get("description") ?? "").trim() || null,
+    work_type: getWorkType(String(formData.get("work_type") ?? "")),
+    status: getWorkStatus(String(formData.get("status") ?? "")),
+    review_status: "pending",
+    role_label: String(formData.get("role_label") ?? "").trim() || null,
+    cover_image_url: coverImageUrl,
+    website_url: websiteUrl,
+    repo_url: repoUrl,
+    demo_url: demoUrl,
+    tags: normalizeTags(String(formData.get("tags") ?? "")),
+    sort_order: 0,
+    is_public: false,
+    is_featured: false,
+  };
+
+  if (workId) {
+    const { error } = await supabase
+      .from("member_works")
+      .update(payload)
+      .eq("id", workId)
+      .eq("member_id", user.id);
+
+    if (error) {
+      console.error("Failed to update account member work.", {
+        error,
+        workId,
+        userId: user.id,
+      });
+      redirect("/account?error=work_save_failed#works");
+    }
+  } else {
+    const { error } = await supabase.from("member_works").insert({
+      ...payload,
+      created_by: user.id,
+    });
+
+    if (error) {
+      console.error("Failed to submit account member work.", {
+        error,
+        userId: user.id,
+      });
+      redirect("/account?error=work_save_failed#works");
+    }
+  }
+
+  revalidatePath("/account");
+  revalidatePath("/works");
+  revalidatePath(`/members/${user.id}`);
+  redirect("/account?updated=work#works");
+}
+
+export async function deleteAccountMemberWork(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?next=/account");
+  }
+
+  const workId = String(formData.get("work_id") ?? "").trim();
+
+  if (workId) {
+    const { error } = await supabase
+      .from("member_works")
+      .delete()
+      .eq("id", workId)
+      .eq("member_id", user.id)
+      .eq("is_public", false);
+
+    if (error) {
+      console.error("Failed to delete account member work.", {
+        error,
+        workId,
+        userId: user.id,
+      });
+      redirect("/account?error=work_save_failed#works");
+    }
+  }
+
+  revalidatePath("/account");
+  revalidatePath("/works");
+  revalidatePath(`/members/${user.id}`);
+  redirect("/account?updated=work_deleted#works");
 }
 
 export async function cancelRegistration(formData: FormData) {
