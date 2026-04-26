@@ -1,28 +1,11 @@
-import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
 import { getStaffContextResult } from "@/lib/supabase/guards";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   buildCommunityQrCodePath,
   EVENT_ASSETS_BUCKET,
 } from "@/lib/supabase/storage";
-
-function createAdminStorageClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
-  const serviceRoleKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    return null;
-  }
-
-  return createClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  });
-}
 
 export async function POST(request: Request) {
   const context = await getStaffContextResult();
@@ -35,7 +18,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
-  const storageAdmin = createAdminStorageClient();
+  const storageAdmin = createSupabaseAdminClient();
 
   if (!storageAdmin) {
     return NextResponse.json(

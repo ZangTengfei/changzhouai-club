@@ -240,6 +240,11 @@ export default async function AdminSocialPage({
                       {qrCode.note ? (
                         <p className="line-clamp-1 text-sm text-muted-foreground">{qrCode.note}</p>
                       ) : null}
+                      {qrCode.expiration_reminded_at ? (
+                        <p className="text-xs font-medium text-amber-700">
+                          已于 {formatDateTime(qrCode.expiration_reminded_at)} 发送过期提醒
+                        </p>
+                      ) : null}
                     </div>
 
                     <div className="flex flex-wrap gap-2 lg:justify-end">

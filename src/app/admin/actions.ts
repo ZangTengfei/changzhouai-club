@@ -761,9 +761,21 @@ export async function saveAdminWechatQrCode(formData: FormData) {
   };
 
   if (qrCodeId) {
+    const { data: existingQrCode } = await supabase
+      .from("community_wechat_qr_codes")
+      .select("image_url, expires_at")
+      .eq("id", qrCodeId)
+      .maybeSingle();
+    const shouldResetReminder =
+      existingQrCode?.image_url !== imageUrl ||
+      existingQrCode?.expires_at !== expiresAt;
+
     const { error } = await supabase
       .from("community_wechat_qr_codes")
-      .update(payload)
+      .update({
+        ...payload,
+        ...(shouldResetReminder ? { expiration_reminded_at: null } : {}),
+      })
       .eq("id", qrCodeId);
 
     if (error) {
