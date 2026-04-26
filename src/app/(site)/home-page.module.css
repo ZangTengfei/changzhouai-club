@@ -783,49 +783,12 @@
   display: block;
 }
 
-.home-next-event-attendance {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 32px;
-}
-
-.home-next-event-avatars {
-  display: flex;
-  align-items: center;
-}
-
-.home-next-event-avatars img,
-.home-next-event-avatars span {
-  width: 28px;
-  height: 28px;
-  margin-left: -8px;
-  border: 2px solid rgba(248, 251, 248, 0.98);
-  border-radius: 999px;
-  background: #d8ede2;
-  box-shadow: 0 6px 12px rgba(var(--ink-rgb), 0.08);
-  object-fit: cover;
-}
-
-.home-next-event-avatars img:first-child,
-.home-next-event-avatars span:first-child {
-  margin-left: 0;
-}
-
-.home-next-event-avatars span {
-  display: grid;
-  place-items: center;
-  color: #0d6f58;
-  font-size: 0.54rem;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-}
-
-.home-next-event-attendance-label {
+.home-next-event-note {
+  margin: 0;
   color: rgba(var(--ink-rgb), 0.72);
   font-size: 0.96rem;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1.55;
 }
 
 .home-next-event-button {

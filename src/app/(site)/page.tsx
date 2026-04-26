@@ -163,6 +163,7 @@ export default async function HomePage() {
   const directory = await getPublicMembersDirectory();
   const wechatQrCode = await getCurrentWechatQrCode();
   const primaryScheduledEvent = scheduledEvents[0];
+  const hasUpcomingEvent = Boolean(primaryScheduledEvent);
   const latestCompletedEvent = completedEvents[0];
   const recentEvents = completedEvents.slice(0, 4);
   const heroCarouselImages = completedEvents
@@ -200,7 +201,7 @@ export default async function HomePage() {
     {
       value: formatMetricDate(latestCompletedEvent?.isoDate ?? null),
       label: "最近一次活动",
-      detail: latestCompletedEvent?.title ?? "AI Agent 实践分享会",
+      detail: latestCompletedEvent?.title ?? "活动回顾待更新",
       icon: "clock",
     },
     {
@@ -218,10 +219,11 @@ export default async function HomePage() {
   const nextEventDateLabel = formatEventDateTime(
     primaryScheduledEvent?.event_at ?? null,
   );
-  const nextEventAttendeeAvatars = memberAvatars.slice(0, 4);
-  const nextEventAttendeeCount = directory.members.length > 0
-    ? Math.min(directory.members.length, 28)
-    : null;
+  const nextEventLocationLabel = primaryScheduledEvent?.venue
+    ? `${primaryScheduledEvent.city ?? "常州"} · ${primaryScheduledEvent.venue}`
+    : hasUpcomingEvent
+      ? "常州 · 线下空间待公布"
+      : "新活动发布后会同步时间和地点";
   const storyMembers = directory.members
     .filter((member) => member.avatarUrl || member.bio || member.roleLabel)
     .slice(0, 4)
@@ -389,55 +391,32 @@ export default async function HomePage() {
 
           <article className={cx("home-next-event-card")}>
             <div className={cx("home-next-event-copy")}>
-              <p className={cx("home-next-event-kicker")}>下一场活动等你来！</p>
+              <p className={cx("home-next-event-kicker")}>
+                {hasUpcomingEvent ? "下一场活动等你来！" : "下一场活动筹备中"}
+              </p>
               <h3>
-                {primaryScheduledEvent?.title ?? "AI Agent 实践分享会"}
+                {primaryScheduledEvent?.title ?? "近期活动正在筹备中"}
               </h3>
               <ul className={cx("home-next-event-meta")}>
                 <li>
                   <CalendarDays aria-hidden="true" strokeWidth={1.9} />
-                  <span>{nextEventDateLabel}</span>
+                  <span>{hasUpcomingEvent ? nextEventDateLabel : "时间待定"}</span>
                 </li>
                 <li>
                   <MapPin aria-hidden="true" strokeWidth={1.9} />
-                  <span>
-                    {primaryScheduledEvent?.venue
-                      ? `${primaryScheduledEvent.city ?? "常州"} · ${primaryScheduledEvent.venue}`
-                      : "常州 · 线下空间待公布"}
-                  </span>
+                  <span>{nextEventLocationLabel}</span>
                 </li>
               </ul>
-              <div className={cx("home-next-event-attendance")}>
-                <div className={cx("home-next-event-avatars")} aria-hidden="true">
-                  {nextEventAttendeeAvatars.length > 0 ? (
-                    nextEventAttendeeAvatars.map((avatarUrl, index) => (
-                      <img
-                        key={`${avatarUrl}-${index}`}
-                        src={avatarUrl}
-                        alt=""
-                        referrerPolicy="no-referrer"
-                        style={{ zIndex: nextEventAttendeeAvatars.length - index }}
-                      />
-                    ))
-                  ) : (
-                    ["AI", "CL", "UB", "CZ"].map((label, index) => (
-                      <span key={label} style={{ zIndex: 4 - index }}>
-                        {label}
-                      </span>
-                    ))
-                  )}
-                </div>
-                <span className={cx("home-next-event-attendance-label")}>
-                  {nextEventAttendeeCount
-                    ? `${nextEventAttendeeCount} 人已报名`
-                    : "开放报名中"}
-                </span>
-              </div>
+              <p className={cx("home-next-event-note")}>
+                {hasUpcomingEvent
+                  ? "活动已开放报名，报名状态以活动详情页为准。"
+                  : "新的线下活动发布后，会第一时间出现在活动页。"}
+              </p>
               <Link
                 href={primaryScheduledEvent ? `/events/${primaryScheduledEvent.slug}` : "/events"}
                 className={cx("button home-primary-button home-next-event-button")}
               >
-                查看活动详情
+                {hasUpcomingEvent ? "查看活动详情" : "查看活动列表"}
                 <span aria-hidden="true">→</span>
               </Link>
             </div>
