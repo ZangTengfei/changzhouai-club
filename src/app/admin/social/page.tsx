@@ -29,7 +29,7 @@ import { loadAdminSocialData } from "@/lib/admin/social";
 
 export const metadata: Metadata = {
   title: "社交入口管理",
-  description: "管理社区外部平台入口和微信群二维码。",
+  description: "管理社区外部平台入口和官方微信二维码。",
 };
 
 type AdminSocialPageProps = {
@@ -92,7 +92,8 @@ export default async function AdminSocialPage({
   const params = await searchParams;
   const { qrCodes, currentQrCode, queryErrors } = await loadAdminSocialData();
   const startsAt = new Date();
-  const expiresAt = new Date(startsAt.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const expiresAt = new Date(startsAt);
+  expiresAt.setFullYear(expiresAt.getFullYear() + 10);
 
   return (
     <AdminPageStack>
@@ -104,11 +105,11 @@ export default async function AdminSocialPage({
       <AdminPanel>
         <AdminPanelHeader
           eyebrow="Social"
-          title="社交入口与微信群二维码"
+          title="社交入口与官方微信二维码"
           actions={
             <>
               <AdminMetric label="二维码" value={qrCodes.length} />
-              <AdminMetric label="当前状态" value={currentQrCode ? "可扫码" : "需更新"} />
+              <AdminMetric label="当前状态" value={currentQrCode ? "可添加" : "需更新"} />
             </>
           }
         />
@@ -123,14 +124,14 @@ export default async function AdminSocialPage({
           eyebrow="History"
           title="二维码历史"
           actions={
-            <AdminModal title="发布新的微信群二维码" triggerLabel="上传二维码">
+            <AdminModal title="发布新的官方微信二维码" triggerLabel="上传二维码">
               <form action={saveAdminWechatQrCode} className="grid gap-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <AdminField label="标题">
                     <Input
                       name="title"
-                      defaultValue="常州 AI Club 微信群"
-                      placeholder="例如：常州 AI Club 微信群"
+                      defaultValue="常州 AI Club 官方微信"
+                      placeholder="例如：常州 AI Club 官方微信"
                       required
                     />
                   </AdminField>
@@ -142,7 +143,7 @@ export default async function AdminSocialPage({
                       uploadScope="community"
                       mode="upload-only"
                       placeholder="上传图片后会自动填写，也可以粘贴 Supabase Storage 图片地址"
-                      uploadLabel="上传微信群二维码"
+                      uploadLabel="上传官方微信二维码"
                       clearLabel="清空二维码"
                       filledStatusText="已设置二维码"
                       emptyStatusText="当前未设置二维码"
@@ -190,7 +191,7 @@ export default async function AdminSocialPage({
                       <Textarea
                         name="note"
                         rows={3}
-                        placeholder="可选：例如这张二维码对应哪个群、何时从微信生成。备注只在后台显示。"
+                        placeholder="可选：例如这个二维码对应哪个官方微信号、何时从微信生成。备注只在后台显示。"
                       />
                     </AdminField>
                   </div>
@@ -198,7 +199,7 @@ export default async function AdminSocialPage({
 
                 <div className="flex flex-wrap items-center gap-2">
                   <Button type="submit">保存并发布二维码</Button>
-                  <span className="text-sm text-muted-foreground">默认有效期 7 天。</span>
+                  <span className="text-sm text-muted-foreground">默认长期有效，可在高级设置里调整。</span>
                 </div>
               </form>
             </AdminModal>
@@ -239,11 +240,6 @@ export default async function AdminSocialPage({
                       </p>
                       {qrCode.note ? (
                         <p className="line-clamp-1 text-sm text-muted-foreground">{qrCode.note}</p>
-                      ) : null}
-                      {qrCode.expiration_reminded_at ? (
-                        <p className="text-xs font-medium text-amber-700">
-                          已于 {formatDateTime(qrCode.expiration_reminded_at)} 发送过期提醒
-                        </p>
                       ) : null}
                     </div>
 
@@ -299,7 +295,7 @@ export default async function AdminSocialPage({
                             eventSlug="wechat-group"
                             uploadScope="community"
                             mode="upload-only"
-                            placeholder="微信群二维码图片地址"
+                            placeholder="官方微信二维码图片地址"
                             uploadLabel="重新上传二维码"
                             clearLabel="清空二维码"
                             filledStatusText="已设置二维码"

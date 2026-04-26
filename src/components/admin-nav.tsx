@@ -36,7 +36,7 @@ const adminNavItems = [
   {
     href: "/admin/social",
     label: "社交入口",
-    description: "平台入口与微信群二维码",
+    description: "平台入口与官方微信二维码",
     icon: Share2,
   },
 ];

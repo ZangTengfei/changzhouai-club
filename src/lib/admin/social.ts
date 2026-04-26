@@ -7,7 +7,6 @@ export type AdminWechatQrCodeRow = {
   note: string | null;
   starts_at: string;
   expires_at: string;
-  expiration_reminded_at: string | null;
   is_active: boolean;
   created_at: string;
 };
@@ -23,9 +22,7 @@ export async function loadAdminSocialData(): Promise<AdminSocialData> {
   const now = new Date().toISOString();
   const { data, error } = await supabase
     .from("community_wechat_qr_codes")
-    .select(
-      "id, title, image_url, note, starts_at, expires_at, expiration_reminded_at, is_active, created_at",
-    )
+    .select("id, title, image_url, note, starts_at, expires_at, is_active, created_at")
     .order("created_at", { ascending: false });
 
   const qrCodes = (data ?? []) as AdminWechatQrCodeRow[];

@@ -1,10 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "regions": ["hnd1"],
-  "crons": [
-    {
-      "path": "/api/cron/wechat-qr-expiration",
-      "schedule": "0 * * * *"
-    }
-  ]
+  "regions": ["hnd1"]
 }

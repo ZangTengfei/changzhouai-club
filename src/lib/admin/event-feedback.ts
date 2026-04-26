@@ -18,8 +18,8 @@ const adminSavedMessageMap: Record<string, string> = {
   sponsor_deleted: "赞助者已删除。",
   sponsor_image: "赞助者图片已保存。",
   sponsor_image_deleted: "赞助者图片已删除。",
-  wechat_qr: "微信群二维码已保存。",
-  wechat_qr_deleted: "微信群二维码已删除。",
+  wechat_qr: "官方微信二维码已保存。",
+  wechat_qr_deleted: "官方微信二维码已删除。",
 };
 
 const adminErrorMessageMap: Record<string, string> = {

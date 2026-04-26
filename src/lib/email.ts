@@ -78,13 +78,6 @@ type EventRegistrationNotificationPayload = {
   note: string | null;
 };
 
-type WechatQrExpirationReminderPayload = {
-  qrCodeId: string;
-  title: string;
-  expiresAt: string;
-  note: string | null;
-};
-
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -389,21 +382,6 @@ async function sendFeishuNotification(
   };
 }
 
-async function dispatchFeishuNotification(
-  envelope: NotificationEnvelope,
-): Promise<NotificationChannelStatus> {
-  const result = await sendFeishuNotification(envelope);
-
-  if (!result.ok) {
-    console.error("Feishu admin notification failed or is not configured.", {
-      subject: envelope.subject,
-      result,
-    });
-  }
-
-  return result;
-}
-
 async function dispatchAdminNotification(
   envelope: NotificationEnvelope,
 ): Promise<NotificationDispatchResult> {
@@ -535,34 +513,6 @@ export async function sendAdminEventRegistrationNotification(
       { label: "成员微信", value: payload.registrantWechat },
       { label: "成员城市", value: payload.registrantCity },
       { label: "报名备注", value: payload.note },
-    ],
-  });
-
-  return result.ok;
-}
-
-export async function sendWechatQrExpirationReminder(
-  payload: WechatQrExpirationReminderPayload,
-) {
-  const expiresAt = formatChangzhouDateTime(payload.expiresAt, {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-
-  const result = await dispatchFeishuNotification({
-    subject: `微信群二维码即将过期：${payload.title}`,
-    title: "微信群二维码即将过期",
-    intro: "当前展示的微信群二维码即将过期或已经过期，请尽快到后台上传新的二维码。",
-    adminUrl: getAdminUrl("/admin/social"),
-    fields: [
-      { label: "二维码", value: payload.title },
-      { label: "过期时间", value: expiresAt },
-      { label: "备注", value: payload.note },
-      { label: "二维码 ID", value: payload.qrCodeId },
     ],
   });
 

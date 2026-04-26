@@ -737,7 +737,7 @@ export async function saveAdminWechatQrCode(formData: FormData) {
   const { supabase, user } = await requireStaffContext();
 
   const qrCodeId = String(formData.get("qr_code_id") ?? "").trim();
-  const title = String(formData.get("title") ?? "").trim() || "常州 AI Club 微信群";
+  const title = String(formData.get("title") ?? "").trim() || "常州 AI Club 官方微信";
   const imageUrl = String(formData.get("image_url") ?? "").trim();
   const startsAt = toWechatQrDateTime(getOptionalValue(formData, "starts_at"));
   const expiresAt = toWechatQrDateTime(getOptionalValue(formData, "expires_at"));
@@ -761,21 +761,9 @@ export async function saveAdminWechatQrCode(formData: FormData) {
   };
 
   if (qrCodeId) {
-    const { data: existingQrCode } = await supabase
-      .from("community_wechat_qr_codes")
-      .select("image_url, expires_at")
-      .eq("id", qrCodeId)
-      .maybeSingle();
-    const shouldResetReminder =
-      existingQrCode?.image_url !== imageUrl ||
-      existingQrCode?.expires_at !== expiresAt;
-
     const { error } = await supabase
       .from("community_wechat_qr_codes")
-      .update({
-        ...payload,
-        ...(shouldResetReminder ? { expiration_reminded_at: null } : {}),
-      })
+      .update(payload)
       .eq("id", qrCodeId);
 
     if (error) {

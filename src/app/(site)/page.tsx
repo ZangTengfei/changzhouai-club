@@ -537,7 +537,7 @@ export default async function HomePage() {
         <div className={cx("home-join-banner-copy")}>
           <h2 id="home-join-banner-title">加入我们，成为常州 AI 生态的一部分</h2>
           <p>
-            扫描二维码，加入常州 AI Club 微信群，获取活动通知、资料分享和合作机会。
+            扫描二维码添加社区官方微信，备注来意后由运营同学邀请你进入交流群。
           </p>
         </div>
 
@@ -556,14 +556,14 @@ export default async function HomePage() {
           </div>
 
           <div className={cx("home-join-banner-info")}>
-            <span>微信交流群</span>
-            <strong>{wechatQrCode?.title ?? "常州 AI Club 微信群"}</strong>
+            <span>社区官方微信</span>
+            <strong>{wechatQrCode?.title ?? "常州 AI Club 官方微信"}</strong>
             <small>200+ 位成员</small>
-            <p>活动・学习・合作・成长</p>
+            <p>添加好友・备注来意・邀请进群</p>
           </div>
         </div>
         <Link href="/join" className={cx("button home-primary-button home-join-banner-button")}>
-          扫码加入
+          申请加入
         </Link>
       </section>
     </div>
