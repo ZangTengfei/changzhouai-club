@@ -13,3 +13,6 @@ supabase/.temp/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# cc-connect local config may contain messaging platform credentials.
+config.toml
