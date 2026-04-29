@@ -146,7 +146,7 @@ const fallbackMemberStories = [
     id: "story-4",
     name: "社区成员",
     meta: "本地 AI 连接者",
-    story: "社区让本地开发者、产品人和创业者有了更稳定的相遇和协作场景。",
+    story: "社区让本地 OPC、开发者、产品人和创业者有了更稳定的相遇和协作场景。",
     tags: ["# 灵感碰撞", "# 常州 AI", "# 社区成长"],
   },
 ] as const;
@@ -287,7 +287,7 @@ export default async function HomePage() {
             <span className={cx("home-hero-title-line")}>本地 AI 人的共同家园</span>
           </h1>
           <p className={cx("home-hero-lede")}>
-            连接常州的开发者、产品人、创业者和 AI 爱好者，
+            连接常州的 OPC、开发者、产品人、创业者和 AI 爱好者，
             一起探索 AI，落地创新，推动本地 AI 生态发展。
           </p>
 

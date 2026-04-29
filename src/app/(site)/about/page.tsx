@@ -39,7 +39,7 @@ const designThoughts = [
 const longTermDirections = [
   {
     title: "持续线下相遇",
-    summary: "让常州本地的开发者、产品人、创业者和 AI 爱好者稳定碰面。",
+    summary: "让常州本地的 OPC、开发者、产品人、创业者和 AI 爱好者稳定碰面。",
   },
   {
     title: "沉淀真实分享",
