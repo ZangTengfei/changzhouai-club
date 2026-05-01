@@ -16,3 +16,6 @@ supabase/.temp/
 
 # cc-connect local config may contain messaging platform credentials.
 config.toml
+
+# Generated artifacts
+output/
