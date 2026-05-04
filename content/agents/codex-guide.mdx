@@ -9,57 +9,74 @@ description: 通过 AGENTS.md、Skills、Plugins、MCP、Subagents、Sandbox、R
 
 ![Codex 管理控制台截图](/docs-assets/agent-codex-dashboard.png)
 
----
-1. Codex 能力体系总览
-Codex 不只是一个可以聊天的代码助手。它可以通过多种机制扩展上下文、工具能力、执行权限和团队工作流。
-你可以把 Codex 的能力体系理解成下面几层：
-项目上下文层：AGENTS.md / Memories / Chronicle
-工作流复用层：Skills
-能力分发层：Plugins
-外部工具层：MCP / Apps
-复杂任务协作层：Subagents
-安全控制层：Sandbox / Approval Policy / Rules / Hooks
-自动化执行层：Worktrees / Automations / codex exec / GitHub Action / SDK
-交互体验层：Codex App / IDE Extension / CLI / In-app Browser / Computer Use
-每一层解决的问题不同：
-暂时无法在飞书文档外展示此内容
-一句话总结：
-AGENTS.md 让 Codex 懂项目；
-Skills 让 Codex 会流程；
-Plugins 让能力可安装和分发；
-MCP 让 Codex 接外部工具；
-Subagents 让复杂任务并行处理；
-Sandbox、Rules、Hooks 让执行更可控；
-Automations、exec、GitHub Action 让 Codex 进入工程流水线。
+## 1. Codex 能力体系总览
 
----
-2. AGENTS.md：项目长期规则
+Codex 不只是一个可以聊天的代码助手。它可以通过多种机制扩展上下文、工具能力、执行权限和团队工作流。
+
+你可以把 Codex 的能力体系理解成下面几层：
+
+- 项目上下文层：AGENTS.md / Memories / Chronicle
+- 工作流复用层：Skills
+- 能力分发层：Plugins
+- 外部工具层：MCP / Apps
+- 复杂任务协作层：Subagents
+- 安全控制层：Sandbox / Approval Policy / Rules / Hooks
+- 自动化执行层：Worktrees / Automations / codex exec / GitHub Action / SDK
+- 交互体验层：Codex App / IDE Extension / CLI / In-app Browser / Computer Use
+
+**每一层解决的问题不同：**
+
+> 暂时无法在飞书文档外展示此内容
+
+一句话总结：
+
+- AGENTS.md 让 Codex 懂项目；
+- Skills 让 Codex 会流程；
+- Plugins 让能力可安装和分发；
+- MCP 让 Codex 接外部工具；
+- Subagents 让复杂任务并行处理；
+- Sandbox、Rules、Hooks 让执行更可控；
+- Automations、exec、GitHub Action 让 Codex 进入工程流水线。
+
+## 2. AGENTS.md：项目长期规则
+
 AGENTS.md 是 Codex 的项目说明书。它适合存放稳定、长期、可复用的项目规则。
+
 如果你发现自己每次打开项目都要告诉 Codex：
-这个项目用 React + TypeScript；
-测试命令是 npm test；
-不要改 generated 文件；
-UI 组件都在 src/components/ui；
-不要随便新增依赖。
+
+- 这个项目用 React + TypeScript；
+- 测试命令是 npm test；
+- 不要改 generated 文件；
+- UI 组件都在 src/components/ui；
+- 不要随便新增依赖。
+
 那这些内容就应该放进 AGENTS.md。
-2.1 AGENTS.md 适合写什么
+
+### 2.1 AGENTS.md 适合写什么
+
 推荐放入：
-项目简介
-目录结构
-常用命令
-代码规范
-测试要求
-提交规范
-禁止修改的文件
-常见坑
-团队约定
-不推荐放入：
-一次性任务
-临时需求
-短期实验
-个人情绪化偏好
-会频繁变化的 TODO
-2.2 示例：基础版 AGENTS.md
+
+- 项目简介
+- 目录结构
+- 常用命令
+- 代码规范
+- 测试要求
+- 提交规范
+- 禁止修改的文件
+- 常见坑
+- 团队约定
+
+**不推荐放入：**
+
+- 一次性任务
+- 临时需求
+- 短期实验
+- 个人情绪化偏好
+- 会频繁变化的 TODO
+
+### 2.2 示例：基础版 AGENTS.md
+
+```markdown
 # AGENTS.md
 
 ## Project Overview
@@ -109,7 +126,11 @@ This is a React + TypeScript dashboard project.
 - Do not modify generated files.
 - Do not change public APIs unless explicitly requested.
 - Do not format unrelated files.
-2.3 示例：团队规范版 AGENTS.md
+```
+
+### 2.3 示例：团队规范版 AGENTS.md
+
+```markdown
 # AGENTS.md
 
 ## How Codex Should Work In This Repository
@@ -151,80 +172,111 @@ Use severity labels:
 - Do not rename files unless necessary.
 - Do not change formatting-only diffs in unrelated files.
 - Do not paste or expose secrets.
-2.4 AGENTS.md 的使用建议
+```
+
+### 2.4 AGENTS.md 的使用建议
+
 推荐规则：
-仓库根目录放全局项目规则；
-子目录可以放更具体的 AGENTS.md；
-越靠近当前工作目录的规则越具体；
-稳定规则写进 AGENTS.md；
-临时任务写在 Prompt 里。
 
----
-3. Memories：让 Codex 记住长期上下文
+- 仓库根目录放全局项目规则；
+- 子目录可以放更具体的 AGENTS.md；
+- 越靠近当前工作目录的规则越具体；
+- 稳定规则写进 AGENTS.md；
+- 临时任务写在 Prompt 里。
+
+## 3. Memories：让 Codex 记住长期上下文
+
 Memories 用来让 Codex 在后续任务中记住有价值的上下文。
-它适合记录：
-你常用的技术栈
-你偏好的代码风格
-某个项目的长期约定
-反复出现的坑
-团队常用工作流
-但不要把 Memories 当成团队规则的唯一来源。重要规则仍然应该写进：
-AGENTS.md
-README.md
-CONTRIBUTING.md
-项目文档
-3.1 Memories 适合什么
-适合：
-我通常使用 pnpm；
-这个项目不要使用 class component；
-我偏好小 diff；
-这个团队 PR 描述需要包含测试方式；
-这个仓库的 mock 数据在 src/mocks。
-不适合：
-生产密钥
-数据库密码
-短期任务
-敏感个人信息
-必须强制执行的合规规则
-3.2 AGENTS.md 和 Memories 的区别
-暂时无法在飞书文档外展示此内容
-建议：
-必须所有人遵守的规则，写 AGENTS.md；
-个人偏好和长期习惯，放 Memories；
-当前任务的临时要求，写 Prompt。
 
----
-4. Skills：把重复工作流封装成能力
+它适合记录：
+
+- 你常用的技术栈
+- 你偏好的代码风格
+- 某个项目的长期约定
+- 反复出现的坑
+- 团队常用工作流
+
+但不要把 Memories 当成团队规则的唯一来源。重要规则仍然应该写进：
+
+- AGENTS.md
+- README.md
+- CONTRIBUTING.md
+- 项目文档
+
+### 3.1 Memories 适合什么
+
+适合：
+
+- 我通常使用 pnpm；
+- 这个项目不要使用 class component；
+- 我偏好小 diff；
+- 这个团队 PR 描述需要包含测试方式；
+- 这个仓库的 mock 数据在 src/mocks。
+
+**不适合：**
+
+- 生产密钥
+- 数据库密码
+- 短期任务
+- 敏感个人信息
+- 必须强制执行的合规规则
+
+### 3.2 AGENTS.md 和 Memories 的区别
+
+> 暂时无法在飞书文档外展示此内容
+
+建议：
+
+- 必须所有人遵守的规则，写 AGENTS.md；
+- 个人偏好和长期习惯，放 Memories；
+- 当前任务的临时要求，写 Prompt。
+
+## 4. Skills：把重复工作流封装成能力
+
 Skill 是 Codex 能力体系里非常核心的一层。
+
 你可以把 Skill 理解成：
+
 一份可复用的工作流说明书。
+
 当某类任务会反复出现时，不应该每次都写一大段 Prompt，而应该把它沉淀为 Skill。
-4.1 什么时候应该写 Skill
+
+### 4.1 什么时候应该写 Skill
+
 适合写 Skill 的场景：
-每次 PR Review 都按同一套标准检查；
-每次发版都要按同一个 checklist；
-每次写组件都遵循同一套结构；
-每次排查 bug 都要先复现、定位、最小修复、跑测试；
-每次写文档都要包含概述、用法、示例和 FAQ。
-不适合写 Skill 的场景：
-只做一次的小任务；
-非常模糊的探索性问题；
-还没有稳定流程的任务；
-需要大量临时上下文的任务。
-4.2 Skill 的推荐结构
+
+- 每次 PR Review 都按同一套标准检查；
+- 每次发版都要按同一个 checklist；
+- 每次写组件都遵循同一套结构；
+- 每次排查 bug 都要先复现、定位、最小修复、跑测试；
+- 每次写文档都要包含概述、用法、示例和 FAQ。
+
+**不适合写 Skill 的场景：**
+
+- 只做一次的小任务；
+- 非常模糊的探索性问题；
+- 还没有稳定流程的任务；
+- 需要大量临时上下文的任务。
+
+### 4.2 Skill 的推荐结构
+
 一个好的 Skill 通常包含：
-名称
-描述
-使用场景
-输入要求
-执行步骤
-允许操作
-禁止操作
-验证方式
-输出格式
-参考资料
-辅助脚本
-推荐目录结构：
+
+- 名称
+- 描述
+- 使用场景
+- 输入要求
+- 执行步骤
+- 允许操作
+- 禁止操作
+- 验证方式
+- 输出格式
+- 参考资料
+- 辅助脚本
+
+**推荐目录结构：**
+
+```text
 skills/
 └── pr-review/
     ├── SKILL.md
@@ -234,7 +286,11 @@ skills/
     │   └── collect-diff.sh
     └── assets/
         └── pr-template.md
-4.3 示例：PR Review Skill
+```
+
+### 4.3 示例：PR Review Skill
+
+```markdown
 ---
 name: pr-review
 description: Review pull requests and git diffs for correctness, safety, and maintainability.
@@ -282,7 +338,11 @@ For each finding, include:
 - Do not nitpick style unless it affects maintainability.
 - Do not request unrelated refactors.
 - Do not invent issues without evidence from the diff.
-4.4 示例：Bug Investigation Skill
+```
+
+### 4.4 示例：Bug Investigation Skill
+
+```markdown
 ---
 name: bug-investigation
 description: Investigate bugs by reproducing, locating root cause, applying minimal fixes, and verifying results.
@@ -326,7 +386,11 @@ Include:
 - fix summary
 - tests run
 - remaining risks
-4.5 示例：Docs Writer Skill
+```
+
+### 4.5 示例：Docs Writer Skill
+
+```markdown
 ---
 name: docs-writer
 description: Write clear project documentation with overview, setup, usage, examples, and FAQ.
@@ -372,32 +436,46 @@ Use this structure by default:
 - Keep headings short.
 - Use code blocks for commands and config.
 
----
-5. Plugins：把能力打包成可安装组件
+```
+
+## 5. Plugins：把能力打包成可安装组件
+
 Plugin 是比 Skill 更高一层的分发单位。
+
 可以这样理解：
-Skill = 一个可复用工作流
-Plugin = 一组可安装能力包
-Plugin 可以包含：
-Skills
-App integrations
-MCP servers
-Hooks
-Assets
-配置文件
-5.1 什么时候需要 Plugin
+
+- Skill = 一个可复用工作流
+- Plugin = 一组可安装能力包
+
+**Plugin 可以包含：**
+
+- Skills
+- App integrations
+- MCP servers
+- Hooks
+- Assets
+- 配置文件
+
+### 5.1 什么时候需要 Plugin
+
 适合做 Plugin 的场景：
-团队希望共享一套 Codex 工作流；
-一个插件里需要包含多个 Skills；
-需要同时配置 MCP Server 和 Skills；
-需要把能力发布给其他项目或其他开发者；
-需要把团队规范、工具和工作流打包。
-不适合做 Plugin 的场景：
-只有一个简单 Prompt；
-只是当前项目临时使用；
-还没有稳定流程；
-不需要分发给别人。
-5.2 Plugin 目录结构示例
+
+- 团队希望共享一套 Codex 工作流；
+- 一个插件里需要包含多个 Skills；
+- 需要同时配置 MCP Server 和 Skills；
+- 需要把能力发布给其他项目或其他开发者；
+- 需要把团队规范、工具和工作流打包。
+
+**不适合做 Plugin 的场景：**
+
+- 只有一个简单 Prompt；
+- 只是当前项目临时使用；
+- 还没有稳定流程；
+- 不需要分发给别人。
+
+### 5.2 Plugin 目录结构示例
+
+```text
 my-codex-plugin/
 ├── .codex-plugin/
 │   └── plugin.json
@@ -415,21 +493,25 @@ my-codex-plugin/
 └── assets/
     ├── icon.png
     └── screenshot.png
-5.3 Plugin manifest 示例
-&#123;
+```
+
+### 5.3 Plugin manifest 示例
+
+```json
+{
   "name": "team-codex-plugin",
   "version": "0.1.0",
   "description": "Reusable Codex workflows for engineering teams.",
-  "author": &#123;
+  "author": {
     "name": "Your Team",
     "email": "team@example.com"
-  &#125;,
+  },
   "license": "MIT",
   "skills": "./skills/",
   "mcpServers": "./.mcp.json",
   "apps": "./.app.json",
   "hooks": "./hooks/hooks.json",
-  "interface": &#123;
+  "interface": {
     "displayName": "Team Codex Plugin",
     "shortDescription": "Team workflows for PR review, bug fixes, and docs.",
     "longDescription": "A shared Codex plugin that packages team coding standards, review workflows, documentation workflows, and MCP integrations.",
@@ -443,80 +525,119 @@ my-codex-plugin/
     ],
     "composerIcon": "./assets/icon.png",
     "logo": "./assets/icon.png"
-  &#125;
-&#125;
-5.4 Skill 和 Plugin 怎么选
-暂时无法在飞书文档外展示此内容
+  }
+}
+```
 
----
-6. MCP：连接外部工具和上下文
+### 5.4 Skill 和 Plugin 怎么选
+
+> 暂时无法在飞书文档外展示此内容
+
+## 6. MCP：连接外部工具和上下文
+
 MCP 用来让 Codex 连接外部工具、数据源和上下文。
+
 它解决的问题是：
-Codex 只看本地代码不够；
-Codex 需要查外部文档；
-Codex 需要访问设计系统；
-Codex 需要查询 issue、PR、CI 日志；
-Codex 需要连接数据库、浏览器或内部服务。
-6.1 MCP 适合连接什么
+
+- Codex 只看本地代码不够；
+- Codex 需要查外部文档；
+- Codex 需要访问设计系统；
+- Codex 需要查询 issue、PR、CI 日志；
+- Codex 需要连接数据库、浏览器或内部服务。
+
+### 6.1 MCP 适合连接什么
+
 常见场景：
-官方文档查询
-Figma 设计稿
-浏览器自动化
-GitHub / GitLab
-Slack / Linear / Jira
-数据库
-内部 API
-设计系统文档
-日志平台
-CI/CD 系统
-6.2 MCP 和 Skill 的关系
+
+- 官方文档查询
+- Figma 设计稿
+- 浏览器自动化
+- GitHub / GitLab
+- Slack / Linear / Jira
+- 数据库
+- 内部 API
+- 设计系统文档
+- 日志平台
+- CI/CD 系统
+
+### 6.2 MCP 和 Skill 的关系
+
 可以这样理解：
-Skill 告诉 Codex 怎么做；
-MCP 给 Codex 工具和数据；
-Plugin 把 Skill 和 MCP 打包在一起。
+
+- Skill 告诉 Codex 怎么做；
+- MCP 给 Codex 工具和数据；
+- Plugin 把 Skill 和 MCP 打包在一起。
+
 例如：
+
 PR Review Skill：规定审查步骤和输出格式；
+
 GitHub MCP：提供 PR、评论、commit、issue 等上下文；
+
 Team Review Plugin：把两者打包给团队使用。
-6.3 MCP 配置示例
+
+### 6.3 MCP 配置示例
+
 用户级配置通常放在：
-~/.codex/config.toml
-项目级配置可以放在：
-.codex/config.toml
-示例：添加一个文档查询 MCP Server。
+
+- ~/.codex/config.toml
+
+**项目级配置可以放在：**
+
+- .codex/config.toml
+- 示例：添加一个文档查询 MCP Server。
+
+```toml
 [mcp_servers.context7]
 command = "npx"
 args = ["-y", "@upstash/context7-mcp"]
+```
+
 示例：HTTP MCP Server。
+
+```toml
 [mcp_servers.internal_docs]
 url = "https://mcp.example.com"
 bearer_token_env_var = "INTERNAL_DOCS_TOKEN"
-6.4 MCP 使用建议
-推荐：
-优先连接稳定、可信的数据源；
-对敏感工具设置最小权限；
-为不同项目配置不同 MCP；
-把团队共享 MCP 放进 Plugin；
-避免让 MCP 暴露不必要的内部数据。
-不推荐：
-把生产密钥写进配置文件；
-给 Codex 不必要的写权限；
-让一个 MCP 暴露所有内部系统；
-没有权限边界就接数据库。
+```
 
----
-7. Apps / App Integrations：连接外部应用
+### 6.4 MCP 使用建议
+
+推荐：
+
+- 优先连接稳定、可信的数据源；
+- 对敏感工具设置最小权限；
+- 为不同项目配置不同 MCP；
+- 把团队共享 MCP 放进 Plugin；
+- 避免让 MCP 暴露不必要的内部数据。
+
+**不推荐：**
+
+- 把生产密钥写进配置文件；
+- 给 Codex 不必要的写权限；
+- 让一个 MCP 暴露所有内部系统；
+- 没有权限边界就接数据库。
+
+## 7. Apps / App Integrations：连接外部应用
+
 Apps 是 Codex 连接外部应用的一类方式。它适合让 Codex 读取或操作常见协作工具。
+
 常见场景：
-读取 Gmail 邮件
-总结 Slack 频道
-查 Google Drive 文档
-读取 GitHub PR
-整理会议资料
-草拟回复
-7.1 Apps、MCP、Plugin 的区别
-暂时无法在飞书文档外展示此内容
-7.2 示例：团队资料整理 Plugin
+
+- 读取 Gmail 邮件
+- 总结 Slack 频道
+- 查 Google Drive 文档
+- 读取 GitHub PR
+- 整理会议资料
+- 草拟回复
+
+### 7.1 Apps、MCP、Plugin 的区别
+
+> 暂时无法在飞书文档外展示此内容
+
+### 7.2 示例：团队资料整理 Plugin
+
+```text
 team-research-plugin/
 ├── skills/
 │   └── weekly-summary/
@@ -524,32 +645,46 @@ team-research-plugin/
 ├── .app.json
 └── .codex-plugin/
     └── plugin.json
-它可以包含：
-Slack app：读取团队频道
-Google Drive app：读取文档
-weekly-summary skill：规定如何整理周报
+```
 
----
-8. Subagents：多 Agent 并行协作
+它可以包含：
+
+- Slack app：读取团队频道
+- Google Drive app：读取文档
+- weekly-summary skill：规定如何整理周报
+
+## 8. Subagents：多 Agent 并行协作
+
 Subagents 适合处理复杂、可并行拆分的任务。
+
 你可以把它理解成：
+
 主 Codex 把任务拆给多个专门 Agent，最后汇总结果。
-8.1 什么时候使用 Subagents
+
+### 8.1 什么时候使用 Subagents
+
 适合：
-大型代码库分析
-多模块 bug 排查
-安全审查
-迁移计划
-性能优化分析
-多方案对比
-复杂功能设计
-不适合：
-很小的单文件修改
-简单问题
-只需要一个明确答案的任务
-需要严格控制 token 成本的任务
-8.2 示例：大型代码库分析
+
+- 大型代码库分析
+- 多模块 bug 排查
+- 安全审查
+- 迁移计划
+- 性能优化分析
+- 多方案对比
+- 复杂功能设计
+
+**不适合：**
+
+- 很小的单文件修改
+- 简单问题
+- 只需要一个明确答案的任务
+- 需要严格控制 token 成本的任务
+
+### 8.2 示例：大型代码库分析
+
 Prompt 示例：
+
+```text
 Use subagents to analyze this repository.
 
 Assign separate subagents to:
@@ -566,7 +701,11 @@ Each subagent should return:
 
 Then combine the results into one final report.
 Do not modify files.
-8.3 示例：复杂迁移计划
+```
+
+### 8.3 示例：复杂迁移计划
+
+```text
 Use subagents to investigate the migration from REST API calls to GraphQL.
 
 Assign subagents to:
@@ -577,52 +716,78 @@ Assign subagents to:
 
 Return a phased migration plan.
 Do not edit code yet.
-8.4 Subagents 使用建议
-推荐：
-任务足够大时再用；
-明确每个 subagent 的职责；
-要求最后汇总；
-先分析，不要直接改；
-让主 Agent 做最终判断。
+```
 
----
-9. Sandbox：给 Codex 设置执行边界
+### 8.4 Subagents 使用建议
+
+推荐：
+
+- 任务足够大时再用；
+- 明确每个 subagent 的职责；
+- 要求最后汇总；
+- 先分析，不要直接改；
+- 让主 Agent 做最终判断。
+
+## 9. Sandbox：给 Codex 设置执行边界
+
 Sandbox 是 Codex 的执行边界。它决定 Codex 在本地运行命令时能访问什么、修改什么、是否能联网。
-9.1 Sandbox 解决什么问题
+
+### 9.1 Sandbox 解决什么问题
+
 它解决的是：
-Codex 可以自动执行任务，但不能无限制访问你的机器；
-低风险任务可以自动进行；
-高风险操作需要进入 approval flow；
-用户可以减少频繁确认，同时保留控制权。
-9.2 Sandbox 和 Approval Policy 的区别
-暂时无法在飞书文档外展示此内容
+
+- Codex 可以自动执行任务，但不能无限制访问你的机器；
+- 低风险任务可以自动进行；
+- 高风险操作需要进入 approval flow；
+- 用户可以减少频繁确认，同时保留控制权。
+
+### 9.2 Sandbox 和 Approval Policy 的区别
+
+> 暂时无法在飞书文档外展示此内容
+
 简单说：
-Sandbox 决定能不能做；
-Approval Policy 决定什么时候要问。
-9.3 常见模式
-暂时无法在飞书文档外展示此内容
-9.4 推荐策略
+
+- Sandbox 决定能不能做；
+- Approval Policy 决定什么时候要问。
+
+### 9.3 常见模式
+
+> 暂时无法在飞书文档外展示此内容
+
+### 9.4 推荐策略
+
 新手推荐：
-默认使用 workspace-write；
-重要项目开启确认；
-陌生仓库先用 read-only；
-不要在本机随便使用 danger-full-access；
+
+- 默认使用 workspace-write；
+- 重要项目开启确认；
+- 陌生仓库先用 read-only；
+- 不要在本机随便使用 danger-full-access；
+
 如果必须使用高权限，请放在隔离环境。
 
----
-10. Rules：精细控制命令权限
+## 10. Rules：精细控制命令权限
+
 Rules 用来控制 Codex 在 sandbox 外运行哪些命令。
+
 它适合处理这种需求：
-允许 gh pr view；
-禁止 rm -rf；
-运行 deploy 前必须确认；
-允许读取日志，但禁止写生产环境；
-某些命令只能 prompt，不能自动执行。
-10.1 Rule 的三种决策
+
+- 允许 gh pr view；
+- 禁止 rm -rf；
+- 运行 deploy 前必须确认；
+- 允许读取日志，但禁止写生产环境；
+- 某些命令只能 prompt，不能自动执行。
+
+### 10.1 Rule 的三种决策
+
 allow：允许执行，不提示
+
 prompt：执行前询问用户
+
 forbidden：禁止执行，不询问
-10.2 示例：执行 gh pr view 前询问
+
+### 10.2 示例：执行 gh pr view 前询问
+
+```python
 # rules/default.rules
 
 prefix_rule(
@@ -637,105 +802,149 @@ prefix_rule(
         "gh pr list"
     ]
 )
-10.3 示例：禁止危险删除命令
+```
+
+### 10.3 示例：禁止危险删除命令
+
+```python
 prefix_rule(
     pattern = ["rm", "-rf"],
     decision = "forbidden",
     justification = "Dangerous recursive deletion is blocked. Use a safer file-specific delete command instead."
 )
-10.4 Rules 使用建议
+```
+
+### 10.4 Rules 使用建议
+
 推荐为这些命令设置规则：
-部署命令
-数据库迁移
-删除文件
-修改权限
-推送代码
-创建 PR
-访问生产环境
-调用外部服务
 
----
-11. Hooks：在 Codex 生命周期插入脚本
+- 部署命令
+- 数据库迁移
+- 删除文件
+- 修改权限
+- 推送代码
+- 创建 PR
+- 访问生产环境
+- 调用外部服务
+
+## 11. Hooks：在 Codex 生命周期插入脚本
+
 Hooks 是 Codex 的扩展框架，可以在 Codex 的执行流程中插入确定性脚本。
+
 它适合做：
-Prompt 提交前扫描密钥
-任务结束后运行检查
-把对话记录发送到内部日志系统
-自动生成记忆
-根据目录注入额外提示
-强制检查输出格式
-11.1 Hooks 和 Skills 的区别
-暂时无法在飞书文档外展示此内容
+
+- Prompt 提交前扫描密钥
+- 任务结束后运行检查
+- 把对话记录发送到内部日志系统
+- 自动生成记忆
+- 根据目录注入额外提示
+- 强制检查输出格式
+
+### 11.1 Hooks 和 Skills 的区别
+
+> 暂时无法在飞书文档外展示此内容
+
 Skill 是“指导工作流”，Hook 是“强制执行或自动触发”。
-11.2 示例：密钥扫描 Hook 的用途
+
+### 11.2 示例：密钥扫描 Hook 的用途
+
 可以在用户提交 Prompt 前检查：
-是否包含 API key
-是否包含私钥
-是否包含 token
-是否包含数据库连接串
+
+- 是否包含 API key
+- 是否包含私钥
+- 是否包含 token
+- 是否包含数据库连接串
+
 如果发现风险，阻止继续执行。
-11.3 示例：任务结束校验 Hook 的用途
+
+### 11.3 示例：任务结束校验 Hook 的用途
+
 可以在 Codex 停止时自动检查：
-是否生成了测试结果
-是否有未说明的修改文件
-是否违反输出格式
-是否遗漏风险说明
-11.4 Hooks 使用建议
+
+- 是否生成了测试结果
+- 是否有未说明的修改文件
+- 是否违反输出格式
+- 是否遗漏风险说明
+
+### 11.4 Hooks 使用建议
+
 推荐用于：
-安全检查
-团队合规
-日志审计
-重复校验
-自动化质量门禁
-不推荐用于：
-复杂推理任务
-替代测试系统
-隐藏性修改用户文件
-自动执行高风险命令
 
----
-12. Worktrees：并行任务隔离
+- 安全检查
+- 团队合规
+- 日志审计
+- 重复校验
+- 自动化质量门禁
+
+**不推荐用于：**
+
+- 复杂推理任务
+- 替代测试系统
+- 隐藏性修改用户文件
+- 自动执行高风险命令
+
+## 12. Worktrees：并行任务隔离
+
 Worktrees 用来让多个 Codex 任务在同一个仓库中并行工作，而不互相污染改动。
-12.1 为什么需要 Worktrees
-如果你同时让 Codex 做：
-任务 A：修复登录 bug
-任务 B：重构表格组件
-任务 C：更新 README
-它们都在同一个工作目录改文件，就很容易互相冲突。
-Worktree 的作用是：
-每个任务在独立工作区运行；
-多个任务可以并行；
-不会污染你当前未完成的本地修改；
-任务完成后再选择是否合并 diff。
-12.2 适合 Worktrees 的场景
-多个 Codex thread 并行处理
-后台自动化任务
-大型功能拆分
-多个方案实验
-不想污染当前工作区
-12.3 使用建议
-推荐：
-高风险任务放 worktree；
-长时间后台任务放 worktree；
-多个方案对比时每个方案一个 worktree；
-任务完成后审查 diff 再合并。
 
----
-13. Automations：定时执行 Codex 任务
+### 12.1 为什么需要 Worktrees
+
+如果你同时让 Codex 做：
+
+- 任务 A：修复登录 bug
+- 任务 B：重构表格组件
+- 任务 C：更新 README
+- 它们都在同一个工作目录改文件，就很容易互相冲突。
+
+**Worktree 的作用是：**
+
+- 每个任务在独立工作区运行；
+- 多个任务可以并行；
+- 不会污染你当前未完成的本地修改；
+- 任务完成后再选择是否合并 diff。
+
+### 12.2 适合 Worktrees 的场景
+
+- 多个 Codex thread 并行处理
+- 后台自动化任务
+- 大型功能拆分
+- 多个方案实验
+- 不想污染当前工作区
+
+### 12.3 使用建议
+
+推荐：
+
+- 高风险任务放 worktree；
+- 长时间后台任务放 worktree；
+- 多个方案对比时每个方案一个 worktree；
+- 任务完成后审查 diff 再合并。
+
+## 13. Automations：定时执行 Codex 任务
+
 Automations 用来让 Codex 定期执行后台任务。
-13.1 适合自动化的任务
-每日检查依赖更新
-每周生成项目总结
-定期检查 TODO
-定期扫描失败测试
-定期审查安全风险
-定期整理 issue
-定期生成 release notes 草稿
-13.2 示例：每日检查依赖
+
+### 13.1 适合自动化的任务
+
+- 每日检查依赖更新
+- 每周生成项目总结
+- 定期检查 TODO
+- 定期扫描失败测试
+- 定期审查安全风险
+- 定期整理 issue
+- 定期生成 release notes 草稿
+
+### 13.2 示例：每日检查依赖
+
+```text
 Every weekday morning, check whether this project has outdated dependencies.
 If there are safe patch updates, summarize them.
 Do not modify files unless explicitly asked.
-13.3 示例：每周生成工程摘要
+```
+
+### 13.3 示例：每周生成工程摘要
+
+```text
 Every Friday afternoon, summarize this week's repository changes.
 Include:
 - notable commits
@@ -743,48 +952,79 @@ Include:
 - risky changes
 - missing tests
 - suggested follow-ups
-13.4 Automations 和 Skills 组合
+```
+
+### 13.4 Automations 和 Skills 组合
+
 Automations 负责“什么时候做”，Skills 负责“怎么做”。
+
 例如：
+
 Automation：每周五运行
+
 Skill：weekly-engineering-summary
+
 这样可以让定时任务稳定输出统一格式。
 
----
-14. codex exec：非交互式运行 Codex
-codex exec 适合脚本化、CI、自动化场景。
-它和交互式 Codex 的区别是：
-暂时无法在飞书文档外展示此内容
-14.1 示例：在当前项目做一次代码审查
-codex exec "Review the current git diff and report bugs, risks, and missing tests. Do not edit files."
-14.2 示例：输出到文件
-codex exec "Summarize this repository architecture" --output-last-message report.md
-14.3 示例：CI 中使用
-codex exec "Review this pull request for regressions and security risks. Do not edit files."
-14.4 使用建议
-推荐：
-用于只读分析；
-用于 CI 中生成报告；
-用于批量文档生成；
-用于重复检查；
-配合 Rules 和 Sandbox 使用。
-谨慎：
-不要在本机无脑跳过 sandbox；
-不要让 CI 中的 Codex 拥有过大权限；
-不要让非交互任务直接部署生产环境。
+## 14. codex exec：非交互式运行 Codex
 
----
-15. GitHub Action：把 Codex 接入 CI/CD
+codex exec 适合脚本化、CI、自动化场景。
+
+它和交互式 Codex 的区别是：
+
+> 暂时无法在飞书文档外展示此内容
+
+### 14.1 示例：在当前项目做一次代码审查
+
+```bash
+codex exec "Review the current git diff and report bugs, risks, and missing tests. Do not edit files."
+```
+
+### 14.2 示例：输出到文件
+
+```bash
+codex exec "Summarize this repository architecture" --output-last-message report.md
+```
+
+### 14.3 示例：CI 中使用
+
+```bash
+codex exec "Review this pull request for regressions and security risks. Do not edit files."
+```
+
+### 14.4 使用建议
+
+推荐：
+
+- 用于只读分析；
+- 用于 CI 中生成报告；
+- 用于批量文档生成；
+- 用于重复检查；
+- 配合 Rules 和 Sandbox 使用。
+
+**谨慎：**
+
+- 不要在本机无脑跳过 sandbox；
+- 不要让 CI 中的 Codex 拥有过大权限；
+- 不要让非交互任务直接部署生产环境。
+
+## 15. GitHub Action：把 Codex 接入 CI/CD
+
 GitHub Action 可以在 GitHub 工作流中运行 Codex。
+
 适合场景：
-PR 自动审查
-Release 前检查
-自动修复简单问题
-迁移任务
-生成变更摘要
-安全检查
-质量门禁
-15.1 示例：PR Review Workflow
+
+- PR 自动审查
+- Release 前检查
+- 自动修复简单问题
+- 迁移任务
+- 生成变更摘要
+- 安全检查
+- 质量门禁
+
+### 15.1 示例：PR Review Workflow
+
+```yaml
 name: Codex PR Review
 
 on:
@@ -802,7 +1042,7 @@ jobs:
       - name: Run Codex review
         uses: openai/codex-action@v1
         with:
-          openai-api-key: $&#123;&#123; secrets.OPENAI_API_KEY &#125;&#125;
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           prompt: |
             Review this pull request.
             Focus on:
@@ -811,7 +1051,11 @@ jobs:
             - missing tests
             - breaking changes
             Do not modify files.
-15.2 示例：Release 检查
+```
+
+### 15.2 示例：Release 检查
+
+```yaml
 name: Codex Release Check
 
 on:
@@ -826,7 +1070,7 @@ jobs:
 
       - uses: openai/codex-action@v1
         with:
-          openai-api-key: $&#123;&#123; secrets.OPENAI_API_KEY &#125;&#125;
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
           prompt: |
             Perform a release readiness review.
             Check:
@@ -836,53 +1080,73 @@ jobs:
             - migration notes
             - documentation updates
             Do not edit files.
-15.3 使用建议
+```
+
+### 15.3 使用建议
+
 推荐：
-先从只读 review 开始；
-不要一开始就让 Action 自动改代码；
-明确输出格式；
-把 API key 放在 GitHub Secrets；
-给 Codex 最小权限；
-重要结论需要人工审查。
 
----
-16. Codex SDK：把 Codex 接进内部系统
+- 先从只读 review 开始；
+- 不要一开始就让 Action 自动改代码；
+- 明确输出格式；
+- 把 API key 放在 GitHub Secrets；
+- 给 Codex 最小权限；
+- 重要结论需要人工审查。
+
+## 16. Codex SDK：把 Codex 接进内部系统
+
 Codex SDK 适合把 Codex 编程式地集成到内部工具或自动化系统里。
-适合场景：
-内部代码审查平台
-自动迁移工具
-自定义开发门户
-自动修复机器人
-多 Agent 开发流水线
-企业内部工程助手
-16.1 SDK 和 CLI 的区别
-暂时无法在飞书文档外展示此内容
-16.2 使用建议
-如果你只是写文档站，可以先把 SDK 放在“高阶集成”章节，不必展开太多代码。
-建议重点讲：
-SDK 不是普通用户入门必需；
-SDK 适合团队把 Codex 接入现有系统；
-SDK 应该配合权限、日志、审计、沙箱一起使用。
 
----
-17. In-app Browser：网页预览与视觉调试
-In-app Browser 是 Codex App 中用于预览网页和留下视觉反馈的功能。
 适合场景：
-本地 Web App 预览
-页面布局 bug
-响应式问题
-视觉反馈
-UI 细节修改
-可访问性检查
-17.1 使用方式
+
+- 内部代码审查平台
+- 自动迁移工具
+- 自定义开发门户
+- 自动修复机器人
+- 多 Agent 开发流水线
+- 企业内部工程助手
+
+### 16.1 SDK 和 CLI 的区别
+
+> 暂时无法在飞书文档外展示此内容
+
+### 16.2 使用建议
+
+如果你只是写文档站，可以先把 SDK 放在“高阶集成”章节，不必展开太多代码。
+
+建议重点讲：
+
+- SDK 不是普通用户入门必需；
+- SDK 适合团队把 Codex 接入现有系统；
+- SDK 应该配合权限、日志、审计、沙箱一起使用。
+
+## 17. In-app Browser：网页预览与视觉调试
+
+In-app Browser 是 Codex App 中用于预览网页和留下视觉反馈的功能。
+
+适合场景：
+
+- 本地 Web App 预览
+- 页面布局 bug
+- 响应式问题
+- 视觉反馈
+- UI 细节修改
+- 可访问性检查
+
+### 17.1 使用方式
+
 典型流程：
+
 1. 启动本地 dev server
 2. 在 Codex App 中打开 in-app browser
 3. 打开本地页面或公开页面
 4. 在页面上留下评论
 5. 让 Codex 根据评论修改代码
 6. 重新预览并验收
-17.2 示例 Prompt
+
+### 17.2 示例 Prompt
+
+```text
 Use the browser to open http://localhost:3000/settings.
 Reproduce the layout bug.
 Fix only the overflowing controls.
@@ -890,232 +1154,378 @@ Keep the existing component structure unchanged.
 I left comments on the pricing page in the in-app browser.
 Address the mobile layout issues only.
 Do not change the desktop layout.
-17.3 注意事项
+```
+
+### 17.3 注意事项
+
 In-app Browser 适合不需要登录的页面；
+
 不要在里面输入密钥或敏感信息；
+
 需要登录态、浏览器扩展或真实账号时，使用普通浏览器；
+
 视觉任务要尽量小，方便一次性验收。
 
----
-18. Computer Use：让 Codex 操作桌面应用
+## 18. Computer Use：让 Codex 操作桌面应用
+
 Computer Use 允许 Codex 查看并操作图形界面应用。
+
 适合场景：
-桌面 App 测试
-浏览器操作
-iOS 模拟器流程
-复现 GUI bug
-修改应用设置
-跨多个 App 的流程
-没有 MCP 或插件可用的数据源
-18.1 使用示例
+
+- 桌面 App 测试
+- 浏览器操作
+- iOS 模拟器流程
+- 复现 GUI bug
+- 修改应用设置
+- 跨多个 App 的流程
+- 没有 MCP 或插件可用的数据源
+
+### 18.1 使用示例
+
+```text
 Open the app with computer use.
 Reproduce the onboarding bug.
 Fix the smallest code path that causes it.
 After each change, run the same UI flow again.
 Open @Chrome and verify the checkout page still works after the latest changes.
 Do not enter real payment information.
-18.2 安全建议
+```
+
+### 18.2 安全建议
+
 一次只给一个明确的 app 或流程；
+
 敏感应用保持关闭；
+
 涉及账号、支付、权限、隐私时保持人在旁边；
+
 不要让 Codex 自动处理密钥或密码；
+
 发现 Codex 操作错误窗口时立即停止；
+
 优先使用结构化集成，只有需要视觉操作时才用 Computer Use。
 
----
-19. Slash Commands：交互式会话控制
+## 19. Slash Commands：交互式会话控制
+
 Slash Commands 是 Codex CLI 中以 / 开头的控制命令。
+
 常见命令：
-暂时无法在飞书文档外展示此内容
-19.1 常见操作
+
+> 暂时无法在飞书文档外展示此内容
+
+### 19.1 常见操作
+
 查看当前修改：
+
 /diff
+
 切换模型：
-/model
-调整权限：
-/permissions
-压缩长对话：
-/compact
-生成项目规则文件：
-/init
 
----
-20. 推荐组合方案
-20.1 个人开发者基础组合
+- /model
+
+**调整权限：**
+
+- /permissions
+
+**压缩长对话：**
+
+- /compact
+
+**生成项目规则文件：**
+
+- /init
+
+## 20. 推荐组合方案
+
+### 20.1 个人开发者基础组合
+
 AGENTS.md
+
 + Skills
+
 + Sandbox workspace-write
+
 + /diff
+
 适合：
-个人项目
-日常修 bug
-写功能
-写文档
-代码审查
-20.2 团队协作组合
+
+- 个人项目
+- 日常修 bug
+- 写功能
+- 写文档
+- 代码审查
+
+### 20.2 团队协作组合
+
 AGENTS.md
+
 + Team Skills
+
 + Plugin
+
 + Rules
+
 + GitHub Action
+
 适合：
-团队统一代码审查标准
-统一发版流程
-统一文档风格
-PR 自动审查
-CI 质量检查
-20.3 高级自动化组合
+
+- 团队统一代码审查标准
+- 统一发版流程
+- 统一文档风格
+- PR 自动审查
+- CI 质量检查
+
+### 20.3 高级自动化组合
+
 Skills
+
 + MCP
+
 + Hooks
+
 + Automations
+
 + Worktrees
+
 + codex exec
+
 适合：
-定期巡检
-自动化报告
-依赖升级
-安全扫描
-后台修复任务
-20.4 大型项目分析组合
+
+- 定期巡检
+- 自动化报告
+- 依赖升级
+- 安全扫描
+- 后台修复任务
+
+### 20.4 大型项目分析组合
+
 AGENTS.md
+
 + Subagents
+
 + MCP
+
 + read-only sandbox
+
 + Docs Skill
+
 适合：
-陌生代码库分析
-架构梳理
-迁移计划
-安全风险审查
-技术债盘点
 
----
-21. 功能选择指南
-21.1 我只是想让 Codex 记住项目规则
+- 陌生代码库分析
+- 架构梳理
+- 迁移计划
+- 安全风险审查
+- 技术债盘点
+
+## 21. 功能选择指南
+
+### 21.1 我只是想让 Codex 记住项目规则
+
 用：
-AGENTS.md
-21.2 我每次都让 Codex 做同样的流程
+
+- AGENTS.md
+
+### 21.2 我每次都让 Codex 做同样的流程
+
 用：
-Skill
-21.3 我想把一组能力发给团队用
+
+- Skill
+
+### 21.3 我想把一组能力发给团队用
+
 用：
-Plugin
-21.4 我想让 Codex 查外部文档或系统
+
+- Plugin
+
+### 21.4 我想让 Codex 查外部文档或系统
+
 用：
-MCP 或 Apps
-21.5 我想限制 Codex 能运行哪些命令
+
+- MCP 或 Apps
+
+### 21.5 我想限制 Codex 能运行哪些命令
+
 用：
-Sandbox + Approval Policy + Rules
-21.6 我想在 Codex 执行过程中自动跑脚本
+
+- Sandbox + Approval Policy + Rules
+
+### 21.6 我想在 Codex 执行过程中自动跑脚本
+
 用：
-Hooks
-21.7 我想让 Codex 定期执行任务
+
+- Hooks
+
+### 21.7 我想让 Codex 定期执行任务
+
 用：
-Automations
-21.8 我想在 CI 中运行 Codex
+
+- Automations
+
+### 21.8 我想在 CI 中运行 Codex
+
 用：
+
+```bash
 codex exec 或 GitHub Action
-21.9 我想让 Codex 同时分析多个模块
-用：
-Subagents
-21.10 我想让 Codex 看网页效果并修改 UI
-用：
-In-app Browser
-21.11 我想让 Codex 操作桌面应用
-用：
-Computer Use
+```
 
----
-22. 反模式：不要这样配置 Codex
-22.1 把所有东西都写进 Prompt
+### 21.9 我想让 Codex 同时分析多个模块
+
+用：
+
+- Subagents
+
+#### 21.10 我想让 Codex 看网页效果并修改 UI
+
+用：
+
+- In-app Browser
+
+#### 21.11 我想让 Codex 操作桌面应用
+
+用：
+
+- Computer Use
+
+## 22. 反模式：不要这样配置 Codex
+
+### 22.1 把所有东西都写进 Prompt
+
 不推荐：
+
 每次都复制一大段项目规则、审查标准、测试命令、输出格式。
+
 推荐：
-项目长期规则放 AGENTS.md；
-重复工作流放 Skill；
-团队能力放 Plugin；
-一次性需求才放 Prompt。
-22.2 用 Skill 替代项目文档
+
+- 项目长期规则放 AGENTS.md；
+- 重复工作流放 Skill；
+- 团队能力放 Plugin；
+- 一次性需求才放 Prompt。
+
+### 22.2 用 Skill 替代项目文档
+
 Skill 是任务流程，不是项目说明书。
+
 项目结构、代码规范、测试命令更适合放：
-AGENTS.md
-README.md
-CONTRIBUTING.md
-22.3 用 Plugin 包一堆不稳定流程
+
+- AGENTS.md
+- README.md
+- CONTRIBUTING.md
+
+### 22.3 用 Plugin 包一堆不稳定流程
+
 Plugin 适合分发稳定能力。
+
 如果流程还没固定，先用：
-Prompt → Skill → Plugin
-不要直接跳到 Plugin。
-22.4 给 Codex 过大权限
+
+- Prompt → Skill → Plugin
+- 不要直接跳到 Plugin。
+
+### 22.4 给 Codex 过大权限
+
 不推荐：
-默认 danger-full-access；
-允许所有命令；
-自动运行部署；
-自动访问生产数据库。
-推荐：
-默认 workspace-write；
-敏感命令 prompt；
-危险命令 forbidden；
-生产环境只读或人工确认。
-22.5 把敏感信息交给 Codex
+
+- 默认 danger-full-access；
+- 允许所有命令；
+- 自动运行部署；
+- 自动访问生产数据库。
+
+**推荐：**
+
+- 默认 workspace-write；
+- 敏感命令 prompt；
+- 危险命令 forbidden；
+- 生产环境只读或人工确认。
+
+### 22.5 把敏感信息交给 Codex
+
 不要把下面内容直接贴进 Prompt、AGENTS.md、Skill 或 Plugin：
-API key
-SSH 私钥
-数据库密码
-生产 token
-用户隐私数据
-内部机密文档
+
+- API key
+- SSH 私钥
+- 数据库密码
+- 生产 token
+- 用户隐私数据
+- 内部机密文档
+
 如果必须访问外部系统，应通过受控的 MCP、Apps、环境变量和权限系统接入。
 
----
-23. 推荐落地路线
+## 23. 推荐落地路线
+
 如果你要从零开始配置 Codex，不建议一口气上所有功能。
+
 推荐按阶段推进。
+
 阶段一：先让 Codex 懂项目
+
 完成：
-创建 AGENTS.md
-写清项目结构
-写清测试命令
-写清代码规范
-写清禁止事项
-目标：
+
+- 创建 AGENTS.md
+- 写清项目结构
+- 写清测试命令
+- 写清代码规范
+- 写清禁止事项
+
+**目标：**
+
 每次进入项目，Codex 都知道基本规则。
+
 阶段二：沉淀重复工作流
+
 完成：
-写 PR Review Skill
-写 Bug Investigation Skill
-写 Docs Writer Skill
-写 Release Checklist Skill
-目标：
+
+- 写 PR Review Skill
+- 写 Bug Investigation Skill
+- 写 Docs Writer Skill
+- 写 Release Checklist Skill
+
+**目标：**
+
 重复任务不用每次重新写长 Prompt。
+
 阶段三：接入外部工具
+
 完成：
-配置 MCP
-连接文档系统
-连接 GitHub / Slack / Drive 等 Apps
-目标：
+
+- 配置 MCP
+- 连接文档系统
+- 连接 GitHub / Slack / Drive 等 Apps
+
+**目标：**
+
 Codex 能读取项目外部上下文。
+
 阶段四：打包团队能力
+
 完成：
-把 Skills + MCP + Apps 打包成 Plugin
-统一团队使用方式
-写 Plugin 使用说明
-目标：
+
+- 把 Skills + MCP + Apps 打包成 Plugin
+- 统一团队使用方式
+- 写 Plugin 使用说明
+
+**目标：**
+
 团队成员安装后获得同一套 Codex 能力。
+
 阶段五：加入安全和自动化
+
 完成：
-配置 Sandbox
-配置 Rules
-配置 Hooks
-配置 Automations
-接入 GitHub Action
-目标：
+
+- 配置 Sandbox
+- 配置 Rules
+- 配置 Hooks
+- 配置 Automations
+- 接入 GitHub Action
+
+**目标：**
+
 Codex 不只是能用，而且可控、可审计、可自动化。
 
----
-24. 文档站目录建议
+## 24. 文档站目录建议
+
 如果你要做成类似 GitHub 文档站或 Docsify 文档站，可以这样组织：
+
+```text
 docs/
 ├── README.md
 ├── codex/
@@ -1150,90 +1560,132 @@ docs/
     ├── mcp-config.md
     ├── rules-examples.md
     └── github-action-review.md
+```
+
 侧边栏可以这样写：
+
 - Codex 能力配置
-  - 能力体系总览: codex/README.md
-  - AGENTS.md: codex/agents-md.md
-  - Memories: codex/memories.md
-  - Skills: codex/skills.md
-  - Plugins: codex/plugins.md
-  - MCP: codex/mcp.md
-  - Apps: codex/apps.md
-  - Subagents: codex/subagents.md
+- 能力体系总览: codex/README.md
+- AGENTS.md: codex/agents-md.md
+- Memories: codex/memories.md
+- Skills: codex/skills.md
+- Plugins: codex/plugins.md
+- MCP: codex/mcp.md
+- Apps: codex/apps.md
+- Subagents: codex/subagents.md
 
 - 安全与控制
-  - Sandbox: codex/sandbox.md
-  - Rules: codex/rules.md
-  - Hooks: codex/hooks.md
+- Sandbox: codex/sandbox.md
+- Rules: codex/rules.md
+- Hooks: codex/hooks.md
 
 - 自动化与团队工作流
-  - Worktrees: codex/worktrees.md
-  - Automations: codex/automations.md
-  - codex exec: codex/codex-exec.md
-  - GitHub Action: codex/github-action.md
-  - SDK: codex/sdk.md
+- Worktrees: codex/worktrees.md
+- Automations: codex/automations.md
+- codex exec: codex/codex-exec.md
+- GitHub Action: codex/github-action.md
+- SDK: codex/sdk.md
 
 - App 与交互体验
-  - In-app Browser: codex/in-app-browser.md
-  - Computer Use: codex/computer-use.md
-  - Slash Commands: codex/slash-commands.md
+- In-app Browser: codex/in-app-browser.md
+- Computer Use: codex/computer-use.md
+- Slash Commands: codex/slash-commands.md
 
 - 示例
-  - AGENTS.md 示例: examples/agents-md-basic.md
-  - PR Review Skill: examples/pr-review-skill.md
-  - Bug Investigation Skill: examples/bug-investigation-skill.md
-  - Team Plugin: examples/team-plugin.md
+- AGENTS.md 示例: examples/agents-md-basic.md
+- PR Review Skill: examples/pr-review-skill.md
+- Bug Investigation Skill: examples/bug-investigation-skill.md
+- Team Plugin: examples/team-plugin.md
 
----
-25. FAQ
+## 25. FAQ
+
 Q1：AGENTS.md、Skill、Plugin 到底怎么区分？
+
 AGENTS.md：项目长期规则
+
 Skill：可复用任务流程
+
 Plugin：可安装能力包
+
 例如：
+
 代码风格写 AGENTS.md；
+
 PR 审查流程写 Skill；
+
 把 PR Review Skill、Docs Skill、GitHub MCP 打包给团队，用 Plugin。
+
 Q2：Skill 能不能替代 Prompt？
+
 不能完全替代。
+
 Skill 负责稳定流程，Prompt 负责当前任务。
+
 推荐方式：
-Prompt 说明这次要做什么；
-Skill 说明这类任务应该怎么做。
+
+- Prompt 说明这次要做什么；
+- Skill 说明这类任务应该怎么做。
+
 Q3：什么时候需要 MCP？
+
 当 Codex 需要本地代码之外的信息时，就考虑 MCP。
+
 例如：
+
 查外部文档
+
 读设计稿
+
 查 issue
+
 查 PR
+
 访问内部系统
+
 获取数据库结构
+
 Q4：什么时候需要 Subagents？
+
 当任务可以拆成多个独立方向并行分析时，适合 Subagents。
+
 例如：
+
 大型代码库分析
+
 安全审查
+
 迁移规划
+
 多模块问题排查
+
 Q5：我应该先学哪个功能？
+
 推荐顺序：
+
 AGENTS.md → Skills → MCP → Plugins → Sandbox/Rules → Hooks → Automations/Subagents
+
 Q6：团队应该从哪里开始？
+
 团队最应该先做三件事：
+
 1. 写好 AGENTS.md
 2. 写 PR Review Skill
 3. 配置基础 Rules，限制危险命令
-然后再考虑：
-Plugin
-MCP
-GitHub Action
-Automations
 
----
-26. 最小可用模板
+**然后再考虑：**
+
+- Plugin
+- MCP
+- GitHub Action
+- Automations
+
+## 26. 最小可用模板
+
 如果只想先快速落地，可以先准备这三个文件。
-26.1 AGENTS.md
+
+### 26.1 AGENTS.md
+
+```markdown
 # AGENTS.md
 
 ## Project Rules
@@ -1249,7 +1701,11 @@ Automations
 - Install: `npm install`
 - Test: `npm test`
 - Build: `npm run build`
-26.2 skills/pr-review/SKILL.md
+```
+
+### 26.2 skills/pr-review/SKILL.md
+
+```markdown
 ---
 name: pr-review
 description: Review code diffs for bugs, risks, and missing tests.
@@ -1266,7 +1722,11 @@ When reviewing code:
 5. Group findings by P0, P1, and P2.
 
 If there are no major issues, say so clearly.
-26.3 skills/bug-investigation/SKILL.md
+```
+
+### 26.3 skills/bug-investigation/SKILL.md
+
+```markdown
 ---
 name: bug-investigation
 description: Investigate bugs, identify root causes, and apply minimal safe fixes.
@@ -1281,17 +1741,23 @@ description: Investigate bugs, identify root causes, and apply minimal safe fixe
 5. Run relevant tests.
 6. Summarize what changed and what was verified.
 
----
-27. 总结
+```
+
+## 27. 总结
+
 Codex 的高级用法不是“写更长的 Prompt”，而是把能力工程化。
+
 核心思路是：
-稳定规则 → AGENTS.md
-重复流程 → Skills
-团队分发 → Plugins
-外部上下文 → MCP / Apps
-复杂任务 → Subagents
-安全边界 → Sandbox / Rules / Hooks
-自动执行 → Worktrees / Automations / codex exec / GitHub Action
-视觉和 GUI → In-app Browser / Computer Use
-最终目标是：
+
+- 稳定规则 → AGENTS.md
+- 重复流程 → Skills
+- 团队分发 → Plugins
+- 外部上下文 → MCP / Apps
+- 复杂任务 → Subagents
+- 安全边界 → Sandbox / Rules / Hooks
+- 自动执行 → Worktrees / Automations / codex exec / GitHub Action
+- 视觉和 GUI → In-app Browser / Computer Use
+
+**最终目标是：**
+
 让 Codex 不只是能帮你写代码，而是能按你的项目规则、团队流程和安全边界，稳定地完成工程任务。
