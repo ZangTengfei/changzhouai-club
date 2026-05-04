@@ -21,6 +21,24 @@
   --docs-code-dot-red: #71717a;
   --docs-code-dot-yellow: #a1a1aa;
   --docs-code-dot-green: #d4d4d8;
+  --docs-code-action-color: #9de7cf;
+  --docs-code-action-hover-color: #ffffff;
+  --docs-code-action-border: rgba(var(--accent-rgb), 0.28);
+  --docs-code-action-bg:
+    linear-gradient(
+      135deg,
+      rgba(var(--accent-rgb), 0.18),
+      rgba(var(--accent-warm-rgb), 0.12)
+    ),
+    rgba(24, 24, 27, 0.82);
+  --docs-code-action-hover-border: rgba(var(--accent-rgb), 0.44);
+  --docs-code-action-hover-bg:
+    linear-gradient(
+      135deg,
+      rgba(var(--accent-rgb), 0.28),
+      rgba(var(--accent-warm-rgb), 0.18)
+    ),
+    rgba(39, 39, 42, 0.96);
   --nextra-primary-hue: 240;
   --nextra-primary-saturation: 6%;
   --nextra-primary-lightness: 78%;
@@ -164,17 +182,20 @@
 }
 
 .docs-layout-shell div.nextra-code > pre button {
-  border: 1px solid var(--docs-code-line);
+  border: 1px solid var(--docs-code-action-border);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.78);
-  color: var(--docs-text-soft);
-  box-shadow: 0 8px 18px rgba(var(--docs-neutral-rgb), 0.08);
+  background: var(--docs-code-action-bg);
+  color: var(--docs-code-action-color);
+  box-shadow:
+    0 8px 18px rgba(var(--docs-neutral-rgb), 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.36);
 }
 
 .docs-layout-shell div.nextra-code > pre button:hover,
 .docs-layout-shell div.nextra-code > pre button:focus-visible {
-  background: #ffffff;
-  color: var(--docs-text);
+  border-color: var(--docs-code-action-hover-border);
+  background: var(--docs-code-action-hover-bg);
+  color: var(--docs-code-action-hover-color);
   transform: translateY(-1px);
 }
 
@@ -197,9 +218,11 @@
   .nextra-code
   > pre
   button {
-  background: rgba(24, 24, 27, 0.78);
-  color: var(--docs-text-soft);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.32);
+  background: var(--docs-code-action-bg);
+  color: var(--docs-code-action-color);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.32),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 :where(.dark, [data-theme="dark"])
@@ -212,8 +235,9 @@
   .nextra-code
   > pre
   button:focus-visible {
-  background: rgba(39, 39, 42, 0.96);
-  color: var(--docs-text);
+  border-color: var(--docs-code-action-hover-border);
+  background: var(--docs-code-action-hover-bg);
+  color: var(--docs-code-action-hover-color);
 }
 
 :where(.dark, [data-theme="dark"])
