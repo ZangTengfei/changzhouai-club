@@ -10,6 +10,9 @@ const meta = {
   "getting-started": {
     title: "开始使用",
   },
+  agents: {
+    title: "Agent 教程",
+  },
   guides: {
     title: "共建指南",
   },

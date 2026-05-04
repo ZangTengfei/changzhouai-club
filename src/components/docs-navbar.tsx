@@ -31,6 +31,7 @@ export function DocsNavbar() {
       <nav className={cx("docs-navbar-links")} aria-label="文档导航">
         <Link href="/docs">首页</Link>
         <Link href="/docs/getting-started">开始使用</Link>
+        <Link href="/docs/agents/install-guide">Agent 教程</Link>
         <Link href="/docs/guides/co-build-workflow">共建流程</Link>
         <Link href="/docs/contributing">参与贡献</Link>
         <Link

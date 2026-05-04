@@ -16,6 +16,8 @@ const routes = [
   "/faq",
   "/docs",
   "/docs/getting-started",
+  "/docs/agents/install-guide",
+  "/docs/agents/codex-guide",
   "/docs/events/2026-03-21-ai-salon",
   "/docs/events/2026-04-11-gov-ai-salon",
   "/docs/events/2026-04-25-ai-salon",

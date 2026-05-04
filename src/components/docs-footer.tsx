@@ -14,6 +14,7 @@ export function DocsFooter() {
         </p>
         <div className={cx("docs-footer-links")}>
           <Link href="/docs/getting-started">开始使用</Link>
+          <Link href="/docs/agents/install-guide">Agent 教程</Link>
           <Link href="/docs/guides/co-build-workflow">共建流程</Link>
           <Link href="/docs/contributing">贡献规范</Link>
           <Link href="/join">加入社区</Link>
