@@ -108,7 +108,7 @@
 }
 
 .docs-layout-shell :global(.nextra-sidebar),
-.docs-layout-shell :global(.nextra-toc nav) {
+.docs-layout-shell :global(.nextra-toc > div) {
   border-color: var(--docs-line);
 }
 
@@ -116,8 +116,32 @@
   color: var(--docs-text-soft);
 }
 
-.docs-layout-shell :global(.nextra-toc nav) {
-  border-left: 1px solid var(--docs-line);
+.docs-layout-shell :global(.nextra-toc > div) {
+  margin-top: 18px;
+  padding: 4px;
+  border: 1px solid rgba(var(--accent-rgb), 0.12);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(var(--accent-rgb), 0.08), transparent 40%),
+    rgba(255, 252, 247, 0.62);
+  box-shadow: 0 14px 34px rgba(var(--ink-rgb), 0.06);
+  backdrop-filter: blur(14px);
+}
+
+.docs-layout-shell :global(.nextra-toc > div > p) {
+  padding: 12px 12px 6px;
+  color: var(--docs-text);
+  font-weight: 760;
+}
+
+.docs-layout-shell :global(.nextra-toc > div ul) {
+  padding: 8px 8px 12px;
+}
+
+.docs-layout-shell :global(.nextra-toc > div a) {
+  border-radius: 10px;
+  padding: 6px 8px;
+  line-height: 1.55;
 }
 
 .docs-layout-shell :global(.nextra-content),
@@ -180,11 +204,40 @@
 
 .docs-layout-shell :global(.nextra-toc a:hover),
 .docs-layout-shell :global(.nextra-toc a:focus-visible) {
+  background: rgba(var(--accent-rgb), 0.08);
   color: var(--docs-accent-strong);
 }
 
 .docs-layout-shell :global(.nextra-breadcrumb a) {
   color: var(--docs-text-muted);
+}
+
+.docs-layout-shell :global(.nextra-breadcrumb) {
+  width: fit-content;
+  max-width: 100%;
+  margin: 2px 0 22px;
+  padding: 7px 11px;
+  border: 1px solid rgba(var(--accent-rgb), 0.12);
+  border-radius: 999px;
+  background:
+    linear-gradient(135deg, rgba(var(--accent-rgb), 0.08), transparent 44%),
+    rgba(255, 252, 247, 0.72);
+  box-shadow: 0 10px 26px rgba(var(--ink-rgb), 0.05);
+  backdrop-filter: blur(14px);
+}
+
+.docs-layout-shell :global(.nextra-breadcrumb span),
+.docs-layout-shell :global(.nextra-breadcrumb a) {
+  min-width: 0;
+}
+
+.docs-layout-shell :global(.nextra-breadcrumb svg) {
+  color: rgba(var(--ink-rgb), 0.34);
+}
+
+.docs-layout-shell :global(.nextra-breadcrumb span:last-child) {
+  color: var(--docs-text);
+  font-weight: 720;
 }
 
 .docs-layout-shell :global(.nextra-breadcrumb a:hover),
@@ -302,6 +355,24 @@
 @media (max-width: 768px) {
   .docs-layout-shell {
     --nextra-navbar-height: 64px;
+  }
+
+  .docs-layout-shell :global(.nextra-breadcrumb) {
+    width: 100%;
+    margin: 0 0 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    font-size: 0.84rem;
+  }
+
+  .docs-layout-shell :global(.nextra-breadcrumb span),
+  .docs-layout-shell :global(.nextra-breadcrumb a) {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .docs-layout-shell :global(article main h1) {

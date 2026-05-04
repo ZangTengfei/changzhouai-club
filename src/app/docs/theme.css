@@ -67,6 +67,34 @@
 
 :where(.dark, [data-theme="dark"])
   .docs-layout-shell
+  .nextra-breadcrumb {
+  border-color: rgba(102, 213, 182, 0.16);
+  background:
+    linear-gradient(135deg, rgba(102, 213, 182, 0.1), transparent 44%),
+    rgba(12, 31, 27, 0.68);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.26);
+}
+
+:where(.dark, [data-theme="dark"])
+  .docs-layout-shell
+  .nextra-breadcrumb
+  svg {
+  color: rgba(226, 241, 235, 0.42);
+}
+
+:where(.dark, [data-theme="dark"])
+  .docs-layout-shell
+  .nextra-toc
+  > div {
+  border-color: rgba(102, 213, 182, 0.16);
+  background:
+    linear-gradient(135deg, rgba(102, 213, 182, 0.1), transparent 40%),
+    rgba(12, 31, 27, 0.62);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
+}
+
+:where(.dark, [data-theme="dark"])
+  .docs-layout-shell
   article
   main
   blockquote {
