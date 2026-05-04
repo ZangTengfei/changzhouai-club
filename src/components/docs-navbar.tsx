@@ -1,4 +1,8 @@
+"use client";
+
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import { setMenu, useMenu } from "nextra-theme-docs";
 
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { SocialPlatformIcon } from "@/components/social-platform-icon";
@@ -9,23 +13,45 @@ import styles from "./docs-navbar.module.css";
 const cx = cssModuleCx.bind(null, styles);
 
 export function DocsNavbar() {
+  const menuOpen = useMenu();
+
   return (
     <div className={cx("docs-navbar-shell")}>
-      <div className={cx("docs-navbar-identity")}>
-        <Link href="/" className={cx("docs-navbar-home-brand")} aria-label="返回常州 AI Club 首页">
-          <span className={cx("docs-navbar-mark")}>
-            <SiteLogoMark className={cx("docs-navbar-mark-icon")} />
-          </span>
-          <span className={cx("docs-navbar-main-copy")} aria-hidden="true">
-            常州 AI Club
-          </span>
-        </Link>
-        <Link href="/docs" className={cx("docs-navbar-docs-title")}>
-          <span className={cx("docs-navbar-copy")}>
-            <strong>文档</strong>
-            <small>共建资料、方法与沉淀</small>
-          </span>
-        </Link>
+      <div className={cx("docs-navbar-head")}>
+        <div className={cx("docs-navbar-identity")}>
+          <Link href="/" className={cx("docs-navbar-home-brand")} aria-label="返回常州 AI Club 首页">
+            <span className={cx("docs-navbar-mark")}>
+              <SiteLogoMark className={cx("docs-navbar-mark-icon")} />
+            </span>
+            <span className={cx("docs-navbar-main-copy")} aria-hidden="true">
+              常州 AI Club
+            </span>
+          </Link>
+          <Link href="/docs" className={cx("docs-navbar-docs-title")}>
+            <span className={cx("docs-navbar-copy")}>
+              <strong>文档</strong>
+              <small>共建资料、方法与沉淀</small>
+            </span>
+          </Link>
+        </div>
+
+        <button
+          type="button"
+          className={cx("docs-navbar-menu-button")}
+          aria-label={menuOpen ? "关闭文档目录" : "打开文档目录"}
+          aria-expanded={menuOpen}
+          data-open={menuOpen}
+          onClick={() => {
+            setMenu((open) => !open);
+          }}
+        >
+          {menuOpen ? (
+            <X className={cx("docs-navbar-menu-icon")} aria-hidden="true" />
+          ) : (
+            <Menu className={cx("docs-navbar-menu-icon")} aria-hidden="true" />
+          )}
+          <span>目录</span>
+        </button>
       </div>
 
       <nav className={cx("docs-navbar-links")} aria-label="文档导航">

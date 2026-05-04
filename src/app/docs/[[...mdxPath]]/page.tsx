@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { generateStaticParamsFor, importPage } from "nextra/pages";
 
+import { DocsMobileToc } from "@/components/docs-mobile-toc";
 import { useMDXComponents } from "@/mdx-components";
 
 export const generateStaticParams = generateStaticParamsFor("mdxPath");
@@ -41,9 +42,15 @@ export default async function DocsPage(props: DocsPageProps) {
   const { default: MDXContent, toc, metadata, sourceCode } = await loadDocPage(
     params.mdxPath,
   );
+  const mobileTocItems = toc.map((item) => ({
+    depth: item.depth,
+    id: item.id,
+    value: typeof item.value === "string" ? item.value : "",
+  }));
 
   return (
     <Wrapper toc={toc} metadata={metadata} sourceCode={sourceCode}>
+      <DocsMobileToc items={mobileTocItems} />
       <MDXContent {...props} params={params} />
     </Wrapper>
   );
