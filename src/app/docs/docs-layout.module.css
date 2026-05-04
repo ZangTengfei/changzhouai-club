@@ -22,29 +22,11 @@
   --docs-code-bg: rgba(250, 250, 250, 0.98);
   --docs-code-chrome: rgba(244, 244, 245, 0.96);
   --docs-code-line: rgba(var(--docs-neutral-rgb), 0.13);
-  --docs-code-dot-red: #d4d4d8;
-  --docs-code-dot-yellow: #a1a1aa;
-  --docs-code-dot-green: #71717a;
+  --docs-code-dot-red: #ef6a5e;
+  --docs-code-dot-yellow: #f5bf4f;
+  --docs-code-dot-green: #35c36b;
   --docs-color-accent-rgb: var(--accent-rgb);
   --docs-color-warm-rgb: var(--accent-warm-rgb);
-  --docs-code-action-color: rgb(var(--docs-color-accent-rgb));
-  --docs-code-action-hover-color: #111827;
-  --docs-code-action-border: rgba(var(--docs-color-accent-rgb), 0.26);
-  --docs-code-action-bg:
-    linear-gradient(
-      135deg,
-      rgba(var(--docs-color-accent-rgb), 0.13),
-      rgba(var(--docs-color-warm-rgb), 0.1)
-    ),
-    rgba(255, 255, 255, 0.82);
-  --docs-code-action-hover-border: rgba(var(--docs-color-accent-rgb), 0.42);
-  --docs-code-action-hover-bg:
-    linear-gradient(
-      135deg,
-      rgba(var(--docs-color-accent-rgb), 0.2),
-      rgba(var(--docs-color-warm-rgb), 0.16)
-    ),
-    #ffffff;
   --docs-toc-sticky-gap: 18px;
   --docs-toc-bottom-gap: 28px;
   --nextra-primary-hue: 220;
