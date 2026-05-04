@@ -10,6 +10,12 @@
   --docs-text-soft: #475569;
   --docs-hover: rgba(15, 23, 42, 0.04);
   --docs-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+  --docs-code-bg: #f7fafc;
+  --docs-code-chrome: rgba(241, 245, 249, 0.96);
+  --docs-code-line: rgba(100, 116, 139, 0.22);
+  --docs-code-dot-red: #f97366;
+  --docs-code-dot-yellow: #f59e0b;
+  --docs-code-dot-green: #22c55e;
   --nextra-primary-hue: 221;
   --nextra-primary-saturation: 16%;
   --nextra-primary-lightness: 42%;

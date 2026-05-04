@@ -8,6 +8,12 @@
   --docs-text-soft: #94a3b8;
   --docs-hover: rgba(148, 163, 184, 0.08);
   --docs-shadow: 0 16px 36px rgba(2, 6, 23, 0.42);
+  --docs-code-bg: #0b1120;
+  --docs-code-chrome: rgba(15, 23, 42, 0.96);
+  --docs-code-line: rgba(148, 163, 184, 0.28);
+  --docs-code-dot-red: #fb7185;
+  --docs-code-dot-yellow: #fbbf24;
+  --docs-code-dot-green: #34d399;
   --nextra-primary-hue: 214;
   --nextra-primary-saturation: 90%;
   --nextra-primary-lightness: 66%;
@@ -17,4 +23,117 @@
   --logo-highlight: #f8fafc;
   background:
     linear-gradient(180deg, #020617 0%, #0f172a 100%);
+}
+
+.docs-layout-shell div.nextra-code {
+  overflow: hidden;
+  border: 1px solid var(--docs-code-line);
+  border-radius: 10px;
+  background: var(--docs-code-bg);
+  box-shadow:
+    0 18px 48px rgba(15, 23, 42, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.7) inset;
+}
+
+.docs-layout-shell div.nextra-code > pre {
+  position: relative;
+  margin: 0;
+  border-radius: 0;
+  border: 0;
+  background:
+    linear-gradient(180deg, var(--docs-code-chrome) 0 44px, transparent 44px),
+    var(--docs-code-bg);
+  box-shadow: none;
+  padding-top: 64px;
+  padding-bottom: 22px;
+  font-size: 0.93rem;
+  line-height: 1.82;
+  scrollbar-color: rgba(100, 116, 139, 0.42) transparent;
+  scrollbar-width: thin;
+}
+
+.docs-layout-shell div.nextra-code > pre::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 20px;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: var(--docs-code-dot-red);
+  box-shadow:
+    20px 0 0 var(--docs-code-dot-yellow),
+    40px 0 0 var(--docs-code-dot-green);
+}
+
+.docs-layout-shell div.nextra-code > pre code.nextra-code {
+  background: transparent;
+}
+
+.docs-layout-shell div.nextra-code > pre code.nextra-code > span {
+  padding-inline: 30px;
+}
+
+.docs-layout-shell div.nextra-code > pre > div:first-child {
+  top: 10px;
+  right: 14px;
+}
+
+.docs-layout-shell div.nextra-code > pre button {
+  border: 1px solid var(--docs-code-line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.78);
+  color: var(--docs-text-soft);
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.docs-layout-shell div.nextra-code > pre button:hover,
+.docs-layout-shell div.nextra-code > pre button:focus-visible {
+  background: #ffffff;
+  color: var(--docs-text);
+  transform: translateY(-1px);
+}
+
+.docs-layout-shell code.nextra-code:not(pre code.nextra-code) {
+  border-color: var(--docs-code-line);
+  background: rgba(15, 23, 42, 0.04);
+  color: var(--docs-text);
+}
+
+:where(.dark, [data-theme="dark"])
+  .docs-layout-shell
+  .nextra-code {
+  box-shadow:
+    0 22px 52px rgba(2, 6, 23, 0.5),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset;
+}
+
+:where(.dark, [data-theme="dark"])
+  .docs-layout-shell
+  .nextra-code
+  > pre
+  button {
+  background: rgba(15, 23, 42, 0.78);
+  color: var(--docs-text-soft);
+  box-shadow: 0 10px 22px rgba(2, 6, 23, 0.32);
+}
+
+:where(.dark, [data-theme="dark"])
+  .docs-layout-shell
+  .nextra-code
+  > pre
+  button:hover,
+:where(.dark, [data-theme="dark"])
+  .docs-layout-shell
+  .nextra-code
+  > pre
+  button:focus-visible {
+  background: rgba(30, 41, 59, 0.96);
+  color: var(--docs-text);
+}
+
+:where(.dark, [data-theme="dark"])
+  .docs-layout-shell
+  code.nextra-code:not(pre code.nextra-code) {
+  background: rgba(148, 163, 184, 0.12);
 }
