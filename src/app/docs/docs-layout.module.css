@@ -45,6 +45,8 @@
       rgba(var(--docs-color-warm-rgb), 0.16)
     ),
     #ffffff;
+  --docs-toc-sticky-gap: 18px;
+  --docs-toc-bottom-gap: 28px;
   --nextra-primary-hue: 220;
   --nextra-primary-saturation: 8%;
   --nextra-primary-lightness: 34%;
@@ -118,7 +120,13 @@
 }
 
 .docs-layout-shell :global(.nextra-toc > div) {
-  margin-top: 18px;
+  top: calc(var(--nextra-navbar-height) + var(--docs-toc-sticky-gap));
+  max-height: calc(
+    100vh - var(--nextra-navbar-height) - var(--docs-toc-sticky-gap) -
+      var(--docs-toc-bottom-gap)
+  );
+  min-height: 0;
+  margin-top: 0;
   padding: 4px;
   border: 1px solid var(--docs-line);
   border-radius: 14px;
@@ -127,6 +135,7 @@
     var(--docs-surface);
   box-shadow: 0 14px 34px rgba(var(--docs-neutral-rgb), 0.06);
   backdrop-filter: blur(14px);
+  overflow: hidden;
 }
 
 .docs-layout-shell :global(.nextra-toc > div > p) {
@@ -136,7 +145,9 @@
 }
 
 .docs-layout-shell :global(.nextra-toc > div ul) {
+  min-height: 0;
   padding: 8px 8px 12px;
+  scrollbar-gutter: stable;
 }
 
 .docs-layout-shell :global(.nextra-toc > div a) {
