@@ -104,7 +104,7 @@ export function SiteHeader() {
                   <div
                     id="docs-navigation-menu"
                     className={cx("nav-dropdown-menu")}
-                    aria-label="文档相关链接"
+                    aria-label="社区文档相关链接"
                   >
                     <Link
                       href={siteRepositoryUrl}
@@ -126,7 +126,7 @@ export function SiteHeader() {
                       onClick={() => setDocsMenuOpen(false)}
                     >
                       <BookOpen aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
-                      <span>文档链接</span>
+                      <span>社区文档</span>
                     </Link>
                   </div>
                 </div>

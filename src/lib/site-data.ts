@@ -6,7 +6,7 @@ export const navItems = [
   { href: "/projects", label: "项目共建" },
   { href: "/cooperate", label: "合作联系" },
   { href: "/about", label: "关于我们" },
-  { href: "/docs", label: "文档" },
+  { href: "/docs", label: "社区文档" },
 ];
 
 export const siteRepositoryUrl = "https://github.com/ZangTengfei/changzhouai-club";

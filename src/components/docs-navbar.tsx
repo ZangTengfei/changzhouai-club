@@ -29,7 +29,7 @@ export function DocsNavbar() {
           </Link>
           <Link href="/docs" className={cx("docs-navbar-docs-title")}>
             <span className={cx("docs-navbar-copy")}>
-              <strong>文档</strong>
+              <strong>社区文档</strong>
               <small className={cx("docs-navbar-subtitle-desktop")}>
                 共建资料、方法与沉淀
               </small>
@@ -43,7 +43,7 @@ export function DocsNavbar() {
         <button
           type="button"
           className={cx("docs-navbar-menu-button")}
-          aria-label={menuOpen ? "关闭文档目录" : "打开文档目录"}
+          aria-label={menuOpen ? "关闭社区文档目录" : "打开社区文档目录"}
           aria-expanded={menuOpen}
           data-open={menuOpen}
           onClick={() => {
@@ -59,7 +59,7 @@ export function DocsNavbar() {
         </button>
       </div>
 
-      <nav className={cx("docs-navbar-links")} aria-label="文档导航">
+      <nav className={cx("docs-navbar-links")} aria-label="社区文档导航">
         <Link href="/docs">首页</Link>
         <Link href="/docs/getting-started">开始使用</Link>
         <Link href="/docs/agents/install-guide">Agent 教程</Link>
