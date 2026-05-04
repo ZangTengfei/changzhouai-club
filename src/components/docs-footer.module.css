@@ -1,7 +1,7 @@
 .docs-footer {
   width: 100%;
   margin: 0;
-  padding: 28px 24px 0;
+  padding: 30px 24px 0;
 }
 
 .docs-footer-inner {
@@ -9,8 +9,14 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 20px;
-  padding-top: 18px;
+  padding: 18px 18px 0;
   border-top: 1px solid var(--docs-line);
+  border-radius: 18px 18px 0 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 247, 0.62),
+    rgba(255, 252, 247, 0)
+  );
   color: var(--docs-text-soft);
 }
 
@@ -31,19 +37,27 @@
 .docs-footer-links a {
   display: inline-flex;
   align-items: center;
-  padding: 0;
-  border: 0;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
   background: transparent;
   color: var(--docs-text-soft);
   transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
     color 0.18s ease,
-    opacity 0.18s ease;
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
 
 .docs-footer-links a:hover,
 .docs-footer-links a:focus-visible {
-  color: var(--docs-text);
+  border-color: rgba(var(--accent-rgb), 0.14);
+  background: rgba(var(--accent-rgb), 0.08);
+  color: var(--docs-accent-strong);
   opacity: 1;
+  transform: translateY(-1px);
 }
 
 @media (max-width: 1024px) {

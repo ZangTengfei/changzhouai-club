@@ -5,8 +5,9 @@
   gap: 20px;
   width: 100%;
   margin: 0;
-  padding: 14px 24px 12px;
-  border-bottom: 1px solid var(--docs-line);
+  min-height: 76px;
+  padding: 13px 24px 12px;
+  border-bottom: 1px solid rgba(var(--accent-rgb), 0.08);
 }
 
 .docs-navbar-identity {
@@ -48,7 +49,7 @@
 .docs-navbar-main-copy {
   color: var(--docs-text);
   font-size: 0.95rem;
-  font-weight: 600;
+  font-weight: 760;
   white-space: nowrap;
 }
 
@@ -61,7 +62,7 @@
 .docs-navbar-copy strong {
   font-size: 0.98rem;
   color: var(--docs-text);
-  font-weight: 600;
+  font-weight: 760;
 }
 
 .docs-navbar-copy small {
@@ -79,31 +80,42 @@
 .docs-navbar-links a {
   display: inline-flex;
   align-items: center;
-  padding: 0;
-  border: 0;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 12px;
   background: transparent;
   color: var(--docs-text-soft);
+  font-size: 0.92rem;
+  font-weight: 700;
   transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
     color 0.18s ease,
-    opacity 0.18s ease;
+    opacity 0.18s ease,
+    transform 0.18s ease;
 }
 
 .docs-navbar-links a:hover,
 .docs-navbar-links a:focus-visible {
-  color: var(--docs-text);
+  border-color: rgba(var(--accent-rgb), 0.14);
+  background: rgba(var(--accent-rgb), 0.08);
+  color: var(--docs-accent-strong);
   opacity: 1;
+  transform: translateY(-1px);
 }
 
 .docs-navbar-icon-link {
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
   border-radius: 999px;
 }
 
 .docs-navbar-icon-link:hover,
 .docs-navbar-icon-link:focus-visible {
-  background: var(--docs-hover);
+  background: rgba(var(--accent-rgb), 0.1);
 }
 
 .docs-navbar-icon {
