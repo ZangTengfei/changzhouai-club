@@ -122,23 +122,23 @@
   transform: translateY(-1px);
 }
 
-.docs-navbar-icon-link {
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border-radius: 999px;
+.docs-navbar-github-link {
+  gap: 7px;
+  padding: 0 13px;
+  border-color: rgba(var(--accent-rgb), 0.14);
+  background: rgba(var(--accent-rgb), 0.06);
 }
 
-.docs-navbar-icon-link:hover,
-.docs-navbar-icon-link:focus-visible {
-  background: rgba(var(--accent-rgb), 0.1);
+.docs-navbar-github-link:hover,
+.docs-navbar-github-link:focus-visible {
+  background: rgba(var(--accent-rgb), 0.12);
 }
 
 .docs-navbar-icon {
   display: block;
   width: 20px;
   height: 20px;
+  flex-shrink: 0;
 }
 
 .docs-navbar-menu-button {

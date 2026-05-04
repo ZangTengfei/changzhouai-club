@@ -67,16 +67,15 @@ export function DocsNavbar() {
         <Link href="/docs/contributing">参与贡献</Link>
         <Link
           href={siteRepositoryUrl}
-          className={cx("docs-navbar-icon-link")}
+          className={cx("docs-navbar-github-link")}
           target="_blank"
           rel="noreferrer"
           aria-label="打开 GitHub 仓库"
           title="GitHub 仓库"
         >
           <SocialPlatformIcon tone="github" className={cx("docs-navbar-icon")} />
-          <span className="sr-only">GitHub 仓库</span>
+          <span>GitHub</span>
         </Link>
-        <Link href="/">返回主站</Link>
       </nav>
     </div>
   );
