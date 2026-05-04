@@ -1,56 +1,46 @@
 :where(.dark, [data-theme="dark"]) .docs-layout-shell {
-  --docs-bg: #071411;
-  --docs-bg-soft: rgba(12, 31, 27, 0.86);
-  --docs-surface: rgba(14, 36, 31, 0.78);
-  --docs-surface-strong: rgba(18, 43, 37, 0.92);
-  --docs-line: rgba(119, 206, 177, 0.18);
-  --docs-line-strong: rgba(119, 206, 177, 0.3);
-  --docs-text: #e8f4ee;
-  --docs-text-soft: rgba(226, 241, 235, 0.72);
-  --docs-text-muted: rgba(226, 241, 235, 0.52);
-  --docs-accent: #66d5b6;
-  --docs-accent-strong: #9de7cf;
-  --docs-accent-soft: rgba(102, 213, 182, 0.12);
-  --docs-warm-soft: rgba(246, 180, 100, 0.13);
-  --docs-hover: rgba(102, 213, 182, 0.1);
+  --docs-neutral-rgb: 244, 244, 245;
+  --docs-bg: #0b0b0c;
+  --docs-bg-soft: rgba(18, 18, 19, 0.86);
+  --docs-surface: rgba(24, 24, 27, 0.78);
+  --docs-surface-strong: rgba(31, 31, 35, 0.92);
+  --docs-line: rgba(var(--docs-neutral-rgb), 0.14);
+  --docs-line-strong: rgba(var(--docs-neutral-rgb), 0.22);
+  --docs-text: #f4f4f5;
+  --docs-text-soft: rgba(var(--docs-neutral-rgb), 0.7);
+  --docs-text-muted: rgba(var(--docs-neutral-rgb), 0.5);
+  --docs-accent: #d4d4d8;
+  --docs-accent-strong: #ffffff;
+  --docs-accent-soft: rgba(var(--docs-neutral-rgb), 0.1);
+  --docs-warm-soft: rgba(var(--docs-neutral-rgb), 0.08);
+  --docs-hover: rgba(var(--docs-neutral-rgb), 0.09);
   --docs-shadow: 0 18px 48px rgba(0, 0, 0, 0.36);
-  --docs-code-bg: #0b1513;
-  --docs-code-chrome: rgba(18, 43, 37, 0.96);
-  --docs-code-line: rgba(119, 206, 177, 0.2);
-  --docs-code-dot-red: #fb7185;
-  --docs-code-dot-yellow: #fbbf24;
-  --docs-code-dot-green: #34d399;
-  --nextra-primary-hue: 164;
-  --nextra-primary-saturation: 62%;
-  --nextra-primary-lightness: 62%;
-  --nextra-bg: 7 20 17;
-  --logo-primary: #66d5b6;
-  --logo-secondary: #e8f4ee;
-  --logo-highlight: #f6b464;
-  background:
-    linear-gradient(
-      135deg,
-      rgba(102, 213, 182, 0.11) 0%,
-      transparent 30%
-    ),
-    linear-gradient(
-      225deg,
-      rgba(246, 180, 100, 0.1) 0%,
-      transparent 28%
-    ),
-    linear-gradient(180deg, #06110f 0%, #0b1e1a 54%, var(--docs-bg) 100%);
+  --docs-code-bg: #111113;
+  --docs-code-chrome: rgba(31, 31, 35, 0.96);
+  --docs-code-line: rgba(var(--docs-neutral-rgb), 0.16);
+  --docs-code-dot-red: #71717a;
+  --docs-code-dot-yellow: #a1a1aa;
+  --docs-code-dot-green: #d4d4d8;
+  --nextra-primary-hue: 240;
+  --nextra-primary-saturation: 6%;
+  --nextra-primary-lightness: 78%;
+  --nextra-bg: 11 11 12;
+  --logo-primary: #f4f4f5;
+  --logo-secondary: #a1a1aa;
+  --logo-highlight: #ffffff;
+  background: linear-gradient(180deg, #050505 0%, #0b0b0c 52%, var(--docs-bg) 100%);
 }
 
 :where(.dark, [data-theme="dark"]) .docs-layout-shell::before {
   background-image:
-    linear-gradient(rgba(232, 244, 238, 0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(232, 244, 238, 0.025) 1px, transparent 1px);
+    linear-gradient(rgba(244, 244, 245, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244, 244, 245, 0.022) 1px, transparent 1px);
 }
 
 :where(.dark, [data-theme="dark"])
   .docs-layout-shell
   .nextra-nav-container {
-  background: rgba(7, 20, 17, 0.74);
+  background: rgba(11, 11, 12, 0.78);
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
 }
 
@@ -60,18 +50,18 @@
   background:
     linear-gradient(
       180deg,
-      rgba(9, 28, 24, 0.74),
-      rgba(9, 28, 24, 0.48)
+      rgba(18, 18, 19, 0.74),
+      rgba(18, 18, 19, 0.48)
     );
 }
 
 :where(.dark, [data-theme="dark"])
   .docs-layout-shell
   .nextra-breadcrumb {
-  border-color: rgba(102, 213, 182, 0.16);
+  border-color: var(--docs-line);
   background:
-    linear-gradient(135deg, rgba(102, 213, 182, 0.1), transparent 44%),
-    rgba(12, 31, 27, 0.68);
+    linear-gradient(180deg, rgba(31, 31, 35, 0.78), rgba(24, 24, 27, 0.68)),
+    var(--docs-surface);
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.26);
 }
 
@@ -79,17 +69,17 @@
   .docs-layout-shell
   .nextra-breadcrumb
   svg {
-  color: rgba(226, 241, 235, 0.42);
+  color: rgba(244, 244, 245, 0.42);
 }
 
 :where(.dark, [data-theme="dark"])
   .docs-layout-shell
   .nextra-toc
   > div {
-  border-color: rgba(102, 213, 182, 0.16);
+  border-color: var(--docs-line);
   background:
-    linear-gradient(135deg, rgba(102, 213, 182, 0.1), transparent 40%),
-    rgba(12, 31, 27, 0.62);
+    linear-gradient(180deg, rgba(31, 31, 35, 0.78), rgba(24, 24, 27, 0.62)),
+    var(--docs-surface);
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.24);
 }
 
@@ -99,8 +89,8 @@
   main
   blockquote {
   background:
-    linear-gradient(90deg, rgba(102, 213, 182, 0.14), transparent),
-    rgba(12, 31, 27, 0.76);
+    linear-gradient(90deg, var(--docs-accent-soft), transparent),
+    rgba(24, 24, 27, 0.76);
 }
 
 :where(.dark, [data-theme="dark"])
@@ -116,7 +106,7 @@
   article
   main
   th {
-  background: rgba(102, 213, 182, 0.12);
+  background: rgba(244, 244, 245, 0.08);
 }
 
 .docs-layout-shell div.nextra-code {
@@ -125,7 +115,7 @@
   border-radius: 10px;
   background: var(--docs-code-bg);
   box-shadow:
-    0 18px 48px rgba(15, 23, 42, 0.08),
+    0 18px 48px rgba(var(--docs-neutral-rgb), 0.08),
     0 1px 0 rgba(255, 255, 255, 0.7) inset;
 }
 
@@ -142,7 +132,7 @@
   padding-bottom: 22px;
   font-size: 0.93rem;
   line-height: 1.82;
-  scrollbar-color: rgba(100, 116, 139, 0.42) transparent;
+  scrollbar-color: rgba(var(--docs-neutral-rgb), 0.34) transparent;
   scrollbar-width: thin;
 }
 
@@ -178,7 +168,7 @@
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.78);
   color: var(--docs-text-soft);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 8px 18px rgba(var(--docs-neutral-rgb), 0.08);
 }
 
 .docs-layout-shell div.nextra-code > pre button:hover,
@@ -190,7 +180,7 @@
 
 .docs-layout-shell code.nextra-code:not(pre code.nextra-code) {
   border-color: var(--docs-code-line);
-  background: rgba(15, 23, 42, 0.04);
+  background: rgba(var(--docs-neutral-rgb), 0.04);
   color: var(--docs-text);
 }
 
@@ -198,7 +188,7 @@
   .docs-layout-shell
   .nextra-code {
   box-shadow:
-    0 22px 52px rgba(2, 6, 23, 0.5),
+    0 22px 52px rgba(0, 0, 0, 0.5),
     0 1px 0 rgba(255, 255, 255, 0.05) inset;
 }
 
@@ -207,9 +197,9 @@
   .nextra-code
   > pre
   button {
-  background: rgba(15, 23, 42, 0.78);
+  background: rgba(24, 24, 27, 0.78);
   color: var(--docs-text-soft);
-  box-shadow: 0 10px 22px rgba(2, 6, 23, 0.32);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.32);
 }
 
 :where(.dark, [data-theme="dark"])
@@ -222,12 +212,12 @@
   .nextra-code
   > pre
   button:focus-visible {
-  background: rgba(30, 41, 59, 0.96);
+  background: rgba(39, 39, 42, 0.96);
   color: var(--docs-text);
 }
 
 :where(.dark, [data-theme="dark"])
   .docs-layout-shell
   code.nextra-code:not(pre code.nextra-code) {
-  background: rgba(148, 163, 184, 0.12);
+  background: rgba(244, 244, 245, 0.1);
 }

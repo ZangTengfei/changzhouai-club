@@ -10,8 +10,8 @@
   margin: 0;
   min-height: 64px;
   padding: 10px 24px;
-  border-bottom: 1px solid rgba(var(--accent-rgb), 0.08);
-  background: rgba(255, 252, 248, 0.74);
+  border-bottom: 1px solid var(--docs-line);
+  background: rgba(255, 255, 255, 0.76);
   backdrop-filter: blur(16px);
 }
 
@@ -119,8 +119,8 @@
 
 .docs-navbar-links a:hover,
 .docs-navbar-links a:focus-visible {
-  border-color: rgba(var(--accent-rgb), 0.14);
-  background: rgba(var(--accent-rgb), 0.08);
+  border-color: var(--docs-line-strong);
+  background: var(--docs-hover);
   color: var(--docs-accent-strong);
   opacity: 1;
   transform: translateY(-1px);
@@ -129,13 +129,13 @@
 .docs-navbar-github-link {
   gap: 7px;
   padding: 0 13px;
-  border-color: rgba(var(--accent-rgb), 0.14);
-  background: rgba(var(--accent-rgb), 0.06);
+  border-color: var(--docs-line);
+  background: var(--docs-accent-soft);
 }
 
 .docs-navbar-github-link:hover,
 .docs-navbar-github-link:focus-visible {
-  background: rgba(var(--accent-rgb), 0.12);
+  background: var(--docs-hover);
 }
 
 .docs-navbar-icon {
@@ -152,9 +152,9 @@
   gap: 7px;
   min-height: 38px;
   padding: 0 12px;
-  border: 1px solid rgba(var(--accent-rgb), 0.18);
+  border: 1px solid var(--docs-line-strong);
   border-radius: 13px;
-  background: rgba(var(--accent-rgb), 0.08);
+  background: var(--docs-accent-soft);
   color: var(--docs-text);
   font: inherit;
   font-size: 0.92rem;
@@ -170,8 +170,8 @@
 .docs-navbar-menu-button:hover,
 .docs-navbar-menu-button:focus-visible,
 .docs-navbar-menu-button[data-open="true"] {
-  border-color: rgba(var(--accent-rgb), 0.26);
-  background: rgba(var(--accent-rgb), 0.14);
+  border-color: var(--docs-line-strong);
+  background: var(--docs-hover);
   color: var(--docs-accent-strong);
 }
 
@@ -190,19 +190,19 @@
 }
 
 :global(:where(.dark, [data-theme="dark"])) .docs-navbar-shell {
-  background: rgba(7, 20, 17, 0.78);
+  background: rgba(11, 11, 12, 0.78);
 }
 
 :global(:where(.dark, [data-theme="dark"])) .docs-navbar-menu-button {
-  border-color: rgba(102, 213, 182, 0.2);
-  background: rgba(102, 213, 182, 0.1);
+  border-color: var(--docs-line);
+  background: var(--docs-accent-soft);
 }
 
 :global(:where(.dark, [data-theme="dark"])) .docs-navbar-menu-button:hover,
 :global(:where(.dark, [data-theme="dark"])) .docs-navbar-menu-button:focus-visible,
 :global(:where(.dark, [data-theme="dark"])) .docs-navbar-menu-button[data-open="true"] {
-  border-color: rgba(102, 213, 182, 0.34);
-  background: rgba(102, 213, 182, 0.16);
+  border-color: var(--docs-line-strong);
+  background: var(--docs-hover);
 }
 
 @media (max-width: 1024px) {
@@ -222,15 +222,15 @@
     align-items: center;
     min-height: 64px;
     padding: 9px 16px;
-    border-bottom-color: rgba(var(--accent-rgb), 0.12);
+    border-bottom-color: var(--docs-line);
     background:
-      linear-gradient(180deg, rgba(255, 252, 248, 0.96), rgba(255, 252, 248, 0.86));
-    box-shadow: 0 10px 28px rgba(var(--ink-rgb), 0.07);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(250, 250, 250, 0.88));
+    box-shadow: 0 10px 28px rgba(var(--docs-neutral-rgb), 0.07);
   }
 
   :global(:where(.dark, [data-theme="dark"])) .docs-navbar-shell {
     background:
-      linear-gradient(180deg, rgba(7, 20, 17, 0.96), rgba(7, 20, 17, 0.84));
+      linear-gradient(180deg, rgba(11, 11, 12, 0.96), rgba(18, 18, 19, 0.86));
     box-shadow: 0 10px 28px rgba(0, 0, 0, 0.28);
   }
 
@@ -293,23 +293,23 @@
     padding: 0 13px;
     border-radius: 999px;
     background:
-      linear-gradient(135deg, rgba(var(--accent-rgb), 0.14), rgba(var(--accent-warm-rgb), 0.08)),
-      rgba(255, 252, 247, 0.82);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 244, 245, 0.78)),
+      var(--docs-accent-soft);
     box-shadow:
-      0 8px 18px rgba(var(--ink-rgb), 0.07),
+      0 8px 18px rgba(var(--docs-neutral-rgb), 0.07),
       inset 0 0 0 1px rgba(255, 255, 255, 0.44);
   }
 
   .docs-navbar-menu-button[data-open="true"] {
     background:
-      linear-gradient(135deg, rgba(var(--accent-rgb), 0.2), rgba(var(--accent-warm-rgb), 0.12)),
-      rgba(255, 252, 247, 0.9);
+      linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(244, 244, 245, 0.86)),
+      var(--docs-hover);
   }
 
   :global(:where(.dark, [data-theme="dark"])) .docs-navbar-menu-button {
     background:
-      linear-gradient(135deg, rgba(102, 213, 182, 0.16), rgba(246, 180, 100, 0.08)),
-      rgba(12, 31, 27, 0.78);
+      linear-gradient(180deg, rgba(31, 31, 35, 0.92), rgba(24, 24, 27, 0.76)),
+      var(--docs-accent-soft);
     box-shadow:
       0 8px 18px rgba(0, 0, 0, 0.24),
       inset 0 0 0 1px rgba(255, 255, 255, 0.05);
@@ -317,8 +317,8 @@
 
   :global(:where(.dark, [data-theme="dark"])) .docs-navbar-menu-button[data-open="true"] {
     background:
-      linear-gradient(135deg, rgba(102, 213, 182, 0.22), rgba(246, 180, 100, 0.12)),
-      rgba(12, 31, 27, 0.88);
+      linear-gradient(180deg, rgba(39, 39, 42, 0.94), rgba(31, 31, 35, 0.84)),
+      var(--docs-hover);
   }
 }
 

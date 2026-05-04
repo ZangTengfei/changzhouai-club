@@ -14,8 +14,8 @@
   border-radius: 18px 18px 0 0;
   background: linear-gradient(
     180deg,
-    rgba(255, 252, 247, 0.62),
-    rgba(255, 252, 247, 0)
+    rgba(255, 255, 255, 0.62),
+    rgba(255, 255, 255, 0)
   );
   color: var(--docs-text-soft);
 }
@@ -53,8 +53,8 @@
 
 .docs-footer-links a:hover,
 .docs-footer-links a:focus-visible {
-  border-color: rgba(var(--accent-rgb), 0.14);
-  background: rgba(var(--accent-rgb), 0.08);
+  border-color: var(--docs-line-strong);
+  background: var(--docs-hover);
   color: var(--docs-accent-strong);
   opacity: 1;
   transform: translateY(-1px);
