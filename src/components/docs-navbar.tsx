@@ -30,7 +30,12 @@ export function DocsNavbar() {
           <Link href="/docs" className={cx("docs-navbar-docs-title")}>
             <span className={cx("docs-navbar-copy")}>
               <strong>文档</strong>
-              <small>共建资料、方法与沉淀</small>
+              <small className={cx("docs-navbar-subtitle-desktop")}>
+                共建资料、方法与沉淀
+              </small>
+              <small className={cx("docs-navbar-subtitle-mobile")}>
+                常州 AI Club
+              </small>
             </span>
           </Link>
         </div>
@@ -50,7 +55,7 @@ export function DocsNavbar() {
           ) : (
             <Menu className={cx("docs-navbar-menu-icon")} aria-hidden="true" />
           )}
-          <span>目录</span>
+          <span className={cx("docs-navbar-menu-label")}>目录</span>
         </button>
       </div>
 

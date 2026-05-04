@@ -300,6 +300,10 @@
 }
 
 @media (max-width: 768px) {
+  .docs-layout-shell {
+    --nextra-navbar-height: 64px;
+  }
+
   .docs-layout-shell :global(article main h1) {
     font-size: 2.45rem;
   }
