@@ -127,8 +127,9 @@
 }
 
 .docs-navbar-github-link {
-  gap: 7px;
-  padding: 0 13px;
+  justify-content: center;
+  width: 38px;
+  padding: 0;
   border-color: var(--docs-line);
   background: var(--docs-accent-soft);
 }

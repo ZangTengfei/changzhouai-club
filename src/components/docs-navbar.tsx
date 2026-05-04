@@ -73,7 +73,6 @@ export function DocsNavbar() {
           aria-label="打开 GitHub 仓库"
           title="GitHub 仓库"
         >
-          <span>GitHub</span>
           <SocialPlatformIcon tone="github" className={cx("docs-navbar-icon")} />
         </Link>
       </nav>
