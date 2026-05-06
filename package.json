@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "news:radar": "node scripts/ai-news-radar.mjs",
+    "news:radar:md": "node scripts/ai-news-radar.mjs --format markdown --limit 12"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -17,6 +19,7 @@
     "@vercel/speed-insights": "^2.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "fast-xml-parser": "^5.7.3",
     "lucide-react": "^1.8.0",
     "next": "^16.2.1",
     "nextra": "^4.6.1",
