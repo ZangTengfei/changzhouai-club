@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, ChevronDown } from "lucide-react";
+import { BookOpen, Boxes, ChevronDown, UsersRound } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { MobileMenuToggle } from "@/components/mobile-menu-toggle";
@@ -20,7 +20,10 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [authReady, setAuthReady] = useState(!hasSupabaseEnv());
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [membersMenuOpen, setMembersMenuOpen] = useState(false);
   const [docsMenuOpen, setDocsMenuOpen] = useState(false);
+  const membersDropdownRef = useRef<HTMLDivElement>(null);
+  const membersTriggerRef = useRef<HTMLButtonElement>(null);
   const docsDropdownRef = useRef<HTMLDivElement>(null);
   const docsTriggerRef = useRef<HTMLButtonElement>(null);
   const shouldShowJoinButton = authReady && !isAuthenticated;
@@ -30,15 +33,23 @@ export function SiteHeader() {
   }, []);
 
   useEffect(() => {
+    setMembersMenuOpen(false);
     setDocsMenuOpen(false);
   }, [pathname]);
 
   useEffect(() => {
-    if (!docsMenuOpen) {
+    if (!membersMenuOpen && !docsMenuOpen) {
       return;
     }
 
     const handlePointerDown = (event: PointerEvent) => {
+      if (
+        membersMenuOpen &&
+        !membersDropdownRef.current?.contains(event.target as Node)
+      ) {
+        setMembersMenuOpen(false);
+      }
+
       if (!docsDropdownRef.current?.contains(event.target as Node)) {
         setDocsMenuOpen(false);
       }
@@ -46,8 +57,16 @@ export function SiteHeader() {
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        const shouldFocusMembersTrigger = membersMenuOpen;
+
+        setMembersMenuOpen(false);
         setDocsMenuOpen(false);
-        docsTriggerRef.current?.focus();
+
+        if (shouldFocusMembersTrigger) {
+          membersTriggerRef.current?.focus();
+        } else {
+          docsTriggerRef.current?.focus();
+        }
       }
     };
 
@@ -58,7 +77,7 @@ export function SiteHeader() {
       document.removeEventListener("pointerdown", handlePointerDown);
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [docsMenuOpen]);
+  }, [docsMenuOpen, membersMenuOpen]);
 
   return (
     <header className={cx("site-header")}>
@@ -76,9 +95,72 @@ export function SiteHeader() {
         <nav id="site-navigation" className={cx("nav-links")} aria-label="主导航">
           {navItems.map((item) => {
             const isActive =
-              item.href === "/"
+              item.href === "/members"
+                ? pathname === "/members" ||
+                  pathname.startsWith("/members/") ||
+                  pathname === "/works"
+                : item.href === "/"
                 ? pathname === "/"
                 : pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+            if (item.href === "/members") {
+              return (
+                <div
+                  key={item.href}
+                  className={cx("nav-dropdown", membersMenuOpen && "nav-dropdown-open")}
+                  ref={membersDropdownRef}
+                >
+                  <button
+                    type="button"
+                    ref={membersTriggerRef}
+                    className={cx(
+                      "nav-dropdown-trigger",
+                      isActive && "nav-link-active",
+                    )}
+                    aria-expanded={membersMenuOpen}
+                    aria-controls="members-navigation-menu"
+                    onClick={() => {
+                      setMembersMenuOpen((current) => !current);
+                      setDocsMenuOpen(false);
+                    }}
+                  >
+                    <span>{item.label}</span>
+                    <ChevronDown aria-hidden="true" className={cx("nav-dropdown-chevron")} />
+                  </button>
+                  <div
+                    id="members-navigation-menu"
+                    className={cx("nav-dropdown-menu")}
+                    aria-label="成员地图相关链接"
+                  >
+                    <Link
+                      href="/members"
+                      className={cx("nav-dropdown-item")}
+                      aria-current={
+                        pathname === "/members" || pathname.startsWith("/members/")
+                          ? "page"
+                          : undefined
+                      }
+                      onClick={() => setMembersMenuOpen(false)}
+                    >
+                      <UsersRound
+                        aria-hidden="true"
+                        className={cx("nav-dropdown-item-icon")}
+                      />
+                      <span>成员地图</span>
+                    </Link>
+                    <Link
+                      href="/works"
+                      className={cx("nav-dropdown-item")}
+                      aria-current={pathname === "/works" ? "page" : undefined}
+                      onClick={() => setMembersMenuOpen(false)}
+                    >
+                      <Boxes aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
+                      <span>作品墙</span>
+                    </Link>
+                  </div>
+                </div>
+              );
+            }
 
             if (item.href === "/docs") {
               return (
@@ -96,7 +178,10 @@ export function SiteHeader() {
                     )}
                     aria-expanded={docsMenuOpen}
                     aria-controls="docs-navigation-menu"
-                    onClick={() => setDocsMenuOpen((current) => !current)}
+                    onClick={() => {
+                      setDocsMenuOpen((current) => !current);
+                      setMembersMenuOpen(false);
+                    }}
                   >
                     <span>{item.label}</span>
                     <ChevronDown aria-hidden="true" className={cx("nav-dropdown-chevron")} />
