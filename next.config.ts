@@ -10,6 +10,15 @@ const withNextra = nextra({
 });
 
 const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      {
+        source: "/ai-news",
+        destination: "/news",
+        permanent: true,
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

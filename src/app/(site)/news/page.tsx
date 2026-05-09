@@ -92,7 +92,7 @@ function buildFeedHref(
 
   if (next.view === "daily") {
     params.set("view", "daily");
-    return `/ai-news?${params.toString()}`;
+    return `/news?${params.toString()}`;
   }
 
   if (next.mode !== "selected") {
@@ -105,7 +105,7 @@ function buildFeedHref(
 
   const query = params.toString();
 
-  return query ? `/ai-news?${query}` : "/ai-news";
+  return query ? `/news?${query}` : "/news";
 }
 
 function countDailyItems(sections: Array<{ items: unknown[] }>) {
@@ -250,7 +250,7 @@ function DailyReportView({
         <span>AI HOT DAILY</span>
         <h2>AI 日报暂时不可用</h2>
         <p>可以先查看精选或全部动态，稍后再回来刷新日报内容。</p>
-        <Link href="/ai-news">查看精选资讯</Link>
+        <Link href="/news">查看精选资讯</Link>
       </section>
     );
   }
@@ -474,7 +474,7 @@ export default async function AiNewsPage({
                 <div className={styles.emptyState}>
                   <strong>当前筛选下没有资讯</strong>
                   <p>可以切回精选或调整分类重新查看。</p>
-                  <Link href="/ai-news">回到默认资讯流</Link>
+                  <Link href="/news">回到默认资讯流</Link>
                 </div>
               )}
             </main>
