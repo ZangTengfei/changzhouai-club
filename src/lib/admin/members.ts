@@ -24,6 +24,7 @@ type AdminMemberRow = {
   willing_to_attend: boolean;
   willing_to_share: boolean;
   willing_to_join_projects: boolean;
+  is_co_builder: boolean;
   is_publicly_visible: boolean;
   is_featured_on_home: boolean;
   joined_at: string;
@@ -79,6 +80,7 @@ export type AdminMember = {
   status: string;
   willingToShare: boolean;
   willingToJoinProjects: boolean;
+  isCoBuilder: boolean;
   isPubliclyVisible: boolean;
   isFeaturedOnHome: boolean;
   joinedAt: string;
@@ -125,6 +127,7 @@ export type AdminMembersData = {
   stats: {
     totalMembers: number;
     activeMembers: number;
+    coBuilders: number;
     willingToShare: number;
     willingToJoinProjects: number;
     joinRequests: number;
@@ -185,7 +188,7 @@ export async function loadAdminMembersData(
     supabase
       .from("members")
       .select(
-        "id, status, willing_to_attend, willing_to_share, willing_to_join_projects, is_publicly_visible, is_featured_on_home, joined_at, last_active_at",
+        "id, status, willing_to_attend, willing_to_share, willing_to_join_projects, is_co_builder, is_publicly_visible, is_featured_on_home, joined_at, last_active_at",
       ),
     supabase.from("event_registrations").select("user_id, status"),
     supabase
@@ -239,6 +242,7 @@ export async function loadAdminMembersData(
         status: member.status,
         willingToShare: member.willing_to_share,
         willingToJoinProjects: member.willing_to_join_projects,
+        isCoBuilder: member.is_co_builder,
         isPubliclyVisible: member.is_publicly_visible,
         isFeaturedOnHome: member.is_featured_on_home,
         joinedAt: member.joined_at,
@@ -309,6 +313,9 @@ export async function loadAdminMembersData(
       totalMembers: mergedMembers.length,
       activeMembers: mergedMembers.filter((member) =>
         ["active", "organizer", "admin"].includes(member.status),
+      ).length,
+      coBuilders: mergedMembers.filter(
+        (member) => !["organizer", "admin"].includes(member.status) && member.isCoBuilder,
       ).length,
       willingToShare: mergedMembers.filter((member) => member.willingToShare).length,
       willingToJoinProjects: mergedMembers.filter(

@@ -125,7 +125,7 @@ export default async function CooperatePage({
       icon: MessageCircle,
     },
     {
-      value: directory.stats.willingToJoinProjects || "持续招募",
+      value: directory.stats.coBuilders || "持续招募",
       label: "共建成员",
       detail: "适合试点与项目推进",
       icon: UsersRound,

@@ -1,10 +1,10 @@
 .member-directory-card {
   position: relative;
   display: grid;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto auto auto 1fr;
   gap: 16px;
   height: 100%;
-  min-height: 214px;
+  min-height: 236px;
   padding: 18px 18px 16px;
   border: 1px solid rgba(205, 213, 209, 0.72);
   border-radius: 20px;
@@ -108,15 +108,39 @@
 .member-directory-bio {
   display: -webkit-box;
   flex: 1;
-  min-height: calc(1.7em * 4);
+  min-height: calc(1.7em * 3);
   overflow: hidden;
   margin: 0;
   color: rgba(var(--ink-rgb), 0.68);
   font-size: 0.92rem;
   line-height: 1.68;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
-  line-clamp: 4;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.member-directory-signal-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  min-height: 27px;
+  overflow: hidden;
+}
+
+.member-directory-signal-list span {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  max-width: 100%;
+  min-height: 27px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: rgba(255, 252, 247, 0.82);
+  color: rgba(var(--ink-rgb), 0.62);
+  font-size: 0.76rem;
+  font-weight: 850;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .member-skill-list-capped {

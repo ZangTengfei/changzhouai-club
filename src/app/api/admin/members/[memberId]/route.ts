@@ -78,6 +78,7 @@ export async function PATCH(
   const willingToAttend = Boolean(payload.willing_to_attend);
   const willingToShare = Boolean(payload.willing_to_share);
   const willingToJoinProjects = Boolean(payload.willing_to_join_projects);
+  const isCoBuilder = Boolean(payload.is_co_builder);
   const isPubliclyVisible = Boolean(payload.is_publicly_visible);
   const isFeaturedOnHome = isPubliclyVisible && Boolean(payload.is_featured_on_home);
   const publicSlug = normalizeMemberPublicSlug(String(payload.public_slug ?? ""));
@@ -115,6 +116,7 @@ export async function PATCH(
         willing_to_attend: willingToAttend,
         willing_to_share: willingToShare,
         willing_to_join_projects: willingToJoinProjects,
+        is_co_builder: isCoBuilder,
         is_publicly_visible: isPubliclyVisible,
         is_featured_on_home: isFeaturedOnHome,
       })

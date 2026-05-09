@@ -249,7 +249,11 @@ export default async function HomePage() {
         .map((skill) => `# ${skill}`);
 
       if (storyTags.length === 0) {
-        if (member.willingToJoinProjects) {
+        if (member.isCoBuilder) {
+          storyTags.push("# 共建成员");
+        }
+
+        if (member.willingToJoinProjects && !member.isCoBuilder) {
           storyTags.push("# 项目共建");
         }
 

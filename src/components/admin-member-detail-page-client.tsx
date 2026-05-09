@@ -99,6 +99,7 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
             willing_to_attend: formData.get("willing_to_attend") === "on",
             willing_to_share: formData.get("willing_to_share") === "on",
             willing_to_join_projects: formData.get("willing_to_join_projects") === "on",
+            is_co_builder: formData.get("is_co_builder") === "on",
             is_publicly_visible: formData.get("is_publicly_visible") === "on",
             is_featured_on_home: formData.get("is_featured_on_home") === "on",
           }),
@@ -139,6 +140,9 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
             <AdminStatusBadge tone={getAdminMemberStatusTone(member.status) as AdminTone}>
               {formatAdminMemberStatus(member.status)}
             </AdminStatusBadge>
+            {member.isCoBuilder ? (
+              <AdminStatusBadge tone="completed">共建成员</AdminStatusBadge>
+            ) : null}
             <AdminStatusBadge tone="neutral">{member.city}</AdminStatusBadge>
             <AdminStatusBadge tone="neutral">
               {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
@@ -204,6 +208,9 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                       </AdminStatusBadge>
                       <AdminStatusBadge tone="scheduled">
                         {member.willingToJoinProjects ? "愿意共建" : "暂不共建"}
+                      </AdminStatusBadge>
+                      <AdminStatusBadge tone="completed">
+                        {member.isCoBuilder ? "共建成员" : "普通成员"}
                       </AdminStatusBadge>
                       <AdminStatusBadge tone="neutral">
                         {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
@@ -331,6 +338,16 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                       className="size-4 accent-[var(--primary)]"
                     />
                     <span>公开展示到成员页</span>
+                  </AdminCheckboxRow>
+
+                  <AdminCheckboxRow className="self-end">
+                    <input
+                      type="checkbox"
+                      name="is_co_builder"
+                      defaultChecked={member.isCoBuilder}
+                      className="size-4 accent-[var(--primary)]"
+                    />
+                    <span>标记为已参与共建成员</span>
                   </AdminCheckboxRow>
 
                   <AdminCheckboxRow className="self-end">

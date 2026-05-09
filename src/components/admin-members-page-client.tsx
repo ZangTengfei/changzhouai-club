@@ -147,6 +147,10 @@ export function AdminMembersPageClient() {
         return false;
       }
 
+      if (intentFilter === "co_builder" && !member.isCoBuilder) {
+        return false;
+      }
+
       return matchesKeyword(
         [
           member.displayName,
@@ -191,6 +195,7 @@ export function AdminMembersPageClient() {
           actions={
             <>
               <AdminMetric label="成员总数" value={data?.stats.totalMembers ?? "..."} />
+              <AdminMetric label="共建成员" value={data?.stats.coBuilders ?? "..."} />
               <AdminMetric label="愿意分享" value={data?.stats.willingToShare ?? "..."} />
               <AdminMetric
                 label="愿意共建"
@@ -244,6 +249,7 @@ export function AdminMembersPageClient() {
             <AdminField label="参与意愿">
               <NativeSelect name="intent" defaultValue={intentFilter}>
                 <option value="all">全部</option>
+                <option value="co_builder">共建成员</option>
                 <option value="share">愿意分享</option>
                 <option value="build">愿意共建</option>
               </NativeSelect>
@@ -291,7 +297,7 @@ export function AdminMembersPageClient() {
                     <TableHead>公开</TableHead>
                     <TableHead>加入时间</TableHead>
                     <TableHead>活动</TableHead>
-                    <TableHead>意愿</TableHead>
+                    <TableHead>身份 / 意愿</TableHead>
                     <TableHead className="text-right">操作</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -337,6 +343,7 @@ export function AdminMembersPageClient() {
                       </TableCell>
                       <TableCell className="text-sm text-muted-foreground">
                         {[
+                          member.isCoBuilder ? "共建成员" : null,
                           member.willingToShare ? "分享" : null,
                           member.willingToJoinProjects ? "共建" : null,
                         ]

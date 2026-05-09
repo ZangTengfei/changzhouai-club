@@ -18,7 +18,7 @@ import {
 import { MemberAvatar } from "@/components/member-avatar";
 import { MemberWorkCard } from "@/components/member-work-card";
 import { ToneBadge } from "@/components/tone-badge";
-import { getPublicMemberByHandle } from "@/lib/community-members";
+import { getPublicMemberByHandle, isCorePublicMember } from "@/lib/community-members";
 import { getPublicWorksByMemberId } from "@/lib/community-works";
 import { getMemberPublicSlugPath, isUuidLike } from "@/lib/member-public-slug";
 
@@ -42,10 +42,18 @@ function formatJoinDate(value: string) {
 }
 
 function buildParticipationSignals(member: {
+  status: string;
   willingToShare: boolean;
   willingToJoinProjects: boolean;
+  isCoBuilder: boolean;
 }) {
   const items = ["已公开展示"];
+
+  if (isCorePublicMember(member)) {
+    items.push("核心成员");
+  } else if (member.isCoBuilder) {
+    items.push("共建成员");
+  }
 
   if (member.willingToShare) {
     items.push("愿意分享");
@@ -124,6 +132,21 @@ export default async function MemberDetailPage({
     },
   ];
   const signalCards = [
+    {
+      title: "社区层级",
+      value: isCorePublicMember(member)
+        ? "核心成员"
+        : member.isCoBuilder
+          ? "共建成员"
+          : "社区成员",
+      summary: isCorePublicMember(member)
+        ? "参与社区方向、活动节奏与长期维护。"
+        : member.isCoBuilder
+          ? "已经开始参与活动、内容、项目或运营共建。"
+          : "已授权公开展示，可以通过活动和主题继续认识。",
+      icon: Sparkles,
+      tone: "green",
+    },
     {
       title: "公开展示",
       value: "是",

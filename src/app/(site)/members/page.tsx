@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
-  MapPin,
   MessageCircle,
   Sparkles,
   UsersRound,
@@ -84,22 +83,22 @@ export default async function MembersPage() {
       icon: UsersRound,
     },
     {
+      value: directory.stats.organizers,
+      label: "核心成员",
+      detail: "发起与长期维护",
+      icon: Sparkles,
+    },
+    {
+      value: directory.stats.coBuilders,
+      label: "共建成员",
+      detail: "已开始参与社区建设",
+      icon: Wrench,
+    },
+    {
       value: directory.stats.willingToShare,
       label: "愿意分享",
       detail: "可邀约主题交流",
       icon: MessageCircle,
-    },
-    {
-      value: directory.stats.willingToJoinProjects,
-      label: "愿意共建",
-      detail: "适合项目协作与试点",
-      icon: Wrench,
-    },
-    {
-      value: directory.stats.cities || 1,
-      label: "城市线索",
-      detail: "立足常州，连接更多伙伴",
-      icon: MapPin,
     },
   ];
 
@@ -113,8 +112,8 @@ export default async function MembersPage() {
             <span>让想法有回应</span>
           </h1>
           <p>
-            成员地图展示社区里公开的角色、技能和参与意愿。你可以从这里找到分享者、
-            共建伙伴，也更快理解常州 AI Club 正在聚集怎样的人。
+            成员地图按核心成员、共建成员和公开成员组织信息。你可以从这里找到正在维护社区的人、
+            已经参与共建的伙伴，也更快理解常州 AI Club 正在聚集怎样的人。
           </p>
 
           <div className={styles["members-hero-actions"]}>
@@ -247,8 +246,8 @@ export default async function MembersPage() {
           <div className={styles["members-section-heading"]}>
             <p className="home-kicker">Signals</p>
             <div>
-              <h2>从这些入口开始认识成员</h2>
-              <p>按社区角色与参与意愿整理，方便活动邀约、项目共建和新成员破冰。</p>
+              <h2>按社区参与层级认识成员</h2>
+              <p>优先展示核心成员，再展示已经参与共建的小伙伴，最后连接更多公开成员。</p>
             </div>
           </div>
 
@@ -310,7 +309,7 @@ export default async function MembersPage() {
             <div>
               <h3>每一张成员卡，都是一个可继续对话的线索</h3>
               <p>
-                点开成员主页可以查看更完整的介绍。你也可以先从技能标签、分享意愿和共建意愿判断是否适合进一步交流。
+                点开成员主页可以查看更完整的介绍。你也可以先从社区层级、技能标签、分享意愿和共建意向判断是否适合进一步交流。
               </p>
             </div>
             <Link href="/cooperate" className={styles["members-directory-feature-link"]}>

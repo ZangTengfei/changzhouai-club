@@ -18,6 +18,7 @@ type PublicMemberRow = {
   status: string;
   willing_to_share: boolean;
   willing_to_join_projects: boolean;
+  is_co_builder: boolean;
   is_publicly_visible: boolean;
   is_featured_on_home: boolean;
   joined_at: string;
@@ -41,6 +42,7 @@ export type PublicMember = {
   status: string;
   willingToShare: boolean;
   willingToJoinProjects: boolean;
+  isCoBuilder: boolean;
   isPubliclyVisible: boolean;
   isFeaturedOnHome: boolean;
   joinedAt: string;
@@ -59,6 +61,7 @@ export type PublicMembersDirectory = {
     registeredMembers: number;
     publicMembers: number;
     organizers: number;
+    coBuilders: number;
     willingToShare: number;
     willingToJoinProjects: number;
     cities: number;
@@ -67,6 +70,25 @@ export type PublicMembersDirectory = {
 
 const PUBLIC_MEMBERS_REVALIDATE_SECONDS = 60;
 const PUBLIC_MEMBER_TAG_LIMIT = 18;
+const coreMemberStatuses = new Set(["admin", "organizer"]);
+
+export function isCorePublicMember(member: Pick<PublicMember, "status">) {
+  return coreMemberStatuses.has(member.status);
+}
+
+export function getPublicMemberTierWeight(
+  member: Pick<PublicMember, "status" | "isCoBuilder">,
+) {
+  if (isCorePublicMember(member)) {
+    return 0;
+  }
+
+  if (member.isCoBuilder) {
+    return 1;
+  }
+
+  return 2;
+}
 
 function pickMembers(
   members: PublicMember[],
@@ -103,10 +125,27 @@ function mapPublicMember(row: PublicMemberRow): PublicMember {
     status: row.status,
     willingToShare: row.willing_to_share,
     willingToJoinProjects: row.willing_to_join_projects,
+    isCoBuilder: Boolean(row.is_co_builder),
     isPubliclyVisible: row.is_publicly_visible,
     isFeaturedOnHome: row.is_featured_on_home,
     joinedAt: row.joined_at,
   };
+}
+
+function comparePublicMembers(a: PublicMember, b: PublicMember) {
+  const tierDiff = getPublicMemberTierWeight(a) - getPublicMemberTierWeight(b);
+
+  if (tierDiff !== 0) {
+    return tierDiff;
+  }
+
+  const joinedAtDiff = new Date(a.joinedAt).getTime() - new Date(b.joinedAt).getTime();
+
+  if (joinedAtDiff !== 0) {
+    return joinedAtDiff;
+  }
+
+  return a.displayName.localeCompare(b.displayName, "zh-CN");
 }
 
 function buildTopSkillTags(members: PublicMember[]) {
@@ -163,6 +202,7 @@ export async function getPublicMembersDirectory(): Promise<PublicMembersDirector
         registeredMembers: 0,
         publicMembers: 0,
         organizers: 0,
+        coBuilders: 0,
         willingToShare: 0,
         willingToJoinProjects: 0,
         cities: 0,
@@ -188,29 +228,33 @@ const getCachedPublicMembersDirectory = unstable_cache(
       supabase.rpc("list_public_members"),
       supabase.rpc("get_public_member_stats").maybeSingle(),
     ]);
-    const members = ((data ?? []) as PublicMemberRow[]).map(mapPublicMember);
+    const members = ((data ?? []) as PublicMemberRow[])
+      .map(mapPublicMember)
+      .sort(comparePublicMembers);
     const statsData = (statsDataRaw ?? null) as PublicMemberStatsRow | null;
     const cityCount = new Set(members.map((member) => member.city)).size;
     const registeredMembers =
       typeof statsData?.registered_members === "number"
         ? statsData.registered_members
         : members.length;
+    const coreMemberIds = new Set(
+      members.filter(isCorePublicMember).map((member) => member.id),
+    );
     const organizers = pickMembers(
       members,
-      (member) => ["admin", "organizer"].includes(member.status),
+      isCorePublicMember,
       4,
     );
-    const organizerIds = new Set(organizers.map((member) => member.id));
-    const sharers = pickMembersExcluding(
+    const coBuilders = pickMembersExcluding(
       members,
-      (member) => member.willingToShare,
-      organizerIds,
+      (member) => member.isCoBuilder,
+      coreMemberIds,
       4,
     );
-    const builders = pickMembersExcluding(
+    const highlightedMembers = pickMembersExcluding(
       members,
-      (member) => member.willingToJoinProjects,
-      organizerIds,
+      (member) => !member.isCoBuilder,
+      new Set([...coreMemberIds, ...coBuilders.map((member) => member.id)]),
       4,
     );
 
@@ -220,28 +264,29 @@ const getCachedPublicMembersDirectory = unstable_cache(
       featuredGroups: [
         {
           id: "organizers",
-          title: "核心组织者",
-          description: "帮助你快速了解社区节奏、活动方向与组织角色。",
+          title: "核心成员 / 发起人",
+          description: "负责社区方向、活动节奏与长期维护，是最先被看见的组织角色。",
           members: organizers,
         },
         {
-          id: "sharers",
-          title: "愿意分享的成员",
-          description: "适合作为活动嘉宾、主题共创者与内容交流对象。",
-          members: sharers,
+          id: "co-builders",
+          title: "共建成员",
+          description: "已经开始参与活动组织、内容运营、项目协作或社区支持的小伙伴。",
+          members: coBuilders,
         },
         {
-          id: "builders",
-          title: "愿意参与共建",
-          description: "适合项目协作、需求对接与小范围试点推进。",
-          members: builders,
+          id: "members",
+          title: "社区成员",
+          description: "公开展示的普通成员，包含愿意分享、愿意参与共建等不同意向。",
+          members: highlightedMembers,
         },
       ].filter((group) => group.members.length > 0),
       stats: {
         registeredMembers,
         publicMembers: members.length,
-        organizers: members.filter((member) =>
-          ["admin", "organizer"].includes(member.status),
+        organizers: members.filter(isCorePublicMember).length,
+        coBuilders: members.filter(
+          (member) => !isCorePublicMember(member) && member.isCoBuilder,
         ).length,
         willingToShare: members.filter((member) => member.willingToShare).length,
         willingToJoinProjects: members.filter((member) => member.willingToJoinProjects).length,

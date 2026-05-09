@@ -67,6 +67,7 @@ type PublicMemberRow = {
   status: string;
   willing_to_share: boolean;
   willing_to_join_projects: boolean;
+  is_co_builder: boolean;
   is_publicly_visible: boolean;
   is_featured_on_home: boolean;
   joined_at: string;
@@ -130,6 +131,7 @@ function mapPublicMember(row: PublicMemberRow): PublicMember {
     status: row.status,
     willingToShare: row.willing_to_share,
     willingToJoinProjects: row.willing_to_join_projects,
+    isCoBuilder: Boolean(row.is_co_builder),
     isPubliclyVisible: row.is_publicly_visible,
     isFeaturedOnHome: row.is_featured_on_home,
     joinedAt: row.joined_at,
