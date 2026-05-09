@@ -3,11 +3,13 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
+  BadgeCheck,
   Boxes,
+  BriefcaseBusiness,
   CalendarDays,
   GitBranch,
   Lightbulb,
-  MessageCircle,
+  Timer,
   Rocket,
   Sparkles,
   UsersRound,
@@ -16,6 +18,7 @@ import {
 import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { getCompletedEventRecaps } from "@/lib/community-events";
 import { getPublicMembersDirectory } from "@/lib/community-members";
+import { getVisibleProjectOpportunities } from "@/lib/community-projects";
 import { joinSteps, opcTracks, projectStatus } from "@/lib/site-data";
 
 import styles from "./projects-page.module.css";
@@ -71,11 +74,13 @@ const buildStepToneClasses = {
 } as const;
 
 export default async function ProjectsPage() {
-  const [directory, completedEvents] = await Promise.all([
+  const [directory, completedEvents, projectDirectory] = await Promise.all([
     getPublicMembersDirectory(),
     getCompletedEventRecaps(),
+    getVisibleProjectOpportunities(),
   ]);
   const latestEvent = completedEvents[0];
+  const openOpportunities = projectDirectory.opportunities;
   const projectStats = [
     {
       value: directory.stats.willingToJoinProjects || "持续招募",
@@ -84,21 +89,21 @@ export default async function ProjectsPage() {
       icon: UsersRound,
     },
     {
-      value: completedEvents.length || 7,
-      label: "活动线索",
-      detail: "从交流中沉淀项目机会",
-      icon: CalendarDays,
+      value: projectDirectory.stats.opportunities || "逐步开放",
+      label: "开放机会",
+      detail: "公开或成员可见的共建项目",
+      icon: BriefcaseBusiness,
     },
     {
-      value: opcTracks.length,
-      label: "OPC 方向",
-      detail: "个人产品与高杠杆实践",
-      icon: Sparkles,
+      value: projectDirectory.stats.recruiting || "待发布",
+      label: "招募中",
+      detail: "可报名或申请对接",
+      icon: BadgeCheck,
     },
     {
-      value: projectStatus.length,
-      label: "共建状态",
-      detail: "从孵化到明确角色",
+      value: projectDirectory.stats.roleCount || "按需匹配",
+      label: "角色类型",
+      detail: "项目经理、开发、运营等",
       icon: Boxes,
     },
   ];
@@ -118,20 +123,22 @@ export default async function ProjectsPage() {
           </p>
 
           <div className={styles.projectsHeroActions}>
-            <Link href="/cooperate" className="button home-primary-button">
-              发起合作
+            <Link href="#opportunities" className="button home-primary-button">
+              查看开放机会
               <ArrowRight aria-hidden="true" strokeWidth={2} />
             </Link>
-            <Link href="/members" className="button home-ghost-button">
-              找共建成员
+            <Link href="/cooperate" className="button home-ghost-button">
+              发起合作
             </Link>
           </div>
 
           <div className={styles.projectsHeroProof}>
             <strong>{directory.stats.willingToJoinProjects || "共建中"}</strong>
             <span>
-              位成员标记了共建意愿，最近线索来自
-              {latestEvent ? `「${latestEvent.title}」` : "线下活动与社区交流"}。
+              位成员标记了共建意愿，
+              {openOpportunities.length > 0
+                ? `当前有 ${openOpportunities.length} 个开放机会可查看。`
+                : `最近线索来自${latestEvent ? `「${latestEvent.title}」` : "线下活动与社区交流"}。`}
             </span>
           </div>
         </div>
@@ -187,6 +194,89 @@ export default async function ProjectsPage() {
             </article>
           );
         })}
+      </section>
+
+      <section className={styles.projectsOpportunitySection} id="opportunities">
+        <div className={styles.projectsSectionHeading}>
+          <p className="home-kicker">Opportunities</p>
+          <div>
+            <h2>开放共建机会</h2>
+            <p>
+              这里展示经过社区确认后适合公开招募或申请对接的项目机会，轻量众包和大项目角色招募都可以放在同一套框架里。
+            </p>
+          </div>
+        </div>
+
+        {openOpportunities.length > 0 ? (
+          <div className={styles.projectsOpportunityGrid}>
+            {openOpportunities.map((opportunity) => (
+              <article className={styles.projectsOpportunityCard} key={opportunity.id}>
+                <div className={styles.projectsOpportunityHeader}>
+                  <div className={styles.projectsOpportunityBadges}>
+                    <span>{opportunity.typeLabel}</span>
+                    <span>{opportunity.statusLabel}</span>
+                    {opportunity.visibility !== "public" ? (
+                      <span>{opportunity.visibilityLabel}</span>
+                    ) : null}
+                  </div>
+                  <h3>{opportunity.title}</h3>
+                  <p>{opportunity.summary}</p>
+                </div>
+
+                <div className={styles.projectsOpportunityMeta}>
+                  {opportunity.headcountLabel ? (
+                    <span>
+                      <UsersRound aria-hidden="true" strokeWidth={1.8} />
+                      {opportunity.headcountLabel}
+                    </span>
+                  ) : null}
+                  {opportunity.timeCommitment ? (
+                    <span>
+                      <Timer aria-hidden="true" strokeWidth={1.8} />
+                      {opportunity.timeCommitment}
+                    </span>
+                  ) : null}
+                  {opportunity.compensation ? (
+                    <span>
+                      <Sparkles aria-hidden="true" strokeWidth={1.8} />
+                      {opportunity.compensation}
+                    </span>
+                  ) : null}
+                  {opportunity.deadlineLabel ? (
+                    <span>
+                      <CalendarDays aria-hidden="true" strokeWidth={1.8} />
+                      截止 {opportunity.deadlineLabel}
+                    </span>
+                  ) : null}
+                </div>
+
+                {[...opportunity.roleTags, ...opportunity.topicTags].length > 0 ? (
+                  <div className={styles.projectsOpportunityTags}>
+                    {[...opportunity.roleTags, ...opportunity.topicTags].slice(0, 8).map((tag) => (
+                      <span key={`${opportunity.id}-${tag}`}>{tag}</span>
+                    ))}
+                  </div>
+                ) : null}
+
+                <div className={styles.projectsOpportunityActions}>
+                  <Link href={opportunity.href} className="button home-primary-button">
+                    查看并申请
+                    <ArrowRight aria-hidden="true" strokeWidth={2} />
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className={styles.projectsOpportunityEmpty}>
+            <BriefcaseBusiness aria-hidden="true" strokeWidth={1.8} />
+            <strong>暂未开放公开招募项目</strong>
+            <p>社区会先确认需求边界、保密要求和可投入角色，再把适合公开招募的机会放到这里。</p>
+            <Link href="/cooperate" className="button home-ghost-button">
+              提交合作需求
+            </Link>
+          </div>
+        )}
       </section>
 
       <section className={styles.projectsStatusSection}>

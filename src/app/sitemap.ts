@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 
 import { getPublicMembersDirectory } from "@/lib/community-members";
+import { getVisibleProjectOpportunities } from "@/lib/community-projects";
 import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
 import { getPublicSponsors } from "@/lib/sponsors";
 
@@ -26,9 +27,10 @@ const routes = [
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [sponsors, memberDirectory] = await Promise.all([
+  const [sponsors, memberDirectory, projectDirectory] = await Promise.all([
     getPublicSponsors(),
     getPublicMembersDirectory(),
+    getVisibleProjectOpportunities(),
   ]);
   const staticRoutes = routes.map((route) => ({
     url: `https://changzhouai.club${route}`,
@@ -45,5 +47,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     lastModified: new Date(),
   }));
 
-  return [...staticRoutes, ...sponsorRoutes, ...memberRoutes];
+  const projectRoutes = projectDirectory.opportunities
+    .filter((opportunity) => opportunity.visibility === "public")
+    .map((opportunity) => ({
+      url: `https://changzhouai.club${opportunity.href}`,
+      lastModified: new Date(opportunity.updatedAt),
+    }));
+
+  return [...staticRoutes, ...sponsorRoutes, ...memberRoutes, ...projectRoutes];
 }

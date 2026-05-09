@@ -9,8 +9,37 @@ import { requireStaffContext } from "@/lib/supabase/guards";
 const ADMIN_EVENTS_PATH = "/admin/events";
 const ADMIN_LEADS_PATH = "/admin/leads";
 const ADMIN_MEMBERS_PATH = "/admin/members";
+const ADMIN_PROJECTS_PATH = "/admin/projects";
 const ADMIN_SOCIAL_PATH = "/admin/social";
 const ADMIN_WORKS_PATH = "/admin/works";
+const PROJECT_TYPES = new Set([
+  "crowdsource",
+  "project",
+  "project_manager",
+  "enterprise",
+  "role",
+  "idea",
+]);
+const PROJECT_STATUSES = new Set([
+  "draft",
+  "recruiting",
+  "matching",
+  "in_progress",
+  "filled",
+  "closed",
+  "archived",
+]);
+const PROJECT_VISIBILITIES = new Set(["public", "members", "private"]);
+const PROJECT_APPLICATION_STATUSES = new Set([
+  "new",
+  "reviewing",
+  "contacted",
+  "shortlisted",
+  "introduced",
+  "active",
+  "not_fit",
+  "withdrawn",
+]);
 const WORK_TYPES = new Set([
   "product",
   "project",
@@ -74,6 +103,26 @@ function getWorkReviewStatus(value: string) {
   return WORK_REVIEW_STATUSES.has(normalized) ? normalized : "pending";
 }
 
+function getProjectType(value: string) {
+  const normalized = value.trim();
+  return PROJECT_TYPES.has(normalized) ? normalized : "project";
+}
+
+function getProjectStatus(value: string) {
+  const normalized = value.trim();
+  return PROJECT_STATUSES.has(normalized) ? normalized : "draft";
+}
+
+function getProjectVisibility(value: string) {
+  const normalized = value.trim();
+  return PROJECT_VISIBILITIES.has(normalized) ? normalized : "public";
+}
+
+function getProjectApplicationStatus(value: string) {
+  const normalized = value.trim();
+  return PROJECT_APPLICATION_STATUSES.has(normalized) ? normalized : "new";
+}
+
 function buildRedirectPath(basePath: string, redirectTo: string | null, params: Record<string, string>) {
   const safeTarget = redirectTo?.startsWith("/") ? redirectTo : basePath;
   const [pathname, query = ""] = safeTarget.split("?");
@@ -122,6 +171,16 @@ function revalidateLeadPaths(leadId?: string) {
   if (leadId) {
     revalidatePath(`${ADMIN_LEADS_PATH}/${leadId}`);
   }
+}
+
+function revalidateProjectPaths(...slugs: Array<string | null | undefined>) {
+  revalidatePath(ADMIN_PROJECTS_PATH);
+  revalidatePath("/");
+  revalidatePath("/projects");
+
+  slugs.filter(Boolean).forEach((slug) => {
+    revalidatePath(`/projects/${slug}`);
+  });
 }
 
 function revalidateSocialPaths() {
@@ -758,6 +817,126 @@ export async function deleteAdminLeadMatch(formData: FormData) {
       saved: "lead_match_deleted",
     }),
   );
+}
+
+export async function saveAdminProjectOpportunity(formData: FormData) {
+  const { supabase, user } = await requireStaffContext();
+
+  const opportunityId = String(formData.get("opportunity_id") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const slugInput = String(formData.get("slug") ?? "").trim();
+  const slug = normalizeSlug(slugInput || title);
+  const summary = String(formData.get("summary") ?? "").trim();
+  let previousSlug: string | null = null;
+
+  if (!title || !summary || !slug) {
+    redirect(`${ADMIN_PROJECTS_PATH}?error=missing_project_fields`);
+  }
+
+  if (opportunityId) {
+    const { data: existingOpportunity } = await supabase
+      .from("project_opportunities")
+      .select("slug")
+      .eq("id", opportunityId)
+      .maybeSingle();
+
+    previousSlug = existingOpportunity?.slug ?? null;
+  }
+
+  const payload = {
+    slug,
+    title,
+    summary,
+    description: getOptionalValue(formData, "description"),
+    opportunity_type: getProjectType(String(formData.get("opportunity_type") ?? "")),
+    status: getProjectStatus(String(formData.get("status") ?? "")),
+    visibility: getProjectVisibility(String(formData.get("visibility") ?? "")),
+    role_tags: normalizeSkills(String(formData.get("role_tags") ?? "")),
+    topic_tags: normalizeSkills(String(formData.get("topic_tags") ?? "")),
+    headcount_label: getOptionalValue(formData, "headcount_label"),
+    time_commitment: getOptionalValue(formData, "time_commitment"),
+    compensation: getOptionalValue(formData, "compensation"),
+    deadline_at: normalizeAdminEventDateTime(getOptionalValue(formData, "deadline_at")),
+    location: getOptionalValue(formData, "location"),
+    application_cta: getOptionalValue(formData, "application_cta"),
+    application_note: getOptionalValue(formData, "application_note"),
+    sort_order: getOptionalInteger(formData, "sort_order"),
+    is_featured: formData.get("is_featured") === "on",
+  };
+
+  if (opportunityId) {
+    const { error } = await supabase
+      .from("project_opportunities")
+      .update(payload)
+      .eq("id", opportunityId);
+
+    if (error) {
+      redirect(`${ADMIN_PROJECTS_PATH}?error=database_write_failed`);
+    }
+  } else {
+    const { error } = await supabase.from("project_opportunities").insert({
+      ...payload,
+      created_by: user.id,
+      owner_id: user.id,
+    });
+
+    if (error) {
+      redirect(`${ADMIN_PROJECTS_PATH}?error=database_write_failed`);
+    }
+  }
+
+  revalidateProjectPaths(slug, previousSlug);
+  redirect(`${ADMIN_PROJECTS_PATH}?saved=project`);
+}
+
+export async function deleteAdminProjectOpportunity(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+  const opportunityId = String(formData.get("opportunity_id") ?? "").trim();
+  const slug = String(formData.get("slug") ?? "").trim();
+
+  if (!opportunityId) {
+    redirect(`${ADMIN_PROJECTS_PATH}?error=missing_required_fields`);
+  }
+
+  const { error } = await supabase
+    .from("project_opportunities")
+    .delete()
+    .eq("id", opportunityId);
+
+  if (error) {
+    redirect(`${ADMIN_PROJECTS_PATH}?error=database_write_failed`);
+  }
+
+  revalidateProjectPaths(slug);
+  redirect(`${ADMIN_PROJECTS_PATH}?saved=project_deleted`);
+}
+
+export async function updateAdminProjectApplication(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+
+  const applicationId = String(formData.get("application_id") ?? "").trim();
+  const projectId = String(formData.get("project_id") ?? "").trim();
+  const projectSlug = String(formData.get("project_slug") ?? "").trim();
+  const status = getProjectApplicationStatus(String(formData.get("status") ?? ""));
+
+  if (!applicationId || !projectId || !status) {
+    redirect(`${ADMIN_PROJECTS_PATH}?error=missing_required_fields`);
+  }
+
+  const { error } = await supabase
+    .from("project_applications")
+    .update({
+      status,
+      admin_note: getOptionalValue(formData, "admin_note"),
+    })
+    .eq("id", applicationId);
+
+  if (error) {
+    redirect(`${ADMIN_PROJECTS_PATH}?error=database_write_failed`);
+  }
+
+  revalidateProjectPaths(projectSlug);
+  redirect(`${ADMIN_PROJECTS_PATH}?saved=project_application`);
 }
 
 export async function saveAdminMemberWork(formData: FormData) {
