@@ -6,8 +6,6 @@ import {
   ArrowRight,
   BriefcaseBusiness,
   CalendarDays,
-  CheckCircle2,
-  Clock3,
   MapPin,
   ShieldCheck,
   Sparkles,
@@ -18,6 +16,7 @@ import {
 import { submitProjectApplication } from "@/app/(site)/projects/actions";
 import { getVisibleProjectOpportunityBySlug } from "@/lib/community-projects";
 
+import { ProjectApplicationToast } from "./project-application-toast";
 import styles from "./project-detail-page.module.css";
 
 type ProjectDetailSearchParams = {
@@ -136,19 +135,10 @@ export default async function ProjectDetailPage({
 
   return (
     <div className={styles.projectDetailPage}>
-      {query.applied ? (
-        <div className={styles.statusNote}>
-          <CheckCircle2 aria-hidden="true" strokeWidth={1.9} />
-          <span>申请已提交，社区会根据你留下的信息继续联系和筛选。</span>
-        </div>
-      ) : null}
-
-      {errorMessage ? (
-        <div className={`${styles.statusNote} ${styles.statusNoteError}`}>
-          <Clock3 aria-hidden="true" strokeWidth={1.9} />
-          <span>{errorMessage}</span>
-        </div>
-      ) : null}
+      <ProjectApplicationToast
+        applied={Boolean(query.applied)}
+        errorMessage={errorMessage}
+      />
 
       <Link href="/projects#opportunities" className={styles.backLink}>
         <ArrowLeft aria-hidden="true" strokeWidth={1.9} />
