@@ -7,100 +7,189 @@ import {
   Boxes,
   BriefcaseBusiness,
   CalendarDays,
+  ChevronDown,
   Handshake,
   Radar,
   Share2,
   Users,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 
 import { cn, cssModuleCxWithGlobals } from "@/lib/utils";
 
 import styles from "@/app/admin/admin-layout.module.css";
 
-const adminNavItems = [
+type AdminNavItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+};
+
+type AdminNavGroup = {
+  id: string;
+  label: string;
+  items: AdminNavItem[];
+};
+
+const adminNavGroups: AdminNavGroup[] = [
   {
-    href: "/admin/events",
-    label: "活动管理",
-    description: "活动列表、创建与编辑",
-    icon: CalendarDays,
+    id: "content",
+    label: "内容运营",
+    items: [
+      {
+        href: "/admin/events",
+        label: "活动管理",
+        icon: CalendarDays,
+      },
+      {
+        href: "/admin/ai-news-radar",
+        label: "AI 信息雷达",
+        icon: Radar,
+      },
+      {
+        href: "/admin/social",
+        label: "社交入口",
+        icon: Share2,
+      },
+    ],
   },
   {
-    href: "/admin/members",
-    label: "成员管理",
-    description: "成员资料与参与情况",
-    icon: Users,
+    id: "community",
+    label: "成员生态",
+    items: [
+      {
+        href: "/admin/members",
+        label: "成员管理",
+        icon: Users,
+      },
+      {
+        href: "/admin/projects",
+        label: "共建项目",
+        icon: BriefcaseBusiness,
+      },
+      {
+        href: "/admin/works",
+        label: "成员作品",
+        icon: Boxes,
+      },
+    ],
   },
   {
-    href: "/admin/leads",
-    label: "合作线索",
-    description: "需求线索与合作跟进",
-    icon: Handshake,
-  },
-  {
-    href: "/admin/projects",
-    label: "共建项目",
-    description: "项目机会、招募与申请",
-    icon: BriefcaseBusiness,
-  },
-  {
-    href: "/admin/works",
-    label: "成员作品",
-    description: "产品、工具、项目和案例",
-    icon: Boxes,
-  },
-  {
-    href: "/admin/ai-news-radar",
-    label: "AI 信息雷达",
-    description: "新闻抓取、筛选与候选结果",
-    icon: Radar,
-  },
-  {
-    href: "/admin/sponsors",
-    label: "赞助者",
-    description: "Logo、详情与图片排序",
-    icon: BadgeCheck,
-  },
-  {
-    href: "/admin/social",
-    label: "社交入口",
-    description: "平台入口与官方微信二维码",
-    icon: Share2,
+    id: "partnership",
+    label: "合作资源",
+    items: [
+      {
+        href: "/admin/leads",
+        label: "合作线索",
+        icon: Handshake,
+      },
+      {
+        href: "/admin/sponsors",
+        label: "赞助者",
+        icon: BadgeCheck,
+      },
+    ],
   },
 ];
 
 const cx = cssModuleCxWithGlobals.bind(null, styles);
+const defaultAdminNavGroupId = adminNavGroups[0]?.id ?? null;
+
+function isActivePath(pathname: string, href: string) {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function AdminNav() {
   const pathname = usePathname();
+  const activeGroupId = useMemo<string | null>(
+    () =>
+      adminNavGroups.find((group) =>
+        group.items.some((item) => isActivePath(pathname, item.href)),
+      )?.id ?? defaultAdminNavGroupId,
+    [pathname],
+  );
+  const [openGroupId, setOpenGroupId] = useState<string | null>(activeGroupId);
+
+  useEffect(() => {
+    setOpenGroupId(activeGroupId);
+  }, [activeGroupId]);
 
   return (
-    <nav className={cx("admin-nav")}>
-      {adminNavItems.map((item) => {
-        const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-        const Icon = item.icon;
+    <nav className={cx("admin-nav")} aria-label="后台导航">
+      {adminNavGroups.map((group) => {
+        const isOpen = openGroupId === group.id;
+        const isGroupActive = activeGroupId === group.id;
+        const panelId = `admin-nav-group-${group.id}`;
 
         return (
-          <Link
-            key={item.href}
-            href={item.href}
+          <section
+            key={group.id}
             className={cn(
-              cx("admin-nav-item group flex items-start gap-3 rounded-xl border px-3 py-3 transition-colors"),
-              isActive ? cx("admin-nav-item-active") : null,
+              cx("admin-nav-group"),
+              isGroupActive ? cx("admin-nav-group-active") : null,
             )}
           >
-            <span
-              className={cn(
-                cx("admin-nav-icon mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg"),
-                isActive ? cx("admin-nav-icon-active") : null,
-              )}
+            <button
+              type="button"
+              className={cx("admin-nav-group-trigger")}
+              aria-expanded={isOpen}
+              aria-controls={panelId}
+              onClick={() =>
+                setOpenGroupId((currentGroupId) =>
+                  currentGroupId === group.id && group.id !== activeGroupId
+                    ? null
+                    : group.id,
+                )
+              }
             >
-              <Icon className="size-4" />
-            </span>
-            <span className="grid gap-0.5">
-              <strong className="text-sm font-semibold">{item.label}</strong>
-              <span className="text-xs text-muted-foreground">{item.description}</span>
-            </span>
-          </Link>
+              <span className={cx("admin-nav-group-copy")}>
+                <strong>{group.label}</strong>
+              </span>
+              <span className={cx("admin-nav-group-meta")}>
+                <ChevronDown
+                  aria-hidden="true"
+                  className={cn(
+                    cx("admin-nav-group-chevron"),
+                    isOpen ? cx("admin-nav-group-chevron-open") : null,
+                  )}
+                />
+              </span>
+            </button>
+
+            {isOpen ? (
+              <div id={panelId} className={cx("admin-nav-group-items")}>
+                {group.items.map((item) => {
+                  const isActive = isActivePath(pathname, item.href);
+                  const Icon = item.icon;
+
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      aria-current={isActive ? "page" : undefined}
+                      className={cn(
+                        cx("admin-nav-item group transition-colors"),
+                        isActive ? cx("admin-nav-item-active") : null,
+                      )}
+                    >
+                      <span
+                        className={cn(
+                          cx("admin-nav-icon flex size-8 shrink-0 items-center justify-center rounded-lg"),
+                          isActive ? cx("admin-nav-icon-active") : null,
+                        )}
+                      >
+                        <Icon className="size-4" />
+                      </span>
+                      <span className={cx("admin-nav-item-copy")}>
+                        <strong className="text-sm font-semibold">{item.label}</strong>
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : null}
+          </section>
         );
       })}
     </nav>
