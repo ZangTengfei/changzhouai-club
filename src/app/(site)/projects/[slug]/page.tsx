@@ -6,6 +6,7 @@ import {
   ArrowRight,
   BriefcaseBusiness,
   CalendarDays,
+  CheckCircle2,
   MapPin,
   ShieldCheck,
   Sparkles,
@@ -91,6 +92,7 @@ export default async function ProjectDetailPage({
   }
 
   const errorMessage = getErrorMessage(query.error);
+  const hasApplied = Boolean(query.applied);
   const descriptionParagraphs = getParagraphs(opportunity.description);
   const isRecruiting = opportunity.status === "recruiting";
   const quickFacts = [
@@ -136,7 +138,7 @@ export default async function ProjectDetailPage({
   return (
     <div className={styles.projectDetailPage}>
       <ProjectApplicationToast
-        applied={Boolean(query.applied)}
+        applied={hasApplied}
         errorMessage={errorMessage}
       />
 
@@ -160,7 +162,7 @@ export default async function ProjectDetailPage({
           </div>
 
           <div className={styles.projectHeroActions}>
-            {isRecruiting ? (
+            {isRecruiting && !hasApplied ? (
               <Link href="#application-form" className="button home-primary-button">
                 {opportunity.applicationCta}
                 <ArrowRight aria-hidden="true" strokeWidth={2} />
@@ -256,14 +258,33 @@ export default async function ProjectDetailPage({
         <aside className={styles.applicationPanel} id="application-form">
           <div className={styles.applicationPanelHeading}>
             <p className="home-kicker">Apply</p>
-            <h2>{isRecruiting ? opportunity.applicationCta : "当前暂不开放申请"}</h2>
+            <h2>
+              {hasApplied
+                ? "申请已提交"
+                : isRecruiting
+                  ? opportunity.applicationCta
+                  : "当前暂不开放申请"}
+            </h2>
             <p>
-              {opportunity.applicationNote ??
-                "请补充你的角色意向、相关经验和可投入时间。具体项目筛选问题可以写在备注里。"}
+              {hasApplied
+                ? "你的申请已经进入社区后台，后续会根据你留下的信息继续联系和筛选。"
+                : (opportunity.applicationNote ??
+                  "请补充你的角色意向、相关经验和可投入时间。具体项目筛选问题可以写在备注里。")}
             </p>
           </div>
 
-          {isRecruiting ? (
+          {hasApplied ? (
+            <div className={styles.applicationSuccessPanel}>
+              <CheckCircle2 aria-hidden="true" strokeWidth={1.9} />
+              <div>
+                <strong>我们已经收到这次共建申请</strong>
+                <p>不用重复提交。你可以继续浏览其他共建机会，或等待社区后续联系。</p>
+              </div>
+              <Link href="/projects#opportunities" className="button home-ghost-button">
+                查看其他机会
+              </Link>
+            </div>
+          ) : isRecruiting ? (
             <form action={submitProjectApplication} className={styles.applicationForm}>
               <input type="hidden" name="project_id" value={opportunity.id} />
               <input type="hidden" name="project_slug" value={opportunity.slug} />
