@@ -9,6 +9,7 @@ import {
   CalendarDays,
   ChevronDown,
   Handshake,
+  MessagesSquare,
   Radar,
   Share2,
   Users,
@@ -41,6 +42,11 @@ const adminNavGroups: AdminNavGroup[] = [
         href: "/admin/events",
         label: "活动管理",
         icon: CalendarDays,
+      },
+      {
+        href: "/admin/updates",
+        label: "社区动态",
+        icon: MessagesSquare,
       },
       {
         href: "/admin/ai-news-radar",

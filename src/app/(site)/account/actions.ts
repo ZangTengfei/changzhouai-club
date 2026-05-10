@@ -21,6 +21,14 @@ const WORK_TYPES = new Set([
   "service",
 ]);
 const WORK_STATUSES = new Set(["idea", "building", "launched", "paused", "archived"]);
+const COMMUNITY_UPDATE_TYPES = new Set([
+  "activity",
+  "project",
+  "share",
+  "help",
+  "collab",
+  "official",
+]);
 
 function isMissingSchemaColumnError(error: { code?: string | null } | null | undefined) {
   return error?.code === "PGRST204";
@@ -38,6 +46,14 @@ function normalizeTags(raw: string) {
     .split(/[,，\n]/)
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function normalizeImageUrls(raw: string) {
+  return raw
+    .split(/[,，\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 6);
 }
 
 function normalizeAvatarUrl(raw: string) {
@@ -88,6 +104,11 @@ function getWorkType(value: string) {
 function getWorkStatus(value: string) {
   const normalized = value.trim();
   return WORK_STATUSES.has(normalized) ? normalized : "building";
+}
+
+function getCommunityUpdateType(value: string) {
+  const normalized = value.trim();
+  return COMMUNITY_UPDATE_TYPES.has(normalized) ? normalized : "share";
 }
 
 function isUniqueViolationError(error: { code?: string | null } | null | undefined) {
@@ -356,6 +377,122 @@ export async function saveAccountMemberWork(formData: FormData) {
   revalidatePath("/works");
   revalidatePath(`/members/${user.id}`);
   redirect("/account?updated=work#works");
+}
+
+export async function saveAccountCommunityUpdate(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect(`/login?next=${encodeURIComponent("/account?submit=update#updates")}`);
+  }
+
+  const title = String(formData.get("title") ?? "").trim();
+  const content = String(formData.get("content") ?? "").trim();
+  const rawRelatedUrl = String(formData.get("related_url") ?? "");
+  const relatedUrl = normalizeOptionalUrl(rawRelatedUrl);
+  const imageUrls = normalizeImageUrls(String(formData.get("image_urls") ?? ""));
+  const hasInvalidUrl =
+    (rawRelatedUrl.trim() && !relatedUrl) ||
+    imageUrls.some((imageUrl) => !normalizeOptionalUrl(imageUrl));
+
+  if (!content) {
+    redirect("/account?error=missing_update_fields#updates");
+  }
+
+  if (hasInvalidUrl) {
+    redirect("/account?error=invalid_update_url#updates");
+  }
+
+  const { data: createdUpdate, error } = await supabase
+    .from("community_updates")
+    .insert({
+      author_id: user.id,
+      update_type: getCommunityUpdateType(String(formData.get("update_type") ?? "")),
+      title: title || null,
+      content,
+      tags: normalizeTags(String(formData.get("tags") ?? "")),
+      related_type: relatedUrl ? "external" : null,
+      related_url: relatedUrl,
+      status: "pending",
+      is_featured: false,
+      is_pinned: false,
+      created_by: user.id,
+    })
+    .select("id")
+    .single();
+
+  if (error || !createdUpdate?.id) {
+    console.error("Failed to submit account community update.", {
+      error,
+      userId: user.id,
+    });
+    redirect("/account?error=update_save_failed#updates");
+  }
+
+  if (imageUrls.length > 0) {
+    const { error: imageError } = await supabase
+      .from("community_update_images")
+      .insert(
+        imageUrls.map((imageUrl, index) => ({
+          update_id: createdUpdate.id,
+          image_url: normalizeOptionalUrl(imageUrl),
+          sort_order: index,
+        })),
+      );
+
+    if (imageError) {
+      console.error("Failed to save account community update images.", {
+        imageError,
+        updateId: createdUpdate.id,
+        userId: user.id,
+      });
+      redirect("/account?error=update_save_failed#updates");
+    }
+  }
+
+  revalidatePath("/account");
+  revalidatePath("/");
+  revalidatePath("/updates");
+  redirect("/account?updated=community_update#updates");
+}
+
+export async function deleteAccountCommunityUpdate(formData: FormData) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login?next=/account");
+  }
+
+  const updateId = String(formData.get("update_id") ?? "").trim();
+
+  if (updateId) {
+    const { error } = await supabase
+      .from("community_updates")
+      .delete()
+      .eq("id", updateId)
+      .eq("author_id", user.id)
+      .neq("status", "published");
+
+    if (error) {
+      console.error("Failed to delete account community update.", {
+        error,
+        updateId,
+        userId: user.id,
+      });
+      redirect("/account?error=update_save_failed#updates");
+    }
+  }
+
+  revalidatePath("/account");
+  revalidatePath("/");
+  revalidatePath("/updates");
+  redirect("/account?updated=community_update_deleted#updates");
 }
 
 export async function deleteAccountMemberWork(formData: FormData) {

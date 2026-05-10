@@ -5,6 +5,7 @@
 
 .disabledPanel,
 .accountSummary,
+.accountUpdatesSection,
 .accountWorksSection,
 .registrationSection {
   display: grid;
@@ -361,6 +362,200 @@
   gap: 18px;
 }
 
+.accountUpdatesSection {
+  display: grid;
+  gap: 18px;
+}
+
+.accountUpdateForm {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 0 18px 18px;
+}
+
+.accountUpdateDialogForm {
+  padding: 0;
+}
+
+.accountUpdateForm label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.accountUpdateForm label > span {
+  color: #132321;
+  font-size: 0.86rem;
+  font-weight: 850;
+}
+
+.accountUpdateForm :global(.input),
+.accountUpdateForm :global(.textarea) {
+  border-color: rgba(var(--ink-rgb), 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.accountUpdateWideField,
+.accountUpdateFormFooter {
+  grid-column: 1 / -1;
+}
+
+.accountUpdateFormFooter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.accountUpdateFormFooter span {
+  color: rgba(var(--ink-rgb), 0.58);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.accountUpdateList {
+  display: grid;
+  gap: 14px;
+}
+
+.accountUpdateCard {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-radius: 20px;
+  background: rgba(255, 252, 247, 0.72);
+}
+
+.accountUpdateCardHead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: start;
+}
+
+.accountUpdateCardHead h3,
+.accountUpdateCardHead p,
+.accountUpdateCard > p {
+  margin: 0;
+}
+
+.accountUpdateCardHead h3 {
+  margin-top: 10px;
+  color: #111a1d;
+  font-size: 1.22rem;
+  line-height: 1.18;
+}
+
+.accountUpdateCardHead p,
+.accountUpdateCard > p {
+  color: rgba(var(--ink-rgb), 0.62);
+  line-height: 1.58;
+}
+
+.accountUpdateCard > p {
+  white-space: pre-wrap;
+}
+
+.accountUpdateMetrics {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.accountUpdateMetrics span {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  color: rgba(var(--ink-rgb), 0.58);
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.accountUpdateMetrics svg {
+  width: 15px;
+  height: 15px;
+}
+
+.updateReviewBadge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  margin-right: 6px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.updateReviewPending {
+  border-color: rgba(238, 127, 24, 0.18);
+  background: rgba(238, 127, 24, 0.1);
+  color: #b45f14;
+}
+
+.updateReviewPublished {
+  border-color: rgba(var(--accent-rgb), 0.18);
+  background: rgba(var(--accent-rgb), 0.1);
+  color: var(--accent-strong);
+}
+
+.updateReviewChanges {
+  border-color: rgba(42, 123, 211, 0.18);
+  background: rgba(42, 123, 211, 0.1);
+  color: #236bb8;
+}
+
+.updateReviewRejected {
+  border-color: rgba(197, 91, 79, 0.2);
+  background: rgba(197, 91, 79, 0.1);
+  color: var(--destructive);
+}
+
+.updateReviewFeatured {
+  border-color: rgba(246, 190, 75, 0.3);
+  background: rgba(246, 190, 75, 0.16);
+  color: #9a6414;
+}
+
+.accountUpdateTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.accountUpdateTags span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 9px;
+  border: 1px solid rgba(var(--accent-rgb), 0.12);
+  border-radius: 999px;
+  background: rgba(var(--accent-rgb), 0.07);
+  color: rgba(var(--ink-rgb), 0.66);
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.accountUpdateNote {
+  padding: 12px 14px;
+  border: 1px dashed rgba(42, 123, 211, 0.22);
+  border-radius: 14px;
+  background: rgba(42, 123, 211, 0.07);
+  color: #236bb8;
+  font-size: 0.88rem;
+  font-weight: 750;
+  line-height: 1.58;
+}
+
 .accountWorkCard {
   border: 1px solid rgba(var(--ink-rgb), 0.08);
   border-radius: 20px;
@@ -697,6 +892,7 @@
 
   .accountSummary,
   .accountProfileForm,
+  .accountUpdatesSection,
   .accountWorksSection,
   .registrationSection,
   .disabledPanel {
@@ -705,6 +901,8 @@
 
   .accountAvatarCard,
   .accountMetaGrid,
+  .accountUpdateForm,
+  .accountUpdateCardHead,
   .accountWorkForm,
   .accountWorkCardHead,
   .accountSummaryActions {
@@ -724,6 +922,8 @@
   .accountSummaryActions :global(.button),
   .accountSummaryActions :global(.auth-button),
   .accountSectionAction,
+  .accountUpdateFormFooter :global(.button),
+  .accountUpdateCard :global(.button),
   .accountWorkFormFooter :global(.button),
   .accountWorkCard :global(.button),
   .emptyRegistrationPanel :global(.button) {

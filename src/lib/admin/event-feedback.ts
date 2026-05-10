@@ -24,6 +24,8 @@ const adminSavedMessageMap: Record<string, string> = {
   project_deleted: "共建机会已删除。",
   project_application: "项目申请状态已更新。",
   project_application_deleted: "项目申请记录已删除。",
+  community_update: "社区动态已保存。",
+  community_update_deleted: "社区动态已删除。",
   work: "成员作品已保存。",
   work_deleted: "成员作品已删除。",
 };
@@ -34,6 +36,8 @@ const adminErrorMessageMap: Record<string, string> = {
   missing_sponsor_image_fields: "请至少填写赞助者图片路径，再提交。",
   missing_project_fields: "请至少填写项目标题、链接和一句话摘要。",
   missing_work_fields: "请至少选择成员，并填写作品名称和一句话介绍。",
+  missing_update_fields: "请至少选择成员，并填写动态正文。",
+  invalid_update_url: "动态链接格式无效，请填写以 http 或 https 开头的公开链接。",
   invalid_qr_expiration: "二维码过期时间必须晚于开始展示时间。",
   invalid_public_slug: "成员主页链接无效，请使用 3-32 位小写英文、数字或短横线。",
   public_slug_taken: "成员主页链接已被占用，请换一个。",

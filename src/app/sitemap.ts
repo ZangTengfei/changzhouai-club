@@ -8,6 +8,7 @@ import { getPublicSponsors } from "@/lib/sponsors";
 const routes = [
   "",
   "/events",
+  "/updates",
   "/news",
   "/projects",
   "/members",

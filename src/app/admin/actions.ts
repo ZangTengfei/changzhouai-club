@@ -11,7 +11,30 @@ const ADMIN_LEADS_PATH = "/admin/leads";
 const ADMIN_MEMBERS_PATH = "/admin/members";
 const ADMIN_PROJECTS_PATH = "/admin/projects";
 const ADMIN_SOCIAL_PATH = "/admin/social";
+const ADMIN_UPDATES_PATH = "/admin/updates";
 const ADMIN_WORKS_PATH = "/admin/works";
+const COMMUNITY_UPDATE_TYPES = new Set([
+  "activity",
+  "project",
+  "share",
+  "help",
+  "collab",
+  "official",
+]);
+const COMMUNITY_UPDATE_STATUSES = new Set([
+  "pending",
+  "published",
+  "changes_requested",
+  "rejected",
+  "archived",
+]);
+const COMMUNITY_UPDATE_RELATED_TYPES = new Set([
+  "event",
+  "work",
+  "project",
+  "doc",
+  "external",
+]);
 const PROJECT_TYPES = new Set([
   "crowdsource",
   "project",
@@ -86,6 +109,49 @@ function normalizeSkills(raw: string) {
     .split(/[,，\n]/)
     .map((item) => item.trim())
     .filter(Boolean);
+}
+
+function normalizeImageUrls(raw: string) {
+  return raw
+    .split(/[,，\n]/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, 6);
+}
+
+function normalizeOptionalUrlValue(raw: string | null) {
+  const value = raw?.trim() ?? "";
+
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const url = new URL(value);
+
+    if (!["http:", "https:"].includes(url.protocol)) {
+      return null;
+    }
+
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+function getCommunityUpdateType(value: string) {
+  const normalized = value.trim();
+  return COMMUNITY_UPDATE_TYPES.has(normalized) ? normalized : "share";
+}
+
+function getCommunityUpdateStatus(value: string) {
+  const normalized = value.trim();
+  return COMMUNITY_UPDATE_STATUSES.has(normalized) ? normalized : "pending";
+}
+
+function getCommunityUpdateRelatedType(value: string) {
+  const normalized = value.trim();
+  return COMMUNITY_UPDATE_RELATED_TYPES.has(normalized) ? normalized : null;
 }
 
 function getWorkType(value: string) {
@@ -186,6 +252,16 @@ function revalidateProjectPaths(...slugs: Array<string | null | undefined>) {
 function revalidateSocialPaths() {
   revalidatePath(ADMIN_SOCIAL_PATH);
   revalidatePath("/");
+}
+
+function revalidateCommunityUpdatePaths(updateId?: string) {
+  revalidatePath(ADMIN_UPDATES_PATH);
+  revalidatePath("/");
+  revalidatePath("/updates");
+
+  if (updateId) {
+    revalidatePath(`/updates/${updateId}`);
+  }
 }
 
 function revalidateWorkPaths(memberId?: string) {
@@ -960,6 +1036,139 @@ export async function deleteAdminProjectApplication(formData: FormData) {
 
   revalidateProjectPaths(projectSlug);
   redirect(`${ADMIN_PROJECTS_PATH}?saved=project_application_deleted`);
+}
+
+export async function saveAdminCommunityUpdate(formData: FormData) {
+  const { supabase, user } = await requireStaffContext();
+
+  const updateId = String(formData.get("update_id") ?? "").trim();
+  const authorId = String(formData.get("author_id") ?? "").trim();
+  const content = String(formData.get("content") ?? "").trim();
+  const title = getOptionalValue(formData, "title");
+  const status = getCommunityUpdateStatus(String(formData.get("status") ?? ""));
+  const relatedType = getCommunityUpdateRelatedType(
+    String(formData.get("related_type") ?? ""),
+  );
+  const rawRelatedUrl = String(formData.get("related_url") ?? "");
+  const relatedUrl = normalizeOptionalUrlValue(rawRelatedUrl);
+  const imageUrls = normalizeImageUrls(String(formData.get("image_urls") ?? ""));
+  const hasInvalidUrl =
+    (rawRelatedUrl.trim() && !relatedUrl) ||
+    imageUrls.some((url) => !normalizeOptionalUrlValue(url));
+
+  if (!authorId || !content) {
+    redirect(`${ADMIN_UPDATES_PATH}?error=missing_update_fields`);
+  }
+
+  if (hasInvalidUrl) {
+    redirect(`${ADMIN_UPDATES_PATH}?error=invalid_update_url`);
+  }
+
+  const { data: existingUpdate } = updateId
+    ? await supabase
+        .from("community_updates")
+        .select("published_at")
+        .eq("id", updateId)
+        .maybeSingle()
+    : { data: null };
+  const publishedAt =
+    status === "published"
+      ? existingUpdate?.published_at ?? new Date().toISOString()
+      : null;
+  const shouldPubliclyFeature = status === "published";
+  const payload = {
+    author_id: authorId,
+    update_type: getCommunityUpdateType(String(formData.get("update_type") ?? "")),
+    title,
+    content,
+    tags: normalizeSkills(String(formData.get("tags") ?? "")),
+    related_type: relatedType,
+    related_url: relatedUrl,
+    status,
+    moderation_note: getOptionalValue(formData, "moderation_note"),
+    sort_order: getOptionalInteger(formData, "sort_order"),
+    is_featured: shouldPubliclyFeature && formData.get("is_featured") === "on",
+    is_pinned: shouldPubliclyFeature && formData.get("is_pinned") === "on",
+    published_at: publishedAt,
+    reviewed_by: user.id,
+  };
+
+  let savedUpdateId = updateId;
+
+  if (updateId) {
+    const { error } = await supabase
+      .from("community_updates")
+      .update(payload)
+      .eq("id", updateId);
+
+    if (error) {
+      redirect(`${ADMIN_UPDATES_PATH}?error=database_write_failed`);
+    }
+  } else {
+    const { data: createdUpdate, error } = await supabase
+      .from("community_updates")
+      .insert({
+        ...payload,
+        created_by: user.id,
+      })
+      .select("id")
+      .single();
+
+    if (error || !createdUpdate?.id) {
+      redirect(`${ADMIN_UPDATES_PATH}?error=database_write_failed`);
+    }
+
+    savedUpdateId = createdUpdate.id;
+  }
+
+  const { error: deleteImagesError } = await supabase
+    .from("community_update_images")
+    .delete()
+    .eq("update_id", savedUpdateId);
+
+  if (deleteImagesError) {
+    redirect(`${ADMIN_UPDATES_PATH}?error=database_write_failed`);
+  }
+
+  if (imageUrls.length > 0) {
+    const { error: imageInsertError } = await supabase
+      .from("community_update_images")
+      .insert(
+        imageUrls.map((imageUrl, index) => ({
+          update_id: savedUpdateId,
+          image_url: normalizeOptionalUrlValue(imageUrl),
+          sort_order: index,
+        })),
+      );
+
+    if (imageInsertError) {
+      redirect(`${ADMIN_UPDATES_PATH}?error=database_write_failed`);
+    }
+  }
+
+  revalidateCommunityUpdatePaths(savedUpdateId);
+  redirect(`${ADMIN_UPDATES_PATH}?saved=community_update`);
+}
+
+export async function deleteAdminCommunityUpdate(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+  const updateId = String(formData.get("update_id") ?? "").trim();
+
+  if (!updateId) {
+    redirect(`${ADMIN_UPDATES_PATH}?error=missing_required_fields`);
+  }
+
+  const { error } = await supabase
+    .from("community_updates")
+    .delete()
+    .eq("id", updateId);
+
+  if (error) {
+    redirect(`${ADMIN_UPDATES_PATH}?error=database_write_failed`);
+  }
+
+  revalidateCommunityUpdatePaths(updateId);
+  redirect(`${ADMIN_UPDATES_PATH}?saved=community_update_deleted`);
 }
 
 export async function saveAdminMemberWork(formData: FormData) {
