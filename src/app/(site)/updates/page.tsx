@@ -8,17 +8,17 @@ import {
   Plus,
   Sparkles,
   Tags,
-  UsersRound,
 } from "lucide-react";
 
+import { MarkdownContent } from "@/components/markdown-content";
 import { MemberAvatar } from "@/components/member-avatar";
+import { formatChangzhouDateTime, formatChangzhouIsoDate } from "@/lib/changzhou-time";
 import {
   communityUpdateTypeLabels,
   getPublicCommunityUpdatesDirectory,
   isCommunityUpdateType,
   type PublicCommunityUpdate,
 } from "@/lib/community-updates";
-import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import { cn } from "@/lib/utils";
 
 import styles from "./updates-page.module.css";
@@ -34,25 +34,71 @@ type UpdatesPageProps = {
   }>;
 };
 
+type TimelineGroup = {
+  key: string;
+  label: string;
+  updates: PublicCommunityUpdate[];
+};
+
 const typeEntries = Object.entries(communityUpdateTypeLabels);
 
-function formatUpdateDate(value: string | null) {
-  if (!value) {
-    return "刚刚";
-  }
+function getUpdateDateValue(update: PublicCommunityUpdate) {
+  return update.publishedAt ?? update.createdAt;
+}
 
+function getUpdateTimestamp(update: PublicCommunityUpdate) {
+  const timestamp = new Date(getUpdateDateValue(update)).getTime();
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+function formatTimelineDay(value: string) {
   return formatChangzhouDateTime(value, {
     year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
+    month: "long",
+    day: "numeric",
   });
 }
 
-function UpdateCard({ update, featured = false }: { update: PublicCommunityUpdate; featured?: boolean }) {
-  const previewImages = update.images.slice(0, featured ? 3 : 2);
+function formatTimelineTime(value: string) {
+  return formatChangzhouDateTime(value, {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
+function getTimelineGroups(updates: PublicCommunityUpdate[]) {
+  const groups = new Map<string, TimelineGroup>();
+
+  [...updates]
+    .sort((a, b) => getUpdateTimestamp(b) - getUpdateTimestamp(a))
+    .forEach((update) => {
+      const updateDate = getUpdateDateValue(update);
+      const key = formatChangzhouIsoDate(updateDate) ?? updateDate;
+      const existingGroup = groups.get(key);
+
+      if (existingGroup) {
+        existingGroup.updates.push(update);
+        return;
+      }
+
+      groups.set(key, {
+        key,
+        label: formatTimelineDay(updateDate),
+        updates: [update],
+      });
+    });
+
+  return [...groups.values()];
+}
+
+function TimelineUpdate({ update }: { update: PublicCommunityUpdate }) {
+  const updateDate = getUpdateDateValue(update);
+  const previewImages = update.images.slice(0, 4);
+  const authorMeta = update.author.roleLabel ?? update.author.organization ?? update.author.city;
 
   return (
-    <article className={cn(styles.updateCard, featured ? styles.updateCardFeatured : null)}>
+    <article className={styles.updateCard}>
       <div className={styles.updateCardHead}>
         <Link href={update.author.href} className={styles.updateAuthor}>
           <MemberAvatar
@@ -62,26 +108,28 @@ function UpdateCard({ update, featured = false }: { update: PublicCommunityUpdat
           />
           <span>
             <strong>{update.author.displayName}</strong>
-            <small>
-              {update.author.roleLabel ?? update.author.organization ?? update.author.city}
-            </small>
+            <small>{authorMeta}</small>
           </span>
         </Link>
 
-        <time dateTime={update.publishedAt ?? update.createdAt}>
-          {formatUpdateDate(update.publishedAt ?? update.createdAt)}
-        </time>
+        <time dateTime={updateDate}>{formatTimelineTime(updateDate)}</time>
       </div>
 
-      <Link href={update.href} className={styles.updateCardBody}>
-        <div className={styles.updateTypeRow}>
-          <span>{update.typeLabel}</span>
-          {update.isFeatured ? <i>精华</i> : null}
-          {update.isPinned ? <i>置顶</i> : null}
-        </div>
-        <h2>{update.title || update.typeLabel}</h2>
-        <p>{update.excerpt}</p>
-      </Link>
+      <div className={styles.updateActionRow}>
+        <span>{update.typeLabel}</span>
+        {update.isPinned ? <i>置顶</i> : null}
+        {update.isFeatured ? <i>精华</i> : null}
+      </div>
+
+      <div className={styles.updateCardBody}>
+        {update.title ? (
+          <Link href={update.href} className={styles.updateTitleLink}>
+            <h2>{update.title}</h2>
+          </Link>
+        ) : null}
+
+        <MarkdownContent content={update.content} className={styles.updateContent} />
+      </div>
 
       {previewImages.length > 0 ? (
         <Link
@@ -90,6 +138,7 @@ function UpdateCard({ update, featured = false }: { update: PublicCommunityUpdat
             styles.updateImageGrid,
             previewImages.length === 1 ? styles.updateImageGridSingle : null,
           )}
+          aria-label={`查看 ${update.title ?? update.typeLabel} 的图片动态`}
         >
           {previewImages.map((image) => (
             <span key={image.id}>
@@ -136,87 +185,32 @@ export default async function UpdatesPage({ searchParams }: UpdatesPageProps) {
   const params = await searchParams;
   const activeType = params.type && isCommunityUpdateType(params.type) ? params.type : null;
   const directory = await getPublicCommunityUpdatesDirectory(activeType);
-  const featuredUpdates = directory.featuredUpdates;
-  const updates = directory.updates;
-  const stats = [
-    {
-      value: directory.stats.updates,
-      label: "公开动态",
-      detail: "成员分享与社区记录",
-      icon: MessageCircle,
-    },
-    {
-      value: directory.stats.featured,
-      label: "精华沉淀",
-      detail: "适合优先阅读",
-      icon: Sparkles,
-    },
-    {
-      value: directory.stats.authors,
-      label: "参与成员",
-      detail: "正在贡献一手经验",
-      icon: UsersRound,
-    },
-    {
-      value: directory.stats.images,
-      label: "图片记录",
-      detail: "活动与项目现场",
-      icon: Eye,
-    },
-  ];
+  const timelineGroups = getTimelineGroups(directory.updates);
+  const feedTitle = activeType ? communityUpdateTypeLabels[activeType] : "社区正在发生什么";
 
   return (
     <div className={styles.updatesPageStack}>
-      <section className={styles.updatesHero} aria-labelledby="updates-hero-title">
-        <div className={styles.updatesHeroCopy}>
+      <section className={styles.timelineHeader} aria-labelledby="updates-title">
+        <div className={styles.timelineHeaderCopy}>
           <p className="home-kicker">Updates · 社区动态</p>
-          <h1 id="updates-hero-title">
-            看见社区
-            <span>正在发生什么</span>
-          </h1>
+          <h1 id="updates-title">{feedTitle}</h1>
           <p>
-            这里沉淀活动现场、项目进展、经验分享、问题求助和协作招募。它比文档更轻，
-            也让值得反复查看的社区精华更容易被找到。
+            按时间记录活动现场、项目进展、经验分享、问题求助和协作招募。轻量记录先沉淀，
+            高价值内容再整理进活动回顾、项目共建或社区文档。
           </p>
-
-          <div className={styles.updatesHeroActions}>
-            <Link href="#updates-feed" className="button home-primary-button">
-              浏览动态
-              <ArrowRight aria-hidden="true" strokeWidth={2} />
-            </Link>
-            <Link href="/account?submit=update#updates" className="button home-ghost-button">
-              <Plus aria-hidden="true" strokeWidth={2} />
-              发布动态
-            </Link>
-          </div>
         </div>
 
-        <aside className={styles.updatesHeroPanel} aria-label="社区动态说明">
-          <span>Community Feed</span>
-          <strong>{directory.stats.updates || "动态待更新"}</strong>
-          <p>
-            先用轻量动态记录现场和想法，再把高价值内容整理进活动回顾、项目共建或社区文档。
-          </p>
-        </aside>
-      </section>
-
-      <section className={styles.updatesStatsPanel} aria-label="社区动态数据">
-        {stats.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <article className={styles.updatesStatCard} key={item.label}>
-              <Icon aria-hidden="true" strokeWidth={1.9} />
-              <strong>{item.value}</strong>
-              <span>{item.label}</span>
-              <small>{item.detail}</small>
-            </article>
-          );
-        })}
+        <div className={styles.timelineHeaderSide}>
+          <span>{directory.stats.updates} 条动态</span>
+          <Link href="/account?submit=update#updates" className="button home-primary-button">
+            <Plus aria-hidden="true" strokeWidth={2} />
+            发布动态
+          </Link>
+        </div>
       </section>
 
       <section className={styles.updatesFilterPanel} aria-label="动态类型筛选">
-        <nav>
+        <nav className={styles.typeFilters}>
           <Link
             href="/updates"
             className={!activeType ? styles.activeFilter : undefined}
@@ -244,51 +238,35 @@ export default async function UpdatesPage({ searchParams }: UpdatesPageProps) {
         ) : null}
       </section>
 
-      {featuredUpdates.length > 0 ? (
-        <section className={styles.updatesFeaturedSection} aria-labelledby="updates-featured-title">
-          <div className={styles.updatesSectionHeading}>
-            <p className="home-kicker">Featured</p>
-            <div>
-              <h2 id="updates-featured-title">精华动态</h2>
-              <p>优先展示已经被社区确认值得继续沉淀的内容。</p>
+      {timelineGroups.length > 0 ? (
+        <section className={styles.timelineSection} id="updates-feed" aria-label="社区动态时间线">
+          {timelineGroups.map((group) => (
+            <div className={styles.timelineGroup} key={group.key}>
+              <time className={styles.timelineDate} dateTime={group.key}>
+                {group.label}
+              </time>
+
+              <ol className={styles.timelineItems}>
+                {group.updates.map((update) => (
+                  <li className={styles.timelineItem} key={update.id}>
+                    <TimelineUpdate update={update} />
+                  </li>
+                ))}
+              </ol>
             </div>
-          </div>
-
-          <div className={styles.updatesFeaturedGrid}>
-            {featuredUpdates.slice(0, 2).map((update) => (
-              <UpdateCard update={update} featured key={`featured-${update.id}`} />
-            ))}
-          </div>
+          ))}
         </section>
-      ) : null}
-
-      <section className={styles.updatesFeedSection} id="updates-feed">
-        <div className={styles.updatesSectionHeading}>
-          <p className="home-kicker">Feed</p>
-          <div>
-            <h2>{activeType ? communityUpdateTypeLabels[activeType] : "全部动态"}</h2>
-            <p>从日常分享里看见真实活动、真实问题和真实协作机会。</p>
-          </div>
-        </div>
-
-        {updates.length > 0 ? (
-          <div className={styles.updatesFeedList}>
-            {updates.map((update) => (
-              <UpdateCard update={update} key={update.id} />
-            ))}
-          </div>
-        ) : (
-          <div className={styles.updatesEmptyPanel}>
-            <Sparkles aria-hidden="true" strokeWidth={1.8} />
-            <strong>这里还在等待第一批动态</strong>
-            <p>成员提交并审核通过后，活动瞬间、项目进展和经验分享会出现在这里。</p>
-            <Link href="/account?submit=update#updates" className="button home-primary-button">
-              <Plus aria-hidden="true" strokeWidth={2} />
-              发布动态
-            </Link>
-          </div>
-        )}
-      </section>
+      ) : (
+        <section className={styles.updatesEmptyPanel}>
+          <Sparkles aria-hidden="true" strokeWidth={1.8} />
+          <strong>这里还在等待第一批动态</strong>
+          <p>成员提交并审核通过后，活动瞬间、项目进展和经验分享会按时间出现在这里。</p>
+          <Link href="/account?submit=update#updates" className="button home-primary-button">
+            <Plus aria-hidden="true" strokeWidth={2} />
+            发布动态
+          </Link>
+        </section>
+      )}
     </div>
   );
 }
