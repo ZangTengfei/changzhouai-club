@@ -388,6 +388,15 @@ export default async function AdminProjectsPage({
               <AdminMetric label="招募中" value={stats.recruiting} />
               <AdminMetric label="可见" value={stats.visible} />
               <AdminMetric label="申请" value={stats.applications} />
+              <Button asChild variant="outline">
+                <a
+                  href="/api/admin/projects/applications/export"
+                  download
+                  aria-label="导出全部共建申请记录 CSV"
+                >
+                  导出申请记录
+                </a>
+              </Button>
               <AdminModal title="新增共建机会" triggerLabel="新增机会">
                 <ProjectOpportunityForm />
               </AdminModal>
