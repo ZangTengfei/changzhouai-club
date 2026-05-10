@@ -3,9 +3,7 @@ import Link from "next/link";
 import {
   CalendarDays,
   Clock3,
-  Heart,
   MapPin,
-  MessageCircle,
   UsersRound,
 } from "lucide-react";
 
@@ -18,7 +16,6 @@ import {
   getHomeCompletedEventRecaps,
   getScheduledEvents,
 } from "@/lib/community-events";
-import { getHomeCommunityUpdates } from "@/lib/community-updates";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import { getEventImageUrl } from "@/lib/public-image-url";
 import { getCurrentWechatQrCode } from "@/lib/community-social";
@@ -175,14 +172,12 @@ export default async function HomePage() {
     completedEventsCount,
     directory,
     wechatQrCode,
-    homeCommunityUpdates,
   ] = await Promise.all([
     getScheduledEvents(),
     getHomeCompletedEventRecaps(),
     getCompletedEventsCount(),
     getPublicMembersDirectory(),
     getCurrentWechatQrCode(),
-    getHomeCommunityUpdates(),
   ]);
   const primaryScheduledEvent = scheduledEvents[0];
   const hasUpcomingEvent = Boolean(primaryScheduledEvent);
@@ -502,78 +497,6 @@ export default async function HomePage() {
             </Link>
           ))}
         </div>
-      </section>
-
-      <section className={cx("home-community-updates")} aria-labelledby="home-community-updates-title">
-        <div className={cx("home-card-heading home-showcase-heading")}>
-          <div>
-            <h2 id="home-community-updates-title">社区正在发生什么</h2>
-            <p>轻量记录活动现场、项目进展和成员实践</p>
-          </div>
-          <Link href="/updates">查看更多 →</Link>
-        </div>
-
-        {homeCommunityUpdates.length > 0 ? (
-          <div className={cx("home-community-update-list")}>
-            {homeCommunityUpdates.map((update) => (
-              <Link
-                href={update.href}
-                className={cx("home-community-update-card")}
-                key={update.id}
-              >
-                <div className={cx("home-community-update-head")}>
-                  <div className={cx("home-community-update-avatar")} aria-hidden="true">
-                    {update.author.avatarUrl ? (
-                      <img
-                        src={update.author.avatarUrl}
-                        alt=""
-                        referrerPolicy="no-referrer"
-                      />
-                    ) : (
-                      <span>{update.author.displayName.slice(0, 1)}</span>
-                    )}
-                  </div>
-                  <div>
-                    <strong>{update.author.displayName}</strong>
-                    <small>
-                      {update.typeLabel} · {formatReviewDate(update.publishedAt ?? update.createdAt)}
-                    </small>
-                  </div>
-                </div>
-
-                <div className={cx("home-community-update-body")}>
-                  <h3>{update.title || update.typeLabel}</h3>
-                  <p>{update.excerpt}</p>
-                </div>
-
-                {update.images[0] ? (
-                  <div className={cx("home-community-update-media")}>
-                    <img
-                      src={update.images[0].imageUrl}
-                      alt={update.images[0].alt ?? update.title ?? update.typeLabel}
-                    />
-                  </div>
-                ) : null}
-
-                <div className={cx("home-community-update-foot")}>
-                  {update.tags[0] ? <span>{update.tags[0]}</span> : <span>{update.typeLabel}</span>}
-                  <small>
-                    <Heart aria-hidden="true" strokeWidth={1.8} />
-                    {update.likeCount}
-                  </small>
-                  <small>
-                    <MessageCircle aria-hidden="true" strokeWidth={1.8} />
-                    {update.commentCount}
-                  </small>
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className={cx("home-empty-state")}>
-            社区动态开放后，成员分享的活动瞬间、项目进展和实践经验会在这里出现。
-          </div>
-        )}
       </section>
 
       <section className={cx("home-event-review-section")} aria-labelledby="home-event-review-title">
