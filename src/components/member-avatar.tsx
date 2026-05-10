@@ -33,8 +33,15 @@ export function MemberAvatar({
 }: MemberAvatarProps) {
   const className =
     size === "sm"
-      ? `${styles["member-avatar"]} ${styles["member-avatar-sm"]}`
-      : styles["member-avatar"];
+      ? [
+          styles["member-avatar"],
+          styles["member-avatar-sm"],
+          "member-avatar",
+          "member-avatar-sm",
+        ].join(" ")
+      : `${styles["member-avatar"]} member-avatar`;
+  const imageClassName = `${styles["member-avatar-image"]} member-avatar-image`;
+  const fallbackClassName = `${styles["member-avatar-fallback"]} member-avatar-fallback`;
 
   if (avatarUrl) {
     return (
@@ -42,7 +49,7 @@ export function MemberAvatar({
         <img
           src={avatarUrl}
           alt={name}
-          className={styles["member-avatar-image"]}
+          className={imageClassName}
           loading="lazy"
           referrerPolicy="no-referrer"
         />
@@ -52,7 +59,7 @@ export function MemberAvatar({
 
   return (
     <span className={className}>
-      <span className={styles["member-avatar-fallback"]}>{getAvatarInitials(name)}</span>
+      <span className={fallbackClassName}>{getAvatarInitials(name)}</span>
     </span>
   );
 }

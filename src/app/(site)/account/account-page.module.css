@@ -47,13 +47,19 @@
 .accountAvatarCard {
   display: grid;
   grid-template-columns: 82px minmax(0, 1fr);
-  gap: 16px;
+  gap: 18px;
   align-items: center;
   min-width: 0;
   padding: 18px;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
   border-radius: 20px;
   background: rgba(255, 252, 247, 0.72);
+}
+
+.accountAvatarCard > div {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
 }
 
 .accountAvatarCard :global(.member-avatar) {
@@ -83,7 +89,6 @@
 }
 
 .accountAvatarCard span {
-  margin-top: 6px;
   color: rgba(var(--ink-rgb), 0.62);
   font-size: 0.92rem;
   font-weight: 750;
