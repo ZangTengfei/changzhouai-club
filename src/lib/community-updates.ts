@@ -169,8 +169,21 @@ function shouldIgnoreCommunityUpdateError(error: { code?: string | null }) {
 }
 
 function createExcerpt(content: string) {
-  const normalized = content.replace(/\s+/g, " ").trim();
-  return normalized.length > 128 ? `${normalized.slice(0, 128)}...` : normalized;
+  const normalized = content
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/!\[[^\]]*]\([^)]*\)/g, " ")
+    .replace(/\[([^\]]+)]\([^)]*\)/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^>\s?/gm, "")
+    .replace(/^\s*[-*+]\s+/gm, "")
+    .replace(/^\s*\d+[.)]\s+/gm, "")
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/__([^_]+)__/g, "$1")
+    .replace(/[*_~`|]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return normalized.length > 150 ? `${normalized.slice(0, 150)}...` : normalized;
 }
 
 function buildTags(updates: PublicCommunityUpdate[]) {

@@ -297,29 +297,15 @@
   color: var(--accent-strong);
 }
 
-.updateContent {
+.updateExcerpt {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0;
   color: rgba(var(--ink-rgb), 0.7);
   font-size: 0.98rem;
   line-height: 1.78;
-}
-
-.updateContent :global(h1) {
-  font-size: 1.22rem;
-}
-
-.updateContent :global(h2) {
-  font-size: 1.14rem;
-}
-
-.updateContent :global(h3),
-.updateContent :global(h4),
-.updateContent :global(h5),
-.updateContent :global(h6) {
-  font-size: 1.02rem;
-}
-
-.updateContent :global(blockquote) {
-  border-radius: 0 12px 12px 0;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
 }
 
 .updateImageGrid {

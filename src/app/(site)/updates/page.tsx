@@ -10,7 +10,6 @@ import {
   Tags,
 } from "lucide-react";
 
-import { MarkdownContent } from "@/components/markdown-content";
 import { MemberAvatar } from "@/components/member-avatar";
 import { formatChangzhouDateTime, formatChangzhouIsoDate } from "@/lib/changzhou-time";
 import {
@@ -128,7 +127,7 @@ function TimelineUpdate({ update }: { update: PublicCommunityUpdate }) {
           </Link>
         ) : null}
 
-        <MarkdownContent content={update.content} className={styles.updateContent} />
+        <p className={styles.updateExcerpt}>{update.excerpt}</p>
       </div>
 
       {previewImages.length > 0 ? (
