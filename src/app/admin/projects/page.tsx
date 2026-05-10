@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import {
+  deleteAdminProjectApplication,
   deleteAdminProjectOpportunity,
   saveAdminProjectOpportunity,
   updateAdminProjectApplication,
@@ -355,11 +356,18 @@ function ProjectApplicationCard({
           />
         </AdminField>
 
-        <div className="md:col-span-2">
+        <div className="flex flex-wrap gap-2 md:col-span-2">
           <Button type="submit" variant="secondary" size="sm">
             更新申请
           </Button>
         </div>
+      </form>
+      <form action={deleteAdminProjectApplication} className="mt-3">
+        <input type="hidden" name="application_id" value={application.id} />
+        <input type="hidden" name="project_slug" value={opportunity.slug} />
+        <Button type="submit" variant="destructive" size="sm">
+          删除这条提交
+        </Button>
       </form>
     </article>
   );

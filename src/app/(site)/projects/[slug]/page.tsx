@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { randomUUID } from "crypto";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
@@ -16,7 +17,9 @@ import {
 
 import { submitProjectApplication } from "@/app/(site)/projects/actions";
 import { getVisibleProjectOpportunityBySlug } from "@/lib/community-projects";
+import { createClient } from "@/lib/supabase/server";
 
+import { ProjectApplicationSubmitButton } from "./project-application-submit-button";
 import { ProjectApplicationToast } from "./project-application-toast";
 import styles from "./project-detail-page.module.css";
 
@@ -77,6 +80,35 @@ export async function generateMetadata({
   };
 }
 
+async function hasSignedInUserApplied(projectId: string) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return false;
+  }
+
+  const { data, error } = await supabase
+    .from("project_applications")
+    .select("id")
+    .eq("project_id", projectId)
+    .eq("applicant_user_id", user.id)
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Failed to check current user's project application.", {
+      projectId,
+      error,
+    });
+    return false;
+  }
+
+  return Boolean(data);
+}
+
 export default async function ProjectDetailPage({
   params,
   searchParams,
@@ -92,7 +124,9 @@ export default async function ProjectDetailPage({
   }
 
   const errorMessage = getErrorMessage(query.error);
-  const hasApplied = Boolean(query.applied);
+  const justSubmitted = Boolean(query.applied);
+  const hasApplied = justSubmitted || (await hasSignedInUserApplied(opportunity.id));
+  const submissionKey = randomUUID();
   const descriptionParagraphs = getParagraphs(opportunity.description);
   const isRecruiting = opportunity.status === "recruiting";
   const quickFacts = [
@@ -138,7 +172,7 @@ export default async function ProjectDetailPage({
   return (
     <div className={styles.projectDetailPage}>
       <ProjectApplicationToast
-        applied={hasApplied}
+        applied={justSubmitted}
         errorMessage={errorMessage}
       />
 
@@ -288,6 +322,7 @@ export default async function ProjectDetailPage({
             <form action={submitProjectApplication} className={styles.applicationForm}>
               <input type="hidden" name="project_id" value={opportunity.id} />
               <input type="hidden" name="project_slug" value={opportunity.slug} />
+              <input type="hidden" name="submission_key" value={submissionKey} />
 
               <label>
                 <span>称呼</span>
@@ -344,10 +379,7 @@ export default async function ProjectDetailPage({
                 />
               </label>
 
-              <button type="submit" className="button home-primary-button">
-                提交申请
-                <ArrowRight aria-hidden="true" strokeWidth={2} />
-              </button>
+              <ProjectApplicationSubmitButton />
             </form>
           ) : (
             <div className={styles.projectSoftNote}>

@@ -939,6 +939,29 @@ export async function updateAdminProjectApplication(formData: FormData) {
   redirect(`${ADMIN_PROJECTS_PATH}?saved=project_application`);
 }
 
+export async function deleteAdminProjectApplication(formData: FormData) {
+  const { supabase } = await requireStaffContext();
+
+  const applicationId = String(formData.get("application_id") ?? "").trim();
+  const projectSlug = String(formData.get("project_slug") ?? "").trim();
+
+  if (!applicationId) {
+    redirect(`${ADMIN_PROJECTS_PATH}?error=missing_required_fields`);
+  }
+
+  const { error } = await supabase
+    .from("project_applications")
+    .delete()
+    .eq("id", applicationId);
+
+  if (error) {
+    redirect(`${ADMIN_PROJECTS_PATH}?error=database_write_failed`);
+  }
+
+  revalidateProjectPaths(projectSlug);
+  redirect(`${ADMIN_PROJECTS_PATH}?saved=project_application_deleted`);
+}
+
 export async function saveAdminMemberWork(formData: FormData) {
   const { supabase, user } = await requireStaffContext();
 

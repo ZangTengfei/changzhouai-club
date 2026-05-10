@@ -23,6 +23,7 @@ const adminSavedMessageMap: Record<string, string> = {
   project: "共建机会已保存。",
   project_deleted: "共建机会已删除。",
   project_application: "项目申请状态已更新。",
+  project_application_deleted: "项目申请记录已删除。",
   work: "成员作品已保存。",
   work_deleted: "成员作品已删除。",
 };
