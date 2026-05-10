@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Boxes, ChevronDown, UsersRound } from "lucide-react";
+import { BookOpen, Boxes, ChevronDown, Info, UsersRound } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { MobileMenuToggle } from "@/components/mobile-menu-toggle";
@@ -99,6 +99,10 @@ export function SiteHeader() {
                 ? pathname === "/members" ||
                   pathname.startsWith("/members/") ||
                   pathname === "/works"
+                : item.href === "/docs"
+                ? pathname === "/docs" ||
+                  pathname.startsWith("/docs/") ||
+                  pathname === "/about"
                 : item.href === "/"
                 ? pathname === "/"
                 : pathname === item.href || pathname.startsWith(`${item.href}/`);
@@ -192,6 +196,28 @@ export function SiteHeader() {
                     aria-label="社区文档相关链接"
                   >
                     <Link
+                      href="/docs"
+                      className={cx("nav-dropdown-item")}
+                      aria-current={
+                        pathname === "/docs" || pathname.startsWith("/docs/")
+                          ? "page"
+                          : undefined
+                      }
+                      onClick={() => setDocsMenuOpen(false)}
+                    >
+                      <BookOpen aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
+                      <span>社区文档</span>
+                    </Link>
+                    <Link
+                      href="/about"
+                      className={cx("nav-dropdown-item")}
+                      aria-current={pathname === "/about" ? "page" : undefined}
+                      onClick={() => setDocsMenuOpen(false)}
+                    >
+                      <Info aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
+                      <span>关于我们</span>
+                    </Link>
+                    <Link
                       href={siteRepositoryUrl}
                       className={cx("nav-dropdown-item")}
                       target="_blank"
@@ -203,15 +229,6 @@ export function SiteHeader() {
                         className={cx("nav-dropdown-item-icon")}
                       />
                       <span>开源仓库</span>
-                    </Link>
-                    <Link
-                      href="/docs"
-                      className={cx("nav-dropdown-item")}
-                      aria-current={isActive ? "page" : undefined}
-                      onClick={() => setDocsMenuOpen(false)}
-                    >
-                      <BookOpen aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
-                      <span>社区文档</span>
                     </Link>
                   </div>
                 </div>
