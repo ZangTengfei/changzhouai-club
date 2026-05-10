@@ -156,16 +156,7 @@
 }
 
 .updateContent {
-  display: grid;
-  gap: 12px;
-  color: rgba(var(--ink-rgb), 0.72);
-  font-size: 1.02rem;
-  line-height: 1.86;
-}
-
-.updateContent p {
-  margin: 0;
-  white-space: pre-wrap;
+  max-width: 760px;
 }
 
 .updateTags span {

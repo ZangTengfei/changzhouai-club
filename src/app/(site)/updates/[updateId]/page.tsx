@@ -9,6 +9,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { MarkdownContent } from "@/components/markdown-content";
 import { MemberAvatar } from "@/components/member-avatar";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import { getPublicCommunityUpdateById } from "@/lib/community-updates";
@@ -129,13 +130,7 @@ export default async function UpdateDetailPage({
           </div>
         ) : null}
 
-        <div className={styles.updateContent}>
-          {update.content.split("\n").map((paragraph, index) => (
-            <p key={`${update.id}-paragraph-${index}`}>
-              {paragraph.trim() || "\u00a0"}
-            </p>
-          ))}
-        </div>
+        <MarkdownContent content={update.content} className={styles.updateContent} />
 
         {update.tags.length > 0 ? (
           <div className={styles.updateTags}>

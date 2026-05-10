@@ -466,7 +466,7 @@ export default async function AccountPage({
             </div>
             <AccountActionModal
               title="发布社区动态"
-              description="写下最近发生的实践、问题或协作需求，审核通过后会公开展示。"
+              description="写下最近发生的实践、问题或协作需求。正文支持 Markdown，审核通过后会公开展示。"
               defaultOpen={shouldOpenUpdateModal}
               trigger={
                 <button
@@ -503,13 +503,13 @@ export default async function AccountPage({
                 </label>
 
                 <label className={styles.accountUpdateWideField}>
-                  <span>正文</span>
+                  <span>正文（支持 Markdown）</span>
                   <textarea
                     className="input textarea"
                     name="content"
                     rows={5}
                     required
-                    placeholder="说清楚发生了什么、你想分享什么，或者需要什么帮助。"
+                    placeholder="可以直接粘贴 Markdown，例如标题、列表、引用、代码块。"
                   />
                 </label>
 

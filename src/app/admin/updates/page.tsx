@@ -136,12 +136,13 @@ function UpdateForm({
           </NativeSelect>
         </AdminField>
 
-        <AdminField label="正文" className="md:col-span-2">
+        <AdminField label="正文（支持 Markdown）" className="md:col-span-2">
           <Textarea
             name="content"
             defaultValue={update?.content ?? ""}
             rows={6}
             required
+            placeholder="支持标题、列表、引用、代码块和表格。HTML 会被忽略。"
           />
         </AdminField>
 
