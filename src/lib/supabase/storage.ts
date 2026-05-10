@@ -1,5 +1,6 @@
 export const EVENT_ASSETS_BUCKET = "event-assets";
 export const MEMBER_AVATARS_BUCKET = "member-avatars";
+export const COMMUNITY_UPDATE_ASSETS_BUCKET = "community-update-assets";
 
 function sanitizeSegment(value: string) {
   return value
@@ -34,6 +35,14 @@ export function buildCommunityQrCodePath(fileName: string) {
   const timestamp = Date.now();
 
   return `community/wechat-qr/${timestamp}-${safeFileName}`;
+}
+
+export function buildCommunityUpdateAssetPath(userId: string, fileName: string) {
+  const safeUserId = sanitizeSegment(userId || "member");
+  const safeFileName = sanitizeSegment(fileName || "upload.jpg") || "upload.jpg";
+  const timestamp = Date.now();
+
+  return `${safeUserId}/updates/${timestamp}-${safeFileName}`;
 }
 
 export function buildMemberAvatarPath(userId: string) {

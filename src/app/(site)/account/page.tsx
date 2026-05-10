@@ -47,6 +47,7 @@ import { hasSupabaseEnv } from "@/lib/env";
 import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
 import { createClient } from "@/lib/supabase/server";
 
+import { AccountCommunityUpdateComposer } from "./account-community-update-composer";
 import styles from "./account-page.module.css";
 
 export const metadata: Metadata = {
@@ -478,76 +479,11 @@ export default async function AccountPage({
                 </button>
               }
             >
-              <form
+              <AccountCommunityUpdateComposer
                 action={saveAccountCommunityUpdate}
-                className={`${styles.accountUpdateForm} ${styles.accountUpdateDialogForm}`}
-              >
-                <label>
-                  <span>动态类型</span>
-                  <select className="input" name="update_type" defaultValue="share">
-                    {Object.entries(communityUpdateTypeLabels).map(([value, label]) => (
-                      <option value={value} key={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  <span>标题</span>
-                  <input
-                    className="input"
-                    name="title"
-                    placeholder="可选，例如：一个 RAG 小实验"
-                  />
-                </label>
-
-                <label className={styles.accountUpdateWideField}>
-                  <span>正文（支持 Markdown）</span>
-                  <textarea
-                    className="input textarea"
-                    name="content"
-                    rows={5}
-                    required
-                    placeholder="可以直接粘贴 Markdown，例如标题、列表、引用、代码块。"
-                  />
-                </label>
-
-                <label className={styles.accountUpdateWideField}>
-                  <span>图片链接</span>
-                  <textarea
-                    className="input textarea"
-                    name="image_urls"
-                    rows={3}
-                    placeholder="每行一个公开图片链接，最多 6 张"
-                  />
-                </label>
-
-                <label>
-                  <span>相关链接</span>
-                  <input
-                    className="input"
-                    name="related_url"
-                    placeholder="https://..."
-                  />
-                </label>
-
-                <label>
-                  <span>标签</span>
-                  <input
-                    className="input"
-                    name="tags"
-                    placeholder="例如：Agent、RAG、活动照片"
-                  />
-                </label>
-
-                <div className={styles.accountUpdateFormFooter}>
-                  <button type="submit" className="button home-primary-button">
-                    提交审核
-                  </button>
-                  <span>通过审核后会公开展示，敏感客户、项目或个人信息请先脱敏。</span>
-                </div>
-              </form>
+                userId={user.id}
+                typeOptions={Object.entries(communityUpdateTypeLabels)}
+              />
             </AccountActionModal>
           </div>
         </div>
