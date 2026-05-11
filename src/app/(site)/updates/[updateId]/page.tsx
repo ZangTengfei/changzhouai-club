@@ -5,15 +5,17 @@ import {
   ArrowLeft,
   Eye,
   Heart,
-  MessageCircle,
   Sparkles,
 } from "lucide-react";
 
+import { toggleCommunityUpdateLike } from "@/app/(site)/updates/actions";
 import { MarkdownContent } from "@/components/markdown-content";
 import { MemberAvatar } from "@/components/member-avatar";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
+import { getViewerCommunityUpdateLike } from "@/lib/community-update-interactions";
 import { getPublicCommunityUpdateById } from "@/lib/community-updates";
 
+import { CommunityUpdateViewTracker } from "./community-update-view-tracker";
 import styles from "./update-detail-page.module.css";
 
 type UpdateDetailPageProps = {
@@ -65,8 +67,12 @@ export default async function UpdateDetailPage({
     notFound();
   }
 
+  const viewerHasLiked = await getViewerCommunityUpdateLike(update.id);
+
   return (
     <div className={styles.updateDetailPage}>
+      <CommunityUpdateViewTracker updateId={update.id} />
+
       <Link href="/updates" className={styles.backLink}>
         <ArrowLeft aria-hidden="true" strokeWidth={2} />
         返回社区动态
@@ -103,14 +109,25 @@ export default async function UpdateDetailPage({
           <h1>{update.title || update.typeLabel}</h1>
 
           <div className={styles.updateMetrics} aria-label="动态互动数据">
-            <span>
-              <Heart aria-hidden="true" strokeWidth={1.8} />
-              {update.likeCount} 赞
-            </span>
-            <span>
-              <MessageCircle aria-hidden="true" strokeWidth={1.8} />
-              {update.commentCount} 评论
-            </span>
+            <form action={toggleCommunityUpdateLike}>
+              <input type="hidden" name="update_id" value={update.id} />
+              <button
+                type="submit"
+                className={
+                  viewerHasLiked
+                    ? `${styles.updateMetricButton} ${styles.updateMetricButtonActive}`
+                    : styles.updateMetricButton
+                }
+                aria-pressed={viewerHasLiked}
+              >
+                <Heart
+                  aria-hidden="true"
+                  fill={viewerHasLiked ? "currentColor" : "none"}
+                  strokeWidth={1.8}
+                />
+                {update.likeCount} 赞
+              </button>
+            </form>
             <span>
               <Eye aria-hidden="true" strokeWidth={1.8} />
               {update.viewCount} 浏览

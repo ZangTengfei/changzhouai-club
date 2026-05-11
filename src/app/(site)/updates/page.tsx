@@ -4,7 +4,6 @@ import {
   ArrowRight,
   Eye,
   Heart,
-  MessageCircle,
   Plus,
   Sparkles,
   Tags,
@@ -162,10 +161,6 @@ function TimelineUpdate({ update }: { update: PublicCommunityUpdate }) {
         <span>
           <Heart aria-hidden="true" strokeWidth={1.8} />
           {update.likeCount}
-        </span>
-        <span>
-          <MessageCircle aria-hidden="true" strokeWidth={1.8} />
-          {update.commentCount}
         </span>
         <span>
           <Eye aria-hidden="true" strokeWidth={1.8} />
