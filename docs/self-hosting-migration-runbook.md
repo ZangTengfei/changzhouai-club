@@ -154,6 +154,24 @@ mkdir -p output/migration-backups
 - `member_works.cover_image_url`
 - `community_update_images.image_url`
 
+本仓库也提供了一个基于 Supabase JS 的复制脚本，适合 Mac 本地彩排或小规模迁移：
+
+```bash
+set -a
+source .env.local
+SOURCE_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL"
+SOURCE_SUPABASE_SERVICE_ROLE_KEY="$SUPABASE_SERVICE_ROLE_KEY"
+source .env.selfhost.local
+TARGET_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL"
+TARGET_SUPABASE_SERVICE_ROLE_KEY="$SUPABASE_SERVICE_ROLE_KEY"
+set +a
+
+npm run storage:copy -- --dry-run
+npm run storage:copy -- --upsert
+```
+
+默认复制 `event-assets`、`member-avatars`、`community-update-assets`。也可以用 `--bucket <bucket-id>` 指定单个 bucket。
+
 如果数据库里仍然保存旧的 `https://<project>.supabase.co/storage/...`，在本地恢复库中先演练 URL 替换：
 
 ```sql
