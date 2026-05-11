@@ -97,6 +97,7 @@ npm run start
 - `FEISHU_BOT_WEBHOOK_SECRET`
 - `NEXT_PUBLIC_SITE_URL`
 - `SITE_URL`
+- `ENABLE_VERCEL_INSIGHTS`
 
 其中：
 
@@ -104,6 +105,7 @@ npm run start
 - `SUPABASE_SERVICE_ROLE_KEY` 用于后台上传活动图片、脚本迁移等服务端能力
 - 邮件相关变量用于管理员通知邮件
 - 企业微信 / 飞书 webhook 变量用于把加入申请、成员资料完成、合作线索等动态同步到群机器人
+- `ENABLE_VERCEL_INSIGHTS=true` 时才会在非 Vercel 环境加载 Vercel Analytics 和 Speed Insights；自托管环境建议保持 `false`
 
 目前已接入的管理员通知场景包括：
 
@@ -171,6 +173,29 @@ docs                   补充文档
 - 已执行数据库迁移和必要的种子数据
 - Google OAuth 回调地址与生产域名一致
 - 如启用活动图片后台上传，已配置服务端密钥
+
+## 自托管迁移演练
+
+仓库已包含 Docker 自托管基础文件：
+
+- `Dockerfile`
+- `.dockerignore`
+- `docker-compose.app.yml`
+- `.env.selfhost.example`
+
+本地 Mac 彩排和国内云预生产迁移请先读：
+
+- [docs/self-hosting-migration-runbook.md](docs/self-hosting-migration-runbook.md)
+
+最小 Docker 验证流程：
+
+```bash
+cp .env.selfhost.example .env.selfhost.local
+docker build -t changzhouai-club-web:local .
+docker compose -f docker-compose.app.yml up --build
+```
+
+`next.config.ts` 已启用 Next.js standalone 输出，并会根据 `NEXT_PUBLIC_SUPABASE_URL` 放行自托管 Supabase Storage 图片域名。
 
 ## 补充说明
 

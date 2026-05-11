@@ -7,6 +7,16 @@ import { AppToaster } from "@/components/app-toaster";
 
 import "./globals.css";
 
+function shouldRenderVercelInsights() {
+  const configured = process.env.ENABLE_VERCEL_INSIGHTS;
+
+  if (configured) {
+    return configured === "true";
+  }
+
+  return process.env.VERCEL === "1";
+}
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://changzhouai.club"),
   title: {
@@ -35,6 +45,8 @@ export default function RootLayout({
 }: {
   children: ReactNode;
 }) {
+  const renderVercelInsights = shouldRenderVercelInsights();
+
   return (
     <html
       lang="zh-CN"
@@ -45,8 +57,12 @@ export default function RootLayout({
       <body>
         <AppToaster />
         {children}
-        <Analytics />
-        <SpeedInsights />
+        {renderVercelInsights ? (
+          <>
+            <Analytics />
+            <SpeedInsights />
+          </>
+        ) : null}
       </body>
     </html>
   );

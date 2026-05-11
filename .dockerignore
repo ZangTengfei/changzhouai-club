@@ -1,13 +1,16 @@
+.DS_Store
+.git
+.gitignore
 .next
-next-env.d.ts
+.vercel
 node_modules
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.DS_Store
-.vercel
-supabase/.temp/
+output
+config.toml
+
 .env
 .env.local
 .env.selfhost.local
@@ -15,8 +18,6 @@ supabase/.temp/
 .env.test.local
 .env.production.local
 
-# cc-connect local config may contain messaging platform credentials.
-config.toml
-
-# Generated artifacts
-output/
+Dockerfile
+docker-compose*.yml
+docker-compose*.yaml
