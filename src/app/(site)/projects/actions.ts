@@ -124,12 +124,13 @@ export async function submitProjectApplication(formData: FormData) {
   const projectId = String(formData.get("project_id") ?? "").trim();
   const projectSlug = String(formData.get("project_slug") ?? "").trim();
   const applicantName = String(formData.get("applicant_name") ?? "").trim();
+  const applicantOccupation = getOptionalValue(formData, "applicant_occupation");
   const contactWechat = getOptionalValue(formData, "contact_wechat");
   const contactPhone = getOptionalValue(formData, "contact_phone");
   const contactEmail = getOptionalValue(formData, "contact_email");
   const submissionKey = getOptionalValue(formData, "submission_key");
 
-  if (!projectId || !applicantName) {
+  if (!projectId || !applicantName || !applicantOccupation) {
     redirect(buildProjectRedirect(projectSlug, { error: "missing_required_fields" }));
   }
 
@@ -176,6 +177,7 @@ export async function submitProjectApplication(formData: FormData) {
     project_id: projectId,
     applicant_user_id: applicantUserId,
     applicant_name: applicantName,
+    applicant_occupation: applicantOccupation,
     contact_wechat: contactWechat,
     contact_phone: contactPhone,
     contact_email: contactEmail,

@@ -23,6 +23,16 @@ import { ProjectApplicationSubmitButton } from "./project-application-submit-but
 import { ProjectApplicationToast } from "./project-application-toast";
 import styles from "./project-detail-page.module.css";
 
+const occupationOptions = [
+  "学生",
+  "公司职员",
+  "自由职业者",
+  "个体经营者",
+  "暂无工作",
+  "退休",
+  "其他",
+];
+
 type ProjectDetailSearchParams = {
   applied?: string;
   error?: string;
@@ -34,7 +44,7 @@ function getErrorMessage(error?: string) {
   }
 
   if (error === "missing_required_fields") {
-    return "请至少填写称呼。";
+    return "请填写称呼和职业 / 当前身份。";
   }
 
   if (error === "missing_contact_channel") {
@@ -364,6 +374,22 @@ export default async function ProjectDetailPage({
               <label>
                 <span>称呼</span>
                 <input className="input" name="applicant_name" placeholder="怎么称呼你" required />
+              </label>
+
+              <label>
+                <span>职业 / 当前身份</span>
+                <input
+                  className="input"
+                  name="applicant_occupation"
+                  list="project-application-occupation-options"
+                  placeholder="例如：学生 / 公司职员 / 暂无工作"
+                  required
+                />
+                <datalist id="project-application-occupation-options">
+                  {occupationOptions.map((option) => (
+                    <option value={option} key={option} />
+                  ))}
+                </datalist>
               </label>
 
               <label>

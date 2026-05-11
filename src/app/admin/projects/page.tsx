@@ -326,6 +326,7 @@ function ProjectApplicationCard({
       </div>
 
       <div className="mt-3 grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
+        <p>职业/身份：{application.applicant_occupation ?? "未填写"}</p>
         <p>申请角色：{application.role_interest ?? "未填写"}</p>
         <p>可投入时间：{application.available_time ?? "未填写"}</p>
         <p>作品链接：{application.portfolio_url ?? "未填写"}</p>

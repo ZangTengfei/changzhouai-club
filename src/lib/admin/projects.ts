@@ -40,6 +40,7 @@ export type AdminProjectApplicationRow = {
   project_id: string;
   applicant_user_id: string | null;
   applicant_name: string;
+  applicant_occupation: string | null;
   contact_wechat: string | null;
   contact_phone: string | null;
   contact_email: string | null;
@@ -111,7 +112,7 @@ export async function loadAdminProjectsData(): Promise<AdminProjectsData> {
     supabase
       .from("project_applications")
       .select(
-        "id, project_id, applicant_user_id, applicant_name, contact_wechat, contact_phone, contact_email, role_interest, available_time, experience_summary, portfolio_url, note, status, admin_note, owner_id, created_at, updated_at",
+        "id, project_id, applicant_user_id, applicant_name, applicant_occupation, contact_wechat, contact_phone, contact_email, role_interest, available_time, experience_summary, portfolio_url, note, status, admin_note, owner_id, created_at, updated_at",
       )
       .order("created_at", { ascending: false }),
     supabase.from("profiles").select("id, display_name, email"),
