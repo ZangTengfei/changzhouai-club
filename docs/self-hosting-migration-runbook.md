@@ -220,10 +220,22 @@ commit;
 
 如果 Next.js 运行在 Docker 容器里，`NEXT_PUBLIC_SUPABASE_URL` 必须同时被浏览器和容器访问到。不要盲目使用 `localhost`：浏览器里的 `localhost` 是 Mac，容器里的 `localhost` 是容器自己。更稳的做法是用局域网 IP、临时域名，或把 Next.js 和 Supabase 放在同一个可解析的反向代理域名后面。
 
-构建镜像：
+构建镜像前，把公开环境变量导出到当前 shell。首页等静态预渲染页面会在构建阶段读取 Supabase，所以构建阶段和运行阶段需要指向同一套数据：
 
 ```bash
-docker build -t changzhouai-club-web:local .
+set -a
+source .env.selfhost.local
+set +a
+
+# Docker 连接 Mac 本机 Supabase 时，可临时改成 Mac 的局域网 IP。
+export NEXT_PUBLIC_SUPABASE_URL="http://$(ipconfig getifaddr en0 || ipconfig getifaddr en1):54321"
+
+docker build \
+  --build-arg NEXT_PUBLIC_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL" \
+  --build-arg NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" \
+  --build-arg NEXT_PUBLIC_SITE_URL="$NEXT_PUBLIC_SITE_URL" \
+  --build-arg ENABLE_VERCEL_INSIGHTS="$ENABLE_VERCEL_INSIGHTS" \
+  -t changzhouai-club-web:local .
 ```
 
 如果 Docker Hub 在当前网络下拉取不稳定，可以通过 `NODE_IMAGE` 使用 Debian 兼容的镜像代理或私有仓库：
@@ -231,12 +243,23 @@ docker build -t changzhouai-club-web:local .
 ```bash
 docker build \
   --build-arg NODE_IMAGE=<your-mirror>/library/node:22-bookworm-slim \
+  --build-arg NEXT_PUBLIC_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL" \
+  --build-arg NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="$NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY" \
+  --build-arg NEXT_PUBLIC_SITE_URL="$NEXT_PUBLIC_SITE_URL" \
+  --build-arg ENABLE_VERCEL_INSIGHTS="$ENABLE_VERCEL_INSIGHTS" \
   -t changzhouai-club-web:local .
 ```
 
 启动应用：
 
 ```bash
+set -a
+source .env.selfhost.local
+set +a
+
+# 如果上面构建时用了局域网 IP，这里也要保持同一个 URL。
+export NEXT_PUBLIC_SUPABASE_URL="http://$(ipconfig getifaddr en0 || ipconfig getifaddr en1):54321"
+
 docker compose -f docker-compose.app.yml up --build
 ```
 
