@@ -214,6 +214,33 @@ commit;
 
 正式环境执行前先把 `begin` 后的更新改成 `select count(*)` 预估影响行数。
 
+## 4.1 数据库业务数据迁移
+
+如果目标库只是本地演练库，可以直接用 `--replace` 把目标业务表和 Auth 用户替换成线上快照。脚本会先创建目标 Auth 用户占位，并保留原用户 ID，然后按外键顺序写入公开业务表。
+
+```bash
+set -a
+source .env.local
+set +a
+
+export SOURCE_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL"
+export SOURCE_SUPABASE_SERVICE_ROLE_KEY="$SUPABASE_SERVICE_ROLE_KEY"
+
+set -a
+source .env.selfhost.local
+set +a
+
+export TARGET_SUPABASE_URL="$NEXT_PUBLIC_SUPABASE_URL"
+export TARGET_SUPABASE_SERVICE_ROLE_KEY="$SUPABASE_SERVICE_ROLE_KEY"
+
+# Docker 本地演练时，把数据库里的 Storage URL 改成容器和浏览器都能访问的地址。
+export TARGET_PUBLIC_SUPABASE_URL="http://$(ipconfig getifaddr en0 || ipconfig getifaddr en1):54321"
+
+npm run db:copy -- --replace
+```
+
+注意：这个脚本不会迁移用户原始密码、OAuth session 或第三方登录身份，只会在目标 Supabase Auth 里创建同 ID 的本地占位用户，用来满足 `profiles`、`members` 等表的外键并支持页面渲染。正式生产迁移如果需要无缝保留登录状态，应优先使用 Supabase 官方备份/恢复或直接数据库 dump/restore。
+
 ## 5. 用 Docker 跑本站应用
 
 先确保 `.env.selfhost.local` 指向演练 Supabase。
