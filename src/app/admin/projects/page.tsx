@@ -279,6 +279,16 @@ function ProjectOpportunityForm({
           />
           <span>设为精选机会</span>
         </AdminCheckboxRow>
+
+        <AdminCheckboxRow>
+          <input
+            type="checkbox"
+            name="application_requires_login"
+            defaultChecked={opportunity?.application_requires_login ?? false}
+            className="size-4"
+          />
+          <span>申请前需要登录</span>
+        </AdminCheckboxRow>
       </div>
 
       <Button type="submit">保存共建机会</Button>
@@ -446,6 +456,11 @@ export default async function AdminProjectsPage({
                       {opportunity.is_featured ? (
                         <AdminStatusBadge tone="registered">精选</AdminStatusBadge>
                       ) : null}
+                      <AdminStatusBadge
+                        tone={opportunity.application_requires_login ? "pending" : "neutral"}
+                      >
+                        {opportunity.application_requires_login ? "需登录申请" : "匿名可申请"}
+                      </AdminStatusBadge>
                     </div>
                     <p className="text-sm text-muted-foreground">{opportunity.summary}</p>
                     <p className="text-xs text-muted-foreground">

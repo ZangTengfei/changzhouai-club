@@ -332,7 +332,8 @@
   gap: 14px;
 }
 
-.applicationSuccessPanel {
+.applicationSuccessPanel,
+.applicationLoginPanel {
   display: grid;
   gap: 14px;
   padding: 18px;
@@ -341,31 +342,42 @@
   background: rgba(var(--accent-rgb), 0.08);
 }
 
-.applicationSuccessPanel > svg {
+.applicationLoginPanel {
+  border-color: rgba(30, 116, 190, 0.18);
+  background: rgba(30, 116, 190, 0.07);
+}
+
+.applicationSuccessPanel > svg,
+.applicationLoginPanel > svg {
   width: 34px;
   height: 34px;
   color: var(--accent);
 }
 
 .applicationSuccessPanel strong,
-.applicationSuccessPanel p {
+.applicationSuccessPanel p,
+.applicationLoginPanel strong,
+.applicationLoginPanel p {
   margin: 0;
 }
 
-.applicationSuccessPanel strong {
+.applicationSuccessPanel strong,
+.applicationLoginPanel strong {
   color: #111a1d;
   font-size: 1.05rem;
   font-weight: 900;
   line-height: 1.28;
 }
 
-.applicationSuccessPanel p {
+.applicationSuccessPanel p,
+.applicationLoginPanel p {
   margin-top: 6px;
   color: rgba(var(--ink-rgb), 0.64);
   line-height: 1.62;
 }
 
-.applicationSuccessPanel :global(.button) {
+.applicationSuccessPanel :global(.button),
+.applicationLoginPanel :global(.button) {
   justify-content: center;
   width: 100%;
 }

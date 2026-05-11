@@ -61,6 +61,7 @@ type PublicProjectOpportunityRow = {
   location: string | null;
   application_cta: string | null;
   application_note: string | null;
+  application_requires_login: boolean;
   sort_order: number;
   is_featured: boolean;
   created_at: string;
@@ -90,6 +91,7 @@ export type PublicProjectOpportunity = {
   location: string | null;
   applicationCta: string;
   applicationNote: string | null;
+  applicationRequiresLogin: boolean;
   sortOrder: number;
   isFeatured: boolean;
   createdAt: string;
@@ -125,6 +127,7 @@ const visibleProjectSelect = [
   "location",
   "application_cta",
   "application_note",
+  "application_requires_login",
   "sort_order",
   "is_featured",
   "created_at",
@@ -167,6 +170,7 @@ function mapProjectOpportunity(row: PublicProjectOpportunityRow): PublicProjectO
     location: row.location,
     applicationCta: row.application_cta?.trim() || "申请参与",
     applicationNote: row.application_note,
+    applicationRequiresLogin: Boolean(row.application_requires_login),
     sortOrder: row.sort_order,
     isFeatured: row.is_featured,
     createdAt: row.created_at,
@@ -188,7 +192,7 @@ function emptyProjectOpportunityDirectory(): PublicProjectOpportunityDirectory {
 }
 
 function shouldIgnoreProjectOpportunityError(error: { code?: string }) {
-  return error.code === "PGRST205";
+  return error.code === "PGRST205" || error.code === "PGRST204";
 }
 
 export async function getVisibleProjectOpportunities(): Promise<PublicProjectOpportunityDirectory> {

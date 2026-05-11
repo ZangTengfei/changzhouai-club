@@ -25,6 +25,7 @@ export type AdminProjectOpportunityRow = {
   location: string | null;
   application_cta: string | null;
   application_note: string | null;
+  application_requires_login: boolean;
   source_lead_id: string | null;
   owner_id: string | null;
   created_by: string | null;
@@ -102,7 +103,7 @@ export async function loadAdminProjectsData(): Promise<AdminProjectsData> {
     supabase
       .from("project_opportunities")
       .select(
-        "id, slug, title, summary, description, opportunity_type, status, visibility, role_tags, topic_tags, headcount_label, time_commitment, compensation, deadline_at, location, application_cta, application_note, source_lead_id, owner_id, created_by, sort_order, is_featured, created_at, updated_at",
+        "id, slug, title, summary, description, opportunity_type, status, visibility, role_tags, topic_tags, headcount_label, time_commitment, compensation, deadline_at, location, application_cta, application_note, application_requires_login, source_lead_id, owner_id, created_by, sort_order, is_featured, created_at, updated_at",
       )
       .order("is_featured", { ascending: false })
       .order("sort_order", { ascending: true })

@@ -143,7 +143,7 @@ export async function submitProjectApplication(formData: FormData) {
 
   const { data: project, error: projectError } = await supabase
     .from("project_opportunities")
-    .select("id, slug, status")
+    .select("id, slug, status, application_requires_login")
     .eq("id", projectId)
     .maybeSingle();
 
@@ -153,6 +153,10 @@ export async function submitProjectApplication(formData: FormData) {
 
   if (project.status !== "recruiting") {
     redirect(buildProjectRedirect(project.slug, { error: "applications_closed" }));
+  }
+
+  if (project.application_requires_login && !user) {
+    redirect(`/login?next=${encodeURIComponent(`/projects/${project.slug}#application-form`)}`);
   }
 
   const applicantUserId = user?.id ?? null;

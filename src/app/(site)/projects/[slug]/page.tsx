@@ -49,6 +49,10 @@ function getErrorMessage(error?: string) {
     return "没有找到可申请的项目机会。";
   }
 
+  if (error === "login_required") {
+    return "这个机会需要登录后申请。";
+  }
+
   return "提交失败，请稍后再试。";
 }
 
@@ -80,21 +84,26 @@ export async function generateMetadata({
   };
 }
 
-async function hasSignedInUserApplied(projectId: string) {
+async function getSignedInUserId() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  return user?.id ?? null;
+}
+
+async function hasSignedInUserApplied(projectId: string, userId: string | null) {
+  if (!userId) {
     return false;
   }
 
+  const supabase = await createClient();
   const { data, error } = await supabase
     .from("project_applications")
     .select("id")
     .eq("project_id", projectId)
-    .eq("applicant_user_id", user.id)
+    .eq("applicant_user_id", userId)
     .limit(1)
     .maybeSingle();
 
@@ -125,10 +134,15 @@ export default async function ProjectDetailPage({
 
   const errorMessage = getErrorMessage(query.error);
   const justSubmitted = Boolean(query.applied);
-  const hasApplied = justSubmitted || (await hasSignedInUserApplied(opportunity.id));
+  const signedInUserId = await getSignedInUserId();
+  const hasApplied = justSubmitted || (await hasSignedInUserApplied(opportunity.id, signedInUserId));
   const submissionKey = randomUUID();
   const descriptionParagraphs = getParagraphs(opportunity.description);
   const isRecruiting = opportunity.status === "recruiting";
+  const requiresLogin = opportunity.applicationRequiresLogin;
+  const canApplyNow = isRecruiting && !hasApplied && (!requiresLogin || Boolean(signedInUserId));
+  const shouldPromptLogin = isRecruiting && !hasApplied && requiresLogin && !signedInUserId;
+  const loginHref = `/login?next=${encodeURIComponent(`/projects/${opportunity.slug}#application-form`)}`;
   const quickFacts = [
     {
       label: "机会类型",
@@ -187,6 +201,7 @@ export default async function ProjectDetailPage({
             <span>{opportunity.typeLabel}</span>
             <span>{opportunity.statusLabel}</span>
             <span>{opportunity.visibilityLabel}</span>
+            <span>{requiresLogin ? "登录后申请" : "可直接申请"}</span>
           </div>
 
           <div className={styles.projectHeroHeading}>
@@ -196,9 +211,15 @@ export default async function ProjectDetailPage({
           </div>
 
           <div className={styles.projectHeroActions}>
-            {isRecruiting && !hasApplied ? (
+            {canApplyNow ? (
               <Link href="#application-form" className="button home-primary-button">
                 {opportunity.applicationCta}
+                <ArrowRight aria-hidden="true" strokeWidth={2} />
+              </Link>
+            ) : null}
+            {shouldPromptLogin ? (
+              <Link href={loginHref} className="button home-primary-button">
+                登录后申请
                 <ArrowRight aria-hidden="true" strokeWidth={2} />
               </Link>
             ) : null}
@@ -295,6 +316,8 @@ export default async function ProjectDetailPage({
             <h2>
               {hasApplied
                 ? "申请已提交"
+                : shouldPromptLogin
+                  ? "登录后申请"
                 : isRecruiting
                   ? opportunity.applicationCta
                   : "当前暂不开放申请"}
@@ -302,6 +325,8 @@ export default async function ProjectDetailPage({
             <p>
               {hasApplied
                 ? "你的申请已经进入社区后台，后续会根据你留下的信息继续联系和筛选。"
+                : shouldPromptLogin
+                  ? "这个机会要求先登录社区账号，再提交申请信息。登录后会回到当前项目页面。"
                 : (opportunity.applicationNote ??
                   "请补充你的角色意向、相关经验和可投入时间。具体项目筛选问题可以写在备注里。")}
             </p>
@@ -316,6 +341,18 @@ export default async function ProjectDetailPage({
               </div>
               <Link href="/projects#opportunities" className="button home-ghost-button">
                 查看其他机会
+              </Link>
+            </div>
+          ) : shouldPromptLogin ? (
+            <div className={styles.applicationLoginPanel}>
+              <ShieldCheck aria-hidden="true" strokeWidth={1.9} />
+              <div>
+                <strong>这个机会需要登录后申请</strong>
+                <p>登录会帮助社区把申请和账号关联起来，也方便后续查看和跟进。</p>
+              </div>
+              <Link href={loginHref} className="button home-primary-button">
+                登录后申请
+                <ArrowRight aria-hidden="true" strokeWidth={2} />
               </Link>
             </div>
           ) : isRecruiting ? (

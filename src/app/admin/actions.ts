@@ -936,6 +936,7 @@ export async function saveAdminProjectOpportunity(formData: FormData) {
     location: getOptionalValue(formData, "location"),
     application_cta: getOptionalValue(formData, "application_cta"),
     application_note: getOptionalValue(formData, "application_note"),
+    application_requires_login: formData.get("application_requires_login") === "on",
     sort_order: getOptionalInteger(formData, "sort_order"),
     is_featured: formData.get("is_featured") === "on",
   };
