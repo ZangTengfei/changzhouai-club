@@ -9,6 +9,21 @@ Rules:
 - If there are unrelated user changes in the worktree, avoid committing them unless they are part of the requested task.
 - If a commit would be risky or ambiguous, ask once before committing.
 
+# Local Knowledge Workspace
+
+This repository also contains local-only community knowledge directories that are intentionally ignored by Git:
+
+- `output/`: temporary generated artifacts, drafts, intermediate analysis files, and files that can be regenerated or discarded.
+- `files/`: original source materials and large/binary assets, such as cloud-drive exports, photos, PDFs, audio/video, slide decks, posters, and finished media files.
+- `knowledge/`: the Obsidian knowledge base for structured community memory, such as event notes, recaps, meeting summaries, SOPs, people profiles, content planning, and other durable Markdown knowledge.
+
+When producing new files:
+- Put temporary work products in `output/` first.
+- Put original materials and finalized binary/media exports in `files/`.
+- Put durable Markdown knowledge and Obsidian notes in `knowledge/`.
+- Only copy curated, publishable content into tracked website directories such as `content/` or `public/`.
+- Do not add `files/` or `knowledge/` contents to Git unless the user explicitly requests it.
+
 # cc-connect Integration
 
 This project is managed via cc-connect, a bridge to messaging platforms.
