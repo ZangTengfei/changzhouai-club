@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { submitProjectApplication } from "@/app/(site)/projects/actions";
+import { MarkdownContent } from "@/components/markdown-content";
 import { getVisibleProjectOpportunityBySlug } from "@/lib/community-projects";
 import { createClient } from "@/lib/supabase/server";
 
@@ -64,13 +65,6 @@ function getErrorMessage(error?: string) {
   }
 
   return "提交失败，请稍后再试。";
-}
-
-function getParagraphs(value: string | null) {
-  return (value ?? "")
-    .split(/\n{2,}|\r?\n/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean);
 }
 
 export async function generateMetadata({
@@ -147,7 +141,7 @@ export default async function ProjectDetailPage({
   const signedInUserId = await getSignedInUserId();
   const hasApplied = justSubmitted || (await hasSignedInUserApplied(opportunity.id, signedInUserId));
   const submissionKey = randomUUID();
-  const descriptionParagraphs = getParagraphs(opportunity.description);
+  const descriptionMarkdown = opportunity.description?.trim();
   const isRecruiting = opportunity.status === "recruiting";
   const requiresLogin = opportunity.applicationRequiresLogin;
   const canApplyNow = isRecruiting && !hasApplied && (!requiresLogin || Boolean(signedInUserId));
@@ -288,12 +282,11 @@ export default async function ProjectDetailPage({
               </div>
             </div>
 
-            {descriptionParagraphs.length > 0 ? (
-              <div className={styles.projectRichtext}>
-                {descriptionParagraphs.map((paragraph) => (
-                  <p key={paragraph}>{paragraph}</p>
-                ))}
-              </div>
+            {descriptionMarkdown ? (
+              <MarkdownContent
+                content={descriptionMarkdown}
+                className={styles.projectRichtext}
+              />
             ) : (
               <div className={styles.projectSoftNote}>
                 这个项目的详细说明还在整理中，可以先根据标题和摘要判断是否适合继续了解。

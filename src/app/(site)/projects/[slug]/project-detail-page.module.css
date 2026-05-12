@@ -277,15 +277,8 @@
 }
 
 .projectRichtext {
-  display: grid;
-  gap: 14px;
-}
-
-.projectRichtext p {
-  margin: 0;
   color: rgba(var(--ink-rgb), 0.72);
   font-size: 1rem;
-  line-height: 1.84;
 }
 
 .projectSoftNote {
