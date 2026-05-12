@@ -23,6 +23,7 @@ When producing new files:
 - Put durable Markdown knowledge and Obsidian notes in `knowledge/`.
 - Only copy curated, publishable content into tracked website directories such as `content/` or `public/`.
 - Do not add `files/` or `knowledge/` contents to Git unless the user explicitly requests it.
+- Use Chinese names for `knowledge/` directories, files, and note titles when possible. Follow the local guide at `knowledge/00_知识库规范/知识库规范.md` when creating or organizing knowledge notes.
 
 # cc-connect Integration
 
