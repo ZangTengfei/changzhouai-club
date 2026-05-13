@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
+  BookOpenText,
   BriefcaseBusiness,
   CalendarDays,
   GitBranch,
@@ -47,6 +48,8 @@ const buildStepToneClasses = {
   orange: styles.projectsBuildSteporange,
   blue: styles.projectsBuildStepblue,
 } as const;
+
+const coBuilderRulesPath = "/docs/guides/co-builder-rules";
 
 export default async function ProjectsPage() {
   const projectDirectory = await getVisibleProjectOpportunities();
@@ -209,7 +212,10 @@ export default async function ProjectsPage() {
         <div>
           <p className="home-kicker">Join</p>
           <h2>想参与或发起项目？</h2>
-          <p>加入社区适合找长期伙伴；提交合作需求适合带着明确项目来对接。</p>
+          <p>
+            加入社区适合找长期伙伴；提交合作需求适合带着明确项目来对接。
+            如果你想长期参与社区运营、内容或项目共建，也可以先了解共建者协作规则。
+          </p>
         </div>
 
         <div className={styles.projectsJoinActions}>
@@ -219,6 +225,10 @@ export default async function ProjectsPage() {
           </Link>
           <Link href="/cooperate" className="button home-ghost-button">
             提交合作需求
+          </Link>
+          <Link href={coBuilderRulesPath} className="button home-ghost-button">
+            了解共建规则
+            <BookOpenText aria-hidden="true" strokeWidth={2} />
           </Link>
         </div>
       </section>

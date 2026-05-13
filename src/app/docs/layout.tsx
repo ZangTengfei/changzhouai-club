@@ -21,8 +21,8 @@ export default async function DocsLayout({
     <div className={`${styles["docs-layout-shell"]} docs-layout-shell`}>
       <Layout
         pageMap={pageMap}
-        navbar={<DocsNavbar />}
-        footer={<DocsFooter />}
+        navbar={<DocsNavbar key="docs-navbar" />}
+        footer={<DocsFooter key="docs-footer" />}
         copyPageButton={false}
         docsRepositoryBase="https://github.com/ZangTengfei/changzhouai-club/blob/main/content"
         editLink="在 GitHub 上编辑此页"

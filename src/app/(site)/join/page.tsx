@@ -4,10 +4,13 @@ import Link from "next/link";
 import {
   ArrowRight,
   BadgeCheck,
+  BookOpenText,
   CheckCircle2,
   Clock3,
   IdCard,
   MessageCircle,
+  Sparkles,
+  UsersRound,
 } from "lucide-react";
 
 import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
@@ -23,6 +26,7 @@ export const metadata: Metadata = {
 };
 
 const onboardingPath = "/account?onboarding=1";
+const coBuilderRulesPath = "/docs/guides/co-builder-rules";
 
 const requiredFields = [
   {
@@ -46,6 +50,24 @@ const optionalFields = [
   "是否愿意参加线下活动",
   "是否愿意分享",
   "是否愿意参与项目",
+] as const;
+
+const coBuilderSignals = [
+  {
+    title: "先读规则",
+    summary: "了解共建者能做什么、不能代表社区承诺什么，以及贡献如何被看见。",
+    icon: BookOpenText,
+  },
+  {
+    title: "表达意向",
+    summary: "在个人资料里补充参与方向、可投入时间和你愿意从哪类小任务开始。",
+    icon: UsersRound,
+  },
+  {
+    title: "从小任务开始",
+    summary: "活动记录、内容整理、嘉宾推荐、项目讨论或现场协助，都可以成为第一步。",
+    icon: Sparkles,
+  },
 ] as const;
 
 export default async function JoinPage() {
@@ -190,6 +212,45 @@ export default async function JoinPage() {
               ))}
             </div>
           </article>
+        </div>
+      </section>
+
+      <section className={styles.coBuilderSection} aria-labelledby="co-builder-title">
+        <div className={styles.coBuilderCopy}>
+          <p className="home-kicker">Co-builder</p>
+          <h2 id="co-builder-title">想参与社区共建？</h2>
+          <p>
+            如果你愿意参与活动组织、内容输出、项目协作、资料整理或社群运营，
+            可以先阅读共建者协作规则，再在个人资料里补充你的方向和可投入时间。
+          </p>
+
+          <div className={styles.coBuilderActions}>
+            <Link href={coBuilderRulesPath} className="button home-primary-button">
+              阅读共建规则
+              <BookOpenText aria-hidden="true" strokeWidth={2} />
+            </Link>
+            <Link href={primaryHref} className="button home-ghost-button">
+              报名参与共建
+              <ArrowRight aria-hidden="true" strokeWidth={2} />
+            </Link>
+          </div>
+        </div>
+
+        <div className={styles.coBuilderSignals} aria-label="参与共建步骤">
+          {coBuilderSignals.map((item, index) => {
+            const Icon = item.icon;
+
+            return (
+              <article className={styles.coBuilderSignal} key={item.title}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <Icon aria-hidden="true" strokeWidth={1.8} />
+                <div>
+                  <h3>{item.title}</h3>
+                  <p>{item.summary}</p>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 

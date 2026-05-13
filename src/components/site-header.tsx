@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Boxes, ChevronDown, Info } from "lucide-react";
+import { BookOpenText, Boxes, ChevronDown, Info } from "lucide-react";
 import { type FocusEvent, useCallback, useEffect, useRef, useState } from "react";
 
 import { MobileMenuToggle } from "@/components/mobile-menu-toggle";
@@ -196,6 +196,20 @@ export function SiteHeader() {
                     className={cx("nav-dropdown-menu")}
                     aria-label="社区文档相关链接"
                   >
+                    <Link
+                      href="/docs/guides/co-builder-rules"
+                      className={cx("nav-dropdown-item")}
+                      aria-current={
+                        pathname === "/docs/guides/co-builder-rules" ? "page" : undefined
+                      }
+                      onClick={() => setDocsMenuOpen(false)}
+                    >
+                      <BookOpenText
+                        aria-hidden="true"
+                        className={cx("nav-dropdown-item-icon")}
+                      />
+                      <span>共建规则</span>
+                    </Link>
                     <Link
                       href="/about"
                       className={cx("nav-dropdown-item")}

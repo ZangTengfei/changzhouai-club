@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
+  ArrowRight,
   CalendarDays,
   Clock3,
   MapPin,
@@ -25,6 +26,7 @@ import styles from "./home-page.module.css";
 
 const cx = cssModuleCx.bind(null, styles);
 const HERO_CAROUSEL_IMAGE_LIMIT = 3;
+const CO_BUILDER_RULES_PATH = "/docs/guides/co-builder-rules";
 
 function formatMetricDate(isoDate: string | null) {
   if (!isoDate) {
@@ -561,6 +563,10 @@ export default async function HomePage() {
           <p>
             扫描二维码添加社区官方微信，备注来意后由运营同学邀请你进入交流群。
           </p>
+          <Link href={CO_BUILDER_RULES_PATH} className={cx("home-join-banner-rule-link")}>
+            想参与社区共建？查看协作规则
+            <ArrowRight aria-hidden="true" strokeWidth={2} />
+          </Link>
         </div>
 
         <div className={cx("home-join-banner-side")}>
