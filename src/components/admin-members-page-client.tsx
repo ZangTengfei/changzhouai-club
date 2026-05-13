@@ -1,7 +1,10 @@
 "use client";
 
+import { Eye, LoaderCircle } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 import {
   AdminField,
@@ -112,9 +115,25 @@ function buildDetailHref(basePath: string, currentPath: string) {
   return `${basePath}?${params.toString()}`;
 }
 
+async function readApiResult(response: Response) {
+  const payload = (await response.json().catch(() => null)) as
+    | { error?: string; saved?: string }
+    | null;
+
+  if (!response.ok) {
+    throw new Error(getAdminErrorMessage(payload?.error) ?? "提交失败，请稍后再试。");
+  }
+
+  return payload;
+}
+
 export function AdminMembersPageClient() {
   const searchParams = useSearchParams();
-  const { data, error, isLoading } = useAdminResource<AdminMembersData>("/api/admin/members");
+  const { data, error, isLoading, reload } =
+    useAdminResource<AdminMembersData>("/api/admin/members");
+  const publishingMemberIdsRef = useRef(new Set<string>());
+  const [publishingMemberIds, setPublishingMemberIds] = useState<Set<string>>(() => new Set());
+  const [publishedMemberIds, setPublishedMemberIds] = useState<Set<string>>(() => new Set());
 
   const statusFilter = searchParams.get("status") ?? "all";
   const visibilityFilter = searchParams.get("visibility") ?? "all";
@@ -180,6 +199,48 @@ export function AdminMembersPageClient() {
     memberQueryInput,
     currentMemberPage,
   );
+
+  function setMemberPublishing(memberId: string, isPublishing: boolean) {
+    if (isPublishing) {
+      publishingMemberIdsRef.current.add(memberId);
+    } else {
+      publishingMemberIdsRef.current.delete(memberId);
+    }
+
+    setPublishingMemberIds(new Set(publishingMemberIdsRef.current));
+  }
+
+  async function handlePublishMember(memberId: string, displayName: string) {
+    if (publishingMemberIdsRef.current.has(memberId)) {
+      return;
+    }
+
+    setMemberPublishing(memberId, true);
+
+    try {
+      const response = await fetch(`/api/admin/members/${memberId}/visibility`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          is_publicly_visible: true,
+        }),
+      });
+      const result = await readApiResult(response);
+
+      setPublishedMemberIds((current) => new Set(current).add(memberId));
+      toast.success(
+        getAdminSavedMessage(result?.saved ?? "member_public_visibility") ??
+          `${displayName} 已公开展示。`,
+      );
+      reload();
+    } catch (requestError) {
+      toast.error(requestError instanceof Error ? requestError.message : "公开失败，请稍后再试。");
+    } finally {
+      setMemberPublishing(memberId, false);
+    }
+  }
 
   return (
     <AdminPageStack>
@@ -302,68 +363,95 @@ export function AdminMembersPageClient() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedMembers.map((member) => (
-                    <TableRow key={member.id}>
-                      <TableCell>
-                        <div className="grid gap-1">
-                          <Link
-                            href={buildDetailHref(
-                              `/admin/members/${member.id}`,
-                              currentMembersPath,
-                            )}
-                            className="font-semibold text-foreground transition-colors hover:text-primary"
+                  {paginatedMembers.map((member) => {
+                    const isPublishing = publishingMemberIds.has(member.id);
+                    const isPubliclyVisible =
+                      member.isPubliclyVisible || publishedMemberIds.has(member.id);
+
+                    return (
+                      <TableRow key={member.id}>
+                        <TableCell>
+                          <div className="grid gap-1">
+                            <Link
+                              href={buildDetailHref(
+                                `/admin/members/${member.id}`,
+                                currentMembersPath,
+                              )}
+                              className="font-semibold text-foreground transition-colors hover:text-primary"
+                            >
+                              {member.displayName}
+                            </Link>
+                            <span className="text-sm text-muted-foreground">
+                              {member.email ?? "未提供邮箱"}
+                            </span>
+                            <span className="text-xs text-muted-foreground">{member.city}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <AdminStatusBadge
+                            tone={getAdminMemberStatusTone(member.status) as AdminTone}
                           >
-                            {member.displayName}
-                          </Link>
-                          <span className="text-sm text-muted-foreground">
-                            {member.email ?? "未提供邮箱"}
-                          </span>
-                          <span className="text-xs text-muted-foreground">{member.city}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <AdminStatusBadge
-                          tone={getAdminMemberStatusTone(member.status) as AdminTone}
-                        >
-                          {formatAdminMemberStatus(member.status)}
-                        </AdminStatusBadge>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {member.isPubliclyVisible
-                          ? member.isFeaturedOnHome
-                            ? "公开 / 首页"
-                            : "公开"
-                          : "未公开"}
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                        {formatDate(member.joinedAt)}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {member.registrationCount} 次
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {[
-                          member.isCoBuilder ? "共建成员" : null,
-                          member.willingToShare ? "分享" : null,
-                          member.willingToJoinProjects ? "共建" : null,
-                        ]
-                          .filter(Boolean)
-                          .join(" / ") || "暂无"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button asChild size="sm" variant="outline">
-                          <Link
-                            href={buildDetailHref(
-                              `/admin/members/${member.id}`,
-                              currentMembersPath,
-                            )}
-                          >
-                            详情
-                          </Link>
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                            {formatAdminMemberStatus(member.status)}
+                          </AdminStatusBadge>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {isPubliclyVisible
+                            ? member.isFeaturedOnHome
+                              ? "公开 / 首页"
+                              : "公开"
+                            : "未公开"}
+                        </TableCell>
+                        <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+                          {formatDate(member.joinedAt)}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {member.registrationCount} 次
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {[
+                            member.isCoBuilder ? "共建成员" : null,
+                            member.willingToShare ? "分享" : null,
+                            member.willingToJoinProjects ? "共建" : null,
+                          ]
+                            .filter(Boolean)
+                            .join(" / ") || "暂无"}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex flex-wrap justify-end gap-2">
+                            {!isPubliclyVisible ? (
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="secondary"
+                                disabled={isPublishing}
+                                aria-label={`公开展示 ${member.displayName}`}
+                                onClick={() => {
+                                  void handlePublishMember(member.id, member.displayName);
+                                }}
+                              >
+                                {isPublishing ? (
+                                  <LoaderCircle aria-hidden="true" className="animate-spin" />
+                                ) : (
+                                  <Eye aria-hidden="true" />
+                                )}
+                                {isPublishing ? "公开中..." : "一键公开"}
+                              </Button>
+                            ) : null}
+                            <Button asChild size="sm" variant="outline">
+                              <Link
+                                href={buildDetailHref(
+                                  `/admin/members/${member.id}`,
+                                  currentMembersPath,
+                                )}
+                              >
+                                详情
+                              </Link>
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
 

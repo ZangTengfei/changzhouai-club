@@ -9,6 +9,7 @@ const adminSavedMessageMap: Record<string, string> = {
   lead_match_deleted: "线索匹配成员已删除。",
   member: "成员设置已更新。",
   member_profile: "成员资料已更新。",
+  member_public_visibility: "成员已公开展示。",
   join_request: "加入申请状态已更新。",
   join_request_pipeline: "加入申请转化节点已更新。",
   photo: "活动照片已保存。",
