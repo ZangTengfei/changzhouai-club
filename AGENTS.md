@@ -26,6 +26,12 @@ When producing new files:
 - Use Chinese names for `knowledge/` directories, files, and note titles when possible. Follow the local guide at `knowledge/00_知识库规范/知识库规范.md` when creating or organizing knowledge notes.
 - When preparing materials for community co-builders, follow `knowledge/00_知识库规范/共建资料同步规范.md`: treat local `knowledge/` and `files/` as the source of truth, generate reviewed sync packages under `output/`, and never include `visibility: private` source material unless the user explicitly approves a sanitized summary.
 
+# Project-local Skills
+
+This repository keeps project-specific Codex skill instructions under `.codex/skills/`.
+
+For Changzhou AI Club website event publishing, use `.codex/skills/changzhou-event-publisher/SKILL.md` and the repository script `npm run event:publish`. Keep this skill project-local because it writes to this website's Supabase project and should not implicitly apply to unrelated repositories.
+
 # cc-connect Integration
 
 This project is managed via cc-connect, a bridge to messaging platforms.

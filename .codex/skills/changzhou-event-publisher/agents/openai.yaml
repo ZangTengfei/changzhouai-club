@@ -1,0 +1,4 @@
+interface:
+  display_name: "常州活动发布"
+  short_description: "Publish Changzhou AI Club events from organizer notes"
+  default_prompt: "Use $changzhou-event-publisher to publish a Changzhou AI Club event from this announcement."
