@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "event:publish": "node scripts/publish-event.mjs",
     "news:radar": "node scripts/ai-news-radar.mjs",
     "news:radar:md": "node scripts/ai-news-radar.mjs --format markdown --limit 12",
     "news:social": "node scripts/ai-daily-social-materials.mjs",
