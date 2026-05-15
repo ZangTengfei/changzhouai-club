@@ -54,6 +54,7 @@ async function main() {
     take: clampInteger(args.take, 50, 5, 100),
     sinceHours: clampInteger(args["since-hours"], 36, 6, 168),
     write: args.write !== "false" && args["no-write"] !== true,
+    poster: args.poster !== "false" && args["no-poster"] !== true,
   };
 
   const since = new Date(Date.now() - options.sinceHours * 60 * 60 * 1000).toISOString();
@@ -77,9 +78,13 @@ async function main() {
   });
   const markdown = toMarkdown(material);
   const json = `${JSON.stringify(material, null, 2)}\n`;
+  let posterResult = null;
 
   if (options.write) {
     await writeOutputs(options.outDir, material.date, markdown, json);
+    if (options.poster) {
+      posterResult = await renderWechatPoster(options.outDir);
+    }
   }
 
   if (options.send) {
@@ -96,6 +101,12 @@ async function main() {
         `已生成 ${material.date} AI 每日素材`,
         `Markdown: ${path.relative(projectRoot, path.join(options.outDir, `${material.date}.md`))}`,
         `JSON: ${path.relative(projectRoot, path.join(options.outDir, `${material.date}.json`))}`,
+        ...(posterResult
+          ? [
+              `Poster: ${path.relative(projectRoot, posterResult.latestPngPath)}`,
+              `Poster HTML: ${path.relative(projectRoot, posterResult.latestHtmlPath)}`,
+            ]
+          : []),
         `小红书标题: ${material.xiaohongshu.titles[0]}`,
         "",
       ].join("\n"),
@@ -422,6 +433,34 @@ async function writeOutputs(outDir, date, markdown, json) {
     writeFile(path.join(outDir, "latest.md"), markdown, "utf8"),
     writeFile(path.join(outDir, "latest.json"), json, "utf8"),
   ]);
+}
+
+async function renderWechatPoster(outDir) {
+  const scriptPath = path.join(projectRoot, "scripts/render-ai-daily-wechat-poster.mjs");
+  const output = await new Promise((resolve, reject) => {
+    const child = spawn(process.execPath, [scriptPath, "--out-dir", outDir], {
+      cwd: projectRoot,
+      stdio: ["ignore", "pipe", "pipe"],
+    });
+    let stdout = "";
+    let stderr = "";
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk;
+    });
+    child.stderr.on("data", (chunk) => {
+      stderr += chunk;
+    });
+    child.on("error", reject);
+    child.on("close", (code) => {
+      if (code === 0) {
+        resolve(stdout);
+      } else {
+        reject(new Error(`render-ai-daily-wechat-poster failed with ${code}: ${stderr.trim()}`));
+      }
+    });
+  });
+
+  return JSON.parse(output);
 }
 
 async function sendToCurrentChat(message) {

@@ -10,6 +10,7 @@
     "news:radar": "node scripts/ai-news-radar.mjs",
     "news:radar:md": "node scripts/ai-news-radar.mjs --format markdown --limit 12",
     "news:social": "node scripts/ai-daily-social-materials.mjs",
+    "news:poster": "node scripts/render-ai-daily-wechat-poster.mjs",
     "db:copy": "node scripts/copy-supabase-database.mjs",
     "storage:copy": "node scripts/copy-supabase-storage.mjs"
   },
