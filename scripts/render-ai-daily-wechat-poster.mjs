@@ -16,7 +16,7 @@ const data = JSON.parse(await fs.readFile(dataPath, "utf8"));
 
 const dailyUrl = "https://changzhouai.club/news?view=daily";
 const width = 1080;
-const height = 1920;
+const height = 1800;
 const date = data.date || new Date().toISOString().slice(0, 10);
 const [year, month, day] = date.split("-");
 const logoData = await fs.readFile(logoPath);
