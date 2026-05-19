@@ -12,6 +12,7 @@ export function StorageImageUrlField({
   clearLabel = "清空图片",
   filledStatusText = "已填写图片地址",
   emptyStatusText = "当前未设置图片",
+  compressUpload = true,
 }: {
   name: string;
   defaultValue?: string;
@@ -24,6 +25,7 @@ export function StorageImageUrlField({
   clearLabel?: string;
   filledStatusText?: string;
   emptyStatusText?: string;
+  compressUpload?: boolean;
 }) {
   return (
     <ImageUploadField
@@ -42,6 +44,7 @@ export function StorageImageUrlField({
       filledStatusText={filledStatusText}
       emptyStatusText={emptyStatusText}
       required={required}
+      compressUpload={compressUpload}
     />
   );
 }

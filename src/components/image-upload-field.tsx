@@ -6,6 +6,10 @@ import { UploadCloud } from "lucide-react";
 import { AdminNotice } from "@/components/admin-ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  compressImageFile,
+  formatFileSize,
+} from "@/lib/client-image-compression";
 import { createClient } from "@/lib/supabase/client";
 import {
   buildMemberAvatarPath,
@@ -18,6 +22,7 @@ import styles from "./image-upload-field.module.css";
 type UploadMode = "upload-only" | "upload-or-url";
 type UploadAppearance = "site" | "admin";
 type StorageUploadScope = "event" | "sponsor" | "community";
+type UploadStage = "idle" | "compressing" | "uploading";
 
 type UploadTarget =
   | {
@@ -47,6 +52,7 @@ type ImageUploadFieldProps = {
   required?: boolean;
   allowClear?: boolean;
   preview?: ReactNode | ((value: string) => ReactNode);
+  compressUpload?: boolean;
 };
 
 function getStorageUploadUrl(scope: StorageUploadScope) {
@@ -78,29 +84,53 @@ export function ImageUploadField({
   required = false,
   allowClear = true,
   preview,
+  compressUpload = true,
 }: ImageUploadFieldProps) {
   const [value, setValue] = useState(defaultValue);
   const [error, setError] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [uploadStage, setUploadStage] = useState<UploadStage>("idle");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isUploading = uploadStage !== "idle";
 
   async function handleUpload(file: File | null) {
     if (!file) {
       return;
     }
 
-    setIsUploading(true);
+    setUploadStage("compressing");
     setError(null);
+    setNotice(null);
 
     try {
+      const compressionResult = compressUpload
+        ? await compressImageFile(file)
+        : {
+            file,
+            didCompress: false,
+            originalSize: file.size,
+            compressedSize: file.size,
+          };
+      const uploadFile = compressionResult.file;
+
+      if (compressionResult.didCompress) {
+        setNotice(
+          `已自动压缩：${formatFileSize(
+            compressionResult.originalSize,
+          )} -> ${formatFileSize(compressionResult.compressedSize)}`,
+        );
+      }
+
+      setUploadStage("uploading");
+
       if (uploadTarget.kind === "member-avatar") {
         const supabase = createClient();
         const assetPath = buildMemberAvatarPath(uploadTarget.userId);
         const { error: uploadError } = await supabase.storage
           .from(MEMBER_AVATARS_BUCKET)
-          .upload(assetPath, file, {
+          .upload(assetPath, uploadFile, {
             upsert: true,
-            contentType: file.type || undefined,
+            contentType: uploadFile.type || undefined,
           });
 
         if (uploadError) {
@@ -119,7 +149,7 @@ export function ImageUploadField({
       } else {
         const payload = new FormData();
         payload.append("eventSlug", uploadTarget.eventSlug);
-        payload.append("file", file);
+        payload.append("file", uploadFile);
 
         const response = await fetch(getStorageUploadUrl(uploadTarget.scope), {
           method: "POST",
@@ -140,7 +170,7 @@ export function ImageUploadField({
         uploadError instanceof Error ? uploadError.message : "图片上传失败，请稍后再试。";
       setError(message);
     } finally {
-      setIsUploading(false);
+      setUploadStage("idle");
 
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -151,6 +181,12 @@ export function ImageUploadField({
   const resolvedPreview =
     typeof preview === "function" ? preview(value) : preview;
   const statusText = value ? filledStatusText : emptyStatusText;
+  const uploadLabelText =
+    uploadStage === "compressing"
+      ? "压缩中..."
+      : uploadStage === "uploading"
+        ? "上传中..."
+        : uploadLabel;
 
   return (
     <div
@@ -215,7 +251,7 @@ export function ImageUploadField({
               disabled={isUploading}
             >
               <UploadCloud className="size-4" />
-              {isUploading ? "上传中..." : uploadLabel}
+              {uploadLabelText}
             </Button>
           ) : (
             <button
@@ -224,7 +260,7 @@ export function ImageUploadField({
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
             >
-              {isUploading ? "上传中..." : uploadLabel}
+              {uploadLabelText}
             </button>
           )}
 
@@ -268,6 +304,13 @@ export function ImageUploadField({
             <AdminNotice>{error}</AdminNotice>
           ) : (
             <div className="note-strip">{error}</div>
+          )
+        : null}
+      {!error && notice
+        ? appearance === "admin" ? (
+            <AdminNotice>{notice}</AdminNotice>
+          ) : (
+            <div className="note-strip">{notice}</div>
           )
         : null}
     </div>

@@ -147,6 +147,7 @@ export default async function AdminSocialPage({
                       clearLabel="清空二维码"
                       filledStatusText="已设置二维码"
                       emptyStatusText="当前未设置二维码"
+                      compressUpload={false}
                       required
                     />
                   </AdminField>
@@ -300,6 +301,7 @@ export default async function AdminSocialPage({
                             clearLabel="清空二维码"
                             filledStatusText="已设置二维码"
                             emptyStatusText="当前未设置二维码"
+                            compressUpload={false}
                             required
                           />
                         </AdminField>

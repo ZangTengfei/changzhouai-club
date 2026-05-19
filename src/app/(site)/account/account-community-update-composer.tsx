@@ -11,6 +11,10 @@ import {
 } from "lucide-react";
 
 import { MarkdownContent } from "@/components/markdown-content";
+import {
+  compressImageFile,
+  formatFileSize,
+} from "@/lib/client-image-compression";
 import { createClient } from "@/lib/supabase/client";
 import {
   buildCommunityUpdateAssetPath,
@@ -126,26 +130,36 @@ export function AccountCommunityUpdateComposer({
       return;
     }
 
-    const oversizedFile = selectedFiles.find((file) => file.size > MAX_IMAGE_SIZE);
-
-    if (oversizedFile) {
-      setUploadMessage("单张图片不能超过 8MB。");
-      return;
-    }
-
     setIsUploading(true);
     setUploadMessage(null);
 
     try {
       const supabase = createClient();
       const uploadedUrls: string[] = [];
+      let compressedCount = 0;
+      let originalTotalSize = 0;
+      let uploadTotalSize = 0;
 
       for (const file of selectedFiles) {
-        const assetPath = buildCommunityUpdateAssetPath(userId, file.name);
+        const compressionResult = await compressImageFile(file);
+        const uploadFile = compressionResult.file;
+
+        if (uploadFile.size > MAX_IMAGE_SIZE) {
+          throw new Error("单张图片压缩后仍超过 8MB，请换一张更小的图片。");
+        }
+
+        if (compressionResult.didCompress) {
+          compressedCount += 1;
+        }
+
+        originalTotalSize += compressionResult.originalSize;
+        uploadTotalSize += compressionResult.compressedSize;
+
+        const assetPath = buildCommunityUpdateAssetPath(userId, uploadFile.name);
         const { error } = await supabase.storage
           .from(COMMUNITY_UPDATE_ASSETS_BUCKET)
-          .upload(assetPath, file, {
-            contentType: file.type || undefined,
+          .upload(assetPath, uploadFile, {
+            contentType: uploadFile.type || undefined,
           });
 
         if (error) {
@@ -163,7 +177,13 @@ export function AccountCommunityUpdateComposer({
         [...current, ...uploadedUrls].slice(0, MAX_UPDATE_IMAGES),
       );
       setUploadMessage(
-        uploadedUrls.length > 0 ? `已上传 ${uploadedUrls.length} 张图片。` : null,
+        uploadedUrls.length > 0
+          ? compressedCount > 0
+            ? `已压缩 ${compressedCount} 张并上传 ${uploadedUrls.length} 张图片：${formatFileSize(
+                originalTotalSize,
+              )} -> ${formatFileSize(uploadTotalSize)}。`
+            : `已上传 ${uploadedUrls.length} 张图片。`
+          : null,
       );
     } catch (error) {
       setUploadMessage(
