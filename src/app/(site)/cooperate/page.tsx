@@ -2,16 +2,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
+  BrainCircuit,
   Building2,
   CalendarClock,
   CheckCircle2,
   ClipboardList,
+  FileCode,
   GraduationCap,
   Handshake,
   Lightbulb,
   MessageCircle,
+  Settings2,
   Rocket,
   Sparkles,
+  UserRoundCog,
   UsersRound,
 } from "lucide-react";
 
@@ -49,7 +53,7 @@ const cooperationScenarios = [
   },
   {
     title: "项目与人才",
-    summary: "连接成员能力、项目机会、分享嘉宾和轻量协作团队。",
+    summary: "连接成员能力、项目机会、FDE 型工程师和轻量协作团队。",
     icon: UsersRound,
     tone: "blue",
   },
@@ -68,13 +72,31 @@ const cooperationFlow = [
   },
   {
     title: "匹配资源",
-    summary: "根据场景匹配社区成员、分享者、顾问或协作团队。",
+    summary: "根据场景匹配社区成员、分享者、FDE 型工程师、顾问或协作团队。",
     icon: Handshake,
   },
   {
     title: "推进试点",
     summary: "进入分享、培训、PoC、项目开发或长期合作阶段。",
     icon: Rocket,
+  },
+] as const;
+
+const fdeCapabilities = [
+  {
+    title: "懂现场的需求澄清",
+    summary: "由有项目经验的 FDE 型工程师协助拆解业务流程、关键角色、数据边界和可验证目标。",
+    icon: UserRoundCog,
+  },
+  {
+    title: "从原型到集成试点",
+    summary: "围绕 Agent、RAG、自动化工作流和既有系统对接，先做可演示、可评估的小步验证。",
+    icon: FileCode,
+  },
+  {
+    title: "陪跑交付与复盘",
+    summary: "在试点过程中协助沟通技术选择、落地节奏和交付风险，让需求方和工程侧说同一种语言。",
+    icon: Settings2,
   },
 ] as const;
 
@@ -143,7 +165,8 @@ export default async function CooperatePage({
           </h1>
           <p>
             如果你正在寻找 AI 主题分享、企业内训、PoC 验证、项目协作或本地人才连接，
-            可以从这里把需求交给社区，我们会根据场景匹配合适的成员与合作方式。
+            可以从这里把需求交给社区，我们会根据场景匹配合适的成员、合作方式与有经验的
+            FDE 型工程师对接。
           </p>
 
           <div className={styles.cooperateHeroActions}>
@@ -158,7 +181,7 @@ export default async function CooperatePage({
 
           <div className={styles.cooperateHeroProof}>
             <CheckCircle2 aria-hidden="true" strokeWidth={1.9} />
-            <span>社区会优先对齐真实场景、目标结果和可投入角色，再推进下一步沟通。</span>
+            <span>社区会优先对齐真实场景、目标结果和可投入角色，再判断是否需要 FDE 工程师介入。</span>
           </div>
         </div>
 
@@ -187,7 +210,7 @@ export default async function CooperatePage({
 
           <div className={styles.cooperateStickyNote}>
             <span>合作原则</span>
-            <strong>先讲清业务场景，再匹配社区能力</strong>
+            <strong>先讲清业务场景，再匹配工程落地能力</strong>
           </div>
           <DoodleSparkles className={styles.cooperateHeroDoodle} />
           <HandDrawnArrow className={styles.cooperateHeroArrow} />
@@ -236,6 +259,32 @@ export default async function CooperatePage({
           {cooperationAreas.map((item) => (
             <ToneBadge key={item} label={item} />
           ))}
+        </div>
+      </section>
+
+      <section className={styles.cooperateFdeSection}>
+        <div className={styles.cooperateFdeLead}>
+          <p className="home-kicker">FDE Support</p>
+          <BrainCircuit aria-hidden="true" strokeWidth={1.8} />
+          <h2>可对接有经验的 FDE 型工程师</h2>
+          <p className={styles.cooperateFdeSummary}>
+            对于已经有明确业务场景的企业或机构，社区可以协助对接既懂工程实现、也能进入现场沟通的
+            FDE 型工程师，帮助把 AI 需求从概念变成可验证的试点路径。
+          </p>
+        </div>
+
+        <div className={styles.cooperateFdeGrid}>
+          {fdeCapabilities.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <article className={styles.cooperateFdeCard} key={item.title}>
+                <Icon aria-hidden="true" strokeWidth={1.8} />
+                <h3>{item.title}</h3>
+                <p>{item.summary}</p>
+              </article>
+            );
+          })}
         </div>
       </section>
 
