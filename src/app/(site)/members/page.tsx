@@ -1,21 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  ArrowRight,
-  MessageCircle,
-  Sparkles,
-  UsersRound,
-  Wrench,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
-import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
-import { MemberAvatar } from "@/components/member-avatar";
 import { MemberDirectoryCard } from "@/components/member-directory-card";
 import { ToneBadge } from "@/components/tone-badge";
 import { getPublicMembersDirectory } from "@/lib/community-members";
-import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
 import { memberTags } from "@/lib/site-data";
-import { cn } from "@/lib/utils";
 
 import styles from "./members-page.module.css";
 
@@ -36,289 +26,83 @@ function formatMemberHeadline(member: {
 
 const memberFlowSteps = [
   {
-    title: "先找到方向",
-    summary: "通过角色、技能和参与信号，快速判断谁可能和你的问题相关。",
-    tone: "green",
+    title: "看方向",
+    summary: "从角色、组织、城市和技能标签，先判断对方的实践领域。",
   },
   {
-    title: "再线下见面",
-    summary: "活动现场让名字变得具体，也让合作前的信任更容易发生。",
-    tone: "orange",
+    title: "看信号",
+    summary: "核心成员、共建成员、愿意分享等标签，可以帮助你找到合适入口。",
   },
   {
-    title: "最后一起做事",
-    summary: "从一次交流延伸到分享、项目试点、资源对接或长期共建。",
-    tone: "blue",
+    title: "继续连接",
+    summary: "点开成员主页了解更多，也可以通过活动或合作联系发起具体沟通。",
   },
 ] as const;
-
-const memberFlowToneClassName = {
-  green: "",
-  orange: styles["members-flow-card-orange"],
-  blue: styles["members-flow-card-blue"],
-} satisfies Record<(typeof memberFlowSteps)[number]["tone"], string>;
-
-const memberMapNodeClassName = [
-  styles["members-map-node-1"],
-  styles["members-map-node-2"],
-  styles["members-map-node-3"],
-  styles["members-map-node-4"],
-  styles["members-map-node-5"],
-  styles["members-map-node-6"],
-  styles["members-map-node-7"],
-];
 
 export default async function MembersPage() {
   const directory = await getPublicMembersDirectory();
   const skillTags =
     directory.skillTags.length > 0 ? directory.skillTags : memberTags;
-  const heroMembers = directory.members.slice(0, 6);
-  const mapMembers = directory.members.slice(0, 7);
-  const featuredGroups = directory.featuredGroups;
-  const memberStats = [
+  const memberHighlights = [
     {
       value: directory.stats.publicMembers,
       label: "公开成员",
-      detail: "已授权展示的社区伙伴",
-      icon: UsersRound,
-    },
-    {
-      value: directory.stats.organizers,
-      label: "核心成员",
-      detail: "发起与长期维护",
-      icon: Sparkles,
     },
     {
       value: directory.stats.coBuilders,
       label: "共建成员",
-      detail: "已开始参与社区建设",
-      icon: Wrench,
     },
     {
       value: directory.stats.willingToShare,
       label: "愿意分享",
-      detail: "可邀约主题交流",
-      icon: MessageCircle,
     },
   ];
 
   return (
-    <div className={styles["members-page-stack"]}>
-      <section className={styles["members-hero"]} aria-labelledby="members-hero-title">
-        <div className={styles["members-hero-copy"]}>
+    <div className={styles.membersPageStack}>
+      <section className={styles.membersHero} aria-labelledby="members-hero-title">
+        <div className={styles.membersHeroCopy}>
           <p className="home-kicker">Members · 成员地图</p>
-          <h1 id="members-hero-title">
-            找到同路的人，
-            <span>让想法有回应</span>
-          </h1>
+          <h1 id="members-hero-title">找到常州 AI Club 里正在做 AI 的人</h1>
           <p>
-            成员地图按核心成员、共建成员和公开成员组织信息。你可以从这里找到正在维护社区的人、
-            已经参与共建的伙伴，也更快理解常州 AI Club 正在聚集怎样的人。
+            这里展示成员授权公开的介绍、技能和参与信号。先从卡片认识人，
+            再通过线下活动、成员主页或合作联系继续对接。
           </p>
 
-          <div className={styles["members-hero-actions"]}>
-            <Link href="/join" className="button home-primary-button">
-              加入社区
+          <div className={styles.membersHeroActions}>
+            <Link href="#member-directory" className="button home-primary-button">
+              浏览成员
               <ArrowRight aria-hidden="true" strokeWidth={2} />
             </Link>
-            <Link href="#member-directory" className="button home-ghost-button">
-              浏览名录
+            <Link href="/join" className="button home-ghost-button">
+              加入社区
             </Link>
           </div>
-
-          <div className={styles["members-hero-proof"]} aria-label="社区成员概览">
-            <div className="home-avatar-stack" aria-hidden="true">
-              {heroMembers.length > 0 ? (
-                heroMembers.map((member, index) =>
-                  member.avatarUrl ? (
-                    <img
-                      key={member.id}
-                      src={member.avatarUrl}
-                      alt=""
-                      style={{ zIndex: heroMembers.length - index }}
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    <span key={member.id} style={{ zIndex: heroMembers.length - index }}>
-                      {member.displayName.slice(0, 2)}
-                    </span>
-                  ),
-                )
-              ) : (
-                ["AI", "PM", "DEV", "OP"].map((label, index) => (
-                  <span key={label} style={{ zIndex: 4 - index }}>
-                    {label}
-                  </span>
-                ))
-              )}
-            </div>
-            <div>
-              <strong>{directory.stats.registeredMembers || "200+"}</strong>
-              <span>位成员正在社区里相遇、分享和共建</span>
-            </div>
-          </div>
         </div>
 
-        <div className={styles["members-map-panel"]} aria-label="成员连接地图">
-          <div className={styles["members-map-orbit"]}>
-            <span>活动</span>
-            <span>分享</span>
-            <span>项目</span>
-          </div>
-          <div className={styles["members-map-core"]}>
-            <Sparkles aria-hidden="true" strokeWidth={1.9} />
-            <strong>常州 AI Club</strong>
-            <span>本地连接网络</span>
-          </div>
-
-          <div className={styles["members-map-nodes"]}>
-            {mapMembers.length > 0
-              ? mapMembers.map((member, index) => (
-                  <Link
-                    href={getMemberPublicSlugPath(member)}
-                    className={cn(
-                      styles["members-map-node"],
-                      memberMapNodeClassName[index],
-                    )}
-                    key={member.id}
-                  >
-                    <MemberAvatar
-                      name={member.displayName}
-                      avatarUrl={member.avatarUrl}
-                      size="sm"
-                    />
-                    <span>{member.displayName}</span>
-                  </Link>
-                ))
-              : ["开发者", "产品人", "创业者", "设计师", "运营"].map((label, index) => (
-                  <div
-                    className={cn(
-                      styles["members-map-node"],
-                      memberMapNodeClassName[index],
-                    )}
-                    key={label}
-                  >
-                    <MemberAvatar name={label} size="sm" />
-                    <span>{label}</span>
-                  </div>
-                ))}
-          </div>
-
-          <div className={styles["members-sticky-note"]}>
-            <span>成员地图</span>
-            <strong>先看方向，再约一场真实交流</strong>
-          </div>
-          <DoodleSparkles className={styles["members-hero-doodle"]} />
-          <HandDrawnArrow className={styles["members-hero-arrow"]} />
-        </div>
-      </section>
-
-      <section className={styles["members-stats-panel"]} aria-label="成员数据">
-        {memberStats.map((item, index) => {
-          const Icon = item.icon;
-
-          return (
-            <article className={styles["members-stat-card"]} key={item.label}>
-              <Icon aria-hidden="true" strokeWidth={1.9} />
+        <div className={styles.membersHeroSummary} aria-label="成员概览">
+          {memberHighlights.map((item) => (
+            <div className={styles.membersHeroSummaryItem} key={item.label}>
               <strong>{item.value}</strong>
               <span>{item.label}</span>
-              <small>{item.detail}</small>
-            </article>
-          );
-        })}
-      </section>
-
-      <section className={styles["members-flow-strip"]} aria-label="成员连接路径">
-        {memberFlowSteps.map((item, index) => (
-          <article
-            className={cn(styles["members-flow-card"], memberFlowToneClassName[item.tone])}
-            key={item.title}
-          >
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <h2>{item.title}</h2>
-            <p>{item.summary}</p>
-          </article>
-        ))}
-      </section>
-
-      {featuredGroups.length > 0 ? (
-        <section className={styles["members-featured-section"]}>
-          <div className={styles["members-section-heading"]}>
-            <p className="home-kicker">Signals</p>
-            <div>
-              <h2>按社区参与层级认识成员</h2>
-              <p>优先展示核心成员，再展示已经参与共建的小伙伴，最后连接更多公开成员。</p>
             </div>
-          </div>
-
-          <div className={styles["members-featured-grid"]}>
-            {featuredGroups.map((group, index) => (
-              <article
-                className={cn(
-                  styles["members-featured-card"],
-                  styles[`members-featured-card-${index + 1}`],
-                )}
-                key={group.id}
-              >
-                <div className={styles["members-featured-head"]}>
-                  <span>{String(index + 1).padStart(2, "0")}</span>
-                  <div>
-                    <h3>{group.title}</h3>
-                    <p>{group.description}</p>
-                  </div>
-                </div>
-
-                <div className={styles["members-featured-list"]}>
-                  {group.members.map((member) => (
-                    <Link
-                      href={getMemberPublicSlugPath(member)}
-                      className={styles["members-featured-person"]}
-                      key={`${group.id}-${member.id}`}
-                    >
-                      <MemberAvatar
-                        name={member.displayName}
-                        avatarUrl={member.avatarUrl}
-                        size="sm"
-                      />
-                      <span>
-                        <strong>{member.displayName}</strong>
-                        <small>{formatMemberHeadline(member) || member.city}</small>
-                      </span>
-                    </Link>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : null}
+          ))}
+        </div>
+      </section>
 
       {directory.members.length > 0 ? (
-        <section className={styles["members-directory-section"]} id="member-directory">
-          <div className={styles["members-section-heading"]}>
+        <section className={styles.membersDirectorySection} id="member-directory">
+          <div className={styles.membersSectionHeading}>
             <p className="home-kicker">Directory</p>
             <div>
-              <h2>公开成员名录</h2>
+              <h2>公开成员</h2>
               <p>
-                页面展示经成员授权公开的信息，包括方向、技能与参与信号，不直接公开联系方式。
+                每张卡片都来自成员授权公开的信息，用来快速了解方向、技能和参与意愿。
               </p>
             </div>
           </div>
 
-          <div className={styles["members-directory-feature"]}>
-            <div>
-              <h3>每一张成员卡，都是一个可继续对话的线索</h3>
-              <p>
-                点开成员主页可以查看更完整的介绍。你也可以先从社区层级、技能标签、分享意愿和共建意向判断是否适合进一步交流。
-              </p>
-            </div>
-            <Link href="/cooperate" className={styles["members-directory-feature-link"]}>
-              发起合作联系
-              <ArrowRight aria-hidden="true" strokeWidth={2} />
-            </Link>
-          </div>
-
-          <div className={`member-directory-grid ${styles["members-directory-grid"]}`}>
+          <div className={`member-directory-grid ${styles.membersDirectoryGrid}`}>
             {directory.members.map((member) => (
               <MemberDirectoryCard
                 key={member.id}
@@ -330,24 +114,44 @@ export default async function MembersPage() {
           </div>
         </section>
       ) : (
-        <div className={styles["members-empty-panel"]}>
+        <div className={styles.membersEmptyPanel}>
           <strong>暂无公开成员信息</strong>
           <p>成员授权公开后，会在这里展示方向、技能与参与信号。</p>
         </div>
       )}
 
-      <section className={styles["members-skill-section"]}>
-        <div className={styles["members-section-heading"]}>
+      <section className={styles.membersGuideSection} aria-label="成员地图说明">
+        <div className={styles.membersSectionHeading}>
+          <p className="home-kicker">Guide</p>
+          <div>
+            <h2>成员地图说明</h2>
+            <p>成员地图用于帮助你判断“可以和谁聊”，真正的连接仍然发生在具体交流里。</p>
+          </div>
+        </div>
+
+        <div className={styles.membersGuideGrid}>
+          {memberFlowSteps.map((item, index) => (
+            <article className={styles.membersGuideCard} key={item.title}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <h3>{item.title}</h3>
+              <p>{item.summary}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className={styles.membersSkillSection}>
+        <div className={styles.membersSectionHeading}>
           <p className="home-kicker">Skills</p>
           <div>
-            <h2>社区技能云</h2>
+            <h2>技能标签</h2>
             <p>
-              这些标签来自公开成员信息和社区常见方向，用来帮助你快速理解成员能力分布。
+              这些标签来自公开成员信息和社区常见方向，可辅助理解成员能力分布。
             </p>
           </div>
         </div>
 
-        <div className={styles["members-skill-cloud"]}>
+        <div className={styles.membersSkillCloud}>
           {skillTags.map((tag) => (
             <ToneBadge key={tag} label={tag} />
           ))}
