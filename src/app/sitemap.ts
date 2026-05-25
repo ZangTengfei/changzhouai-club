@@ -15,6 +15,8 @@ const routes = [
   "/cooperate",
   "/about",
   "/archive",
+  "/reports",
+  "/reports/ai-office-course-survey",
   "/faq",
   "/docs",
   "/docs/getting-started",

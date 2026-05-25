@@ -1,0 +1,121 @@
+.reportList {
+  display: grid;
+  gap: 20px;
+}
+
+.reportCard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.72fr) auto;
+  gap: 22px;
+  align-items: center;
+  padding: 24px;
+  border: 1px solid rgba(var(--ink-rgb), 0.1);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 92% 14%, rgba(236, 142, 68, 0.14), transparent 24%),
+    rgba(var(--surface-rgb), 0.84);
+  box-shadow: 0 16px 36px rgba(var(--ink-rgb), 0.06);
+}
+
+.reportCardCopy {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.reportCardCopy span {
+  color: var(--accent);
+  font-family: var(--font-latin-rounded);
+  font-size: 0.86rem;
+  font-weight: 850;
+}
+
+.reportCardCopy h2,
+.reportCardCopy p {
+  margin: 0;
+}
+
+.reportCardCopy h2 {
+  color: #111b1f;
+  font-size: clamp(1.42rem, 2.6vw, 2.05rem);
+  line-height: 1.16;
+  letter-spacing: 0;
+}
+
+.reportCardCopy p {
+  max-width: 43rem;
+  color: rgba(var(--ink-rgb), 0.66);
+  line-height: 1.72;
+}
+
+.reportStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.reportStat {
+  display: grid;
+  gap: 4px;
+  min-height: 116px;
+  padding: 16px;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-radius: 16px;
+  background: rgba(255, 252, 247, 0.72);
+}
+
+.reportStat svg {
+  width: 24px;
+  height: 24px;
+  color: var(--accent);
+}
+
+.reportStat strong {
+  color: #111b1f;
+  font-family: var(--font-latin-rounded);
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.reportStat span {
+  color: rgba(var(--ink-rgb), 0.62);
+  font-size: 0.84rem;
+  font-weight: 750;
+  line-height: 1.28;
+}
+
+.reportCard :global(.button) {
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.reportCard :global(.button) svg {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 1040px) {
+  .reportCard {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .reportCard :global(.button) {
+    width: fit-content;
+  }
+}
+
+@media (max-width: 640px) {
+  .reportCard {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .reportStats {
+    grid-template-columns: 1fr;
+  }
+
+  .reportStat {
+    min-height: 92px;
+  }
+}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
+  BarChart3,
   BrainCircuit,
   Building2,
   CalendarClock,
@@ -15,6 +16,7 @@ import {
   Settings2,
   Rocket,
   Sparkles,
+  Target,
   UserRoundCog,
   UsersRound,
 } from "lucide-react";
@@ -97,6 +99,27 @@ const fdeCapabilities = [
     title: "陪跑交付与复盘",
     summary: "在试点过程中协助沟通技术选择、落地节奏和交付风险，让需求方和工程侧说同一种语言。",
     icon: Settings2,
+  },
+] as const;
+
+const trainingSurveyStats = [
+  {
+    value: "30",
+    label: "有效问卷",
+    detail: "课前调研样本",
+    icon: ClipboardList,
+  },
+  {
+    value: "67%",
+    label: "首要场景",
+    detail: "希望拆解 PPT 制作",
+    icon: Target,
+  },
+  {
+    value: "54%",
+    label: "进阶基础",
+    detail: "高频或深度使用 AI",
+    icon: BarChart3,
   },
 ] as const;
 
@@ -244,6 +267,36 @@ export default async function CooperatePage({
             </article>
           );
         })}
+      </section>
+
+      <section className={styles.trainingReportSection}>
+        <div className={styles.trainingReportCopy}>
+          <p className="home-kicker">Training Research</p>
+          <h2>AI 办公通识课课前调研样本</h2>
+          <p>
+            我们把一次 AI 办公通识课的课前问卷整理成公开报告，展示如何用调研结果反推课程主线、
+            学员分层、工具选择和互动答疑安排。
+          </p>
+          <Link href="/reports/ai-office-course-survey" className="button home-ghost-button">
+            查看调研分析
+            <ArrowRight aria-hidden="true" strokeWidth={2} />
+          </Link>
+        </div>
+
+        <div className={styles.trainingReportStats} aria-label="AI 办公通识课调研摘要">
+          {trainingSurveyStats.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <article className={styles.trainingReportStat} key={item.label}>
+                <Icon aria-hidden="true" strokeWidth={1.8} />
+                <strong>{item.value}</strong>
+                <span>{item.label}</span>
+                <small>{item.detail}</small>
+              </article>
+            );
+          })}
+        </div>
       </section>
 
       <section className={styles.cooperateAreasSection}>
