@@ -1,31 +1,12 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import {
   ArrowRight,
-  BarChart3,
-  BrainCircuit,
-  Building2,
-  CalendarClock,
   CheckCircle2,
-  ClipboardList,
-  FileCode,
-  GraduationCap,
-  Handshake,
   Lightbulb,
-  MessageCircle,
-  Settings2,
-  Rocket,
-  Sparkles,
-  Target,
-  UserRoundCog,
-  UsersRound,
 } from "lucide-react";
 
 import { submitCooperationLead } from "@/app/(site)/cooperate/actions";
-import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { ToneBadge } from "@/components/tone-badge";
-import { getCompletedEventRecaps } from "@/lib/community-events";
-import { getPublicMembersDirectory } from "@/lib/community-members";
 import { cooperationAreas } from "@/lib/site-data";
 
 import styles from "./cooperate-page.module.css";
@@ -40,86 +21,18 @@ type SearchParams = {
   error?: string;
 };
 
-const cooperationScenarios = [
-  {
-    title: "企业与园区",
-    summary: "围绕 AI 培训、工具落地、业务自动化和 PoC 验证展开沟通。",
-    icon: Building2,
-    tone: "green",
-  },
-  {
-    title: "高校与机构",
-    summary: "对接主题分享、学生实践、课程共创和本地 AI 交流活动。",
-    icon: GraduationCap,
-    tone: "orange",
-  },
-  {
-    title: "项目与人才",
-    summary: "连接成员能力、项目机会、FDE 型工程师和轻量协作团队。",
-    icon: UsersRound,
-    tone: "blue",
-  },
-] as const;
-
-const cooperationFlow = [
-  {
-    title: "提交需求",
-    summary: "先留下合作背景、联系人和希望解决的问题。",
-    icon: ClipboardList,
-  },
+const followUpNotes = [
   {
     title: "确认场景",
-    summary: "进一步了解行业、目标、时间和预期交付形式。",
-    icon: MessageCircle,
+    summary: "先看业务背景、目标结果和当前进度，判断需求是否已经适合推进。",
   },
   {
     title: "匹配资源",
-    summary: "根据场景匹配社区成员、分享者、FDE 型工程师、顾问或协作团队。",
-    icon: Handshake,
+    summary: "再根据需求类型匹配分享嘉宾、培训讲师、FDE 工程师或项目协作团队。",
   },
   {
-    title: "推进试点",
-    summary: "进入分享、培训、PoC、项目开发或长期合作阶段。",
-    icon: Rocket,
-  },
-] as const;
-
-const fdeCapabilities = [
-  {
-    title: "懂现场的需求澄清",
-    summary: "由有项目经验的 FDE 型工程师协助拆解业务流程、关键角色、数据边界和可验证目标。",
-    icon: UserRoundCog,
-  },
-  {
-    title: "从原型到集成试点",
-    summary: "围绕 Agent、RAG、自动化工作流和既有系统对接，先做可演示、可评估的小步验证。",
-    icon: FileCode,
-  },
-  {
-    title: "陪跑交付与复盘",
-    summary: "在试点过程中协助沟通技术选择、落地节奏和交付风险，让需求方和工程侧说同一种语言。",
-    icon: Settings2,
-  },
-] as const;
-
-const trainingSurveyStats = [
-  {
-    value: "30",
-    label: "有效问卷",
-    detail: "课前调研样本",
-    icon: ClipboardList,
-  },
-  {
-    value: "67%",
-    label: "首要场景",
-    detail: "希望拆解 PPT 制作",
-    icon: Target,
-  },
-  {
-    value: "54%",
-    label: "进阶基础",
-    detail: "高频或深度使用 AI",
-    icon: BarChart3,
+    title: "约定下一步",
+    summary: "适合继续沟通的需求，会进入电话沟通、线下拜访、PoC 或项目方案阶段。",
   },
 ] as const;
 
@@ -144,307 +57,132 @@ export default async function CooperatePage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const [params, directory, completedEvents] = await Promise.all([
-    searchParams,
-    getPublicMembersDirectory(),
-    getCompletedEventRecaps(),
-  ]);
+  const params = await searchParams;
   const errorMessage = getStatusMessage(params.error);
-  const cooperationStats = [
-    {
-      value: cooperationAreas.length,
-      label: "合作方向",
-      detail: "分享、内训、PoC、项目协作",
-      icon: Sparkles,
-    },
-    {
-      value: completedEvents.length || 7,
-      label: "活动沉淀",
-      detail: "持续积累真实交流场景",
-      icon: CalendarClock,
-    },
-    {
-      value: directory.stats.willingToShare || "持续邀请",
-      label: "分享成员",
-      detail: "可对接主题交流与嘉宾",
-      icon: MessageCircle,
-    },
-    {
-      value: directory.stats.coBuilders || "持续招募",
-      label: "共建成员",
-      detail: "适合试点与项目推进",
-      icon: UsersRound,
-    },
-  ];
 
   return (
     <div className={styles.cooperatePageStack}>
-      <section className={styles.cooperateHero} aria-labelledby="cooperate-hero-title">
-        <div className={styles.cooperateHeroCopy}>
+      <section className={styles.leadFormSection} id="lead-form" aria-labelledby="lead-form-title">
+        <div className={styles.leadFormIntro}>
           <p className="home-kicker">Cooperate · 合作联系</p>
-          <h1 id="cooperate-hero-title">
-            让真实需求，
-            <span>连接合适的人</span>
+          <h1 id="lead-form-title">
+            提交你的
+            <span>AI 合作需求</span>
           </h1>
           <p>
             如果你正在寻找 AI 主题分享、企业内训、PoC 验证、项目协作或本地人才连接，
-            可以从这里把需求交给社区，我们会根据场景匹配合适的成员、合作方式与有经验的
-            FDE 型工程师对接。
+            可以先把需求提交给社区。我们会根据场景判断适合的沟通方式和可对接资源。
           </p>
 
-          <div className={styles.cooperateHeroActions}>
-            <Link href="#lead-form" className="button home-primary-button">
-              提交需求
-              <ArrowRight aria-hidden="true" strokeWidth={2} />
-            </Link>
-            <Link href="/projects" className="button home-ghost-button">
-              了解共建方式
-            </Link>
-          </div>
-
-          <div className={styles.cooperateHeroProof}>
-            <CheckCircle2 aria-hidden="true" strokeWidth={1.9} />
-            <span>社区会优先对齐真实场景、目标结果和可投入角色，再判断是否需要 FDE 工程师介入。</span>
+          <div className={styles.cooperateAreaCloud} aria-label="适合提交的合作方向">
+            {cooperationAreas.map((item) => (
+              <ToneBadge key={item} label={item} />
+            ))}
           </div>
         </div>
 
-        <div className={styles.cooperateBoard} aria-label="合作场景板">
-          <div className={styles.cooperateBoardHeader}>
-            <span>Cooperation Desk</span>
-            <strong>把需求拆成可推进的下一步</strong>
+        <div className={styles.leadFormPanel}>
+          <div className={styles.leadFormPanelHeader}>
+            <p className="home-kicker">Lead Form</p>
+            <h2>需求提交表单</h2>
           </div>
 
-          <div className={styles.cooperateBoardGrid}>
-            {cooperationScenarios.map((item) => {
-              const Icon = item.icon;
+          {params.submitted ? (
+            <div className={styles.statusNote}>
+              <CheckCircle2 aria-hidden="true" strokeWidth={1.9} />
+              <span>提交成功，我们已收到你的合作需求，并会根据你填写的联系方式尽快联系。</span>
+            </div>
+          ) : null}
 
-              return (
-                <article
-                  className={`${styles.cooperateScenarioCard} ${styles[`cooperateScenario${item.tone}`]}`}
-                  key={item.title}
-                >
-                  <Icon aria-hidden="true" strokeWidth={1.8} />
-                  <h2>{item.title}</h2>
-                  <p>{item.summary}</p>
-                </article>
-              );
-            })}
-          </div>
+          {errorMessage ? (
+            <div className={`${styles.statusNote} ${styles.statusNoteError}`}>
+              <Lightbulb aria-hidden="true" strokeWidth={1.9} />
+              <span>{errorMessage}</span>
+            </div>
+          ) : null}
 
-          <div className={styles.cooperateStickyNote}>
-            <span>合作原则</span>
-            <strong>先讲清业务场景，再匹配工程落地能力</strong>
-          </div>
-          <DoodleSparkles className={styles.cooperateHeroDoodle} />
-          <HandDrawnArrow className={styles.cooperateHeroArrow} />
+          <form action={submitCooperationLead} className={styles.leadForm}>
+            <div className={styles.formGrid}>
+              <label className={styles.formField}>
+                <span>公司 / 机构名称</span>
+                <input
+                  className="input"
+                  name="company_name"
+                  placeholder="例如：某制造企业 / 园区 / 高校"
+                  required
+                />
+              </label>
+
+              <label className={styles.formField}>
+                <span>联系人</span>
+                <input className="input" name="contact_name" placeholder="怎么称呼你" />
+              </label>
+
+              <label className={styles.formField}>
+                <span>微信号</span>
+                <input className="input" name="contact_wechat" placeholder="微信或手机号至少填一项" />
+              </label>
+
+              <label className={styles.formField}>
+                <span>手机号</span>
+                <input className="input" name="contact_phone" placeholder="微信或手机号至少填一项" />
+              </label>
+
+              <label className={styles.formField}>
+                <span>需求类型</span>
+                <input className="input" name="requirement_type" placeholder="分享 / 内训 / PoC / 项目开发" />
+              </label>
+
+              <label className={styles.formField}>
+                <span>预算范围</span>
+                <input className="input" name="budget_range" placeholder="例如：5k-20k / 需进一步沟通" />
+              </label>
+
+              <label className={`${styles.formField} ${styles.formFieldWide}`}>
+                <span>期望时间</span>
+                <input
+                  className="input"
+                  name="desired_timeline"
+                  placeholder="例如：近期先沟通，5 月启动试点"
+                />
+              </label>
+
+              <label className={`${styles.formField} ${styles.formFieldWide}`}>
+                <span>需求简介</span>
+                <textarea
+                  className="input textarea"
+                  name="requirement_summary"
+                  rows={5}
+                  placeholder="请尽量写清楚业务场景、希望解决的问题、预期结果，以及是否需要线下沟通。"
+                  required
+                />
+              </label>
+            </div>
+
+            <div className={styles.formActions}>
+              <button type="submit" className="button home-primary-button">
+                提交合作需求
+                <ArrowRight aria-hidden="true" strokeWidth={2} />
+              </button>
+            </div>
+          </form>
         </div>
       </section>
 
-      {params.submitted ? (
-        <div className={styles.statusNote}>
-          <CheckCircle2 aria-hidden="true" strokeWidth={1.9} />
-          <span>提交成功，我们已收到你的合作需求，并会根据你填写的联系方式尽快联系。</span>
+      <section className={styles.followUpSection} aria-labelledby="follow-up-title">
+        <div className={styles.followUpHeading}>
+          <p className="home-kicker">Next</p>
+          <h2 id="follow-up-title">提交后会怎么处理</h2>
         </div>
-      ) : null}
 
-      {errorMessage ? (
-        <div className={`${styles.statusNote} ${styles.statusNoteError}`}>
-          <Lightbulb aria-hidden="true" strokeWidth={1.9} />
-          <span>{errorMessage}</span>
-        </div>
-      ) : null}
-
-      <section className={styles.cooperateStatsPanel} aria-label="合作资源概览">
-        {cooperationStats.map((item) => {
-          const Icon = item.icon;
-
-          return (
-            <article className={styles.cooperateStatCard} key={item.label}>
-              <Icon aria-hidden="true" strokeWidth={1.9} />
-              <strong>{item.value}</strong>
-              <span>{item.label}</span>
-              <small>{item.detail}</small>
+        <div className={styles.followUpGrid}>
+          {followUpNotes.map((item) => (
+            <article className={styles.followUpCard} key={item.title}>
+              <h3>{item.title}</h3>
+              <p>{item.summary}</p>
             </article>
-          );
-        })}
-      </section>
-
-      <section className={styles.trainingReportSection}>
-        <div className={styles.trainingReportCopy}>
-          <p className="home-kicker">Training Research</p>
-          <h2>AI 办公通识课课前调研样本</h2>
-          <p>
-            我们把一次 AI 办公通识课的课前问卷整理成公开报告，展示如何用调研结果反推课程主线、
-            学员分层、工具选择和互动答疑安排。
-          </p>
-          <Link href="/reports/ai-office-course-survey" className="button home-ghost-button">
-            查看调研分析
-            <ArrowRight aria-hidden="true" strokeWidth={2} />
-          </Link>
-        </div>
-
-        <div className={styles.trainingReportStats} aria-label="AI 办公通识课调研摘要">
-          {trainingSurveyStats.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <article className={styles.trainingReportStat} key={item.label}>
-                <Icon aria-hidden="true" strokeWidth={1.8} />
-                <strong>{item.value}</strong>
-                <span>{item.label}</span>
-                <small>{item.detail}</small>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className={styles.cooperateAreasSection}>
-        <div className={styles.cooperateSectionHeading}>
-          <p className="home-kicker">Areas</p>
-          <div>
-            <h2>适合发起的合作方向</h2>
-            <p>这些方向更容易和社区活动、成员能力、项目协作形成连接。</p>
-          </div>
-        </div>
-
-        <div className={styles.cooperateAreaCloud}>
-          {cooperationAreas.map((item) => (
-            <ToneBadge key={item} label={item} />
           ))}
         </div>
-      </section>
-
-      <section className={styles.cooperateFdeSection}>
-        <div className={styles.cooperateFdeLead}>
-          <p className="home-kicker">FDE Support</p>
-          <BrainCircuit aria-hidden="true" strokeWidth={1.8} />
-          <h2>可对接有经验的 FDE 型工程师</h2>
-          <p className={styles.cooperateFdeSummary}>
-            对于已经有明确业务场景的企业或机构，社区可以协助对接既懂工程实现、也能进入现场沟通的
-            FDE 型工程师，帮助把 AI 需求从概念变成可验证的试点路径。
-          </p>
-        </div>
-
-        <div className={styles.cooperateFdeGrid}>
-          {fdeCapabilities.map((item) => {
-            const Icon = item.icon;
-
-            return (
-              <article className={styles.cooperateFdeCard} key={item.title}>
-                <Icon aria-hidden="true" strokeWidth={1.8} />
-                <h3>{item.title}</h3>
-                <p>{item.summary}</p>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className={styles.cooperateFlowSection}>
-        <div className={styles.cooperateSectionHeading}>
-          <p className="home-kicker">Flow</p>
-          <div>
-            <h2>合作推进方式</h2>
-            <p>我们会先把需求变清楚，再判断适合分享、培训、PoC 还是项目协作。</p>
-          </div>
-        </div>
-
-        <div className={styles.cooperateFlowGrid}>
-          {cooperationFlow.map((item, index) => {
-            const Icon = item.icon;
-
-            return (
-              <article className={styles.cooperateFlowCard} key={item.title}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <Icon aria-hidden="true" strokeWidth={1.8} />
-                <h3>{item.title}</h3>
-                <p>{item.summary}</p>
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className={styles.leadFormSection} id="lead-form">
-        <div className={styles.leadFormIntro}>
-          <p className="home-kicker">Lead Form</p>
-          <h2>提交合作需求</h2>
-          <p>请尽量完整填写合作背景、需求场景与联系方式，便于进一步沟通与对接。</p>
-
-          <div className={styles.leadFormChecklist}>
-            <span>公司 / 机构名称</span>
-            <span>联系人与微信 / 手机号</span>
-            <span>需求类型与场景简介</span>
-            <span>预算范围与期望时间</span>
-          </div>
-        </div>
-
-        <form action={submitCooperationLead} className={styles.leadForm}>
-          <div className={styles.formGrid}>
-            <label className={styles.formField}>
-              <span>公司 / 机构名称</span>
-              <input
-                className="input"
-                name="company_name"
-                placeholder="例如：某制造企业 / 园区 / 高校"
-                required
-              />
-            </label>
-
-            <label className={styles.formField}>
-              <span>联系人</span>
-              <input className="input" name="contact_name" placeholder="怎么称呼你" />
-            </label>
-
-            <label className={styles.formField}>
-              <span>微信号</span>
-              <input className="input" name="contact_wechat" placeholder="请至少填写微信或手机号其中一项" />
-            </label>
-
-            <label className={styles.formField}>
-              <span>手机号</span>
-              <input className="input" name="contact_phone" placeholder="请至少填写微信或手机号其中一项" />
-            </label>
-
-            <label className={styles.formField}>
-              <span>需求类型</span>
-              <input className="input" name="requirement_type" placeholder="分享 / 内训 / PoC / 项目开发 / 顾问支持" />
-            </label>
-
-            <label className={styles.formField}>
-              <span>预算范围</span>
-              <input className="input" name="budget_range" placeholder="例如：5k-20k / 预算待评估 / 需进一步沟通" />
-            </label>
-
-            <label className={`${styles.formField} ${styles.formFieldWide}`}>
-              <span>期望时间</span>
-              <input
-                className="input"
-                name="desired_timeline"
-                placeholder="例如：4 月中旬安排沟通，5 月启动试点"
-              />
-            </label>
-
-            <label className={`${styles.formField} ${styles.formFieldWide}`}>
-              <span>需求简介</span>
-              <textarea
-                className="input textarea"
-                name="requirement_summary"
-                rows={5}
-                placeholder="请尽量写清楚业务场景、希望解决的问题、预期结果，以及是否需要线下沟通。"
-                required
-              />
-            </label>
-          </div>
-
-          <div className={styles.formActions}>
-            <button type="submit" className="button home-primary-button">
-              提交合作需求
-              <ArrowRight aria-hidden="true" strokeWidth={2} />
-            </button>
-          </div>
-        </form>
       </section>
     </div>
   );
