@@ -3,6 +3,7 @@ export const navItems = [
   { href: "/events", label: "活动" },
   { href: "/news", label: "AI 资讯" },
   { href: "/members", label: "成员地图" },
+  { href: "/works", label: "案例库" },
   { href: "/projects", label: "项目共建" },
   { href: "/cooperate", label: "合作联系" },
   { href: "/docs", label: "社区文档" },

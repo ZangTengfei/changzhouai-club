@@ -5,11 +5,9 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3,
   BookOpenText,
-  Boxes,
   ChevronDown,
   FileText,
   Info,
-  UsersRound,
 } from "lucide-react";
 import {
   type FocusEvent,
@@ -40,10 +38,7 @@ export function SiteHeader() {
   const [authReady, setAuthReady] = useState(!hasSupabaseEnv());
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [membersMenuOpen, setMembersMenuOpen] = useState(false);
   const [docsMenuOpen, setDocsMenuOpen] = useState(false);
-  const membersDropdownRef = useRef<HTMLDivElement>(null);
-  const membersTriggerRef = useRef<HTMLAnchorElement>(null);
   const docsDropdownRef = useRef<HTMLDivElement>(null);
   const docsTriggerRef = useRef<HTMLAnchorElement>(null);
   const shouldShowJoinButton = authReady && !isAuthenticated;
@@ -53,7 +48,6 @@ export function SiteHeader() {
   }, []);
   const closeAllMenus = useCallback(() => {
     setMobileMenuOpen(false);
-    setMembersMenuOpen(false);
     setDocsMenuOpen(false);
   }, []);
   const handleMobileMenuToggle = useCallback(() => {
@@ -61,21 +55,11 @@ export function SiteHeader() {
       const nextOpen = !current;
 
       if (!nextOpen) {
-        setMembersMenuOpen(false);
         setDocsMenuOpen(false);
       }
 
       return nextOpen;
     });
-  }, []);
-  const handleMembersTriggerClick = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
-    if (!isMobileNavigationMode()) {
-      return;
-    }
-
-    event.preventDefault();
-    setMembersMenuOpen((current) => !current);
-    setDocsMenuOpen(false);
   }, []);
   const handleDocsTriggerClick = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
     if (!isMobileNavigationMode()) {
@@ -84,16 +68,6 @@ export function SiteHeader() {
 
     event.preventDefault();
     setDocsMenuOpen((current) => !current);
-    setMembersMenuOpen(false);
-  }, []);
-  const handleMembersMenuBlur = useCallback((event: FocusEvent<HTMLDivElement>) => {
-    const nextFocused = event.relatedTarget as Node | null;
-
-    if (nextFocused && event.currentTarget.contains(nextFocused)) {
-      return;
-    }
-
-    setMembersMenuOpen(false);
   }, []);
   const handleDocsMenuBlur = useCallback((event: FocusEvent<HTMLDivElement>) => {
     const nextFocused = event.relatedTarget as Node | null;
@@ -110,22 +84,18 @@ export function SiteHeader() {
   }, [closeAllMenus, pathname]);
 
   useEffect(() => {
-    if (!mobileMenuOpen && !membersMenuOpen && !docsMenuOpen) {
+    if (!mobileMenuOpen && !docsMenuOpen) {
       return;
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        const shouldFocusMembersTrigger = membersMenuOpen;
         const shouldFocusDocsTrigger = docsMenuOpen;
 
-        setMembersMenuOpen(false);
         setDocsMenuOpen(false);
         setMobileMenuOpen(false);
 
-        if (shouldFocusMembersTrigger) {
-          membersTriggerRef.current?.focus();
-        } else if (shouldFocusDocsTrigger) {
+        if (shouldFocusDocsTrigger) {
           docsTriggerRef.current?.focus();
         }
       }
@@ -136,7 +106,7 @@ export function SiteHeader() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [docsMenuOpen, membersMenuOpen, mobileMenuOpen]);
+  }, [docsMenuOpen, mobileMenuOpen]);
 
   return (
     <header className={cx("site-header")}>
@@ -157,92 +127,13 @@ export function SiteHeader() {
         <nav id="site-navigation" className={cx("nav-links")} aria-label="主导航">
           {navItems.map((item) => {
             const isActive =
-              item.href === "/members"
-                ? pathname === "/members" ||
-                  pathname.startsWith("/members/") ||
-                  pathname === "/works"
-                : item.href === "/docs"
+              item.href === "/docs"
                 ? pathname === "/docs" ||
                   pathname.startsWith("/docs/") ||
                   pathname === "/about"
                 : item.href === "/"
                 ? pathname === "/"
                 : pathname === item.href || pathname.startsWith(`${item.href}/`);
-
-            if (item.href === "/members") {
-              return (
-                <div
-                  key={item.href}
-                  className={cx("nav-dropdown", membersMenuOpen && "nav-dropdown-open")}
-                  ref={membersDropdownRef}
-                  onMouseEnter={() => {
-                    if (isMobileNavigationMode()) {
-                      return;
-                    }
-
-                    setMembersMenuOpen(true);
-                    setDocsMenuOpen(false);
-                  }}
-                  onMouseLeave={() => {
-                    if (!isMobileNavigationMode()) {
-                      setMembersMenuOpen(false);
-                    }
-                  }}
-                  onBlur={handleMembersMenuBlur}
-                >
-                  <Link
-                    href="/members"
-                    ref={membersTriggerRef}
-                    className={cx(
-                      "nav-dropdown-trigger",
-                      isActive && "nav-link-active",
-                    )}
-                    aria-haspopup="true"
-                    aria-expanded={membersMenuOpen}
-                    aria-controls="members-navigation-menu"
-                    onClick={handleMembersTriggerClick}
-                    onFocus={() => {
-                      if (isMobileNavigationMode()) {
-                        return;
-                      }
-
-                      setMembersMenuOpen(true);
-                      setDocsMenuOpen(false);
-                    }}
-                  >
-                    <span>{item.label}</span>
-                    <ChevronDown aria-hidden="true" className={cx("nav-dropdown-chevron")} />
-                  </Link>
-                  <div
-                    id="members-navigation-menu"
-                    className={cx("nav-dropdown-menu")}
-                    aria-label="成员地图相关链接"
-                  >
-                    <Link
-                      href="/members"
-                      className={cx("nav-dropdown-item mobile-dropdown-item")}
-                      aria-current={pathname === "/members" ? "page" : undefined}
-                      onClick={closeAllMenus}
-                    >
-                      <UsersRound
-                        aria-hidden="true"
-                        className={cx("nav-dropdown-item-icon")}
-                      />
-                      <span>成员地图</span>
-                    </Link>
-                    <Link
-                      href="/works"
-                      className={cx("nav-dropdown-item")}
-                      aria-current={pathname === "/works" ? "page" : undefined}
-                      onClick={closeAllMenus}
-                    >
-                      <Boxes aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
-                      <span>作品墙</span>
-                    </Link>
-                  </div>
-                </div>
-              );
-            }
 
             if (item.href === "/docs") {
               return (
@@ -256,7 +147,6 @@ export function SiteHeader() {
                     }
 
                     setDocsMenuOpen(true);
-                    setMembersMenuOpen(false);
                   }}
                   onMouseLeave={() => {
                     if (!isMobileNavigationMode()) {
@@ -282,7 +172,6 @@ export function SiteHeader() {
                       }
 
                       setDocsMenuOpen(true);
-                      setMembersMenuOpen(false);
                     }}
                   >
                     <span>{item.label}</span>

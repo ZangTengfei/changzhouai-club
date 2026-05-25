@@ -580,7 +580,7 @@ export default async function AccountPage({
               <h2>我的作品</h2>
               <p>
                 可以提交你做过的产品、工具、开源项目、案例或 Demo。提交后先进入待审核状态，
-                管理员通过后会展示到作品墙和你的成员主页。
+                管理员通过后会展示到案例库和你的成员主页。
               </p>
             </div>
             <AccountActionModal
@@ -837,10 +837,10 @@ export default async function AccountPage({
             <Boxes aria-hidden="true" strokeWidth={1.8} />
             <div>
               <strong>你还没有提交作品</strong>
-              <p>可以先把自己的产品、工具、开源项目或案例补充进来，审核后进入作品墙。</p>
+              <p>可以先把自己的产品、工具、开源项目或案例补充进来，审核后进入案例库。</p>
             </div>
             <Link href="/works" className="button home-ghost-button">
-              查看作品墙
+              查看案例库
             </Link>
           </div>
         )}

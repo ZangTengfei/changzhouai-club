@@ -347,7 +347,7 @@ export default async function AdminWorksPage({
               </article>
             ))
           ) : (
-            <AdminNotice>还没有成员作品。添加后可选择公开展示到作品墙。</AdminNotice>
+            <AdminNotice>还没有成员作品。添加后可选择公开展示到案例库。</AdminNotice>
           )}
         </AdminPanelBody>
       </AdminPanel>
