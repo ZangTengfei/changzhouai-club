@@ -65,6 +65,7 @@ export function DocsNavbar() {
         <Link href="/docs/agents/install-guide">Agent 教程</Link>
         <Link href="/docs/guides/co-build-workflow">共建流程</Link>
         <Link href="/docs/guides/co-builder-rules">共建规则</Link>
+        <Link href="/reports">研究报告</Link>
         <Link href="/docs/contributing">参与贡献</Link>
         <Link
           href={siteRepositoryUrl}

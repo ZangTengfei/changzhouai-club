@@ -1,6 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, BarChart3, GraduationCap, UsersRound } from "lucide-react";
+import {
+  ArrowRight,
+  BarChart3,
+  CircleDollarSign,
+  Code2,
+  GraduationCap,
+  Network,
+  UsersRound,
+  WalletCards,
+} from "lucide-react";
 
 import { PageHero } from "@/components/page-hero";
 
@@ -13,6 +22,18 @@ export const metadata: Metadata = {
 
 const reports = [
   {
+    title: "常州 AI Club 培训需求调研",
+    description:
+      "基于 23 份回收问卷，梳理成员职业背景、AI 使用程度、学习痛点、内容偏好、培训形式与价格接受度。",
+    href: "/reports/training-demand-survey",
+    date: "2026-05-25",
+    stats: [
+      { label: "回收问卷", value: "23", icon: UsersRound },
+      { label: "经常/深度使用 AI", value: "87%", icon: BarChart3 },
+      { label: "关注 AI 变现", value: "65%", icon: CircleDollarSign },
+    ],
+  },
+  {
     title: "AI 办公通识课 · 课前调研分析",
     description:
       "基于 30 份有效问卷，梳理学员岗位分布、AI 使用深度、办公痛点、课程偏好与课程设计建议。",
@@ -22,6 +43,18 @@ const reports = [
       { label: "有效问卷", value: "30", icon: UsersRound },
       { label: "岗位类型", value: "7", icon: BarChart3 },
       { label: "偏好 45-60 分钟", value: "67%", icon: GraduationCap },
+    ],
+  },
+  {
+    title: "2026 AI 编程现状及电信 OPC 套餐需求调研",
+    description:
+      "基于 16 份有效问卷，梳理开发者模型使用、Agent 工作流、Token 消耗痛点与电信 OPC / Coding Plan 套餐偏好。",
+    href: "/reports/opc-package-survey",
+    date: "2026-04-09",
+    stats: [
+      { label: "有效问卷", value: "16", icon: Code2 },
+      { label: "需要统一结算", value: "94%", icon: WalletCards },
+      { label: "上下文瓶颈", value: "63%", icon: Network },
     ],
   },
 ] as const;

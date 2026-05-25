@@ -17,6 +17,8 @@ const routes = [
   "/archive",
   "/reports",
   "/reports/ai-office-course-survey",
+  "/reports/opc-package-survey",
+  "/reports/training-demand-survey",
   "/faq",
   "/docs",
   "/docs/getting-started",

@@ -100,7 +100,7 @@
 }
 
 .heroPanel::after {
-  content: "30";
+  content: attr(data-hero-number);
   position: absolute;
   right: 22px;
   top: 4px;
@@ -626,14 +626,18 @@
   }
 
   .heroCopy h1 {
-    max-width: none;
-    font-size: clamp(2.05rem, 10.5vw, 2.72rem);
+    max-width: min(100%, 11ch);
+    font-size: 2.05rem;
     line-height: 1.12;
+    overflow-wrap: anywhere;
+    word-break: break-all;
+    white-space: normal;
   }
 
   .heroCopy > p,
   .heroPanel p {
     overflow-wrap: anywhere;
+    word-break: break-all;
   }
 
   .heroActions {

@@ -2,7 +2,15 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpenText, Boxes, ChevronDown, FileText, Info, UsersRound } from "lucide-react";
+import {
+  BarChart3,
+  BookOpenText,
+  Boxes,
+  ChevronDown,
+  FileText,
+  Info,
+  UsersRound,
+} from "lucide-react";
 import {
   type FocusEvent,
   type MouseEvent,
@@ -307,6 +315,15 @@ export function SiteHeader() {
                         className={cx("nav-dropdown-item-icon")}
                       />
                       <span>共建规则</span>
+                    </Link>
+                    <Link
+                      href="/reports"
+                      className={cx("nav-dropdown-item")}
+                      aria-current={pathname === "/reports" ? "page" : undefined}
+                      onClick={closeAllMenus}
+                    >
+                      <BarChart3 aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
+                      <span>研究与报告</span>
                     </Link>
                     <Link
                       href="/about"

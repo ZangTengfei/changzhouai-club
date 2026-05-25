@@ -283,7 +283,7 @@ export default function AiOfficeCourseSurveyPage() {
           </div>
         </div>
 
-        <div className={styles.heroPanel} aria-label="报告摘要">
+        <div className={styles.heroPanel} data-hero-number="30" aria-label="报告摘要">
           <span>样本摘要</span>
           <strong>输出型工作，是这次调研里最清晰的 AI 办公切入点。</strong>
           <p>PPT、创意、写作、表格、会议纪要都指向同一件事：学员需要的是能马上进入日常流程的方法。</p>
