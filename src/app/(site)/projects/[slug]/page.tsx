@@ -78,7 +78,7 @@ export async function generateMetadata({
   if (!opportunity) {
     return {
       title: "项目机会",
-      description: "查看常州 AI Club 的项目共建机会。",
+      description: "查看常州 AI Club 的项目协作机会。",
     };
   }
 
@@ -196,7 +196,7 @@ export default async function ProjectDetailPage({
 
       <Link href="/projects#opportunities" className={styles.backLink}>
         <ArrowLeft aria-hidden="true" strokeWidth={1.9} />
-        返回项目共建
+        返回项目协作
       </Link>
 
       <section className={styles.projectHero} aria-labelledby="project-detail-title">
@@ -209,7 +209,7 @@ export default async function ProjectDetailPage({
           </div>
 
           <div className={styles.projectHeroHeading}>
-            <p className="home-kicker">Project Opportunity · 共建机会</p>
+            <p className="home-kicker">Project Opportunity · 项目机会</p>
             <h1 id="project-detail-title">{opportunity.title}</h1>
             <p>{opportunity.summary}</p>
           </div>
@@ -278,7 +278,7 @@ export default async function ProjectDetailPage({
               <p className="home-kicker">Brief</p>
               <div>
                 <h2>项目说明</h2>
-                <p>包括背景、参与条件、角色要求、保密边界和具体备注。</p>
+                <p>包括背景、参与条件、角色要求、保密边界、交付方式和具体备注。</p>
               </div>
             </div>
 
@@ -300,7 +300,7 @@ export default async function ProjectDetailPage({
                 <p className="home-kicker">Roles</p>
                 <div>
                   <h2>角色与标签</h2>
-                  <p>用于快速判断这个机会适合哪些成员、能力和兴趣方向。</p>
+                  <p>用于快速判断这个机会适合哪些成员、能力和参与方式。</p>
                 </div>
               </div>
 
@@ -339,8 +339,8 @@ export default async function ProjectDetailPage({
             <div className={styles.applicationSuccessPanel}>
               <CheckCircle2 aria-hidden="true" strokeWidth={1.9} />
               <div>
-                <strong>我们已经收到这次共建申请</strong>
-                <p>不用重复提交。你可以继续浏览其他共建机会，或等待社区后续联系。</p>
+                <strong>我们已经收到这次项目申请</strong>
+                <p>不用重复提交。你可以继续浏览其他项目机会，或等待社区后续联系。</p>
               </div>
               <Link href="/projects#opportunities" className="button home-ghost-button">
                 查看其他机会

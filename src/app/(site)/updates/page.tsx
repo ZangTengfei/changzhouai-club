@@ -190,7 +190,7 @@ export default async function UpdatesPage({ searchParams }: UpdatesPageProps) {
           <h1 id="updates-title">{feedTitle}</h1>
           <p>
             按时间记录活动现场、项目进展、经验分享、问题求助和协作招募。轻量记录先沉淀，
-            高价值内容再整理进活动回顾、项目共建或社区文档。
+            高价值内容再整理进活动回顾、项目协作或社区文档。
           </p>
         </div>
 

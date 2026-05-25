@@ -168,7 +168,7 @@ export default async function MemberDetailPage({
       value: member.willingToJoinProjects ? "是" : "否",
       summary: member.willingToJoinProjects
         ? "适合项目试点、需求对接和协作探索。"
-        : "当前未标记项目共建意愿。",
+        : "当前未标记项目协作意愿。",
       icon: Wrench,
       tone: "blue",
     },
@@ -313,7 +313,7 @@ export default async function MemberDetailPage({
         <div>
           <p className="home-kicker">Next</p>
           <h2>想和这位成员进一步连接？</h2>
-          <p>可以先通过活动现场、项目共建或合作联系留下明确的交流场景。</p>
+          <p>可以先通过活动现场、项目协作或合作联系留下明确的交流场景。</p>
         </div>
         <Link href="/cooperate" className="button home-primary-button">
           合作联系

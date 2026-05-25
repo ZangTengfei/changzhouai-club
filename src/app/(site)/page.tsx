@@ -101,8 +101,8 @@ const homeFlowSteps = [
   },
   {
     step: "03",
-    title: "合作共建",
-    summary: "项目合作、资源对接，让想法真正落地",
+    title: "项目协作",
+    summary: "真实需求、资源对接，让项目真正落地",
     tone: "blue",
     illustrationSrc: "/home-flow-build.png",
     illustrationAlt: "",
@@ -147,7 +147,7 @@ const fallbackMemberStories = [
     name: "社区成员",
     meta: "项目参与者",
     story: "一次线下碰面可能带来新的伙伴、资源连接，甚至一次项目的开始。",
-    tags: ["# 项目落地", "# 资源对接", "# 合作共建"],
+    tags: ["# 项目落地", "# 资源对接", "# 项目协作"],
   },
   {
     id: "story-4",
@@ -261,7 +261,7 @@ export default async function HomePage() {
         }
 
         if (member.willingToJoinProjects && !member.isCoBuilder) {
-          storyTags.push("# 项目共建");
+          storyTags.push("# 项目协作");
         }
 
         if (member.willingToShare) {

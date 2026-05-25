@@ -22,7 +22,7 @@ import styles from "./join-page.module.css";
 
 export const metadata: Metadata = {
   title: "加入我们",
-  description: "了解如何加入常州 AI Club，参与线下活动、项目共建和长期协作。",
+  description: "了解如何加入常州 AI Club，参与线下活动、项目协作和长期共建。",
 };
 
 const onboardingPath = "/account?onboarding=1";

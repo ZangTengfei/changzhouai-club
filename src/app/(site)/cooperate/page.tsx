@@ -304,7 +304,7 @@ export default async function CooperatePage({
           <p className="home-kicker">Areas</p>
           <div>
             <h2>适合发起的合作方向</h2>
-            <p>这些方向更容易和社区活动、成员能力、项目共建形成连接。</p>
+            <p>这些方向更容易和社区活动、成员能力、项目协作形成连接。</p>
           </div>
         </div>
 

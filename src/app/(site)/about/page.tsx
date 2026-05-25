@@ -46,8 +46,8 @@ const longTermDirections = [
     summary: "把工具、项目、业务场景和一线经验沉淀成可复用的社区资产。",
   },
   {
-    title: "推动项目共建",
-    summary: "从一次交流延伸到 PoC、试点、成员协作和对外合作。",
+    title: "推动项目协作",
+    summary: "从一次交流延伸到 PoC、试点、项目小队和对外合作。",
   },
 ] as const;
 
@@ -156,7 +156,7 @@ export default function AboutPage() {
         <div>
           <p className="home-kicker">Next</p>
           <h2>如果你也在常州关注 AI，欢迎加入这张连接网络</h2>
-          <p>你可以从参加活动、公开成员主页、发起合作或参与项目共建开始。</p>
+          <p>你可以从参加活动、公开成员主页、发起合作或参与项目协作开始。</p>
         </div>
 
         <div className={styles.aboutJoinActions}>
