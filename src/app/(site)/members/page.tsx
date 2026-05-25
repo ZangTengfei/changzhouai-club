@@ -14,6 +14,35 @@ export const metadata: Metadata = {
   description: "展示常州 AI Club 的成员技能分布和参与方向。",
 };
 
+type SearchParams = {
+  page?: string | string[];
+};
+
+type MembersPageProps = {
+  searchParams: Promise<SearchParams>;
+};
+
+const MEMBERS_PER_PAGE = 12;
+
+function parsePageParam(value: SearchParams["page"]) {
+  const rawValue = Array.isArray(value) ? value[0] : value;
+  const page = Number.parseInt(rawValue ?? "1", 10);
+
+  if (Number.isNaN(page) || page < 1) {
+    return 1;
+  }
+
+  return page;
+}
+
+function getMemberPageHref(page: number) {
+  if (page <= 1) {
+    return "/members#member-directory";
+  }
+
+  return `/members?page=${page}#member-directory`;
+}
+
 function formatMemberHeadline(member: {
   roleLabel: string | null;
   organization: string | null;
@@ -39,10 +68,21 @@ const memberFlowSteps = [
   },
 ] as const;
 
-export default async function MembersPage() {
-  const directory = await getPublicMembersDirectory();
+export default async function MembersPage({ searchParams }: MembersPageProps) {
+  const [directory, params] = await Promise.all([
+    getPublicMembersDirectory(),
+    searchParams,
+  ]);
   const skillTags =
     directory.skillTags.length > 0 ? directory.skillTags : memberTags;
+  const totalPages = Math.max(1, Math.ceil(directory.members.length / MEMBERS_PER_PAGE));
+  const currentPage = Math.min(parsePageParam(params.page), totalPages);
+  const memberStartIndex = (currentPage - 1) * MEMBERS_PER_PAGE;
+  const paginatedMembers = directory.members.slice(
+    memberStartIndex,
+    memberStartIndex + MEMBERS_PER_PAGE,
+  );
+  const memberEndIndex = memberStartIndex + paginatedMembers.length;
   const memberHighlights = [
     {
       value: directory.stats.publicMembers,
@@ -102,8 +142,17 @@ export default async function MembersPage() {
             </div>
           </div>
 
+          <div className={styles.membersDirectoryMeta}>
+            <span>
+              第 {currentPage} / {totalPages} 页
+            </span>
+            <span>
+              正在显示 {memberStartIndex + 1}-{memberEndIndex} 位，共 {directory.members.length} 位公开成员
+            </span>
+          </div>
+
           <div className={`member-directory-grid ${styles.membersDirectoryGrid}`}>
-            {directory.members.map((member) => (
+            {paginatedMembers.map((member) => (
               <MemberDirectoryCard
                 key={member.id}
                 member={member}
@@ -112,6 +161,38 @@ export default async function MembersPage() {
               />
             ))}
           </div>
+
+          {totalPages > 1 ? (
+            <nav className={styles.membersPagination} aria-label="公开成员分页">
+              {currentPage > 1 ? (
+                <Link href={getMemberPageHref(currentPage - 1)}>上一页</Link>
+              ) : (
+                <span aria-disabled="true">上一页</span>
+              )}
+
+              <div className={styles.membersPaginationPages}>
+                {Array.from({ length: totalPages }, (_, index) => {
+                  const page = index + 1;
+
+                  return page === currentPage ? (
+                    <span aria-current="page" key={page}>
+                      {page}
+                    </span>
+                  ) : (
+                    <Link href={getMemberPageHref(page)} key={page}>
+                      {page}
+                    </Link>
+                  );
+                })}
+              </div>
+
+              {currentPage < totalPages ? (
+                <Link href={getMemberPageHref(currentPage + 1)}>下一页</Link>
+              ) : (
+                <span aria-disabled="true">下一页</span>
+              )}
+            </nav>
+          ) : null}
         </section>
       ) : (
         <div className={styles.membersEmptyPanel}>

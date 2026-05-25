@@ -137,6 +137,83 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.membersDirectoryMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+  color: rgba(var(--ink-rgb), 0.58);
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.membersDirectoryMeta span:first-child {
+  color: var(--accent-strong);
+}
+
+.membersPagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  padding-top: 4px;
+}
+
+.membersPagination a,
+.membersPagination span {
+  display: inline-grid;
+  place-items: center;
+  min-width: 42px;
+  min-height: 40px;
+  padding: 0 13px;
+  border: 1px solid rgba(208, 214, 207, 0.82);
+  border-radius: 12px;
+  background: rgba(255, 252, 247, 0.74);
+  color: rgba(var(--ink-rgb), 0.68);
+  font-size: 0.9rem;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.membersPagination a {
+  transition:
+    transform 0.18s ease,
+    border-color 0.18s ease,
+    background 0.18s ease;
+}
+
+.membersPagination a:hover,
+.membersPagination a:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(var(--accent-rgb), 0.24);
+  background: rgba(var(--accent-rgb), 0.08);
+  color: var(--accent-strong);
+}
+
+.membersPagination a:focus-visible {
+  outline: 3px solid rgba(var(--accent-rgb), 0.18);
+  outline-offset: 3px;
+}
+
+.membersPagination span[aria-current="page"] {
+  border-color: rgba(var(--accent-rgb), 0.28);
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.membersPagination span[aria-disabled="true"] {
+  opacity: 0.46;
+}
+
+.membersPaginationPages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
 .membersGuideSection,
 .membersSkillSection,
 .membersEmptyPanel {
