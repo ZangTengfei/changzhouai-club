@@ -27,6 +27,7 @@ import {
   type AiNewsItem,
 } from "@/lib/aihot";
 
+import { DailyReportExportButton } from "./daily-report-export-button";
 import styles from "./ai-news-page.module.css";
 
 export const metadata: Metadata = {
@@ -35,6 +36,8 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 300;
+
+const dailyReportUrl = "https://changzhouai.club/news?view=daily";
 
 type AiNewsSearchParams = {
   category?: string;
@@ -260,7 +263,17 @@ function DailyReportView({
   return (
     <section className={styles.dailyReportView} aria-labelledby="daily-report-title">
       <header className={styles.dailyHero}>
-        <span>VOL.{formatDailyVolume(report.date)} · {dailyItemCount} STORIES · AI HOT DAILY</span>
+        <div className={styles.dailyHeroTop}>
+          <span>VOL.{formatDailyVolume(report.date)} · {dailyItemCount} STORIES · AI HOT DAILY</span>
+          <DailyReportExportButton
+            dailyItemCount={dailyItemCount}
+            fullDate={formatDailyFullDate(report.date)}
+            pageUrl={dailyReportUrl}
+            report={report}
+            sourceCount={sourceCount}
+            volume={formatDailyVolume(report.date)}
+          />
+        </div>
         <h2 id="daily-report-title">AI 日报</h2>
         <p>{formatDailyFullDate(report.date)} DAILY · 每早八时</p>
         {report.lead?.leadParagraph ? <strong>{report.lead.leadParagraph}</strong> : null}
