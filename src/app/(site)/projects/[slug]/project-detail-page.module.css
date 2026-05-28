@@ -313,6 +313,7 @@
 .applicationPanel {
   position: sticky;
   top: 92px;
+  scroll-margin-top: 108px;
 }
 
 .applicationPanelHeading {

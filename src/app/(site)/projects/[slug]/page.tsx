@@ -22,6 +22,7 @@ import { createClient } from "@/lib/supabase/server";
 
 import { ProjectApplicationSubmitButton } from "./project-application-submit-button";
 import { ProjectApplicationToast } from "./project-application-toast";
+import { ProjectAnchorScroll } from "./project-anchor-scroll";
 import styles from "./project-detail-page.module.css";
 
 const occupationOptions = [
@@ -189,6 +190,7 @@ export default async function ProjectDetailPage({
 
   return (
     <div className={styles.projectDetailPage}>
+      <ProjectAnchorScroll targetId="application-form" />
       <ProjectApplicationToast
         applied={justSubmitted}
         errorMessage={errorMessage}
