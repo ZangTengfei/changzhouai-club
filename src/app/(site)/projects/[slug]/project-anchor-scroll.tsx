@@ -23,6 +23,7 @@ function scrollToTarget(targetId: string, behavior: ScrollBehavior) {
 export function ProjectAnchorScroll({ targetId }: ProjectAnchorScrollProps) {
   useEffect(() => {
     const targetHash = `#${targetId}`;
+    const clickListenerOptions = { capture: true };
     let firstFrame = 0;
     let secondFrame = 0;
     let fallbackTimeout = 0;
@@ -59,7 +60,11 @@ export function ProjectAnchorScroll({ targetId }: ProjectAnchorScrollProps) {
 
       const url = new URL(anchor.href);
 
-      if (url.pathname !== window.location.pathname || url.hash !== targetHash) {
+      if (
+        url.origin !== window.location.origin ||
+        url.pathname !== window.location.pathname ||
+        url.hash !== targetHash
+      ) {
         return;
       }
 
@@ -72,13 +77,13 @@ export function ProjectAnchorScroll({ targetId }: ProjectAnchorScrollProps) {
       scrollToTarget(targetId, "smooth");
     }
 
-    document.addEventListener("click", handleSamePageAnchorClick);
+    document.addEventListener("click", handleSamePageAnchorClick, clickListenerOptions);
 
     return () => {
       window.cancelAnimationFrame(firstFrame);
       window.cancelAnimationFrame(secondFrame);
       window.clearTimeout(fallbackTimeout);
-      document.removeEventListener("click", handleSamePageAnchorClick);
+      document.removeEventListener("click", handleSamePageAnchorClick, clickListenerOptions);
     };
   }, [targetId]);
 
