@@ -1,6 +1,7 @@
 .eventDetailPage {
   display: grid;
   gap: 28px;
+  min-width: 0;
 }
 
 .statusNote {
@@ -63,8 +64,18 @@
 }
 
 .eventStatusPill {
+  display: inline-flex;
+  justify-self: start;
+  align-items: center;
+  max-width: 100%;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
   color: var(--accent-strong) !important;
   background: rgba(var(--accent-rgb), 0.1) !important;
+  font-size: 0.88rem;
+  font-weight: 850;
+  line-height: 1.2;
 }
 
 .eventStatusPillorange {
@@ -251,6 +262,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(300px, 340px);
   gap: 22px;
   align-items: start;
+  min-width: 0;
 }
 
 .eventMainFlow {
@@ -290,6 +302,7 @@
 .eventSidebarHeading {
   display: grid;
   gap: 12px;
+  justify-items: start;
 }
 
 .eventSidebarHeading h2 {
@@ -369,6 +382,7 @@
   font-size: 0.94rem;
   line-height: 1.45;
   text-overflow: ellipsis;
+  overflow-wrap: anywhere;
 }
 
 .eventSidebarActions {
@@ -378,6 +392,7 @@
 
 .eventSidebarActions :global(.button) {
   width: 100%;
+  max-width: 100%;
   justify-content: center;
 }
 
@@ -423,6 +438,7 @@
 }
 
 .eventSoftNote {
+  min-width: 0;
   padding: 15px 16px;
   border: 1px dashed rgba(var(--accent-rgb), 0.2);
   border-radius: 16px;
@@ -431,6 +447,8 @@
   font-size: 0.95rem;
   font-weight: 700;
   line-height: 1.62;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .eventRegistrationPanel {
@@ -440,6 +458,7 @@
 .eventRegistrationPanel :global(.event-registration-card) {
   display: grid;
   gap: 14px;
+  min-width: 0;
   padding: 22px;
   border: 1px solid rgba(var(--accent-rgb), 0.15);
   border-radius: 24px;
@@ -460,6 +479,13 @@
   margin: 0;
   color: rgba(var(--ink-rgb), 0.64);
   line-height: 1.62;
+  overflow-wrap: anywhere;
+}
+
+.eventRegistrationPanel :global(.note-strip) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .eventRegistrationPanel :global(.detail-list) {
