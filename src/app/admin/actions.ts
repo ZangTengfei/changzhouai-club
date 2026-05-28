@@ -296,6 +296,7 @@ export async function saveAdminEvent(formData: FormData) {
     agenda: getOptionalValue(formData, "agenda"),
     speaker_lineup: getOptionalValue(formData, "speaker_lineup"),
     registration_note: getOptionalValue(formData, "registration_note"),
+    registration_url: normalizeOptionalUrlValue(getOptionalValue(formData, "registration_url")),
     recap: getOptionalValue(formData, "recap"),
     docs_url: getOptionalValue(formData, "docs_url"),
     event_at: normalizeAdminEventDateTime(getOptionalValue(formData, "event_at")),

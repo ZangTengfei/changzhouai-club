@@ -1,5 +1,6 @@
 .next
 next-env.d.ts
+tsconfig.tsbuildinfo
 node_modules
 npm-debug.log*
 pnpm-debug.log*

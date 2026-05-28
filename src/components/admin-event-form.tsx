@@ -10,6 +10,7 @@ type AdminEvent = {
   agenda: string | null;
   speaker_lineup: string | null;
   registration_note: string | null;
+  registration_url: string | null;
   recap: string | null;
   docs_url: string | null;
   event_at: string | null;
@@ -121,6 +122,16 @@ export function AdminEventForm({
               defaultValue={event?.registration_note ?? ""}
               rows={3}
               placeholder="例如：本场人数有限，请报名后按时参加；现场欢迎自带项目和问题来交流。"
+            />
+          </label>
+
+          <label className="form-field form-field-wide">
+            <span>外部报名链接</span>
+            <input
+              className="input"
+              name="registration_url"
+              defaultValue={event?.registration_url ?? ""}
+              placeholder="例如：https://senseleap.feishu.cn/share/base/form/..."
             />
           </label>
 

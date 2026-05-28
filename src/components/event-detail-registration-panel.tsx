@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { EventRegistrationForm } from "@/components/event-registration-form";
 import type { PublicEventDetail } from "@/lib/community-events";
 import { hasSupabaseEnv } from "@/lib/env";
+import { getExternalRegistrationUrl } from "@/lib/event-registration-link";
 import { createClient } from "@/lib/supabase/client";
 
 type AuthState = "loading" | "logged_out" | "logged_in";
@@ -18,8 +19,18 @@ export function EventDetailRegistrationPanel({
 }) {
   const [authState, setAuthState] = useState<AuthState>("loading");
   const [isRegistered, setIsRegistered] = useState(false);
+  const externalRegistrationUrl = getExternalRegistrationUrl(
+    event.registrationUrl,
+    event.registrationNote,
+  );
 
   useEffect(() => {
+    if (externalRegistrationUrl) {
+      setIsRegistered(false);
+      setAuthState("logged_out");
+      return;
+    }
+
     if (!hasSupabaseEnv()) {
       setAuthState("logged_out");
       return;
@@ -68,7 +79,7 @@ export function EventDetailRegistrationPanel({
       cancelled = true;
       subscription.unsubscribe();
     };
-  }, [event.id]);
+  }, [event.id, externalRegistrationUrl]);
 
   return (
     <EventRegistrationForm
@@ -81,6 +92,7 @@ export function EventDetailRegistrationPanel({
         city: event.city,
         slug: event.slug,
         registration_note: event.registrationNote,
+        registration_url: event.registrationUrl,
       }}
       authState={authState}
       isRegistered={isRegistered}

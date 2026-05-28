@@ -20,6 +20,7 @@ const EVENT_FIELDS = new Set([
   "agenda",
   "speaker_lineup",
   "registration_note",
+  "registration_url",
   "recap",
   "docs_url",
   "event_at",
@@ -61,7 +62,7 @@ Required JSON fields:
 
 Common JSON fields:
   summary, description, event_at, venue, city, agenda, speaker_lineup,
-  registration_note, cover_image_url, status
+  registration_note, registration_url, cover_image_url, status
 `);
 }
 
@@ -253,6 +254,28 @@ function normalizeEventDateTime(value) {
   return `${valueWithSeconds}${CHANGZHOU_TIMEZONE_OFFSET}`;
 }
 
+function normalizeOptionalUrlValue(value, fieldName) {
+  const trimmed = getOptionalString(value);
+
+  if (!trimmed) {
+    return null;
+  }
+
+  let url;
+
+  try {
+    url = new URL(trimmed);
+  } catch {
+    throw new Error(`${fieldName} must be a valid http(s) URL.`);
+  }
+
+  if (!["http:", "https:"].includes(url.protocol)) {
+    throw new Error(`${fieldName} must be a valid http(s) URL.`);
+  }
+
+  return url.toString();
+}
+
 function assertNoUnknownFields(payload) {
   const unknownFields = Object.keys(payload).filter((key) => !EVENT_FIELDS.has(key));
 
@@ -317,6 +340,7 @@ function normalizePayload(rawPayload, options) {
     agenda: getTextField(rawPayload, "agenda"),
     speaker_lineup: getTextField(rawPayload, "speaker_lineup"),
     registration_note: getTextField(rawPayload, "registration_note"),
+    registration_url: normalizeOptionalUrlValue(rawPayload.registration_url, "registration_url"),
     recap: getTextField(rawPayload, "recap"),
     docs_url: getTextField(rawPayload, "docs_url"),
     event_at: normalizeEventDateTime(rawPayload.event_at),

@@ -24,6 +24,7 @@ type EventRow = {
   agenda: string | null;
   speaker_lineup: string | null;
   registration_note: string | null;
+  registration_url: string | null;
   recap: string | null;
   docs_url: string | null;
   status: string;
@@ -54,6 +55,7 @@ export type PublicScheduledEvent = {
   slug: string;
   cover_image_url: string | null;
   registration_note?: string | null;
+  registration_url?: string | null;
 };
 
 export type PublicGalleryImage = {
@@ -93,6 +95,7 @@ export type PublicEventDetail = {
   agendaItems: string[];
   speakerItems: string[];
   registrationNote: string | null;
+  registrationUrl: string | null;
   recapParagraphs: string[];
   docsUrl: string | null;
   gallery: PublicGalleryImage[];
@@ -281,6 +284,7 @@ function mapPublicEventDetail(row: EventRow): PublicEventDetail {
     agendaItems: parseLineList(row.agenda),
     speakerItems: parseLineList(row.speaker_lineup),
     registrationNote: row.registration_note,
+    registrationUrl: row.registration_url,
     recapParagraphs: parseParagraphs(row.recap),
     docsUrl: row.docs_url,
     gallery,
@@ -333,7 +337,7 @@ const getCachedCompletedEventRecaps = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, recap, docs_url, status, event_photos(id, image_url, caption, sort_order)",
+        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, recap, docs_url, status, event_photos(id, image_url, caption, sort_order)",
       )
       .eq("status", "completed")
       .order("event_at", { ascending: false, nullsFirst: false });
@@ -388,7 +392,7 @@ const getCachedScheduledEvents = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, title, summary, event_at, venue, city, slug, cover_image_url, registration_note",
+        "id, title, summary, event_at, venue, city, slug, cover_image_url, registration_note, registration_url",
       )
       .eq("status", "scheduled")
       .order("event_at", { ascending: true, nullsFirst: false });
@@ -405,7 +409,7 @@ const getCachedPublicEventBySlug = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, recap, docs_url, status, event_photos(id, image_url, caption, sort_order)",
+        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, recap, docs_url, status, event_photos(id, image_url, caption, sort_order)",
       )
       .eq("slug", slug)
       .in("status", ["scheduled", "completed", "cancelled"])

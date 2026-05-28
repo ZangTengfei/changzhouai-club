@@ -2,6 +2,11 @@ import Link from "next/link";
 
 import { registerForEvent } from "@/app/(site)/events/actions";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
+import {
+  getExternalRegistrationLabel,
+  getExternalRegistrationUrl,
+  getRegistrationNoteWithoutUrl,
+} from "@/lib/event-registration-link";
 
 type UpcomingEvent = {
   id: string;
@@ -12,6 +17,7 @@ type UpcomingEvent = {
   city: string | null;
   slug: string;
   registration_note?: string | null;
+  registration_url?: string | null;
 };
 
 function formatEventDateTime(value: string | null) {
@@ -46,6 +52,14 @@ export function EventRegistrationForm({
 }) {
   const detailHref = `/events/${event.slug}`;
   const nextPath = redirectTo ?? detailHref;
+  const externalRegistrationUrl = getExternalRegistrationUrl(
+    event.registration_url,
+    event.registration_note,
+  );
+  const registrationNote = getRegistrationNoteWithoutUrl(
+    event.registration_note,
+    externalRegistrationUrl,
+  );
 
   return (
     <article className="card event-registration-card">
@@ -59,9 +73,20 @@ export function EventRegistrationForm({
         <li>地点：{event.venue ?? "待公布"}</li>
         {showEventSlug ? <li>活动标识：{event.slug}</li> : null}
       </ul>
-      {event.registration_note ? <div className="note-strip">{event.registration_note}</div> : null}
+      {registrationNote ? <div className="note-strip">{registrationNote}</div> : null}
 
-      {isRegistered ? (
+      {externalRegistrationUrl ? (
+        <div className="cta-row">
+          <a
+            href={externalRegistrationUrl}
+            className="button"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {getExternalRegistrationLabel(externalRegistrationUrl)}
+          </a>
+        </div>
+      ) : isRegistered ? (
         <div className="note-strip">你已经报名这场活动了，可以去账号页查看报名记录。</div>
       ) : authState === "logged_in" ? (
         <form action={registerForEvent} className="registration-form">

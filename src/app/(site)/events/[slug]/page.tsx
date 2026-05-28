@@ -17,6 +17,7 @@ import {
 
 import { EventDetailRegistrationPanel } from "@/components/event-detail-registration-panel";
 import { getPublicEventBySlug } from "@/lib/community-events";
+import { getRegistrationNoteWithoutUrl } from "@/lib/event-registration-link";
 import { getEventImageUrl } from "@/lib/public-image-url";
 
 import styles from "./event-detail-page.module.css";
@@ -75,6 +76,10 @@ export default async function EventDetailPage({
   const statusTone = statusToneMap[event.status] ?? "green";
   const eventDocsHref = event.docsUrl;
   const isExternalDocsHref = eventDocsHref?.startsWith("http") ?? false;
+  const registrationNote = getRegistrationNoteWithoutUrl(
+    event.registrationNote,
+    event.registrationUrl,
+  );
   const eventHighlights = [
     {
       label: "活动状态",
@@ -295,8 +300,8 @@ export default async function EventDetailPage({
               ) : null}
             </ul>
 
-            {event.registrationNote ? (
-              <div className={styles.eventSoftNote}>{event.registrationNote}</div>
+            {registrationNote ? (
+              <div className={styles.eventSoftNote}>{registrationNote}</div>
             ) : null}
 
             <div className={styles.eventSidebarActions}>

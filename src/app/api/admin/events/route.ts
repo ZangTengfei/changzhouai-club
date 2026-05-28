@@ -33,6 +33,24 @@ function getOptionalValue(payload: Record<string, unknown>, key: string) {
   return value || null;
 }
 
+function normalizeOptionalUrlValue(raw: string | null) {
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    const url = new URL(raw);
+
+    if (!["http:", "https:"].includes(url.protocol)) {
+      return null;
+    }
+
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(request: Request) {
   const context = await getStaffContextResult();
 
@@ -69,6 +87,7 @@ export async function POST(request: Request) {
       agenda: getOptionalValue(payload, "agenda"),
       speaker_lineup: getOptionalValue(payload, "speaker_lineup"),
       registration_note: getOptionalValue(payload, "registration_note"),
+      registration_url: normalizeOptionalUrlValue(getOptionalValue(payload, "registration_url")),
       recap: getOptionalValue(payload, "recap"),
       docs_url: getOptionalValue(payload, "docs_url"),
       event_at: normalizeAdminEventDateTime(getOptionalValue(payload, "event_at")),
