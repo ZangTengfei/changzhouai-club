@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>头像墙海报生成器</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <aside class="sidebar" aria-label="控制面板">
+        <header class="brand">
+          <div class="brand-mark">AW</div>
+          <div>
+            <h1>头像墙海报生成器</h1>
+            <p>截图分割 · 图形排布 · 分层导出</p>
+          </div>
+        </header>
+
+        <section class="panel">
+          <div class="panel-title">
+            <span>01</span>
+            <h2>节日预设</h2>
+          </div>
+          <div class="preset-grid">
+            <button class="preset-button active" type="button" data-preset="children">六一儿童节</button>
+            <button class="preset-button" type="button" data-preset="mayday">五一劳动节</button>
+            <button class="preset-button" type="button" data-preset="custom">空白模板</button>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <span>02</span>
+            <h2>头像截图</h2>
+          </div>
+          <label class="file-drop" for="sourceInput">
+            <input id="sourceInput" type="file" accept="image/*" multiple />
+            <strong>上传截图</strong>
+            <small>支持微信群成员长截图或多张截图</small>
+          </label>
+          <div class="control-grid">
+            <label>
+              头像列数
+              <input id="columnCount" type="number" min="1" max="12" value="5" />
+            </label>
+            <label>
+              预期数量
+              <input id="expectedCount" type="number" min="1" value="204" />
+            </label>
+            <label>
+              顶部跳过
+              <input id="topSkip" type="number" min="0" value="250" />
+            </label>
+            <label>
+              底部跳过
+              <input id="bottomSkip" type="number" min="0" value="450" />
+            </label>
+          </div>
+          <button id="detectButton" class="primary-button" type="button">自动分割并编号</button>
+          <p id="detectStatus" class="status">等待上传截图</p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <span>03</span>
+            <h2>头像墙</h2>
+          </div>
+          <div class="control-grid">
+            <label>
+              图形文字
+              <input id="shapeText" type="text" value="61" maxlength="8" />
+            </label>
+            <label>
+              字号
+              <input id="shapeFontSize" type="number" min="120" max="1800" value="900" />
+            </label>
+            <label>
+              墙宽
+              <input id="wallWidth" type="number" min="600" max="2600" value="1260" />
+            </label>
+            <label>
+              墙高
+              <input id="wallHeight" type="number" min="500" max="2200" value="900" />
+            </label>
+            <label>
+              头像尺寸
+              <input id="tileSize" type="number" min="20" max="120" value="42" />
+            </label>
+            <label>
+              头像间距
+              <input id="tileGap" type="number" min="0" max="32" value="4" />
+            </label>
+          </div>
+          <label class="switch-row">
+            <input id="autoFitTiles" type="checkbox" checked />
+            <span>自动匹配头像尺寸</span>
+          </label>
+          <label class="switch-row">
+            <input id="drawTopOutline" type="checkbox" />
+            <span>在头像上方叠加数字轮廓</span>
+          </label>
+          <button id="wallButton" class="primary-button" type="button">生成头像墙</button>
+          <p id="wallStatus" class="status">头像墙未生成</p>
+        </section>
+
+        <section class="panel">
+          <div class="panel-title">
+            <span>04</span>
+            <h2>文案与海报</h2>
+          </div>
+          <div class="control-grid">
+            <label>
+              主标题
+              <input id="posterTitle" type="text" value="六一儿童节" />
+            </label>
+            <label>
+              头像墙 Y
+              <input id="wallY" type="number" min="0" max="3000" value="660" />
+            </label>
+            <label>
+              海报宽
+              <input id="posterWidth" type="number" min="720" max="3200" value="1536" />
+            </label>
+            <label>
+              海报高
+              <input id="posterHeight" type="number" min="960" max="4800" value="2304" />
+            </label>
+          </div>
+          <label>
+            副标题
+            <input id="posterSubtitle" type="text" value="童心创造价值 AI 点亮未来" />
+          </label>
+          <label>
+            顶部品牌
+            <input id="brandText" type="text" value="常州 AI Club" />
+          </label>
+          <label>
+            底部信息
+            <input id="footerText" type="text" value="changzhouai.club" />
+          </label>
+          <div class="button-row">
+            <button id="presetBackgroundButton" type="button">生成本地背景</button>
+            <label class="small-upload">
+              上传背景
+              <input id="backgroundInput" type="file" accept="image/*" />
+            </label>
+          </div>
+          <button id="composeButton" class="primary-button" type="button">合成海报</button>
+          <div class="button-row">
+            <button id="downloadPosterButton" type="button">下载海报</button>
+            <button id="downloadWallButton" type="button">下载透明头像墙</button>
+            <button id="downloadSheetButton" type="button">下载编号图</button>
+          </div>
+          <p id="backgroundStatus" class="status">使用本地默认背景</p>
+        </section>
+      </aside>
+
+      <section class="workspace" aria-label="预览区">
+        <div class="preview-toolbar">
+          <div>
+            <strong id="summaryTitle">准备生成</strong>
+            <span id="summaryMeta">0 个头像</span>
+          </div>
+          <div class="segmented" role="tablist" aria-label="预览切换">
+            <button class="active" data-view="poster" type="button">海报</button>
+            <button data-view="wall" type="button">头像墙</button>
+            <button data-view="avatars" type="button">头像</button>
+          </div>
+        </div>
+
+        <div class="preview-stage" data-active-view="poster">
+          <canvas id="posterCanvas" width="1536" height="2304" aria-label="海报预览"></canvas>
+          <canvas id="wallCanvas" width="1260" height="900" aria-label="头像墙预览"></canvas>
+          <div id="avatarGrid" class="avatar-grid" aria-label="头像编号预览"></div>
+        </div>
+      </section>
+    </main>
+
+    <template id="avatarTemplate">
+      <figure class="avatar-tile">
+        <img alt="" />
+        <figcaption></figcaption>
+      </figure>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "name": "avatar-wall-poster",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Standalone avatar wall poster generator for community festival posters.",
+  "scripts": {
+    "dev": "python3 -m http.server 5174",
+    "check": "node --check app.js"
+  }
+}
