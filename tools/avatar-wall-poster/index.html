@@ -45,16 +45,8 @@
               <input id="columnCount" type="number" min="1" max="12" value="5" />
             </label>
             <label>
-              预期数量
-              <input id="expectedCount" type="number" min="1" value="204" />
-            </label>
-            <label>
-              顶部跳过
-              <input id="topSkip" type="number" min="0" value="250" />
-            </label>
-            <label>
-              底部跳过
-              <input id="bottomSkip" type="number" min="0" value="450" />
+              预期数量（可选）
+              <input id="expectedCount" type="number" min="0" placeholder="自动识别" autocomplete="off" />
             </label>
           </div>
           <button id="detectButton" class="primary-button" type="button">自动分割并编号</button>

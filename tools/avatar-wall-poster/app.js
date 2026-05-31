@@ -86,6 +86,13 @@ function setRootColor(name, value) {
   document.documentElement.style.setProperty(name, value);
 }
 
+function clearLegacyExpectedCountDefault() {
+  const expectedCountInput = $("#expectedCount");
+  if (expectedCountInput?.value === "204" && expectedCountInput.placeholder === "自动识别") {
+    expectedCountInput.value = "";
+  }
+}
+
 function applyPreset(name) {
   const preset = presets[name] || presets.children;
   state.preset = name;
@@ -150,27 +157,67 @@ function findRanges(values, threshold, minWidth) {
   return ranges;
 }
 
-function buildExpectedRowStarts(rowStarts, avatarSize, expectedCount, columns, imageHeight) {
-  if (!expectedCount) return rowStarts;
-  const requiredRows = Math.ceil(expectedCount / columns);
-  const starts = [...rowStarts].slice(0, requiredRows);
-  if (starts.length >= requiredRows) return starts;
+function nearestValue(values, target, tolerance) {
+  let best = null;
+  let bestDistance = Infinity;
+  values.forEach((value) => {
+    const distance = Math.abs(value - target);
+    if (distance <= tolerance && distance < bestDistance) {
+      best = value;
+      bestDistance = distance;
+    }
+  });
+  return best;
+}
 
+function estimateGridStep(rowStarts, avatarSize) {
   const gaps = [];
   for (let index = 1; index < rowStarts.length; index += 1) {
     const gap = rowStarts[index] - rowStarts[index - 1];
-    if (gap > avatarSize * 0.8) gaps.push(gap);
+    if (gap > avatarSize * 1.15 && gap < avatarSize * 3.1) gaps.push(gap);
   }
-  const rowStep = Math.round(median(gaps) || avatarSize * 1.7);
-  while (starts.length < requiredRows && starts.length > 0) {
-    const expectedStart = starts[starts.length - 1] + rowStep;
-    const maxStart = Math.max(0, imageHeight - avatarSize);
-    const nextStart = Math.min(expectedStart, maxStart);
-    const previousStart = starts[starts.length - 1];
-    if (nextStart <= previousStart) break;
-    starts.push(nextStart);
+  return Math.round(median(gaps) || avatarSize * 1.7);
+}
+
+function scoreGridStart(start, rowStarts, rowStep, requiredRows, tolerance) {
+  let matchedRows = 0;
+  let closeness = 0;
+  for (let row = 0; row < requiredRows; row += 1) {
+    const target = start + row * rowStep;
+    const nearest = nearestValue(rowStarts, target, tolerance);
+    if (nearest !== null) {
+      matchedRows += 1;
+      closeness += 1 - Math.abs(nearest - target) / tolerance;
+    }
   }
-  return starts;
+  return matchedRows * 10 + closeness;
+}
+
+function buildExpectedRowStarts(rowStarts, avatarSize, expectedCount, columns, imageHeight) {
+  if (!expectedCount) return rowStarts;
+  const requiredRows = Math.ceil(expectedCount / columns);
+  if (!rowStarts.length) return rowStarts;
+
+  const rowStep = estimateGridStep(rowStarts, avatarSize);
+  const tolerance = Math.max(avatarSize * 0.45, rowStep * 0.22);
+  let bestStart = rowStarts[0];
+  let bestScore = -Infinity;
+  rowStarts.forEach((start) => {
+    const score = scoreGridStart(start, rowStarts, rowStep, requiredRows, tolerance);
+    if (score > bestScore) {
+      bestStart = start;
+      bestScore = score;
+    }
+  });
+
+  const maxStart = Math.max(0, imageHeight - avatarSize);
+  const starts = [];
+  for (let row = 0; row < requiredRows; row += 1) {
+    const predicted = Math.min(bestStart + row * rowStep, maxStart);
+    const nearest = nearestValue(rowStarts, predicted, tolerance);
+    starts.push(Math.round(nearest ?? predicted));
+  }
+  return starts.filter((start, index) => index === 0 || start > starts[index - 1]);
 }
 
 function looksLikeAvatar(canvas) {
@@ -198,13 +245,10 @@ function detectAvatarCrops(source, options) {
   const { width, height } = sourceCanvas;
   const ctx = sourceCanvas.getContext("2d", { willReadFrequently: true });
   const imageData = ctx.getImageData(0, 0, width, height).data;
-  const topSkip = Math.min(options.topSkip, height - 1);
-  const bottomSkip = Math.min(options.bottomSkip, height - topSkip - 1);
-  const yEnd = height - bottomSkip;
   const colDensity = new Float32Array(width);
   const rowDensity = new Float32Array(height);
 
-  for (let y = topSkip; y < yEnd; y += 1) {
+  for (let y = 0; y < height; y += 1) {
     let rowHits = 0;
     for (let x = 0; x < width; x += 1) {
       const offset = (y * width + x) * 4;
@@ -217,14 +261,13 @@ function detectAvatarCrops(source, options) {
     rowDensity[y] = rowHits / width;
   }
 
-  const scanHeight = Math.max(1, yEnd - topSkip);
-  for (let x = 0; x < width; x += 1) colDensity[x] /= scanHeight;
+  for (let x = 0; x < width; x += 1) colDensity[x] /= height;
 
   const xRanges = findRanges(colDensity, 0.015, Math.max(24, Math.round(width * 0.04))).slice(0, options.columns);
   const yRanges = findRanges(rowDensity, 0.05, Math.max(24, Math.round(width * 0.08)));
 
   if (xRanges.length < options.columns || yRanges.length === 0) {
-    throw new Error(`识别失败：检测到 ${xRanges.length} 列、${yRanges.length} 行，请调整跳过值`);
+    throw new Error(`识别失败：检测到 ${xRanges.length} 列、${yRanges.length} 行，请检查截图是否包含完整头像网格`);
   }
 
   const xStarts = xRanges.map(([start]) => start);
@@ -703,8 +746,6 @@ detectButton.addEventListener("click", () => {
     const options = {
       columns: numericValue("#columnCount", 5),
       expectedCount: numericValue("#expectedCount", 0),
-      topSkip: numericValue("#topSkip", 250),
-      bottomSkip: numericValue("#bottomSkip", 450),
     };
     const batches = [];
     let remaining = options.expectedCount;
@@ -732,7 +773,7 @@ detectButton.addEventListener("click", () => {
       .join(" + ");
     const countHint =
       options.expectedCount && state.avatars.length !== options.expectedCount
-        ? `，还差 ${options.expectedCount - state.avatars.length} 个，请减小底部跳过或检查截图底部是否被裁切`
+        ? `，还差 ${options.expectedCount - state.avatars.length} 个，请检查截图底部是否被裁切`
         : "";
     setStatus(
       "#detectStatus",
@@ -778,5 +819,7 @@ document.querySelectorAll(".preset-button").forEach((button) => {
   button.addEventListener("click", () => applyPreset(button.dataset.preset));
 });
 
+clearLegacyExpectedCountDefault();
 applyPreset("children");
+clearLegacyExpectedCountDefault();
 updateSummary();
