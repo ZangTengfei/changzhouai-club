@@ -163,8 +163,11 @@ function buildExpectedRowStarts(rowStarts, avatarSize, expectedCount, columns, i
   }
   const rowStep = Math.round(median(gaps) || avatarSize * 1.7);
   while (starts.length < requiredRows && starts.length > 0) {
-    const nextStart = starts[starts.length - 1] + rowStep;
-    if (nextStart + avatarSize > imageHeight) break;
+    const expectedStart = starts[starts.length - 1] + rowStep;
+    const maxStart = Math.max(0, imageHeight - avatarSize);
+    const nextStart = Math.min(expectedStart, maxStart);
+    const previousStart = starts[starts.length - 1];
+    if (nextStart <= previousStart) break;
     starts.push(nextStart);
   }
   return starts;
@@ -727,7 +730,14 @@ detectButton.addEventListener("click", () => {
           : `${batch.meta.detectedRows}/${batch.meta.usedRows} 行`,
       )
       .join(" + ");
-    setStatus("#detectStatus", `已分割 ${state.avatars.length} 个头像，单头像约 ${batches[0].meta.avatarSize}px，行数 ${rowMeta}`);
+    const countHint =
+      options.expectedCount && state.avatars.length !== options.expectedCount
+        ? `，还差 ${options.expectedCount - state.avatars.length} 个，请减小底部跳过或检查截图底部是否被裁切`
+        : "";
+    setStatus(
+      "#detectStatus",
+      `已分割 ${state.avatars.length} 个头像，单头像约 ${batches[0].meta.avatarSize}px，行数 ${rowMeta}${countHint}`,
+    );
     previewStage.dataset.activeView = "avatars";
     setActiveTab("avatars");
   } catch (error) {
