@@ -150,6 +150,26 @@ function findRanges(values, threshold, minWidth) {
   return ranges;
 }
 
+function buildExpectedRowStarts(rowStarts, avatarSize, expectedCount, columns, imageHeight) {
+  if (!expectedCount) return rowStarts;
+  const requiredRows = Math.ceil(expectedCount / columns);
+  const starts = [...rowStarts].slice(0, requiredRows);
+  if (starts.length >= requiredRows) return starts;
+
+  const gaps = [];
+  for (let index = 1; index < rowStarts.length; index += 1) {
+    const gap = rowStarts[index] - rowStarts[index - 1];
+    if (gap > avatarSize * 0.8) gaps.push(gap);
+  }
+  const rowStep = Math.round(median(gaps) || avatarSize * 1.7);
+  while (starts.length < requiredRows && starts.length > 0) {
+    const nextStart = starts[starts.length - 1] + rowStep;
+    if (nextStart + avatarSize > imageHeight) break;
+    starts.push(nextStart);
+  }
+  return starts;
+}
+
 function looksLikeAvatar(canvas) {
   const sample = document.createElement("canvas");
   sample.width = 20;
@@ -205,7 +225,7 @@ function detectAvatarCrops(source, options) {
   }
 
   const xStarts = xRanges.map(([start]) => start);
-  const rowStarts = yRanges.map(([start]) => start);
+  const detectedRowStarts = yRanges.map(([start]) => start);
   const avatarSize = Math.round(
     Math.min(
       median(xRanges.map(([start, end]) => end - start + 1)),
@@ -213,6 +233,7 @@ function detectAvatarCrops(source, options) {
     ),
   );
   const expectedCount = options.expectedCount;
+  const rowStarts = buildExpectedRowStarts(detectedRowStarts, avatarSize, expectedCount, options.columns, height);
   const fullRows = expectedCount ? Math.floor(expectedCount / options.columns) : rowStarts.length;
   const remainder = expectedCount ? expectedCount % options.columns : 0;
   const avatars = [];
@@ -243,7 +264,16 @@ function detectAvatarCrops(source, options) {
     }
   }
 
-  return { avatars, meta: { xRanges, yRanges, avatarSize } };
+  return {
+    avatars,
+    meta: {
+      xRanges,
+      yRanges,
+      avatarSize,
+      detectedRows: detectedRowStarts.length,
+      usedRows: rowStarts.length,
+    },
+  };
 }
 
 function renderAvatarGrid() {
@@ -690,7 +720,14 @@ detectButton.addEventListener("click", () => {
     state.avatars = batches.flatMap((batch) => batch.avatars).slice(0, options.expectedCount || undefined);
     state.wallReady = false;
     renderAvatarGrid();
-    setStatus("#detectStatus", `已分割 ${state.avatars.length} 个头像，单头像约 ${batches[0].meta.avatarSize}px`);
+    const rowMeta = batches
+      .map((batch) =>
+        batch.meta.detectedRows === batch.meta.usedRows
+          ? `${batch.meta.usedRows} 行`
+          : `${batch.meta.detectedRows}/${batch.meta.usedRows} 行`,
+      )
+      .join(" + ");
+    setStatus("#detectStatus", `已分割 ${state.avatars.length} 个头像，单头像约 ${batches[0].meta.avatarSize}px，行数 ${rowMeta}`);
     previewStage.dataset.activeView = "avatars";
     setActiveTab("avatars");
   } catch (error) {
