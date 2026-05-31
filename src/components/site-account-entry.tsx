@@ -4,9 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import {
+  getLegacyAdminPermissionsForMemberStatus,
+  hasAdminPermission,
+} from "@/lib/admin/permissions";
 import { hasSupabaseEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/client";
 import styles from "./site-account-entry.module.css";
+
+type AdminPermissionRow = {
+  permission_key: string | null;
+};
 
 type AccountState = {
   href: string;
@@ -86,14 +94,24 @@ export function SiteAccountEntry({
         return;
       }
 
-      const [{ data: profile }, { data: member }] = await Promise.all([
+      const [{ data: profile }, { data: member }, { data: adminPermissions }] = await Promise.all([
         supabase
           .from("profiles")
           .select("display_name, avatar_url")
           .eq("id", user.id)
           .maybeSingle(),
         supabase.from("members").select("status").eq("id", user.id).maybeSingle(),
+        supabase.rpc("list_current_admin_permissions"),
       ]);
+      const permissionKeys = new Set<string>(
+        getLegacyAdminPermissionsForMemberStatus(member?.status),
+      );
+
+      ((adminPermissions ?? []) as AdminPermissionRow[]).forEach((permission) => {
+        if (permission.permission_key) {
+          permissionKeys.add(permission.permission_key);
+        }
+      });
 
       const displayName =
         profile?.display_name ||
@@ -113,7 +131,7 @@ export function SiteAccountEntry({
           label: "账号中心",
           name: displayName,
           avatarUrl,
-          isStaff: ["organizer", "admin"].includes(member?.status ?? ""),
+          isStaff: hasAdminPermission(permissionKeys, "admin.access"),
         });
         onAuthStateChange?.(true);
       }
