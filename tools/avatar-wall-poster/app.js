@@ -26,10 +26,6 @@ const presets = {
     tileSize: 42,
     tileGap: 4,
     wallY: 660,
-    title: "六一儿童节",
-    subtitle: "童心创造价值 AI 点亮未来",
-    brand: "常州 AI Club",
-    footer: "changzhouai.club",
   },
   mayday: {
     accent: "#14936f",
@@ -41,10 +37,6 @@ const presets = {
     tileSize: 45,
     tileGap: 3,
     wallY: 575,
-    title: "五一劳动节",
-    subtitle: "劳动创造价值 AI 点亮未来",
-    brand: "常州 AI Club",
-    footer: "changzhouai.club",
   },
   custom: {
     accent: "#2368d8",
@@ -56,10 +48,6 @@ const presets = {
     tileSize: 42,
     tileGap: 4,
     wallY: 680,
-    title: "头像墙海报",
-    subtitle: "连接每一个真实的人",
-    brand: "Community",
-    footer: "",
   },
 };
 
@@ -105,10 +93,6 @@ function applyPreset(name) {
   $("#tileSize").value = preset.tileSize;
   $("#tileGap").value = preset.tileGap;
   $("#wallY").value = preset.wallY;
-  $("#posterTitle").value = preset.title;
-  $("#posterSubtitle").value = preset.subtitle;
-  $("#brandText").value = preset.brand;
-  $("#footerText").value = preset.footer;
   document.querySelectorAll(".preset-button").forEach((button) => {
     button.classList.toggle("active", button.dataset.preset === name);
   });
@@ -689,49 +673,7 @@ function generatePresetBackground() {
   state.backgroundCanvas = createPresetBackgroundCanvas(width, height);
   state.backgroundImage = null;
   state.backgroundReady = true;
-  setStatus("#backgroundStatus", "已生成本地无字背景");
-}
-
-function drawPosterText(ctx, width, height) {
-  const title = $("#posterTitle").value.trim();
-  const subtitle = $("#posterSubtitle").value.trim();
-  const brand = $("#brandText").value.trim();
-  const footer = $("#footerText").value.trim();
-
-  ctx.save();
-  ctx.textAlign = "center";
-  ctx.fillStyle = state.preset === "mayday" ? "#0a682e" : "#0d5f7d";
-  ctx.font = `900 ${Math.round(width * 0.12)}px "STKaiti", "KaiTi", "PingFang SC", sans-serif`;
-  ctx.fillText(title, width / 2, height * 0.2);
-  ctx.font = `800 ${Math.round(width * 0.036)}px "PingFang SC", sans-serif`;
-  ctx.fillText(subtitle, width / 2, height * 0.265);
-  ctx.textAlign = "left";
-  ctx.fillStyle = "#10286d";
-  ctx.font = `900 ${Math.round(width * 0.034)}px Arial, "PingFang SC", sans-serif`;
-  ctx.fillText(brand, width * 0.68, height * 0.065);
-  ctx.font = `700 ${Math.round(width * 0.018)}px "PingFang SC", sans-serif`;
-  ctx.fillText("探索 AI · 连接未来 · 共创价值", width * 0.68, height * 0.09);
-
-  if (footer) {
-    ctx.textAlign = "center";
-    ctx.font = `900 ${Math.round(width * 0.052)}px "PingFang SC", sans-serif`;
-    ctx.fillStyle = "#fff";
-    ctx.fillText(brand, width / 2, height * 0.936);
-    const pillWidth = Math.max(width * 0.28, ctx.measureText(footer).width + width * 0.08);
-    roundPill(ctx, width / 2 - pillWidth / 2, height * 0.955, pillWidth, height * 0.03, height * 0.015, "rgba(8, 111, 91, 0.9)");
-    ctx.font = `700 ${Math.round(width * 0.026)}px Arial, sans-serif`;
-    ctx.fillStyle = "#fff";
-    ctx.fillText(footer, width / 2, height * 0.977);
-  }
-  ctx.restore();
-}
-
-function roundPill(ctx, x, y, width, height, radius, fillStyle) {
-  ctx.save();
-  ctx.fillStyle = fillStyle;
-  roundedRect(ctx, x, y, width, height, radius);
-  ctx.fill();
-  ctx.restore();
+  setStatus("#backgroundStatus", "已使用默认底图，仅等待叠加头像墙");
 }
 
 function composePoster() {
@@ -745,7 +687,6 @@ function composePoster() {
 
   const background = state.backgroundImage || state.backgroundCanvas || createPresetBackgroundCanvas(width, height);
   drawCover(ctx, background, width, height);
-  drawPosterText(ctx, width, height);
 
   if (state.wallReady) {
     const renderWidth = Math.min(width * 0.92, wallCanvas.width);
@@ -869,7 +810,9 @@ backgroundInput.addEventListener("change", async () => {
   state.backgroundImage = image;
   state.backgroundCanvas = null;
   state.backgroundReady = true;
-  setStatus("#backgroundStatus", `已上传背景：${file.name}`);
+  $("#posterWidth").value = image.naturalWidth || image.width;
+  $("#posterHeight").value = image.naturalHeight || image.height;
+  setStatus("#backgroundStatus", `已上传海报底图：${file.name}`);
   composePoster();
 });
 

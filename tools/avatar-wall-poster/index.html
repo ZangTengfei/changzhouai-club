@@ -99,13 +99,9 @@
         <section class="panel">
           <div class="panel-title">
             <span>04</span>
-            <h2>文案与海报</h2>
+            <h2>海报合成</h2>
           </div>
           <div class="control-grid">
-            <label>
-              主标题
-              <input id="posterTitle" type="text" value="六一儿童节" />
-            </label>
             <label>
               头像墙 Y
               <input id="wallY" type="number" min="0" max="3000" value="660" />
@@ -119,22 +115,10 @@
               <input id="posterHeight" type="number" min="960" max="4800" value="2304" />
             </label>
           </div>
-          <label>
-            副标题
-            <input id="posterSubtitle" type="text" value="童心创造价值 AI 点亮未来" />
-          </label>
-          <label>
-            顶部品牌
-            <input id="brandText" type="text" value="常州 AI Club" />
-          </label>
-          <label>
-            底部信息
-            <input id="footerText" type="text" value="changzhouai.club" />
-          </label>
           <div class="button-row">
-            <button id="presetBackgroundButton" type="button">生成本地背景</button>
+            <button id="presetBackgroundButton" type="button">使用默认底图</button>
             <label class="small-upload">
-              上传背景
+              上传海报底图
               <input id="backgroundInput" type="file" accept="image/*" />
             </label>
           </div>
@@ -144,7 +128,7 @@
             <button id="downloadWallButton" type="button">下载透明头像墙</button>
             <button id="downloadSheetButton" type="button">下载编号图</button>
           </div>
-          <p id="backgroundStatus" class="status">使用本地默认背景</p>
+          <p id="backgroundStatus" class="status">请上传已带文案的海报底图；工具只叠加头像墙</p>
         </section>
       </aside>
 
