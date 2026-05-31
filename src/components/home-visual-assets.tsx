@@ -70,13 +70,12 @@ export function HandDrawnArrow({ className }: HomeIllustrationProps) {
       className={className}
     >
       <path
-        d="M9 29C39 42 88 43 133 25"
+        d="M9 28C39 42 88 43 133 25"
         stroke="currentColor"
         strokeWidth="4"
         strokeLinecap="round"
       />
       <path d="M124 13L148 19L134 39" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-      <path d="M18 17C22 15 25 14 31 14" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
     </svg>
   );
 }

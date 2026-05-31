@@ -314,10 +314,10 @@
 
 .heroArrow {
   position: absolute;
-  left: 238px;
-  bottom: 0;
+  left: 156px;
+  bottom: 8px;
   z-index: 3;
-  width: 116px;
+  width: 108px;
   color: var(--accent);
   transform: rotate(-10deg);
 }
