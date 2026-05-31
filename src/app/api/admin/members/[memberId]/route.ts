@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { loadAdminMembersData } from "@/lib/admin/members";
 import { revalidateAdminMemberPaths } from "@/lib/admin/revalidate";
 import {
   isValidMemberPublicSlug,
   normalizeMemberPublicSlug,
 } from "@/lib/member-public-slug";
-import { getStaffContextResult } from "@/lib/supabase/guards";
+import { canAdmin } from "@/lib/supabase/guards";
 
 function getOptionalValue(payload: Record<string, unknown>, key: string) {
   const value = String(payload[key] ?? "").trim();
@@ -24,15 +25,8 @@ export async function GET(
   _request: Request,
   context: { params: Promise<{ memberId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } = await requireAdminApiPermission("members.read");
+  if (response) return response;
 
   const { memberId } = await context.params;
   const data = await loadAdminMembersData(staffContext);
@@ -52,15 +46,9 @@ export async function PATCH(
   request: Request,
   context: { params: Promise<{ memberId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } =
+    await requireAdminApiPermission("members.write_profile");
+  if (response) return response;
 
   const { memberId } = await context.params;
   const payload = (await request.json().catch(() => null)) as Record<string, unknown> | null;
@@ -87,27 +75,65 @@ export async function PATCH(
     return NextResponse.json({ error: "invalid_public_slug" }, { status: 400 });
   }
 
-  const { data: existingProfile } = await staffContext.supabase
-    .from("profiles")
-    .select("public_slug")
-    .eq("id", memberId)
-    .maybeSingle();
+  const [{ data: existingProfile }, { data: existingMember, error: memberLookupError }] =
+    await Promise.all([
+      staffContext.supabase
+        .from("profiles")
+        .select("public_slug")
+        .eq("id", memberId)
+        .maybeSingle(),
+      staffContext.supabase
+        .from("members")
+        .select("status, is_co_builder")
+        .eq("id", memberId)
+        .maybeSingle(),
+    ]);
+
+  if (memberLookupError) {
+    return NextResponse.json({ error: "database_write_failed" }, { status: 400 });
+  }
+
+  if (!existingMember) {
+    return NextResponse.json({ error: "not_found" }, { status: 404 });
+  }
+
+  if (status !== existingMember.status && !canAdmin(staffContext, "members.manage_status")) {
+    return NextResponse.json(
+      { error: "forbidden", permission: "members.manage_status" },
+      { status: 403 },
+    );
+  }
+
+  if (
+    isCoBuilder !== existingMember.is_co_builder &&
+    !canAdmin(staffContext, "members.manage_co_builder")
+  ) {
+    return NextResponse.json(
+      { error: "forbidden", permission: "members.manage_co_builder" },
+      { status: 403 },
+    );
+  }
+
+  const profileUpdate: Record<string, string | string[] | null> = {
+    display_name: getOptionalValue(payload, "display_name"),
+    public_slug: publicSlug,
+    city: getOptionalValue(payload, "city") ?? "常州",
+    role_label: getOptionalValue(payload, "role_label"),
+    organization: getOptionalValue(payload, "organization"),
+    monthly_time: getOptionalValue(payload, "monthly_time"),
+    bio: getOptionalValue(payload, "bio"),
+    skills: normalizeSkills(String(payload.skills ?? "")),
+    interests: normalizeSkills(String(payload.interests ?? "")),
+  };
+
+  if (canAdmin(staffContext, "members.read_contact")) {
+    profileUpdate.wechat = getOptionalValue(payload, "wechat");
+  }
 
   const [{ error: profileError }, { error: memberError }] = await Promise.all([
     staffContext.supabase
       .from("profiles")
-      .update({
-        display_name: getOptionalValue(payload, "display_name"),
-        public_slug: publicSlug,
-        wechat: getOptionalValue(payload, "wechat"),
-        city: getOptionalValue(payload, "city") ?? "常州",
-        role_label: getOptionalValue(payload, "role_label"),
-        organization: getOptionalValue(payload, "organization"),
-        monthly_time: getOptionalValue(payload, "monthly_time"),
-        bio: getOptionalValue(payload, "bio"),
-        skills: normalizeSkills(String(payload.skills ?? "")),
-        interests: normalizeSkills(String(payload.interests ?? "")),
-      })
+      .update(profileUpdate)
       .eq("id", memberId),
     staffContext.supabase
       .from("members")

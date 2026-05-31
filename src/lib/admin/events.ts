@@ -1,6 +1,11 @@
 import { notFound } from "next/navigation";
 
-import { getStaffContextResult, requireStaffContext } from "@/lib/supabase/guards";
+import { redactSensitiveValue } from "@/lib/admin/permissions";
+import {
+  canAdmin,
+  getAdminContextResult,
+  requireAdminPermission,
+} from "@/lib/supabase/guards";
 
 export type AdminEventRow = {
   id: string;
@@ -71,21 +76,24 @@ export type AdminEventsData = {
   debugSnapshot: AdminDebugSnapshot;
 };
 
-type StaffContext = Awaited<ReturnType<typeof getStaffContextResult>>;
+type AdminContext = Awaited<ReturnType<typeof getAdminContextResult>>;
 
 function sortPhotos(photos: AdminEventPhotoRow[]) {
   return photos.slice().sort((a, b) => a.sort_order - b.sort_order);
 }
 
 export async function loadAdminEventsData(
-  context?: StaffContext,
+  context?: AdminContext,
 ): Promise<AdminEventsData> {
-  const { supabase, user, member, isStaff } = context ?? (await requireStaffContext());
+  const adminContext = context ?? (await requireAdminPermission("events.read"));
+  const { supabase, user, member, isStaff } = adminContext;
 
   if (!user) {
     throw new Error("Admin events data requires an authenticated staff user.");
   }
 
+  const canReadRegistrations = canAdmin(adminContext, "events.read_registrations");
+  const canReadRegistrationContact = canAdmin(adminContext, "events.read_registration_contact");
   const [
     { data: eventsData, error: eventsError },
     { data: photosData, error: photosError },
@@ -102,11 +110,15 @@ export async function loadAdminEventsData(
       .from("event_photos")
       .select("id, event_id, image_url, caption, sort_order")
       .order("sort_order", { ascending: true }),
-    supabase
-      .from("event_registrations")
-      .select("id, event_id, status, note, created_at, user_id")
-      .order("created_at", { ascending: false }),
-    supabase.from("profiles").select("id, display_name, email, city"),
+    canReadRegistrations
+      ? supabase
+          .from("event_registrations")
+          .select("id, event_id, status, note, created_at, user_id")
+          .order("created_at", { ascending: false })
+      : Promise.resolve({ data: [], error: null }),
+    canReadRegistrations
+      ? supabase.from("profiles").select("id, display_name, email, city")
+      : Promise.resolve({ data: [], error: null }),
   ]);
 
   const events = (eventsData ?? []) as AdminEventRow[];
@@ -132,9 +144,17 @@ export async function loadAdminEventsData(
 
   registrations.forEach((registration) => {
     const eventRegistrations = registrationsByEventId.get(registration.event_id) ?? [];
+    const profile = profilesByUserId.get(registration.user_id) ?? null;
+
     eventRegistrations.push({
       ...registration,
-      profile: profilesByUserId.get(registration.user_id) ?? null,
+      note: canReadRegistrationContact ? registration.note : redactSensitiveValue(registration.note),
+      profile: profile
+        ? {
+            ...profile,
+            email: canReadRegistrationContact ? profile.email : redactSensitiveValue(profile.email),
+          }
+        : null,
     });
     registrationsByEventId.set(registration.event_id, eventRegistrations);
   });

@@ -1,4 +1,5 @@
-import { requireStaffContext } from "@/lib/supabase/guards";
+import { redactSensitiveValue } from "@/lib/admin/permissions";
+import { canAdmin, requireAdminPermission } from "@/lib/supabase/guards";
 import {
   type CommunityUpdateStatus,
   type CommunityUpdateType,
@@ -60,12 +61,14 @@ export type AdminCommunityUpdatesData = {
   queryErrors: string[];
 };
 
-function getDisplayName(profile?: AdminProfileOptionRow) {
-  return profile?.display_name?.trim() || profile?.email || "未填写显示名";
+function getDisplayName(profile?: AdminProfileOptionRow, canUseEmail = true) {
+  return profile?.display_name?.trim() || (canUseEmail ? profile?.email : null) || "未填写显示名";
 }
 
 export async function loadAdminCommunityUpdatesData(): Promise<AdminCommunityUpdatesData> {
-  const { supabase } = await requireStaffContext();
+  const adminContext = await requireAdminPermission("updates.read");
+  const { supabase } = adminContext;
+  const canReadMemberContact = canAdmin(adminContext, "members.read_contact");
 
   const [
     { data: updatesData, error: updatesError },
@@ -100,8 +103,8 @@ export async function loadAdminCommunityUpdatesData(): Promise<AdminCommunityUpd
     .filter((profile) => memberIds.has(profile.id))
     .map((profile) => ({
       id: profile.id,
-      displayName: getDisplayName(profile),
-      email: profile.email,
+      displayName: getDisplayName(profile, canReadMemberContact),
+      email: canReadMemberContact ? profile.email : redactSensitiveValue(profile.email),
     }))
     .sort((a, b) => a.displayName.localeCompare(b.displayName, "zh-CN"));
   const imagesByUpdateId = new Map<string, AdminCommunityUpdateImageRow[]>();
@@ -119,8 +122,10 @@ export async function loadAdminCommunityUpdatesData(): Promise<AdminCommunityUpd
       return {
         ...update,
         tags: update.tags ?? [],
-        authorDisplayName: getDisplayName(profile),
-        authorEmail: profile?.email ?? null,
+        authorDisplayName: getDisplayName(profile, canReadMemberContact),
+        authorEmail: canReadMemberContact
+          ? profile?.email ?? null
+          : redactSensitiveValue(profile?.email),
         authorAvatarUrl: profile?.avatar_url ?? null,
         images: imagesByUpdateId.get(update.id) ?? [],
       };

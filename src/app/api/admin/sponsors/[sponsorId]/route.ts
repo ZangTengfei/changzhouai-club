@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { revalidateAdminSponsorPaths } from "@/lib/admin/revalidate";
 import { loadAdminSponsorsData } from "@/lib/admin/sponsors";
-import { getStaffContextResult } from "@/lib/supabase/guards";
+import { canAdmin } from "@/lib/supabase/guards";
 
 function normalizeSlug(raw: string) {
   return raw
@@ -37,15 +38,8 @@ export async function GET(
   _request: Request,
   context: { params: Promise<{ sponsorId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } = await requireAdminApiPermission("sponsors.read");
+  if (response) return response;
 
   const { sponsorId } = await context.params;
   const data = await loadAdminSponsorsData(staffContext);
@@ -66,15 +60,8 @@ export async function PATCH(
   request: Request,
   context: { params: Promise<{ sponsorId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } = await requireAdminApiPermission("sponsors.write");
+  if (response) return response;
 
   const { sponsorId } = await context.params;
   const payload = (await request.json().catch(() => null)) as Record<string, unknown> | null;
@@ -88,6 +75,13 @@ export async function PATCH(
 
   if (!name || !slug) {
     return NextResponse.json({ error: "missing_required_fields" }, { status: 400 });
+  }
+
+  if (Boolean(payload.is_active) && !canAdmin(staffContext, "sponsors.publish")) {
+    return NextResponse.json(
+      { error: "forbidden", permission: "sponsors.publish" },
+      { status: 403 },
+    );
   }
 
   const { error } = await staffContext.supabase
@@ -118,15 +112,8 @@ export async function DELETE(
   _request: Request,
   context: { params: Promise<{ sponsorId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } = await requireAdminApiPermission("sponsors.delete");
+  if (response) return response;
 
   const { sponsorId } = await context.params;
 

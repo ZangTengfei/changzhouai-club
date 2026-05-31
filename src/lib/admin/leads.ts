@@ -1,6 +1,11 @@
 import { notFound } from "next/navigation";
 
-import { getStaffContextResult, requireStaffContext } from "@/lib/supabase/guards";
+import { redactSensitiveValue } from "@/lib/admin/permissions";
+import {
+  canAdmin,
+  getAdminContextResult,
+  requireAdminPermission,
+} from "@/lib/supabase/guards";
 
 type AdminLeadRow = {
   id: string;
@@ -112,7 +117,7 @@ export type AdminLeadsData = {
   queryErrors: string[];
 };
 
-type StaffContext = Awaited<ReturnType<typeof getStaffContextResult>>;
+type AdminContext = Awaited<ReturnType<typeof getAdminContextResult>>;
 
 function getLeadSortWeight(status: string) {
   switch (status) {
@@ -131,14 +136,16 @@ function getLeadSortWeight(status: string) {
   }
 }
 
-function getProfileDisplayName(profile?: AdminLeadProfileRow) {
-  return profile?.display_name?.trim() || profile?.email || "未填写显示名";
+function getProfileDisplayName(profile?: AdminLeadProfileRow, canUseEmail = true) {
+  return profile?.display_name?.trim() || (canUseEmail ? profile?.email : null) || "未填写显示名";
 }
 
 export async function loadAdminLeadsData(
-  context?: StaffContext,
+  context?: AdminContext,
 ): Promise<AdminLeadsData> {
-  const { supabase } = context ?? (await requireStaffContext());
+  const adminContext = context ?? (await requireAdminPermission("leads.read"));
+  const { supabase } = adminContext;
+  const canReadSensitive = canAdmin(adminContext, "leads.read_sensitive");
 
   const [
     { data, error },
@@ -176,8 +183,8 @@ export async function loadAdminLeadsData(
     .filter((profile) => staffIds.has(profile.id))
     .map((profile) => ({
       id: profile.id,
-      displayName: getProfileDisplayName(profile),
-      email: profile.email,
+      displayName: getProfileDisplayName(profile, canReadSensitive),
+      email: canReadSensitive ? profile.email : redactSensitiveValue(profile.email),
     }))
     .sort((a, b) => a.displayName.localeCompare(b.displayName, "zh-CN"));
 
@@ -188,8 +195,8 @@ export async function loadAdminLeadsData(
 
       return {
         id: member.id,
-        displayName: getProfileDisplayName(profile),
-        email: profile?.email ?? null,
+        displayName: getProfileDisplayName(profile, canReadSensitive),
+        email: canReadSensitive ? profile?.email ?? null : redactSensitiveValue(profile?.email),
         city: profile?.city?.trim() || "常州",
         skills: profile?.skills ?? [],
         status: member.status,
@@ -207,13 +214,13 @@ export async function loadAdminLeadsData(
     items.push({
       id: match.id,
       memberId: match.member_id,
-      memberDisplayName: getProfileDisplayName(profile),
-      memberEmail: profile?.email ?? null,
+      memberDisplayName: getProfileDisplayName(profile, canReadSensitive),
+      memberEmail: canReadSensitive ? profile?.email ?? null : redactSensitiveValue(profile?.email),
       memberCity: profile?.city?.trim() || "常州",
       memberSkills: profile?.skills ?? [],
       memberStatus: member?.status ?? "active",
       status: match.status,
-      note: match.note,
+      note: canReadSensitive ? match.note : redactSensitiveValue(match.note),
       createdAt: match.created_at,
       updatedAt: match.updated_at,
     });
@@ -228,21 +235,26 @@ export async function loadAdminLeadsData(
       return {
         id: lead.id,
         companyName: lead.company_name,
-        contactName: lead.contact_name,
-        contactWechat: lead.contact_wechat,
-        contactPhone: lead.contact_phone,
+        contactName: canReadSensitive ? lead.contact_name : redactSensitiveValue(lead.contact_name),
+        contactWechat: canReadSensitive
+          ? lead.contact_wechat
+          : redactSensitiveValue(lead.contact_wechat),
+        contactPhone: canReadSensitive ? lead.contact_phone : redactSensitiveValue(lead.contact_phone),
         requirementType: lead.requirement_type,
         requirementSummary: lead.requirement_summary,
-        budgetRange: lead.budget_range,
-        desiredTimeline: lead.desired_timeline,
+        budgetRange: canReadSensitive ? lead.budget_range : redactSensitiveValue(lead.budget_range),
+        desiredTimeline: canReadSensitive
+          ? lead.desired_timeline
+          : redactSensitiveValue(lead.desired_timeline),
         status: lead.status,
         ownerId: lead.owner_id,
         ownerDisplayName: lead.owner_id
-          ? getProfileDisplayName(profilesById.get(lead.owner_id))
+          ? getProfileDisplayName(profilesById.get(lead.owner_id), canReadSensitive)
           : null,
-        ownerEmail: lead.owner_id ? profilesById.get(lead.owner_id)?.email ?? null : null,
-        adminNote: lead.admin_note,
-        nextAction: lead.next_action,
+        ownerEmail:
+          canReadSensitive && lead.owner_id ? profilesById.get(lead.owner_id)?.email ?? null : null,
+        adminNote: canReadSensitive ? lead.admin_note : redactSensitiveValue(lead.admin_note),
+        nextAction: canReadSensitive ? lead.next_action : redactSensitiveValue(lead.next_action),
         nextActionAt: lead.next_action_at,
         lastContactedAt: lead.last_contacted_at,
         matchCount: leadMatches.length,

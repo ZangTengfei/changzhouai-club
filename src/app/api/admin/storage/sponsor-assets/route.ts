@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
-import { getStaffContextResult } from "@/lib/supabase/guards";
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import {
   buildSponsorAssetPath,
   EVENT_ASSETS_BUCKET,
@@ -25,15 +25,8 @@ function createAdminStorageClient() {
 }
 
 export async function POST(request: Request) {
-  const context = await getStaffContextResult();
-
-  if (!context.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!context.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { response } = await requireAdminApiPermission("storage.upload_sponsor_assets");
+  if (response) return response;
 
   const storageAdmin = createAdminStorageClient();
 

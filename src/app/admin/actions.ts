@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { normalizeAdminEventDateTime } from "@/lib/admin/event-datetime";
-import { requireStaffContext } from "@/lib/supabase/guards";
+import { canAdmin, requireAdminPermission } from "@/lib/supabase/guards";
 
 const ADMIN_EVENTS_PATH = "/admin/events";
 const ADMIN_LEADS_PATH = "/admin/leads";
@@ -276,7 +276,8 @@ function revalidateWorkPaths(memberId?: string) {
 }
 
 export async function saveAdminEvent(formData: FormData) {
-  const { supabase, user } = await requireStaffContext();
+  const adminContext = await requireAdminPermission("events.write");
+  const { supabase, user } = adminContext;
 
   const eventId = String(formData.get("event_id") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
@@ -286,6 +287,10 @@ export async function saveAdminEvent(formData: FormData) {
 
   if (!title || !slug) {
     redirect(`${ADMIN_EVENTS_PATH}?error=missing_required_fields`);
+  }
+
+  if (status !== "draft" && !canAdmin(adminContext, "events.publish")) {
+    redirect(`${ADMIN_EVENTS_PATH}?error=permission_required`);
   }
 
   const payload = {
@@ -335,7 +340,7 @@ export async function saveAdminEvent(formData: FormData) {
 }
 
 export async function deleteAdminEvent(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("events.delete");
 
   const eventId = String(formData.get("event_id") ?? "").trim();
 
@@ -353,7 +358,7 @@ export async function deleteAdminEvent(formData: FormData) {
 }
 
 export async function saveAdminEventPhoto(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("events.manage_photos");
 
   const eventId = String(formData.get("event_id") ?? "").trim();
   const eventSlug = String(formData.get("event_slug") ?? "").trim();
@@ -390,7 +395,7 @@ export async function saveAdminEventPhoto(formData: FormData) {
 }
 
 export async function deleteAdminEventPhoto(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("events.manage_photos");
 
   const eventId = String(formData.get("event_id") ?? "").trim();
   const eventSlug = String(formData.get("event_slug") ?? "").trim();
@@ -409,7 +414,7 @@ export async function deleteAdminEventPhoto(formData: FormData) {
 }
 
 export async function setAdminEventCoverImage(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("events.manage_photos");
 
   const eventId = String(formData.get("event_id") ?? "").trim();
   const eventSlug = String(formData.get("event_slug") ?? "").trim();
@@ -433,7 +438,7 @@ export async function setAdminEventCoverImage(formData: FormData) {
 }
 
 export async function updateAdminMember(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("members.manage_status");
 
   const memberId = String(formData.get("member_id") ?? "").trim();
   const status = String(formData.get("status") ?? "").trim();
@@ -474,7 +479,8 @@ export async function updateAdminMember(formData: FormData) {
 }
 
 export async function updateAdminMemberProfile(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const adminContext = await requireAdminPermission("members.write_profile");
+  const { supabase } = adminContext;
 
   const memberId = String(formData.get("member_id") ?? "").trim();
   const redirectTo = getOptionalValue(formData, "redirect_to");
@@ -499,21 +505,23 @@ export async function updateAdminMemberProfile(formData: FormData) {
     );
   }
 
+  const profileUpdate: Record<string, string | string[] | null> = {
+    display_name: displayName,
+    city,
+    role_label: roleLabel,
+    organization,
+    monthly_time: monthlyTime,
+    bio,
+    skills,
+    interests,
+  };
+
+  if (canAdmin(adminContext, "members.read_contact")) {
+    profileUpdate.wechat = wechat;
+  }
+
   const [{ error: profileError }, { error: memberError }] = await Promise.all([
-    supabase
-      .from("profiles")
-      .update({
-        display_name: displayName,
-        wechat,
-        city,
-        role_label: roleLabel,
-        organization,
-        monthly_time: monthlyTime,
-        bio,
-        skills,
-        interests,
-      })
-      .eq("id", memberId),
+    supabase.from("profiles").update(profileUpdate).eq("id", memberId),
     supabase
       .from("members")
       .update({
@@ -542,7 +550,7 @@ export async function updateAdminMemberProfile(formData: FormData) {
 }
 
 export async function updateAdminJoinRequest(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("members.write_profile");
 
   const requestId = String(formData.get("request_id") ?? "").trim();
   const status = String(formData.get("status") ?? "").trim();
@@ -619,7 +627,7 @@ export async function updateAdminJoinRequest(formData: FormData) {
 }
 
 export async function updateAdminJoinRequestPipeline(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("members.write_profile");
 
   const requestId = String(formData.get("request_id") ?? "").trim();
   const redirectTo = getOptionalValue(formData, "redirect_to");
@@ -708,7 +716,7 @@ export async function updateAdminJoinRequestPipeline(formData: FormData) {
 }
 
 export async function updateAdminLead(formData: FormData) {
-  const { supabase, user } = await requireStaffContext();
+  const { supabase, user } = await requireAdminPermission("leads.write");
 
   const leadId = String(formData.get("lead_id") ?? "").trim();
   const status = String(formData.get("status") ?? "").trim();
@@ -749,7 +757,8 @@ export async function updateAdminLead(formData: FormData) {
 }
 
 export async function updateAdminLeadDetail(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const adminContext = await requireAdminPermission("leads.write");
+  const { supabase } = adminContext;
 
   const leadId = String(formData.get("lead_id") ?? "").trim();
   const status = String(formData.get("status") ?? "").trim();
@@ -764,6 +773,15 @@ export async function updateAdminLeadDetail(formData: FormData) {
     redirect(
       buildRedirectPath("/admin/leads", redirectTo, {
         error: "missing_required_fields",
+      }),
+    );
+  }
+
+  if (!canAdmin(adminContext, "leads.read_sensitive")) {
+    redirect(
+      buildRedirectPath("/admin/leads", redirectTo, {
+        error: "permission_required",
+        permission: "leads.read_sensitive",
       }),
     );
   }
@@ -798,7 +816,7 @@ export async function updateAdminLeadDetail(formData: FormData) {
 }
 
 export async function saveAdminLeadMatch(formData: FormData) {
-  const { supabase, user } = await requireStaffContext();
+  const { supabase, user } = await requireAdminPermission("leads.match_members");
 
   const leadId = String(formData.get("lead_id") ?? "").trim();
   const matchId = String(formData.get("match_id") ?? "").trim();
@@ -860,7 +878,7 @@ export async function saveAdminLeadMatch(formData: FormData) {
 }
 
 export async function deleteAdminLeadMatch(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("leads.match_members");
 
   const leadId = String(formData.get("lead_id") ?? "").trim();
   const matchId = String(formData.get("match_id") ?? "").trim();
@@ -897,7 +915,7 @@ export async function deleteAdminLeadMatch(formData: FormData) {
 }
 
 export async function saveAdminProjectOpportunity(formData: FormData) {
-  const { supabase, user } = await requireStaffContext();
+  const { supabase, user } = await requireAdminPermission("projects.write");
 
   const opportunityId = String(formData.get("opportunity_id") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
@@ -968,7 +986,7 @@ export async function saveAdminProjectOpportunity(formData: FormData) {
 }
 
 export async function deleteAdminProjectOpportunity(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("projects.delete");
   const opportunityId = String(formData.get("opportunity_id") ?? "").trim();
   const slug = String(formData.get("slug") ?? "").trim();
 
@@ -990,7 +1008,7 @@ export async function deleteAdminProjectOpportunity(formData: FormData) {
 }
 
 export async function updateAdminProjectApplication(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("projects.review_applications");
 
   const applicationId = String(formData.get("application_id") ?? "").trim();
   const projectId = String(formData.get("project_id") ?? "").trim();
@@ -1018,7 +1036,7 @@ export async function updateAdminProjectApplication(formData: FormData) {
 }
 
 export async function deleteAdminProjectApplication(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("projects.delete");
 
   const applicationId = String(formData.get("application_id") ?? "").trim();
   const projectSlug = String(formData.get("project_slug") ?? "").trim();
@@ -1041,7 +1059,8 @@ export async function deleteAdminProjectApplication(formData: FormData) {
 }
 
 export async function saveAdminCommunityUpdate(formData: FormData) {
-  const { supabase, user } = await requireStaffContext();
+  const adminContext = await requireAdminPermission("updates.review");
+  const { supabase, user } = adminContext;
 
   const updateId = String(formData.get("update_id") ?? "").trim();
   const authorId = String(formData.get("author_id") ?? "").trim();
@@ -1064,6 +1083,17 @@ export async function saveAdminCommunityUpdate(formData: FormData) {
 
   if (hasInvalidUrl) {
     redirect(`${ADMIN_UPDATES_PATH}?error=invalid_update_url`);
+  }
+
+  if (status === "published" && !canAdmin(adminContext, "updates.publish")) {
+    redirect(`${ADMIN_UPDATES_PATH}?error=permission_required`);
+  }
+
+  if (
+    (formData.get("is_featured") === "on" || formData.get("is_pinned") === "on") &&
+    !canAdmin(adminContext, "updates.pin")
+  ) {
+    redirect(`${ADMIN_UPDATES_PATH}?error=permission_required`);
   }
 
   const { data: existingUpdate } = updateId
@@ -1153,7 +1183,7 @@ export async function saveAdminCommunityUpdate(formData: FormData) {
 }
 
 export async function deleteAdminCommunityUpdate(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("updates.delete");
   const updateId = String(formData.get("update_id") ?? "").trim();
 
   if (!updateId) {
@@ -1174,7 +1204,8 @@ export async function deleteAdminCommunityUpdate(formData: FormData) {
 }
 
 export async function saveAdminMemberWork(formData: FormData) {
-  const { supabase, user } = await requireStaffContext();
+  const adminContext = await requireAdminPermission("works.write");
+  const { supabase, user } = adminContext;
 
   const workId = String(formData.get("work_id") ?? "").trim();
   const memberId = String(formData.get("member_id") ?? "").trim();
@@ -1185,6 +1216,17 @@ export async function saveAdminMemberWork(formData: FormData) {
     redirect(`${ADMIN_WORKS_PATH}?error=missing_work_fields`);
   }
 
+  const requestedReviewStatus = getWorkReviewStatus(String(formData.get("review_status") ?? ""));
+  const requestedIsPublic = formData.get("is_public") === "on";
+
+  if (requestedReviewStatus !== "pending" && !canAdmin(adminContext, "works.review")) {
+    redirect(`${ADMIN_WORKS_PATH}?error=permission_required&permission=works.review`);
+  }
+
+  if (requestedIsPublic && !canAdmin(adminContext, "works.publish")) {
+    redirect(`${ADMIN_WORKS_PATH}?error=permission_required&permission=works.publish`);
+  }
+
   const payload = {
     member_id: memberId,
     title,
@@ -1192,7 +1234,7 @@ export async function saveAdminMemberWork(formData: FormData) {
     description: getOptionalValue(formData, "description"),
     work_type: getWorkType(String(formData.get("work_type") ?? "")),
     status: getWorkStatus(String(formData.get("status") ?? "")),
-    review_status: getWorkReviewStatus(String(formData.get("review_status") ?? "")),
+    review_status: requestedReviewStatus,
     role_label: getOptionalValue(formData, "role_label"),
     cover_image_url: getOptionalValue(formData, "cover_image_url"),
     website_url: getOptionalValue(formData, "website_url"),
@@ -1200,7 +1242,7 @@ export async function saveAdminMemberWork(formData: FormData) {
     demo_url: getOptionalValue(formData, "demo_url"),
     tags: normalizeSkills(String(formData.get("tags") ?? "")),
     sort_order: getOptionalInteger(formData, "sort_order"),
-    is_public: formData.get("is_public") === "on",
+    is_public: requestedIsPublic,
     is_featured: formData.get("is_featured") === "on",
   };
   const nextReviewStatus = payload.is_public ? "approved" : payload.review_status;
@@ -1239,7 +1281,7 @@ export async function saveAdminMemberWork(formData: FormData) {
 }
 
 export async function deleteAdminMemberWork(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("works.delete");
   const workId = String(formData.get("work_id") ?? "").trim();
   const memberId = String(formData.get("member_id") ?? "").trim();
 
@@ -1274,7 +1316,7 @@ function toWechatQrDateTime(value: string | null) {
 }
 
 export async function saveAdminWechatQrCode(formData: FormData) {
-  const { supabase, user } = await requireStaffContext();
+  const { supabase, user } = await requireAdminPermission("social.write");
 
   const qrCodeId = String(formData.get("qr_code_id") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim() || "常州 AI Club 官方微信";
@@ -1325,7 +1367,7 @@ export async function saveAdminWechatQrCode(formData: FormData) {
 }
 
 export async function deleteAdminWechatQrCode(formData: FormData) {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("social.write");
   const qrCodeId = String(formData.get("qr_code_id") ?? "").trim();
 
   if (!qrCodeId) {

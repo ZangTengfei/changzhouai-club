@@ -6,7 +6,7 @@ import { AdminNav } from "@/components/admin-nav";
 import { AdminNotice, AdminPanel, AdminPanelBody } from "@/components/admin-ui";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { Button } from "@/components/ui/button";
-import { getStaffContext } from "@/lib/supabase/guards";
+import { getAdminContext } from "@/lib/supabase/guards";
 import { cssModuleCxWithGlobals } from "@/lib/utils";
 
 import styles from "./admin-layout.module.css";
@@ -18,9 +18,9 @@ export default async function AdminLayout({
 }: {
   children: ReactNode;
 }) {
-  const { user, member, isStaff } = await getStaffContext();
+  const { user, member, permissions, isAdmin } = await getAdminContext();
 
-  if (!isStaff) {
+  if (!isAdmin) {
     return (
       <div className={cx("admin-access-state mx-auto flex min-h-screen w-full max-w-3xl items-center px-4 py-8")}>
         <AdminPanel className="w-full">
@@ -36,7 +36,7 @@ export default async function AdminLayout({
                 <h1 className="text-2xl font-semibold text-foreground">当前账号还没有后台权限</h1>
                 <p className="text-sm text-muted-foreground">
                   你的当前成员状态是 `{member?.status ?? "pending"}`。社区后台仅对
-                  `organizer` 或 `admin` 角色开放。
+                  已授权后台角色开放。
                 </p>
               </div>
             </div>
@@ -81,13 +81,13 @@ export default async function AdminLayout({
               <ShieldCheck className="size-5" />
             </div>
             <div>
-              <p>当前角色</p>
-              <strong>{member?.status ?? "pending"}</strong>
+              <p>后台权限</p>
+              <strong>{permissions.length} 项权限</strong>
             </div>
           </div>
 
           <div className={cx("admin-sidebar-nav-card")}>
-            <AdminNav />
+            <AdminNav permissions={permissions} />
           </div>
 
           <div className={cx("admin-sidebar-footer")}>
@@ -122,7 +122,7 @@ export default async function AdminLayout({
         </header>
 
         <div className={cx("admin-mobile-nav lg:hidden")}>
-          <AdminNav />
+          <AdminNav permissions={permissions} />
         </div>
 
         <div className={cx("admin-main-inner mx-auto flex min-h-screen w-full max-w-[1400px] flex-col gap-4 px-4 py-4 lg:px-6")}>

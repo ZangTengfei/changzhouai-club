@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getStaffContextResult } from "@/lib/supabase/guards";
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   buildCommunityQrCodePath,
@@ -8,15 +8,8 @@ import {
 } from "@/lib/supabase/storage";
 
 export async function POST(request: Request) {
-  const context = await getStaffContextResult();
-
-  if (!context.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!context.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { response } = await requireAdminApiPermission("storage.upload_community_assets");
+  if (response) return response;
 
   const storageAdmin = createSupabaseAdminClient();
 

@@ -1,6 +1,9 @@
 import { notFound } from "next/navigation";
 
-import { getStaffContextResult, requireStaffContext } from "@/lib/supabase/guards";
+import {
+  getAdminContextResult,
+  requireAdminPermission,
+} from "@/lib/supabase/guards";
 
 export type AdminSponsorTier = "core" | "partner" | "supporter";
 
@@ -47,16 +50,17 @@ export type AdminSponsorsData = {
   debugSnapshot: AdminSponsorsDebugSnapshot;
 };
 
-type StaffContext = Awaited<ReturnType<typeof getStaffContextResult>>;
+type AdminContext = Awaited<ReturnType<typeof getAdminContextResult>>;
 
 function sortImages(images: AdminSponsorImageRow[]) {
   return images.slice().sort((a, b) => a.sort_order - b.sort_order);
 }
 
 export async function loadAdminSponsorsData(
-  context?: StaffContext,
+  context?: AdminContext,
 ): Promise<AdminSponsorsData> {
-  const { supabase, user, member, isStaff } = context ?? (await requireStaffContext());
+  const { supabase, user, member, isStaff } =
+    context ?? (await requireAdminPermission("sponsors.read"));
 
   if (!user) {
     throw new Error("Admin sponsors data requires an authenticated staff user.");

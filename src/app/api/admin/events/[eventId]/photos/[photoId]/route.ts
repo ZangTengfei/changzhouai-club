@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { revalidateAdminEventPaths } from "@/lib/admin/revalidate";
-import { getStaffContextResult } from "@/lib/supabase/guards";
+import { getAdminContextResult } from "@/lib/supabase/guards";
 
 function getOptionalValue(payload: Record<string, unknown>, key: string) {
   const value = String(payload[key] ?? "").trim();
@@ -19,7 +20,7 @@ function getOptionalInteger(payload: Record<string, unknown>, key: string) {
   return Number.isNaN(parsed) ? 0 : parsed;
 }
 
-async function getEventSlug(eventId: string, supabase: Awaited<ReturnType<typeof getStaffContextResult>>["supabase"]) {
+async function getEventSlug(eventId: string, supabase: Awaited<ReturnType<typeof getAdminContextResult>>["supabase"]) {
   const { data } = await supabase.from("events").select("slug").eq("id", eventId).maybeSingle();
   return data?.slug ?? undefined;
 }
@@ -28,15 +29,9 @@ export async function PATCH(
   request: Request,
   context: { params: Promise<{ eventId: string; photoId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } =
+    await requireAdminApiPermission("events.manage_photos");
+  if (response) return response;
 
   const { eventId, photoId } = await context.params;
   const payload = (await request.json().catch(() => null)) as Record<string, unknown> | null;
@@ -72,15 +67,9 @@ export async function DELETE(
   _request: Request,
   context: { params: Promise<{ eventId: string; photoId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } =
+    await requireAdminApiPermission("events.manage_photos");
+  if (response) return response;
 
   const { eventId, photoId } = await context.params;
 

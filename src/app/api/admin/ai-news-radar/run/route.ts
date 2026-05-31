@@ -4,7 +4,7 @@ import { promisify } from "node:util";
 
 import { NextResponse } from "next/server";
 
-import { getStaffContextResult } from "@/lib/supabase/guards";
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 
 export const runtime = "nodejs";
 export const maxDuration = 90;
@@ -37,15 +37,8 @@ function normalizeSourceType(value: unknown) {
 }
 
 export async function POST(request: Request) {
-  const context = await getStaffContextResult();
-
-  if (!context.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!context.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { response } = await requireAdminApiPermission("ai_news.run");
+  if (response) return response;
 
   const payload = (await request.json().catch(() => ({}))) as RadarRunPayload;
   const sinceHours = clampInteger(payload.sinceHours, 72, 1, 720);

@@ -1,18 +1,11 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { loadAdminLeadsData } from "@/lib/admin/leads";
-import { getStaffContextResult } from "@/lib/supabase/guards";
 
 export async function GET() {
-  const context = await getStaffContextResult();
-
-  if (!context.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!context.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context, response } = await requireAdminApiPermission("leads.read");
+  if (response) return response;
 
   const data = await loadAdminLeadsData(context);
   return NextResponse.json(data);

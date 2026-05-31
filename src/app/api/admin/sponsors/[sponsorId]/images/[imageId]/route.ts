@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { revalidateAdminSponsorPaths } from "@/lib/admin/revalidate";
-import { getStaffContextResult } from "@/lib/supabase/guards";
+import { getAdminContextResult } from "@/lib/supabase/guards";
 
 function getOptionalValue(payload: Record<string, unknown>, key: string) {
   const value = String(payload[key] ?? "").trim();
@@ -21,7 +22,7 @@ function getOptionalInteger(payload: Record<string, unknown>, key: string) {
 
 async function getSponsorSlug(
   sponsorId: string,
-  supabase: Awaited<ReturnType<typeof getStaffContextResult>>["supabase"],
+  supabase: Awaited<ReturnType<typeof getAdminContextResult>>["supabase"],
 ) {
   const { data } = await supabase.from("sponsors").select("slug").eq("id", sponsorId).maybeSingle();
   return data?.slug ?? undefined;
@@ -31,15 +32,9 @@ export async function PATCH(
   request: Request,
   context: { params: Promise<{ sponsorId: string; imageId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } =
+    await requireAdminApiPermission("sponsors.manage_images");
+  if (response) return response;
 
   const { sponsorId, imageId } = await context.params;
   const payload = (await request.json().catch(() => null)) as Record<string, unknown> | null;
@@ -75,15 +70,9 @@ export async function DELETE(
   _request: Request,
   context: { params: Promise<{ sponsorId: string; imageId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } =
+    await requireAdminApiPermission("sponsors.manage_images");
+  if (response) return response;
 
   const { sponsorId, imageId } = await context.params;
 

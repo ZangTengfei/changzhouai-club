@@ -9,6 +9,7 @@ const adminSavedMessageMap: Record<string, string> = {
   lead_match_deleted: "线索匹配成员已删除。",
   member: "成员设置已更新。",
   member_profile: "成员资料已更新。",
+  member_roles: "成员后台角色已更新。",
   member_public_visibility: "成员已公开展示。",
   join_request: "加入申请状态已更新。",
   join_request_pipeline: "加入申请转化节点已更新。",
@@ -43,6 +44,8 @@ const adminErrorMessageMap: Record<string, string> = {
   invalid_public_slug: "成员主页链接无效，请使用 3-32 位小写英文、数字或短横线。",
   public_slug_taken: "成员主页链接已被占用，请换一个。",
   database_write_failed: "保存失败，请稍后再试。",
+  permission_required: "当前账号没有执行这个操作所需的后台权限。",
+  forbidden: "当前账号没有执行这个操作所需的后台权限。",
 };
 
 const adminEventStatusLabelMap: Record<string, string> = {

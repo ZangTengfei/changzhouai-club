@@ -1,4 +1,5 @@
-import { requireStaffContext } from "@/lib/supabase/guards";
+import { redactSensitiveValue } from "@/lib/admin/permissions";
+import { canAdmin, requireAdminPermission } from "@/lib/supabase/guards";
 
 export type AdminWorkType =
   | "product"
@@ -57,12 +58,14 @@ export type AdminWorksData = {
   queryErrors: string[];
 };
 
-function getDisplayName(profile?: AdminProfileOptionRow) {
-  return profile?.display_name?.trim() || profile?.email || "未填写显示名";
+function getDisplayName(profile?: AdminProfileOptionRow, canUseEmail = true) {
+  return profile?.display_name?.trim() || (canUseEmail ? profile?.email : null) || "未填写显示名";
 }
 
 export async function loadAdminWorksData(): Promise<AdminWorksData> {
-  const { supabase } = await requireStaffContext();
+  const adminContext = await requireAdminPermission("works.read");
+  const { supabase } = adminContext;
+  const canReadMemberContact = canAdmin(adminContext, "members.read_contact");
 
   const [
     { data: worksData, error: worksError },
@@ -91,8 +94,8 @@ export async function loadAdminWorksData(): Promise<AdminWorksData> {
     .filter((profile) => memberIds.has(profile.id))
     .map((profile) => ({
       id: profile.id,
-      displayName: getDisplayName(profile),
-      email: profile.email,
+      displayName: getDisplayName(profile, canReadMemberContact),
+      email: canReadMemberContact ? profile.email : redactSensitiveValue(profile.email),
     }))
     .sort((a, b) => a.displayName.localeCompare(b.displayName, "zh-CN"));
 
@@ -103,8 +106,10 @@ export async function loadAdminWorksData(): Promise<AdminWorksData> {
       return {
         ...work,
         tags: work.tags ?? [],
-        memberDisplayName: getDisplayName(profile),
-        memberEmail: profile?.email ?? null,
+        memberDisplayName: getDisplayName(profile, canReadMemberContact),
+        memberEmail: canReadMemberContact
+          ? profile?.email ?? null
+          : redactSensitiveValue(profile?.email),
       };
     }),
     memberOptions,

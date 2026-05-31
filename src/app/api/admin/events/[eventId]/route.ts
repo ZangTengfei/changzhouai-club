@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { normalizeAdminEventDateTime } from "@/lib/admin/event-datetime";
 import { loadAdminEventsData } from "@/lib/admin/events";
 import { revalidateAdminEventPaths } from "@/lib/admin/revalidate";
-import { getStaffContextResult } from "@/lib/supabase/guards";
+import { canAdmin } from "@/lib/supabase/guards";
 
 function getOptionalValue(payload: Record<string, unknown>, key: string) {
   const value = String(payload[key] ?? "").trim();
@@ -32,15 +33,8 @@ export async function GET(
   _request: Request,
   context: { params: Promise<{ eventId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } = await requireAdminApiPermission("events.read");
+  if (response) return response;
 
   const { eventId } = await context.params;
   const data = await loadAdminEventsData(staffContext);
@@ -61,15 +55,8 @@ export async function PATCH(
   request: Request,
   context: { params: Promise<{ eventId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } = await requireAdminApiPermission("events.write");
+  if (response) return response;
 
   const { eventId } = await context.params;
   const payload = (await request.json().catch(() => null)) as Record<string, unknown> | null;
@@ -84,6 +71,13 @@ export async function PATCH(
 
   if (!title || !slug) {
     return NextResponse.json({ error: "missing_required_fields" }, { status: 400 });
+  }
+
+  if (status !== "draft" && !canAdmin(staffContext, "events.publish")) {
+    return NextResponse.json(
+      { error: "forbidden", permission: "events.publish" },
+      { status: 403 },
+    );
   }
 
   const { error } = await staffContext.supabase
@@ -119,15 +113,8 @@ export async function DELETE(
   _request: Request,
   context: { params: Promise<{ eventId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } = await requireAdminApiPermission("events.delete");
+  if (response) return response;
 
   const { eventId } = await context.params;
 

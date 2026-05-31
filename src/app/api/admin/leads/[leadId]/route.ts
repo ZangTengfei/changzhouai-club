@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { loadAdminLeadsData } from "@/lib/admin/leads";
 import { revalidateAdminLeadPaths } from "@/lib/admin/revalidate";
-import { getStaffContextResult } from "@/lib/supabase/guards";
+import { canAdmin } from "@/lib/supabase/guards";
 
 function getOptionalValue(payload: Record<string, unknown>, key: string) {
   const value = String(payload[key] ?? "").trim();
@@ -13,15 +14,8 @@ export async function GET(
   _request: Request,
   context: { params: Promise<{ leadId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } = await requireAdminApiPermission("leads.read");
+  if (response) return response;
 
   const { leadId } = await context.params;
   const data = await loadAdminLeadsData(staffContext);
@@ -43,15 +37,8 @@ export async function PATCH(
   request: Request,
   context: { params: Promise<{ leadId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } = await requireAdminApiPermission("leads.write");
+  if (response) return response;
 
   const { leadId } = await context.params;
   const payload = (await request.json().catch(() => null)) as Record<string, unknown> | null;
@@ -64,6 +51,13 @@ export async function PATCH(
 
   if (!leadId || !status) {
     return NextResponse.json({ error: "missing_required_fields" }, { status: 400 });
+  }
+
+  if (!canAdmin(staffContext, "leads.read_sensitive")) {
+    return NextResponse.json(
+      { error: "forbidden", permission: "leads.read_sensitive" },
+      { status: 403 },
+    );
   }
 
   const { error } = await staffContext.supabase

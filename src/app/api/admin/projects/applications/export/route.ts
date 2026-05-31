@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
+import { recordAdminAuditLog } from "@/lib/admin/audit";
 import { loadAdminProjectsData } from "@/lib/admin/projects";
 import {
   projectApplicationStatusLabels,
   projectOpportunityStatusLabels,
   projectOpportunityVisibilityLabels,
 } from "@/lib/community-projects";
-import { getStaffContextResult } from "@/lib/supabase/guards";
 
 const csvHeaders = [
   "项目标题",
@@ -82,15 +83,8 @@ function buildExportFileName(projectSlug: string) {
 }
 
 export async function GET(request: Request) {
-  const context = await getStaffContextResult();
-
-  if (!context.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!context.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context, response } = await requireAdminApiPermission("projects.export_applications");
+  if (response) return response;
 
   const projectId = new URL(request.url).searchParams.get("project_id");
 
@@ -104,6 +98,16 @@ export async function GET(request: Request) {
   if (!opportunity) {
     return NextResponse.json({ error: "project_not_found" }, { status: 404 });
   }
+
+  await recordAdminAuditLog(context.supabase, {
+    actorId: context.user.id,
+    action: "project_applications.export",
+    resourceType: "project_opportunity",
+    resourceId: projectId,
+    metadata: {
+      applicationCount: opportunity.applications.length,
+    },
+  });
 
   const rows = opportunity.applications.map((application) => [
     opportunity.title,

@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { loadAdminSponsorsData } from "@/lib/admin/sponsors";
 import { revalidateAdminSponsorPaths } from "@/lib/admin/revalidate";
-import { getStaffContextResult } from "@/lib/supabase/guards";
+import { canAdmin } from "@/lib/supabase/guards";
 
 function normalizeSlug(raw: string) {
   return raw
@@ -34,30 +35,16 @@ function getSponsorTier(payload: Record<string, unknown>) {
 }
 
 export async function GET() {
-  const context = await getStaffContextResult();
-
-  if (!context.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!context.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context, response } = await requireAdminApiPermission("sponsors.read");
+  if (response) return response;
 
   const data = await loadAdminSponsorsData(context);
   return NextResponse.json(data);
 }
 
 export async function POST(request: Request) {
-  const context = await getStaffContextResult();
-
-  if (!context.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!context.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context, response } = await requireAdminApiPermission("sponsors.write");
+  if (response) return response;
 
   const payload = (await request.json().catch(() => null)) as Record<string, unknown> | null;
 
@@ -71,6 +58,13 @@ export async function POST(request: Request) {
 
   if (!name || !slug) {
     return NextResponse.json({ error: "missing_required_fields" }, { status: 400 });
+  }
+
+  if (Boolean(payload.is_active) && !canAdmin(context, "sponsors.publish")) {
+    return NextResponse.json(
+      { error: "forbidden", permission: "sponsors.publish" },
+      { status: 403 },
+    );
   }
 
   const { data: createdSponsor, error } = await context.supabase

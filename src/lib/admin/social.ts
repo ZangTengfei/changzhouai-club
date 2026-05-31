@@ -1,4 +1,4 @@
-import { requireStaffContext } from "@/lib/supabase/guards";
+import { requireAdminPermission } from "@/lib/supabase/guards";
 
 export type AdminWechatQrCodeRow = {
   id: string;
@@ -18,7 +18,7 @@ export type AdminSocialData = {
 };
 
 export async function loadAdminSocialData(): Promise<AdminSocialData> {
-  const { supabase } = await requireStaffContext();
+  const { supabase } = await requireAdminPermission("social.write");
   const now = new Date().toISOString();
   const { data, error } = await supabase
     .from("community_wechat_qr_codes")

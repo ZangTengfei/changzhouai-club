@@ -1,20 +1,14 @@
 import { NextResponse } from "next/server";
 
 import { normalizeAdminEventDateTime } from "@/lib/admin/event-datetime";
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { loadAdminEventsData } from "@/lib/admin/events";
 import { revalidateAdminEventPaths } from "@/lib/admin/revalidate";
-import { getStaffContextResult } from "@/lib/supabase/guards";
+import { canAdmin } from "@/lib/supabase/guards";
 
 export async function GET() {
-  const context = await getStaffContextResult();
-
-  if (!context.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!context.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context, response } = await requireAdminApiPermission("events.read");
+  if (response) return response;
 
   const data = await loadAdminEventsData(context);
   return NextResponse.json(data);
@@ -52,15 +46,8 @@ function normalizeOptionalUrlValue(raw: string | null) {
 }
 
 export async function POST(request: Request) {
-  const context = await getStaffContextResult();
-
-  if (!context.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!context.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context, response } = await requireAdminApiPermission("events.write");
+  if (response) return response;
 
   const payload = (await request.json().catch(() => null)) as Record<string, unknown> | null;
 
@@ -75,6 +62,13 @@ export async function POST(request: Request) {
 
   if (!title || !slug) {
     return NextResponse.json({ error: "missing_required_fields" }, { status: 400 });
+  }
+
+  if (status !== "draft" && !canAdmin(context, "events.publish")) {
+    return NextResponse.json(
+      { error: "forbidden", permission: "events.publish" },
+      { status: 403 },
+    );
   }
 
   const { data: createdEvent, error } = await context.supabase

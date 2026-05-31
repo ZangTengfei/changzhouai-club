@@ -1,6 +1,11 @@
 import { notFound } from "next/navigation";
 
-import { getStaffContextResult, requireStaffContext } from "@/lib/supabase/guards";
+import { redactSensitiveValue } from "@/lib/admin/permissions";
+import {
+  canAdmin,
+  getAdminContextResult,
+  requireAdminPermission,
+} from "@/lib/supabase/guards";
 
 type AdminProfileRow = {
   id: string;
@@ -86,6 +91,24 @@ export type AdminMember = {
   joinedAt: string;
   lastActiveAt: string | null;
   registrationCount: number;
+  adminRoles: AdminMemberAdminRole[];
+  availableAdminRoles: AdminRoleOption[];
+};
+
+export type AdminMemberAdminRole = {
+  roleId: string;
+  roleKey: string;
+  name: string;
+  description: string | null;
+  expiresAt: string | null;
+  note: string | null;
+};
+
+export type AdminRoleOption = {
+  id: string;
+  roleKey: string;
+  name: string;
+  description: string | null;
 };
 
 export type AdminJoinRequest = {
@@ -135,7 +158,20 @@ export type AdminMembersData = {
   queryErrors: string[];
 };
 
-type StaffContext = Awaited<ReturnType<typeof getStaffContextResult>>;
+type AdminContext = Awaited<ReturnType<typeof getAdminContextResult>>;
+type AdminRoleRow = {
+  id: string;
+  role_key: string;
+  name: string;
+  description: string | null;
+};
+
+type MemberAdminRoleRow = {
+  member_id: string;
+  role_id: string;
+  expires_at: string | null;
+  note: string | null;
+};
 
 function getMemberSortWeight(status: string) {
   switch (status) {
@@ -170,15 +206,20 @@ function getJoinRequestSortWeight(status: string) {
 }
 
 export async function loadAdminMembersData(
-  context?: StaffContext,
+  context?: AdminContext,
 ): Promise<AdminMembersData> {
-  const { supabase } = context ?? (await requireStaffContext());
+  const adminContext = context ?? (await requireAdminPermission("members.read"));
+  const { supabase } = adminContext;
+  const canReadContact = canAdmin(adminContext, "members.read_contact");
+  const canManageRoles = canAdmin(adminContext, "system.manage_roles");
 
   const [
     { data: profilesData, error: profilesError },
     { data: membersData, error: membersError },
     { data: registrationsData, error: registrationsError },
     { data: joinRequestsData, error: joinRequestsError },
+    { data: rolesData, error: rolesError },
+    { data: memberRolesData, error: memberRolesError },
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -197,6 +238,12 @@ export async function loadAdminMembersData(
         "id, display_name, wechat, city, role_label, organization, monthly_time, skills, interests, note, willing_to_attend, willing_to_share, willing_to_join_projects, status, admin_note, contacted_at, approved_at, invited_to_register_at, joined_group_at, first_attended_event_at, converted_to_member_at, converted_member_id, created_at",
       )
       .order("created_at", { ascending: false }),
+    canManageRoles
+      ? supabase.from("admin_roles").select("id, role_key, name, description").order("sort_order")
+      : Promise.resolve({ data: [], error: null }),
+    canManageRoles
+      ? supabase.from("member_admin_roles").select("member_id, role_id, expires_at, note")
+      : Promise.resolve({ data: [], error: null }),
   ]);
 
   const profiles = (profilesData ?? []) as AdminProfileRow[];
@@ -208,10 +255,41 @@ export async function loadAdminMembersData(
     membersError?.message,
     registrationsError?.message,
     joinRequestsError?.message,
+    rolesError?.message,
+    memberRolesError?.message,
   ].filter(Boolean) as string[];
 
   const profilesById = new Map(profiles.map((profile) => [profile.id, profile]));
+  const roles = (rolesData ?? []) as AdminRoleRow[];
+  const memberRoles = (memberRolesData ?? []) as MemberAdminRoleRow[];
+  const rolesById = new Map(roles.map((role) => [role.id, role]));
+  const availableAdminRoles = roles.map((role) => ({
+    id: role.id,
+    roleKey: role.role_key,
+    name: role.name,
+    description: role.description,
+  }));
+  const adminRolesByMemberId = new Map<string, AdminMemberAdminRole[]>();
   const registrationsByUserId = new Map<string, number>();
+
+  memberRoles.forEach((assignment) => {
+    const role = rolesById.get(assignment.role_id);
+
+    if (!role) {
+      return;
+    }
+
+    const assignments = adminRolesByMemberId.get(assignment.member_id) ?? [];
+    assignments.push({
+      roleId: assignment.role_id,
+      roleKey: role.role_key,
+      name: role.name,
+      description: role.description,
+      expiresAt: assignment.expires_at,
+      note: assignment.note,
+    });
+    adminRolesByMemberId.set(assignment.member_id, assignments);
+  });
 
   registrations.forEach((registration) => {
     registrationsByUserId.set(
@@ -226,11 +304,11 @@ export async function loadAdminMembersData(
 
       return {
         id: member.id,
-        email: profile?.email ?? null,
+        email: canReadContact ? profile?.email ?? null : redactSensitiveValue(profile?.email),
         displayName: profile?.display_name?.trim() || "未填写显示名",
         publicSlug: profile?.public_slug?.trim() || null,
         avatarUrl: profile?.avatar_url ?? null,
-        wechat: profile?.wechat?.trim() || null,
+        wechat: canReadContact ? profile?.wechat?.trim() || null : redactSensitiveValue(profile?.wechat),
         city: profile?.city?.trim() || "常州",
         roleLabel: profile?.role_label?.trim() || null,
         organization: profile?.organization?.trim() || null,
@@ -248,6 +326,8 @@ export async function loadAdminMembersData(
         joinedAt: member.joined_at,
         lastActiveAt: member.last_active_at,
         registrationCount: registrationsByUserId.get(member.id) ?? 0,
+        adminRoles: adminRolesByMemberId.get(member.id) ?? [],
+        availableAdminRoles,
       };
     })
     .sort((a, b) => {
@@ -271,19 +351,19 @@ export async function loadAdminMembersData(
     .map((request) => ({
       id: request.id,
       displayName: request.display_name,
-      wechat: request.wechat,
+      wechat: canReadContact ? request.wechat : redactSensitiveValue(request.wechat) ?? "",
       city: request.city?.trim() || "常州",
       roleLabel: request.role_label,
       organization: request.organization,
       monthlyTime: request.monthly_time,
       skills: request.skills ?? [],
       interests: request.interests ?? [],
-      note: request.note,
+      note: canReadContact ? request.note : redactSensitiveValue(request.note),
       willingToAttend: request.willing_to_attend,
       willingToShare: request.willing_to_share,
       willingToJoinProjects: request.willing_to_join_projects,
       status: request.status,
-      adminNote: request.admin_note,
+      adminNote: canReadContact ? request.admin_note : redactSensitiveValue(request.admin_note),
       contactedAt: request.contacted_at,
       approvedAt: request.approved_at,
       invitedToRegisterAt: request.invited_to_register_at,

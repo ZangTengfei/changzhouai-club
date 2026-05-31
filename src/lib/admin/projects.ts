@@ -1,4 +1,5 @@
-import { requireStaffContext } from "@/lib/supabase/guards";
+import { redactSensitiveValue } from "@/lib/admin/permissions";
+import { canAdmin, requireAdminPermission } from "@/lib/supabase/guards";
 
 import type {
   PublicProjectApplicationStatus,
@@ -90,12 +91,18 @@ export type AdminProjectsData = {
   queryErrors: string[];
 };
 
-function getDisplayName(profile?: AdminProjectProfileRow) {
-  return profile?.display_name?.trim() || profile?.email || "未填写显示名";
+function getDisplayName(profile?: AdminProjectProfileRow, canUseEmail = true) {
+  return profile?.display_name?.trim() || (canUseEmail ? profile?.email : null) || "未填写显示名";
 }
 
 export async function loadAdminProjectsData(): Promise<AdminProjectsData> {
-  const { supabase } = await requireStaffContext();
+  const adminContext = await requireAdminPermission("projects.read");
+  const { supabase } = adminContext;
+  const canReviewApplications = canAdmin(adminContext, "projects.review_applications");
+  const canReadApplicationContact = canAdmin(
+    adminContext,
+    "projects.read_application_contact",
+  );
   const [
     { data: opportunitiesData, error: opportunitiesError },
     { data: applicationsData, error: applicationsError },
@@ -109,12 +116,14 @@ export async function loadAdminProjectsData(): Promise<AdminProjectsData> {
       .order("is_featured", { ascending: false })
       .order("sort_order", { ascending: true })
       .order("created_at", { ascending: false }),
-    supabase
-      .from("project_applications")
-      .select(
-        "id, project_id, applicant_user_id, applicant_name, applicant_occupation, contact_wechat, contact_phone, contact_email, role_interest, available_time, experience_summary, portfolio_url, note, status, admin_note, owner_id, created_at, updated_at",
-      )
-      .order("created_at", { ascending: false }),
+    canReviewApplications
+      ? supabase
+          .from("project_applications")
+          .select(
+            "id, project_id, applicant_user_id, applicant_name, applicant_occupation, contact_wechat, contact_phone, contact_email, role_interest, available_time, experience_summary, portfolio_url, note, status, admin_note, owner_id, created_at, updated_at",
+          )
+          .order("created_at", { ascending: false })
+      : Promise.resolve({ data: [], error: null }),
     supabase.from("profiles").select("id, display_name, email"),
   ]);
 
@@ -130,8 +139,22 @@ export async function loadAdminProjectsData(): Promise<AdminProjectsData> {
 
     applications.push({
       ...application,
-      applicantDisplayName: profile ? getDisplayName(profile) : application.applicant_name,
-      applicantEmail: profile?.email ?? application.contact_email,
+      contact_wechat: canReadApplicationContact
+        ? application.contact_wechat
+        : redactSensitiveValue(application.contact_wechat),
+      contact_phone: canReadApplicationContact
+        ? application.contact_phone
+        : redactSensitiveValue(application.contact_phone),
+      contact_email: canReadApplicationContact
+        ? application.contact_email
+        : redactSensitiveValue(application.contact_email),
+      note: canReadApplicationContact ? application.note : redactSensitiveValue(application.note),
+      applicantDisplayName: profile
+        ? getDisplayName(profile, canReadApplicationContact)
+        : application.applicant_name,
+      applicantEmail: canReadApplicationContact
+        ? profile?.email ?? application.contact_email
+        : redactSensitiveValue(profile?.email ?? application.contact_email),
     });
     applicationsByProjectId.set(application.project_id, applications);
   });
@@ -145,8 +168,10 @@ export async function loadAdminProjectsData(): Promise<AdminProjectsData> {
         ...opportunity,
         role_tags: opportunity.role_tags ?? [],
         topic_tags: opportunity.topic_tags ?? [],
-        ownerDisplayName: ownerProfile ? getDisplayName(ownerProfile) : null,
-        ownerEmail: ownerProfile?.email ?? null,
+        ownerDisplayName: ownerProfile
+          ? getDisplayName(ownerProfile, canReadApplicationContact)
+          : null,
+        ownerEmail: canReadApplicationContact ? ownerProfile?.email ?? null : null,
         applications,
         applicationCount: applications.length,
       };

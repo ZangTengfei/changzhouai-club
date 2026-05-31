@@ -1,21 +1,15 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { revalidateAdminMemberPaths } from "@/lib/admin/revalidate";
-import { getStaffContextResult } from "@/lib/supabase/guards";
 
 export async function PATCH(
   request: Request,
   context: { params: Promise<{ memberId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } =
+    await requireAdminApiPermission("members.write_profile");
+  if (response) return response;
 
   const { memberId } = await context.params;
   const payload = (await request.json().catch(() => null)) as Record<string, unknown> | null;

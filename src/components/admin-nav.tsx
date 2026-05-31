@@ -17,6 +17,10 @@ import {
 import type { LucideIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
+import {
+  hasAnyAdminPermission,
+  type AdminPermissionKey,
+} from "@/lib/admin/permissions";
 import { cn, cssModuleCxWithGlobals } from "@/lib/utils";
 
 import styles from "@/app/admin/admin-layout.module.css";
@@ -25,6 +29,7 @@ type AdminNavItem = {
   href: string;
   label: string;
   icon: LucideIcon;
+  permissions: AdminPermissionKey[];
 };
 
 type AdminNavGroup = {
@@ -42,21 +47,25 @@ const adminNavGroups: AdminNavGroup[] = [
         href: "/admin/events",
         label: "活动管理",
         icon: CalendarDays,
+        permissions: ["events.read"],
       },
       {
         href: "/admin/updates",
         label: "社区动态",
         icon: MessagesSquare,
+        permissions: ["updates.read"],
       },
       {
         href: "/admin/ai-news-radar",
         label: "AI 信息雷达",
         icon: Radar,
+        permissions: ["ai_news.run", "updates.read"],
       },
       {
         href: "/admin/social",
         label: "社交入口",
         icon: Share2,
+        permissions: ["social.write"],
       },
     ],
   },
@@ -68,16 +77,19 @@ const adminNavGroups: AdminNavGroup[] = [
         href: "/admin/members",
         label: "成员管理",
         icon: Users,
+        permissions: ["members.read"],
       },
       {
         href: "/admin/projects",
         label: "共建项目",
         icon: BriefcaseBusiness,
+        permissions: ["projects.read"],
       },
       {
         href: "/admin/works",
         label: "成员作品",
         icon: Boxes,
+        permissions: ["works.read", "updates.review"],
       },
     ],
   },
@@ -89,31 +101,44 @@ const adminNavGroups: AdminNavGroup[] = [
         href: "/admin/leads",
         label: "合作线索",
         icon: Handshake,
+        permissions: ["leads.read"],
       },
       {
         href: "/admin/sponsors",
         label: "赞助者",
         icon: BadgeCheck,
+        permissions: ["sponsors.read"],
       },
     ],
   },
 ];
 
 const cx = cssModuleCxWithGlobals.bind(null, styles);
-const defaultAdminNavGroupId = adminNavGroups[0]?.id ?? null;
 
 function isActivePath(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function AdminNav() {
+export function AdminNav({ permissions }: { permissions: string[] }) {
   const pathname = usePathname();
+  const visibleGroups = useMemo(
+    () =>
+      adminNavGroups
+        .map((group) => ({
+          ...group,
+          items: group.items.filter((item) =>
+            hasAnyAdminPermission(permissions, item.permissions),
+          ),
+        }))
+        .filter((group) => group.items.length > 0),
+    [permissions],
+  );
   const activeGroupId = useMemo<string | null>(
     () =>
-      adminNavGroups.find((group) =>
+      visibleGroups.find((group) =>
         group.items.some((item) => isActivePath(pathname, item.href)),
-      )?.id ?? defaultAdminNavGroupId,
-    [pathname],
+      )?.id ?? visibleGroups[0]?.id ?? null,
+    [pathname, visibleGroups],
   );
   const [openGroupId, setOpenGroupId] = useState<string | null>(activeGroupId);
 
@@ -123,7 +148,7 @@ export function AdminNav() {
 
   return (
     <nav className={cx("admin-nav")} aria-label="后台导航">
-      {adminNavGroups.map((group) => {
+      {visibleGroups.map((group) => {
         const isOpen = openGroupId === group.id;
         const isGroupActive = activeGroupId === group.id;
         const panelId = `admin-nav-group-${group.id}`;

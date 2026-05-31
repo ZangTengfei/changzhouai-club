@@ -113,6 +113,28 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
     });
   }
 
+  function handleRolesSubmit(formData: FormData) {
+    startTransition(async () => {
+      try {
+        const response = await fetch(`/api/admin/members/${memberId}/roles`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            role_ids: formData.getAll("role_id").map((roleId) => String(roleId)),
+            note: String(formData.get("note") ?? ""),
+          }),
+        });
+        const result = await readApiResult(response);
+        toast.success(getAdminSavedMessage(result?.saved ?? "member_roles") ?? "后台角色已更新。");
+        reload();
+      } catch (requestError) {
+        toast.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
+      }
+    });
+  }
+
   return (
     <AdminPageStack>
       <AdminToastSignals
@@ -143,6 +165,11 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
             {member.isCoBuilder ? (
               <AdminStatusBadge tone="completed">共建成员</AdminStatusBadge>
             ) : null}
+            {member.adminRoles.map((role) => (
+              <AdminStatusBadge key={role.roleId} tone="scheduled">
+                {role.name}
+              </AdminStatusBadge>
+            ))}
             <AdminStatusBadge tone="neutral">{member.city}</AdminStatusBadge>
             <AdminStatusBadge tone="neutral">
               {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
@@ -159,6 +186,59 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
 
       {member ? (
         <>
+          {member.availableAdminRoles.length > 0 ? (
+            <AdminPanel>
+              <AdminPanelHeader eyebrow="Admin Roles" title="后台角色" />
+              <AdminPanelBody>
+                <form
+                  className="grid gap-4"
+                  onSubmit={(formEvent) => {
+                    formEvent.preventDefault();
+                    handleRolesSubmit(new FormData(formEvent.currentTarget));
+                  }}
+                >
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {member.availableAdminRoles.map((role) => {
+                      const isAssigned = member.adminRoles.some(
+                        (assignment) => assignment.roleId === role.id,
+                      );
+
+                      return (
+                        <AdminCheckboxRow key={role.id}>
+                          <input
+                            type="checkbox"
+                            name="role_id"
+                            value={role.id}
+                            defaultChecked={isAssigned}
+                            className="size-4 accent-[var(--primary)]"
+                          />
+                          <span>
+                            <strong>{role.name}</strong>
+                            {role.description ? (
+                              <small className="mt-1 block text-muted-foreground">
+                                {role.description}
+                              </small>
+                            ) : null}
+                          </span>
+                        </AdminCheckboxRow>
+                      );
+                    })}
+                  </div>
+
+                  <AdminField label="授权备注">
+                    <Input name="note" placeholder="例如：负责 6 月活动发布" />
+                  </AdminField>
+
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="submit" disabled={isPending}>
+                      {isPending ? "保存中..." : "保存后台角色"}
+                    </Button>
+                  </div>
+                </form>
+              </AdminPanelBody>
+            </AdminPanel>
+          ) : null}
+
           <AdminPanel>
             <AdminPanelHeader eyebrow="Profile" title="成员概览" />
             <AdminPanelBody className="space-y-4">

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { revalidateAdminLeadPaths } from "@/lib/admin/revalidate";
-import { getStaffContextResult } from "@/lib/supabase/guards";
 
 function getOptionalValue(payload: Record<string, unknown>, key: string) {
   const value = String(payload[key] ?? "").trim();
@@ -12,15 +12,9 @@ export async function PATCH(
   request: Request,
   context: { params: Promise<{ leadId: string; matchId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } =
+    await requireAdminApiPermission("leads.match_members");
+  if (response) return response;
 
   const { leadId, matchId } = await context.params;
   const payload = (await request.json().catch(() => null)) as Record<string, unknown> | null;
@@ -57,15 +51,9 @@ export async function DELETE(
   _request: Request,
   context: { params: Promise<{ leadId: string; matchId: string }> },
 ) {
-  const staffContext = await getStaffContextResult();
-
-  if (!staffContext.user) {
-    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
-  }
-
-  if (!staffContext.isStaff) {
-    return NextResponse.json({ error: "forbidden" }, { status: 403 });
-  }
+  const { context: staffContext, response } =
+    await requireAdminApiPermission("leads.match_members");
+  if (response) return response;
 
   const { leadId, matchId } = await context.params;
 
