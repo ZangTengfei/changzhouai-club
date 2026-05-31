@@ -220,24 +220,93 @@ function buildExpectedRowStarts(rowStarts, avatarSize, expectedCount, columns, i
   return starts.filter((start, index) => index === 0 || start > starts[index - 1]);
 }
 
+function inferRegularRowStarts(rowStarts, avatarSize, imageHeight) {
+  if (rowStarts.length <= 2) return rowStarts;
+  const rowStep = estimateGridStep(rowStarts, avatarSize);
+  const tolerance = Math.max(avatarSize * 0.45, rowStep * 0.22);
+  let bestRows = [];
+  let bestScore = -Infinity;
+
+  rowStarts.forEach((start) => {
+    const rows = [];
+    let closeness = 0;
+    for (let target = start; target <= imageHeight - avatarSize; target += rowStep) {
+      const nearest = nearestValue(rowStarts, target, tolerance);
+      if (nearest === null) break;
+      if (rows.length && nearest <= rows[rows.length - 1]) break;
+      rows.push(nearest);
+      closeness += 1 - Math.abs(nearest - target) / tolerance;
+    }
+    const score = rows.length * 10 + closeness;
+    if (score > bestScore) {
+      bestRows = rows;
+      bestScore = score;
+    }
+  });
+
+  return bestRows.length ? bestRows : rowStarts;
+}
+
+function detectColumnRangesFromRows(imageData, width, height, rowStarts, avatarSize, columns) {
+  const colDensity = new Float32Array(width);
+  let sampleHeight = 0;
+  const rowSampleHeight = Math.max(24, Math.round(avatarSize * 0.78));
+
+  rowStarts.forEach((rowStart) => {
+    const yStart = Math.max(0, Math.round(rowStart));
+    const yEnd = Math.min(height, yStart + rowSampleHeight);
+    sampleHeight += Math.max(0, yEnd - yStart);
+    for (let y = yStart; y < yEnd; y += 1) {
+      for (let x = 0; x < width; x += 1) {
+        const offset = (y * width + x) * 4;
+        const hit = imageData[offset] < 245 || imageData[offset + 1] < 245 || imageData[offset + 2] < 245;
+        if (hit) colDensity[x] += 1;
+      }
+    }
+  });
+
+  if (!sampleHeight) return [];
+  for (let x = 0; x < width; x += 1) colDensity[x] /= sampleHeight;
+
+  const minWidth = Math.max(24, Math.round(width * 0.04));
+  for (const threshold of [0.12, 0.08, 0.04, 0.02]) {
+    const ranges = findRanges(colDensity, threshold, minWidth);
+    if (ranges.length >= columns) return ranges.slice(0, columns);
+  }
+  return [];
+}
+
 function looksLikeAvatar(canvas) {
   const sample = document.createElement("canvas");
-  sample.width = 20;
-  sample.height = 20;
+  sample.width = 32;
+  sample.height = 32;
   const ctx = sample.getContext("2d", { willReadFrequently: true });
-  ctx.drawImage(canvas, 0, 0, 20, 20);
-  const data = ctx.getImageData(0, 0, 20, 20).data;
+  ctx.drawImage(canvas, 0, 0, 32, 32);
+  const data = ctx.getImageData(0, 0, 32, 32).data;
   let nonWhite = 0;
-  let variance = 0;
+  let dark = 0;
+  let color = 0;
+  let border = 0;
+  let center = 0;
   for (let index = 0; index < data.length; index += 4) {
+    const pixel = index / 4;
+    const x = pixel % 32;
+    const y = Math.floor(pixel / 32);
     const r = data[index];
     const g = data[index + 1];
     const b = data[index + 2];
-    const avg = (r + g + b) / 3;
-    if (r < 244 || g < 244 || b < 244) nonWhite += 1;
-    variance += Math.abs(r - avg) + Math.abs(g - avg) + Math.abs(b - avg);
+    const active = r < 245 || g < 245 || b < 245;
+    if (!active) continue;
+    nonWhite += 1;
+    if (r < 230 || g < 230 || b < 230) dark += 1;
+    if (Math.max(r, g, b) - Math.min(r, g, b) > 18) color += 1;
+    if (x < 4 || x >= 28 || y < 4 || y >= 28) border += 1;
+    if (x >= 10 && x < 22 && y >= 10 && y < 22) center += 1;
   }
-  return nonWhite > 80 && variance > 900;
+
+  const looksLikeActionButton = border > nonWhite * 0.55 && center < nonWhite * 0.4 && color < Math.max(8, nonWhite * 0.08);
+  if (looksLikeActionButton) return false;
+  return nonWhite > 70 || dark > 50 || color > 30 || center > 20;
 }
 
 function detectAvatarCrops(source, options) {
@@ -245,7 +314,6 @@ function detectAvatarCrops(source, options) {
   const { width, height } = sourceCanvas;
   const ctx = sourceCanvas.getContext("2d", { willReadFrequently: true });
   const imageData = ctx.getImageData(0, 0, width, height).data;
-  const colDensity = new Float32Array(width);
   const rowDensity = new Float32Array(height);
 
   for (let y = 0; y < height; y += 1) {
@@ -253,33 +321,31 @@ function detectAvatarCrops(source, options) {
     for (let x = 0; x < width; x += 1) {
       const offset = (y * width + x) * 4;
       const hit = imageData[offset] < 245 || imageData[offset + 1] < 245 || imageData[offset + 2] < 245;
-      if (hit) {
-        rowHits += 1;
-        colDensity[x] += 1;
-      }
+      if (hit) rowHits += 1;
     }
     rowDensity[y] = rowHits / width;
   }
 
-  for (let x = 0; x < width; x += 1) colDensity[x] /= height;
-
-  const xRanges = findRanges(colDensity, 0.015, Math.max(24, Math.round(width * 0.04))).slice(0, options.columns);
   const yRanges = findRanges(rowDensity, 0.05, Math.max(24, Math.round(width * 0.08)));
 
-  if (xRanges.length < options.columns || yRanges.length === 0) {
-    throw new Error(`识别失败：检测到 ${xRanges.length} 列、${yRanges.length} 行，请检查截图是否包含完整头像网格`);
+  if (yRanges.length === 0) {
+    throw new Error("识别失败：没有检测到头像行，请检查截图是否包含完整头像网格");
+  }
+
+  const detectedRowStarts = yRanges.map(([start]) => start);
+  const rowSize = Math.round(median(yRanges.map(([start, end]) => end - start + 1)));
+  const expectedCount = options.expectedCount;
+  const rowStarts = expectedCount
+    ? buildExpectedRowStarts(detectedRowStarts, rowSize, expectedCount, options.columns, height)
+    : inferRegularRowStarts(detectedRowStarts, rowSize, height);
+  const xRanges = detectColumnRangesFromRows(imageData, width, height, rowStarts, rowSize, options.columns);
+
+  if (xRanges.length < options.columns || rowStarts.length === 0) {
+    throw new Error(`识别失败：检测到 ${xRanges.length} 列、${rowStarts.length} 行，请检查截图是否包含完整头像网格`);
   }
 
   const xStarts = xRanges.map(([start]) => start);
-  const detectedRowStarts = yRanges.map(([start]) => start);
-  const avatarSize = Math.round(
-    Math.min(
-      median(xRanges.map(([start, end]) => end - start + 1)),
-      median(yRanges.map(([start, end]) => end - start + 1)),
-    ),
-  );
-  const expectedCount = options.expectedCount;
-  const rowStarts = buildExpectedRowStarts(detectedRowStarts, avatarSize, expectedCount, options.columns, height);
+  const avatarSize = Math.round(Math.min(median(xRanges.map(([start, end]) => end - start + 1)), rowSize));
   const fullRows = expectedCount ? Math.floor(expectedCount / options.columns) : rowStarts.length;
   const remainder = expectedCount ? expectedCount % options.columns : 0;
   const avatars = [];
