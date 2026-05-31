@@ -32,7 +32,6 @@ export const ADMIN_PERMISSION_DEFINITIONS = [
   { key: "updates.pin", label: "置顶和精选动态", module: "updates", sensitivity: "L1" },
   { key: "updates.delete", label: "删除社区动态", module: "updates", sensitivity: "L3" },
   { key: "social.write", label: "管理社交入口", module: "social", sensitivity: "L1" },
-  { key: "ai_news.run", label: "运行 AI 信息雷达", module: "ai_news", sensitivity: "L1" },
 
   { key: "members.read", label: "查看成员", module: "members", sensitivity: "L1" },
   { key: "members.read_contact", label: "查看成员联系方式", module: "members", sensitivity: "L2" },
@@ -194,7 +193,7 @@ export const ADMIN_ROLE_DEFINITIONS: AdminRoleDefinition[] = [
   {
     key: "content_operator",
     name: "内容协作者",
-    description: "负责社区动态、社交入口和 AI 信息雷达。",
+    description: "负责社区动态和社交入口。",
     permissions: [
       "admin.access",
       "updates.read",
@@ -202,7 +201,6 @@ export const ADMIN_ROLE_DEFINITIONS: AdminRoleDefinition[] = [
       "updates.publish",
       "updates.pin",
       "social.write",
-      "ai_news.run",
       "events.manage_photos",
       "storage.upload_community_assets",
       "storage.upload_event_assets",

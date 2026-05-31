@@ -10,7 +10,6 @@ import {
   ChevronDown,
   Handshake,
   MessagesSquare,
-  Radar,
   Share2,
   Users,
 } from "lucide-react";
@@ -54,12 +53,6 @@ const adminNavGroups: AdminNavGroup[] = [
         label: "社区动态",
         icon: MessagesSquare,
         permissions: ["updates.read"],
-      },
-      {
-        href: "/admin/ai-news-radar",
-        label: "AI 信息雷达",
-        icon: Radar,
-        permissions: ["ai_news.run", "updates.read"],
       },
       {
         href: "/admin/social",

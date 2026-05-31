@@ -12,7 +12,6 @@ const adminLandingCandidates = [
   { href: "/admin/leads", permission: "leads.read" },
   { href: "/admin/sponsors", permission: "sponsors.read" },
   { href: "/admin/social", permission: "social.write" },
-  { href: "/admin/ai-news-radar", permission: "ai_news.run" },
 ] as const;
 
 export default async function AdminPage() {
