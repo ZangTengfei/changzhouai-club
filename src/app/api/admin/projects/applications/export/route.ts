@@ -68,7 +68,7 @@ function buildCsv(rows: string[][]) {
   ].join("\r\n");
 }
 
-function buildExportFileName() {
+function buildExportFileName(projectSlug: string) {
   const date = new Intl.DateTimeFormat("zh-CN", {
     timeZone: "Asia/Shanghai",
     year: "numeric",
@@ -78,10 +78,10 @@ function buildExportFileName() {
     .format(new Date())
     .replace(/\//g, "");
 
-  return `project-applications-${date}.csv`;
+  return `project-applications-${projectSlug}-${date}.csv`;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const context = await getStaffContextResult();
 
   if (!context.user) {
@@ -92,38 +92,48 @@ export async function GET() {
     return NextResponse.json({ error: "forbidden" }, { status: 403 });
   }
 
+  const projectId = new URL(request.url).searchParams.get("project_id");
+
+  if (!projectId) {
+    return NextResponse.json({ error: "project_id_required" }, { status: 400 });
+  }
+
   const { opportunities } = await loadAdminProjectsData();
-  const rows = opportunities.flatMap((opportunity) =>
-    opportunity.applications.map((application) => [
-      opportunity.title,
-      `/projects/${opportunity.slug}`,
-      projectOpportunityStatusLabels[opportunity.status],
-      projectOpportunityVisibilityLabels[opportunity.visibility],
-      projectApplicationStatusLabels[application.status],
-      application.applicant_name,
-      application.applicant_occupation ?? "",
-      application.applicantDisplayName,
-      application.applicantEmail ?? "",
-      application.contact_wechat ?? "",
-      application.contact_phone ?? "",
-      application.contact_email ?? "",
-      application.role_interest ?? "",
-      application.available_time ?? "",
-      application.experience_summary ?? "",
-      application.portfolio_url ?? "",
-      application.note ?? "",
-      application.admin_note ?? "",
-      formatCsvDateTime(application.created_at),
-      formatCsvDateTime(application.updated_at),
-      application.id,
-      opportunity.id,
-    ]),
-  );
+  const opportunity = opportunities.find((item) => item.id === projectId);
+
+  if (!opportunity) {
+    return NextResponse.json({ error: "project_not_found" }, { status: 404 });
+  }
+
+  const rows = opportunity.applications.map((application) => [
+    opportunity.title,
+    `/projects/${opportunity.slug}`,
+    projectOpportunityStatusLabels[opportunity.status],
+    projectOpportunityVisibilityLabels[opportunity.visibility],
+    projectApplicationStatusLabels[application.status],
+    application.applicant_name,
+    application.applicant_occupation ?? "",
+    application.applicantDisplayName,
+    application.applicantEmail ?? "",
+    application.contact_wechat ?? "",
+    application.contact_phone ?? "",
+    application.contact_email ?? "",
+    application.role_interest ?? "",
+    application.available_time ?? "",
+    application.experience_summary ?? "",
+    application.portfolio_url ?? "",
+    application.note ?? "",
+    application.admin_note ?? "",
+    formatCsvDateTime(application.created_at),
+    formatCsvDateTime(application.updated_at),
+    application.id,
+    opportunity.id,
+  ]);
   const csv = `\uFEFF${buildCsv(rows)}`;
 
   return new Response(csv, {
     headers: {
-      "Content-Disposition": `attachment; filename="${buildExportFileName()}"`,
+      "Content-Disposition": `attachment; filename="${buildExportFileName(opportunity.slug)}"`,
       "Content-Type": "text/csv; charset=utf-8",
     },
   });
