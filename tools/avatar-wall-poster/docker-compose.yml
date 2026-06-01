@@ -1,0 +1,11 @@
+services:
+  avatar-wall-poster:
+    build:
+      context: .
+      args:
+        NGINX_IMAGE: ${NGINX_IMAGE:-nginx:1.27-alpine}
+    image: avatar-wall-poster:local
+    container_name: avatar-wall-poster
+    restart: unless-stopped
+    ports:
+      - "${POSTER_PORT:-3010}:80"
