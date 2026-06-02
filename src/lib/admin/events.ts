@@ -17,6 +17,7 @@ export type AdminEventRow = {
   speaker_lineup: string | null;
   registration_note: string | null;
   registration_url: string | null;
+  event_type: string;
   recap: string | null;
   docs_url: string | null;
   event_at: string | null;
@@ -103,7 +104,7 @@ export async function loadAdminEventsData(
     supabase
       .from("events")
       .select(
-        "id, slug, title, summary, description, agenda, speaker_lineup, registration_note, registration_url, recap, docs_url, event_at, venue, city, cover_image_url, status",
+        "id, slug, title, summary, description, agenda, speaker_lineup, registration_note, registration_url, event_type, recap, docs_url, event_at, venue, city, cover_image_url, status",
       )
       .order("event_at", { ascending: false, nullsFirst: false }),
     supabase

@@ -29,6 +29,7 @@ type EditableAdminEvent = {
   speaker_lineup: string | null;
   registration_note: string | null;
   registration_url: string | null;
+  event_type: string;
   recap: string | null;
   docs_url: string | null;
   event_at: string | null;
@@ -59,6 +60,7 @@ function toPayload(formData: FormData) {
     speaker_lineup: String(formData.get("speaker_lineup") ?? ""),
     registration_note: String(formData.get("registration_note") ?? ""),
     registration_url: String(formData.get("registration_url") ?? ""),
+    event_type: String(formData.get("event_type") ?? "community").trim(),
     recap: String(formData.get("recap") ?? ""),
     docs_url: String(formData.get("docs_url") ?? ""),
     event_at: String(formData.get("event_at") ?? "").trim(),
@@ -184,6 +186,13 @@ export function AdminEventEditorFormClient({
                   defaultValue={event?.slug ?? ""}
                   placeholder="例如：event-07-20260405"
                 />
+              </AdminField>
+
+              <AdminField label="活动类型">
+                <NativeSelect name="event_type" defaultValue={event?.event_type ?? "community"}>
+                  <option value="community">社区活动</option>
+                  <option value="external">外部活动</option>
+                </NativeSelect>
               </AdminField>
 
               <AdminField label="活动简介" className="md:col-span-2">

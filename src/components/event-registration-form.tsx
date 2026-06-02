@@ -18,6 +18,7 @@ type UpcomingEvent = {
   slug: string;
   registration_note?: string | null;
   registration_url?: string | null;
+  eventTypeLabel?: string;
 };
 
 function formatEventDateTime(value: string | null) {
@@ -64,6 +65,9 @@ export function EventRegistrationForm({
   return (
     <article className="card event-registration-card">
       <div className="pill-row">
+        {event.eventTypeLabel ? (
+          <span className="pill pill-warm">{event.eventTypeLabel}</span>
+        ) : null}
         <span className="pill">{formatEventDateTime(event.event_at)}</span>
         <span className="pill">{event.city ?? "常州"}</span>
       </div>

@@ -142,8 +142,8 @@ export default async function EventsPage({
             <span>变成下一次共创</span>
           </h1>
           <p>
-            在这里找到近期开放报名的活动，也回看社区过去的分享、讨论和现场照片。
-            活动是常州 AI Club 最稳定的连接方式。
+            在这里找到近期开放报名的社区活动与外部精选 AI 活动，也回看过去的分享、讨论和现场照片。
+            活动是常州 AI Club 连接本地 AI 伙伴的稳定入口。
           </p>
 
           <div className={styles.heroActions}>
@@ -190,7 +190,7 @@ export default async function EventsPage({
           </div>
 
           <article className={styles.nextCard}>
-            <p>下一场活动</p>
+            <p>{nextEvent?.eventTypeLabel ?? "下一场活动"}</p>
             <h2>{nextEvent?.title ?? "新的线下活动正在筹备"}</h2>
             <div>
               <span>
@@ -236,7 +236,7 @@ export default async function EventsPage({
           <p className="home-kicker">Upcoming</p>
           <div>
             <h2>近期活动报名</h2>
-            <p>查看开放报名的活动，获取时间、地点、主题介绍与报名入口。</p>
+            <p>查看开放报名的社区活动和外部精选活动，获取时间、地点、主题介绍与报名入口。</p>
           </div>
         </div>
 

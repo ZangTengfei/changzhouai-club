@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { normalizeAdminEventDateTime } from "@/lib/admin/event-datetime";
+import { normalizeEventType } from "@/lib/event-type";
 import { canAdmin, requireAdminPermission } from "@/lib/supabase/guards";
 
 const ADMIN_EVENTS_PATH = "/admin/events";
@@ -302,6 +303,7 @@ export async function saveAdminEvent(formData: FormData) {
     speaker_lineup: getOptionalValue(formData, "speaker_lineup"),
     registration_note: getOptionalValue(formData, "registration_note"),
     registration_url: normalizeOptionalUrlValue(getOptionalValue(formData, "registration_url")),
+    event_type: normalizeEventType(getOptionalValue(formData, "event_type")),
     recap: getOptionalValue(formData, "recap"),
     docs_url: getOptionalValue(formData, "docs_url"),
     event_at: normalizeAdminEventDateTime(getOptionalValue(formData, "event_at")),

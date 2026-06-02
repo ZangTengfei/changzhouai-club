@@ -4,6 +4,7 @@ import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { normalizeAdminEventDateTime } from "@/lib/admin/event-datetime";
 import { loadAdminEventsData } from "@/lib/admin/events";
 import { revalidateAdminEventPaths } from "@/lib/admin/revalidate";
+import { normalizeEventType } from "@/lib/event-type";
 import { canAdmin } from "@/lib/supabase/guards";
 
 function getOptionalValue(payload: Record<string, unknown>, key: string) {
@@ -91,6 +92,7 @@ export async function PATCH(
       speaker_lineup: getOptionalValue(payload, "speaker_lineup"),
       registration_note: getOptionalValue(payload, "registration_note"),
       registration_url: normalizeOptionalUrlValue(getOptionalValue(payload, "registration_url")),
+      event_type: normalizeEventType(getOptionalValue(payload, "event_type")),
       recap: getOptionalValue(payload, "recap"),
       docs_url: getOptionalValue(payload, "docs_url"),
       event_at: normalizeAdminEventDateTime(getOptionalValue(payload, "event_at")),

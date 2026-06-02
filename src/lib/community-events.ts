@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 
 import { formatChangzhouDateTime, formatChangzhouIsoDate } from "@/lib/changzhou-time";
 import { hasSupabaseEnv } from "@/lib/env";
+import { formatEventType } from "@/lib/event-type";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 type EventPhotoRow = {
@@ -25,6 +26,7 @@ type EventRow = {
   speaker_lineup: string | null;
   registration_note: string | null;
   registration_url: string | null;
+  event_type: string;
   recap: string | null;
   docs_url: string | null;
   status: string;
@@ -42,6 +44,7 @@ type CompletedEventPreviewRow = Pick<
   | "venue"
   | "city"
   | "cover_image_url"
+  | "event_type"
   | "status"
 >;
 
@@ -56,6 +59,8 @@ export type PublicScheduledEvent = {
   cover_image_url: string | null;
   registration_note?: string | null;
   registration_url?: string | null;
+  event_type?: string | null;
+  eventTypeLabel: string;
 };
 
 export type PublicGalleryImage = {
@@ -87,6 +92,8 @@ export type PublicEventDetail = {
   dateTimeLabel: string;
   status: string;
   statusLabel: string;
+  eventType: string;
+  eventTypeLabel: string;
   city: string | null;
   venue: string | null;
   locationLabel: string;
@@ -206,6 +213,7 @@ function formatPublicEventStatus(status: string) {
 function mapCompletedEvent(row: EventRow): PublicEventRecap {
   const gallery = buildEventGallery(row);
   const photoCount = gallery.length;
+  const eventTypeLabel = formatEventType(row.event_type);
 
   return {
     id: row.id,
@@ -220,6 +228,7 @@ function mapCompletedEvent(row: EventRow): PublicEventRecap {
     locationLabel: buildLocationLabel(row.city, row.venue),
     imageUrl: row.cover_image_url ?? gallery[0]?.imageUrl ?? null,
     highlights: [
+      eventTypeLabel,
       row.city ?? "常州",
       row.venue ?? "线下交流",
       photoCount > 0 ? `${photoCount} 张活动照片` : "活动已归档",
@@ -229,6 +238,7 @@ function mapCompletedEvent(row: EventRow): PublicEventRecap {
 }
 
 function mapCompletedEventPreview(row: CompletedEventPreviewRow): PublicEventRecap {
+  const eventTypeLabel = formatEventType(row.event_type);
   const gallery = row.cover_image_url
     ? [
         {
@@ -252,6 +262,7 @@ function mapCompletedEventPreview(row: CompletedEventPreviewRow): PublicEventRec
     locationLabel: buildLocationLabel(row.city, row.venue),
     imageUrl: row.cover_image_url ?? null,
     highlights: [
+      eventTypeLabel,
       row.city ?? "常州",
       row.venue ?? "线下交流",
       row.cover_image_url ? "活动图片已归档" : "活动已归档",
@@ -270,12 +281,14 @@ function mapPublicEventDetail(row: EventRow): PublicEventDetail {
     summary:
       row.summary ??
       row.description ??
-      "这是一场常州 AI Club 的线下活动，欢迎查看时间、地点与活动介绍。",
+      "这是一场已发布的 AI 活动，欢迎查看时间、地点与活动介绍。",
     eventAt: row.event_at,
     dateLabel: row.event_at ? formatEventDateLabel(row.event_at) : "时间待定",
     dateTimeLabel: formatEventDateTimeLabel(row.event_at),
     status: row.status,
     statusLabel: formatPublicEventStatus(row.status),
+    eventType: row.event_type,
+    eventTypeLabel: formatEventType(row.event_type),
     city: row.city,
     venue: row.venue,
     locationLabel: buildLocationLabel(row.city, row.venue),
@@ -337,7 +350,7 @@ const getCachedCompletedEventRecaps = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, recap, docs_url, status, event_photos(id, image_url, caption, sort_order)",
+        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, event_type, recap, docs_url, status, event_photos(id, image_url, caption, sort_order)",
       )
       .eq("status", "completed")
       .order("event_at", { ascending: false, nullsFirst: false });
@@ -358,7 +371,7 @@ const getCachedHomeCompletedEventRecaps = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, status",
+        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, event_type, status",
       )
       .eq("status", "completed")
       .order("event_at", { ascending: false, nullsFirst: false })
@@ -392,12 +405,17 @@ const getCachedScheduledEvents = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, title, summary, event_at, venue, city, slug, cover_image_url, registration_note, registration_url",
+        "id, title, summary, event_at, venue, city, slug, cover_image_url, registration_note, registration_url, event_type",
       )
       .eq("status", "scheduled")
       .order("event_at", { ascending: true, nullsFirst: false });
 
-    return (data ?? []) as PublicScheduledEvent[];
+    return ((data ?? []) as Array<Omit<PublicScheduledEvent, "eventTypeLabel">>).map(
+      (event) => ({
+        ...event,
+        eventTypeLabel: formatEventType(event.event_type),
+      }),
+    );
   },
   ["public-scheduled-events"],
   { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
@@ -409,7 +427,7 @@ const getCachedPublicEventBySlug = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, recap, docs_url, status, event_photos(id, image_url, caption, sort_order)",
+        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, event_type, recap, docs_url, status, event_photos(id, image_url, caption, sort_order)",
       )
       .eq("slug", slug)
       .in("status", ["scheduled", "completed", "cancelled"])

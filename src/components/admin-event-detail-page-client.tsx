@@ -29,6 +29,7 @@ import { useAdminResource } from "@/components/use-admin-resource";
 import {
   formatAdminEventDate,
   formatAdminEventStatus,
+  formatAdminEventType,
   formatAdminRegistrationStatus,
   getAdminErrorMessage,
   getAdminEventStatusTone,
@@ -80,6 +81,9 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
           <AdminPanelBody className="flex flex-wrap gap-2">
             <AdminStatusBadge tone={getAdminEventStatusTone(eventDetail.status) as AdminTone}>
               {formatAdminEventStatus(eventDetail.status)}
+            </AdminStatusBadge>
+            <AdminStatusBadge tone="neutral">
+              {formatAdminEventType(eventDetail.event_type)}
             </AdminStatusBadge>
             <AdminStatusBadge tone="neutral">
               {formatAdminEventDate(eventDetail.event_at)}

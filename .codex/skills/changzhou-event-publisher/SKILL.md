@@ -9,7 +9,7 @@ description: Publish Changzhou AI Club website events from natural-language anno
 
 Use the current repository root.
 
-1. Extract only public event information: title, date/time, venue, city, summary, description, agenda, organizers, registration note, external registration URL, status, and optional cover image URL.
+1. Extract only public event information: title, date/time, venue, city, summary, description, agenda, organizers, event type, registration note, external registration URL, status, and optional cover image URL.
 2. Omit internal instructions, personal phone numbers, private group QR codes, and administrative contact details unless the user explicitly asks to publish them.
 3. If the exact event time is unknown, set `event_at` to `null` and say that the public page will show “时间待定”. Do not invent a time.
 4. Create an event JSON file under `output/event-publish/`. Use a lowercase ASCII slug such as `2026-05-15-opc-ai-manufacturing`.
@@ -43,6 +43,7 @@ Use these fields. `title` and `slug` are required.
   "city": "常州",
   "agenda": ["签到与交流", "主题分享", "自由讨论"],
   "speaker_lineup": ["主办：...", "本地组织：..."],
+  "event_type": "community",
   "registration_note": "报名后请在备注里填写必要对接信息，最终安排以组织方通知为准。",
   "registration_url": null,
   "cover_image_url": null,
@@ -51,6 +52,8 @@ Use these fields. `title` and `slug` are required.
 ```
 
 Allowed `status` values are `draft`, `scheduled`, `completed`, and `cancelled`. Use `scheduled` for an activity that should appear on the public events page.
+
+Allowed `event_type` values are `community` and `external`. Use `external` for partner, government, institution, or other non-Changzhou AI Club hosted activities that should still appear on the site and support registration.
 
 ## Authentication
 

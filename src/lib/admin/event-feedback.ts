@@ -1,4 +1,5 @@
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
+import { formatEventType as formatSharedEventType } from "@/lib/event-type";
 
 const adminSavedMessageMap: Record<string, string> = {
   event: "活动信息已保存。",
@@ -129,6 +130,10 @@ export function formatAdminEventDate(value: string | null, withTime = true) {
 
 export function formatAdminEventStatus(status: string) {
   return adminEventStatusLabelMap[status] ?? status;
+}
+
+export function formatAdminEventType(eventType: string | null | undefined) {
+  return formatSharedEventType(eventType);
 }
 
 export function formatAdminRegistrationStatus(status: string) {

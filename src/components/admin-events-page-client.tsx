@@ -32,6 +32,7 @@ import type { AdminEventsData } from "@/lib/admin/events";
 import {
   formatAdminEventDate,
   formatAdminEventStatus,
+  formatAdminEventType,
   getAdminErrorMessage,
   getAdminEventStatusTone,
   getAdminSavedMessage,
@@ -126,7 +127,14 @@ export function AdminEventsPageClient() {
       }
 
       return matchesKeyword(
-        [event.title, event.slug, event.summary, event.city, event.venue],
+        [
+          event.title,
+          event.slug,
+          event.summary,
+          event.city,
+          event.venue,
+          formatAdminEventType(event.event_type),
+        ],
         eventKeyword,
       );
     }) ?? [];
@@ -264,6 +272,11 @@ export function AdminEventsPageClient() {
                             {event.title}
                           </Link>
                           <span className="text-xs text-muted-foreground">{event.slug}</span>
+                          <div>
+                            <AdminStatusBadge tone="neutral">
+                              {formatAdminEventType(event.event_type)}
+                            </AdminStatusBadge>
+                          </div>
                         </div>
                       </TableCell>
                       <TableCell>

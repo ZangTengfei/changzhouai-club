@@ -87,6 +87,11 @@ export default async function EventDetailPage({
       icon: Ticket,
     },
     {
+      label: "活动类型",
+      value: event.eventTypeLabel,
+      icon: Sparkles,
+    },
+    {
       label: "活动时间",
       value: event.dateTimeLabel,
       icon: CalendarDays,
@@ -126,6 +131,7 @@ export default async function EventDetailPage({
               {event.statusLabel}
             </span>
             <span>{event.dateLabel}</span>
+            <span>{event.eventTypeLabel}</span>
             <span>{event.city ?? "常州"}</span>
           </div>
 
@@ -271,6 +277,11 @@ export default async function EventDetailPage({
             </div>
 
             <ul className={styles.eventDetailList}>
+              <li>
+                <Sparkles aria-hidden="true" strokeWidth={1.8} />
+                <span>活动类型</span>
+                <strong>{event.eventTypeLabel}</strong>
+              </li>
               <li>
                 <CalendarDays aria-hidden="true" strokeWidth={1.8} />
                 <span>活动时间</span>
