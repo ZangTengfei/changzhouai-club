@@ -49,6 +49,9 @@ export async function GET(
     event,
     queryErrors: data.queryErrors,
     debugSnapshot: data.debugSnapshot,
+    permissions: {
+      canExportRegistrations: canAdmin(staffContext, "events.export_registrations"),
+    },
   });
 }
 

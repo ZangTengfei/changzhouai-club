@@ -41,6 +41,9 @@ import type { AdminEvent } from "@/lib/admin/events";
 type AdminEventDetailData = {
   event: AdminEvent;
   queryErrors: string[];
+  permissions?: {
+    canExportRegistrations: boolean;
+  };
 };
 
 export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
@@ -119,6 +122,19 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
             <AdminPanelHeader
               eyebrow="Registrations"
               title={`${eventDetail.title} 的报名名单`}
+              actions={
+                data?.permissions?.canExportRegistrations ? (
+                  <Button asChild type="button" variant="outline" size="sm">
+                    <a
+                      href={`/api/admin/events/registrations/export?event_id=${encodeURIComponent(eventDetail.id)}`}
+                      download
+                      aria-label={`导出 ${eventDetail.title} 的报名记录 CSV`}
+                    >
+                      导出报名
+                    </a>
+                  </Button>
+                ) : null
+              }
             />
             <AdminPanelBody className="p-0">
               {eventDetail.registrations.length > 0 ? (
