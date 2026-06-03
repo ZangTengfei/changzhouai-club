@@ -46,6 +46,14 @@ export default async function WorksPage() {
             <Link href="/members" className="button home-ghost-button">
               找到创作者
             </Link>
+            <a
+              href="http://abbs.fun:25181/?tab=library"
+              className="button home-ghost-button"
+              target="_blank"
+              rel="noreferrer"
+            >
+              更多案例
+            </a>
           </div>
         </div>
       </section>
