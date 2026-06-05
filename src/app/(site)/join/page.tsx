@@ -145,11 +145,12 @@ export default async function JoinPage() {
 
           <div className={styles.joinBoardIllustration} aria-hidden="true">
             <Image
-              src="/join-card.png"
+              src="/join-card-optimized.webp"
               alt=""
               width={1000}
-              height={1000}
+              height={577}
               priority
+              sizes="(max-width: 820px) 72vw, 288px"
             />
           </div>
 

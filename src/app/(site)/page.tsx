@@ -88,7 +88,7 @@ const homeFlowSteps = [
     title: "参与活动",
     summary: "线下交流、主题分享、拓展你的 AI 视野",
     tone: "green",
-    illustrationSrc: "/home-flow-participate.png",
+    illustrationSrc: "/home-flow-participate-card.webp",
     illustrationAlt: "",
   },
   {
@@ -96,7 +96,7 @@ const homeFlowSteps = [
     title: "认识成员",
     summary: "通过交流发现更合拍的伙伴，建立信任连接",
     tone: "orange",
-    illustrationSrc: "/home-flow-connect.png",
+    illustrationSrc: "/home-flow-connect-card.webp",
     illustrationAlt: "",
   },
   {
@@ -104,7 +104,7 @@ const homeFlowSteps = [
     title: "项目协作",
     summary: "真实需求、资源对接，让项目真正落地",
     tone: "blue",
-    illustrationSrc: "/home-flow-build.png",
+    illustrationSrc: "/home-flow-build-card.webp",
     illustrationAlt: "",
   },
 ] as const;
@@ -408,6 +408,7 @@ export default async function HomePage() {
                     height={1400}
                     className={cx("home-flow-illustration-image")}
                     aria-hidden="true"
+                    sizes="(max-width: 820px) 70vw, 220px"
                   />
                 </div>
                 {index < homeFlowSteps.length - 1 ? (
@@ -449,13 +450,14 @@ export default async function HomePage() {
               </Link>
             </div>
             <Image
-              src="/event-card-character-v2.png"
+              src="/event-card-character-v2-card.webp"
               alt=""
               width={1024}
               height={1536}
               className={cx("home-event-person")}
               aria-hidden="true"
               priority={false}
+              sizes="(max-width: 1024px) 1px, 220px"
             />
             <DoodleSparkles className={cx("home-doodle home-doodle-event-sparkles")} />
           </article>
@@ -554,9 +556,12 @@ export default async function HomePage() {
 
       <section className={cx("home-join-banner")} aria-labelledby="home-join-banner-title">
         <div className={cx("home-join-banner-illustration")} aria-hidden="true">
-          <img
-            src="/join-card.png?v=20260424-join-crop"
+          <Image
+            src="/join-card-optimized.webp"
             alt=""
+            width={1000}
+            height={577}
+            sizes="(max-width: 820px) 138px, 196px"
             className={cx("home-join-banner-illustration-image")}
           />
         </div>

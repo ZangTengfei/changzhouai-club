@@ -103,6 +103,7 @@ export function HeroPhotoCarousel({
               width={760}
               height={520}
               priority
+              fetchPriority="high"
               unoptimized
               sizes="(max-width: 1024px) calc(100vw - 48px), 560px"
               className={cx("home-photo-main-image")}

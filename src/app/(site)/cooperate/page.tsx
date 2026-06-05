@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -194,9 +195,12 @@ export default async function CooperatePage({
 
       <section className={styles.joinBanner} aria-labelledby="cooperate-join-banner-title">
         <div className={styles.joinBannerIllustration} aria-hidden="true">
-          <img
-            src="/join-card.png?v=20260424-join-crop"
+          <Image
+            src="/join-card-optimized.webp"
             alt=""
+            width={1000}
+            height={577}
+            sizes="(max-width: 820px) 138px, 196px"
             className={styles.joinBannerIllustrationImage}
           />
         </div>

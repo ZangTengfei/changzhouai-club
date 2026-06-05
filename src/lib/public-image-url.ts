@@ -19,9 +19,9 @@ const SUPABASE_RENDER_PUBLIC_PATH = "/storage/v1/render/image/public/";
 
 const eventImageVariantMap: Record<EventImageVariant, PublicImageTransformOptions> = {
   "hero-main": {
-    width: 1280,
-    height: 876,
-    quality: 82,
+    width: 1120,
+    height: 768,
+    quality: 78,
     resize: "cover",
   },
   "hero-thumb": {
