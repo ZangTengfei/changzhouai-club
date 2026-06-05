@@ -229,7 +229,7 @@ export default async function CooperatePage({
           <div className={styles.joinBannerInfo}>
             <span>社区官方微信</span>
             <strong>{wechatQrCode?.title ?? "常州 AI Club 官方微信"}</strong>
-            <small>200+ 位成员</small>
+            <small>300+ 位成员</small>
             <p>添加好友・备注来意・邀请进群</p>
           </div>
         </div>

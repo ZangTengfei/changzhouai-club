@@ -211,7 +211,7 @@ export default async function HomePage() {
     .slice(0, 6);
   const communityStats = [
     {
-      value: "200+",
+      value: "300+",
       label: "全网成员",
       detail: "本地 AI 从业者与爱好者",
       icon: "people",
@@ -337,7 +337,7 @@ export default async function HomePage() {
             </div>
             <div className={cx("home-member-proof-copy")}>
               <span className={cx("home-member-proof-line")}>
-                <strong>200+</strong>
+                <strong>300+</strong>
                 <span>位成员已加入我们</span>
               </span>
               <small>期待你的加入！</small>
@@ -589,7 +589,7 @@ export default async function HomePage() {
           <div className={cx("home-join-banner-info")}>
             <span>社区官方微信</span>
             <strong>{wechatQrCode?.title ?? "常州 AI Club 官方微信"}</strong>
-            <small>200+ 位成员</small>
+            <small>300+ 位成员</small>
             <p>添加好友・备注来意・邀请进群</p>
           </div>
         </div>
