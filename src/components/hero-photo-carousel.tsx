@@ -6,7 +6,6 @@ import Link from "next/link";
 import { ArrowUpRight, Heart, Smile } from "lucide-react";
 
 import { DoodleSparkles } from "@/components/home-visual-assets";
-import { getEventImageUrl } from "@/lib/public-image-url";
 import { cssModuleCx } from "@/lib/utils";
 
 import styles from "@/app/(site)/home-page.module.css";
@@ -20,7 +19,8 @@ type HeroNote = {
 };
 
 type HeroPhotoCarouselImage = {
-  src: string;
+  mainSrc: string;
+  thumbSrc: string;
   alt: string;
   href: string;
 };
@@ -85,9 +85,7 @@ export function HeroPhotoCarousel({
   }, [activeIndex, visibleImages.length]);
 
   const activeImage = visibleImages[activeIndex] ?? null;
-  const activeImageSrc = activeImage
-    ? getEventImageUrl(activeImage.src, "hero-main") ?? activeImage.src
-    : null;
+  const activeImageSrc = activeImage?.mainSrc ?? null;
 
   return (
     <div className={cx("home-hero-visual")} aria-label="社区活动现场">
@@ -123,7 +121,7 @@ export function HeroPhotoCarousel({
           <div className={cx("home-photo-carousel-track")} role="tablist" aria-label="活动照片">
             {visibleImages.map((image, index) => (
               <button
-                key={`${image.src}-${index}`}
+                key={`${image.mainSrc}-${index}`}
                 type="button"
                 role="tab"
                 aria-selected={index === activeIndex}
@@ -135,7 +133,7 @@ export function HeroPhotoCarousel({
                 onClick={() => setActiveIndex(index)}
               >
                 <Image
-                  src={getEventImageUrl(image.src, "hero-thumb") ?? image.src}
+                  src={image.thumbSrc}
                   alt=""
                   width={220}
                   height={132}

@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 
 import { hasSupabaseEnv } from "@/lib/env";
+import { getWechatQrCodeImageUrl } from "@/lib/public-image-url";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 const PUBLIC_SOCIAL_REVALIDATE_SECONDS = 60;
@@ -25,7 +26,7 @@ function mapPublicWechatQrCode(row: WechatQrCodeRow): PublicWechatQrCode {
   return {
     id: row.id,
     title: row.title,
-    imageUrl: row.image_url,
+    imageUrl: getWechatQrCodeImageUrl(row.image_url) ?? row.image_url,
     note: row.note,
     expiresAt: row.expires_at,
   };

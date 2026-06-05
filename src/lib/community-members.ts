@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 
 import { hasSupabaseEnv } from "@/lib/env";
 import { isUuidLike } from "@/lib/member-public-slug";
+import { getAvatarImageUrl } from "@/lib/public-image-url";
 import { memberTags } from "@/lib/site-data";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
@@ -116,7 +117,7 @@ function mapPublicMember(row: PublicMemberRow): PublicMember {
     id: row.id,
     publicSlug: row.public_slug?.trim() || null,
     displayName: row.display_name?.trim() || "社区成员",
-    avatarUrl: row.avatar_url,
+    avatarUrl: getAvatarImageUrl(row.avatar_url),
     city: row.city?.trim() || "常州",
     roleLabel: row.role_label?.trim() || null,
     organization: row.organization?.trim() || null,

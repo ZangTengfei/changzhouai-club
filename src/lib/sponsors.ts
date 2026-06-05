@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 
 import { hasSupabaseEnv } from "@/lib/env";
+import { getSponsorImageUrl, getSponsorLogoImageUrl } from "@/lib/public-image-url";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 type SponsorImageRow = {
@@ -108,7 +109,7 @@ function mapSponsor(row: SponsorRow): PublicSponsor {
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((image) => ({
       id: image.id,
-      imageUrl: image.image_url,
+      imageUrl: getSponsorImageUrl(image.image_url) ?? image.image_url,
       caption: image.caption,
     }));
 
@@ -119,7 +120,7 @@ function mapSponsor(row: SponsorRow): PublicSponsor {
     tier: row.tier,
     tierLabel: sponsorTierLabels[row.tier] ?? sponsorTierLabels.supporter,
     sponsorLabel: row.sponsor_label ?? "赞助者",
-    logoUrl: row.logo_url,
+    logoUrl: getSponsorLogoImageUrl(row.logo_url),
     summary:
       row.summary ??
       row.description ??

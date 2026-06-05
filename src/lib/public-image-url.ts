@@ -31,21 +31,56 @@ const eventImageVariantMap: Record<EventImageVariant, PublicImageTransformOption
     resize: "cover",
   },
   "review-card": {
+    width: 720,
+    height: 480,
     quality: 74,
+    resize: "cover",
   },
   "event-feature": {
+    width: 960,
+    height: 540,
     quality: 78,
+    resize: "cover",
   },
   "event-detail-hero": {
+    width: 1600,
+    height: 900,
     quality: 82,
+    resize: "cover",
   },
   gallery: {
+    width: 1280,
     quality: 76,
   },
   archive: {
+    width: 720,
+    height: 405,
     quality: 74,
+    resize: "cover",
   },
 };
+
+function getConfiguredSupabaseOrigin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
+
+  if (!supabaseUrl) {
+    return null;
+  }
+
+  try {
+    return new URL(supabaseUrl).origin;
+  } catch {
+    return null;
+  }
+}
+
+function isKnownSupabaseStorageUrl(url: URL) {
+  if (url.hostname.endsWith(".supabase.co")) {
+    return true;
+  }
+
+  return url.origin === getConfiguredSupabaseOrigin();
+}
 
 export function getPublicImageUrl(
   imageUrl: string | null | undefined,
@@ -63,7 +98,7 @@ export function getPublicImageUrl(
     return imageUrl;
   }
 
-  if (!url.hostname.endsWith(".supabase.co")) {
+  if (!isKnownSupabaseStorageUrl(url)) {
     return imageUrl;
   }
 
@@ -105,4 +140,52 @@ export function getEventImageUrl(
   variant: EventImageVariant,
 ) {
   return getPublicImageUrl(imageUrl, eventImageVariantMap[variant]);
+}
+
+export function getAvatarImageUrl(imageUrl: string | null | undefined) {
+  return getPublicImageUrl(imageUrl, {
+    width: 160,
+    height: 160,
+    quality: 72,
+    resize: "cover",
+  });
+}
+
+export function getWorkCoverImageUrl(imageUrl: string | null | undefined) {
+  return getPublicImageUrl(imageUrl, {
+    width: 720,
+    height: 405,
+    quality: 76,
+    resize: "cover",
+  });
+}
+
+export function getCommunityUpdateImageUrl(imageUrl: string | null | undefined) {
+  return getPublicImageUrl(imageUrl, {
+    width: 960,
+    quality: 76,
+  });
+}
+
+export function getSponsorLogoImageUrl(imageUrl: string | null | undefined) {
+  return getPublicImageUrl(imageUrl, {
+    width: 320,
+    height: 160,
+    quality: 78,
+    resize: "contain",
+  });
+}
+
+export function getSponsorImageUrl(imageUrl: string | null | undefined) {
+  return getPublicImageUrl(imageUrl, {
+    width: 1200,
+    quality: 76,
+  });
+}
+
+export function getWechatQrCodeImageUrl(imageUrl: string | null | undefined) {
+  return getPublicImageUrl(imageUrl, {
+    width: 720,
+    quality: 78,
+  });
 }

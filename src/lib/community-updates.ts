@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 
 import { hasSupabaseEnv } from "@/lib/env";
 import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
+import { getAvatarImageUrl, getCommunityUpdateImageUrl } from "@/lib/public-image-url";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
@@ -222,7 +223,7 @@ function mapAuthor(row: PublicUpdateAuthorRow | undefined): PublicCommunityUpdat
   return {
     id: row?.id ?? "",
     displayName: row?.display_name?.trim() || "社区成员",
-    avatarUrl: row?.avatar_url ?? null,
+    avatarUrl: getAvatarImageUrl(row?.avatar_url),
     city: row?.city?.trim() || "常州",
     roleLabel: row?.role_label?.trim() || null,
     organization: row?.organization?.trim() || null,
@@ -321,7 +322,7 @@ async function loadPublicCommunityUpdates(type?: CommunityUpdateType | null, lim
     const images = imagesByUpdateId.get(image.update_id) ?? [];
     images.push({
       id: image.id,
-      imageUrl: image.image_url,
+      imageUrl: getCommunityUpdateImageUrl(image.image_url) ?? image.image_url,
       alt: image.alt,
       sortOrder: image.sort_order,
     });

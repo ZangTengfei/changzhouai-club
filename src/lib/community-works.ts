@@ -3,6 +3,7 @@ import { unstable_cache } from "next/cache";
 import { type PublicMember } from "@/lib/community-members";
 import { hasSupabaseEnv } from "@/lib/env";
 import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
+import { getAvatarImageUrl, getWorkCoverImageUrl } from "@/lib/public-image-url";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
@@ -122,7 +123,7 @@ function mapPublicMember(row: PublicMemberRow): PublicMember {
     id: row.id,
     publicSlug: row.public_slug?.trim() || null,
     displayName: row.display_name?.trim() || "社区成员",
-    avatarUrl: row.avatar_url,
+    avatarUrl: getAvatarImageUrl(row.avatar_url),
     city: row.city?.trim() || "常州",
     roleLabel: row.role_label?.trim() || null,
     organization: row.organization?.trim() || null,
@@ -153,7 +154,7 @@ function mapPublicWork(
     status: row.status,
     statusLabel: workStatusLabels[row.status] ?? row.status,
     roleLabel: row.role_label?.trim() || null,
-    coverImageUrl: row.cover_image_url,
+    coverImageUrl: getWorkCoverImageUrl(row.cover_image_url),
     websiteUrl: row.website_url,
     repoUrl: row.repo_url,
     demoUrl: row.demo_url,

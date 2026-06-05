@@ -9,6 +9,7 @@ import {
   hasAdminPermission,
 } from "@/lib/admin/permissions";
 import { hasSupabaseEnv } from "@/lib/env";
+import { getAvatarImageUrl } from "@/lib/public-image-url";
 import { createClient } from "@/lib/supabase/client";
 import styles from "./site-account-entry.module.css";
 
@@ -130,7 +131,7 @@ export function SiteAccountEntry({
           href: "/account",
           label: "账号中心",
           name: displayName,
-          avatarUrl,
+          avatarUrl: getAvatarImageUrl(avatarUrl),
           isStaff: hasAdminPermission(permissionKeys, "admin.access"),
         });
         onAuthStateChange?.(true);

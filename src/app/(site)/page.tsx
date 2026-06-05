@@ -191,15 +191,18 @@ export default async function HomePage() {
 
       return imageUrl
         ? {
-            src: imageUrl,
+            mainSrc: getEventImageUrl(imageUrl, "hero-main") ?? imageUrl,
+            thumbSrc: getEventImageUrl(imageUrl, "hero-thumb") ?? imageUrl,
             alt: `${event.title} 活动现场`,
             href: `/events/${event.slug}`,
           }
         : null;
     })
-    .filter((item): item is { src: string; alt: string; href: string } => Boolean(item))
+    .filter((item): item is { mainSrc: string; thumbSrc: string; alt: string; href: string } =>
+      Boolean(item),
+    )
     .filter((item, index, items) => (
-      items.findIndex((candidate) => candidate.src === item.src) === index
+      items.findIndex((candidate) => candidate.mainSrc === item.mainSrc) === index
     ))
     .slice(0, HERO_CAROUSEL_IMAGE_LIMIT);
   const memberAvatars = directory.members
