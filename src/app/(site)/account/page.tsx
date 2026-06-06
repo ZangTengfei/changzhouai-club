@@ -10,6 +10,7 @@ import {
   ClipboardList,
   Eye,
   EyeOff,
+  KeyRound,
   PencilLine,
   Plus,
   ShieldCheck,
@@ -394,6 +395,10 @@ export default async function AccountPage({
             <Link href="/events" className="button home-ghost-button">
               查看活动
             </Link>
+            <Link href="/account/password" className="button home-ghost-button">
+              设置密码
+              <KeyRound aria-hidden="true" strokeWidth={2} />
+            </Link>
             {publicProfilePath ? (
               <Link href={publicProfilePath} className="button home-ghost-button">
                 查看公开主页
@@ -434,6 +439,8 @@ export default async function AccountPage({
           <span>
             {params.updated === "profile"
               ? "成员资料已保存。"
+              : params.updated === "password"
+                ? "邮箱登录密码已更新。"
               : params.updated === "work"
                 ? "作品已提交，等待管理员审核。"
                 : params.updated === "work_deleted"

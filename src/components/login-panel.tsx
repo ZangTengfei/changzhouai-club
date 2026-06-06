@@ -4,7 +4,6 @@ import Link from "next/link";
 import { ArrowRight, BadgeCheck, CalendarDays, Sparkles } from "lucide-react";
 
 import { EmailAuthForm } from "@/components/email-auth-form";
-import { GoogleSignInButton } from "@/components/google-sign-in-button";
 
 import styles from "./login-panel.module.css";
 
@@ -15,7 +14,7 @@ type LoginPanelProps = {
 };
 
 const errorMap: Record<string, string> = {
-  oauth_callback: "Google 登录回调失败，请确认 Supabase 和 Google OAuth 配置是否完整。",
+  oauth_callback: "登录回调失败，请稍后重试，或改用邮箱密码登录。",
 };
 
 export function LoginPanel({
@@ -48,17 +47,9 @@ export function LoginPanel({
 
         <EmailAuthForm enabled={enabled} nextPath={nextPath} />
 
-        <div className={styles.oauthDivider}>
-          <span>或</span>
-        </div>
-
-        <div className={styles.googlePanel}>
-          <GoogleSignInButton
-            className={styles.googleButton}
-            enabled={enabled}
-            nextPath={nextPath}
-          />
-        </div>
+        <p className={styles.recoveryNote}>
+          原 Google 登录用户请使用同一个邮箱找回密码，设置完成后即可用邮箱密码登录。
+        </p>
 
         {!enabled ? (
           <p className={styles.hint}>

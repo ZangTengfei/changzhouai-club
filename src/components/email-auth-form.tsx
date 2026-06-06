@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 
 import styles from "./email-auth-form.module.css";
 
-type EmailAuthMode = "sign-in" | "sign-up";
+type EmailAuthMode = "sign-in" | "sign-up" | "reset";
 
 type EmailAuthFormProps = {
   enabled: boolean;
@@ -20,6 +20,10 @@ function getSafeNextPath(nextPath: string) {
   }
 
   return nextPath;
+}
+
+function getPasswordResetPath() {
+  return "/account/password";
 }
 
 function getAuthErrorMessage(message: string) {
@@ -68,6 +72,15 @@ export function EmailAuthForm({
     callbackUrl.searchParams.set("next", safeNextPath);
     return callbackUrl.toString();
   }, [safeNextPath]);
+  const resetRedirectTo = useMemo(() => {
+    if (typeof window === "undefined") {
+      return "";
+    }
+
+    const callbackUrl = new URL("/auth/callback", window.location.origin);
+    callbackUrl.searchParams.set("next", getPasswordResetPath());
+    return callbackUrl.toString();
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -78,6 +91,36 @@ export function EmailAuthForm({
 
     const trimmedEmail = email.trim();
     const trimmedDisplayName = displayName.trim();
+
+    if (mode === "reset") {
+      if (!trimmedEmail) {
+        setError("请输入用于登录的邮箱。");
+        setMessage(null);
+        return;
+      }
+
+      setPending(true);
+      setError(null);
+      setMessage(null);
+
+      const supabase = createClient();
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+        trimmedEmail,
+        {
+          redirectTo: resetRedirectTo,
+        },
+      );
+
+      setPending(false);
+
+      if (resetError) {
+        setError(getAuthErrorMessage(resetError.message));
+        return;
+      }
+
+      setMessage("重设密码邮件已发送。请打开邮箱里的链接，然后设置新的登录密码。");
+      return;
+    }
 
     if (!trimmedEmail || !password) {
       setError("请输入邮箱和密码。");
@@ -162,9 +205,13 @@ export function EmailAuthForm({
       ? pending
         ? "正在登录..."
         : "邮箱登录"
-      : pending
-        ? "正在注册..."
-        : "邮箱注册";
+      : mode === "sign-up"
+        ? pending
+          ? "正在注册..."
+          : "邮箱注册"
+        : pending
+          ? "正在发送..."
+          : "发送重设邮件";
   const passwordInputType = showPassword ? "text" : "password";
   const PasswordIcon = showPassword ? EyeOff : Eye;
   const passwordToggleLabel = showPassword ? "隐藏密码" : "显示密码";
@@ -183,33 +230,40 @@ export function EmailAuthForm({
 
   return (
     <form className={styles.form} onSubmit={handleSubmit}>
-      <div className={styles.modeTabs} role="tablist" aria-label="邮箱认证方式">
-        <button
-          type="button"
-          className={`${styles.modeTab} ${mode === "sign-in" ? styles.modeTabActive : ""}`}
-          onClick={() => {
-            setMode("sign-in");
-            setConfirmPassword("");
-            setError(null);
-            setMessage(null);
-          }}
-          aria-pressed={mode === "sign-in"}
-        >
-          登录
-        </button>
-        <button
-          type="button"
-          className={`${styles.modeTab} ${mode === "sign-up" ? styles.modeTabActive : ""}`}
-          onClick={() => {
-            setMode("sign-up");
-            setError(null);
-            setMessage(null);
-          }}
-          aria-pressed={mode === "sign-up"}
-        >
-          注册
-        </button>
-      </div>
+      {mode === "reset" ? (
+        <div className={styles.resetHeading}>
+          <strong>找回或设置邮箱密码</strong>
+          <span>原 Google 登录用户也可以输入同一个邮箱，收到邮件后设置新的邮箱密码。</span>
+        </div>
+      ) : (
+        <div className={styles.modeTabs} role="tablist" aria-label="邮箱认证方式">
+          <button
+            type="button"
+            className={`${styles.modeTab} ${mode === "sign-in" ? styles.modeTabActive : ""}`}
+            onClick={() => {
+              setMode("sign-in");
+              setConfirmPassword("");
+              setError(null);
+              setMessage(null);
+            }}
+            aria-pressed={mode === "sign-in"}
+          >
+            登录
+          </button>
+          <button
+            type="button"
+            className={`${styles.modeTab} ${mode === "sign-up" ? styles.modeTabActive : ""}`}
+            onClick={() => {
+              setMode("sign-up");
+              setError(null);
+              setMessage(null);
+            }}
+            aria-pressed={mode === "sign-up"}
+          >
+            注册
+          </button>
+        </div>
+      )}
 
       {mode === "sign-up" ? (
         <label className="form-field">
@@ -243,24 +297,26 @@ export function EmailAuthForm({
         />
       </label>
 
-      <label className="form-field">
-        <span>密码</span>
-        <span className={styles.passwordField}>
-          <input
-            className="input"
-            type={passwordInputType}
-            name="password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
-            placeholder="至少 6 位字符"
-            disabled={!enabled || pending}
-            minLength={6}
-            required
-          />
-          {renderPasswordToggle()}
-        </span>
-      </label>
+      {mode !== "reset" ? (
+        <label className="form-field">
+          <span>密码</span>
+          <span className={styles.passwordField}>
+            <input
+              className="input"
+              type={passwordInputType}
+              name="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete={mode === "sign-in" ? "current-password" : "new-password"}
+              placeholder="至少 6 位字符"
+              disabled={!enabled || pending}
+              minLength={6}
+              required
+            />
+            {renderPasswordToggle()}
+          </span>
+        </label>
+      ) : null}
 
       {mode === "sign-up" ? (
         <label className="form-field">
@@ -293,6 +349,38 @@ export function EmailAuthForm({
       >
         {submitText}
       </button>
+
+      {mode === "sign-in" ? (
+        <button
+          type="button"
+          className={styles.textButton}
+          onClick={() => {
+            setMode("reset");
+            setPassword("");
+            setConfirmPassword("");
+            setError(null);
+            setMessage(null);
+          }}
+          disabled={!enabled || pending}
+        >
+          忘记密码，或为原 Google 账号设置邮箱密码
+        </button>
+      ) : null}
+
+      {mode === "reset" ? (
+        <button
+          type="button"
+          className={styles.textButton}
+          onClick={() => {
+            setMode("sign-in");
+            setError(null);
+            setMessage(null);
+          }}
+          disabled={!enabled || pending}
+        >
+          返回邮箱登录
+        </button>
+      ) : null}
     </form>
   );
 }

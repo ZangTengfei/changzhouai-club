@@ -8,7 +8,7 @@ import styles from "./login-page.module.css";
 
 export const metadata: Metadata = {
   title: "登录",
-  description: "使用邮箱或 Google 登录常州 AI Club 账号。",
+  description: "使用邮箱密码登录常州 AI Club 账号。",
 };
 
 export default async function LoginPage({

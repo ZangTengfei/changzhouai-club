@@ -86,36 +86,17 @@
   box-shadow: none;
 }
 
-.oauthDivider {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  gap: 12px;
-  align-items: center;
-  color: rgba(var(--ink-rgb), 0.46);
-  font-size: 0.82rem;
-  font-weight: 800;
-}
-
-.oauthDivider::before,
-.oauthDivider::after {
-  content: "";
-  height: 1px;
-  background: rgba(var(--ink-rgb), 0.1);
-}
-
-.googlePanel {
-  display: flex;
-  align-items: center;
-}
-
-.googleButton {
-  width: 100%;
-  white-space: nowrap;
-}
-
 .hint {
   margin-top: 12px;
   color: var(--muted);
+}
+
+.recoveryNote {
+  margin: 0;
+  color: rgba(var(--ink-rgb), 0.68);
+  font-size: 0.9rem;
+  font-weight: 650;
+  line-height: 1.68;
 }
 
 .sideStack {
