@@ -299,23 +299,27 @@ export default async function AccountPage({
   return (
     <div className={styles.accountPage}>
       <section className={styles.accountSummary} aria-labelledby="account-title">
-        <div className={styles.accountAvatarCard}>
-          <MemberAvatar
-            name={displayName}
-            avatarUrl={profile?.avatar_url ?? null}
-          />
-          <div>
-            <strong>{displayName}</strong>
-            <span>{profile?.role_label ?? "常州 AI Club 成员"}</span>
+        <div className={styles.accountSummaryHero}>
+          <div className={styles.accountAvatarCard}>
+            <MemberAvatar
+              name={displayName}
+              avatarUrl={profile?.avatar_url ?? null}
+            />
+            <div>
+              <strong>{displayName}</strong>
+              <span>{profile?.role_label ?? "常州 AI Club 成员"}</span>
+            </div>
+          </div>
+
+          <div className={styles.accountSummaryCopy}>
+            <p className="home-kicker">Account · 账号中心</p>
+            <h1 id="account-title">管理社区身份</h1>
+            <p>维护成员资料、查看活动报名记录，并更新你在社区中的公开信息。</p>
           </div>
         </div>
 
-        <div className={styles.accountSummaryCopy}>
-          <p className="home-kicker">Account · 账号中心</p>
-          <h1 id="account-title">管理社区身份</h1>
-          <p>维护成员资料、查看活动报名记录，并更新你在社区中的公开信息。</p>
-
-          <div className={styles.accountSummaryActions}>
+        <div className={styles.accountSummaryActions} aria-label="账号操作">
+          <div className={styles.accountPrimaryActions}>
             <AccountActionModal
               title={profileComplete ? "编辑个人资料" : "完善加入资料"}
               description={
@@ -325,9 +329,12 @@ export default async function AccountPage({
               }
               defaultOpen={shouldOpenProfileModal}
               trigger={
-                <button type="button" className="button home-primary-button">
-                  {profileComplete ? "编辑资料" : "完善资料"}
+                <button
+                  type="button"
+                  className={`button home-primary-button ${styles.accountPrimaryAction}`}
+                >
                   <PencilLine aria-hidden="true" strokeWidth={2} />
+                  {profileComplete ? "编辑资料" : "完善资料"}
                 </button>
               }
             >
@@ -338,23 +345,44 @@ export default async function AccountPage({
                 member={member}
               />
             </AccountActionModal>
+          </div>
+
+          <div className={styles.accountNavActions}>
             {profileComplete ? (
-              <Link href="#registrations" className="button home-ghost-button">
-                查看报名记录
+              <Link
+                href="#registrations"
+                className={`button home-ghost-button ${styles.accountUtilityAction}`}
+              >
+                <Ticket aria-hidden="true" strokeWidth={2} />
+                报名记录
               </Link>
             ) : null}
-            <Link href="/events" className="button home-ghost-button">
-              查看活动
-            </Link>
-            <Link href="/account/password" className="button home-ghost-button">
-              设置密码
-              <KeyRound aria-hidden="true" strokeWidth={2} />
+            <Link
+              href="/events"
+              className={`button home-ghost-button ${styles.accountUtilityAction}`}
+            >
+              <CalendarDays aria-hidden="true" strokeWidth={2} />
+              活动
             </Link>
             {publicProfilePath ? (
-              <Link href={publicProfilePath} className="button home-ghost-button">
-                查看公开主页
+              <Link
+                href={publicProfilePath}
+                className={`button home-ghost-button ${styles.accountUtilityAction}`}
+              >
+                <Eye aria-hidden="true" strokeWidth={2} />
+                公开主页
               </Link>
             ) : null}
+          </div>
+
+          <div className={styles.accountSecurityActions}>
+            <Link
+              href="/account/password"
+              className={`button button-secondary ${styles.accountSecurityAction}`}
+            >
+              <KeyRound aria-hidden="true" strokeWidth={2} />
+              设置密码
+            </Link>
             <SignOutButton enabled />
           </div>
         </div>
