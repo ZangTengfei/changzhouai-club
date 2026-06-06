@@ -3,10 +3,12 @@ import Link from "next/link";
 import {
   ArrowRight,
   BarChart3,
+  Building2,
   CircleDollarSign,
   Code2,
   GraduationCap,
   Network,
+  Presentation,
   UsersRound,
   WalletCards,
 } from "lucide-react";
@@ -21,6 +23,18 @@ export const metadata: Metadata = {
 };
 
 const reports = [
+  {
+    title: "常州科教城 OPC 共创社区运营经费申请汇报",
+    description:
+      "网页形式的 16:9 汇报材料，说明社区在做什么、科教城能获得什么价值、为什么需要固定场地，以及 50 万启动 + 达标追加至 100 万年度运营包的使用计划。",
+    href: "/reports/opc-community-funding",
+    date: "2026-06-06",
+    stats: [
+      { label: "网页演示", value: "15页", icon: Presentation },
+      { label: "启动经费", value: "50万", icon: WalletCards },
+      { label: "场地需求", value: "固定", icon: Building2 },
+    ],
+  },
   {
     title: "常州 AI Club 培训需求调研",
     description:
