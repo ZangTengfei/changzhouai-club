@@ -58,6 +58,39 @@
   line-height: 1.68;
 }
 
+.resetCodePanel {
+  display: grid;
+  gap: 14px;
+  margin-top: 2px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(var(--ink-rgb), 0.1);
+}
+
+.resetCodeIntro {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--accent);
+  background: rgba(var(--accent-rgb), 0.06);
+}
+
+.resetCodeIntro strong {
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.resetCodeIntro span {
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.62;
+}
+
+.resetCodePanel :global(.auth-button) {
+  width: 100%;
+}
+
 .passwordField {
   position: relative;
   display: block;

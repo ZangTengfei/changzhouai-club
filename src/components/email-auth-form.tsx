@@ -77,10 +77,14 @@ export function EmailAuthForm({
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [resetCode, setResetCode] = useState("");
+  const [resetEmailSent, setResetEmailSent] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
+  const [resetPendingAction, setResetPendingAction] = useState<
+    "send" | "verify" | null
+  >(null);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -92,6 +96,62 @@ export function EmailAuthForm({
     return getAuthCallbackUrl(getPasswordResetPath());
   }, []);
 
+  function handleEmailChange(value: string) {
+    setEmail(value);
+
+    if (mode === "reset" && resetEmailSent) {
+      setResetEmailSent(false);
+      setResetCode("");
+      setMessage(null);
+      setError(null);
+    }
+  }
+
+  function resetRecoveryState() {
+    setResetCode("");
+    setResetEmailSent(false);
+    setResetPendingAction(null);
+  }
+
+  async function handleSendResetEmail() {
+    if (!enabled || pending) {
+      return;
+    }
+
+    const trimmedEmail = email.trim();
+
+    if (!trimmedEmail) {
+      setError("请输入用于登录的邮箱。");
+      setMessage(null);
+      return;
+    }
+
+    setPending(true);
+    setResetPendingAction("send");
+    setError(null);
+    setMessage(null);
+
+    const supabase = createClient();
+    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+      trimmedEmail,
+      {
+        redirectTo: resetRedirectTo,
+      },
+    );
+
+    setPending(false);
+    setResetPendingAction(null);
+
+    if (resetError) {
+      setError(getAuthErrorMessage(resetError.message));
+      return;
+    }
+
+    setResetEmailSent(true);
+    setResetCode("");
+    setMessage("重设密码邮件已发送，请查看邮箱里的链接或 6 位验证码。");
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -99,38 +159,18 @@ export function EmailAuthForm({
       return;
     }
 
-    const trimmedEmail = email.trim();
-    const trimmedDisplayName = displayName.trim();
-
     if (mode === "reset") {
-      if (!trimmedEmail) {
-        setError("请输入用于登录的邮箱。");
-        setMessage(null);
+      if (resetEmailSent) {
+        await handleVerifyResetCode();
         return;
       }
 
-      setPending(true);
-      setError(null);
-      setMessage(null);
-
-      const supabase = createClient();
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-        trimmedEmail,
-        {
-          redirectTo: resetRedirectTo,
-        },
-      );
-
-      setPending(false);
-
-      if (resetError) {
-        setError(getAuthErrorMessage(resetError.message));
-        return;
-      }
-
-      setMessage("重设密码邮件已发送。你可以打开邮件链接，也可以输入邮件里的 6 位验证码继续设置密码。");
+      await handleSendResetEmail();
       return;
     }
+
+    const trimmedEmail = email.trim();
+    const trimmedDisplayName = displayName.trim();
 
     if (!trimmedEmail || !password) {
       setError("请输入邮箱和密码。");
@@ -159,6 +199,7 @@ export function EmailAuthForm({
     }
 
     setPending(true);
+    setResetPendingAction(null);
     setError(null);
     setMessage(null);
 
@@ -231,6 +272,7 @@ export function EmailAuthForm({
     }
 
     setPending(true);
+    setResetPendingAction("verify");
     setError(null);
     setMessage(null);
 
@@ -244,6 +286,7 @@ export function EmailAuthForm({
     if (verifyError) {
       setError(getAuthErrorMessage(verifyError.message));
       setPending(false);
+      setResetPendingAction(null);
       return;
     }
 
@@ -341,35 +384,13 @@ export function EmailAuthForm({
           type="email"
           name="email"
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={(event) => handleEmailChange(event.target.value)}
           autoComplete="email"
           placeholder="you@example.com"
           disabled={!enabled || pending}
           required
         />
       </label>
-
-      {mode === "reset" ? (
-        <label className="form-field">
-          <span>6 位验证码</span>
-          <input
-            className="input"
-            type="text"
-            name="reset_code"
-            value={resetCode}
-            onChange={(event) => setResetCode(event.target.value)}
-            autoComplete="one-time-code"
-            inputMode="numeric"
-            pattern="[0-9]*"
-            maxLength={6}
-            placeholder="邮件里的 6 位数字"
-            disabled={!enabled || pending}
-          />
-          <small className="form-field-help">
-            邮件链接打不开时，可以输入邮件里的验证码继续设置密码。
-          </small>
-        </label>
-      ) : null}
 
       {mode !== "reset" ? (
         <label className="form-field">
@@ -416,22 +437,56 @@ export function EmailAuthForm({
       {error ? <div className={`note-strip ${styles.message}`}>{error}</div> : null}
       {message ? <div className={`note-strip ${styles.message}`}>{message}</div> : null}
 
-      <button
-        type="submit"
-        className="button auth-button"
-        disabled={!enabled || pending}
-      >
-        {submitText}
-      </button>
+      {mode === "reset" && resetEmailSent ? (
+        <div className={styles.resetCodePanel}>
+          <div className={styles.resetCodeIntro}>
+            <strong>输入验证码继续设置密码</strong>
+            <span>邮件链接打不开时，复制邮件里的 6 位数字到这里。</span>
+          </div>
 
-      {mode === "reset" ? (
+          <label className="form-field">
+            <span>6 位验证码</span>
+            <input
+              className="input"
+              type="text"
+              name="reset_code"
+              value={resetCode}
+              onChange={(event) => setResetCode(event.target.value)}
+              autoComplete="one-time-code"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={6}
+              placeholder="邮件里的 6 位数字"
+              disabled={!enabled || pending}
+            />
+          </label>
+
+          <button
+            type="submit"
+            className="button auth-button"
+            disabled={!enabled || pending}
+          >
+            {resetPendingAction === "verify" ? "正在验证..." : "使用验证码继续设置密码"}
+          </button>
+
+          <button
+            type="button"
+            className={styles.textButton}
+            onClick={handleSendResetEmail}
+            disabled={!enabled || pending}
+          >
+            {resetPendingAction === "send" ? "正在重新发送..." : "重新发送邮件"}
+          </button>
+        </div>
+      ) : null}
+
+      {mode !== "reset" || !resetEmailSent ? (
         <button
-          type="button"
-          className="button button-secondary"
-          onClick={handleVerifyResetCode}
+          type="submit"
+          className="button auth-button"
           disabled={!enabled || pending}
         >
-          使用验证码继续设置密码
+          {submitText}
         </button>
       ) : null}
 
@@ -443,7 +498,7 @@ export function EmailAuthForm({
             setMode("reset");
             setPassword("");
             setConfirmPassword("");
-            setResetCode("");
+            resetRecoveryState();
             setError(null);
             setMessage(null);
           }}
@@ -459,7 +514,7 @@ export function EmailAuthForm({
           className={styles.textButton}
           onClick={() => {
             setMode("sign-in");
-            setResetCode("");
+            resetRecoveryState();
             setError(null);
             setMessage(null);
           }}
