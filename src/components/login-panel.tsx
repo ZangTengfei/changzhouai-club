@@ -15,6 +15,8 @@ type LoginPanelProps = {
 
 const errorMap: Record<string, string> = {
   oauth_callback: "登录回调失败，请稍后重试，或改用邮箱密码登录。",
+  recovery_link: "密码重设链接不完整，请重新发送找回密码邮件。",
+  recovery_link_expired: "这封邮件里的链接已失效或已经使用过，请重新发送找回密码邮件，或输入邮件里的 6 位验证码。",
 };
 
 export function LoginPanel({

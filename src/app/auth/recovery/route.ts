@@ -1,3 +1,4 @@
+import type { EmailOtpType } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 
 import { getPublicSiteUrl, hasSupabaseEnv } from "@/lib/env";
@@ -5,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 
 function getSafeNextPath(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) {
-    return "/account";
+    return "/account/password";
   }
 
   return value;
@@ -21,21 +22,23 @@ function redirectToSite(requestUrl: URL, path: string) {
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
-  const code = requestUrl.searchParams.get("code");
+  const tokenHash = requestUrl.searchParams.get("token_hash");
+  const type = requestUrl.searchParams.get("type");
   const next = getSafeNextPath(requestUrl.searchParams.get("next"));
 
-  if (!hasSupabaseEnv()) {
-    return redirectToSite(requestUrl, "/login?error=oauth_callback");
+  if (!hasSupabaseEnv() || !tokenHash || type !== "recovery") {
+    return redirectToSite(requestUrl, "/login?error=recovery_link");
   }
 
-  if (code) {
-    const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const supabase = await createClient();
+  const { error } = await supabase.auth.verifyOtp({
+    token_hash: tokenHash,
+    type: type as EmailOtpType,
+  });
 
-    if (!error) {
-      return redirectToSite(requestUrl, next);
-    }
+  if (error) {
+    return redirectToSite(requestUrl, "/login?error=recovery_link_expired");
   }
 
-  return redirectToSite(requestUrl, "/login?error=oauth_callback");
+  return redirectToSite(requestUrl, next);
 }

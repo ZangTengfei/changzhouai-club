@@ -3,6 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 
+import { getPublicSiteUrl } from "@/lib/env";
 import { createClient } from "@/lib/supabase/client";
 
 import styles from "./email-auth-form.module.css";
@@ -26,6 +27,22 @@ function getPasswordResetPath() {
   return "/account/password";
 }
 
+function getSiteOrigin() {
+  return getPublicSiteUrl() ?? (typeof window === "undefined" ? "" : window.location.origin);
+}
+
+function getAuthCallbackUrl(nextPath: string) {
+  const siteOrigin = getSiteOrigin();
+
+  if (!siteOrigin) {
+    return "";
+  }
+
+  const callbackUrl = new URL("/auth/callback", siteOrigin);
+  callbackUrl.searchParams.set("next", nextPath);
+  return callbackUrl.toString();
+}
+
 function getAuthErrorMessage(message: string) {
   const normalized = message.toLowerCase();
 
@@ -39,6 +56,10 @@ function getAuthErrorMessage(message: string) {
 
   if (normalized.includes("user already registered")) {
     return "这个邮箱已经注册过，可以直接登录。";
+  }
+
+  if (normalized.includes("token") || normalized.includes("otp")) {
+    return "验证码无效或已过期，请重新发送找回密码邮件。";
   }
 
   if (normalized.includes("password")) {
@@ -55,6 +76,7 @@ export function EmailAuthForm({
   const [mode, setMode] = useState<EmailAuthMode>("sign-in");
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
+  const [resetCode, setResetCode] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -64,22 +86,10 @@ export function EmailAuthForm({
 
   const safeNextPath = getSafeNextPath(nextPath);
   const redirectTo = useMemo(() => {
-    if (typeof window === "undefined") {
-      return "";
-    }
-
-    const callbackUrl = new URL("/auth/callback", window.location.origin);
-    callbackUrl.searchParams.set("next", safeNextPath);
-    return callbackUrl.toString();
+    return getAuthCallbackUrl(safeNextPath);
   }, [safeNextPath]);
   const resetRedirectTo = useMemo(() => {
-    if (typeof window === "undefined") {
-      return "";
-    }
-
-    const callbackUrl = new URL("/auth/callback", window.location.origin);
-    callbackUrl.searchParams.set("next", getPasswordResetPath());
-    return callbackUrl.toString();
+    return getAuthCallbackUrl(getPasswordResetPath());
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -118,7 +128,7 @@ export function EmailAuthForm({
         return;
       }
 
-      setMessage("重设密码邮件已发送。请打开邮箱里的链接，然后设置新的登录密码。");
+      setMessage("重设密码邮件已发送。你可以打开邮件链接，也可以输入邮件里的 6 位验证码继续设置密码。");
       return;
     }
 
@@ -200,6 +210,46 @@ export function EmailAuthForm({
     setMessage("注册确认邮件已发送，请打开邮箱完成确认后再登录。");
   }
 
+  async function handleVerifyResetCode() {
+    if (!enabled || pending) {
+      return;
+    }
+
+    const trimmedEmail = email.trim();
+    const token = resetCode.trim().replace(/\s/g, "");
+
+    if (!trimmedEmail) {
+      setError("请输入收到验证码的邮箱。");
+      setMessage(null);
+      return;
+    }
+
+    if (!/^\d{6}$/.test(token)) {
+      setError("请输入邮件里的 6 位数字验证码。");
+      setMessage(null);
+      return;
+    }
+
+    setPending(true);
+    setError(null);
+    setMessage(null);
+
+    const supabase = createClient();
+    const { error: verifyError } = await supabase.auth.verifyOtp({
+      email: trimmedEmail,
+      token,
+      type: "recovery",
+    });
+
+    if (verifyError) {
+      setError(getAuthErrorMessage(verifyError.message));
+      setPending(false);
+      return;
+    }
+
+    window.location.assign(getPasswordResetPath());
+  }
+
   const submitText =
     mode === "sign-in"
       ? pending
@@ -243,6 +293,7 @@ export function EmailAuthForm({
             onClick={() => {
               setMode("sign-in");
               setConfirmPassword("");
+              setResetCode("");
               setError(null);
               setMessage(null);
             }}
@@ -255,6 +306,7 @@ export function EmailAuthForm({
             className={`${styles.modeTab} ${mode === "sign-up" ? styles.modeTabActive : ""}`}
             onClick={() => {
               setMode("sign-up");
+              setResetCode("");
               setError(null);
               setMessage(null);
             }}
@@ -296,6 +348,28 @@ export function EmailAuthForm({
           required
         />
       </label>
+
+      {mode === "reset" ? (
+        <label className="form-field">
+          <span>6 位验证码</span>
+          <input
+            className="input"
+            type="text"
+            name="reset_code"
+            value={resetCode}
+            onChange={(event) => setResetCode(event.target.value)}
+            autoComplete="one-time-code"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={6}
+            placeholder="邮件里的 6 位数字"
+            disabled={!enabled || pending}
+          />
+          <small className="form-field-help">
+            邮件链接打不开时，可以输入邮件里的验证码继续设置密码。
+          </small>
+        </label>
+      ) : null}
 
       {mode !== "reset" ? (
         <label className="form-field">
@@ -350,6 +424,17 @@ export function EmailAuthForm({
         {submitText}
       </button>
 
+      {mode === "reset" ? (
+        <button
+          type="button"
+          className="button button-secondary"
+          onClick={handleVerifyResetCode}
+          disabled={!enabled || pending}
+        >
+          使用验证码继续设置密码
+        </button>
+      ) : null}
+
       {mode === "sign-in" ? (
         <button
           type="button"
@@ -358,6 +443,7 @@ export function EmailAuthForm({
             setMode("reset");
             setPassword("");
             setConfirmPassword("");
+            setResetCode("");
             setError(null);
             setMessage(null);
           }}
@@ -373,6 +459,7 @@ export function EmailAuthForm({
           className={styles.textButton}
           onClick={() => {
             setMode("sign-in");
+            setResetCode("");
             setError(null);
             setMessage(null);
           }}

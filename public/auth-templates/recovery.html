@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>设置常州 AI Club 登录密码</title>
+  </head>
+  <body style="margin:0;background:#f7f3eb;color:#1f2933;font-family:Arial,'Microsoft YaHei',sans-serif;">
+    <div style="max-width:560px;margin:0 auto;padding:28px 18px;">
+      <div style="border:1px solid #e2d8c8;border-radius:12px;background:#fffdfa;padding:24px;">
+        <p style="margin:0 0 10px;color:#0f6f62;font-size:13px;font-weight:700;letter-spacing:.02em;">
+          常州 AI Club
+        </p>
+        <h1 style="margin:0 0 16px;color:#111b1f;font-size:22px;line-height:1.35;">
+          设置你的邮箱登录密码
+        </h1>
+        <p style="margin:0 0 14px;line-height:1.75;">
+          你好，你正在为常州 AI Club 社区账号设置或重置邮箱登录密码。
+        </p>
+        <p style="margin:0 0 22px;line-height:1.75;">
+          点击下方按钮后，会进入网站的密码设置页面。
+        </p>
+        <p style="margin:0 0 22px;">
+          <a href="{{ .SiteURL }}/auth/recovery?token_hash={{ .TokenHash }}&amp;type=recovery" style="display:inline-block;padding:12px 18px;border-radius:8px;background:#0f6f62;color:#ffffff;text-decoration:none;font-weight:700;">
+            设置新密码
+          </a>
+        </p>
+        <p style="margin:0 0 10px;line-height:1.75;">
+          如果按钮无法打开，也可以在登录页输入这组 6 位验证码继续：
+        </p>
+        <p style="margin:0 0 18px;color:#111b1f;font-size:24px;font-weight:800;letter-spacing:.18em;">
+          {{ .Token }}
+        </p>
+        <p style="margin:0 0 10px;line-height:1.75;">
+          如果需要复制链接，请使用下面的完整地址：
+        </p>
+        <p style="margin:0 0 18px;word-break:break-all;color:#0f6f62;line-height:1.65;">
+          {{ .SiteURL }}/auth/recovery?token_hash={{ .TokenHash }}&amp;type=recovery
+        </p>
+        <p style="margin:0;line-height:1.75;color:#5c6873;">
+          如果不是你本人操作，可以忽略这封邮件。
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

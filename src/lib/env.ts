@@ -17,3 +17,17 @@ export function getSupabaseEnv() {
 
   return { url, publishableKey };
 }
+
+export function getPublicSiteUrl() {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+
+  if (!siteUrl) {
+    return null;
+  }
+
+  try {
+    return new URL(siteUrl).origin;
+  } catch {
+    return null;
+  }
+}
