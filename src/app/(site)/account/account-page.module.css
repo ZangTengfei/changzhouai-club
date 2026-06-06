@@ -5,7 +5,6 @@
 
 .disabledPanel,
 .accountSummary,
-.accountUpdatesSection,
 .accountWorksSection,
 .registrationSection {
   display: grid;
@@ -367,449 +366,6 @@
   gap: 18px;
 }
 
-.accountUpdatesSection {
-  display: grid;
-  gap: 18px;
-}
-
-.accountUpdateComposer {
-  display: grid;
-  gap: 16px;
-  min-width: 0;
-}
-
-.accountUpdateComposerToolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.accountUpdateComposerToolbar > span {
-  max-width: 34rem;
-  overflow: hidden;
-  color: rgba(var(--ink-rgb), 0.58);
-  font-size: 0.84rem;
-  font-weight: 750;
-  line-height: 1.5;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.accountUpdateModeSwitch {
-  display: inline-flex;
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 999px;
-  background: rgba(255, 252, 247, 0.68);
-}
-
-.accountUpdateModeSwitch button {
-  display: inline-flex;
-  gap: 6px;
-  align-items: center;
-  min-height: 34px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: rgba(var(--ink-rgb), 0.62);
-  cursor: pointer;
-  font-size: 0.84rem;
-  font-weight: 900;
-}
-
-.accountUpdateModeSwitch svg {
-  width: 15px;
-  height: 15px;
-}
-
-.accountUpdateModeSwitch .accountUpdateModeActive {
-  background: rgba(var(--accent-rgb), 0.12);
-  color: var(--accent-strong);
-}
-
-.accountUpdateForm {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  padding: 0 18px 18px;
-}
-
-.accountUpdateComposer .accountUpdateForm {
-  padding: 0;
-}
-
-.accountUpdateDialogForm {
-  padding: 0;
-}
-
-.accountUpdateForm label {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-}
-
-.accountUpdateForm label > span {
-  color: #132321;
-  font-size: 0.86rem;
-  font-weight: 850;
-}
-
-.accountUpdateForm :global(.input),
-.accountUpdateForm :global(.textarea) {
-  border-color: rgba(var(--ink-rgb), 0.12);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.74);
-}
-
-.accountUpdateWideField,
-.accountUpdateFormFooter,
-.accountUpdateUploadPanel {
-  grid-column: 1 / -1;
-}
-
-.accountUpdateUploadPanel {
-  display: grid;
-  gap: 12px;
-  min-width: 0;
-  padding: 16px;
-  border: 1px solid rgba(var(--ink-rgb), 0.07);
-  border-radius: 18px;
-  background: rgba(255, 252, 247, 0.62);
-}
-
-.accountUpdateUploadPanel > div:first-child {
-  display: grid;
-  gap: 4px;
-}
-
-.accountUpdateUploadPanel > div:first-child span {
-  color: #132321;
-  font-size: 0.86rem;
-  font-weight: 850;
-}
-
-.accountUpdateUploadPanel > div:first-child p {
-  margin: 0;
-  color: rgba(var(--ink-rgb), 0.58);
-  font-size: 0.84rem;
-  font-weight: 700;
-  line-height: 1.56;
-}
-
-.accountUpdateUploadActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
-
-.accountUpdateUploadActions svg,
-.accountUpdateImageUrlRow svg,
-.accountUpdateFormFooter svg {
-  width: 17px;
-  height: 17px;
-}
-
-.accountUpdateImageUrlRow {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 10px;
-  align-items: center;
-}
-
-.accountUpdateImagePreviewGrid,
-.accountUpdatePreviewImages {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.accountUpdateImagePreviewGrid figure {
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 1.35 / 1;
-  margin: 0;
-  border-radius: 14px;
-  background: #dbe3db;
-}
-
-.accountUpdateImagePreviewGrid img,
-.accountUpdatePreviewImages img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.accountUpdateImagePreviewGrid figure button {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  display: inline-grid;
-  place-items: center;
-  width: 30px;
-  height: 30px;
-  border: 1px solid rgba(var(--ink-rgb), 0.12);
-  border-radius: 999px;
-  background: rgba(255, 252, 247, 0.9);
-  color: #132321;
-  cursor: pointer;
-}
-
-.accountUpdateImagePreviewGrid figure button svg {
-  width: 15px;
-  height: 15px;
-}
-
-.accountUpdateUploadMessage {
-  margin: 0;
-  color: rgba(var(--ink-rgb), 0.62);
-  font-size: 0.84rem;
-  font-weight: 750;
-}
-
-.accountUpdatePreviewPanel {
-  display: grid;
-  gap: 14px;
-  min-width: 0;
-  padding: 18px;
-  border: 1px solid rgba(var(--ink-rgb), 0.07);
-  border-radius: 18px;
-  background: rgba(255, 252, 247, 0.66);
-}
-
-.accountUpdatePreviewMeta,
-.accountUpdatePreviewTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-
-.accountUpdatePreviewMeta span,
-.accountUpdatePreviewTags span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 26px;
-  padding: 0 9px;
-  border-radius: 999px;
-  background: rgba(var(--accent-rgb), 0.09);
-  color: var(--accent-strong);
-  font-size: 0.76rem;
-  font-weight: 900;
-}
-
-.accountUpdatePreviewPanel h3,
-.accountUpdatePreviewPanel p {
-  margin: 0;
-}
-
-.accountUpdatePreviewPanel h3 {
-  color: #111a1d;
-  font-size: 1.45rem;
-  font-weight: 900;
-  line-height: 1.18;
-}
-
-.accountUpdatePreviewMarkdown {
-  color: rgba(var(--ink-rgb), 0.7);
-  font-size: 0.98rem;
-  line-height: 1.78;
-}
-
-.accountUpdatePreviewEmpty {
-  color: rgba(var(--ink-rgb), 0.56);
-  font-weight: 750;
-}
-
-.accountUpdatePreviewImages {
-  max-width: 680px;
-}
-
-.accountUpdatePreviewImages img {
-  aspect-ratio: 1.45 / 1;
-  border-radius: 14px;
-}
-
-.accountUpdateExcerptPreview {
-  display: grid;
-  gap: 6px;
-  padding: 12px 14px;
-  border: 1px dashed rgba(var(--accent-rgb), 0.2);
-  border-radius: 14px;
-  background: rgba(var(--accent-rgb), 0.06);
-}
-
-.accountUpdateExcerptPreview strong {
-  color: #132321;
-  font-size: 0.84rem;
-  font-weight: 900;
-}
-
-.accountUpdateExcerptPreview p {
-  color: rgba(var(--ink-rgb), 0.62);
-  font-size: 0.9rem;
-  line-height: 1.58;
-}
-
-.accountUpdateFormFooter {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-}
-
-.accountUpdateFormFooter span {
-  color: rgba(var(--ink-rgb), 0.58);
-  font-size: 0.88rem;
-  font-weight: 700;
-}
-
-.accountUpdateList {
-  display: grid;
-  gap: 14px;
-}
-
-.accountUpdateCard {
-  display: grid;
-  gap: 14px;
-  padding: 18px;
-  border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 20px;
-  background: rgba(255, 252, 247, 0.72);
-}
-
-.accountUpdateCardHead {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 16px;
-  align-items: start;
-}
-
-.accountUpdateCardHead h3,
-.accountUpdateCardHead p,
-.accountUpdateCard > p {
-  margin: 0;
-}
-
-.accountUpdateCardHead h3 {
-  margin-top: 10px;
-  color: #111a1d;
-  font-size: 1.22rem;
-  line-height: 1.18;
-}
-
-.accountUpdateCardHead p,
-.accountUpdateCard > p {
-  color: rgba(var(--ink-rgb), 0.62);
-  line-height: 1.58;
-}
-
-.accountUpdateCard > p {
-  white-space: pre-wrap;
-}
-
-.accountUpdateMetrics {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-.accountUpdateMetrics span {
-  display: inline-flex;
-  gap: 5px;
-  align-items: center;
-  min-height: 30px;
-  padding: 0 10px;
-  border: 1px solid rgba(var(--ink-rgb), 0.07);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.62);
-  color: rgba(var(--ink-rgb), 0.58);
-  font-size: 0.8rem;
-  font-weight: 850;
-}
-
-.accountUpdateMetrics svg {
-  width: 15px;
-  height: 15px;
-}
-
-.updateReviewBadge {
-  display: inline-flex;
-  align-items: center;
-  min-height: 28px;
-  margin-right: 6px;
-  padding: 0 10px;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  font-size: 0.78rem;
-  font-weight: 900;
-}
-
-.updateReviewPending {
-  border-color: rgba(238, 127, 24, 0.18);
-  background: rgba(238, 127, 24, 0.1);
-  color: #b45f14;
-}
-
-.updateReviewPublished {
-  border-color: rgba(var(--accent-rgb), 0.18);
-  background: rgba(var(--accent-rgb), 0.1);
-  color: var(--accent-strong);
-}
-
-.updateReviewChanges {
-  border-color: rgba(42, 123, 211, 0.18);
-  background: rgba(42, 123, 211, 0.1);
-  color: #236bb8;
-}
-
-.updateReviewRejected {
-  border-color: rgba(197, 91, 79, 0.2);
-  background: rgba(197, 91, 79, 0.1);
-  color: var(--destructive);
-}
-
-.updateReviewFeatured {
-  border-color: rgba(246, 190, 75, 0.3);
-  background: rgba(246, 190, 75, 0.16);
-  color: #9a6414;
-}
-
-.accountUpdateTags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.accountUpdateTags span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 26px;
-  padding: 0 9px;
-  border: 1px solid rgba(var(--accent-rgb), 0.12);
-  border-radius: 999px;
-  background: rgba(var(--accent-rgb), 0.07);
-  color: rgba(var(--ink-rgb), 0.66);
-  font-size: 0.76rem;
-  font-weight: 850;
-}
-
-.accountUpdateNote {
-  padding: 12px 14px;
-  border: 1px dashed rgba(42, 123, 211, 0.22);
-  border-radius: 14px;
-  background: rgba(42, 123, 211, 0.07);
-  color: #236bb8;
-  font-size: 0.88rem;
-  font-weight: 750;
-  line-height: 1.58;
-}
-
 .accountWorkCard {
   border: 1px solid rgba(var(--ink-rgb), 0.08);
   border-radius: 20px;
@@ -1126,11 +682,6 @@
     width: fit-content;
   }
 
-  .accountUpdateImagePreviewGrid,
-  .accountUpdatePreviewImages {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .registrationCard {
     grid-template-columns: 48px minmax(0, 1fr);
   }
@@ -1151,7 +702,6 @@
 
   .accountSummary,
   .accountProfileForm,
-  .accountUpdatesSection,
   .accountWorksSection,
   .registrationSection,
   .disabledPanel {
@@ -1160,23 +710,10 @@
 
   .accountAvatarCard,
   .accountMetaGrid,
-  .accountUpdateForm,
-  .accountUpdateCardHead,
-  .accountUpdateImageUrlRow,
   .accountWorkForm,
   .accountWorkCardHead,
   .accountSummaryActions {
     grid-template-columns: 1fr;
-  }
-
-  .accountUpdateComposerToolbar {
-    display: grid;
-    justify-items: start;
-  }
-
-  .accountUpdateComposerToolbar > span {
-    max-width: none;
-    white-space: normal;
   }
 
   .accountAvatarCard :global(.member-avatar) {
@@ -1192,9 +729,6 @@
   .accountSummaryActions :global(.button),
   .accountSummaryActions :global(.auth-button),
   .accountSectionAction,
-  .accountUpdateImageUrlRow :global(.button),
-  .accountUpdateFormFooter :global(.button),
-  .accountUpdateCard :global(.button),
   .accountWorkFormFooter :global(.button),
   .accountWorkCard :global(.button),
   .emptyRegistrationPanel :global(.button) {
@@ -1202,11 +736,6 @@
   }
 
   .accountMetaGrid {
-    grid-template-columns: 1fr;
-  }
-
-  .accountUpdateImagePreviewGrid,
-  .accountUpdatePreviewImages {
     grid-template-columns: 1fr;
   }
 

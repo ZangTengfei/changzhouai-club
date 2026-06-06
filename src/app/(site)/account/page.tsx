@@ -20,9 +20,7 @@ import {
 
 import {
   cancelRegistration,
-  deleteAccountCommunityUpdate,
   deleteAccountMemberWork,
-  saveAccountCommunityUpdate,
   saveAccountMemberWork,
 } from "@/app/(site)/account/actions";
 import { AccountActionModal } from "@/components/account-action-modal";
@@ -30,12 +28,6 @@ import { AccountProfileForm } from "@/components/account-profile-form";
 import { MemberAvatar } from "@/components/member-avatar";
 import { SignOutButton } from "@/components/sign-out-button";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
-import {
-  communityUpdateStatusLabels,
-  communityUpdateTypeLabels,
-  type CommunityUpdateStatus,
-  type CommunityUpdateType,
-} from "@/lib/community-updates";
 import {
   workReviewStatusLabels,
   workStatusLabels,
@@ -48,7 +40,6 @@ import { hasSupabaseEnv } from "@/lib/env";
 import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
 import { createClient } from "@/lib/supabase/server";
 
-import { AccountCommunityUpdateComposer } from "./account-community-update-composer";
 import styles from "./account-page.module.css";
 
 export const metadata: Metadata = {
@@ -141,24 +132,6 @@ type AccountMemberWork = {
   updated_at: string;
 };
 
-type AccountCommunityUpdate = {
-  id: string;
-  update_type: CommunityUpdateType;
-  title: string | null;
-  content: string;
-  tags: string[] | null;
-  status: CommunityUpdateStatus;
-  moderation_note: string | null;
-  like_count: number;
-  comment_count: number;
-  view_count: number;
-  is_featured: boolean;
-  is_pinned: boolean;
-  published_at: string | null;
-  created_at: string;
-  updated_at: string;
-};
-
 function getReviewTone(status: PublicWorkReviewStatus, isPublic: boolean) {
   if (isPublic) {
     return styles.workReviewApproved;
@@ -187,12 +160,6 @@ const workModalErrorCodes = new Set([
   "missing_work_fields",
   "invalid_work_url",
   "work_save_failed",
-]);
-
-const updateModalErrorCodes = new Set([
-  "missing_update_fields",
-  "invalid_update_url",
-  "update_save_failed",
 ]);
 
 export default async function AccountPage({
@@ -237,8 +204,6 @@ export default async function AccountPage({
       ? "/account?onboarding=1"
       : params.submit === "work"
         ? "/account?submit=work#works"
-        : params.submit === "update"
-          ? "/account?submit=update#updates"
         : "/account";
     redirect(`/login?next=${encodeURIComponent(nextPath)}`);
   }
@@ -248,7 +213,6 @@ export default async function AccountPage({
     { data: member },
     { data: registrations },
     { data: works },
-    { data: updates },
   ] = await Promise.all([
       supabase
         .from("profiles")
@@ -278,13 +242,6 @@ export default async function AccountPage({
         )
         .eq("member_id", user.id)
         .order("updated_at", { ascending: false }),
-      supabase
-        .from("community_updates")
-        .select(
-          "id, update_type, title, content, tags, status, moderation_note, like_count, comment_count, view_count, is_featured, is_pinned, published_at, created_at, updated_at",
-        )
-        .eq("author_id", user.id)
-        .order("updated_at", { ascending: false }),
     ]);
 
   const identities = identityData?.identities ?? [];
@@ -305,10 +262,6 @@ export default async function AccountPage({
     ...work,
     tags: work.tags ?? [],
   }));
-  const communityUpdates = ((updates ?? []) as AccountCommunityUpdate[]).map((update) => ({
-    ...update,
-    tags: update.tags ?? [],
-  }));
   const activeRegistrationCount =
     registrations?.filter((item) => item.status !== "cancelled").length ?? 0;
   const statusMessage = getStatusMessage(params.error);
@@ -316,8 +269,6 @@ export default async function AccountPage({
     Boolean(params.onboarding) || profileModalErrorCodes.has(params.error ?? "");
   const shouldOpenWorkModal =
     params.submit === "work" || workModalErrorCodes.has(params.error ?? "");
-  const shouldOpenUpdateModal =
-    params.submit === "update" || updateModalErrorCodes.has(params.error ?? "");
   const accountSummaryItems = [
     {
       label: "资料状态",
@@ -460,124 +411,6 @@ export default async function AccountPage({
           <span>{statusMessage}</span>
         </div>
       ) : null}
-
-      <section className={styles.accountUpdatesSection} id="updates">
-        <div className={styles.accountSectionHeading}>
-          <p className="home-kicker">Updates</p>
-          <div className={styles.accountSectionHeadingMain}>
-            <div>
-              <h2>我的动态</h2>
-              <p>
-                可以发布活动照片、项目进展、工具技巧、求助和协作招募。提交后先进入审核，
-                通过后会出现在社区动态和首页精选里。
-              </p>
-            </div>
-            <AccountActionModal
-              title="发布社区动态"
-              description="写下最近发生的实践、问题或协作需求。正文支持 Markdown，审核通过后会公开展示。"
-              defaultOpen={shouldOpenUpdateModal}
-              trigger={
-                <button
-                  type="button"
-                  className={`button home-primary-button ${styles.accountSectionAction}`}
-                >
-                  <PencilLine aria-hidden="true" strokeWidth={2} />
-                  发布动态
-                </button>
-              }
-            >
-              <AccountCommunityUpdateComposer
-                action={saveAccountCommunityUpdate}
-                userId={user.id}
-                typeOptions={Object.entries(communityUpdateTypeLabels)}
-              />
-            </AccountActionModal>
-          </div>
-        </div>
-
-        {communityUpdates.length > 0 ? (
-          <div className={styles.accountUpdateList}>
-            {communityUpdates.map((update) => (
-              <article className={styles.accountUpdateCard} key={update.id}>
-                <div className={styles.accountUpdateCardHead}>
-                  <div>
-                    <span
-                      className={`${styles.updateReviewBadge} ${
-                        update.status === "published"
-                          ? styles.updateReviewPublished
-                          : update.status === "changes_requested"
-                            ? styles.updateReviewChanges
-                            : update.status === "rejected"
-                              ? styles.updateReviewRejected
-                              : styles.updateReviewPending
-                      }`}
-                    >
-                      {communityUpdateStatusLabels[update.status]}
-                    </span>
-                    {update.is_featured ? (
-                      <span className={`${styles.updateReviewBadge} ${styles.updateReviewFeatured}`}>
-                        精选
-                      </span>
-                    ) : null}
-                    <h3>{update.title || communityUpdateTypeLabels[update.update_type]}</h3>
-                    <p>
-                      {communityUpdateTypeLabels[update.update_type]} · 更新于{" "}
-                      {formatChangzhouDateTime(update.updated_at, {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                      })}
-                    </p>
-                  </div>
-                  <div className={styles.accountUpdateMetrics} aria-label="动态互动数据">
-                    <span>
-                      <Eye aria-hidden="true" strokeWidth={1.8} />
-                      {update.view_count}
-                    </span>
-                    <span>
-                      <Sparkles aria-hidden="true" strokeWidth={1.8} />
-                      {update.like_count}
-                    </span>
-                  </div>
-                </div>
-
-                <p>{update.content}</p>
-                {(update.tags ?? []).length > 0 ? (
-                  <div className={styles.accountUpdateTags}>
-                    {(update.tags ?? []).map((tag) => (
-                      <span key={`${update.id}-${tag}`}>{tag}</span>
-                    ))}
-                  </div>
-                ) : null}
-                {update.moderation_note ? (
-                  <div className={styles.accountUpdateNote}>
-                    审核备注：{update.moderation_note}
-                  </div>
-                ) : null}
-                {update.status !== "published" ? (
-                  <form action={deleteAccountCommunityUpdate}>
-                    <input type="hidden" name="update_id" value={update.id} />
-                    <button type="submit" className="button home-ghost-button">
-                      删除这条动态
-                    </button>
-                  </form>
-                ) : null}
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className={styles.emptyRegistrationPanel}>
-            <ClipboardList aria-hidden="true" strokeWidth={1.8} />
-            <div>
-              <strong>你还没有发布社区动态</strong>
-              <p>可以先分享一次活动收获、一个工具技巧，或者一个正在寻找反馈的问题。</p>
-            </div>
-            <Link href="/updates" className="button home-ghost-button">
-              查看社区动态
-            </Link>
-          </div>
-        )}
-      </section>
 
       <section className={styles.accountWorksSection} id="works">
         <div className={styles.accountSectionHeading}>

@@ -4,7 +4,6 @@ import {
   ArrowRight,
   Eye,
   Heart,
-  Plus,
   Sparkles,
   Tags,
 } from "lucide-react";
@@ -196,10 +195,6 @@ export default async function UpdatesPage({ searchParams }: UpdatesPageProps) {
 
         <div className={styles.timelineHeaderSide}>
           <span>{directory.stats.updates} 条动态</span>
-          <Link href="/account?submit=update#updates" className="button home-primary-button">
-            <Plus aria-hidden="true" strokeWidth={2} />
-            发布动态
-          </Link>
         </div>
       </section>
 
@@ -255,10 +250,6 @@ export default async function UpdatesPage({ searchParams }: UpdatesPageProps) {
           <Sparkles aria-hidden="true" strokeWidth={1.8} />
           <strong>这里还在等待第一批动态</strong>
           <p>成员提交并审核通过后，活动瞬间、项目进展和经验分享会按时间出现在这里。</p>
-          <Link href="/account?submit=update#updates" className="button home-primary-button">
-            <Plus aria-hidden="true" strokeWidth={2} />
-            发布动态
-          </Link>
         </section>
       )}
     </div>
