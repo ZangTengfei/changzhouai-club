@@ -80,6 +80,13 @@ const WORK_REVIEW_STATUSES = new Set([
   "changes_requested",
   "rejected",
 ]);
+const EXTERNAL_CASE_CARD_TYPES = new Set([
+  "external",
+  "project",
+  "case",
+  "tool",
+  "service",
+]);
 
 function normalizeSlug(raw: string) {
   return raw
@@ -168,6 +175,11 @@ function getWorkStatus(value: string) {
 function getWorkReviewStatus(value: string) {
   const normalized = value.trim();
   return WORK_REVIEW_STATUSES.has(normalized) ? normalized : "pending";
+}
+
+function getExternalCaseCardType(value: string) {
+  const normalized = value.trim();
+  return EXTERNAL_CASE_CARD_TYPES.has(normalized) ? normalized : "external";
 }
 
 function getProjectType(value: string) {
@@ -1299,6 +1311,90 @@ export async function deleteAdminMemberWork(formData: FormData) {
 
   revalidateWorkPaths(memberId);
   redirect(`${ADMIN_WORKS_PATH}?saved=work_deleted`);
+}
+
+export async function saveAdminExternalCaseCard(formData: FormData) {
+  const adminContext = await requireAdminPermission("works.write");
+  const { supabase, user } = adminContext;
+
+  const cardId = String(formData.get("external_card_id") ?? "").trim();
+  const slugInput = String(formData.get("slug") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const summary = String(formData.get("summary") ?? "").trim();
+  const externalUrl = normalizeOptionalUrlValue(getOptionalValue(formData, "external_url"));
+  const requestedIsPublic = formData.get("is_public") === "on";
+
+  if (!title || !summary || !externalUrl) {
+    redirect(`${ADMIN_WORKS_PATH}?error=missing_external_card_fields`);
+  }
+
+  if (requestedIsPublic && !canAdmin(adminContext, "works.publish")) {
+    redirect(`${ADMIN_WORKS_PATH}?error=permission_required&permission=works.publish`);
+  }
+
+  const slug =
+    normalizeSlug(slugInput) ||
+    normalizeSlug(title) ||
+    `external-${Date.now().toString(36)}`;
+  const payload = {
+    slug,
+    title,
+    summary,
+    description: getOptionalValue(formData, "description"),
+    card_type: getExternalCaseCardType(String(formData.get("card_type") ?? "")),
+    source_label: getOptionalValue(formData, "source_label"),
+    cover_image_url: getOptionalValue(formData, "cover_image_url"),
+    external_url: externalUrl,
+    cta_label: getOptionalValue(formData, "cta_label") ?? "查看详情",
+    tags: normalizeSkills(String(formData.get("tags") ?? "")),
+    sort_order: getOptionalInteger(formData, "sort_order"),
+    is_public: requestedIsPublic,
+    is_featured: requestedIsPublic ? formData.get("is_featured") === "on" : false,
+  };
+
+  if (cardId) {
+    const { error } = await supabase
+      .from("external_case_cards")
+      .update(payload)
+      .eq("id", cardId);
+
+    if (error) {
+      redirect(`${ADMIN_WORKS_PATH}?error=database_write_failed`);
+    }
+  } else {
+    const { error } = await supabase.from("external_case_cards").insert({
+      ...payload,
+      created_by: user.id,
+    });
+
+    if (error) {
+      redirect(`${ADMIN_WORKS_PATH}?error=database_write_failed`);
+    }
+  }
+
+  revalidateWorkPaths();
+  redirect(`${ADMIN_WORKS_PATH}?saved=external_case_card`);
+}
+
+export async function deleteAdminExternalCaseCard(formData: FormData) {
+  const { supabase } = await requireAdminPermission("works.delete");
+  const cardId = String(formData.get("external_card_id") ?? "").trim();
+
+  if (!cardId) {
+    redirect(`${ADMIN_WORKS_PATH}?error=missing_required_fields`);
+  }
+
+  const { error } = await supabase
+    .from("external_case_cards")
+    .delete()
+    .eq("id", cardId);
+
+  if (error) {
+    redirect(`${ADMIN_WORKS_PATH}?error=database_write_failed`);
+  }
+
+  revalidateWorkPaths();
+  redirect(`${ADMIN_WORKS_PATH}?saved=external_case_card_deleted`);
 }
 
 function toWechatQrDateTime(value: string | null) {

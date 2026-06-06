@@ -8,6 +8,16 @@
   box-shadow: 0 12px 28px rgba(var(--ink-rgb), 0.045);
 }
 
+.workCardLink {
+  color: inherit;
+  text-decoration: none;
+}
+
+.workCardLink:focus-visible {
+  outline: 3px solid rgba(var(--accent-rgb), 0.32);
+  outline-offset: 3px;
+}
+
 .workCardCompact {
   height: 100%;
 }
@@ -122,6 +132,15 @@
   background: rgba(255, 252, 247, 0.82);
 }
 
+.workTitleIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  color: var(--accent);
+}
+
 .workTitleRow a:hover,
 .workTitleRow a:focus-visible,
 .workLinks a:hover,
@@ -195,6 +214,27 @@
 .workLinks a {
   width: 28px;
   height: 28px;
+}
+
+.workExternalFooter {
+  display: grid;
+  gap: 3px;
+  padding-top: 2px;
+}
+
+.workExternalFooter strong {
+  color: var(--accent-strong);
+  font-size: 0.88rem;
+  font-weight: 900;
+}
+
+.workExternalFooter small {
+  overflow: hidden;
+  color: rgba(var(--ink-rgb), 0.55);
+  font-size: 0.76rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (max-width: 640px) {

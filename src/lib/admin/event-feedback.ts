@@ -31,6 +31,8 @@ const adminSavedMessageMap: Record<string, string> = {
   community_update_deleted: "社区动态已删除。",
   work: "成员作品已保存。",
   work_deleted: "成员作品已删除。",
+  external_case_card: "外部展示卡片已保存。",
+  external_case_card_deleted: "外部展示卡片已删除。",
 };
 
 const adminErrorMessageMap: Record<string, string> = {
@@ -39,6 +41,7 @@ const adminErrorMessageMap: Record<string, string> = {
   missing_sponsor_image_fields: "请至少填写赞助者图片路径，再提交。",
   missing_project_fields: "请至少填写项目标题、链接和一句话摘要。",
   missing_work_fields: "请至少选择成员，并填写作品名称和一句话介绍。",
+  missing_external_card_fields: "请至少填写卡片标题、一句话介绍和有效外部链接。",
   missing_update_fields: "请至少选择成员，并填写动态正文。",
   invalid_update_url: "动态链接格式无效，请填写以 http 或 https 开头的公开链接。",
   invalid_qr_expiration: "二维码过期时间必须晚于开始展示时间。",

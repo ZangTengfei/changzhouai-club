@@ -6,7 +6,7 @@ import {
   Tags,
 } from "lucide-react";
 
-import { MemberWorkCard } from "@/components/member-work-card";
+import { ExternalCaseCard, MemberWorkCard } from "@/components/member-work-card";
 import { ToneBadge } from "@/components/tone-badge";
 import { getPublicWorksDirectory, workTypeLabels } from "@/lib/community-works";
 
@@ -14,7 +14,7 @@ import styles from "./works-page.module.css";
 
 export const metadata: Metadata = {
   title: "案例库",
-  description: "查看常州 AI Club 成员公开展示的 AI 产品、工具和项目案例。",
+  description: "查看常州 AI Club 成员公开展示的 AI 产品、工具、OPC 揭榜挂帅项目和实践案例。",
 };
 
 export default async function WorksPage() {
@@ -63,28 +63,27 @@ export default async function WorksPage() {
           <p className="home-kicker">Directory</p>
           <div>
             <h2>公开案例</h2>
-            <p>每个案例都会回到成员本人，方便从“案例”继续认识背后的人。</p>
+            <p>公开案例可以关联成员，也可以跳转到外部展示页，方便继续查看完整项目资料。</p>
           </div>
         </div>
 
-        {directory.works.length > 0 ? (
-          <div className={styles.worksGrid}>
-            {directory.works.map((work) => (
-              <div id={`work-${work.id}`} key={work.id}>
-                <MemberWorkCard work={work} />
-              </div>
-            ))}
+        <div className={styles.worksGrid}>
+          {directory.externalCards.map((card) => (
+            <ExternalCaseCard card={card} key={card.id} />
+          ))}
+
+          {directory.works.map((work) => (
+            <div id={`work-${work.id}`} key={work.id}>
+              <MemberWorkCard work={work} />
+            </div>
+          ))}
+        </div>
+
+        {directory.works.length === 0 && directory.externalCards.length === 0 ? (
+          <div className={styles.worksEmptyNote}>
+            成员提交作品或案例并通过审核后，会继续补充到这里。
           </div>
-        ) : (
-          <div className={styles.worksEmptyPanel}>
-            <strong>还没有公开案例</strong>
-            <p>成员提交作品或案例并通过审核后，会在这里形成社区案例库。</p>
-            <Link href="/account?submit=work#works" className="button home-primary-button">
-              <Plus aria-hidden="true" strokeWidth={2} />
-              提交作品/案例
-            </Link>
-          </div>
-        )}
+        ) : null}
       </section>
 
       <section className={styles.worksTypeSection}>

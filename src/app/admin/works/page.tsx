@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import {
+  deleteAdminExternalCaseCard,
   deleteAdminMemberWork,
+  saveAdminExternalCaseCard,
   saveAdminMemberWork,
 } from "@/app/admin/actions";
 import {
@@ -28,11 +30,13 @@ import {
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 import {
+  type AdminExternalCaseCardRow,
   type AdminMemberWork,
   type AdminWorkMemberOption,
   loadAdminWorksData,
 } from "@/lib/admin/works";
 import {
+  externalCaseCardTypeLabels,
   workReviewStatusLabels,
   workStatusLabels,
   workTypeLabels,
@@ -221,6 +225,134 @@ function WorkForm({
   );
 }
 
+function ExternalCaseCardForm({ card }: { card?: AdminExternalCaseCardRow }) {
+  return (
+    <form action={saveAdminExternalCaseCard} className="grid gap-4">
+      {card ? (
+        <input type="hidden" name="external_card_id" value={card.id} />
+      ) : null}
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <AdminField label="卡片标题">
+          <Input name="title" defaultValue={card?.title ?? ""} required />
+        </AdminField>
+
+        <AdminField label="唯一标识">
+          <Input
+            name="slug"
+            defaultValue={card?.slug ?? ""}
+            placeholder="例如：telecom-opc-display"
+          />
+        </AdminField>
+
+        <AdminField label="卡片类型">
+          <NativeSelect name="card_type" defaultValue={card?.card_type ?? "external"}>
+            {Object.entries(externalCaseCardTypeLabels).map(([value, label]) => (
+              <option value={value} key={value}>
+                {label}
+              </option>
+            ))}
+          </NativeSelect>
+        </AdminField>
+
+        <AdminField label="来源标签">
+          <Input
+            name="source_label"
+            defaultValue={card?.source_label ?? ""}
+            placeholder="例如：常州电信 OPC"
+          />
+        </AdminField>
+
+        <AdminField label="外部链接" className="md:col-span-2">
+          <Input
+            name="external_url"
+            defaultValue={card?.external_url ?? ""}
+            placeholder="https://..."
+            required
+          />
+        </AdminField>
+
+        <AdminField label="一句话介绍" className="md:col-span-2">
+          <Textarea
+            name="summary"
+            defaultValue={card?.summary ?? ""}
+            rows={2}
+            required
+          />
+        </AdminField>
+
+        <AdminField label="详细说明" className="md:col-span-2">
+          <Textarea
+            name="description"
+            defaultValue={card?.description ?? ""}
+            rows={4}
+          />
+        </AdminField>
+
+        <AdminField label="封面图" className="md:col-span-2">
+          <StorageImageUrlField
+            name="cover_image_url"
+            defaultValue={card?.cover_image_url ?? ""}
+            eventSlug="external-case-card"
+            uploadScope="community"
+            mode="upload-only"
+            placeholder="外部卡片封面图片地址"
+            uploadLabel="上传卡片封面"
+            clearLabel="清空封面"
+            filledStatusText="已设置封面"
+            emptyStatusText="当前未设置封面"
+          />
+        </AdminField>
+
+        <AdminField label="按钮文案">
+          <Input
+            name="cta_label"
+            defaultValue={card?.cta_label ?? "查看详情"}
+          />
+        </AdminField>
+
+        <AdminField label="排序">
+          <Input
+            type="number"
+            name="sort_order"
+            defaultValue={card?.sort_order ?? 0}
+          />
+        </AdminField>
+
+        <AdminField label="标签" className="md:col-span-2">
+          <Input
+            name="tags"
+            defaultValue={card?.tags.join("、") ?? ""}
+            placeholder="智能体项目、常州电信、OPC 共创"
+          />
+        </AdminField>
+
+        <AdminCheckboxRow>
+          <input
+            type="checkbox"
+            name="is_public"
+            defaultChecked={card?.is_public ?? true}
+            className="size-4"
+          />
+          <span>公开展示</span>
+        </AdminCheckboxRow>
+
+        <AdminCheckboxRow>
+          <input
+            type="checkbox"
+            name="is_featured"
+            defaultChecked={card?.is_featured ?? false}
+            className="size-4"
+          />
+          <span>设为精选</span>
+        </AdminCheckboxRow>
+      </div>
+
+      <Button type="submit">保存外部卡片</Button>
+    </form>
+  );
+}
+
 function getReviewTone(status: string, isPublic: boolean) {
   if (isPublic || status === "approved") {
     return "completed" as const;
@@ -241,7 +373,8 @@ export default async function AdminWorksPage({
   searchParams,
 }: AdminWorksPageProps) {
   const params = await searchParams;
-  const { works, memberOptions, queryErrors } = await loadAdminWorksData();
+  const { works, externalCards, memberOptions, queryErrors } =
+    await loadAdminWorksData();
 
   return (
     <AdminPageStack>
@@ -257,10 +390,17 @@ export default async function AdminWorksPage({
           actions={
             <>
               <AdminMetric label="作品" value={works.length} />
+              <AdminMetric label="外部卡片" value={externalCards.length} />
               <AdminMetric
                 label="公开"
-                value={works.filter((work) => work.is_public).length}
+                value={
+                  works.filter((work) => work.is_public).length +
+                  externalCards.filter((card) => card.is_public).length
+                }
               />
+              <AdminModal title="新增外部展示卡片" triggerLabel="新增外部卡片">
+                <ExternalCaseCardForm />
+              </AdminModal>
               <AdminModal title="新增成员作品" triggerLabel="新增作品">
                 <WorkForm memberOptions={memberOptions} />
               </AdminModal>
@@ -272,6 +412,81 @@ export default async function AdminWorksPage({
       {queryErrors.length > 0 ? (
         <AdminNotice>后台数据读取出现问题：{queryErrors.join(" | ")}</AdminNotice>
       ) : null}
+
+      <AdminPanel>
+        <AdminPanelHeader eyebrow="External" title="外部展示卡片" />
+        <AdminPanelBody className="space-y-2">
+          {externalCards.length > 0 ? (
+            externalCards.map((card) => (
+              <article
+                key={card.id}
+                className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background"
+              >
+                <div className="grid gap-3 p-3 lg:grid-cols-[88px_minmax(0,1fr)_auto] lg:items-center">
+                  <div className="relative size-[88px] overflow-hidden rounded-lg border border-border/70 bg-muted/30">
+                    {card.cover_image_url ? (
+                      <img
+                        src={card.cover_image_url}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="grid h-full w-full place-items-center text-lg font-semibold text-muted-foreground">
+                        {card.title.slice(0, 1)}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="min-w-0 space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h2 className="text-base font-semibold text-foreground">{card.title}</h2>
+                      <AdminStatusBadge tone={card.is_public ? "completed" : "neutral"}>
+                        {card.is_public ? "公开" : "隐藏"}
+                      </AdminStatusBadge>
+                      <AdminStatusBadge tone="scheduled">
+                        {externalCaseCardTypeLabels[card.card_type]}
+                      </AdminStatusBadge>
+                      {card.is_featured ? (
+                        <AdminStatusBadge tone="scheduled">精选</AdminStatusBadge>
+                      ) : null}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      {card.source_label ?? "外部案例"} · {card.cta_label}
+                    </p>
+                    <p className="line-clamp-2 text-sm text-muted-foreground">{card.summary}</p>
+                    <p className="truncate text-xs text-muted-foreground">{card.external_url}</p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 lg:justify-end">
+                    <Button asChild type="button" variant="outline" size="sm">
+                      <a href={card.external_url} target="_blank" rel="noreferrer">
+                        访问
+                      </a>
+                    </Button>
+                    <form action={deleteAdminExternalCaseCard}>
+                      <input type="hidden" name="external_card_id" value={card.id} />
+                      <Button type="submit" variant="outline" size="sm">
+                        删除
+                      </Button>
+                    </form>
+                  </div>
+                </div>
+
+                <details className="border-t border-border/70">
+                  <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-muted-foreground">
+                    展开编辑表单
+                  </summary>
+                  <div className="p-3 pt-1">
+                    <ExternalCaseCardForm card={card} />
+                  </div>
+                </details>
+              </article>
+            ))
+          ) : (
+            <AdminNotice>还没有外部展示卡片。添加后可展示到案例库。</AdminNotice>
+          )}
+        </AdminPanelBody>
+      </AdminPanel>
 
       <AdminPanel>
         <AdminPanelHeader eyebrow="List" title="作品列表" />

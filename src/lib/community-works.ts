@@ -32,9 +32,18 @@ export const workReviewStatusLabels = {
   rejected: "已拒绝",
 } as const;
 
+export const externalCaseCardTypeLabels = {
+  external: "外部",
+  project: "项目",
+  case: "案例",
+  tool: "工具",
+  service: "服务",
+} as const;
+
 export type PublicWorkType = keyof typeof workTypeLabels;
 export type PublicWorkStatus = keyof typeof workStatusLabels;
 export type PublicWorkReviewStatus = keyof typeof workReviewStatusLabels;
+export type PublicExternalCaseCardType = keyof typeof externalCaseCardTypeLabels;
 
 type PublicMemberWorkRow = {
   id: string;
@@ -74,6 +83,23 @@ type PublicMemberRow = {
   joined_at: string;
 };
 
+type PublicExternalCaseCardRow = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  description: string | null;
+  card_type: PublicExternalCaseCardType;
+  source_label: string | null;
+  cover_image_url: string | null;
+  external_url: string;
+  cta_label: string;
+  tags: string[] | null;
+  sort_order: number;
+  is_featured: boolean;
+  created_at: string;
+};
+
 export type PublicWorkMember = Pick<
   PublicMember,
   "id" | "publicSlug" | "displayName" | "avatarUrl" | "city" | "roleLabel" | "organization"
@@ -103,8 +129,27 @@ export type PublicMemberWork = {
   member: PublicWorkMember;
 };
 
+export type PublicExternalCaseCard = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  description: string | null;
+  type: PublicExternalCaseCardType;
+  typeLabel: string;
+  sourceLabel: string | null;
+  coverImageUrl: string | null;
+  externalUrl: string;
+  ctaLabel: string;
+  tags: string[];
+  sortOrder: number;
+  isFeatured: boolean;
+  createdAt: string;
+};
+
 export type PublicWorksDirectory = {
   works: PublicMemberWork[];
+  externalCards: PublicExternalCaseCard[];
   featuredWorks: PublicMemberWork[];
   tags: string[];
   stats: {
@@ -175,11 +220,33 @@ function mapPublicWork(
   };
 }
 
-function buildTags(works: PublicMemberWork[]) {
+function mapPublicExternalCaseCard(
+  row: PublicExternalCaseCardRow,
+): PublicExternalCaseCard {
+  return {
+    id: row.id,
+    slug: row.slug.trim(),
+    title: row.title.trim(),
+    summary: row.summary.trim(),
+    description: row.description,
+    type: row.card_type,
+    typeLabel: externalCaseCardTypeLabels[row.card_type] ?? row.card_type,
+    sourceLabel: row.source_label?.trim() || null,
+    coverImageUrl: getWorkCoverImageUrl(row.cover_image_url),
+    externalUrl: row.external_url,
+    ctaLabel: row.cta_label.trim() || "查看详情",
+    tags: row.tags ?? [],
+    sortOrder: row.sort_order,
+    isFeatured: row.is_featured,
+    createdAt: row.created_at,
+  };
+}
+
+function buildTags(items: Array<{ tags: string[] }>) {
   const counts = new Map<string, number>();
 
-  works.forEach((work) => {
-    work.tags.forEach((tag) => {
+  items.forEach((item) => {
+    item.tags.forEach((tag) => {
       const normalized = tag.trim();
 
       if (!normalized) {
@@ -237,10 +304,30 @@ async function loadPublicWorks() {
     .filter(Boolean) as PublicMemberWork[];
 }
 
+async function loadPublicExternalCaseCards() {
+  const supabase = createPublicWorksReadClient();
+  const { data, error } = await supabase
+    .from("external_case_cards")
+    .select(
+      "id, slug, title, summary, description, card_type, source_label, cover_image_url, external_url, cta_label, tags, sort_order, is_featured, created_at",
+    )
+    .eq("is_public", true)
+    .order("is_featured", { ascending: false })
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    return [];
+  }
+
+  return ((data ?? []) as PublicExternalCaseCardRow[]).map(mapPublicExternalCaseCard);
+}
+
 export async function getPublicWorksDirectory(): Promise<PublicWorksDirectory> {
   if (!hasSupabaseEnv()) {
     return {
       works: [],
+      externalCards: [],
       featuredWorks: [],
       tags: [],
       stats: {
@@ -265,16 +352,22 @@ export async function getPublicWorksByMemberId(memberId: string) {
 
 const getCachedPublicWorksDirectory = unstable_cache(
   async (): Promise<PublicWorksDirectory> => {
-    const works = await loadPublicWorks();
+    const [works, externalCards] = await Promise.all([
+      loadPublicWorks(),
+      loadPublicExternalCaseCards(),
+    ]);
     const makerIds = new Set(works.map((work) => work.memberId));
 
     return {
       works,
+      externalCards,
       featuredWorks: works.filter((work) => work.isFeatured).slice(0, 6),
-      tags: buildTags(works),
+      tags: buildTags([...works, ...externalCards]),
       stats: {
-        works: works.length,
-        featuredWorks: works.filter((work) => work.isFeatured).length,
+        works: works.length + externalCards.length,
+        featuredWorks:
+          works.filter((work) => work.isFeatured).length +
+          externalCards.filter((card) => card.isFeatured).length,
         makers: makerIds.size,
         launchedWorks: works.filter((work) => work.status === "launched").length,
       },

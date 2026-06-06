@@ -1,8 +1,17 @@
 import Link from "next/link";
-import { ArrowUpRight, GitBranch, MonitorUp, PlayCircle } from "lucide-react";
+import {
+  ArrowUpRight,
+  ExternalLink,
+  GitBranch,
+  MonitorUp,
+  PlayCircle,
+} from "lucide-react";
 
 import { MemberAvatar } from "@/components/member-avatar";
-import type { PublicMemberWork } from "@/lib/community-works";
+import type {
+  PublicExternalCaseCard,
+  PublicMemberWork,
+} from "@/lib/community-works";
 import { cn } from "@/lib/utils";
 
 import styles from "./member-work-card.module.css";
@@ -88,5 +97,54 @@ export function MemberWorkCard({ work, compact = false }: MemberWorkCardProps) {
         </div>
       </div>
     </article>
+  );
+}
+
+export function ExternalCaseCard({ card }: { card: PublicExternalCaseCard }) {
+  return (
+    <a
+      href={card.externalUrl}
+      className={cn(styles.workCard, styles.workCardLink)}
+      target="_blank"
+      rel="noreferrer"
+    >
+      <div className={styles.workCover} aria-hidden="true">
+        {card.coverImageUrl ? (
+          <img src={card.coverImageUrl} alt="" loading="lazy" />
+        ) : (
+          <span>{getWorkInitial(card.title)}</span>
+        )}
+      </div>
+
+      <div className={styles.workBody}>
+        <div className={styles.workMeta}>
+          <span>{card.typeLabel}</span>
+          <span>{card.sourceLabel ?? "外部案例"}</span>
+          {card.isFeatured ? <span>精选</span> : null}
+        </div>
+
+        <div className={styles.workTitleRow}>
+          <h3>{card.title}</h3>
+          <span className={styles.workTitleIcon}>
+            <ExternalLink aria-hidden="true" strokeWidth={2} />
+          </span>
+        </div>
+
+        <p>{card.summary}</p>
+
+        {card.tags.length > 0 ? (
+          <div className={styles.workTags}>
+            {card.tags.slice(0, 6).map((tag) => (
+              <span key={`${card.id}-${tag}`}>{tag}</span>
+            ))}
+          </div>
+        ) : null}
+
+        <div className={styles.workExternalFooter}>
+          <strong>{card.ctaLabel}</strong>
+          <small>{card.externalUrl.replace(/^https?:\/\//, "")}</small>
+        </div>
+      </div>
+    </a>
   );
 }

@@ -1,6 +1,13 @@
 import { redactSensitiveValue } from "@/lib/admin/permissions";
 import { canAdmin, requireAdminPermission } from "@/lib/supabase/guards";
 
+export type AdminExternalCaseCardType =
+  | "external"
+  | "project"
+  | "case"
+  | "tool"
+  | "service";
+
 export type AdminWorkType =
   | "product"
   | "project"
@@ -35,6 +42,25 @@ export type AdminMemberWorkRow = {
   updated_at: string;
 };
 
+export type AdminExternalCaseCardRow = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string;
+  description: string | null;
+  card_type: AdminExternalCaseCardType;
+  source_label: string | null;
+  cover_image_url: string | null;
+  external_url: string;
+  cta_label: string;
+  tags: string[];
+  sort_order: number;
+  is_public: boolean;
+  is_featured: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
 type AdminProfileOptionRow = {
   id: string;
   display_name: string | null;
@@ -54,6 +80,7 @@ export type AdminMemberWork = AdminMemberWorkRow & {
 
 export type AdminWorksData = {
   works: AdminMemberWork[];
+  externalCards: AdminExternalCaseCardRow[];
   memberOptions: AdminWorkMemberOption[];
   queryErrors: string[];
 };
@@ -69,6 +96,7 @@ export async function loadAdminWorksData(): Promise<AdminWorksData> {
 
   const [
     { data: worksData, error: worksError },
+    { data: externalCardsData, error: externalCardsError },
     { data: profilesData, error: profilesError },
     { data: membersData, error: membersError },
   ] = await Promise.all([
@@ -76,6 +104,14 @@ export async function loadAdminWorksData(): Promise<AdminWorksData> {
       .from("member_works")
       .select(
         "id, member_id, title, summary, description, work_type, status, review_status, role_label, cover_image_url, website_url, repo_url, demo_url, tags, sort_order, is_public, is_featured, created_at, updated_at",
+      )
+      .order("is_featured", { ascending: false })
+      .order("sort_order", { ascending: true })
+      .order("updated_at", { ascending: false }),
+    supabase
+      .from("external_case_cards")
+      .select(
+        "id, slug, title, summary, description, card_type, source_label, cover_image_url, external_url, cta_label, tags, sort_order, is_public, is_featured, created_at, updated_at",
       )
       .order("is_featured", { ascending: false })
       .order("sort_order", { ascending: true })
@@ -112,9 +148,16 @@ export async function loadAdminWorksData(): Promise<AdminWorksData> {
           : redactSensitiveValue(profile?.email),
       };
     }),
+    externalCards: ((externalCardsData ?? []) as AdminExternalCaseCardRow[]).map(
+      (card) => ({
+        ...card,
+        tags: card.tags ?? [],
+      }),
+    ),
     memberOptions,
     queryErrors: [
       worksError?.message,
+      externalCardsError?.message,
       profilesError?.message,
       membersError?.message,
     ].filter(Boolean) as string[],
