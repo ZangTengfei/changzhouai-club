@@ -646,15 +646,13 @@
   padding: 28px;
 }
 
-.recapMeta,
-.recapTags {
+.recapMeta {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.recapMeta span,
-.recapTags span {
+.recapMeta span {
   display: inline-flex;
   align-items: center;
   min-height: 32px;
@@ -685,11 +683,6 @@
   background: rgba(47, 130, 237, 0.09);
   color: #1f6ed2;
   box-shadow: inset 4px 0 0 rgba(47, 130, 237, 0.72);
-}
-
-.recapTags span {
-  background: rgba(var(--ink-rgb), 0.05);
-  color: rgba(var(--ink-rgb), 0.72);
 }
 
 .recapCopy h2 {

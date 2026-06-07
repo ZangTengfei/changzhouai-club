@@ -92,7 +92,7 @@ export default async function EventsPage({
         latestCompletedEvent.imageUrl
       : null;
   const totalPhotoCount = completedEvents.reduce(
-    (count, event) => count + event.gallery.length,
+    (count, event) => count + (event.gallery?.length ?? 0),
     0,
   );
   const eventStats = [
@@ -296,18 +296,13 @@ export default async function EventsPage({
                     </span>
                     <span>{item.locationLabel}</span>
                     <span>
-                      {item.gallery.length > 0
-                        ? `${item.gallery.length} 张照片`
+                      {(item.gallery?.length ?? 0) > 0
+                        ? `${item.gallery?.length ?? 0} 张照片`
                         : "已归档"}
                     </span>
                   </div>
                   <h2>{item.title}</h2>
                   <p>{item.summary}</p>
-                  <div className={styles.recapTags}>
-                    {item.highlights.map((highlight) => (
-                      <span key={highlight}>{highlight}</span>
-                    ))}
-                  </div>
                   <Link href={`/events/${item.slug}`} className={styles.recapLink}>
                     查看活动详情
                     <ArrowRight aria-hidden="true" strokeWidth={2} />

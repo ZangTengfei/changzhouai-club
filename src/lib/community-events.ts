@@ -84,7 +84,6 @@ export type PublicEventRecap = {
   isoDate: string;
   locationLabel: string;
   imageUrl: string | null;
-  highlights: string[];
   gallery: PublicGalleryImage[];
 };
 
@@ -218,7 +217,6 @@ function formatPublicEventStatus(status: string) {
 
 function mapCompletedEvent(row: EventRow): PublicEventRecap {
   const gallery = buildEventGallery(row);
-  const photoCount = gallery.length;
   const eventType = normalizeEventType(row.event_type);
   const eventTypeLabel = formatEventType(eventType);
 
@@ -236,11 +234,6 @@ function mapCompletedEvent(row: EventRow): PublicEventRecap {
     isoDate: row.event_at ? formatChangzhouIsoDate(row.event_at) ?? row.id : row.id,
     locationLabel: buildLocationLabel(row.city, row.venue),
     imageUrl: row.cover_image_url ?? gallery[0]?.imageUrl ?? null,
-    highlights: [
-      row.city ?? "常州",
-      row.venue ?? "线下交流",
-      photoCount > 0 ? `${photoCount} 张活动照片` : "活动已归档",
-    ],
     gallery,
   };
 }
@@ -272,11 +265,6 @@ function mapCompletedEventPreview(row: CompletedEventPreviewRow): PublicEventRec
     isoDate: row.event_at ? formatChangzhouIsoDate(row.event_at) ?? row.id : row.id,
     locationLabel: buildLocationLabel(row.city, row.venue),
     imageUrl: row.cover_image_url ?? null,
-    highlights: [
-      row.city ?? "常州",
-      row.venue ?? "线下交流",
-      row.cover_image_url ? "活动图片已归档" : "活动已归档",
-    ],
     gallery,
   };
 }
