@@ -13,9 +13,9 @@ import { HeroPhotoCarousel } from "@/components/hero-photo-carousel";
 import { SiteSponsors } from "@/components/site-sponsors";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import {
-  getCompletedEventsCount,
   getHomeCompletedEventRecaps,
-  getScheduledEvents,
+  getHomeCompletedEventsCount,
+  getHomeScheduledEvents,
 } from "@/lib/community-events";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import { getEventImageUrl } from "@/lib/public-image-url";
@@ -175,9 +175,9 @@ export default async function HomePage() {
     directory,
     wechatQrCode,
   ] = await Promise.all([
-    getScheduledEvents(),
+    getHomeScheduledEvents(),
     getHomeCompletedEventRecaps(),
-    getCompletedEventsCount(),
+    getHomeCompletedEventsCount(),
     getPublicMembersDirectory(),
     getCurrentWechatQrCode(),
   ]);

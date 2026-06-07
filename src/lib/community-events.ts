@@ -318,6 +318,14 @@ export async function getHomeCompletedEventRecaps() {
   return getCachedHomeCompletedEventRecaps();
 }
 
+export async function getHomeCompletedEventsCount() {
+  if (!hasSupabaseEnv()) {
+    return 0;
+  }
+
+  return getCachedHomeCompletedEventsCount();
+}
+
 export async function getCompletedEventsCount() {
   if (!hasSupabaseEnv()) {
     return 0;
@@ -332,6 +340,14 @@ export async function getScheduledEvents() {
   }
 
   return getCachedScheduledEvents();
+}
+
+export async function getHomeScheduledEvents() {
+  if (!hasSupabaseEnv()) {
+    return [] as PublicScheduledEvent[];
+  }
+
+  return getCachedHomeScheduledEvents();
 }
 
 export async function getPublicEventBySlug(slug: string) {
@@ -372,6 +388,7 @@ const getCachedHomeCompletedEventRecaps = unstable_cache(
         "id, slug, title, summary, description, event_at, venue, city, cover_image_url, event_type, status",
       )
       .eq("status", "completed")
+      .eq("event_type", "community")
       .order("event_at", { ascending: false, nullsFirst: false })
       .limit(4);
 
@@ -379,7 +396,22 @@ const getCachedHomeCompletedEventRecaps = unstable_cache(
       mapCompletedEventPreview,
     );
   },
-  ["public-home-completed-event-recaps"],
+  ["public-home-community-completed-event-recaps"],
+  { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
+);
+
+const getCachedHomeCompletedEventsCount = unstable_cache(
+  async () => {
+    const supabase = createPublicServerClient();
+    const { count } = await supabase
+      .from("events")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "completed")
+      .eq("event_type", "community");
+
+    return count ?? 0;
+  },
+  ["public-home-completed-events-count"],
   { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
 );
 
@@ -416,6 +448,29 @@ const getCachedScheduledEvents = unstable_cache(
     );
   },
   ["public-scheduled-events"],
+  { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
+);
+
+const getCachedHomeScheduledEvents = unstable_cache(
+  async () => {
+    const supabase = createPublicServerClient();
+    const { data } = await supabase
+      .from("events")
+      .select(
+        "id, title, summary, event_at, venue, city, slug, cover_image_url, registration_note, registration_url, event_type",
+      )
+      .eq("status", "scheduled")
+      .eq("event_type", "community")
+      .order("event_at", { ascending: true, nullsFirst: false });
+
+    return ((data ?? []) as Array<Omit<PublicScheduledEvent, "eventTypeLabel">>).map(
+      (event) => ({
+        ...event,
+        eventTypeLabel: formatEventType(event.event_type),
+      }),
+    );
+  },
+  ["public-home-scheduled-events"],
   { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
 );
 
