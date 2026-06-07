@@ -93,6 +93,7 @@ export function EventDetailRegistrationPanel({
         slug: event.slug,
         registration_note: event.registrationNote,
         registration_url: event.registrationUrl,
+        event_type: event.eventType,
         eventTypeLabel: event.eventTypeLabel,
       }}
       authState={authState}

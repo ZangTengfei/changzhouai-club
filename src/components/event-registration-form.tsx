@@ -18,6 +18,7 @@ type UpcomingEvent = {
   slug: string;
   registration_note?: string | null;
   registration_url?: string | null;
+  event_type?: string | null;
   eventTypeLabel?: string;
 };
 
@@ -43,6 +44,7 @@ export function EventRegistrationForm({
   redirectTo,
   showDetailLink = true,
   showEventSlug = true,
+  highlightEventType = false,
 }: {
   event: UpcomingEvent;
   authState: "loading" | "logged_out" | "logged_in";
@@ -50,9 +52,14 @@ export function EventRegistrationForm({
   redirectTo?: string;
   showDetailLink?: boolean;
   showEventSlug?: boolean;
+  highlightEventType?: boolean;
 }) {
   const detailHref = `/events/${event.slug}`;
   const nextPath = redirectTo ?? detailHref;
+  const eventType = event.event_type === "external" ? "external" : "community";
+  const eventTypeLabel =
+    event.eventTypeLabel ?? (eventType === "external" ? "外部活动" : "社区活动");
+  const eventTypeHint = eventType === "external" ? "外部精选" : "AI Club 主办";
   const externalRegistrationUrl = getExternalRegistrationUrl(
     event.registration_url,
     event.registration_note,
@@ -63,10 +70,16 @@ export function EventRegistrationForm({
   );
 
   return (
-    <article className="card event-registration-card">
+    <article className={`card event-registration-card event-registration-card-${eventType}`}>
+      {highlightEventType ? (
+        <div className={`event-type-band event-type-band-${eventType}`}>
+          <strong>{eventTypeLabel}</strong>
+          <span>{eventTypeHint}</span>
+        </div>
+      ) : null}
       <div className="pill-row">
-        {event.eventTypeLabel ? (
-          <span className="pill pill-warm">{event.eventTypeLabel}</span>
+        {event.eventTypeLabel && !highlightEventType ? (
+          <span className="pill pill-warm">{eventTypeLabel}</span>
         ) : null}
         <span className="pill">{formatEventDateTime(event.event_at)}</span>
         <span className="pill">{event.city ?? "常州"}</span>

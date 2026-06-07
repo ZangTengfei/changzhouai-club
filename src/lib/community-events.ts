@@ -2,7 +2,11 @@ import { unstable_cache } from "next/cache";
 
 import { formatChangzhouDateTime, formatChangzhouIsoDate } from "@/lib/changzhou-time";
 import { hasSupabaseEnv } from "@/lib/env";
-import { formatEventType } from "@/lib/event-type";
+import {
+  formatEventType,
+  normalizeEventType,
+  type EventType,
+} from "@/lib/event-type";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 type EventPhotoRow = {
@@ -74,6 +78,8 @@ export type PublicEventRecap = {
   slug: string;
   title: string;
   summary: string;
+  eventType: EventType;
+  eventTypeLabel: string;
   dateLabel: string;
   isoDate: string;
   locationLabel: string;
@@ -213,7 +219,8 @@ function formatPublicEventStatus(status: string) {
 function mapCompletedEvent(row: EventRow): PublicEventRecap {
   const gallery = buildEventGallery(row);
   const photoCount = gallery.length;
-  const eventTypeLabel = formatEventType(row.event_type);
+  const eventType = normalizeEventType(row.event_type);
+  const eventTypeLabel = formatEventType(eventType);
 
   return {
     id: row.id,
@@ -223,12 +230,13 @@ function mapCompletedEvent(row: EventRow): PublicEventRecap {
       row.summary ??
       row.description ??
       "这场活动已经完成，欢迎通过活动记录了解现场主题、分享内容与交流氛围。",
+    eventType,
+    eventTypeLabel,
     dateLabel: row.event_at ? formatEventDateLabel(row.event_at) : "时间待定",
     isoDate: row.event_at ? formatChangzhouIsoDate(row.event_at) ?? row.id : row.id,
     locationLabel: buildLocationLabel(row.city, row.venue),
     imageUrl: row.cover_image_url ?? gallery[0]?.imageUrl ?? null,
     highlights: [
-      eventTypeLabel,
       row.city ?? "常州",
       row.venue ?? "线下交流",
       photoCount > 0 ? `${photoCount} 张活动照片` : "活动已归档",
@@ -238,7 +246,8 @@ function mapCompletedEvent(row: EventRow): PublicEventRecap {
 }
 
 function mapCompletedEventPreview(row: CompletedEventPreviewRow): PublicEventRecap {
-  const eventTypeLabel = formatEventType(row.event_type);
+  const eventType = normalizeEventType(row.event_type);
+  const eventTypeLabel = formatEventType(eventType);
   const gallery = row.cover_image_url
     ? [
         {
@@ -257,12 +266,13 @@ function mapCompletedEventPreview(row: CompletedEventPreviewRow): PublicEventRec
       row.summary ??
       row.description ??
       "这场活动已经完成，欢迎通过活动记录了解现场主题、分享内容与交流氛围。",
+    eventType,
+    eventTypeLabel,
     dateLabel: row.event_at ? formatEventDateLabel(row.event_at) : "时间待定",
     isoDate: row.event_at ? formatChangzhouIsoDate(row.event_at) ?? row.id : row.id,
     locationLabel: buildLocationLabel(row.city, row.venue),
     imageUrl: row.cover_image_url ?? null,
     highlights: [
-      eventTypeLabel,
       row.city ?? "常州",
       row.venue ?? "线下交流",
       row.cover_image_url ? "活动图片已归档" : "活动已归档",

@@ -285,6 +285,15 @@ export default async function EventsPage({
 
                 <div className={styles.recapCopy}>
                   <div className={styles.recapMeta}>
+                    <span
+                      className={`${styles.eventTypeBadge} ${
+                        item.eventType === "external"
+                          ? styles.eventTypeBadgeExternal
+                          : styles.eventTypeBadgeCommunity
+                      }`}
+                    >
+                      {item.eventTypeLabel}
+                    </span>
                     <span>{item.locationLabel}</span>
                     <span>
                       {item.gallery.length > 0
