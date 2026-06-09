@@ -145,7 +145,7 @@ function parseLineList(value: string | null) {
 
   return value
     .split("\n")
-    .map((item) => item.trim().replace(/^[\s\-*•\d.、]+/, ""))
+    .map((item) => item.trim().replace(/^\s*(?:[-*•]\s*|\d+[.、]\s*)/, ""))
     .filter(Boolean);
 }
 
