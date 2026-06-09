@@ -78,6 +78,19 @@ type EventRegistrationNotificationPayload = {
   note: string | null;
 };
 
+type EventProposalNotificationPayload = {
+  initiatorName: string;
+  contactWechat: string | null;
+  contactPhone: string | null;
+  organization: string | null;
+  initiatorRole: string | null;
+  topicTitle: string;
+  preferredFormat: string | null;
+  desiredTimeline: string | null;
+  proposalSummary: string;
+  expectedSupport: string | null;
+};
+
 function escapeHtml(value: string) {
   return value
     .replaceAll("&", "&amp;")
@@ -476,6 +489,31 @@ export async function sendAdminCooperationLeadNotification(
       { label: "需求摘要", value: payload.requirementSummary },
       { label: "预算范围", value: payload.budgetRange },
       { label: "期望时间", value: payload.desiredTimeline },
+    ],
+  });
+
+  return result.ok;
+}
+
+export async function sendAdminEventProposalNotification(
+  payload: EventProposalNotificationPayload,
+) {
+  const result = await dispatchAdminNotification({
+    subject: `新的活动发起申请：${payload.topicTitle} / ${payload.initiatorName}`,
+    title: "有新的活动发起申请",
+    intro: "有成员提交了活动发起申请，请先确认主题、主讲内容和排期可能性。",
+    adminUrl: getAdminUrl("/admin/leads"),
+    fields: [
+      { label: "发起人", value: payload.initiatorName },
+      { label: "联系微信", value: payload.contactWechat },
+      { label: "联系电话", value: payload.contactPhone },
+      { label: "身份 / 单位", value: payload.organization },
+      { label: "发起人背景", value: payload.initiatorRole },
+      { label: "分享主题", value: payload.topicTitle },
+      { label: "活动形式", value: payload.preferredFormat },
+      { label: "期望时间", value: payload.desiredTimeline },
+      { label: "主题简介", value: payload.proposalSummary },
+      { label: "希望社区支持", value: payload.expectedSupport },
     ],
   });
 

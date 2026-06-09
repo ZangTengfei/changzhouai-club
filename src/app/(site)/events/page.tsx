@@ -4,6 +4,8 @@ import {
   ArrowRight,
   CalendarDays,
   Camera,
+  Lightbulb,
+  Mic,
   MapPin,
   Sparkles,
   UsersRound,
@@ -65,6 +67,19 @@ const eventFlowSteps = [
     title: "把想法带走",
     summary: "把灵感沉淀成项目、合作线索或下一次分享的主题。",
     tone: "blue",
+  },
+] as const;
+
+const eventProposalNotes = [
+  {
+    title: "发起人主讲",
+    summary: "申请人需要成为本场主要分享者，把自己的实践、案例或方法带到现场。",
+    icon: Mic,
+  },
+  {
+    title: "先申请再排期",
+    summary: "社区会先确认主题、受众和边界，再一起安排场地、报名和传播。",
+    icon: Lightbulb,
   },
 ] as const;
 
@@ -154,6 +169,9 @@ export default async function EventsPage({
             <Link href="#reviews" className="button home-ghost-button">
               往期回顾
             </Link>
+            <Link href="/events/propose" className="button home-ghost-button">
+              发起活动申请
+            </Link>
           </div>
 
           <div className={styles.heroProof}>
@@ -229,6 +247,36 @@ export default async function EventsPage({
             <p>{item.summary}</p>
           </article>
         ))}
+      </section>
+
+      <section className={styles.proposalSection} aria-labelledby="event-proposal-title">
+        <div className={styles.proposalCopy}>
+          <p className="home-kicker">Host · 群友发起</p>
+          <h2 id="event-proposal-title">有主题，也可以申请发起一场活动</h2>
+          <p>
+            社区欢迎成员把真实实践带到线下。发起人默认是活动的主要分享者，
+            申请通过后再共同确认排期、场地、报名和现场支持。
+          </p>
+        </div>
+
+        <div className={styles.proposalNotes} aria-label="活动发起申请规则">
+          {eventProposalNotes.map((item) => {
+            const Icon = item.icon;
+
+            return (
+              <article key={item.title}>
+                <Icon aria-hidden="true" strokeWidth={1.8} />
+                <strong>{item.title}</strong>
+                <span>{item.summary}</span>
+              </article>
+            );
+          })}
+        </div>
+
+        <Link href="/events/propose" className={`button home-primary-button ${styles.proposalCta}`}>
+          提交活动申请
+          <ArrowRight aria-hidden="true" strokeWidth={2} />
+        </Link>
       </section>
 
       <section className={styles.upcomingSection} id="upcoming">

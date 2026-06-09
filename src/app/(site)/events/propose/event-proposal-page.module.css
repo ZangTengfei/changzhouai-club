@@ -1,0 +1,272 @@
+.proposalPageStack {
+  display: grid;
+  gap: 24px;
+  padding: 20px 0 44px;
+}
+
+.backLink {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  width: fit-content;
+  color: var(--accent-strong);
+  font-size: 0.92rem;
+  font-weight: 850;
+}
+
+.backLink svg {
+  width: 17px;
+  height: 17px;
+}
+
+.proposalHero {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.42fr) minmax(0, 0.58fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.proposalIntro {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+  padding-top: 12px;
+}
+
+.proposalIntro h1,
+.proposalIntro p {
+  margin: 0;
+}
+
+.proposalIntro h1 {
+  color: #111b1f;
+  font-size: clamp(2.35rem, 4.2vw, 3.45rem);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+.proposalIntro h1 span {
+  display: block;
+  color: var(--accent);
+}
+
+.proposalIntro > p {
+  max-width: 36rem;
+  color: rgba(var(--ink-rgb), 0.7);
+  font-size: 1.02rem;
+  font-weight: 650;
+  line-height: 1.78;
+}
+
+.principleList {
+  display: grid;
+  gap: 12px;
+}
+
+.principleCard {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 6px 12px;
+  align-items: start;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid rgba(126, 170, 151, 0.18);
+  border-radius: 16px;
+  background: rgba(248, 250, 246, 0.76);
+  box-shadow: 0 10px 22px rgba(var(--ink-rgb), 0.028);
+}
+
+.principleCard svg {
+  grid-row: 1 / span 2;
+  width: 32px;
+  height: 32px;
+  color: var(--accent);
+}
+
+.principleCard h2,
+.principleCard p {
+  margin: 0;
+}
+
+.principleCard h2 {
+  color: #111a1d;
+  font-size: 1.05rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.principleCard p {
+  color: rgba(var(--ink-rgb), 0.64);
+  font-size: 0.92rem;
+  font-weight: 650;
+  line-height: 1.62;
+}
+
+.formPanel {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid rgba(126, 170, 151, 0.18);
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 92% 10%, rgba(255, 199, 81, 0.14), transparent 18%),
+    linear-gradient(180deg, rgba(242, 249, 245, 0.96), rgba(248, 251, 248, 0.92));
+  box-shadow:
+    0 18px 36px rgba(var(--ink-rgb), 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.formPanelHeader {
+  display: grid;
+  gap: 8px;
+}
+
+.formPanelHeader h2,
+.formPanelHeader p {
+  margin: 0;
+}
+
+.formPanelHeader h2 {
+  color: #111a1d;
+  font-size: clamp(1.65rem, 2.6vw, 2.08rem);
+  font-weight: 900;
+  line-height: 1.12;
+}
+
+.statusNote {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 14px 16px;
+  border: 1px dashed rgba(var(--accent-rgb), 0.28);
+  border-radius: 16px;
+  background: rgba(var(--accent-rgb), 0.08);
+  color: var(--accent-strong);
+  font-weight: 800;
+}
+
+.statusNote svg {
+  width: 20px;
+  height: 20px;
+}
+
+.statusNoteError {
+  border-color: rgba(197, 91, 79, 0.28);
+  background: rgba(197, 91, 79, 0.08);
+  color: var(--destructive);
+}
+
+.proposalForm {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+  padding: 20px;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-radius: 18px;
+  background: rgba(255, 252, 247, 0.78);
+}
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.formField {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.formField span {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.formFieldWide {
+  grid-column: 1 / -1;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.formActions button {
+  gap: 8px;
+  border: 0;
+}
+
+.formActions svg {
+  width: 18px;
+  height: 18px;
+}
+
+.processStrip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.processStrip article {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 5px 12px;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(208, 214, 207, 0.7);
+  border-radius: 18px;
+  background: rgba(248, 250, 246, 0.74);
+  box-shadow: 0 10px 22px rgba(var(--ink-rgb), 0.028);
+}
+
+.processStrip svg {
+  grid-row: 1 / span 2;
+  width: 30px;
+  height: 30px;
+  color: var(--accent);
+}
+
+.processStrip strong {
+  color: #111a1d;
+  font-size: 1.04rem;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.processStrip span {
+  color: rgba(var(--ink-rgb), 0.64);
+  font-size: 0.92rem;
+  font-weight: 650;
+  line-height: 1.55;
+}
+
+@media (max-width: 1024px) {
+  .proposalHero {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .proposalPageStack {
+    gap: 22px;
+    padding-top: 14px;
+  }
+
+  .proposalIntro h1 {
+    font-size: clamp(2rem, 11vw, 2.8rem);
+  }
+
+  .formGrid,
+  .processStrip {
+    grid-template-columns: 1fr;
+  }
+
+  .formPanel,
+  .proposalForm {
+    padding: 18px;
+  }
+}
