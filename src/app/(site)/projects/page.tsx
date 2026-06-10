@@ -20,16 +20,16 @@ export const metadata: Metadata = {
 
 const projectNotes = [
   {
-    title: "真实需求",
-    summary: "项目通常来自企业、机构、园区或成员线索，优先展示已确认基本场景的机会。",
+    title: "问题线索",
+    summary: "项目通常来自企业、机构、园区或成员实践，优先看场景是否真实、具体、可沟通。",
   },
   {
-    title: "组队协作",
-    summary: "社区会按项目需要匹配产品、技术、设计、运营、交付等角色一起推进。",
+    title: "原型验证",
+    summary: "适合推进的机会，会先明确 MVP 范围、目标用户和验证方式，再组织协作。",
   },
   {
-    title: "筛选跟进",
-    summary: "提交申请后由社区后台统一查看，再根据经验、时间和角色匹配情况联系。",
+    title: "试点沉淀",
+    summary: "试点或阶段复盘后，社区会尽量沉淀问题、过程、结果和可公开案例。",
   },
 ] as const;
 
@@ -41,8 +41,11 @@ export default async function ProjectsPage() {
     <div className={styles.projectsPageStack}>
       <section className={styles.projectsIntro} aria-labelledby="projects-title">
         <p className="home-kicker">Projects · 项目协作</p>
-        <h1 id="projects-title">正在招募的项目</h1>
-        <p>真实政企与企业需求进入社区后，会在这里开放适合公开申请的项目机会。</p>
+        <h1 id="projects-title">从真实问题到 AI 试点</h1>
+        <p>
+          真实政企、企业和成员需求进入社区后，会先做场景澄清、范围定义和角色匹配；
+          适合公开招募的机会会展示在这里。
+        </p>
       </section>
 
       <section aria-label="项目列表">
@@ -111,7 +114,7 @@ export default async function ProjectsPage() {
           <div className={styles.projectsOpportunityEmpty}>
             <BriefcaseBusiness aria-hidden="true" strokeWidth={1.8} />
             <strong>暂未开放公开招募项目</strong>
-            <p>有项目线索或合作需求，可以先提交给社区，我们确认后再决定是否公开招募。</p>
+            <p>有真实场景、项目线索或合作需求，可以先提交给社区，我们确认后再决定是否公开招募。</p>
             <Link href="/cooperate" className="button home-ghost-button">
               提交合作需求
             </Link>
@@ -122,7 +125,7 @@ export default async function ProjectsPage() {
       <section className={styles.projectsNotesSection} aria-labelledby="projects-notes-title">
         <div className={styles.projectsNotesHeading}>
           <p className="home-kicker">Collaboration</p>
-          <h2 id="projects-notes-title">项目协作说明</h2>
+          <h2 id="projects-notes-title">项目如何在社区里推进</h2>
         </div>
 
         <div className={styles.projectsNotes}>

@@ -38,16 +38,16 @@ const designThoughts = [
 
 const longTermDirections = [
   {
-    title: "持续线下相遇",
-    summary: "让常州本地的 OPC、开发者、产品人、创业者和 AI 爱好者稳定碰面。",
+    title: "让真实问题进入社区",
+    summary: "从成员实践、企业场景和线下活动里持续发现值得验证的 AI 问题。",
   },
   {
-    title: "沉淀真实分享",
-    summary: "把工具、项目、业务场景和一线经验沉淀成可复用的社区资产。",
+    title: "让共建协作形成原型",
+    summary: "把 OPC、开发者、产品人、场景方和内容运营组织到具体任务里。",
   },
   {
-    title: "推动项目协作",
-    summary: "从一次交流延伸到 PoC、试点、项目小队和对外合作。",
+    title: "让试点经验变成资产",
+    summary: "从一次交流延伸到 PoC、案例复盘、交付模板和可复用社区文档。",
   },
 ] as const;
 
@@ -58,12 +58,13 @@ export default function AboutPage() {
         <div className={styles.aboutHeroCopy}>
           <p className="home-kicker">About · 关于我们</p>
           <h1 id="about-hero-title">
-            一个把人、
-            <span>项目和需求重新连接起来的本地 AI 社区</span>
+            一个把真实问题、
+            <span>AI 能力和本地场景连接起来的社区</span>
           </h1>
           <p>
             常州 AI Club 立足常州，面向实践与共建。我们希望把散落在不同公司、
-            行业和微信群里的 AI 人重新组织起来，让分享发生、项目成形、合作落地。
+            行业和微信群里的 AI 人组织到同一个现场，让问题被看见、原型被做出、
+            试点被推进，经验被沉淀。
           </p>
 
           <div className={styles.aboutHeroActions}>
@@ -78,7 +79,7 @@ export default function AboutPage() {
 
           <div className={styles.aboutHeroProof}>
             <Sparkles aria-hidden="true" strokeWidth={1.9} />
-            <span>连接・分享・共创，是社区长期坚持的三个动作。</span>
+            <span>连接・验证・共创，是社区长期坚持的三个动作。</span>
           </div>
         </div>
 
@@ -137,7 +138,7 @@ export default function AboutPage() {
           <p className="home-kicker">Direction</p>
           <div>
             <h2>我们希望长期形成什么</h2>
-            <p>不是一次性的活动群，而是能持续沉淀内容、成员和合作机会的本地网络。</p>
+            <p>不是一次性的活动群，而是能持续沉淀问题、成员、项目和方法的本地网络。</p>
           </div>
         </div>
 
@@ -155,8 +156,8 @@ export default function AboutPage() {
       <section className={styles.aboutJoinPanel}>
         <div>
           <p className="home-kicker">Next</p>
-          <h2>如果你也在常州关注 AI，欢迎加入这张连接网络</h2>
-          <p>你可以从参加活动、公开成员主页、发起合作或参与项目协作开始。</p>
+          <h2>如果你也在常州关注 AI，欢迎把问题和能力带进来</h2>
+          <p>你可以从参加活动、公开成员主页、提交真实场景或参与项目协作开始。</p>
         </div>
 
         <div className={styles.aboutJoinActions}>

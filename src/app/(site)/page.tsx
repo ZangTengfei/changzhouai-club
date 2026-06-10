@@ -85,24 +85,24 @@ function extractShortBio(value: string | null) {
 const homeFlowSteps = [
   {
     step: "01",
-    title: "参与活动",
-    summary: "线下交流、主题分享、拓展你的 AI 视野",
+    title: "带来问题",
+    summary: "从成员实践和企业场景里发现值得验证的 AI 问题",
     tone: "green",
     illustrationSrc: "/home-flow-participate-card.webp",
     illustrationAlt: "",
   },
   {
     step: "02",
-    title: "认识成员",
-    summary: "通过交流发现更合拍的伙伴，建立信任连接",
+    title: "共创原型",
+    summary: "用活动、工作坊和项目小队把想法做成最小版本",
     tone: "orange",
     illustrationSrc: "/home-flow-connect-card.webp",
     illustrationAlt: "",
   },
   {
     step: "03",
-    title: "项目协作",
-    summary: "真实需求、资源对接，让项目真正落地",
+    title: "试点沉淀",
+    summary: "把反馈、案例和方法写下来，反哺下一次项目",
     tone: "blue",
     illustrationSrc: "/home-flow-build-card.webp",
     illustrationAlt: "",
@@ -112,17 +112,17 @@ const homeFlowSteps = [
 const heroNotes = [
   {
     className: "home-sticky-note home-sticky-note-green",
-    lines: ["在这里", "认识有趣的人", "一起做有意思的事"],
+    lines: ["带着问题来", "一起找到", "可验证的方向"],
     icon: "heart",
   },
   {
     className: "home-sticky-note home-sticky-note-yellow",
-    lines: ["从 0 到 1", "把想法变成", "真实项目"],
+    lines: ["从想法", "到原型", "再到试点"],
     icon: "arrow",
   },
   {
     className: "home-sticky-note home-sticky-note-blue",
-    lines: ["每一次交流", "都可能带来", "新的机会"],
+    lines: ["每次活动", "都沉淀成", "新的上下文"],
     icon: "smile",
   },
 ] as const;
@@ -132,28 +132,28 @@ const fallbackMemberStories = [
     id: "story-1",
     name: "社区成员",
     meta: "AI 爱好者",
-    story: "在这里认识更多同行者，把零散想法变成一次次具体的交流和实践。",
-    tags: ["# 找到方向", "# 真实交流", "# 本地连接"],
+    story: "在这里认识更多同行者，把零散想法变成可讨论、可验证的具体问题。",
+    tags: ["# 问题验证", "# 真实交流", "# 本地连接"],
   },
   {
     id: "story-2",
     name: "社区成员",
     meta: "技术探索者",
-    story: "通过活动里的真实案例和分享，把抽象概念慢慢变成自己能上手的能力。",
-    tags: ["# 学习成长", "# AI 实践", "# 知识分享"],
+    story: "通过活动里的案例和场景拆解，把抽象 AI 能力变成自己能上手的原型。",
+    tags: ["# 原型共创", "# AI 实践", "# 知识分享"],
   },
   {
     id: "story-3",
     name: "社区成员",
     meta: "项目参与者",
-    story: "一次线下碰面可能带来新的伙伴、资源连接，甚至一次项目的开始。",
-    tags: ["# 项目落地", "# 资源对接", "# 项目协作"],
+    story: "一次线下碰面可能带来新的伙伴、资源连接，甚至一次试点项目的开始。",
+    tags: ["# 场景试点", "# 资源对接", "# 项目协作"],
   },
   {
     id: "story-4",
     name: "社区成员",
     meta: "本地 AI 连接者",
-    story: "社区让本地 OPC、开发者、产品人和创业者有了更稳定的相遇和协作场景。",
+    story: "社区让本地 OPC、开发者、产品人、企业场景方有了更稳定的相遇和协作现场。",
     tags: ["# 灵感碰撞", "# 常州 AI", "# 社区成长"],
   },
 ] as const;
@@ -298,11 +298,11 @@ export default async function HomePage() {
           <h1 id="home-hero-title">
             常州 <span className={cx("home-hero-title-accent")}>AI Club</span>
             <br />
-            <span className={cx("home-hero-title-line")}>本地 AI 人的共同家园</span>
+            <span className={cx("home-hero-title-line")}>让真实问题长成 AI 项目</span>
           </h1>
           <p className={cx("home-hero-lede")}>
-            连接常州的 OPC、开发者、产品人、创业者和 AI 爱好者，
-            一起探索 AI，落地创新，推动本地 AI 生态发展。
+            连接常州的 AI 实践者、企业场景方和共建者，
+            把真实问题推进到问题验证、AI 原型、场景试点和案例沉淀。
           </p>
 
           <div className={cx("home-hero-actions")}>
@@ -311,7 +311,7 @@ export default async function HomePage() {
               <span aria-hidden="true">→</span>
             </Link>
             <Link href="/events" className={cx("button home-ghost-button")}>
-              了解更多
+              参加活动
             </Link>
           </div>
 
@@ -384,7 +384,7 @@ export default async function HomePage() {
       <section className={cx("home-flow-section")} aria-labelledby="home-flow-title">
         <div className={cx("home-section-heading home-flow-heading")}>
           <h2 id="home-flow-title">从活动到合作</h2>
-          <p>在这里，认识更多人，创造更多可能</p>
+          <p>活动不是终点，而是让问题、伙伴和项目进入同一个现场</p>
         </div>
 
         <div className={cx("home-flow-layout")}>
@@ -468,7 +468,7 @@ export default async function HomePage() {
         <div className={cx("home-card-heading home-showcase-heading")}>
           <div>
             <h2 id="home-member-stories-title">成员故事</h2>
-            <p>他们在这里找到方向、伙伴和机会</p>
+            <p>他们在这里把经验、问题和 AI 能力连接起来</p>
           </div>
           <Link href="/members">查看更多故事 →</Link>
         </div>
@@ -510,7 +510,7 @@ export default async function HomePage() {
         <div className={cx("home-card-heading home-showcase-heading")}>
           <div>
             <h2 id="home-event-review-title">近期活动回顾</h2>
-            <p>看看最近几场线下活动的现场氛围</p>
+            <p>看看最近几场线下活动如何沉淀问题、案例和连接</p>
           </div>
           <Link href="/events">查看更多 →</Link>
         </div>
@@ -567,7 +567,7 @@ export default async function HomePage() {
         </div>
 
         <div className={cx("home-join-banner-copy")}>
-          <h2 id="home-join-banner-title">加入我们，成为常州 AI 生态的一部分</h2>
+          <h2 id="home-join-banner-title">加入我们，把你的问题和能力带到现场</h2>
           <p>
             扫描二维码添加社区官方微信，备注来意后由运营同学邀请你进入交流群。
           </p>

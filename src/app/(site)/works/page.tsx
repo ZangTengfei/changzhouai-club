@@ -14,7 +14,7 @@ import styles from "./works-page.module.css";
 
 export const metadata: Metadata = {
   title: "案例库",
-  description: "查看常州 AI Club 成员公开展示的 AI 产品、工具、OPC 揭榜挂帅项目和实践案例。",
+  description: "查看常州 AI Club 成员公开展示的 AI 产品、工具、OPC 揭榜挂帅项目和场景实践案例。",
 };
 
 export default async function WorksPage() {
@@ -26,12 +26,12 @@ export default async function WorksPage() {
         <div className={styles.worksHeroCopy}>
           <p className="home-kicker">Cases · 案例库</p>
           <h1 id="works-hero-title">
-            看见成员正在做的
+            看见真实问题长出的
             <span>AI 产品、工具和项目</span>
           </h1>
           <p>
-            这里聚合社区成员公开展示的案例，不限于社区共建项目。它可以是一个产品、
-            一个开源库、一段 Demo、一次服务案例，或者正在验证中的小工具。
+            这里聚合社区成员和合作场景中公开展示的 AI 实践，不限于社区共建项目。
+            它可以是一个产品、一个开源库、一段 Demo、一次服务案例，或者正在验证中的小工具。
           </p>
 
           <div className={styles.worksHeroActions}>
@@ -63,7 +63,7 @@ export default async function WorksPage() {
           <p className="home-kicker">Directory</p>
           <div>
             <h2>公开案例</h2>
-            <p>公开案例可以关联成员，也可以跳转到外部展示页，方便继续查看完整项目资料。</p>
+            <p>公开案例可以关联成员，也可以跳转到外部展示页，方便继续查看问题背景、项目资料和阶段成果。</p>
           </div>
         </div>
 
@@ -91,7 +91,7 @@ export default async function WorksPage() {
           <p className="home-kicker">Browse</p>
           <div>
             <h2>案例类型</h2>
-            <p>用更宽的口径承接成员实践，产品、工具、案例和开源项目都可以展示。</p>
+            <p>用更宽的口径承接成员实践，产品、工具、场景试点、服务案例和开源项目都可以展示。</p>
           </div>
         </div>
 

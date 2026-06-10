@@ -26,16 +26,16 @@ type SearchParams = {
 
 const followUpNotes = [
   {
-    title: "确认场景",
-    summary: "先看业务背景、目标结果和当前进度，判断需求是否已经适合推进。",
+    title: "场景澄清",
+    summary: "先看业务背景、目标结果、当前流程和真实约束，判断问题是否具体。",
   },
   {
-    title: "匹配资源",
-    summary: "再根据需求类型匹配分享嘉宾、培训讲师、FDE 工程师或项目协作团队。",
+    title: "验证路径",
+    summary: "再判断适合主题分享、企业内训、PoC 验证、MVP 原型还是项目协作。",
   },
   {
-    title: "约定下一步",
-    summary: "适合继续沟通的需求，会进入电话沟通、线下拜访、PoC 或项目方案阶段。",
+    title: "共创试点",
+    summary: "适合继续推进的需求，会进入电话沟通、线下拜访、成员匹配或试点方案阶段。",
   },
 ] as const;
 
@@ -74,12 +74,12 @@ export default async function CooperatePage({
         <div className={styles.leadFormIntro}>
           <p className="home-kicker">Cooperate · 合作联系</p>
           <h1 id="lead-form-title">
-            提交你的
-            <span>AI 合作需求</span>
+            把真实场景
+            <span>带进 AI 共创</span>
           </h1>
           <p>
-            如果你正在寻找 AI 主题分享、企业内训、PoC 验证、项目协作或本地人才连接，
-            可以先把需求提交给社区。我们会根据场景判断适合的沟通方式和可对接资源。
+            如果你正在寻找 AI 主题分享、企业内训、场景澄清、PoC 验证、MVP 原型或本地人才连接，
+            可以先把需求提交给社区。我们会根据真实场景判断适合的沟通方式和可对接资源。
           </p>
 
           <div className={styles.cooperateAreaCloud} aria-label="适合提交的合作方向">
@@ -138,7 +138,7 @@ export default async function CooperatePage({
 
               <label className={styles.formField}>
                 <span>需求类型</span>
-                <input className="input" name="requirement_type" placeholder="分享 / 内训 / PoC / 项目开发" />
+                <input className="input" name="requirement_type" placeholder="分享 / 内训 / 场景澄清 / PoC / 项目开发" />
               </label>
 
               <label className={styles.formField}>
@@ -161,7 +161,7 @@ export default async function CooperatePage({
                   className="input textarea"
                   name="requirement_summary"
                   rows={5}
-                  placeholder="请尽量写清楚业务场景、希望解决的问题、预期结果，以及是否需要线下沟通。"
+                  placeholder="请尽量写清楚业务场景、当前流程、希望解决的问题、预期结果，以及是否需要线下沟通。"
                   required
                 />
               </label>
@@ -206,7 +206,7 @@ export default async function CooperatePage({
         </div>
 
         <div className={styles.joinBannerCopy}>
-          <h2 id="cooperate-join-banner-title">加入我们，成为常州 AI 生态的一部分</h2>
+          <h2 id="cooperate-join-banner-title">加入我们，一起把真实问题推进到试点</h2>
           <p>
             扫描二维码添加社区官方微信，备注来意后由运营同学邀请你进入交流群。
           </p>
