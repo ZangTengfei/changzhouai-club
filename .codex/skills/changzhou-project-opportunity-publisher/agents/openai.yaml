@@ -1,0 +1,4 @@
+interface:
+  display_name: "Changzhou Project Opportunity Publisher"
+  short_description: "Publish Changzhou AI Club project collaboration opportunities"
+  default_prompt: "Publish a Changzhou AI Club project collaboration opportunity using the repository workflow."
