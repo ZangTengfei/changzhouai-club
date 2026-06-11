@@ -261,6 +261,14 @@ function ProjectOpportunityForm({
           />
         </AdminField>
 
+        <AdminField label="外部申请链接">
+          <Input
+            name="external_application_url"
+            defaultValue={opportunity?.external_application_url ?? ""}
+            placeholder="https://..."
+          />
+        </AdminField>
+
         <AdminField label="申请说明" className="md:col-span-2">
           <Textarea
             name="application_note"
@@ -451,7 +459,11 @@ export default async function AdminProjectsPage({
                       <AdminStatusBadge
                         tone={opportunity.application_requires_login ? "pending" : "neutral"}
                       >
-                        {opportunity.application_requires_login ? "需登录申请" : "匿名可申请"}
+                        {opportunity.external_application_url
+                          ? "外部表单"
+                          : opportunity.application_requires_login
+                            ? "需登录申请"
+                            : "匿名可申请"}
                       </AdminStatusBadge>
                     </div>
                     <p className="text-sm text-muted-foreground">{opportunity.summary}</p>

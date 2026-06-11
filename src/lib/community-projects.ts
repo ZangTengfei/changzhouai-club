@@ -61,6 +61,7 @@ type PublicProjectOpportunityRow = {
   location: string | null;
   application_cta: string | null;
   application_note: string | null;
+  external_application_url: string | null;
   application_requires_login: boolean;
   sort_order: number;
   is_featured: boolean;
@@ -91,6 +92,7 @@ export type PublicProjectOpportunity = {
   location: string | null;
   applicationCta: string;
   applicationNote: string | null;
+  externalApplicationUrl: string | null;
   applicationRequiresLogin: boolean;
   sortOrder: number;
   isFeatured: boolean;
@@ -127,6 +129,7 @@ const visibleProjectSelect = [
   "location",
   "application_cta",
   "application_note",
+  "external_application_url",
   "application_requires_login",
   "sort_order",
   "is_featured",
@@ -170,6 +173,7 @@ function mapProjectOpportunity(row: PublicProjectOpportunityRow): PublicProjectO
     location: row.location,
     applicationCta: row.application_cta?.trim() || "申请参与",
     applicationNote: row.application_note,
+    externalApplicationUrl: row.external_application_url,
     applicationRequiresLogin: Boolean(row.application_requires_login),
     sortOrder: row.sort_order,
     isFeatured: row.is_featured,

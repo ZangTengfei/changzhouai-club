@@ -60,7 +60,13 @@ export default async function ProjectsPage() {
                     {opportunity.visibility !== "public" ? (
                       <span>{opportunity.visibilityLabel}</span>
                     ) : null}
-                    <span>{opportunity.applicationRequiresLogin ? "登录后申请" : "可直接申请"}</span>
+                    <span>
+                      {opportunity.externalApplicationUrl
+                        ? "外部表单"
+                        : opportunity.applicationRequiresLogin
+                          ? "登录后申请"
+                          : "可直接申请"}
+                    </span>
                   </div>
                   <h3>{opportunity.title}</h3>
                   <p>{opportunity.summary}</p>

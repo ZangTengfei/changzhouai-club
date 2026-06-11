@@ -144,9 +144,16 @@ export default async function ProjectDetailPage({
   const submissionKey = randomUUID();
   const descriptionMarkdown = opportunity.description?.trim();
   const isRecruiting = opportunity.status === "recruiting";
+  const externalApplicationUrl = opportunity.externalApplicationUrl;
+  const hasExternalApplication = Boolean(externalApplicationUrl);
   const requiresLogin = opportunity.applicationRequiresLogin;
-  const canApplyNow = isRecruiting && !hasApplied && (!requiresLogin || Boolean(signedInUserId));
-  const shouldPromptLogin = isRecruiting && !hasApplied && requiresLogin && !signedInUserId;
+  const canApplyNow =
+    isRecruiting &&
+    !hasExternalApplication &&
+    !hasApplied &&
+    (!requiresLogin || Boolean(signedInUserId));
+  const shouldPromptLogin =
+    isRecruiting && !hasExternalApplication && !hasApplied && requiresLogin && !signedInUserId;
   const loginHref = `/login?next=${encodeURIComponent(`/projects/${opportunity.slug}#application-form`)}`;
   const quickFacts = [
     {
@@ -207,7 +214,9 @@ export default async function ProjectDetailPage({
             <span>{opportunity.typeLabel}</span>
             <span>{opportunity.statusLabel}</span>
             <span>{opportunity.visibilityLabel}</span>
-            <span>{requiresLogin ? "登录后申请" : "可直接申请"}</span>
+            <span>
+              {hasExternalApplication ? "外部表单" : requiresLogin ? "登录后申请" : "可直接申请"}
+            </span>
           </div>
 
           <div className={styles.projectHeroHeading}>
@@ -222,6 +231,17 @@ export default async function ProjectDetailPage({
                 {opportunity.applicationCta}
                 <ArrowRight aria-hidden="true" strokeWidth={2} />
               </Link>
+            ) : null}
+            {isRecruiting && externalApplicationUrl ? (
+              <a
+                href={externalApplicationUrl}
+                className="button home-primary-button"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {opportunity.applicationCta}
+                <ArrowRight aria-hidden="true" strokeWidth={2} />
+              </a>
             ) : null}
             {shouldPromptLogin ? (
               <Link href={loginHref} className="button home-primary-button">
@@ -321,6 +341,8 @@ export default async function ProjectDetailPage({
             <h2>
               {hasApplied
                 ? "申请已提交"
+                : hasExternalApplication && isRecruiting
+                  ? opportunity.applicationCta
                 : shouldPromptLogin
                   ? "登录后申请"
                 : isRecruiting
@@ -330,6 +352,9 @@ export default async function ProjectDetailPage({
             <p>
               {hasApplied
                 ? "你的申请已经进入社区后台，后续会根据你留下的信息继续联系和筛选。"
+                : hasExternalApplication && isRecruiting
+                  ? (opportunity.applicationNote ??
+                    "这个机会使用外部表单收集申请信息，请点击按钮前往填写。")
                 : shouldPromptLogin
                   ? "这个机会要求先登录社区账号，再提交申请信息。登录后会回到当前项目页面。"
                 : (opportunity.applicationNote ??
@@ -347,6 +372,23 @@ export default async function ProjectDetailPage({
               <Link href="/projects#opportunities" className="button home-ghost-button">
                 查看其他机会
               </Link>
+            </div>
+          ) : hasExternalApplication && isRecruiting && externalApplicationUrl ? (
+            <div className={styles.applicationLoginPanel}>
+              <Sparkles aria-hidden="true" strokeWidth={1.9} />
+              <div>
+                <strong>通过外部预登记表提交信息</strong>
+                <p>填写后由社区根据项目情况继续做赛事解读、报名辅导和资源对接。</p>
+              </div>
+              <a
+                href={externalApplicationUrl}
+                className="button home-primary-button"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {opportunity.applicationCta}
+                <ArrowRight aria-hidden="true" strokeWidth={2} />
+              </a>
             </div>
           ) : shouldPromptLogin ? (
             <div className={styles.applicationLoginPanel}>
