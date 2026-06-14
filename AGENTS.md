@@ -26,52 +26,14 @@ When producing new files:
 - Use Chinese names for `knowledge/` directories, files, and note titles when possible. Follow the local guide at `knowledge/00_知识库规范/知识库规范.md` when creating or organizing knowledge notes.
 - When preparing materials for community co-builders, follow `knowledge/00_知识库规范/共建资料同步规范.md`: treat local `knowledge/` and `files/` as the source of truth, generate reviewed sync packages under `output/`, and never include `visibility: private` source material unless the user explicitly approves a sanitized summary.
 
+Session knowledge capture:
+- When a session produces durable community knowledge, operational decisions, reusable runbooks, event/project context, or follow-up tasks, create a reviewable Markdown draft under `output/session-knowledge/` before ending the work.
+- Keep the draft concise: include the date, source session summary, key decisions, useful paths/commands, open follow-ups, and any privacy or verification notes.
+- Do not write raw transcripts, secrets, private contact details, unreviewed member data, or speculative conclusions into `knowledge/`.
+- Move or rewrite the draft into `knowledge/` only when the user explicitly asks to archive, publish, sync, or preserve it as durable knowledge. Follow the `knowledge/00_知识库规范/` guides when doing so.
+
 # Project-local Skills
 
 This repository keeps project-specific Codex skill instructions under `.codex/skills/`.
 
 For Changzhou AI Club website event publishing, use `.codex/skills/changzhou-event-publisher/SKILL.md` and the repository script `npm run event:publish`. Keep this skill project-local because it writes to this website's Supabase project and should not implicitly apply to unrelated repositories.
-
-# cc-connect Integration
-
-This project is managed via cc-connect, a bridge to messaging platforms.
-
-## Scheduled tasks (cron)
-
-When the user asks you to do something on a schedule, such as "every day at 6am" or "every Monday morning", use the Bash/shell tool to run:
-
-```bash
-cc-connect cron add --cron "<min> <hour> <day> <month> <weekday>" --prompt "<task description>" --desc "<short label>"
-```
-
-Environment variables `CC_PROJECT` and `CC_SESSION_KEY` are already set. Do not specify `--project` or `--session-key`.
-
-Examples:
-
-```bash
-cc-connect cron add --cron "0 6 * * *" --prompt "Collect GitHub trending repos and send a summary" --desc "Daily GitHub Trending"
-cc-connect cron add --cron "0 9 * * 1" --prompt "Generate a weekly project status report" --desc "Weekly Report"
-```
-
-To list or delete cron jobs:
-
-```bash
-cc-connect cron list
-cc-connect cron del <job-id>
-```
-
-## Send message to current chat
-
-To proactively send a message back to the user's chat session, use `--stdin` for long or multi-line messages:
-
-```bash
-cc-connect send --stdin <<'CCEOF'
-your message here
-CCEOF
-```
-
-For short single-line messages:
-
-```bash
-cc-connect send -m "short message"
-```
