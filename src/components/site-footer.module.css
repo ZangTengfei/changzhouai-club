@@ -99,6 +99,12 @@
   gap: 28px;
 }
 
+.home-footer-legal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+}
+
 .home-footer-bottom a:hover,
 .home-footer-bottom a:focus-visible {
   color: var(--accent-strong);
