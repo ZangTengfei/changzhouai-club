@@ -21,7 +21,7 @@
 - `React 19`
 - `TypeScript`
 - `Supabase Auth + Postgres + Storage`
-- `Vercel` 部署
+- `Docker` 自托管部署
 
 ## 主要页面
 
@@ -165,7 +165,9 @@ docs                   补充文档
 
 ## 部署说明
 
-项目面向 Vercel 部署，仓库内已有 `vercel.json`，当前区域配置为 `hnd1`。
+项目当前以国内服务器 Docker 自托管部署为主。
+
+仓库仍保留 `vercel.json` 作为历史 Vercel 项目配置，但已通过 `ignoreCommand` 阻止 `main` 分支触发 Vercel 自动构建和部署。
 
 部署前建议确认：
 
