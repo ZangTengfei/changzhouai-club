@@ -10,7 +10,7 @@ description: End-to-end Changzhou AI Club event launch workflow. Use when the us
 Use the current repository root.
 
 1. Confirm the public event theme and minimum facts: title, date/time, venue, city, target audience, topic scope, host/partner, and whether it should be public now.
-2. Draft public copy: one-line summary, 1-2 paragraph description, agenda, speaker/host line, registration note, and poster copy.
+2. Draft public copy: one-line summary, 1-2 paragraph description, agenda, speaker/host line, registration note, and poster copy. For Changzhou AI Club community-hosted events, also remind the user to include the community platform angle: speakers share real practice and may connect to cooperation opportunities, while the community structures demand, matches capabilities, and can support workflow customization/development rather than only serving as a free event organizer.
 3. Generate a Feishu form prompt if the form does not already exist. Keep it mobile-friendly and collect only necessary fields.
 4. Create or obtain the Feishu registration URL and QR code:
    - If a Feishu/browser session is available and the user asked you to operate it, use the browser/Chrome workflow to create the form.
@@ -81,6 +81,25 @@ Use this structure and adapt fields to the event. Do not add private or excessiv
 报名已提交，感谢关注 <活动标题>。活动具体安排以组织方后续通知为准，请保持手机或微信畅通。
 
 表单风格要求：简洁、专业、偏科技感，不要收集不必要的隐私信息。
+```
+
+## Community Platform Messaging
+
+For future event posters, registration pages, opening remarks, and host scripts, include a short practical community-promotion segment when appropriate:
+
+- Do not only say abstract phrases such as “连接大家” or “共同学习”.
+- State the concrete flywheel: real case sharing can bring speakers visibility and cooperation requests; this attracts stronger speakers and better scenarios.
+- Also state the community's own role and “self-interest”: Changzhou AI Club wants to become a cooperation platform, not a pure公益活动 organizer. It can help structure demand, connect scenario owners with practitioners, and turn needs into workflows, prototypes, or projects.
+- Keep the wording balanced: do not promise guaranteed leads or imply that every cooperation request belongs to the community.
+
+Reusable Chinese lines:
+
+```text
+来常州 AI Club 分享真实实践，不只是一次曝光，也可能连接到本地企业、团队和项目方的真实合作机会。
+
+我们办活动不只是为了热闹，也有一点自己的私心：希望把本地真实需求、AI 实践者和可交付的工作流组织到一个平台里。大家有场景、有能力、有项目，都可以在这里被看见、被梳理、被对接。
+
+社区可以协助把一个模糊需求拆成具体场景、工作流、原型或项目合作；视频方向可以是 AI 视频工作流，其他方向也可以沉淀成对应的行业工作流。
 ```
 
 ## Event JSON
