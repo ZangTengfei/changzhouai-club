@@ -25,6 +25,7 @@
 
 .home-hero-copy h1 {
   margin: 0;
+  max-width: 12.8em;
   color: #111b1f;
   font-family: var(--font-display);
   font-size: clamp(2.65rem, 4.45vw, 3.68rem);
@@ -42,7 +43,8 @@
 
 .home-hero-title-line {
   display: inline-block;
-  white-space: nowrap;
+  max-width: 100%;
+  text-wrap: balance;
 }
 
 .home-hero-copy h1::after {
