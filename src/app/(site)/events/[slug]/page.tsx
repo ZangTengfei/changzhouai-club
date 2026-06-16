@@ -276,11 +276,6 @@ export default async function EventDetailPage({
               </div>
 
               <div className={styles.eventVideoMeta}>
-                <span>
-                  <PlayCircle aria-hidden="true" strokeWidth={1.8} />
-                  {event.video.providerLabel}
-                </span>
-                {event.video.fileId ? <span>FileId：{event.video.fileId}</span> : null}
                 <a href={event.video.url} target="_blank" rel="noreferrer">
                   新窗口打开
                   <ArrowRight aria-hidden="true" strokeWidth={1.8} />

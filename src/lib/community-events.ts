@@ -34,8 +34,6 @@ type EventRow = {
   recap: string | null;
   docs_url: string | null;
   video_url?: string | null;
-  video_provider?: string | null;
-  video_file_id?: string | null;
   video_title?: string | null;
   video_cover_url?: string | null;
   status: string;
@@ -80,9 +78,6 @@ export type PublicGalleryImage = {
 
 export type PublicEventVideo = {
   url: string;
-  provider: string | null;
-  providerLabel: string;
-  fileId: string | null;
   title: string | null;
   coverUrl: string | null;
 };
@@ -212,18 +207,6 @@ function buildEventGallery(row: EventRow) {
   return gallery;
 }
 
-function formatVideoProvider(value: string | null | undefined) {
-  if (value === "tencent_vod") {
-    return "腾讯云 VOD";
-  }
-
-  if (value === "mp4") {
-    return "MP4 视频";
-  }
-
-  return value ?? "活动视频";
-}
-
 function buildEventVideo(row: EventRow): PublicEventVideo | null {
   if (!row.video_url) {
     return null;
@@ -231,9 +214,6 @@ function buildEventVideo(row: EventRow): PublicEventVideo | null {
 
   return {
     url: row.video_url,
-    provider: row.video_provider ?? null,
-    providerLabel: formatVideoProvider(row.video_provider),
-    fileId: row.video_file_id ?? null,
     title: row.video_title ?? null,
     coverUrl: row.video_cover_url ?? row.cover_image_url,
   };
@@ -524,7 +504,7 @@ const getCachedPublicEventBySlug = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, event_type, recap, docs_url, video_url, video_provider, video_file_id, video_title, video_cover_url, status, event_photos(id, image_url, caption, sort_order)",
+        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, event_type, recap, docs_url, video_url, video_title, video_cover_url, status, event_photos(id, image_url, caption, sort_order)",
       )
       .eq("slug", slug)
       .in("status", ["scheduled", "completed", "cancelled"])
