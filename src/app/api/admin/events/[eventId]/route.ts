@@ -102,6 +102,11 @@ export async function PATCH(
       venue: getOptionalValue(payload, "venue"),
       city: getOptionalValue(payload, "city") ?? "常州",
       cover_image_url: getOptionalValue(payload, "cover_image_url"),
+      video_url: normalizeOptionalUrlValue(getOptionalValue(payload, "video_url")),
+      video_provider: getOptionalValue(payload, "video_provider"),
+      video_file_id: getOptionalValue(payload, "video_file_id"),
+      video_title: getOptionalValue(payload, "video_title"),
+      video_cover_url: normalizeOptionalUrlValue(getOptionalValue(payload, "video_cover_url")),
       status,
     })
     .eq("id", eventId);

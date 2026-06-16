@@ -11,6 +11,7 @@ import {
   FileText,
   ListChecks,
   MapPin,
+  PlayCircle,
   Sparkles,
   Ticket,
 } from "lucide-react";
@@ -76,6 +77,9 @@ export default async function EventDetailPage({
   const statusTone = statusToneMap[event.status] ?? "green";
   const eventDocsHref = event.docsUrl;
   const isExternalDocsHref = eventDocsHref?.startsWith("http") ?? false;
+  const videoPosterUrl = event.video?.coverUrl
+    ? getEventImageUrl(event.video.coverUrl, "event-detail-hero") ?? event.video.coverUrl
+    : undefined;
   const registrationNote = getRegistrationNoteWithoutUrl(
     event.registrationNote,
     event.registrationUrl,
@@ -248,6 +252,43 @@ export default async function EventDetailPage({
             </article>
           )}
 
+          {event.video ? (
+            <article className={styles.eventVideoPanel}>
+              <div className={styles.eventSectionHeading}>
+                <p className="home-kicker">Video</p>
+                <div>
+                  <h2>活动视频</h2>
+                  <p>回看现场分享和关键讨论，方便错过活动的朋友补上上下文。</p>
+                </div>
+              </div>
+
+              <div className={styles.eventVideoFrame}>
+                <video
+                  controls
+                  playsInline
+                  preload="metadata"
+                  poster={videoPosterUrl}
+                  aria-label={event.video.title ?? event.title}
+                >
+                  <source src={event.video.url} type="video/mp4" />
+                  <a href={event.video.url}>打开活动视频</a>
+                </video>
+              </div>
+
+              <div className={styles.eventVideoMeta}>
+                <span>
+                  <PlayCircle aria-hidden="true" strokeWidth={1.8} />
+                  {event.video.providerLabel}
+                </span>
+                {event.video.fileId ? <span>FileId：{event.video.fileId}</span> : null}
+                <a href={event.video.url} target="_blank" rel="noreferrer">
+                  新窗口打开
+                  <ArrowRight aria-hidden="true" strokeWidth={1.8} />
+                </a>
+              </div>
+            </article>
+          ) : null}
+
           {hasRecap ? (
             <section className={styles.eventRecapPanel}>
               <div className={styles.eventSectionHeading}>
@@ -307,6 +348,13 @@ export default async function EventDetailPage({
                   <FileText aria-hidden="true" strokeWidth={1.8} />
                   <span>完整纪要</span>
                   <strong>已整理到文档</strong>
+                </li>
+              ) : null}
+              {event.video ? (
+                <li>
+                  <PlayCircle aria-hidden="true" strokeWidth={1.8} />
+                  <span>活动视频</span>
+                  <strong>已发布</strong>
                 </li>
               ) : null}
             </ul>

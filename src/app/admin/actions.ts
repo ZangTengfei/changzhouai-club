@@ -322,6 +322,11 @@ export async function saveAdminEvent(formData: FormData) {
     venue: getOptionalValue(formData, "venue"),
     city: getOptionalValue(formData, "city") ?? "常州",
     cover_image_url: getOptionalValue(formData, "cover_image_url"),
+    video_url: normalizeOptionalUrlValue(getOptionalValue(formData, "video_url")),
+    video_provider: getOptionalValue(formData, "video_provider"),
+    video_file_id: getOptionalValue(formData, "video_file_id"),
+    video_title: getOptionalValue(formData, "video_title"),
+    video_cover_url: normalizeOptionalUrlValue(getOptionalValue(formData, "video_cover_url")),
     status,
   };
 

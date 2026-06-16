@@ -25,6 +25,11 @@ const EVENT_FIELDS = new Set([
   "event_type",
   "recap",
   "docs_url",
+  "video_url",
+  "video_provider",
+  "video_file_id",
+  "video_title",
+  "video_cover_url",
   "event_at",
   "venue",
   "city",
@@ -39,6 +44,7 @@ const PUBLIC_TEXT_FIELDS = [
   "speaker_lineup",
   "registration_note",
   "recap",
+  "video_title",
   "venue",
 ];
 
@@ -64,7 +70,8 @@ Required JSON fields:
 
 Common JSON fields:
   summary, description, event_at, venue, city, agenda, speaker_lineup,
-  registration_note, registration_url, event_type, cover_image_url, status
+  registration_note, registration_url, event_type, cover_image_url,
+  video_url, video_provider, video_file_id, video_title, video_cover_url, status
 `);
 }
 
@@ -356,6 +363,11 @@ function normalizePayload(rawPayload, options) {
     event_type: normalizeEventType(rawPayload.event_type),
     recap: getTextField(rawPayload, "recap"),
     docs_url: getTextField(rawPayload, "docs_url"),
+    video_url: normalizeOptionalUrlValue(rawPayload.video_url, "video_url"),
+    video_provider: getTextField(rawPayload, "video_provider"),
+    video_file_id: getTextField(rawPayload, "video_file_id"),
+    video_title: getTextField(rawPayload, "video_title"),
+    video_cover_url: normalizeOptionalUrlValue(rawPayload.video_cover_url, "video_cover_url"),
     event_at: normalizeEventDateTime(rawPayload.event_at),
     venue: getTextField(rawPayload, "venue"),
     city: getTextField(rawPayload, "city") ?? "常州",

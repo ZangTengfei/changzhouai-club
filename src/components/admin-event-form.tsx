@@ -17,6 +17,11 @@ type AdminEvent = {
   venue: string | null;
   city: string | null;
   cover_image_url: string | null;
+  video_url: string | null;
+  video_provider: string | null;
+  video_file_id: string | null;
+  video_title: string | null;
+  video_cover_url: string | null;
   status: string;
 };
 
@@ -153,6 +158,55 @@ export function AdminEventForm({
               name="docs_url"
               defaultValue={event?.docs_url ?? ""}
               placeholder="/docs/events/2026-04-25-ai-salon 或飞书文档链接"
+            />
+          </label>
+
+          <label className="form-field form-field-wide">
+            <span>视频播放地址</span>
+            <input
+              className="input"
+              name="video_url"
+              defaultValue={event?.video_url ?? ""}
+              placeholder="例如：https://.../video.mp4"
+            />
+          </label>
+
+          <label className="form-field">
+            <span>视频来源</span>
+            <select className="input" name="video_provider" defaultValue={event?.video_provider ?? ""}>
+              <option value="">未设置</option>
+              <option value="tencent_vod">腾讯云 VOD</option>
+              <option value="mp4">MP4 直链</option>
+            </select>
+          </label>
+
+          <label className="form-field">
+            <span>视频 FileId</span>
+            <input
+              className="input"
+              name="video_file_id"
+              defaultValue={event?.video_file_id ?? ""}
+              placeholder="腾讯云 VOD FileId"
+            />
+          </label>
+
+          <label className="form-field form-field-wide">
+            <span>视频标题</span>
+            <input
+              className="input"
+              name="video_title"
+              defaultValue={event?.video_title ?? ""}
+              placeholder="例如：AI + 外贸主题沙龙活动视频"
+            />
+          </label>
+
+          <label className="form-field form-field-wide">
+            <span>视频封面图</span>
+            <input
+              className="input"
+              name="video_cover_url"
+              defaultValue={event?.video_cover_url ?? ""}
+              placeholder="不填时默认使用活动封面"
             />
           </label>
 

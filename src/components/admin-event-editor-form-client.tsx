@@ -36,6 +36,11 @@ type EditableAdminEvent = {
   venue: string | null;
   city: string | null;
   cover_image_url: string | null;
+  video_url: string | null;
+  video_provider: string | null;
+  video_file_id: string | null;
+  video_title: string | null;
+  video_cover_url: string | null;
   status: string;
 };
 
@@ -67,6 +72,11 @@ function toPayload(formData: FormData) {
     venue: String(formData.get("venue") ?? ""),
     city: String(formData.get("city") ?? ""),
     cover_image_url: String(formData.get("cover_image_url") ?? ""),
+    video_url: String(formData.get("video_url") ?? ""),
+    video_provider: String(formData.get("video_provider") ?? ""),
+    video_file_id: String(formData.get("video_file_id") ?? ""),
+    video_title: String(formData.get("video_title") ?? ""),
+    video_cover_url: String(formData.get("video_cover_url") ?? ""),
     status: String(formData.get("status") ?? "draft").trim(),
   };
 }
@@ -261,6 +271,46 @@ export function AdminEventEditorFormClient({
                   name="docs_url"
                   defaultValue={event?.docs_url ?? ""}
                   placeholder="/docs/events/2026-04-25-ai-salon 或飞书文档链接"
+                />
+              </AdminField>
+
+              <AdminField label="视频播放地址" className="md:col-span-2">
+                <Input
+                  name="video_url"
+                  defaultValue={event?.video_url ?? ""}
+                  placeholder="例如：https://.../video.mp4"
+                />
+              </AdminField>
+
+              <AdminField label="视频来源">
+                <NativeSelect name="video_provider" defaultValue={event?.video_provider ?? ""}>
+                  <option value="">未设置</option>
+                  <option value="tencent_vod">腾讯云 VOD</option>
+                  <option value="mp4">MP4 直链</option>
+                </NativeSelect>
+              </AdminField>
+
+              <AdminField label="视频 FileId">
+                <Input
+                  name="video_file_id"
+                  defaultValue={event?.video_file_id ?? ""}
+                  placeholder="腾讯云 VOD FileId"
+                />
+              </AdminField>
+
+              <AdminField label="视频标题" className="md:col-span-2">
+                <Input
+                  name="video_title"
+                  defaultValue={event?.video_title ?? ""}
+                  placeholder="例如：AI + 外贸主题沙龙活动视频"
+                />
+              </AdminField>
+
+              <AdminField label="视频封面图" className="md:col-span-2">
+                <Input
+                  name="video_cover_url"
+                  defaultValue={event?.video_cover_url ?? ""}
+                  placeholder="不填时默认使用活动封面"
                 />
               </AdminField>
 

@@ -281,6 +281,7 @@
 
 .eventInfoPanel,
 .eventContentPanel,
+.eventVideoPanel,
 .eventRecapPanel,
 .eventGallerySection,
 .eventSidebarCard {
@@ -567,6 +568,62 @@
     linear-gradient(180deg, rgba(242, 249, 245, 0.94), rgba(248, 251, 248, 0.9));
 }
 
+.eventVideoPanel {
+  background:
+    radial-gradient(circle at 90% 8%, rgba(42, 123, 211, 0.12), transparent 24%),
+    linear-gradient(180deg, rgba(242, 246, 249, 0.95), rgba(248, 250, 250, 0.9));
+}
+
+.eventVideoFrame {
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-radius: 20px;
+  background: #101518;
+  box-shadow: 0 16px 36px rgba(var(--ink-rgb), 0.1);
+}
+
+.eventVideoFrame video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #101518;
+  object-fit: contain;
+}
+
+.eventVideoMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.eventVideoMeta span,
+.eventVideoMeta a {
+  display: inline-flex;
+  gap: 7px;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-radius: 999px;
+  background: rgba(255, 252, 247, 0.72);
+  color: rgba(var(--ink-rgb), 0.66);
+  font-size: 0.86rem;
+  font-weight: 850;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.eventVideoMeta a {
+  color: #2363b8;
+}
+
+.eventVideoMeta svg {
+  width: 17px;
+  height: 17px;
+}
+
 .eventGalleryGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -723,6 +780,7 @@
   .eventInfoPanel,
   .eventStatusPanel,
   .eventContentPanel,
+  .eventVideoPanel,
   .eventRecapPanel,
   .eventGallerySection,
   .eventSidebarCard,
