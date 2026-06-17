@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, CirclePlay, Heart, Smile } from "lucide-react";
@@ -36,6 +36,7 @@ type HeroPhotoCarouselProps = {
 
 const AUTO_ADVANCE_DELAY = 4200;
 const MAX_CAROUSEL_IMAGES = 3;
+const NOTE_RETREAT_DELAY = 1800;
 const heroNoteIcons = {
   arrow: ArrowUpRight,
   heart: Heart,
@@ -63,8 +64,16 @@ export function HeroPhotoCarousel({
   notes,
 }: HeroPhotoCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [retreatingNote, setRetreatingNote] = useState<string | null>(null);
+  const retreatTimerRef = useRef<number | null>(null);
   const visibleImages = images.slice(0, MAX_CAROUSEL_IMAGES);
   const activeItemHasVideo = Boolean(visibleImages[activeIndex]?.videoUrl);
+
+  useEffect(() => () => {
+    if (retreatTimerRef.current) {
+      window.clearTimeout(retreatTimerRef.current);
+    }
+  }, []);
 
   useEffect(() => {
     if (visibleImages.length <= 1 || activeItemHasVideo) {
@@ -87,6 +96,18 @@ export function HeroPhotoCarousel({
 
     setActiveIndex(0);
   }, [activeIndex, visibleImages.length]);
+
+  function handleNotePointerEnter(noteClassName: string) {
+    if (retreatTimerRef.current) {
+      window.clearTimeout(retreatTimerRef.current);
+    }
+
+    setRetreatingNote(noteClassName);
+    retreatTimerRef.current = window.setTimeout(() => {
+      setRetreatingNote(null);
+      retreatTimerRef.current = null;
+    }, NOTE_RETREAT_DELAY);
+  }
 
   const activeImage = visibleImages[activeIndex] ?? null;
   const activeImageSrc = activeImage?.mainSrc ?? null;
@@ -185,7 +206,15 @@ export function HeroPhotoCarousel({
       ) : null}
 
       {notes.map((note) => (
-        <p key={note.className} className={cx(note.className)}>
+        <p
+          key={note.className}
+          className={cx(
+            note.className,
+            retreatingNote === note.className && "is-retreating",
+          )}
+          onMouseEnter={() => handleNotePointerEnter(note.className)}
+          onPointerEnter={() => handleNotePointerEnter(note.className)}
+        >
           {note.lines.map((line) => (
             <span key={line} className={cx("home-sticky-note-line")}>
               {line}
