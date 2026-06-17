@@ -154,6 +154,7 @@
 }
 
 .home-photo-main-image,
+.home-photo-main-video,
 .home-photo-frame img {
   display: block;
   width: 100%;
@@ -161,7 +162,8 @@
   object-fit: cover;
 }
 
-.home-photo-main-link {
+.home-photo-main-link,
+.home-photo-main-video-wrap {
   display: block;
   color: inherit;
 }
@@ -171,14 +173,60 @@
   outline-offset: -6px;
 }
 
-.home-photo-main-image {
+.home-photo-main-detail-link:focus-visible {
+  outline: 3px solid rgba(var(--accent-rgb), 0.72);
+  outline-offset: 3px;
+}
+
+.home-photo-main-image,
+.home-photo-main-video-wrap {
   animation: home-photo-fade-in 420ms ease;
+}
+
+.home-photo-main-image {
   transition: transform 220ms ease;
 }
 
 .home-photo-main-link:hover .home-photo-main-image,
 .home-photo-main-link:focus-visible .home-photo-main-image {
   transform: scale(1.015);
+}
+
+.home-photo-main-video-wrap {
+  position: relative;
+  background: #17201d;
+}
+
+.home-photo-main-video {
+  background: #17201d;
+}
+
+.home-photo-main-detail-link {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.86);
+  color: var(--accent-strong);
+  box-shadow: 0 10px 24px rgba(var(--ink-rgb), 0.14);
+  transition:
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.home-photo-main-detail-link:hover {
+  background: #fff;
+  transform: translateY(-1px);
+}
+
+.home-photo-main-detail-link svg {
+  width: 18px;
+  height: 18px;
 }
 
 .home-photo-fallback {
@@ -245,6 +293,30 @@
   transition:
     opacity 220ms ease,
     transform 220ms ease;
+}
+
+.home-photo-thumb-wrap {
+  position: relative;
+  display: block;
+}
+
+.home-photo-thumb-video-badge {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: var(--accent-strong);
+  box-shadow: 0 8px 18px rgba(var(--ink-rgb), 0.16);
+}
+
+.home-photo-thumb-video-badge svg {
+  width: 16px;
+  height: 16px;
 }
 
 .home-photo-carousel-item.is-active .home-photo-thumb {
@@ -1854,6 +1926,7 @@
   }
 
   .home-photo-frame img,
+  .home-photo-main-video,
   .home-photo-fallback {
     height: 280px;
   }

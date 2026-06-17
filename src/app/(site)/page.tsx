@@ -186,21 +186,27 @@ export default async function HomePage() {
   const latestCompletedEvent = recentCompletedEvents[0];
   const recentEvents = recentCompletedEvents;
   const heroCarouselImages = recentCompletedEvents
-    .map((event) => {
+    .flatMap((event) => {
       const imageUrl = event.imageUrl ?? event.gallery[0]?.imageUrl ?? null;
 
-      return imageUrl
-        ? {
-            mainSrc: getEventImageUrl(imageUrl, "hero-main") ?? imageUrl,
-            thumbSrc: getEventImageUrl(imageUrl, "hero-thumb") ?? imageUrl,
-            alt: `${event.title} 活动现场`,
-            href: `/events/${event.slug}`,
-          }
-        : null;
+      if (!imageUrl) {
+        return [];
+      }
+
+      return [
+        {
+          mainSrc: getEventImageUrl(imageUrl, "hero-main") ?? imageUrl,
+          thumbSrc: getEventImageUrl(imageUrl, "hero-thumb") ?? imageUrl,
+          alt: `${event.title} 活动现场`,
+          href: `/events/${event.slug}`,
+          videoUrl: event.video?.url ?? null,
+          videoTitle: event.video?.title ?? null,
+          videoPosterSrc: event.video?.coverUrl
+            ? getEventImageUrl(event.video.coverUrl, "hero-main") ?? event.video.coverUrl
+            : null,
+        },
+      ];
     })
-    .filter((item): item is { mainSrc: string; thumbSrc: string; alt: string; href: string } =>
-      Boolean(item),
-    )
     .filter((item, index, items) => (
       items.findIndex((candidate) => candidate.mainSrc === item.mainSrc) === index
     ))

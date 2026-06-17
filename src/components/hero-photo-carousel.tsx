@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Heart, Smile } from "lucide-react";
+import { ArrowUpRight, CirclePlay, Heart, Smile } from "lucide-react";
 
 import { DoodleSparkles } from "@/components/home-visual-assets";
 import { cssModuleCx } from "@/lib/utils";
@@ -23,6 +23,9 @@ type HeroPhotoCarouselImage = {
   thumbSrc: string;
   alt: string;
   href: string;
+  videoUrl?: string | null;
+  videoTitle?: string | null;
+  videoPosterSrc?: string | null;
 };
 
 type HeroPhotoCarouselProps = {
@@ -61,9 +64,10 @@ export function HeroPhotoCarousel({
 }: HeroPhotoCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const visibleImages = images.slice(0, MAX_CAROUSEL_IMAGES);
+  const activeItemHasVideo = Boolean(visibleImages[activeIndex]?.videoUrl);
 
   useEffect(() => {
-    if (visibleImages.length <= 1) {
+    if (visibleImages.length <= 1 || activeItemHasVideo) {
       return undefined;
     }
 
@@ -74,7 +78,7 @@ export function HeroPhotoCarousel({
     }, AUTO_ADVANCE_DELAY);
 
     return () => window.clearInterval(timer);
-  }, [visibleImages.length]);
+  }, [activeItemHasVideo, visibleImages.length]);
 
   useEffect(() => {
     if (activeIndex < visibleImages.length) {
@@ -86,20 +90,45 @@ export function HeroPhotoCarousel({
 
   const activeImage = visibleImages[activeIndex] ?? null;
   const activeImageSrc = activeImage?.mainSrc ?? null;
+  const activeVideoUrl = activeImage?.videoUrl ?? null;
+  const activeLabel = activeImage?.alt || fallbackAlt;
 
   return (
     <div className={cx("home-hero-visual")} aria-label="社区活动现场">
       <div className={cx("home-photo-frame")}>
-        {activeImage && activeImageSrc ? (
+        {activeImage && activeImageSrc && activeVideoUrl ? (
+          <div className={cx("home-photo-main-video-wrap")}>
+            <video
+              key={activeVideoUrl}
+              className={cx("home-photo-main-video")}
+              controls
+              playsInline
+              preload="metadata"
+              poster={activeImage.videoPosterSrc ?? activeImageSrc}
+              aria-label={activeImage.videoTitle ?? activeLabel}
+            >
+              <source src={activeVideoUrl} type="video/mp4" />
+              <a href={activeVideoUrl}>打开活动视频</a>
+            </video>
+            <Link
+              href={activeImage.href}
+              className={cx("home-photo-main-detail-link")}
+              aria-label={`查看${activeLabel}详情`}
+            >
+              <ArrowUpRight aria-hidden="true" strokeWidth={2.1} />
+              <span className="sr-only">查看活动详情</span>
+            </Link>
+          </div>
+        ) : activeImage && activeImageSrc ? (
           <Link
             href={activeImage.href}
             className={cx("home-photo-main-link")}
-            aria-label={`查看${activeImage.alt || fallbackAlt}详情`}
+            aria-label={`查看${activeLabel}详情`}
           >
             <Image
               key={activeImageSrc}
               src={activeImageSrc}
-              alt={activeImage.alt || fallbackAlt}
+              alt={activeLabel}
               width={760}
               height={520}
               priority
@@ -126,22 +155,29 @@ export function HeroPhotoCarousel({
                 type="button"
                 role="tab"
                 aria-selected={index === activeIndex}
-                aria-label={`查看${image.alt}`}
+                aria-label={`${image.videoUrl ? "播放" : "查看"}${image.alt}`}
                 className={cx(
                   "home-photo-carousel-item",
                   index === activeIndex && "is-active",
                 )}
                 onClick={() => setActiveIndex(index)}
               >
-                <Image
-                  src={image.thumbSrc}
-                  alt=""
-                  width={220}
-                  height={132}
-                  unoptimized
-                  sizes="160px"
-                  className={cx("home-photo-thumb")}
-                />
+                <span className={cx("home-photo-thumb-wrap")}>
+                  <Image
+                    src={image.thumbSrc}
+                    alt=""
+                    width={220}
+                    height={132}
+                    unoptimized
+                    sizes="160px"
+                    className={cx("home-photo-thumb")}
+                  />
+                  {image.videoUrl ? (
+                    <span className={cx("home-photo-thumb-video-badge")} aria-hidden="true">
+                      <CirclePlay strokeWidth={2.1} />
+                    </span>
+                  ) : null}
+                </span>
               </button>
             ))}
           </div>

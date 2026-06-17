@@ -53,6 +53,9 @@ type CompletedEventPreviewRow = Pick<
   | "cover_image_url"
   | "event_type"
   | "status"
+  | "video_url"
+  | "video_title"
+  | "video_cover_url"
 >;
 
 export type PublicScheduledEvent = {
@@ -93,6 +96,7 @@ export type PublicEventRecap = {
   isoDate: string;
   locationLabel: string;
   imageUrl: string | null;
+  video: PublicEventVideo | null;
   gallery: PublicGalleryImage[];
 };
 
@@ -207,7 +211,9 @@ function buildEventGallery(row: EventRow) {
   return gallery;
 }
 
-function buildEventVideo(row: EventRow): PublicEventVideo | null {
+function buildEventVideo(
+  row: Pick<EventRow, "cover_image_url" | "video_cover_url" | "video_title" | "video_url">,
+): PublicEventVideo | null {
   if (!row.video_url) {
     return null;
   }
@@ -256,6 +262,7 @@ function mapCompletedEvent(row: EventRow): PublicEventRecap {
     isoDate: row.event_at ? formatChangzhouIsoDate(row.event_at) ?? row.id : row.id,
     locationLabel: buildLocationLabel(row.city, row.venue),
     imageUrl: row.cover_image_url ?? gallery[0]?.imageUrl ?? null,
+    video: buildEventVideo(row),
     gallery,
   };
 }
@@ -287,6 +294,7 @@ function mapCompletedEventPreview(row: CompletedEventPreviewRow): PublicEventRec
     isoDate: row.event_at ? formatChangzhouIsoDate(row.event_at) ?? row.id : row.id,
     locationLabel: buildLocationLabel(row.city, row.venue),
     imageUrl: row.cover_image_url ?? null,
+    video: buildEventVideo(row),
     gallery,
   };
 }
@@ -409,7 +417,7 @@ const getCachedHomeCompletedEventRecaps = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, event_type, status",
+        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, event_type, status, video_url, video_title, video_cover_url",
       )
       .eq("status", "completed")
       .eq("event_type", "community")
@@ -420,7 +428,7 @@ const getCachedHomeCompletedEventRecaps = unstable_cache(
       mapCompletedEventPreview,
     );
   },
-  ["public-home-community-completed-event-recaps"],
+  ["public-home-community-completed-event-recaps-with-video"],
   { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
 );
 
