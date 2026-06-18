@@ -25,6 +25,7 @@ import {
 } from "@/app/(site)/account/actions";
 import { AccountActionModal } from "@/components/account-action-modal";
 import { AccountProfileForm } from "@/components/account-profile-form";
+import { ImageUploadField } from "@/components/image-upload-field";
 import { MemberAvatar } from "@/components/member-avatar";
 import { SignOutButton } from "@/components/sign-out-button";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
@@ -146,6 +147,37 @@ function getReviewTone(status: PublicWorkReviewStatus, isPublic: boolean) {
   }
 
   return styles.workReviewPending;
+}
+
+function WorkImageField({
+  userId,
+  defaultValue = "",
+}: {
+  userId: string;
+  defaultValue?: string;
+}) {
+  return (
+    <div className={`${styles.accountWorkWideField} ${styles.accountWorkFieldGroup}`}>
+      <span className={styles.accountWorkFieldLabel}>封面 / 产品图片</span>
+      <ImageUploadField
+        name="cover_image_url"
+        defaultValue={defaultValue}
+        uploadTarget={{
+          kind: "member-work-asset",
+          userId,
+        }}
+        mode="upload-or-url"
+        appearance="site"
+        placeholder="可上传图片，也可填写 https://..."
+        uploadLabel="上传图片"
+        clearLabel="清空图片"
+        panelTitle="上传封面、产品截图或小程序二维码"
+        panelDescription="没有官网链接也没关系，可以直接上传截图或二维码，审核通过后会展示在案例库。"
+        filledStatusText="已设置图片"
+        emptyStatusText="当前未设置图片"
+      />
+    </div>
+  );
 }
 
 const profileModalErrorCodes = new Set([
@@ -515,10 +547,7 @@ export default async function AccountPage({
                   <textarea className="input textarea" name="description" rows={4} />
                 </label>
 
-                <label>
-                  <span>封面图链接</span>
-                  <input className="input" name="cover_image_url" placeholder="https://..." />
-                </label>
+                <WorkImageField userId={user.id} />
 
                 <label>
                   <span>官网 / 产品链接</span>
@@ -649,14 +678,10 @@ export default async function AccountPage({
                         rows={4}
                       />
                     </label>
-                    <label>
-                      <span>封面图链接</span>
-                      <input
-                        className="input"
-                        name="cover_image_url"
-                        defaultValue={work.cover_image_url ?? ""}
-                      />
-                    </label>
+                    <WorkImageField
+                      userId={user.id}
+                      defaultValue={work.cover_image_url ?? ""}
+                    />
                     <label>
                       <span>官网 / 产品链接</span>
                       <input

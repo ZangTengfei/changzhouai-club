@@ -13,7 +13,9 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import {
   buildMemberAvatarPath,
+  buildMemberWorkAssetPath,
   MEMBER_AVATARS_BUCKET,
+  MEMBER_WORK_ASSETS_BUCKET,
 } from "@/lib/supabase/storage";
 import { cssModuleCx } from "@/lib/utils";
 
@@ -29,6 +31,10 @@ type UploadTarget =
       kind: "member-avatar";
       userId: string;
       cacheBust?: boolean;
+    }
+  | {
+      kind: "member-work-asset";
+      userId: string;
     }
   | {
       kind: "storage";
@@ -146,6 +152,27 @@ export function ImageUploadField({
             ? data.publicUrl
             : `${data.publicUrl}?v=${Date.now()}`,
         );
+      } else if (uploadTarget.kind === "member-work-asset") {
+        const supabase = createClient();
+        const assetPath = buildMemberWorkAssetPath(
+          uploadTarget.userId,
+          uploadFile.name,
+        );
+        const { error: uploadError } = await supabase.storage
+          .from(MEMBER_WORK_ASSETS_BUCKET)
+          .upload(assetPath, uploadFile, {
+            contentType: uploadFile.type || undefined,
+          });
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+        const { data } = supabase.storage
+          .from(MEMBER_WORK_ASSETS_BUCKET)
+          .getPublicUrl(assetPath);
+
+        setValue(data.publicUrl);
       } else {
         const payload = new FormData();
         payload.append("eventSlug", uploadTarget.eventSlug);
@@ -260,6 +287,7 @@ export function ImageUploadField({
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
             >
+              <UploadCloud aria-hidden="true" strokeWidth={2} />
               {uploadLabelText}
             </button>
           )}

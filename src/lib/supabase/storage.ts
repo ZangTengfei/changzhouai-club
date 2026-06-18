@@ -1,5 +1,6 @@
 export const EVENT_ASSETS_BUCKET = "event-assets";
 export const MEMBER_AVATARS_BUCKET = "member-avatars";
+export const MEMBER_WORK_ASSETS_BUCKET = "member-work-assets";
 export const COMMUNITY_UPDATE_ASSETS_BUCKET = "community-update-assets";
 
 function sanitizeSegment(value: string) {
@@ -43,6 +44,15 @@ export function buildCommunityUpdateAssetPath(userId: string, fileName: string) 
   const timestamp = Date.now();
 
   return `${safeUserId}/updates/${timestamp}-${safeFileName}`;
+}
+
+export function buildMemberWorkAssetPath(userId: string, fileName: string) {
+  const safeUserId = sanitizeSegment(userId || "member");
+  const safeFileName =
+    sanitizeSegment(fileName || "work-image.jpg") || "work-image.jpg";
+  const timestamp = Date.now();
+
+  return `${safeUserId}/works/${timestamp}-${safeFileName}`;
 }
 
 export function buildMemberAvatarPath(userId: string) {

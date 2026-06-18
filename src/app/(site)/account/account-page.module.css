@@ -455,7 +455,14 @@
   min-width: 0;
 }
 
-.accountWorkForm label > span {
+.accountWorkFieldGroup {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.accountWorkForm label > span,
+.accountWorkFieldLabel {
   color: #132321;
   font-size: 0.86rem;
   font-weight: 850;
