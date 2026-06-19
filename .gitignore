@@ -8,6 +8,7 @@ yarn-debug.log*
 yarn-error.log*
 .DS_Store
 .vercel
+.playwright-cli/
 supabase/.temp/
 supabase/.branches/
 .env
