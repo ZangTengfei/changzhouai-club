@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import type { ReactNode } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -15,6 +16,21 @@ function shouldRenderVercelInsights() {
   }
 
   return process.env.VERCEL === "1";
+}
+
+function getUmamiConfig() {
+  const scriptUrl = process.env.NEXT_PUBLIC_UMAMI_SCRIPT_URL?.trim();
+  const websiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID?.trim();
+
+  if (!scriptUrl || !websiteId) {
+    return null;
+  }
+
+  return {
+    scriptUrl,
+    websiteId,
+    domains: process.env.NEXT_PUBLIC_UMAMI_DOMAINS?.trim() || undefined,
+  };
 }
 
 export const metadata: Metadata = {
@@ -49,6 +65,7 @@ export default function RootLayout({
   children: ReactNode;
 }) {
   const renderVercelInsights = shouldRenderVercelInsights();
+  const umamiConfig = getUmamiConfig();
 
   return (
     <html
@@ -60,6 +77,15 @@ export default function RootLayout({
       <body>
         <AppToaster />
         {children}
+        {umamiConfig ? (
+          <Script
+            id="umami-analytics"
+            src={umamiConfig.scriptUrl}
+            strategy="afterInteractive"
+            data-website-id={umamiConfig.websiteId}
+            data-domains={umamiConfig.domains}
+          />
+        ) : null}
         {renderVercelInsights ? (
           <>
             <Analytics />

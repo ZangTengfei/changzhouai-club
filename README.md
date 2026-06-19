@@ -98,6 +98,9 @@ npm run start
 - `NEXT_PUBLIC_SITE_URL`
 - `SITE_URL`
 - `ENABLE_VERCEL_INSIGHTS`
+- `NEXT_PUBLIC_UMAMI_SCRIPT_URL`
+- `NEXT_PUBLIC_UMAMI_WEBSITE_ID`
+- `NEXT_PUBLIC_UMAMI_DOMAINS`
 
 其中：
 
@@ -106,6 +109,7 @@ npm run start
 - 邮件相关变量用于管理员通知邮件
 - 企业微信 / 飞书 webhook 变量用于把加入申请、成员资料完成、合作线索等动态同步到群机器人
 - `ENABLE_VERCEL_INSIGHTS=true` 时才会在非 Vercel 环境加载 Vercel Analytics 和 Speed Insights；自托管环境建议保持 `false`
+- `NEXT_PUBLIC_UMAMI_SCRIPT_URL` 和 `NEXT_PUBLIC_UMAMI_WEBSITE_ID` 同时配置后会加载自托管 Umami 访问统计；`NEXT_PUBLIC_UMAMI_DOMAINS` 可限制只采集正式域名
 
 目前已接入的管理员通知场景包括：
 
