@@ -25,5 +25,7 @@ config.toml
 output/
 
 # Local community knowledge base and source files
+files
 files/
+knowledge
 knowledge/
