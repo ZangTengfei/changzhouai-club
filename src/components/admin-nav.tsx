@@ -8,6 +8,7 @@ import {
   BriefcaseBusiness,
   CalendarDays,
   ChevronDown,
+  GitBranch,
   Handshake,
   MessagesSquare,
   Share2,
@@ -47,6 +48,12 @@ const adminNavGroups: AdminNavGroup[] = [
         label: "活动管理",
         icon: CalendarDays,
         permissions: ["events.read"],
+      },
+      {
+        href: "/admin/workflows",
+        label: "工作流中枢",
+        icon: GitBranch,
+        permissions: ["workflows.read"],
       },
       {
         href: "/admin/updates",

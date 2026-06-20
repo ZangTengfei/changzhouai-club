@@ -322,7 +322,7 @@ export function EmailAuthForm({
   );
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
+    <form className={styles.form} method="post" onSubmit={handleSubmit}>
       {mode === "reset" ? (
         <div className={styles.resetHeading}>
           <strong>找回或设置邮箱密码</strong>

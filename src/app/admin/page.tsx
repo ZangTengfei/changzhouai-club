@@ -4,6 +4,7 @@ import { hasAdminPermission } from "@/lib/admin/permissions";
 import { getAdminContext } from "@/lib/supabase/guards";
 
 const adminLandingCandidates = [
+  { href: "/admin/workflows", permission: "workflows.read" },
   { href: "/admin/events", permission: "events.read" },
   { href: "/admin/updates", permission: "updates.read" },
   { href: "/admin/members", permission: "members.read" },
