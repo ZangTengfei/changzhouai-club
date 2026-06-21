@@ -12,9 +12,9 @@ import {
   AdminPanel,
   AdminPanelBody,
   AdminPanelHeader,
-} from "@/components/admin-ui";
+} from "@/components/admin-antd";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
-import { NativeSelect } from "@/components/ui/native-select";
+import { NativeSelect } from "@/components/admin-antd";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
 
 const { TextArea } = Input;

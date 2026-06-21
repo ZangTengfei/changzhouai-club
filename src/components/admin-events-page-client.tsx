@@ -8,7 +8,7 @@ import { Alert, Button, Card, Input, Space, Statistic, Table, type TableColumnsT
 import { AdminStatusTag } from "@/components/admin-antd";
 import { AdminEventEditorModal } from "@/components/admin-event-editor-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { NativeSelect } from "@/components/ui/native-select";
+import { NativeSelect } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminEvent, AdminEventsData } from "@/lib/admin/events";
 import {

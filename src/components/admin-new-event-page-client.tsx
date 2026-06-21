@@ -7,7 +7,7 @@ import {
   AdminPageStack,
   AdminPanel,
   AdminPanelHeader,
-} from "@/components/admin-ui";
+} from "@/components/admin-antd";
 import { AdminEventEditorFormClient } from "@/components/admin-event-editor-form-client";
 
 export function AdminNewEventPageClient() {

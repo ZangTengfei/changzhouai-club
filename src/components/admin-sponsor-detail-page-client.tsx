@@ -12,7 +12,7 @@ import {
   AdminPanelBody,
   AdminPanelHeader,
   AdminStatusBadge,
-} from "@/components/admin-ui";
+} from "@/components/admin-antd";
 import { AdminSponsorEditorFormClient } from "@/components/admin-sponsor-editor-form-client";
 import { AdminSponsorImagesManagerClient } from "@/components/admin-sponsor-images-manager-client";
 import { AdminToastSignals } from "@/components/admin-toast-signals";

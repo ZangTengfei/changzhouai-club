@@ -15,10 +15,10 @@ import {
   AdminPanelHeader,
   AdminStatusBadge,
   type AdminTone,
-} from "@/components/admin-ui";
+} from "@/components/admin-antd";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { ToneBadge } from "@/components/tone-badge";
-import { NativeSelect } from "@/components/ui/native-select";
+import { NativeSelect } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   formatAdminLeadMatchStatus,

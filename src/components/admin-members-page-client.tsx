@@ -19,7 +19,7 @@ import { toast } from "sonner";
 
 import { AdminStatusTag } from "@/components/admin-antd";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { NativeSelect } from "@/components/ui/native-select";
+import { NativeSelect } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminMember, AdminMembersData } from "@/lib/admin/members";
 import {

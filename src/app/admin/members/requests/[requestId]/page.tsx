@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button, Checkbox, Input } from "antd";
+import TextArea from "antd/es/input/TextArea";
 
 import {
   updateAdminJoinRequest,
@@ -8,7 +9,7 @@ import {
 } from "@/app/admin/actions";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { ToneBadge } from "@/components/tone-badge";
-import { NativeSelect } from "@/components/ui/native-select";
+import { NativeSelect } from "@/components/admin-antd";
 import {
   formatAdminJoinRequestStatus,
   getAdminErrorMessage,
@@ -32,7 +33,6 @@ type SearchParams = {
 };
 
 const cx = cssModuleCxWithGlobals.bind(null, styles);
-const { TextArea } = Input;
 
 function formatDate(value: string | null) {
   if (!value) {

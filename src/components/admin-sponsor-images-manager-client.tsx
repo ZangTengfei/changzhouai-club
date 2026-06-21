@@ -12,7 +12,7 @@ import {
   AdminPanelBody,
   AdminPanelHeader,
   AdminStatusBadge,
-} from "@/components/admin-ui";
+} from "@/components/admin-antd";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
 

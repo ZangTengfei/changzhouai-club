@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button, Input } from "antd";
+import TextArea from "antd/es/input/TextArea";
 
 import {
   deleteAdminProjectApplication,
@@ -19,8 +20,8 @@ import { AdminToastSignals } from "@/components/admin-toast-signals";
 import {
   AdminCheckboxRow,
   AdminField,
-} from "@/components/admin-ui";
-import { NativeSelect } from "@/components/ui/native-select";
+} from "@/components/admin-antd";
+import { NativeSelect } from "@/components/admin-antd";
 import {
   getAdminErrorMessage,
   getAdminSavedMessage,
@@ -36,8 +37,6 @@ import {
   projectOpportunityTypeLabels,
   projectOpportunityVisibilityLabels,
 } from "@/lib/community-projects";
-
-const { TextArea } = Input;
 
 export const metadata: Metadata = {
   title: "共建项目管理",

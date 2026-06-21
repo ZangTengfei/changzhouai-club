@@ -1,6 +1,13 @@
 "use client";
 
-import { Children, isValidElement, type ComponentProps, type ReactElement, type ReactNode } from "react";
+import {
+  Children,
+  isValidElement,
+  useState,
+  type ComponentProps,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 
 import Link from "next/link";
 import { Alert, Card as AntCard, Checkbox, Form, Statistic, Tag } from "antd";
@@ -236,6 +243,7 @@ export function AdminCheckboxRow({
   const checkboxValue = value ?? (inputProps?.value ? String(inputProps.value) : undefined);
   const checkboxDefaultChecked = defaultChecked ?? inputProps?.defaultChecked;
   const checkboxDisabled = disabled ?? inputProps?.disabled;
+  const [isChecked, setIsChecked] = useState(Boolean(checkboxDefaultChecked));
 
   return (
     <div
@@ -246,11 +254,13 @@ export function AdminCheckboxRow({
         className,
       )}
     >
+      {checkboxName && isChecked ? (
+        <input type="hidden" name={checkboxName} value={checkboxValue ?? "on"} />
+      ) : null}
       <Checkbox
-        name={checkboxName}
-        value={checkboxValue}
-        defaultChecked={checkboxDefaultChecked}
+        checked={isChecked}
         disabled={checkboxDisabled}
+        onChange={(event) => setIsChecked(event.target.checked)}
       >
         {labelChildren}
       </Checkbox>

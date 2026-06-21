@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Button, Input } from "antd";
+import TextArea from "antd/es/input/TextArea";
 
 import {
   deleteAdminExternalCaseCard,
@@ -11,7 +12,7 @@ import {
 import {
   AdminCheckboxRow,
   AdminField,
-} from "@/components/admin-ui";
+} from "@/components/admin-antd";
 import {
   AdminAntdAlert,
   AdminAntdCard,
@@ -21,7 +22,7 @@ import {
 import { AdminModal } from "@/components/admin-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
-import { NativeSelect } from "@/components/ui/native-select";
+import { NativeSelect } from "@/components/admin-antd";
 import {
   getAdminErrorMessage,
   getAdminSavedMessage,
@@ -38,8 +39,6 @@ import {
   workStatusLabels,
   workTypeLabels,
 } from "@/lib/community-works";
-
-const { TextArea } = Input;
 
 export const metadata: Metadata = {
   title: "成员作品管理",

@@ -25,7 +25,7 @@ import {
 
 import { createWorkflowRunAction } from "@/app/admin/workflows/actions";
 import { AdminStatusTag } from "@/components/admin-antd";
-import { NativeSelect } from "@/components/ui/native-select";
+import { NativeSelect } from "@/components/admin-antd";
 import { formatWorkflowDateTime, getWorkflowStatusLabel } from "@/lib/admin/workflow-display";
 import type { AdminWorkflowRun, AdminWorkflowsData } from "@/lib/admin/workflows";
 

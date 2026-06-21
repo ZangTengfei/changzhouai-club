@@ -7,7 +7,7 @@ import {
   AdminPageStack,
   AdminPanel,
   AdminPanelHeader,
-} from "@/components/admin-ui";
+} from "@/components/admin-antd";
 import { AdminSponsorEditorFormClient } from "@/components/admin-sponsor-editor-form-client";
 
 export function AdminNewSponsorPageClient() {

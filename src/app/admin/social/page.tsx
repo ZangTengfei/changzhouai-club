@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Button, Input } from "antd";
+import TextArea from "antd/es/input/TextArea";
 
 import {
   deleteAdminWechatQrCode,
@@ -14,7 +15,7 @@ import {
 import {
   AdminCheckboxRow,
   AdminField,
-} from "@/components/admin-ui";
+} from "@/components/admin-antd";
 import { AdminModal } from "@/components/admin-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
@@ -23,8 +24,6 @@ import {
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 import { loadAdminSocialData } from "@/lib/admin/social";
-
-const { TextArea } = Input;
 
 export const metadata: Metadata = {
   title: "社交入口管理",

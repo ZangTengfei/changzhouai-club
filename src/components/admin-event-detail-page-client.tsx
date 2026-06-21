@@ -13,7 +13,7 @@ import {
   AdminPanelHeader,
   AdminStatusBadge,
   type AdminTone,
-} from "@/components/admin-ui";
+} from "@/components/admin-antd";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { AdminEventEditorFormClient } from "@/components/admin-event-editor-form-client";
 import { AdminEventPhotosManagerClient } from "@/components/admin-event-photos-manager-client";
