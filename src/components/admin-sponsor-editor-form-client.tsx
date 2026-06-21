@@ -73,7 +73,7 @@ export function AdminSponsorEditorFormClient({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const { message } = AntApp.useApp();
+  const { message, modal } = AntApp.useApp();
   const isEditing = Boolean(sponsor);
 
   function handleSubmit(formData: FormData) {
@@ -110,28 +110,37 @@ export function AdminSponsorEditorFormClient({
   }
 
   function handleDelete() {
-    if (!sponsor || !window.confirm(`确认删除赞助者“${sponsor.name}”吗？`)) {
+    if (!sponsor) {
       return;
     }
 
-    startTransition(async () => {
-      try {
-        const response = await fetch(`/api/admin/sponsors/${sponsor.id}`, {
-          method: "DELETE",
-        });
-        const result = await readApiResult(response);
-        if (onDeleted) {
-          message.success(
-            getAdminSavedMessage(result?.saved ?? "sponsor_deleted") ?? "后台内容已更新。",
-          );
-          onDeleted();
-          return;
-        }
+    modal.confirm({
+      title: `确认删除赞助者“${sponsor.name}”吗？`,
+      content: "删除后将从赞助者后台列表移除，请确认不再需要保留这条记录。",
+      okText: "删除赞助者",
+      cancelText: "取消",
+      okButtonProps: { danger: true },
+      onOk: () => {
+        startTransition(async () => {
+          try {
+            const response = await fetch(`/api/admin/sponsors/${sponsor.id}`, {
+              method: "DELETE",
+            });
+            const result = await readApiResult(response);
+            if (onDeleted) {
+              message.success(
+                getAdminSavedMessage(result?.saved ?? "sponsor_deleted") ?? "后台内容已更新。",
+              );
+              onDeleted();
+              return;
+            }
 
-        router.push(`/admin/sponsors?saved=${result?.saved ?? "sponsor_deleted"}`);
-      } catch (submitError) {
-        message.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
-      }
+            router.push(`/admin/sponsors?saved=${result?.saved ?? "sponsor_deleted"}`);
+          } catch (submitError) {
+            message.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
+          }
+        });
+      },
     });
   }
 

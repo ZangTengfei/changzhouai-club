@@ -51,7 +51,7 @@ export function AdminEventPhotosManagerClient({
   onChanged?: () => void;
 }) {
   const [isPending, startTransition] = useTransition();
-  const { message } = AntApp.useApp();
+  const { message, modal } = AntApp.useApp();
 
   function submitCreate(formData: FormData) {
     startTransition(async () => {
@@ -100,23 +100,28 @@ export function AdminEventPhotosManagerClient({
   }
 
   function handleDelete(photoId: string) {
-    if (!window.confirm("确认删除这张活动照片吗？")) {
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        const response = await fetch(`/api/admin/events/${eventId}/photos/${photoId}`, {
-          method: "DELETE",
+    modal.confirm({
+      title: "确认删除这张活动照片吗？",
+      content: "删除后相册中将不再展示这张照片。",
+      okText: "删除照片",
+      cancelText: "取消",
+      okButtonProps: { danger: true },
+      onOk: () => {
+        startTransition(async () => {
+          try {
+            const response = await fetch(`/api/admin/events/${eventId}/photos/${photoId}`, {
+              method: "DELETE",
+            });
+            const result = await readApiResult(response);
+            message.success(
+              getAdminSavedMessage(result?.saved ?? "photo_deleted") ?? "后台内容已更新。",
+            );
+            onChanged?.();
+          } catch (submitError) {
+            message.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
+          }
         });
-        const result = await readApiResult(response);
-        message.success(
-          getAdminSavedMessage(result?.saved ?? "photo_deleted") ?? "后台内容已更新。",
-        );
-        onChanged?.();
-      } catch (submitError) {
-        message.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
-      }
+      },
     });
   }
 

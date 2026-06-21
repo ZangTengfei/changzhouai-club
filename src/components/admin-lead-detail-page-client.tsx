@@ -85,7 +85,7 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
     `/api/admin/leads/${leadId}`,
   );
   const [isPending, startTransition] = useTransition();
-  const { message } = AntApp.useApp();
+  const { message, modal } = AntApp.useApp();
   const lead = data?.lead;
   const staffOptions = data?.staffOptions ?? [];
   const memberOptions = data?.memberOptions ?? [];
@@ -166,23 +166,28 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
   }
 
   function handleDeleteMatch(matchId: string) {
-    if (!window.confirm("确认删除这条成员匹配记录吗？")) {
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        const response = await fetch(`/api/admin/leads/${leadId}/matches/${matchId}`, {
-          method: "DELETE",
+    modal.confirm({
+      title: "确认删除这条成员匹配记录吗？",
+      content: "删除后这位成员将从当前线索的候选匹配中移除。",
+      okText: "删除匹配",
+      cancelText: "取消",
+      okButtonProps: { danger: true },
+      onOk: () => {
+        startTransition(async () => {
+          try {
+            const response = await fetch(`/api/admin/leads/${leadId}/matches/${matchId}`, {
+              method: "DELETE",
+            });
+            const result = await readApiResult(response);
+            message.success(
+              getAdminSavedMessage(result?.saved ?? "lead_match_deleted") ?? "后台内容已更新。",
+            );
+            reload();
+          } catch (requestError) {
+            message.error(requestError instanceof Error ? requestError.message : "删除失败，请稍后再试。");
+          }
         });
-        const result = await readApiResult(response);
-        message.success(
-          getAdminSavedMessage(result?.saved ?? "lead_match_deleted") ?? "后台内容已更新。",
-        );
-        reload();
-      } catch (requestError) {
-        message.error(requestError instanceof Error ? requestError.message : "删除失败，请稍后再试。");
-      }
+      },
     });
   }
 

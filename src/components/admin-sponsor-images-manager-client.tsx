@@ -49,7 +49,7 @@ export function AdminSponsorImagesManagerClient({
   onChanged?: () => void;
 }) {
   const [isPending, startTransition] = useTransition();
-  const { message } = AntApp.useApp();
+  const { message, modal } = AntApp.useApp();
 
   function submitCreate(formData: FormData) {
     startTransition(async () => {
@@ -98,23 +98,28 @@ export function AdminSponsorImagesManagerClient({
   }
 
   function handleDelete(imageId: string) {
-    if (!window.confirm("确认删除这张赞助者图片吗？")) {
-      return;
-    }
-
-    startTransition(async () => {
-      try {
-        const response = await fetch(`/api/admin/sponsors/${sponsorId}/images/${imageId}`, {
-          method: "DELETE",
+    modal.confirm({
+      title: "确认删除这张赞助者图片吗？",
+      content: "删除后赞助者图片库中将不再展示这张图片。",
+      okText: "删除图片",
+      cancelText: "取消",
+      okButtonProps: { danger: true },
+      onOk: () => {
+        startTransition(async () => {
+          try {
+            const response = await fetch(`/api/admin/sponsors/${sponsorId}/images/${imageId}`, {
+              method: "DELETE",
+            });
+            const result = await readApiResult(response);
+            message.success(
+              getAdminSavedMessage(result?.saved ?? "sponsor_image_deleted") ?? "后台内容已更新。",
+            );
+            onChanged?.();
+          } catch (submitError) {
+            message.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
+          }
         });
-        const result = await readApiResult(response);
-        message.success(
-          getAdminSavedMessage(result?.saved ?? "sponsor_image_deleted") ?? "后台内容已更新。",
-        );
-        onChanged?.();
-      } catch (submitError) {
-        message.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
-      }
+      },
     });
   }
 

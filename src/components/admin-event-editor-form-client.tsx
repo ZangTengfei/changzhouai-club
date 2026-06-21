@@ -105,7 +105,7 @@ export function AdminEventEditorFormClient({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const { message } = AntApp.useApp();
+  const { message, modal } = AntApp.useApp();
   const isEditing = Boolean(event);
 
   function handleSubmit(formData: FormData) {
@@ -142,26 +142,35 @@ export function AdminEventEditorFormClient({
   }
 
   function handleDelete() {
-    if (!event || !window.confirm(`确认删除活动“${event.title}”吗？`)) {
+    if (!event) {
       return;
     }
 
-    startTransition(async () => {
-      try {
-        const response = await fetch(`/api/admin/events/${event.id}`, {
-          method: "DELETE",
-        });
-        const result = await readApiResult(response);
-        if (onDeleted) {
-          message.success(getAdminSavedMessage(result?.saved ?? "deleted") ?? "后台内容已更新。");
-          onDeleted();
-          return;
-        }
+    modal.confirm({
+      title: `确认删除活动“${event.title}”吗？`,
+      content: "删除后将从后台活动列表移除，请确认不再需要保留这条活动记录。",
+      okText: "删除活动",
+      cancelText: "取消",
+      okButtonProps: { danger: true },
+      onOk: () => {
+        startTransition(async () => {
+          try {
+            const response = await fetch(`/api/admin/events/${event.id}`, {
+              method: "DELETE",
+            });
+            const result = await readApiResult(response);
+            if (onDeleted) {
+              message.success(getAdminSavedMessage(result?.saved ?? "deleted") ?? "后台内容已更新。");
+              onDeleted();
+              return;
+            }
 
-        router.push(`/admin/events?saved=${result?.saved ?? "deleted"}`);
-      } catch (submitError) {
-        message.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
-      }
+            router.push(`/admin/events?saved=${result?.saved ?? "deleted"}`);
+          } catch (submitError) {
+            message.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
+          }
+        });
+      },
     });
   }
 
