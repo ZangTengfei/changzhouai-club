@@ -2,33 +2,28 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-
+import { EyeOutlined } from "@ant-design/icons";
 import {
-  AdminMetric,
-  AdminNotice,
-  AdminPageStack,
-  AdminPanel,
-  AdminPanelBody,
-  AdminPanelHeader,
-  AdminStatusBadge,
-} from "@/components/admin-ui";
+  Alert,
+  Button,
+  Card,
+  Image,
+  Space,
+  Statistic,
+  Table,
+  Typography,
+  type TableColumnsType,
+} from "antd";
+
+import { AdminStatusTag } from "@/components/admin-antd";
 import { AdminSponsorEditorModal } from "@/components/admin-sponsor-editor-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   getAdminErrorMessage,
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
-import type { AdminSponsorsData } from "@/lib/admin/sponsors";
+import type { AdminSponsor, AdminSponsorsData } from "@/lib/admin/sponsors";
 
 const sponsorTierLabelMap: Record<string, string> = {
   core: "核心赞助者",
@@ -45,130 +40,137 @@ export function AdminSponsorsPageClient() {
   const saved = searchParams.get("saved") ?? undefined;
   const queryError = searchParams.get("error") ?? undefined;
   const showDebug = searchParams.get("debug") === "1";
+  const activeCount = data?.sponsors.filter((sponsor) => sponsor.is_active).length ?? 0;
+  const imageCount = data?.sponsors.reduce((total, sponsor) => total + sponsor.images.length, 0) ?? 0;
+
+  const columns: TableColumnsType<AdminSponsor> = [
+    {
+      title: "赞助者",
+      dataIndex: "name",
+      render: (_, sponsor) => (
+        <Space>
+          {sponsor.logo_url ? (
+            <span className="grid size-14 place-items-center overflow-hidden rounded-lg border border-border/70 bg-muted/30 p-2">
+              <Image
+                src={sponsor.logo_url}
+                alt={`${sponsor.name} Logo`}
+                preview={false}
+                className="max-h-full max-w-full object-contain"
+              />
+            </span>
+          ) : null}
+          <Space orientation="vertical" size={2}>
+            <Link
+              href={`/admin/sponsors/${sponsor.id}`}
+              className="font-semibold text-foreground hover:text-primary"
+            >
+              {sponsor.name}
+            </Link>
+            <Typography.Text type="secondary">{sponsor.slug}</Typography.Text>
+          </Space>
+        </Space>
+      ),
+    },
+    {
+      title: "展示信息",
+      render: (_, sponsor) => (
+        <Space orientation="vertical" size={2}>
+          <Typography.Text strong>{sponsor.sponsor_label ?? "未设置赞助标签"}</Typography.Text>
+          <Typography.Text type="secondary">{sponsorTierLabelMap[sponsor.tier] ?? sponsor.tier}</Typography.Text>
+          <Typography.Text type="secondary">{sponsor.summary ?? "暂未填写一句话介绍。"}</Typography.Text>
+          <Typography.Text type="secondary">排序 {sponsor.display_order}</Typography.Text>
+        </Space>
+      ),
+    },
+    {
+      title: "状态",
+      width: 110,
+      render: (_, sponsor) => (
+        <AdminStatusTag
+          status={sponsor.is_active ? "published" : "archived"}
+          label={sponsor.is_active ? "公开展示" : "已隐藏"}
+        />
+      ),
+    },
+    {
+      title: "图片",
+      width: 90,
+      render: (_, sponsor) => <Typography.Text type="secondary">{sponsor.images.length}</Typography.Text>,
+    },
+    {
+      title: "操作",
+      width: 150,
+      align: "right",
+      render: (_, sponsor) => (
+        <Space>
+          <AdminSponsorEditorModal
+            sponsorId={sponsor.id}
+            triggerLabel="编辑"
+            onChanged={reload}
+          />
+          <Button icon={<EyeOutlined />} href={`/admin/sponsors/${sponsor.id}`}>
+            查看
+          </Button>
+        </Space>
+      ),
+    },
+  ];
 
   return (
-    <AdminPageStack>
+    <div className="grid gap-4">
       <AdminToastSignals
         success={getAdminSavedMessage(saved)}
         error={queryError ? getAdminErrorMessage(queryError) : null}
       />
 
-      <AdminPanel>
-        <AdminPanelHeader
-          eyebrow="Sponsors"
-          title="赞助者管理"
-          actions={
-            <>
-              <AdminMetric label="赞助者" value={data?.sponsors.length ?? "..."} />
-              <AdminSponsorEditorModal triggerLabel="新增赞助者" onChanged={reload} />
-            </>
-          }
-        />
-      </AdminPanel>
+      <Card className="min-w-0">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <Typography.Text type="secondary">Sponsors</Typography.Text>
+            <Typography.Title level={2} style={{ margin: "4px 0 0" }}>
+              赞助者管理
+            </Typography.Title>
+          </div>
+          <Space wrap size="large">
+            <Statistic title="赞助者" value={data?.sponsors.length ?? 0} />
+            <Statistic title="公开展示" value={activeCount} />
+            <Statistic title="图片" value={imageCount} />
+            <AdminSponsorEditorModal triggerLabel="新增赞助者" onChanged={reload} />
+          </Space>
+        </div>
+      </Card>
 
-      {error ? <AdminNotice>后台数据读取出现问题：{error}</AdminNotice> : null}
+      {error ? <Alert title={`后台数据读取出现问题：${error}`} type="warning" showIcon /> : null}
       {data && data.queryErrors.length > 0 ? (
-        <AdminNotice>后台数据读取出现问题：{data.queryErrors.join(" | ")}</AdminNotice>
+        <Alert title={`后台数据读取出现问题：${data.queryErrors.join(" | ")}`} type="warning" showIcon />
       ) : null}
 
       {showDebug && data ? (
-        <AdminPanel>
-          <AdminPanelHeader eyebrow="Diagnostics" title="数据诊断信息" />
-          <AdminPanelBody>
-            <pre className="overflow-x-auto rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 p-3 text-xs text-muted-foreground">
-              {JSON.stringify(data.debugSnapshot, null, 2)}
-            </pre>
-          </AdminPanelBody>
-        </AdminPanel>
+        <Card className="min-w-0" title="数据诊断信息">
+          <pre className="overflow-x-auto rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 p-3 text-xs text-muted-foreground">
+            {JSON.stringify(data.debugSnapshot, null, 2)}
+          </pre>
+        </Card>
       ) : null}
 
-      <AdminPanel>
-        <AdminPanelHeader eyebrow="List" title="赞助者结果" />
-        <AdminPanelBody className="p-0">
-          {isLoading ? (
-            <div className="p-4">
-              <AdminNotice>正在加载赞助者列表...</AdminNotice>
-            </div>
-          ) : data && data.sponsors.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>赞助者</TableHead>
-                  <TableHead>展示信息</TableHead>
-                  <TableHead>状态</TableHead>
-                  <TableHead>图片</TableHead>
-                  <TableHead className="w-[96px] text-right">操作</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.sponsors.map((sponsor) => (
-                  <TableRow key={sponsor.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        {sponsor.logo_url ? (
-                          <span className="grid size-14 place-items-center overflow-hidden rounded-lg border border-border/70 bg-muted/30 p-2">
-                            <img
-                              src={sponsor.logo_url}
-                              alt={`${sponsor.name} Logo`}
-                              className="max-h-full max-w-full object-contain"
-                            />
-                          </span>
-                        ) : null}
-                        <div className="grid gap-1">
-                          <Link
-                            href={`/admin/sponsors/${sponsor.id}`}
-                            className="font-semibold text-foreground transition-colors hover:text-primary"
-                          >
-                            {sponsor.name}
-                          </Link>
-                          <p className="text-xs text-muted-foreground">{sponsor.slug}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="grid gap-1 text-sm text-muted-foreground">
-                        <span className="font-medium text-foreground">
-                          {sponsor.sponsor_label ?? "未设置赞助标签"}
-                        </span>
-                        <span>{sponsorTierLabelMap[sponsor.tier] ?? sponsor.tier}</span>
-                        <span className="line-clamp-2">
-                          {sponsor.summary ?? "暂未填写一句话介绍。"}
-                        </span>
-                        <span>排序 {sponsor.display_order}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <AdminStatusBadge tone={sponsor.is_active ? "completed" : "neutral"}>
-                        {sponsor.is_active ? "公开展示" : "已隐藏"}
-                      </AdminStatusBadge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      图片 {sponsor.images.length}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        <AdminSponsorEditorModal
-                          sponsorId={sponsor.id}
-                          triggerLabel="编辑"
-                          onChanged={reload}
-                        />
-                        <Button asChild size="sm" variant="secondary">
-                          <Link href={`/admin/sponsors/${sponsor.id}`}>查看</Link>
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <div className="space-y-3 p-4">
-              <AdminNotice>创建赞助者后，即可在首页和赞助者详情页展示。</AdminNotice>
-              <AdminSponsorEditorModal triggerLabel="去创建赞助者" onChanged={reload} />
-            </div>
-          )}
-        </AdminPanelBody>
-      </AdminPanel>
-    </AdminPageStack>
+      <Card className="min-w-0" title="赞助者结果">
+        <Table
+          columns={columns}
+          dataSource={data?.sponsors ?? []}
+          rowKey="id"
+          loading={isLoading}
+          pagination={false}
+          scroll={{ x: 920 }}
+          locale={{
+            emptyText: (
+              <Space orientation="vertical">
+                <Typography.Text type="secondary">创建赞助者后，即可在首页和赞助者详情页展示。</Typography.Text>
+                <AdminSponsorEditorModal triggerLabel="去创建赞助者" onChanged={reload} />
+              </Space>
+            ),
+          }}
+        />
+      </Card>
+    </div>
   );
 }
