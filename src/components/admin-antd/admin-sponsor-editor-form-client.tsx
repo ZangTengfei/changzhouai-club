@@ -13,7 +13,7 @@ import {
   AdminPanelBody,
   AdminPanelHeader,
 } from "@/components/admin-antd";
-import { StorageImageUrlField } from "@/components/storage-image-url-field";
+import { AdminStorageImageUrlField } from "@/components/admin-antd";
 import { NativeSelect } from "@/components/admin-antd";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
 
@@ -202,7 +202,7 @@ export function AdminSponsorEditorFormClient({
               </AdminField>
 
               <AdminField label="Logo 路径" className="md:col-span-2">
-                <StorageImageUrlField
+                <AdminStorageImageUrlField
                   name="logo_url"
                   defaultValue={sponsor?.logo_url ?? ""}
                   eventSlug={sponsor?.slug ?? ""}

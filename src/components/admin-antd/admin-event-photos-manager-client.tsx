@@ -14,7 +14,7 @@ import {
   AdminRecordCard,
   AdminStatusBadge,
 } from "@/components/admin-antd";
-import { StorageImageUrlField } from "@/components/storage-image-url-field";
+import { AdminStorageImageUrlField } from "@/components/admin-antd";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
 
 type EventPhoto = {
@@ -206,7 +206,7 @@ export function AdminEventPhotosManagerClient({
                       >
                         <div className="grid gap-4 md:grid-cols-2">
                           <AdminField label="图片路径" className="md:col-span-2">
-                            <StorageImageUrlField
+                            <AdminStorageImageUrlField
                               name="image_url"
                               defaultValue={photo.image_url}
                               eventSlug={eventSlug}
@@ -285,7 +285,7 @@ export function AdminEventPhotosManagerClient({
           >
             <div className="grid gap-4 md:grid-cols-2">
               <AdminField label="图片路径" className="md:col-span-2">
-                <StorageImageUrlField
+                <AdminStorageImageUrlField
                   name="image_url"
                   eventSlug={eventSlug}
                   mode="upload-only"

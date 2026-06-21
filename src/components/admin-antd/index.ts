@@ -9,6 +9,7 @@ export {
   AdminRecordCard,
 } from "./admin-page-section";
 export { AdminStatusTag } from "./admin-status-tag";
+export { AdminStorageImageUrlField } from "./admin-storage-image-url-field";
 export { AdminToastSignals } from "./admin-toast-signals";
 export { OperationMetricCard } from "./operation-metric-card";
 export { OperationTaskTable, type OperationTaskRow } from "./operation-task-table";

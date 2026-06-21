@@ -14,7 +14,7 @@ import {
   AdminRecordCard,
   AdminStatusBadge,
 } from "@/components/admin-antd";
-import { StorageImageUrlField } from "@/components/storage-image-url-field";
+import { AdminStorageImageUrlField } from "@/components/admin-antd";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
 
 type SponsorImage = {
@@ -155,7 +155,7 @@ export function AdminSponsorImagesManagerClient({
 
                     <div className="grid gap-4 md:grid-cols-2">
                       <AdminField label="图片路径" className="md:col-span-2">
-                        <StorageImageUrlField
+                        <AdminStorageImageUrlField
                           name="image_url"
                           defaultValue={image.image_url}
                           eventSlug={sponsorSlug}
@@ -216,7 +216,7 @@ export function AdminSponsorImagesManagerClient({
           >
             <div className="grid gap-4 md:grid-cols-2">
               <AdminField label="图片路径" className="md:col-span-2">
-                <StorageImageUrlField
+                <AdminStorageImageUrlField
                   name="image_url"
                   eventSlug={sponsorSlug}
                   uploadScope="sponsor"

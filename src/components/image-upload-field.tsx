@@ -1,8 +1,6 @@
 "use client";
 
 import { type ReactNode, useRef, useState } from "react";
-import { UploadOutlined } from "@ant-design/icons";
-import { Alert, Button as AntButton, Input as AntInput } from "antd";
 
 import {
   compressImageFile,
@@ -239,24 +237,14 @@ export function ImageUploadField({
         ) : null}
 
         {mode === "upload-or-url" ? (
-          appearance === "admin" ? (
-            <AntInput
-              name={name}
-              value={value}
-              onChange={(event) => setValue(event.target.value)}
-              placeholder={placeholder}
-              required={required}
-            />
-          ) : (
-            <input
-              className="input"
-              name={name}
-              value={value}
-              onChange={(event) => setValue(event.target.value)}
-              placeholder={placeholder}
-              required={required}
-            />
-          )
+          <input
+            className="input"
+            name={name}
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+            placeholder={placeholder}
+            required={required}
+          />
         ) : (
           <input type="hidden" name={name} value={value} />
         )}
@@ -267,47 +255,26 @@ export function ImageUploadField({
             appearance === "admin" && "image-upload-actions-admin",
           )}
         >
-          {appearance === "admin" ? (
-            <AntButton
-              htmlType="button"
-              icon={<UploadOutlined />}
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading}
-            >
-              {uploadLabelText}
-            </AntButton>
-          ) : (
-            <button
-              type="button"
-              className="button button-secondary"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading}
-            >
-              <UploadOutlined aria-hidden="true" />
-              {uploadLabelText}
-            </button>
-          )}
+          <button
+            type="button"
+            className="button button-secondary"
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isUploading}
+          >
+            {uploadLabelText}
+          </button>
 
           {allowClear
-            ? appearance === "admin" ? (
-                <AntButton
-                  htmlType="button"
-                  type="text"
-                  onClick={() => setValue("")}
-                  disabled={isUploading || !value}
-                >
-                  {clearLabel}
-                </AntButton>
-              ) : (
-                <button
-                  type="button"
-                  className="button button-secondary"
-                  onClick={() => setValue("")}
-                  disabled={isUploading || !value}
-                >
-                  {clearLabel}
-                </button>
-              )
+            ? (
+              <button
+                type="button"
+                className="button button-secondary"
+                onClick={() => setValue("")}
+                disabled={isUploading || !value}
+              >
+                {clearLabel}
+              </button>
+            )
             : null}
 
           <span className={cx("image-upload-status")}>{statusText}</span>
@@ -322,20 +289,8 @@ export function ImageUploadField({
         onChange={(event) => handleUpload(event.target.files?.[0] ?? null)}
       />
 
-      {error
-        ? appearance === "admin" ? (
-            <Alert title={error} type="error" showIcon />
-          ) : (
-            <div className="note-strip">{error}</div>
-          )
-        : null}
-      {!error && notice
-        ? appearance === "admin" ? (
-            <Alert title={notice} type="info" showIcon />
-          ) : (
-            <div className="note-strip">{notice}</div>
-          )
-        : null}
+      {error ? <div className="note-strip">{error}</div> : null}
+      {!error && notice ? <div className="note-strip">{notice}</div> : null}
     </div>
   );
 }

@@ -18,7 +18,7 @@ import {
   AdminStatusTag,
   AdminToastSignals,
 } from "@/components/admin-antd";
-import { StorageImageUrlField } from "@/components/storage-image-url-field";
+import { AdminStorageImageUrlField } from "@/components/admin-antd";
 import {
   getAdminErrorMessage,
   getAdminSavedMessage,
@@ -131,7 +131,7 @@ export default async function AdminSocialPage({
                   </AdminField>
 
                   <AdminField label="二维码图片" className="md:col-span-2">
-                    <StorageImageUrlField
+                    <AdminStorageImageUrlField
                       name="image_url"
                       eventSlug="wechat-group"
                       uploadScope="community"
@@ -283,7 +283,7 @@ export default async function AdminSocialPage({
                                 />
                               </AdminField>
                               <AdminField label="图片地址" className="md:col-span-2">
-                                <StorageImageUrlField
+                                <AdminStorageImageUrlField
                                   name="image_url"
                                   defaultValue={qrCode.image_url}
                                   eventSlug="wechat-group"

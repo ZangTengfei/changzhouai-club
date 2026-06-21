@@ -22,7 +22,7 @@ import {
   AdminToastSignals,
   NativeSelect,
 } from "@/components/admin-antd";
-import { StorageImageUrlField } from "@/components/storage-image-url-field";
+import { AdminStorageImageUrlField } from "@/components/admin-antd";
 import {
   getAdminErrorMessage,
   getAdminSavedMessage,
@@ -145,7 +145,7 @@ function WorkForm({
         </AdminField>
 
         <AdminField label="封面图" className="md:col-span-2">
-          <StorageImageUrlField
+          <AdminStorageImageUrlField
             name="cover_image_url"
             defaultValue={work?.cover_image_url ?? ""}
             eventSlug="member-work"
@@ -282,7 +282,7 @@ function ExternalCaseCardForm({ card }: { card?: AdminExternalCaseCardRow }) {
         </AdminField>
 
         <AdminField label="封面图" className="md:col-span-2">
-          <StorageImageUrlField
+          <AdminStorageImageUrlField
             name="cover_image_url"
             defaultValue={card?.cover_image_url ?? ""}
             eventSlug="external-case-card"
