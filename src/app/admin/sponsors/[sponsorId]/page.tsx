@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { AdminSponsorDetailPageClient } from "@/components/admin-sponsor-detail-page-client";
+import { AdminSponsorDetailPageClient } from "@/components/admin-antd/admin-sponsor-detail-page-client";
 
 export const metadata: Metadata = {
   title: "赞助者详情",

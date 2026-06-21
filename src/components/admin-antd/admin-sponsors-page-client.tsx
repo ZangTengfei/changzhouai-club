@@ -16,7 +16,7 @@ import {
 } from "antd";
 
 import { AdminStatusTag } from "@/components/admin-antd";
-import { AdminSponsorEditorModal } from "@/components/admin-sponsor-editor-modal";
+import { AdminSponsorEditorModal } from "@/components/admin-antd/admin-sponsor-editor-modal";
 import { AdminToastSignals } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {

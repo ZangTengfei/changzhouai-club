@@ -6,7 +6,7 @@ import { CalendarOutlined, PlusOutlined } from "@ant-design/icons";
 import { Alert, Button, Card, Input, Space, Statistic, Table, type TableColumnsType } from "antd";
 
 import { AdminStatusTag } from "@/components/admin-antd";
-import { AdminEventEditorModal } from "@/components/admin-event-editor-modal";
+import { AdminEventEditorModal } from "@/components/admin-antd/admin-event-editor-modal";
 import { AdminToastSignals } from "@/components/admin-antd";
 import { NativeSelect } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";

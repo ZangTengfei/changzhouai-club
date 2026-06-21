@@ -15,8 +15,8 @@ import {
   type AdminTone,
 } from "@/components/admin-antd";
 import { AdminToastSignals } from "@/components/admin-antd";
-import { AdminEventEditorFormClient } from "@/components/admin-event-editor-form-client";
-import { AdminEventPhotosManagerClient } from "@/components/admin-event-photos-manager-client";
+import { AdminEventEditorFormClient } from "@/components/admin-antd/admin-event-editor-form-client";
+import { AdminEventPhotosManagerClient } from "@/components/admin-antd/admin-event-photos-manager-client";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   formatAdminEventDate,

@@ -8,24 +8,24 @@ import {
   AdminPanel,
   AdminPanelHeader,
 } from "@/components/admin-antd";
-import { AdminSponsorEditorFormClient } from "@/components/admin-sponsor-editor-form-client";
+import { AdminEventEditorFormClient } from "@/components/admin-antd/admin-event-editor-form-client";
 
-export function AdminNewSponsorPageClient() {
+export function AdminNewEventPageClient() {
   return (
     <AdminPageStack>
       <AdminPanel>
         <AdminPanelHeader
-          eyebrow="New Sponsor"
-          title="新增赞助者"
+          eyebrow="New Event"
+          title="新建活动"
           actions={
-            <Link href="/admin/sponsors">
-              <Button>返回赞助者列表</Button>
+            <Link href="/admin/events">
+              <Button>返回活动列表</Button>
             </Link>
           }
         />
       </AdminPanel>
 
-      <AdminSponsorEditorFormClient />
+      <AdminEventEditorFormClient />
     </AdminPageStack>
   );
 }

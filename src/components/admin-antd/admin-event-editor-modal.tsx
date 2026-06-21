@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { Button } from "antd";
 
-import { AdminEventEditorFormClient } from "@/components/admin-event-editor-form-client";
+import { AdminEventEditorFormClient } from "@/components/admin-antd/admin-event-editor-form-client";
 import { AdminModal } from "@/components/admin-antd";
 import { AdminNotice } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";

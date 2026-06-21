@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { AdminMembersPageClient } from "@/components/admin-members-page-client";
+import { AdminMembersPageClient } from "@/components/admin-antd/admin-members-page-client";
 
 export const metadata: Metadata = {
   title: "成员管理",

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "antd";
 
 import { AdminModal } from "@/components/admin-antd";
-import { AdminSponsorEditorFormClient } from "@/components/admin-sponsor-editor-form-client";
+import { AdminSponsorEditorFormClient } from "@/components/admin-antd/admin-sponsor-editor-form-client";
 import { AdminNotice } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminSponsor, AdminSponsorsDebugSnapshot } from "@/lib/admin/sponsors";

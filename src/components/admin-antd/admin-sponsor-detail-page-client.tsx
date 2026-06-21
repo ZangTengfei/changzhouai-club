@@ -13,8 +13,8 @@ import {
   AdminPanelHeader,
   AdminStatusBadge,
 } from "@/components/admin-antd";
-import { AdminSponsorEditorFormClient } from "@/components/admin-sponsor-editor-form-client";
-import { AdminSponsorImagesManagerClient } from "@/components/admin-sponsor-images-manager-client";
+import { AdminSponsorEditorFormClient } from "@/components/admin-antd/admin-sponsor-editor-form-client";
+import { AdminSponsorImagesManagerClient } from "@/components/admin-antd/admin-sponsor-images-manager-client";
 import { AdminToastSignals } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {

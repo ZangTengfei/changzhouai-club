@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { AdminLeadsPageClient } from "@/components/admin-leads-page-client";
+import { AdminLeadsPageClient } from "@/components/admin-antd/admin-leads-page-client";
 
 export const metadata: Metadata = {
   title: "合作线索",
