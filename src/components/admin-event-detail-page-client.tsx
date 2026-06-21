@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Button } from "antd";
+import { Button, Table, type TableColumnsType } from "antd";
 
 import {
   AdminMetric,
@@ -17,14 +17,6 @@ import {
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { AdminEventEditorFormClient } from "@/components/admin-event-editor-form-client";
 import { AdminEventPhotosManagerClient } from "@/components/admin-event-photos-manager-client";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   formatAdminEventDate,
@@ -45,6 +37,7 @@ type AdminEventDetailData = {
     canExportRegistrations: boolean;
   };
 };
+type AdminRegistration = AdminEvent["registrations"][number];
 
 export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
   const searchParams = useSearchParams();
@@ -54,6 +47,58 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
   const saved = searchParams.get("saved") ?? undefined;
   const queryError = searchParams.get("error") ?? undefined;
   const eventDetail = data?.event;
+  const registrationColumns: TableColumnsType<AdminRegistration> = [
+    {
+      title: "成员",
+      render: (_, registration) => (
+        <div className="grid gap-1">
+          <span className="font-semibold text-foreground">
+            {registration.profile?.display_name ?? "未填写显示名"}
+          </span>
+          <span className="text-sm text-muted-foreground">
+            用户 ID: {registration.user_id}
+          </span>
+        </div>
+      ),
+    },
+    {
+      title: "联系信息",
+      render: (_, registration) => (
+        <div className="grid gap-1 text-sm text-muted-foreground">
+          <span>{registration.profile?.email ?? "未提供邮箱"}</span>
+          <span>{registration.profile?.city ?? "未填写城市"}</span>
+        </div>
+      ),
+    },
+    {
+      title: "状态",
+      width: 120,
+      render: (_, registration) => (
+        <AdminStatusBadge
+          tone={getAdminRegistrationStatusTone(registration.status) as AdminTone}
+        >
+          {formatAdminRegistrationStatus(registration.status)}
+        </AdminStatusBadge>
+      ),
+    },
+    {
+      title: "报名时间",
+      width: 180,
+      render: (_, registration) => (
+        <span className="text-sm text-muted-foreground">
+          {new Date(registration.created_at).toLocaleString("zh-CN")}
+        </span>
+      ),
+    },
+    {
+      title: "备注",
+      render: (_, registration) => (
+        <span className="text-sm text-muted-foreground">
+          {registration.note ?? "无备注"}
+        </span>
+      ),
+    },
+  ];
 
   return (
     <AdminPageStack>
@@ -138,54 +183,13 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
             />
             <AdminPanelBody className="p-0">
               {eventDetail.registrations.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>成员</TableHead>
-                      <TableHead>联系信息</TableHead>
-                      <TableHead>状态</TableHead>
-                      <TableHead>报名时间</TableHead>
-                      <TableHead>备注</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {eventDetail.registrations.map((registration) => (
-                      <TableRow key={registration.id}>
-                        <TableCell>
-                          <div className="grid gap-1">
-                            <span className="font-semibold text-foreground">
-                              {registration.profile?.display_name ?? "未填写显示名"}
-                            </span>
-                            <span className="text-sm text-muted-foreground">
-                              用户 ID: {registration.user_id}
-                            </span>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          <div className="grid gap-1">
-                            <span>{registration.profile?.email ?? "未提供邮箱"}</span>
-                            <span>{registration.profile?.city ?? "未填写城市"}</span>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <AdminStatusBadge
-                            tone={
-                              getAdminRegistrationStatusTone(registration.status) as AdminTone
-                            }
-                          >
-                            {formatAdminRegistrationStatus(registration.status)}
-                          </AdminStatusBadge>
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {new Date(registration.created_at).toLocaleString("zh-CN")}
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {registration.note ?? "无备注"}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <Table
+                  columns={registrationColumns}
+                  dataSource={eventDetail.registrations}
+                  rowKey="id"
+                  pagination={false}
+                  scroll={{ x: 860 }}
+                />
               ) : (
                 <div className="p-4">
                   <AdminNotice>这场活动暂时还没有报名记录。</AdminNotice>

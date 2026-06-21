@@ -1,9 +1,9 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { Children, isValidElement, type ComponentProps, type ReactElement, type ReactNode } from "react";
 
 import Link from "next/link";
-import { Alert, Card as AntCard, Form, Statistic, Tag } from "antd";
+import { Alert, Card as AntCard, Checkbox, Form, Statistic, Tag } from "antd";
 
 import { cn, cssModuleCxWithGlobals } from "@/lib/utils";
 
@@ -212,13 +212,33 @@ export function AdminField({
 
 export function AdminCheckboxRow({
   className,
+  name,
+  value,
+  defaultChecked,
+  disabled,
   children,
 }: {
   className?: string;
+  name?: string;
+  value?: string;
+  defaultChecked?: boolean;
+  disabled?: boolean;
   children: ReactNode;
 }) {
+  const childArray = Children.toArray(children);
+  const inputElement = childArray.find(
+    (child): child is ReactElement<ComponentProps<"input">> =>
+      isValidElement(child) && child.type === "input",
+  );
+  const labelChildren = childArray.filter((child) => child !== inputElement);
+  const inputProps = inputElement?.props;
+  const checkboxName = name ?? inputProps?.name;
+  const checkboxValue = value ?? (inputProps?.value ? String(inputProps.value) : undefined);
+  const checkboxDefaultChecked = defaultChecked ?? inputProps?.defaultChecked;
+  const checkboxDisabled = disabled ?? inputProps?.disabled;
+
   return (
-    <label
+    <div
       className={cn(
         cx(
           "admin-checkbox-row flex items-center gap-2 rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/30 px-3 py-2 text-sm text-foreground",
@@ -226,8 +246,15 @@ export function AdminCheckboxRow({
         className,
       )}
     >
-      {children}
-    </label>
+      <Checkbox
+        name={checkboxName}
+        value={checkboxValue}
+        defaultChecked={checkboxDefaultChecked}
+        disabled={checkboxDisabled}
+      >
+        {labelChildren}
+      </Checkbox>
+    </div>
   );
 }
 

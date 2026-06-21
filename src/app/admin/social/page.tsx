@@ -153,13 +153,11 @@ export default async function AdminSocialPage({
                     高级设置
                   </summary>
                   <div className="mt-3 grid gap-4 md:grid-cols-2">
-                    <AdminCheckboxRow className="self-end">
-                      <input
-                        type="checkbox"
-                        name="is_active"
-                        defaultChecked
-                        className="size-4"
-                      />
+                    <AdminCheckboxRow
+                      className="self-end"
+                      name="is_active"
+                      defaultChecked
+                    >
                       <span>立即启用</span>
                     </AdminCheckboxRow>
 
@@ -258,13 +256,11 @@ export default async function AdminSocialPage({
                         <AdminField label="标题">
                           <Input name="title" defaultValue={qrCode.title} required />
                         </AdminField>
-                        <AdminCheckboxRow className="self-end">
-                          <input
-                            type="checkbox"
-                            name="is_active"
-                            defaultChecked={qrCode.is_active}
-                            className="size-4"
-                          />
+                        <AdminCheckboxRow
+                          className="self-end"
+                          name="is_active"
+                          defaultChecked={qrCode.is_active}
+                        >
                           <span>启用</span>
                         </AdminCheckboxRow>
                         <AdminField label="开始展示时间">

@@ -204,14 +204,12 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                       );
 
                       return (
-                        <AdminCheckboxRow key={role.id}>
-                          <input
-                            type="checkbox"
-                            name="role_id"
-                            value={role.id}
-                            defaultChecked={isAssigned}
-                            className="size-4 accent-[var(--primary)]"
-                          />
+                        <AdminCheckboxRow
+                          key={role.id}
+                          name="role_id"
+                          value={role.id}
+                          defaultChecked={isAssigned}
+                        >
                           <span>
                             <strong>{role.name}</strong>
                             {role.description ? (
@@ -410,33 +408,27 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                     </NativeSelect>
                   </AdminField>
 
-                  <AdminCheckboxRow className="self-end">
-                    <input
-                      type="checkbox"
-                      name="is_publicly_visible"
-                      defaultChecked={member.isPubliclyVisible}
-                      className="size-4 accent-[var(--primary)]"
-                    />
+                  <AdminCheckboxRow
+                    className="self-end"
+                    name="is_publicly_visible"
+                    defaultChecked={member.isPubliclyVisible}
+                  >
                     <span>公开展示到成员页</span>
                   </AdminCheckboxRow>
 
-                  <AdminCheckboxRow className="self-end">
-                    <input
-                      type="checkbox"
-                      name="is_co_builder"
-                      defaultChecked={member.isCoBuilder}
-                      className="size-4 accent-[var(--primary)]"
-                    />
+                  <AdminCheckboxRow
+                    className="self-end"
+                    name="is_co_builder"
+                    defaultChecked={member.isCoBuilder}
+                  >
                     <span>标记为已参与共建成员</span>
                   </AdminCheckboxRow>
 
-                  <AdminCheckboxRow className="self-end">
-                    <input
-                      type="checkbox"
-                      name="is_featured_on_home"
-                      defaultChecked={member.isFeaturedOnHome}
-                      className="size-4 accent-[var(--primary)]"
-                    />
+                  <AdminCheckboxRow
+                    className="self-end"
+                    name="is_featured_on_home"
+                    defaultChecked={member.isFeaturedOnHome}
+                  >
                     <span>展示到首页成员区</span>
                   </AdminCheckboxRow>
 
@@ -467,33 +459,24 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                 </div>
 
                 <div className="grid gap-2 md:grid-cols-3">
-                  <AdminCheckboxRow>
-                    <input
-                      type="checkbox"
-                      name="willing_to_attend"
-                      defaultChecked={member.willingToAttend}
-                      className="size-4 accent-[var(--primary)]"
-                    />
+                  <AdminCheckboxRow
+                    name="willing_to_attend"
+                    defaultChecked={member.willingToAttend}
+                  >
                     <span>愿意参加线下活动</span>
                   </AdminCheckboxRow>
 
-                  <AdminCheckboxRow>
-                    <input
-                      type="checkbox"
-                      name="willing_to_share"
-                      defaultChecked={member.willingToShare}
-                      className="size-4 accent-[var(--primary)]"
-                    />
+                  <AdminCheckboxRow
+                    name="willing_to_share"
+                    defaultChecked={member.willingToShare}
+                  >
                     <span>愿意在社区活动里做主题分享</span>
                   </AdminCheckboxRow>
 
-                  <AdminCheckboxRow>
-                    <input
-                      type="checkbox"
-                      name="willing_to_join_projects"
-                      defaultChecked={member.willingToJoinProjects}
-                      className="size-4 accent-[var(--primary)]"
-                    />
+                  <AdminCheckboxRow
+                    name="willing_to_join_projects"
+                    defaultChecked={member.willingToJoinProjects}
+                  >
                     <span>如有合适项目，愿意参与协作</span>
                   </AdminCheckboxRow>
                 </div>

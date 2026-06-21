@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { Button } from "antd";
 
 import {
   hasAnyAdminPermission,
@@ -161,8 +162,9 @@ export function AdminNav({ permissions }: { permissions: string[] }) {
               isGroupActive ? cx("admin-nav-group-active") : null,
             )}
           >
-            <button
-              type="button"
+            <Button
+              htmlType="button"
+              type="text"
               className={cx("admin-nav-group-trigger")}
               aria-expanded={isOpen}
               aria-controls={panelId}
@@ -186,7 +188,7 @@ export function AdminNav({ permissions }: { permissions: string[] }) {
                   )}
                 />
               </span>
-            </button>
+            </Button>
 
             {isOpen ? (
               <div id={panelId} className={cx("admin-nav-group-items")}>

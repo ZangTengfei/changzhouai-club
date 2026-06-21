@@ -196,23 +196,17 @@ function WorkForm({
           />
         </AdminField>
 
-        <AdminCheckboxRow>
-          <input
-            type="checkbox"
-            name="is_public"
-            defaultChecked={work?.is_public ?? true}
-            className="size-4"
-          />
+        <AdminCheckboxRow
+          name="is_public"
+          defaultChecked={work?.is_public ?? true}
+        >
           <span>公开展示</span>
         </AdminCheckboxRow>
 
-        <AdminCheckboxRow>
-          <input
-            type="checkbox"
-            name="is_featured"
-            defaultChecked={work?.is_featured ?? false}
-            className="size-4"
-          />
+        <AdminCheckboxRow
+          name="is_featured"
+          defaultChecked={work?.is_featured ?? false}
+        >
           <span>设为精选</span>
         </AdminCheckboxRow>
       </div>
@@ -326,23 +320,17 @@ function ExternalCaseCardForm({ card }: { card?: AdminExternalCaseCardRow }) {
           />
         </AdminField>
 
-        <AdminCheckboxRow>
-          <input
-            type="checkbox"
-            name="is_public"
-            defaultChecked={card?.is_public ?? true}
-            className="size-4"
-          />
+        <AdminCheckboxRow
+          name="is_public"
+          defaultChecked={card?.is_public ?? true}
+        >
           <span>公开展示</span>
         </AdminCheckboxRow>
 
-        <AdminCheckboxRow>
-          <input
-            type="checkbox"
-            name="is_featured"
-            defaultChecked={card?.is_featured ?? false}
-            className="size-4"
-          />
+        <AdminCheckboxRow
+          name="is_featured"
+          defaultChecked={card?.is_featured ?? false}
+        >
           <span>设为精选</span>
         </AdminCheckboxRow>
       </div>

@@ -228,13 +228,11 @@ export function AdminSponsorEditorFormClient({
                 />
               </AdminField>
 
-              <AdminCheckboxRow className="md:col-span-2">
-                <input
-                  type="checkbox"
-                  name="is_active"
-                  defaultChecked={sponsor?.is_active ?? true}
-                  className="size-4"
-                />
+              <AdminCheckboxRow
+                className="md:col-span-2"
+                name="is_active"
+                defaultChecked={sponsor?.is_active ?? true}
+              >
                 <span>在公开页面展示这个赞助者</span>
               </AdminCheckboxRow>
             </div>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Button, Input } from "antd";
+import { Button, Checkbox, Input } from "antd";
 
 import {
   updateAdminJoinRequest,
@@ -283,41 +283,41 @@ export default async function AdminJoinRequestDetailPage({
           </div>
 
           <div className={cx("checkbox-list")}>
-            <label className={cx("checkbox-row")}>
-              <input
-                type="checkbox"
+            <div className={cx("checkbox-row")}>
+              <Checkbox
                 name="mark_invited_to_register"
                 defaultChecked={Boolean(joinRequest.invitedToRegisterAt)}
-              />
-              <span>已邀请对方注册网站</span>
-            </label>
+              >
+                已邀请对方注册网站
+              </Checkbox>
+            </div>
 
-            <label className={cx("checkbox-row")}>
-              <input
-                type="checkbox"
+            <div className={cx("checkbox-row")}>
+              <Checkbox
                 name="mark_joined_group"
                 defaultChecked={Boolean(joinRequest.joinedGroupAt)}
-              />
-              <span>已加入微信社群或核心运营群</span>
-            </label>
+              >
+                已加入微信社群或核心运营群
+              </Checkbox>
+            </div>
 
-            <label className={cx("checkbox-row")}>
-              <input
-                type="checkbox"
+            <div className={cx("checkbox-row")}>
+              <Checkbox
                 name="mark_first_attended_event"
                 defaultChecked={Boolean(joinRequest.firstAttendedEventAt)}
-              />
-              <span>已参加第一场线下活动</span>
-            </label>
+              >
+                已参加第一场线下活动
+              </Checkbox>
+            </div>
 
-            <label className={cx("checkbox-row")}>
-              <input
-                type="checkbox"
+            <div className={cx("checkbox-row")}>
+              <Checkbox
                 name="mark_converted_to_member"
                 defaultChecked={Boolean(joinRequest.convertedToMemberAt)}
-              />
-              <span>已转为正式成员</span>
-            </label>
+              >
+                已转为正式成员
+              </Checkbox>
+            </div>
           </div>
 
           <div className={cx("form-grid admin-join-request-settings-grid")}>

@@ -235,23 +235,17 @@ function ProjectOpportunityForm({
           />
         </AdminField>
 
-        <AdminCheckboxRow>
-          <input
-            type="checkbox"
-            name="is_featured"
-            defaultChecked={opportunity?.is_featured ?? false}
-            className="size-4"
-          />
+        <AdminCheckboxRow
+          name="is_featured"
+          defaultChecked={opportunity?.is_featured ?? false}
+        >
           <span>设为精选机会</span>
         </AdminCheckboxRow>
 
-        <AdminCheckboxRow>
-          <input
-            type="checkbox"
-            name="application_requires_login"
-            defaultChecked={opportunity?.application_requires_login ?? false}
-            className="size-4"
-          />
+        <AdminCheckboxRow
+          name="application_requires_login"
+          defaultChecked={opportunity?.application_requires_login ?? false}
+        >
           <span>申请前需要登录</span>
         </AdminCheckboxRow>
       </div>

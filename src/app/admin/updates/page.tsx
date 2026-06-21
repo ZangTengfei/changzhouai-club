@@ -178,23 +178,17 @@ function UpdateForm({
           />
         </AdminField>
 
-        <AdminCheckboxRow>
-          <input
-            type="checkbox"
-            name="is_featured"
-            defaultChecked={update?.is_featured ?? false}
-            className="size-4"
-          />
+        <AdminCheckboxRow
+          name="is_featured"
+          defaultChecked={update?.is_featured ?? false}
+        >
           <span>设为精选</span>
         </AdminCheckboxRow>
 
-        <AdminCheckboxRow>
-          <input
-            type="checkbox"
-            name="is_pinned"
-            defaultChecked={update?.is_pinned ?? false}
-            className="size-4"
-          />
+        <AdminCheckboxRow
+          name="is_pinned"
+          defaultChecked={update?.is_pinned ?? false}
+        >
           <span>置顶展示</span>
         </AdminCheckboxRow>
       </div>
