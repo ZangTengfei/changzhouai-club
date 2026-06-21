@@ -3,7 +3,7 @@
 import type { ReactNode } from "react";
 
 import Link from "next/link";
-import { Alert, Card as AntCard, Statistic, Tag } from "antd";
+import { Alert, Card as AntCard, Form, Statistic, Tag } from "antd";
 
 import { cn, cssModuleCxWithGlobals } from "@/lib/utils";
 
@@ -199,12 +199,14 @@ export function AdminField({
   className?: string;
 }) {
   return (
-    <label className={cn(cx("admin-field grid gap-2"), className)}>
-      <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-        {label}
-      </span>
+    <Form.Item
+      className={cn(cx("admin-field"), className)}
+      label={label}
+      colon={false}
+      layout="vertical"
+    >
       {children}
-    </label>
+    </Form.Item>
   );
 }
 

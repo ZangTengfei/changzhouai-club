@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTransition } from "react";
+import { Button, Input } from "antd";
 import { toast } from "sonner";
 
 import {
@@ -19,10 +20,7 @@ import {
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { MemberAvatar } from "@/components/member-avatar";
 import { ToneBadge } from "@/components/tone-badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   formatAdminMemberStatus,
@@ -31,6 +29,8 @@ import {
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 import type { AdminMember } from "@/lib/admin/members";
+
+const { TextArea } = Input;
 
 type AdminMemberDetailData = {
   member: AdminMember;
@@ -152,9 +152,9 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                 <div className="rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 px-3 py-2 text-sm">
                   活动报名 {member.registrationCount} 次
                 </div>
-                <Button asChild variant="secondary">
-                  <Link href={backHref}>返回成员列表</Link>
-                </Button>
+                <Link href={backHref}>
+                  <Button>返回成员列表</Button>
+                </Link>
               </>
             }
           />
@@ -230,7 +230,7 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                   </AdminField>
 
                   <div className="flex flex-wrap gap-2">
-                    <Button type="submit" disabled={isPending}>
+                    <Button htmlType="submit" type="primary" disabled={isPending}>
                       {isPending ? "保存中..." : "保存后台角色"}
                     </Button>
                   </div>
@@ -457,7 +457,7 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                   </AdminField>
 
                   <AdminField label="个人简介" className="md:col-span-2">
-                    <Textarea
+                    <TextArea
                       name="bio"
                       defaultValue={member.bio ?? ""}
                       rows={5}
@@ -499,7 +499,7 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  <Button type="submit" disabled={isPending}>
+                  <Button htmlType="submit" type="primary" disabled={isPending}>
                     {isPending ? "保存中..." : "保存成员资料"}
                   </Button>
                 </div>

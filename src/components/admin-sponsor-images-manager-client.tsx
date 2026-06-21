@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { Button, Input } from "antd";
 import { toast } from "sonner";
 
 import {
@@ -13,8 +14,6 @@ import {
   AdminStatusBadge,
 } from "@/components/admin-ui";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
 
 type SponsorImage = {
@@ -180,12 +179,12 @@ export function AdminSponsorImagesManagerClient({
                     </div>
 
                     <div className="flex flex-wrap gap-2">
-                      <Button type="submit" disabled={isPending}>
+                      <Button htmlType="submit" type="primary" disabled={isPending}>
                         {isPending ? "提交中..." : "保存图片"}
                       </Button>
                       <Button
-                        type="button"
-                        variant="outline"
+                        htmlType="button"
+                        danger
                         onClick={() => handleDelete(image.id)}
                         disabled={isPending}
                       >
@@ -235,7 +234,7 @@ export function AdminSponsorImagesManagerClient({
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button type="submit" disabled={isPending}>
+              <Button htmlType="submit" type="primary" disabled={isPending}>
                 {isPending ? "提交中..." : "添加图片"}
               </Button>
             </div>

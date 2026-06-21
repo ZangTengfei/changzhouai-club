@@ -1,11 +1,9 @@
 "use client";
 
 import { type ReactNode, useRef, useState } from "react";
-import { UploadCloud } from "lucide-react";
+import { UploadOutlined } from "@ant-design/icons";
+import { Alert, Button as AntButton, Input as AntInput } from "antd";
 
-import { AdminNotice } from "@/components/admin-ui";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   compressImageFile,
   formatFileSize,
@@ -242,7 +240,7 @@ export function ImageUploadField({
 
         {mode === "upload-or-url" ? (
           appearance === "admin" ? (
-            <Input
+            <AntInput
               name={name}
               value={value}
               onChange={(event) => setValue(event.target.value)}
@@ -270,16 +268,14 @@ export function ImageUploadField({
           )}
         >
           {appearance === "admin" ? (
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
+            <AntButton
+              htmlType="button"
+              icon={<UploadOutlined />}
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
             >
-              <UploadCloud className="size-4" />
               {uploadLabelText}
-            </Button>
+            </AntButton>
           ) : (
             <button
               type="button"
@@ -287,22 +283,21 @@ export function ImageUploadField({
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
             >
-              <UploadCloud aria-hidden="true" strokeWidth={2} />
+              <UploadOutlined aria-hidden="true" />
               {uploadLabelText}
             </button>
           )}
 
           {allowClear
             ? appearance === "admin" ? (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
+                <AntButton
+                  htmlType="button"
+                  type="text"
                   onClick={() => setValue("")}
                   disabled={isUploading || !value}
                 >
                   {clearLabel}
-                </Button>
+                </AntButton>
               ) : (
                 <button
                   type="button"
@@ -329,14 +324,14 @@ export function ImageUploadField({
 
       {error
         ? appearance === "admin" ? (
-            <AdminNotice>{error}</AdminNotice>
+            <Alert title={error} type="error" showIcon />
           ) : (
             <div className="note-strip">{error}</div>
           )
         : null}
       {!error && notice
         ? appearance === "admin" ? (
-            <AdminNotice>{notice}</AdminNotice>
+            <Alert title={notice} type="info" showIcon />
           ) : (
             <div className="note-strip">{notice}</div>
           )

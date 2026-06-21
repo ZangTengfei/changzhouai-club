@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Button } from "antd";
 
 import { AdminEventEditorFormClient } from "@/components/admin-event-editor-form-client";
 import { AdminModal } from "@/components/admin-modal";
 import { AdminNotice } from "@/components/admin-ui";
-import { Button } from "@/components/ui/button";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminEvent } from "@/lib/admin/events";
 
@@ -52,9 +52,11 @@ function AdminEventEditModalContent({
         }}
       />
       <div className="mt-2">
-        <Button asChild type="button" variant="ghost" size="sm">
-          <Link href={`/admin/events/${detail.data.event.id}`}>打开完整活动详情页</Link>
-        </Button>
+        <Link href={`/admin/events/${detail.data.event.id}`}>
+          <Button type="text" size="small">
+            打开完整活动详情页
+          </Button>
+        </Link>
       </div>
     </>
   );
@@ -75,7 +77,7 @@ export function AdminEventEditorModal({
     <AdminModal
       title={eventId ? "编辑活动" : "新建活动"}
       trigger={
-        <Button type="button" variant={eventId ? "outline" : "default"} size="sm">
+        <Button htmlType="button" type={eventId ? "default" : "primary"} size="small">
           {triggerLabel}
         </Button>
       }

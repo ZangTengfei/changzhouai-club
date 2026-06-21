@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Button, Input } from "antd";
 
 import {
   deleteAdminCommunityUpdate,
@@ -17,10 +18,7 @@ import {
 } from "@/components/admin-antd";
 import { AdminModal } from "@/components/admin-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
 import {
   type AdminCommunityUpdate,
   type AdminCommunityUpdateAuthorOption,
@@ -35,6 +33,8 @@ import {
   getAdminErrorMessage,
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
+
+const { TextArea } = Input;
 
 export const metadata: Metadata = {
   title: "社区动态管理",
@@ -120,7 +120,7 @@ function UpdateForm({
         </AdminField>
 
         <AdminField label="正文（支持 Markdown）" className="md:col-span-2">
-          <Textarea
+          <TextArea
             name="content"
             defaultValue={update?.content ?? ""}
             rows={6}
@@ -130,7 +130,7 @@ function UpdateForm({
         </AdminField>
 
         <AdminField label="图片链接" className="md:col-span-2">
-          <Textarea
+          <TextArea
             name="image_urls"
             defaultValue={imageUrls}
             rows={3}
@@ -170,7 +170,7 @@ function UpdateForm({
         </AdminField>
 
         <AdminField label="审核备注" className="md:col-span-2">
-          <Textarea
+          <TextArea
             name="moderation_note"
             defaultValue={update?.moderation_note ?? ""}
             rows={2}
@@ -199,7 +199,7 @@ function UpdateForm({
         </AdminCheckboxRow>
       </div>
 
-      <Button type="submit" disabled={authorOptions.length === 0}>
+      <Button htmlType="submit" type="primary" disabled={authorOptions.length === 0}>
         保存社区动态
       </Button>
     </form>
@@ -298,13 +298,13 @@ export default async function AdminUpdatesPage({
 
                   <div className="flex flex-wrap gap-2 lg:justify-end">
                     {update.status === "published" ? (
-                      <Button asChild type="button" variant="outline" size="sm">
-                        <Link href={`/updates/${update.id}`}>前台</Link>
-                      </Button>
+                      <Link href={`/updates/${update.id}`}>
+                        <Button htmlType="button" size="small">前台</Button>
+                      </Link>
                     ) : null}
                     <form action={deleteAdminCommunityUpdate}>
                       <input type="hidden" name="update_id" value={update.id} />
-                      <Button type="submit" variant="outline" size="sm">
+                      <Button htmlType="submit" danger size="small">
                         删除
                       </Button>
                     </form>

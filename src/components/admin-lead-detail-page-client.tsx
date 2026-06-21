@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTransition } from "react";
+import { Button, Input } from "antd";
 import { toast } from "sonner";
 
 import {
@@ -17,10 +18,7 @@ import {
 } from "@/components/admin-ui";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { ToneBadge } from "@/components/tone-badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   formatAdminLeadMatchStatus,
@@ -33,6 +31,8 @@ import {
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 import type { AdminLead, AdminLeadMemberOption, AdminLeadStaffOption } from "@/lib/admin/leads";
+
+const { TextArea } = Input;
 
 type AdminLeadDetailData = {
   lead: AdminLead;
@@ -203,9 +203,9 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                 <div className="rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 px-3 py-2 text-sm">
                   当前状态：{formatAdminLeadStatus(lead.status)}
                 </div>
-                <Button asChild variant="secondary">
-                  <Link href={backHref}>返回线索列表</Link>
-                </Button>
+                <Link href={backHref}>
+                  <Button>返回线索列表</Button>
+                </Link>
               </>
             }
           />
@@ -354,7 +354,7 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                   </AdminField>
 
                   <AdminField label="管理员备注" className="md:col-span-2">
-                    <Textarea
+                    <TextArea
                       name="admin_note"
                       rows={5}
                       defaultValue={lead.adminNote ?? ""}
@@ -364,7 +364,7 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
-                  <Button type="submit" disabled={isPending}>
+                  <Button htmlType="submit" type="primary" disabled={isPending}>
                     {isPending ? "保存中..." : "保存线索详情"}
                   </Button>
                 </div>
@@ -438,7 +438,7 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                           </AdminField>
 
                           <AdminField label="匹配备注" className="md:col-span-2">
-                            <Textarea
+                            <TextArea
                               name="note"
                               rows={4}
                               defaultValue={match.note ?? ""}
@@ -448,12 +448,12 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                          <Button type="submit" variant="secondary" disabled={isPending}>
+                          <Button htmlType="submit" disabled={isPending}>
                             {isPending ? "保存中..." : "保存匹配"}
                           </Button>
                           <Button
-                            type="button"
-                            variant="outline"
+                            htmlType="button"
+                            danger
                             onClick={() => handleDeleteMatch(match.id)}
                             disabled={isPending}
                           >
@@ -510,7 +510,7 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                     </AdminField>
 
                     <AdminField label="匹配备注" className="md:col-span-2">
-                      <Textarea
+                      <TextArea
                         name="note"
                         rows={4}
                         placeholder="例如：擅长做企业场景 AI 应用、适合参与需求澄清、已经在线下活动里交流过"
@@ -519,7 +519,7 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                   </div>
 
                   <div className="flex flex-wrap gap-2">
-                    <Button type="submit" disabled={isPending}>
+                    <Button htmlType="submit" type="primary" disabled={isPending}>
                       {isPending ? "保存中..." : "添加候选成员"}
                     </Button>
                   </div>

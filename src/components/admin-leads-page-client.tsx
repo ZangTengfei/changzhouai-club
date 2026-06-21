@@ -193,13 +193,13 @@ export function AdminLeadsPageClient() {
   ];
 
   return (
-    <div className="grid gap-4">
+    <div className="grid min-w-0 gap-4">
       <AdminToastSignals
         success={getAdminSavedMessage(saved)}
         error={queryError ? getAdminErrorMessage(queryError) : null}
       />
 
-      <Card>
+      <Card className="min-w-0">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <Typography.Text type="secondary">Leads</Typography.Text>
@@ -222,7 +222,7 @@ export function AdminLeadsPageClient() {
         <Alert title={`后台数据读取出现问题：${data.queryErrors.join(" | ")}`} type="warning" showIcon />
       ) : null}
 
-      <Card title="线索筛选">
+      <Card title="线索筛选" className="min-w-0">
         <Space orientation="vertical" size={16} style={{ width: "100%" }}>
           <Space wrap>
             {statusFilters.map(([value, label]) => (
@@ -259,7 +259,7 @@ export function AdminLeadsPageClient() {
         </Space>
       </Card>
 
-      <Card title="线索结果">
+      <Card title="线索结果" className="min-w-0">
         <Table
           columns={columns}
           dataSource={filteredLeads}

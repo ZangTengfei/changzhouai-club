@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Button } from "antd";
 
 import {
   AdminPageStack,
@@ -8,7 +9,6 @@ import {
   AdminPanelHeader,
 } from "@/components/admin-ui";
 import { AdminEventEditorFormClient } from "@/components/admin-event-editor-form-client";
-import { Button } from "@/components/ui/button";
 
 export function AdminNewEventPageClient() {
   return (
@@ -18,9 +18,9 @@ export function AdminNewEventPageClient() {
           eyebrow="New Event"
           title="新建活动"
           actions={
-            <Button asChild variant="secondary">
-              <Link href="/admin/events">返回活动列表</Link>
-            </Button>
+            <Link href="/admin/events">
+              <Button>返回活动列表</Button>
+            </Link>
           }
         />
       </AdminPanel>

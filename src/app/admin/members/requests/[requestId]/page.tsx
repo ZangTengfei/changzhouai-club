@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Button, Input } from "antd";
 
 import {
   updateAdminJoinRequest,
@@ -7,6 +8,7 @@ import {
 } from "@/app/admin/actions";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { ToneBadge } from "@/components/tone-badge";
+import { NativeSelect } from "@/components/ui/native-select";
 import {
   formatAdminJoinRequestStatus,
   getAdminErrorMessage,
@@ -30,6 +32,7 @@ type SearchParams = {
 };
 
 const cx = cssModuleCxWithGlobals.bind(null, styles);
+const { TextArea } = Input;
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -109,8 +112,8 @@ export default async function AdminJoinRequestDetailPage({
               <span>当前状态</span>
             </div>
 
-            <Link href={backHref} className={cx("button button-secondary")}>
-              返回申请列表
+            <Link href={backHref}>
+              <Button>返回申请列表</Button>
             </Link>
           </div>
         </div>
@@ -244,18 +247,17 @@ export default async function AdminJoinRequestDetailPage({
           <div className={cx("form-grid admin-join-request-settings-grid")}>
             <label className={cx("form-field")}>
               <span>申请状态</span>
-              <select className={cx("input")} name="status" defaultValue={joinRequest.status}>
+              <NativeSelect className={cx("input")} name="status" defaultValue={joinRequest.status}>
                 <option value="new">新申请</option>
                 <option value="contacted">已联系</option>
                 <option value="approved">已通过</option>
                 <option value="archived">已归档</option>
-              </select>
+              </NativeSelect>
             </label>
 
             <label className={cx("form-field admin-join-request-note-field")}>
               <span>跟进备注</span>
-              <textarea
-                className={cx("input textarea")}
+              <TextArea
                 name="admin_note"
                 rows={4}
                 defaultValue={joinRequest.adminNote ?? ""}
@@ -265,9 +267,9 @@ export default async function AdminJoinRequestDetailPage({
           </div>
 
           <div className={cx("cta-row")}>
-            <button type="submit" className={cx("button button-secondary")}>
+            <Button htmlType="submit">
               保存申请状态
-            </button>
+            </Button>
           </div>
         </form>
 
@@ -321,7 +323,7 @@ export default async function AdminJoinRequestDetailPage({
           <div className={cx("form-grid admin-join-request-settings-grid")}>
             <label className={cx("form-field")}>
               <span>关联正式成员</span>
-              <select
+              <NativeSelect
                 className={cx("input")}
                 name="converted_member_id"
                 defaultValue={joinRequest.convertedMemberId ?? ""}
@@ -333,14 +335,14 @@ export default async function AdminJoinRequestDetailPage({
                     {member.email ? ` · ${member.email}` : ""}
                   </option>
                 ))}
-              </select>
+              </NativeSelect>
             </label>
           </div>
 
           <div className={cx("cta-row")}>
-            <button type="submit" className={cx("button")}>
+            <Button htmlType="submit" type="primary">
               保存转化节点
-            </button>
+            </Button>
           </div>
         </form>
       </section>

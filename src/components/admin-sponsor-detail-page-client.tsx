@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Button } from "antd";
 
 import {
   AdminMetric,
@@ -15,7 +16,6 @@ import {
 import { AdminSponsorEditorFormClient } from "@/components/admin-sponsor-editor-form-client";
 import { AdminSponsorImagesManagerClient } from "@/components/admin-sponsor-images-manager-client";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { Button } from "@/components/ui/button";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   getAdminErrorMessage,
@@ -59,14 +59,14 @@ export function AdminSponsorDetailPageClient({ sponsorId }: { sponsorId: string 
             actions={
               <>
                 <AdminMetric label="图片" value={sponsor.images.length} />
-                <Button asChild>
-                  <Link href={`/sponsors/${sponsor.slug}`} target="_blank" rel="noreferrer">
+                <Link href={`/sponsors/${sponsor.slug}`} target="_blank" rel="noreferrer">
+                  <Button>
                     查看公开页
-                  </Link>
-                </Button>
-                <Button asChild variant="secondary">
-                  <Link href="/admin/sponsors">返回赞助者列表</Link>
-                </Button>
+                  </Button>
+                </Link>
+                <Link href="/admin/sponsors">
+                  <Button>返回赞助者列表</Button>
+                </Link>
               </>
             }
           />

@@ -1,6 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
+import { Button, Input } from "antd";
 import { toast } from "sonner";
 
 import {
@@ -13,8 +14,6 @@ import {
   AdminStatusBadge,
 } from "@/components/admin-ui";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
 
 type EventPhoto = {
@@ -240,13 +239,12 @@ export function AdminEventPhotosManagerClient({
                         </div>
 
                         <div className="flex flex-wrap gap-2">
-                          <Button type="submit" disabled={isPending}>
+                          <Button htmlType="submit" type="primary" disabled={isPending}>
                             {isPending ? "提交中..." : "保存照片"}
                           </Button>
                           {!isCover ? (
                             <Button
-                              type="button"
-                              variant="secondary"
+                              htmlType="button"
                               onClick={() => handleSetCover(photo.image_url)}
                               disabled={isPending}
                             >
@@ -254,8 +252,8 @@ export function AdminEventPhotosManagerClient({
                             </Button>
                           ) : null}
                           <Button
-                            type="button"
-                            variant="outline"
+                            htmlType="button"
+                            danger
                             onClick={() => handleDelete(photo.id)}
                             disabled={isPending}
                           >
@@ -313,7 +311,7 @@ export function AdminEventPhotosManagerClient({
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button type="submit" disabled={isPending}>
+              <Button htmlType="submit" type="primary" disabled={isPending}>
                 {isPending ? "提交中..." : "添加照片"}
               </Button>
             </div>

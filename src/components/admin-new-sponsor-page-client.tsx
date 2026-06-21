@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Button } from "antd";
 
 import {
   AdminPageStack,
@@ -8,7 +9,6 @@ import {
   AdminPanelHeader,
 } from "@/components/admin-ui";
 import { AdminSponsorEditorFormClient } from "@/components/admin-sponsor-editor-form-client";
-import { Button } from "@/components/ui/button";
 
 export function AdminNewSponsorPageClient() {
   return (
@@ -18,9 +18,9 @@ export function AdminNewSponsorPageClient() {
           eyebrow="New Sponsor"
           title="新增赞助者"
           actions={
-            <Button asChild variant="secondary">
-              <Link href="/admin/sponsors">返回赞助者列表</Link>
-            </Button>
+            <Link href="/admin/sponsors">
+              <Button>返回赞助者列表</Button>
+            </Link>
           }
         />
       </AdminPanel>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Button } from "antd";
 
 import {
   AdminMetric,
@@ -16,7 +17,6 @@ import {
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { AdminEventEditorFormClient } from "@/components/admin-event-editor-form-client";
 import { AdminEventPhotosManagerClient } from "@/components/admin-event-photos-manager-client";
-import { Button } from "@/components/ui/button";
 import {
   Table,
   TableBody,
@@ -70,14 +70,14 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
             actions={
               <>
                 <AdminMetric label="当前报名" value={eventDetail.registrations.length} />
-                <Button asChild>
-                  <Link href={`/events/${eventDetail.slug}`} target="_blank" rel="noreferrer">
+                <Link href={`/events/${eventDetail.slug}`} target="_blank" rel="noreferrer">
+                  <Button>
                     查看公开页
-                  </Link>
-                </Button>
-                <Button asChild variant="secondary">
-                  <Link href="/admin/events">返回活动列表</Link>
-                </Button>
+                  </Button>
+                </Link>
+                <Link href="/admin/events">
+                  <Button>返回活动列表</Button>
+                </Link>
               </>
             }
           />
@@ -124,15 +124,15 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
               title={`${eventDetail.title} 的报名名单`}
               actions={
                 data?.permissions?.canExportRegistrations ? (
-                  <Button asChild type="button" variant="outline" size="sm">
-                    <a
-                      href={`/api/admin/events/registrations/export?event_id=${encodeURIComponent(eventDetail.id)}`}
-                      download
-                      aria-label={`导出 ${eventDetail.title} 的报名记录 CSV`}
-                    >
+                  <a
+                    href={`/api/admin/events/registrations/export?event_id=${encodeURIComponent(eventDetail.id)}`}
+                    download
+                    aria-label={`导出 ${eventDetail.title} 的报名记录 CSV`}
+                  >
+                    <Button htmlType="button" size="small">
                       导出报名
-                    </a>
-                  </Button>
+                    </Button>
+                  </a>
                 ) : null
               }
             />

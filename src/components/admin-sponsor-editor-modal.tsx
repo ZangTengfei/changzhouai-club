@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { Button } from "antd";
 
 import { AdminModal } from "@/components/admin-modal";
 import { AdminSponsorEditorFormClient } from "@/components/admin-sponsor-editor-form-client";
 import { AdminNotice } from "@/components/admin-ui";
-import { Button } from "@/components/ui/button";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminSponsor, AdminSponsorsDebugSnapshot } from "@/lib/admin/sponsors";
 
@@ -55,9 +55,11 @@ function AdminSponsorEditModalContent({
         }}
       />
       <div className="mt-2">
-        <Button asChild type="button" variant="ghost" size="sm">
-          <Link href={`/admin/sponsors/${detail.data.sponsor.id}`}>打开完整赞助者详情页</Link>
-        </Button>
+        <Link href={`/admin/sponsors/${detail.data.sponsor.id}`}>
+          <Button type="text" size="small">
+            打开完整赞助者详情页
+          </Button>
+        </Link>
       </div>
     </>
   );
@@ -78,7 +80,7 @@ export function AdminSponsorEditorModal({
     <AdminModal
       title={sponsorId ? "编辑赞助者" : "新增赞助者"}
       trigger={
-        <Button type="button" variant={sponsorId ? "outline" : "default"} size="sm">
+        <Button htmlType="button" type={sponsorId ? "default" : "primary"} size="small">
           {triggerLabel}
         </Button>
       }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Button, Input } from "antd";
 
 import {
   deleteAdminWechatQrCode,
@@ -17,14 +18,13 @@ import {
 import { AdminModal } from "@/components/admin-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import {
   getAdminErrorMessage,
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 import { loadAdminSocialData } from "@/lib/admin/social";
+
+const { TextArea } = Input;
 
 export const metadata: Metadata = {
   title: "社交入口管理",
@@ -184,7 +184,7 @@ export default async function AdminSocialPage({
                     </AdminField>
 
                     <AdminField label="备注" className="md:col-span-2">
-                      <Textarea
+                      <TextArea
                         name="note"
                         rows={3}
                         placeholder="可选：例如这个二维码对应哪个官方微信号、何时从微信生成。备注只在后台显示。"
@@ -194,7 +194,7 @@ export default async function AdminSocialPage({
                 </details>
 
                 <div className="flex flex-wrap items-center gap-2">
-                  <Button type="submit">保存并发布二维码</Button>
+                  <Button htmlType="submit" type="primary">保存并发布二维码</Button>
                   <span className="text-sm text-muted-foreground">默认长期有效，可在高级设置里调整。</span>
                 </div>
               </form>
@@ -241,7 +241,7 @@ export default async function AdminSocialPage({
                     <div className="flex flex-wrap gap-2 lg:justify-end">
                       <form action={deleteAdminWechatQrCode}>
                         <input type="hidden" name="qr_code_id" value={qrCode.id} />
-                        <Button type="submit" variant="outline" size="sm">
+                        <Button htmlType="submit" danger size="small">
                           删除
                         </Button>
                       </form>
@@ -300,14 +300,14 @@ export default async function AdminSocialPage({
                           />
                         </AdminField>
                         <AdminField label="备注" className="md:col-span-2">
-                          <Textarea
+                          <TextArea
                             name="note"
                             defaultValue={qrCode.note ?? ""}
                             rows={2}
                           />
                         </AdminField>
                       </div>
-                      <Button type="submit" variant="secondary" size="sm">
+                      <Button htmlType="submit" size="small">
                         保存这张二维码
                       </Button>
                     </form>

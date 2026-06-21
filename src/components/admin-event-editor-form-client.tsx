@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Button, Input } from "antd";
 import { toast } from "sonner";
 
 import {
@@ -13,11 +14,10 @@ import {
   AdminPanelHeader,
 } from "@/components/admin-ui";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
+
+const { TextArea } = Input;
 
 type EditableAdminEvent = {
   id: string;
@@ -214,7 +214,7 @@ export function AdminEventEditorFormClient({
               </AdminField>
 
               <AdminField label="详细说明" className="md:col-span-2">
-                <Textarea
+                <TextArea
                   name="description"
                   defaultValue={event?.description ?? ""}
                   rows={4}
@@ -223,7 +223,7 @@ export function AdminEventEditorFormClient({
               </AdminField>
 
               <AdminField label="议程安排" className="md:col-span-2">
-                <Textarea
+                <TextArea
                   name="agenda"
                   defaultValue={event?.agenda ?? ""}
                   rows={5}
@@ -232,7 +232,7 @@ export function AdminEventEditorFormClient({
               </AdminField>
 
               <AdminField label="分享人与组织者" className="md:col-span-2">
-                <Textarea
+                <TextArea
                   name="speaker_lineup"
                   defaultValue={event?.speaker_lineup ?? ""}
                   rows={4}
@@ -241,7 +241,7 @@ export function AdminEventEditorFormClient({
               </AdminField>
 
               <AdminField label="报名提示" className="md:col-span-2">
-                <Textarea
+                <TextArea
                   name="registration_note"
                   defaultValue={event?.registration_note ?? ""}
                   rows={3}
@@ -258,7 +258,7 @@ export function AdminEventEditorFormClient({
               </AdminField>
 
               <AdminField label="活动回顾" className="md:col-span-2">
-                <Textarea
+                <TextArea
                   name="recap"
                   defaultValue={event?.recap ?? ""}
                   rows={5}
@@ -363,13 +363,13 @@ export function AdminEventEditorFormClient({
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button type="submit" disabled={isPending}>
+              <Button htmlType="submit" type="primary" disabled={isPending}>
                 {isPending ? "提交中..." : isEditing ? "保存活动" : "创建活动"}
               </Button>
               {isEditing ? (
                 <Button
-                  type="button"
-                  variant="outline"
+                  htmlType="button"
+                  danger
                   onClick={handleDelete}
                   disabled={isPending}
                 >

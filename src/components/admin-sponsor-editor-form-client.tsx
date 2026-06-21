@@ -2,6 +2,7 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Button, Input } from "antd";
 import { toast } from "sonner";
 
 import {
@@ -14,11 +15,10 @@ import {
   AdminPanelHeader,
 } from "@/components/admin-ui";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
+
+const { TextArea } = Input;
 
 type EditableAdminSponsor = {
   id: string;
@@ -220,7 +220,7 @@ export function AdminSponsorEditorFormClient({
               </AdminField>
 
               <AdminField label="详细介绍" className="md:col-span-2">
-                <Textarea
+                <TextArea
                   name="description"
                   defaultValue={sponsor?.description ?? ""}
                   rows={5}
@@ -240,13 +240,13 @@ export function AdminSponsorEditorFormClient({
             </div>
 
             <div className="flex flex-wrap gap-2">
-              <Button type="submit" disabled={isPending}>
+              <Button htmlType="submit" type="primary" disabled={isPending}>
                 {isPending ? "提交中..." : isEditing ? "保存赞助者" : "创建赞助者"}
               </Button>
               {isEditing ? (
                 <Button
-                  type="button"
-                  variant="outline"
+                  htmlType="button"
+                  danger
                   onClick={handleDelete}
                   disabled={isPending}
                 >

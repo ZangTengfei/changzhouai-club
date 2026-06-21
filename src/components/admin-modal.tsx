@@ -1,15 +1,12 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { cloneElement, isValidElement, useState, type MouseEvent, type ReactElement, type ReactNode } from "react";
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Button, Modal } from "antd";
+
+type TriggerElement = ReactElement<{
+  onClick?: (event: MouseEvent<HTMLElement>) => void;
+}>;
 
 export function AdminModal({
   title,
@@ -26,20 +23,67 @@ export function AdminModal({
   onOpenChange?: (open: boolean) => void;
   children: ReactNode;
 }) {
+  const [innerOpen, setInnerOpen] = useState(false);
+  const mergedOpen = open ?? innerOpen;
+
+  function setModalOpen(nextOpen: boolean) {
+    if (open === undefined) {
+      setInnerOpen(nextOpen);
+    }
+    onOpenChange?.(nextOpen);
+  }
+
+  function renderTrigger(node: ReactNode) {
+    if (!node) {
+      return null;
+    }
+
+    if (!isValidElement(node)) {
+      return (
+        <span role="button" tabIndex={0} onClick={() => setModalOpen(true)}>
+          {node}
+        </span>
+      );
+    }
+
+    const triggerElement = node as TriggerElement;
+
+    return cloneElement(triggerElement, {
+      onClick(event) {
+        triggerElement.props.onClick?.(event);
+
+        if (!event.defaultPrevented) {
+          setModalOpen(true);
+        }
+      },
+    });
+  }
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
+    <>
+      {renderTrigger(trigger)}
       {triggerLabel ? (
-        <DialogTrigger asChild>
-          <Button type="button">{triggerLabel}</Button>
-        </DialogTrigger>
+        <Button type="primary" onClick={() => setModalOpen(true)}>
+          {triggerLabel}
+        </Button>
       ) : null}
-      <DialogContent className="max-h-[min(86vh,820px)] max-w-2xl overflow-y-auto border-border/70 bg-card p-0 text-card-foreground">
-        <DialogHeader className="border-b border-border/70 px-4 py-4">
-          <DialogTitle className="text-base text-foreground">{title}</DialogTitle>
-        </DialogHeader>
-        <div className="p-4">{children}</div>
-      </DialogContent>
-    </Dialog>
+      <Modal
+        title={title}
+        open={mergedOpen}
+        onCancel={() => setModalOpen(false)}
+        footer={null}
+        width={720}
+        destroyOnHidden
+        styles={{
+          body: {
+            maxHeight: "min(78vh, 760px)",
+            overflowY: "auto",
+            paddingTop: 12,
+          },
+        }}
+      >
+        {children}
+      </Modal>
+    </>
   );
 }

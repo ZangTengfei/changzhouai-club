@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Button, Input } from "antd";
 
 import {
   deleteAdminProjectApplication,
@@ -19,10 +20,7 @@ import {
   AdminCheckboxRow,
   AdminField,
 } from "@/components/admin-ui";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
 import {
   getAdminErrorMessage,
   getAdminSavedMessage,
@@ -38,6 +36,8 @@ import {
   projectOpportunityTypeLabels,
   projectOpportunityVisibilityLabels,
 } from "@/lib/community-projects";
+
+const { TextArea } = Input;
 
 export const metadata: Metadata = {
   title: "共建项目管理",
@@ -142,11 +142,11 @@ function ProjectOpportunityForm({
         </AdminField>
 
         <AdminField label="一句话摘要" className="md:col-span-2">
-          <Textarea name="summary" rows={2} defaultValue={opportunity?.summary ?? ""} required />
+          <TextArea name="summary" rows={2} defaultValue={opportunity?.summary ?? ""} required />
         </AdminField>
 
         <AdminField label="项目说明" className="md:col-span-2">
-          <Textarea
+          <TextArea
             name="description"
             rows={6}
             defaultValue={opportunity?.description ?? ""}
@@ -227,7 +227,7 @@ function ProjectOpportunityForm({
         </AdminField>
 
         <AdminField label="申请说明" className="md:col-span-2">
-          <Textarea
+          <TextArea
             name="application_note"
             rows={3}
             defaultValue={opportunity?.application_note ?? ""}
@@ -256,7 +256,7 @@ function ProjectOpportunityForm({
         </AdminCheckboxRow>
       </div>
 
-      <Button type="submit">保存共建机会</Button>
+      <Button htmlType="submit" type="primary">保存共建机会</Button>
     </form>
   );
 }
@@ -322,7 +322,7 @@ function ProjectApplicationCard({
         </AdminField>
 
         <AdminField label="管理员备注" className="md:col-span-2">
-          <Textarea
+          <TextArea
             name="admin_note"
             rows={3}
             defaultValue={application.admin_note ?? ""}
@@ -331,7 +331,7 @@ function ProjectApplicationCard({
         </AdminField>
 
         <div className="flex flex-wrap gap-2 md:col-span-2">
-          <Button type="submit" variant="secondary" size="sm">
+          <Button htmlType="submit" size="small">
             更新申请
           </Button>
         </div>
@@ -339,7 +339,7 @@ function ProjectApplicationCard({
       <form action={deleteAdminProjectApplication} className="mt-3">
         <input type="hidden" name="application_id" value={application.id} />
         <input type="hidden" name="project_slug" value={opportunity.slug} />
-        <Button type="submit" variant="destructive" size="sm">
+        <Button htmlType="submit" danger size="small">
           删除这条提交
         </Button>
       </form>
@@ -438,24 +438,24 @@ export default async function AdminProjectsPage({
                   </div>
 
                   <div className="flex flex-wrap gap-2 lg:justify-end">
-                    <Button asChild type="button" variant="outline" size="sm">
-                      <a
-                        href={`/api/admin/projects/applications/export?project_id=${encodeURIComponent(opportunity.id)}`}
-                        download
-                        aria-label={`导出 ${opportunity.title} 的申请记录 CSV`}
-                      >
+                    <a
+                      href={`/api/admin/projects/applications/export?project_id=${encodeURIComponent(opportunity.id)}`}
+                      download
+                      aria-label={`导出 ${opportunity.title} 的申请记录 CSV`}
+                    >
+                      <Button htmlType="button" size="small">
                         导出申请
-                      </a>
-                    </Button>
-                    {opportunity.visibility !== "private" && opportunity.status !== "draft" ? (
-                      <Button asChild type="button" variant="outline" size="sm">
-                        <Link href={`/projects/${opportunity.slug}`}>前台查看</Link>
                       </Button>
+                    </a>
+                    {opportunity.visibility !== "private" && opportunity.status !== "draft" ? (
+                      <Link href={`/projects/${opportunity.slug}`}>
+                        <Button htmlType="button" size="small">前台查看</Button>
+                      </Link>
                     ) : null}
                     <form action={deleteAdminProjectOpportunity}>
                       <input type="hidden" name="opportunity_id" value={opportunity.id} />
                       <input type="hidden" name="slug" value={opportunity.slug} />
-                      <Button type="submit" variant="outline" size="sm">
+                      <Button htmlType="submit" danger size="small">
                         删除
                       </Button>
                     </form>

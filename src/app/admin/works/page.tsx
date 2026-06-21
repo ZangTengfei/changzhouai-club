@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Button, Input } from "antd";
 
 import {
   deleteAdminExternalCaseCard,
@@ -20,10 +21,7 @@ import {
 import { AdminModal } from "@/components/admin-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
 import {
   getAdminErrorMessage,
   getAdminSavedMessage,
@@ -40,6 +38,8 @@ import {
   workStatusLabels,
   workTypeLabels,
 } from "@/lib/community-works";
+
+const { TextArea } = Input;
 
 export const metadata: Metadata = {
   title: "成员作品管理",
@@ -129,7 +129,7 @@ function WorkForm({
         </AdminField>
 
         <AdminField label="一句话介绍" className="md:col-span-2">
-          <Textarea
+          <TextArea
             name="summary"
             defaultValue={work?.summary ?? ""}
             rows={2}
@@ -138,7 +138,7 @@ function WorkForm({
         </AdminField>
 
         <AdminField label="详细说明" className="md:col-span-2">
-          <Textarea
+          <TextArea
             name="description"
             defaultValue={work?.description ?? ""}
             rows={4}
@@ -217,7 +217,7 @@ function WorkForm({
         </AdminCheckboxRow>
       </div>
 
-      <Button type="submit" disabled={memberOptions.length === 0}>
+      <Button htmlType="submit" type="primary" disabled={memberOptions.length === 0}>
         保存成员作品
       </Button>
     </form>
@@ -272,7 +272,7 @@ function ExternalCaseCardForm({ card }: { card?: AdminExternalCaseCardRow }) {
         </AdminField>
 
         <AdminField label="一句话介绍" className="md:col-span-2">
-          <Textarea
+          <TextArea
             name="summary"
             defaultValue={card?.summary ?? ""}
             rows={2}
@@ -281,7 +281,7 @@ function ExternalCaseCardForm({ card }: { card?: AdminExternalCaseCardRow }) {
         </AdminField>
 
         <AdminField label="详细说明" className="md:col-span-2">
-          <Textarea
+          <TextArea
             name="description"
             defaultValue={card?.description ?? ""}
             rows={4}
@@ -347,7 +347,7 @@ function ExternalCaseCardForm({ card }: { card?: AdminExternalCaseCardRow }) {
         </AdminCheckboxRow>
       </div>
 
-      <Button type="submit">保存外部卡片</Button>
+      <Button htmlType="submit" type="primary">保存外部卡片</Button>
     </form>
   );
 }
@@ -441,14 +441,14 @@ export default async function AdminWorksPage({
                   </div>
 
                   <div className="flex flex-wrap gap-2 lg:justify-end">
-                    <Button asChild type="button" variant="outline" size="sm">
-                      <a href={card.external_url} target="_blank" rel="noreferrer">
+                    <a href={card.external_url} target="_blank" rel="noreferrer">
+                      <Button htmlType="button" size="small">
                         访问
-                      </a>
-                    </Button>
+                      </Button>
+                    </a>
                     <form action={deleteAdminExternalCaseCard}>
                       <input type="hidden" name="external_card_id" value={card.id} />
-                      <Button type="submit" variant="outline" size="sm">
+                      <Button htmlType="submit" danger size="small">
                         删除
                       </Button>
                     </form>
@@ -520,13 +520,13 @@ export default async function AdminWorksPage({
                   </div>
 
                   <div className="flex flex-wrap gap-2 lg:justify-end">
-                    <Button asChild type="button" variant="outline" size="sm">
-                      <Link href={`/members/${work.member_id}`}>成员页</Link>
-                    </Button>
+                    <Link href={`/members/${work.member_id}`}>
+                      <Button htmlType="button" size="small">成员页</Button>
+                    </Link>
                     <form action={deleteAdminMemberWork}>
                       <input type="hidden" name="work_id" value={work.id} />
                       <input type="hidden" name="member_id" value={work.member_id} />
-                      <Button type="submit" variant="outline" size="sm">
+                      <Button htmlType="submit" danger size="small">
                         删除
                       </Button>
                     </form>

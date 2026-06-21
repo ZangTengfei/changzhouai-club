@@ -1,27 +1,66 @@
-import * as React from "react";
-import { ChevronDown } from "lucide-react";
+"use client";
 
-import { cn } from "@/lib/utils";
+import { Children, isValidElement, useState, type ComponentProps, type ReactElement, type ReactNode } from "react";
+import { Select } from "antd";
+
+type NativeOptionProps = ComponentProps<"option">;
+type NativeSelectProps = Omit<ComponentProps<"select">, "onChange" | "value"> & {
+  value?: string;
+  onChange?: (value: string) => void;
+};
+
+function getOptionText(children: ReactNode): string {
+  if (typeof children === "string" || typeof children === "number") {
+    return String(children);
+  }
+
+  if (Array.isArray(children)) {
+    return children.map(getOptionText).join("");
+  }
+
+  return "";
+}
 
 function NativeSelect({
   className,
   children,
-  ...props
-}: React.ComponentProps<"select">) {
+  defaultValue,
+  disabled,
+  name,
+  required: _required,
+  value,
+  onChange,
+}: NativeSelectProps) {
+  const options = Children.toArray(children)
+    .filter(isValidElement)
+    .map((child) => {
+      const option = child as ReactElement<NativeOptionProps>;
+      const optionValue = String(option.props.value ?? getOptionText(option.props.children));
+
+      return {
+        label: option.props.children,
+        value: optionValue,
+        disabled: option.props.disabled,
+      };
+    });
+  const fallbackValue = typeof defaultValue === "string" ? defaultValue : String(defaultValue ?? options[0]?.value ?? "");
+  const [innerValue, setInnerValue] = useState(fallbackValue);
+  const selectedValue = value ?? innerValue;
+
   return (
-    <div className="relative">
-      <select
-        data-slot="native-select"
-        className={cn(
-          "flex h-9 w-full appearance-none rounded-[calc(var(--radius)-4px)] border border-input bg-background px-3 py-1 pr-9 text-sm text-foreground shadow-xs transition-[color,box-shadow,border-color] outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </select>
-      <ChevronDown className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-    </div>
+    <>
+      {name ? <input type="hidden" name={name} value={selectedValue} /> : null}
+      <Select
+        className={className}
+        value={selectedValue}
+        disabled={disabled}
+        options={options}
+        onChange={(nextValue) => {
+          setInnerValue(nextValue);
+          onChange?.(nextValue);
+        }}
+      />
+    </>
   );
 }
 
