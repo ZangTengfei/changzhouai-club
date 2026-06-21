@@ -10,14 +10,13 @@ import {
 import {
   AdminCheckboxRow,
   AdminField,
-  AdminMetric,
-  AdminNotice,
-  AdminPageStack,
-  AdminPanel,
-  AdminPanelBody,
-  AdminPanelHeader,
-  AdminStatusBadge,
 } from "@/components/admin-ui";
+import {
+  AdminAntdAlert,
+  AdminAntdCard,
+  AdminAntdPageHeader,
+  AdminStatusTag,
+} from "@/components/admin-antd";
 import { AdminModal } from "@/components/admin-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
@@ -353,22 +352,6 @@ function ExternalCaseCardForm({ card }: { card?: AdminExternalCaseCardRow }) {
   );
 }
 
-function getReviewTone(status: string, isPublic: boolean) {
-  if (isPublic || status === "approved") {
-    return "completed" as const;
-  }
-
-  if (status === "changes_requested") {
-    return "scheduled" as const;
-  }
-
-  if (status === "rejected") {
-    return "cancelled" as const;
-  }
-
-  return "pending" as const;
-}
-
 export default async function AdminWorksPage({
   searchParams,
 }: AdminWorksPageProps) {
@@ -377,45 +360,43 @@ export default async function AdminWorksPage({
     await loadAdminWorksData();
 
   return (
-    <AdminPageStack>
+    <div className="grid gap-4">
       <AdminToastSignals
         success={getAdminSavedMessage(params.saved)}
         error={params.error ? getAdminErrorMessage(params.error) : null}
       />
 
-      <AdminPanel>
-        <AdminPanelHeader
-          eyebrow="Works"
-          title="成员作品管理"
-          actions={
-            <>
-              <AdminMetric label="作品" value={works.length} />
-              <AdminMetric label="外部卡片" value={externalCards.length} />
-              <AdminMetric
-                label="公开"
-                value={
-                  works.filter((work) => work.is_public).length +
-                  externalCards.filter((card) => card.is_public).length
-                }
-              />
-              <AdminModal title="新增外部展示卡片" triggerLabel="新增外部卡片">
-                <ExternalCaseCardForm />
-              </AdminModal>
-              <AdminModal title="新增成员作品" triggerLabel="新增作品">
-                <WorkForm memberOptions={memberOptions} />
-              </AdminModal>
-            </>
-          }
-        />
-      </AdminPanel>
+      <AdminAntdPageHeader
+        eyebrow="Works"
+        title="成员作品管理"
+        stats={[
+          { label: "作品", value: works.length },
+          { label: "外部卡片", value: externalCards.length },
+          {
+            label: "公开",
+            value:
+              works.filter((work) => work.is_public).length +
+              externalCards.filter((card) => card.is_public).length,
+          },
+        ]}
+        actions={
+          <>
+            <AdminModal title="新增外部展示卡片" triggerLabel="新增外部卡片">
+              <ExternalCaseCardForm />
+            </AdminModal>
+            <AdminModal title="新增成员作品" triggerLabel="新增作品">
+              <WorkForm memberOptions={memberOptions} />
+            </AdminModal>
+          </>
+        }
+      />
 
       {queryErrors.length > 0 ? (
-        <AdminNotice>后台数据读取出现问题：{queryErrors.join(" | ")}</AdminNotice>
+        <AdminAntdAlert message={`后台数据读取出现问题：${queryErrors.join(" | ")}`} />
       ) : null}
 
-      <AdminPanel>
-        <AdminPanelHeader eyebrow="External" title="外部展示卡片" />
-        <AdminPanelBody className="space-y-2">
+      <AdminAntdCard eyebrow="External" title="外部展示卡片">
+        <div className="space-y-2">
           {externalCards.length > 0 ? (
             externalCards.map((card) => (
               <article
@@ -440,14 +421,16 @@ export default async function AdminWorksPage({
                   <div className="min-w-0 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-base font-semibold text-foreground">{card.title}</h2>
-                      <AdminStatusBadge tone={card.is_public ? "completed" : "neutral"}>
-                        {card.is_public ? "公开" : "隐藏"}
-                      </AdminStatusBadge>
-                      <AdminStatusBadge tone="scheduled">
-                        {externalCaseCardTypeLabels[card.card_type]}
-                      </AdminStatusBadge>
+                      <AdminStatusTag
+                        status={card.is_public ? "published" : "archived"}
+                        label={card.is_public ? "公开" : "隐藏"}
+                      />
+                      <AdminStatusTag
+                        status="waiting_review"
+                        label={externalCaseCardTypeLabels[card.card_type]}
+                      />
                       {card.is_featured ? (
-                        <AdminStatusBadge tone="scheduled">精选</AdminStatusBadge>
+                        <AdminStatusTag status="waiting_review" label="精选" />
                       ) : null}
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -483,14 +466,13 @@ export default async function AdminWorksPage({
               </article>
             ))
           ) : (
-            <AdminNotice>还没有外部展示卡片。添加后可展示到案例库。</AdminNotice>
+            <AdminAntdAlert message="还没有外部展示卡片。添加后可展示到案例库。" type="info" />
           )}
-        </AdminPanelBody>
-      </AdminPanel>
+        </div>
+      </AdminAntdCard>
 
-      <AdminPanel>
-        <AdminPanelHeader eyebrow="List" title="作品列表" />
-        <AdminPanelBody className="space-y-2">
+      <AdminAntdCard eyebrow="List" title="作品列表">
+        <div className="space-y-2">
           {works.length > 0 ? (
             works.map((work) => (
               <article
@@ -515,16 +497,16 @@ export default async function AdminWorksPage({
                   <div className="min-w-0 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-base font-semibold text-foreground">{work.title}</h2>
-                      <AdminStatusBadge tone={work.is_public ? "completed" : "neutral"}>
-                        {work.is_public ? "公开" : "隐藏"}
-                      </AdminStatusBadge>
-                      <AdminStatusBadge
-                        tone={getReviewTone(work.review_status, work.is_public)}
-                      >
-                        {workReviewStatusLabels[work.review_status]}
-                      </AdminStatusBadge>
+                      <AdminStatusTag
+                        status={work.is_public ? "published" : "archived"}
+                        label={work.is_public ? "公开" : "隐藏"}
+                      />
+                      <AdminStatusTag
+                        status={work.review_status}
+                        label={workReviewStatusLabels[work.review_status]}
+                      />
                       {work.is_featured ? (
-                        <AdminStatusBadge tone="scheduled">精选</AdminStatusBadge>
+                        <AdminStatusTag status="waiting_review" label="精选" />
                       ) : null}
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -562,10 +544,10 @@ export default async function AdminWorksPage({
               </article>
             ))
           ) : (
-            <AdminNotice>还没有成员作品。添加后可选择公开展示到案例库。</AdminNotice>
+            <AdminAntdAlert message="还没有成员作品。添加后可选择公开展示到案例库。" type="info" />
           )}
-        </AdminPanelBody>
-      </AdminPanel>
-    </AdminPageStack>
+        </div>
+      </AdminAntdCard>
+    </div>
   );
 }

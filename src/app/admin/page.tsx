@@ -1,26 +1,15 @@
-import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 
-import { hasAdminPermission } from "@/lib/admin/permissions";
-import { getAdminContext } from "@/lib/supabase/guards";
+import { AdminOperationsDashboard } from "@/components/admin-antd/admin-operations-dashboard";
+import { loadAdminOperationsData } from "@/lib/admin/operations";
 
-const adminLandingCandidates = [
-  { href: "/admin/workflows", permission: "workflows.read" },
-  { href: "/admin/events", permission: "events.read" },
-  { href: "/admin/updates", permission: "updates.read" },
-  { href: "/admin/members", permission: "members.read" },
-  { href: "/admin/projects", permission: "projects.read" },
-  { href: "/admin/works", permission: "works.read" },
-  { href: "/admin/leads", permission: "leads.read" },
-  { href: "/admin/sponsors", permission: "sponsors.read" },
-  { href: "/admin/social", permission: "social.write" },
-] as const;
+export const metadata: Metadata = {
+  title: "运营总控台",
+  description: "查看社区运营工作流、AI 任务、审批、资料和合作线索。",
+};
 
 export default async function AdminPage() {
-  const { permissions } = await getAdminContext();
-  const target =
-    adminLandingCandidates.find((candidate) =>
-      hasAdminPermission(permissions, candidate.permission),
-    )?.href ?? "/account?updated=staff_required";
+  const data = await loadAdminOperationsData();
 
-  redirect(target);
+  return <AdminOperationsDashboard data={data} />;
 }

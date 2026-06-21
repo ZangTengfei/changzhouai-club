@@ -1,0 +1,132 @@
+.shell {
+  min-height: 100vh;
+  background: #f7f9fb;
+}
+
+.sider {
+  position: sticky;
+  top: 0;
+  overflow: auto;
+  height: 100vh;
+  border-right: 1px solid #edf0f3;
+  background: #ffffff;
+}
+
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  min-height: 74px;
+  padding: 18px 16px;
+  border-bottom: 1px solid #eef1f4;
+}
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #0a8f7e, #18b6a3);
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.brandSub {
+  margin-top: 2px;
+  color: #6b7280;
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.menu {
+  border-inline-end: 0 !important;
+  padding: 14px 10px;
+}
+
+.sidebarStats {
+  margin: 10px;
+  background: #fbfdfd;
+}
+
+.statLine {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  color: #5f6b7a;
+  font-size: 13px;
+}
+
+.statLine strong {
+  color: #111827;
+}
+
+.statsLink {
+  height: auto;
+  margin: 12px 0 0;
+  padding: 0;
+  color: #0f8f7e;
+}
+
+.profile {
+  margin: 12px 10px 18px;
+  padding: 12px;
+  border: 1px solid #eef1f4;
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.content {
+  min-width: 0;
+  background: #f7f9fb;
+}
+
+.contentInner {
+  width: min(100%, 1440px);
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 22px 24px 32px;
+}
+
+.accessState {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+  background: #f7f9fb;
+}
+
+.accessCard {
+  width: min(720px, 100%);
+}
+
+.accessActions {
+  margin-top: 18px;
+}
+
+@media (max-width: 768px) {
+  .shell {
+    display: block !important;
+  }
+
+  .sider {
+    position: relative;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    height: auto;
+    max-height: none;
+    flex: 0 0 auto !important;
+    border-right: 0;
+    border-bottom: 1px solid #edf0f3;
+  }
+
+  .contentInner {
+    padding: 14px;
+  }
+
+  .content {
+    width: 100%;
+  }
+}

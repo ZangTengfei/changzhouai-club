@@ -2,39 +2,20 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { CalendarOutlined, PlusOutlined } from "@ant-design/icons";
+import { Alert, Button, Card, Input, Space, Statistic, Table, type TableColumnsType } from "antd";
 
-import {
-  AdminField,
-  AdminMetric,
-  AdminNotice,
-  AdminPageStack,
-  AdminPanel,
-  AdminPanelBody,
-  AdminPanelHeader,
-  AdminStatusBadge,
-  type AdminTone,
-} from "@/components/admin-ui";
+import { AdminStatusTag } from "@/components/admin-antd";
 import { AdminEventEditorModal } from "@/components/admin-event-editor-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { useAdminResource } from "@/components/use-admin-resource";
-import type { AdminEventsData } from "@/lib/admin/events";
+import type { AdminEvent, AdminEventsData } from "@/lib/admin/events";
 import {
   formatAdminEventDate,
   formatAdminEventStatus,
   formatAdminEventType,
   getAdminErrorMessage,
-  getAdminEventStatusTone,
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 
@@ -88,6 +69,14 @@ function buildEventsFilterHref(
 
   const query = params.toString();
   return query ? `/admin/events?${query}` : "/admin/events";
+}
+
+function getVenueText(event: AdminEvent) {
+  if (event.venue) {
+    return `${event.city ?? "常州"} · ${event.venue}`;
+  }
+
+  return event.city ?? "常州";
 }
 
 export function AdminEventsPageClient() {
@@ -146,239 +135,210 @@ export function AdminEventsPageClient() {
     eventPageStartIndex,
     eventPageStartIndex + EVENTS_PER_PAGE,
   );
+  const columns: TableColumnsType<AdminEvent> = [
+    {
+      title: "活动",
+      dataIndex: "title",
+      render: (_, event) => (
+        <div>
+          <Link className="font-semibold text-foreground hover:text-primary" href={`/admin/events/${event.id}`}>
+            {event.title}
+          </Link>
+          <div className="mt-1 text-xs text-muted-foreground">{event.slug}</div>
+          <div className="mt-2">
+            <AdminStatusTag status="neutral" label={formatAdminEventType(event.event_type)} />
+          </div>
+        </div>
+      ),
+    },
+    {
+      title: "状态",
+      dataIndex: "status",
+      width: 110,
+      render: (status) => <AdminStatusTag status={status} label={formatAdminEventStatus(status)} />,
+    },
+    {
+      title: "时间",
+      dataIndex: "event_at",
+      width: 150,
+      render: (value) => formatAdminEventDate(value),
+    },
+    {
+      title: "地点",
+      width: 180,
+      render: (_, event) => getVenueText(event),
+    },
+    {
+      title: "报名",
+      width: 90,
+      render: (_, event) => `${event.registrations.length} 人`,
+    },
+    {
+      title: "操作",
+      width: 150,
+      align: "right",
+      render: (_, event) => (
+        <Space>
+          <AdminEventEditorModal eventId={event.id} triggerLabel="编辑" onChanged={reload} />
+          <Button size="small">
+            <Link href={`/admin/events/${event.id}`}>详情</Link>
+          </Button>
+        </Space>
+      ),
+    },
+  ];
 
   return (
-    <AdminPageStack>
+    <div className="grid gap-4">
       <AdminToastSignals
         success={getAdminSavedMessage(saved)}
         error={queryError ? getAdminErrorMessage(queryError) : null}
       />
 
-      <AdminPanel>
-        <AdminPanelHeader
-          eyebrow="Events"
-          title="活动列表"
-          actions={
-            <>
-              <AdminMetric label="活动总数" value={data?.events.length ?? "..."} />
-              <AdminEventEditorModal triggerLabel="新建活动" onChanged={reload} />
-            </>
-          }
-        />
-      </AdminPanel>
+      <Card variant="outlined">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <span className="text-sm text-muted-foreground">Events</span>
+            <h1 className="m-0 text-3xl font-semibold">活动管理</h1>
+          </div>
+          <Space wrap>
+            <Statistic title="活动总数" value={data?.events.length ?? 0} />
+            <AdminEventEditorModal triggerLabel="新建活动" onChanged={reload} />
+          </Space>
+        </div>
+      </Card>
 
-      {error ? <AdminNotice>后台数据读取出现问题：{error}</AdminNotice> : null}
+      {error ? <Alert title={`后台数据读取出现问题：${error}`} type="warning" showIcon /> : null}
       {data && data.queryErrors.length > 0 ? (
-        <AdminNotice>后台数据读取出现问题：{data.queryErrors.join(" | ")}</AdminNotice>
+        <Alert title={`后台数据读取出现问题：${data.queryErrors.join(" | ")}`} type="warning" showIcon />
       ) : null}
 
-      <AdminPanel>
-        <AdminPanelHeader eyebrow="Filters" title="活动筛选" />
-        <AdminPanelBody>
-          <form
-            action="/admin/events"
-            className="grid gap-3 lg:grid-cols-[1.2fr_0.8fr_0.8fr_auto]"
-          >
-            <AdminField label="活动搜索">
-              <Input
-                type="search"
-                name="event_query"
-                defaultValue={eventQueryInput}
-                placeholder="搜索标题、链接、城市、地点"
-              />
-            </AdminField>
+      <Card title="活动筛选" variant="outlined">
+        <form
+          action="/admin/events"
+          className="grid gap-3 lg:grid-cols-[1.2fr_0.8fr_0.8fr_auto]"
+        >
+          <label className="grid gap-2">
+            <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">活动搜索</span>
+            <Input
+              type="search"
+              name="event_query"
+              defaultValue={eventQueryInput}
+              placeholder="搜索标题、链接、城市、地点"
+            />
+          </label>
 
-            <AdminField label="状态">
-              <NativeSelect name="status" defaultValue={statusFilter}>
-                <option value="all">全部状态</option>
-                <option value="draft">草稿</option>
-                <option value="scheduled">已发布</option>
-                <option value="completed">已结束</option>
-                <option value="cancelled">已取消</option>
-              </NativeSelect>
-            </AdminField>
+          <label className="grid gap-2">
+            <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">状态</span>
+            <NativeSelect name="status" defaultValue={statusFilter}>
+              <option value="all">全部状态</option>
+              <option value="draft">草稿</option>
+              <option value="scheduled">已发布</option>
+              <option value="completed">已结束</option>
+              <option value="cancelled">已取消</option>
+            </NativeSelect>
+          </label>
 
-            <AdminField label="时间">
-              <NativeSelect name="timing" defaultValue={timingFilter}>
-                <option value="all">全部时间</option>
-                <option value="upcoming">未来活动</option>
-                <option value="past">过去活动</option>
-                <option value="unscheduled">未排期</option>
-              </NativeSelect>
-            </AdminField>
+          <label className="grid gap-2">
+            <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">时间</span>
+            <NativeSelect name="timing" defaultValue={timingFilter}>
+              <option value="all">全部时间</option>
+              <option value="upcoming">未来活动</option>
+              <option value="past">过去活动</option>
+              <option value="unscheduled">未排期</option>
+            </NativeSelect>
+          </label>
 
-            <div className="flex flex-wrap items-end gap-2">
-              <Button type="submit" variant="secondary">
-                筛选
+          <div className="flex flex-wrap items-end gap-2">
+            <Button htmlType="submit" type="primary" icon={<CalendarOutlined />}>
+              筛选
+            </Button>
+            {eventQueryInput || statusFilter !== "all" || timingFilter !== "all" ? (
+              <Button>
+                <Link href="/admin/events">重置</Link>
               </Button>
-              {eventQueryInput || statusFilter !== "all" || timingFilter !== "all" ? (
-                <Button asChild variant="outline">
-                  <Link href="/admin/events">重置</Link>
-                </Button>
-              ) : null}
-            </div>
-          </form>
-        </AdminPanelBody>
-      </AdminPanel>
+            ) : null}
+          </div>
+        </form>
+      </Card>
 
       {showDebug && data ? (
-        <AdminPanel>
-          <AdminPanelHeader eyebrow="Diagnostics" title="数据诊断信息" />
-          <AdminPanelBody>
-            <pre className="overflow-x-auto rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 p-3 text-xs text-muted-foreground">
-              {JSON.stringify(data.debugSnapshot, null, 2)}
-            </pre>
-          </AdminPanelBody>
-        </AdminPanel>
+        <Card title="数据诊断信息" variant="outlined">
+          <pre className="overflow-x-auto rounded border border-border/70 bg-muted/40 p-3 text-xs text-muted-foreground">
+            {JSON.stringify(data.debugSnapshot, null, 2)}
+          </pre>
+        </Card>
       ) : null}
 
-      <AdminPanel>
-        <AdminPanelHeader
-          eyebrow="List"
-          title="活动结果"
-          actions={
-            <span className="text-sm text-muted-foreground">
-              共 {filteredEvents.length} 场 · 第 {currentEventPage} / {totalEventPages} 页
-            </span>
-          }
+      <Card
+        title="活动结果"
+        extra={`共 ${filteredEvents.length} 场 · 第 ${currentEventPage} / ${totalEventPages} 页`}
+        variant="outlined"
+      >
+        <Table
+          columns={columns}
+          dataSource={paginatedEvents}
+          rowKey="id"
+          loading={isLoading}
+          pagination={false}
+          locale={{
+            emptyText:
+              data && data.events.length > 0
+                ? "当前筛选条件下没有活动数据。"
+                : "创建活动后，即可继续补充详情、相册和报名信息。",
+          }}
         />
-        <AdminPanelBody className="p-0">
-          {isLoading ? (
-            <div className="p-4">
-              <AdminNotice>正在加载活动列表...</AdminNotice>
-            </div>
-          ) : paginatedEvents.length > 0 ? (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="min-w-[220px]">活动</TableHead>
-                    <TableHead>状态</TableHead>
-                    <TableHead>时间</TableHead>
-                    <TableHead>地点</TableHead>
-                    <TableHead>报名</TableHead>
-                    <TableHead className="w-[96px] text-right">操作</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedEvents.map((event) => (
-                    <TableRow key={event.id}>
-                      <TableCell>
-                        <div className="grid gap-1">
-                          <Link
-                            href={`/admin/events/${event.id}`}
-                            className="font-semibold text-foreground transition-colors hover:text-primary"
-                          >
-                            {event.title}
-                          </Link>
-                          <span className="text-xs text-muted-foreground">{event.slug}</span>
-                          <div>
-                            <AdminStatusBadge tone="neutral">
-                              {formatAdminEventType(event.event_type)}
-                            </AdminStatusBadge>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <AdminStatusBadge
-                          tone={getAdminEventStatusTone(event.status) as AdminTone}
-                        >
-                          {formatAdminEventStatus(event.status)}
-                        </AdminStatusBadge>
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                        {formatAdminEventDate(event.event_at)}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {event.venue
-                          ? `${event.city ?? "常州"} · ${event.venue}`
-                          : (event.city ?? "常州")}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {event.registrations.length} 人
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <AdminEventEditorModal
-                            eventId={event.id}
-                            triggerLabel="编辑"
-                            onChanged={reload}
-                          />
-                          <Button asChild size="sm" variant="outline">
-                            <Link href={`/admin/events/${event.id}`}>详情</Link>
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
 
-              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/70 px-4 py-3">
-                <span className="text-sm text-muted-foreground">
-                  第 {currentEventPage} / {totalEventPages} 页
-                </span>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button asChild size="sm" variant="outline">
-                    <Link
-                      href={buildEventsFilterHref(statusFilter, timingFilter, eventQueryInput, 1)}
-                    >
-                      首页
-                    </Link>
-                  </Button>
-                  <Button asChild size="sm" variant="outline">
-                    <Link
-                      href={buildEventsFilterHref(
-                        statusFilter,
-                        timingFilter,
-                        eventQueryInput,
-                        Math.max(1, currentEventPage - 1),
-                      )}
-                    >
-                      上一页
-                    </Link>
-                  </Button>
-                  <Button asChild size="sm" variant="outline">
-                    <Link
-                      href={buildEventsFilterHref(
-                        statusFilter,
-                        timingFilter,
-                        eventQueryInput,
-                        Math.min(totalEventPages, currentEventPage + 1),
-                      )}
-                    >
-                      下一页
-                    </Link>
-                  </Button>
-                  <Button asChild size="sm" variant="outline">
-                    <Link
-                      href={buildEventsFilterHref(
-                        statusFilter,
-                        timingFilter,
-                        eventQueryInput,
-                        totalEventPages,
-                      )}
-                    >
-                      末页
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="space-y-3 p-4">
-              <AdminNotice>
-                {data && data.events.length > 0
-                  ? "当前筛选条件下没有活动数据。"
-                  : "创建活动后，即可继续补充详情、相册和报名信息。"}
-              </AdminNotice>
-              {data && data.events.length > 0 ? null : (
-                <AdminEventEditorModal triggerLabel="去创建活动" onChanged={reload} />
-              )}
-            </div>
-          )}
-        </AdminPanelBody>
-      </AdminPanel>
-    </AdminPageStack>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+          <span className="text-sm text-muted-foreground">
+            第 {currentEventPage} / {totalEventPages} 页
+          </span>
+          <Space wrap>
+            <Button>
+              <Link href={buildEventsFilterHref(statusFilter, timingFilter, eventQueryInput, 1)}>首页</Link>
+            </Button>
+            <Button>
+              <Link
+                href={buildEventsFilterHref(
+                  statusFilter,
+                  timingFilter,
+                  eventQueryInput,
+                  Math.max(1, currentEventPage - 1),
+                )}
+              >
+                上一页
+              </Link>
+            </Button>
+            <Button>
+              <Link
+                href={buildEventsFilterHref(
+                  statusFilter,
+                  timingFilter,
+                  eventQueryInput,
+                  Math.min(totalEventPages, currentEventPage + 1),
+                )}
+              >
+                下一页
+              </Link>
+            </Button>
+            <Button>
+              <Link
+                href={buildEventsFilterHref(
+                  statusFilter,
+                  timingFilter,
+                  eventQueryInput,
+                  totalEventPages,
+                )}
+              >
+                末页
+              </Link>
+            </Button>
+            {data && data.events.length === 0 ? (
+              <AdminEventEditorModal triggerLabel="去创建活动" onChanged={reload} />
+            ) : null}
+          </Space>
+        </div>
+      </Card>
+    </div>
   );
 }

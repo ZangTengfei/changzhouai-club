@@ -1,0 +1,100 @@
+.dashboard {
+  display: grid;
+  gap: 16px;
+}
+
+.header {
+  min-height: 56px;
+}
+
+.title {
+  margin: 0 0 4px !important;
+  font-size: 30px !important;
+  letter-spacing: 0;
+}
+
+.warningCard {
+  border-color: #ffd8bf;
+  background: #fff7ed;
+  color: #b45309;
+}
+
+.workflowAvatar {
+  background: linear-gradient(135deg, #0f8f7e, #1f7af0);
+  font-weight: 700;
+}
+
+.workflowProgress {
+  width: 74px;
+}
+
+.primaryLink {
+  color: #111827;
+  font-weight: 650;
+}
+
+.primaryLink:hover {
+  color: #0f8f7e;
+}
+
+.mutedText {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.approvalList {
+  display: grid;
+}
+
+.approvalItem {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  gap: 14px;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid #eef1f4;
+}
+
+.approvalItem:first-child {
+  padding-top: 2px;
+}
+
+.approvalItem:last-child {
+  border-bottom: 0;
+}
+
+.approvalIcon {
+  color: #0f8f7e;
+  background: #e8f7f4;
+}
+
+.approvalBody {
+  display: grid;
+  gap: 4px;
+}
+
+.approvalBody span {
+  overflow: hidden;
+  color: #6b7280;
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.emptyBlock {
+  display: grid;
+  min-height: 180px;
+  place-items: center;
+  color: #8a95a3;
+}
+
+@media (max-width: 768px) {
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .approvalItem {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+}

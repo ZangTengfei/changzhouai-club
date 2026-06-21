@@ -2,41 +2,42 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-
 import {
-  AdminField,
-  AdminFilterLink,
-  AdminMetric,
-  AdminNotice,
-  AdminPageStack,
-  AdminPanel,
-  AdminPanelBody,
-  AdminPanelHeader,
-  AdminStatusBadge,
-  type AdminTone,
-} from "@/components/admin-ui";
-import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+  ClearOutlined,
+  EyeOutlined,
+  SearchOutlined,
+  TeamOutlined,
+} from "@ant-design/icons";
 import {
+  Alert,
+  Button,
+  Card,
+  Input,
+  Space,
+  Statistic,
   Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  Typography,
+  type TableColumnsType,
+} from "antd";
+
+import { AdminStatusTag } from "@/components/admin-antd";
+import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { useAdminResource } from "@/components/use-admin-resource";
-import type { AdminLeadsData } from "@/lib/admin/leads";
+import type { AdminLead, AdminLeadsData } from "@/lib/admin/leads";
 import {
   formatAdminLeadStatus,
   getAdminErrorMessage,
-  getAdminLeadStatusTone,
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 
 function formatDate(value: string) {
-  return new Date(value).toLocaleString("zh-CN");
+  return new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
 }
 
 function normalizeSearchText(value: string) {
@@ -71,6 +72,15 @@ function buildLeadDetailHref(leadId: string, currentPath: string) {
   params.set("from", currentPath);
   return `/admin/leads/${leadId}?${params.toString()}`;
 }
+
+const statusFilters = [
+  ["all", "全部"],
+  ["new", "新线索"],
+  ["contacted", "已联系"],
+  ["qualified", "可跟进"],
+  ["won", "已成交"],
+  ["lost", "已关闭"],
+] as const;
 
 export function AdminLeadsPageClient() {
   const searchParams = useSearchParams();
@@ -109,178 +119,159 @@ export function AdminLeadsPageClient() {
       );
     }) ?? [];
 
+  const columns: TableColumnsType<AdminLead> = [
+    {
+      title: "公司与联系人",
+      dataIndex: "companyName",
+      render: (_, lead) => (
+        <Space orientation="vertical" size={2}>
+          <Link className="font-semibold text-foreground hover:text-primary" href={buildLeadDetailHref(lead.id, currentPath)}>
+            {lead.companyName}
+          </Link>
+          <Typography.Text type="secondary">{lead.contactName ?? "未填写联系人"}</Typography.Text>
+        </Space>
+      ),
+    },
+    {
+      title: "联系方式",
+      width: 170,
+      render: (_, lead) => (
+        <Space orientation="vertical" size={2}>
+          <Typography.Text type="secondary">{lead.contactWechat ? `微信 ${lead.contactWechat}` : "未填微信"}</Typography.Text>
+          <Typography.Text type="secondary">{lead.contactPhone ? `电话 ${lead.contactPhone}` : "未填电话"}</Typography.Text>
+        </Space>
+      ),
+    },
+    {
+      title: "需求概况",
+      render: (_, lead) => (
+        <Space orientation="vertical" size={2}>
+          <Typography.Text strong>{lead.requirementType ?? "未填写需求类型"}</Typography.Text>
+          <Typography.Text type="secondary">{lead.requirementSummary}</Typography.Text>
+        </Space>
+      ),
+    },
+    {
+      title: "预算与时间",
+      width: 190,
+      render: (_, lead) => (
+        <Space orientation="vertical" size={2}>
+          <Typography.Text type="secondary">{lead.budgetRange ?? "预算待沟通"}</Typography.Text>
+          <Typography.Text type="secondary">{lead.desiredTimeline ?? "时间待沟通"}</Typography.Text>
+          <Typography.Text type="secondary">提交于 {formatDate(lead.createdAt)}</Typography.Text>
+        </Space>
+      ),
+    },
+    {
+      title: "负责人",
+      width: 210,
+      render: (_, lead) => (
+        <Space orientation="vertical" size={4}>
+          <AdminStatusTag status={lead.status} label={formatAdminLeadStatus(lead.status)} />
+          <Typography.Text type="secondary">
+            {lead.ownerDisplayName ?? "暂未分配"}
+            {lead.ownerEmail ? ` · ${lead.ownerEmail}` : ""}
+          </Typography.Text>
+          <Typography.Text type="secondary">候选成员：{lead.matchCount > 0 ? `${lead.matchCount} 位` : "暂未匹配"}</Typography.Text>
+          <Typography.Text type="secondary">
+            下一步：{lead.nextAction ?? "待补充"}
+            {lead.nextActionAt ? ` · ${formatDate(lead.nextActionAt)}` : ""}
+          </Typography.Text>
+        </Space>
+      ),
+    },
+    {
+      title: "操作",
+      width: 96,
+      align: "right",
+      render: (_, lead) => (
+        <Button icon={<EyeOutlined />} href={buildLeadDetailHref(lead.id, currentPath)}>
+          查看
+        </Button>
+      ),
+    },
+  ];
+
   return (
-    <AdminPageStack>
+    <div className="grid gap-4">
       <AdminToastSignals
         success={getAdminSavedMessage(saved)}
         error={queryError ? getAdminErrorMessage(queryError) : null}
       />
 
-      <AdminPanel>
-        <AdminPanelHeader
-          eyebrow="Leads"
-          title="合作线索"
-          actions={
-            <>
-              <AdminMetric label="线索总数" value={data?.stats.total ?? "..."} />
-              <AdminMetric label="新线索" value={data?.stats.newCount ?? "..."} />
-              <AdminMetric label="已联系" value={data?.stats.contactedCount ?? "..."} />
-              <AdminMetric label="可跟进" value={data?.stats.qualifiedCount ?? "..."} />
-              <AdminMetric label="已匹配" value={data?.stats.matchedCount ?? "..."} />
-            </>
-          }
-        />
-      </AdminPanel>
+      <Card>
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <Typography.Text type="secondary">Leads</Typography.Text>
+            <Typography.Title level={2} style={{ margin: "4px 0 0" }}>
+              合作线索
+            </Typography.Title>
+          </div>
+          <Space wrap size="large">
+            <Statistic title="线索总数" value={data?.stats.total ?? 0} prefix={<TeamOutlined />} />
+            <Statistic title="新线索" value={data?.stats.newCount ?? 0} />
+            <Statistic title="已联系" value={data?.stats.contactedCount ?? 0} />
+            <Statistic title="可跟进" value={data?.stats.qualifiedCount ?? 0} />
+            <Statistic title="已匹配" value={data?.stats.matchedCount ?? 0} />
+          </Space>
+        </div>
+      </Card>
 
-      {error ? <AdminNotice>后台数据读取出现问题：{error}</AdminNotice> : null}
+      {error ? <Alert title={`后台数据读取出现问题：${error}`} type="warning" showIcon /> : null}
       {data && data.queryErrors.length > 0 ? (
-        <AdminNotice>后台数据读取出现问题：{data.queryErrors.join(" | ")}</AdminNotice>
+        <Alert title={`后台数据读取出现问题：${data.queryErrors.join(" | ")}`} type="warning" showIcon />
       ) : null}
 
-      <AdminPanel>
-        <AdminPanelHeader eyebrow="Filters" title="线索筛选" />
-        <AdminPanelBody className="space-y-4">
-          <div className="grid gap-2">
-            <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              状态
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {[
-                ["all", "全部"],
-                ["new", "新线索"],
-                ["contacted", "已联系"],
-                ["qualified", "可跟进"],
-                ["won", "已成交"],
-                ["lost", "已关闭"],
-              ].map(([value, label]) => (
-                <AdminFilterLink
-                  key={value}
-                  href={buildLeadsFilterHref(value, queryInput)}
-                  active={statusFilter === value}
-                >
-                  {label}
-                </AdminFilterLink>
-              ))}
-            </div>
-          </div>
+      <Card title="线索筛选">
+        <Space orientation="vertical" size={16} style={{ width: "100%" }}>
+          <Space wrap>
+            {statusFilters.map(([value, label]) => (
+              <Button
+                key={value}
+                type={statusFilter === value ? "primary" : "default"}
+                href={buildLeadsFilterHref(value, queryInput)}
+              >
+                {label}
+              </Button>
+            ))}
+          </Space>
 
           <form action="/admin/leads" className="grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
             <input type="hidden" name="status" value={statusFilter} />
-
-            <AdminField label="线索搜索">
-              <Input
-                type="search"
-                name="query"
-                defaultValue={queryInput}
-                placeholder="搜索公司、联系人、微信、电话、需求、备注"
-              />
-            </AdminField>
-
-            <div className="flex flex-wrap items-end gap-2">
-              <Button type="submit" variant="secondary">
+            <Input
+              type="search"
+              name="query"
+              defaultValue={queryInput}
+              placeholder="搜索公司、联系人、微信、电话、需求、备注"
+              prefix={<SearchOutlined />}
+            />
+            <Space wrap>
+              <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
                 搜索线索
               </Button>
               {queryInput ? (
-                <Button asChild variant="outline">
-                  <Link href={buildLeadsFilterHref(statusFilter, "")}>清空搜索</Link>
+                <Button href={buildLeadsFilterHref(statusFilter, "")} icon={<ClearOutlined />}>
+                  清空
                 </Button>
               ) : null}
-            </div>
+            </Space>
           </form>
-        </AdminPanelBody>
-      </AdminPanel>
+        </Space>
+      </Card>
 
-      <AdminPanel>
-        <AdminPanelHeader eyebrow="Results" title="线索结果" />
-        <AdminPanelBody className="p-0">
-          {isLoading ? (
-            <div className="p-4">
-              <AdminNotice>正在加载合作线索...</AdminNotice>
-            </div>
-          ) : filteredLeads.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>公司与联系人</TableHead>
-                  <TableHead>联系方式</TableHead>
-                  <TableHead>需求概况</TableHead>
-                  <TableHead>预算与时间</TableHead>
-                  <TableHead>负责人与进度</TableHead>
-                  <TableHead className="w-[96px] text-right">操作</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredLeads.map((lead) => (
-                  <TableRow key={lead.id}>
-                    <TableCell>
-                      <div className="grid gap-1">
-                        <Link
-                          href={buildLeadDetailHref(lead.id, currentPath)}
-                          className="font-semibold text-foreground transition-colors hover:text-primary"
-                        >
-                          {lead.companyName}
-                        </Link>
-                        <span className="text-sm text-muted-foreground">
-                          {lead.contactName ?? "未填写联系人"}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      <div className="grid gap-1">
-                        <span>{lead.contactWechat ? `微信 ${lead.contactWechat}` : "未填微信"}</span>
-                        <span>{lead.contactPhone ? `电话 ${lead.contactPhone}` : "未填电话"}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      <div className="grid gap-1">
-                        <span className="font-medium text-foreground">
-                          {lead.requirementType ?? "未填写需求类型"}
-                        </span>
-                        <span>{lead.requirementSummary}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      <div className="grid gap-1">
-                        <span>{lead.budgetRange ?? "预算待沟通"}</span>
-                        <span>{lead.desiredTimeline ?? "时间待沟通"}</span>
-                        <span>提交于 {formatDate(lead.createdAt)}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">
-                      <div className="grid gap-1">
-                        <AdminStatusBadge
-                          tone={getAdminLeadStatusTone(lead.status) as AdminTone}
-                          className="w-fit"
-                        >
-                          {formatAdminLeadStatus(lead.status)}
-                        </AdminStatusBadge>
-                        <span>
-                          负责人：{lead.ownerDisplayName ?? "暂未分配"}
-                          {lead.ownerEmail ? ` · ${lead.ownerEmail}` : ""}
-                        </span>
-                        <span>候选成员：{lead.matchCount > 0 ? `${lead.matchCount} 位` : "暂未匹配"}</span>
-                        <span>
-                          下一步：{lead.nextAction ?? "待补充"}
-                          {lead.nextActionAt ? ` · ${formatDate(lead.nextActionAt)}` : ""}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button asChild size="sm" variant="secondary">
-                        <Link href={buildLeadDetailHref(lead.id, currentPath)}>查看</Link>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <div className="p-4">
-              <AdminNotice>当前筛选条件下没有合作线索。</AdminNotice>
-            </div>
-          )}
-        </AdminPanelBody>
-      </AdminPanel>
-    </AdminPageStack>
+      <Card title="线索结果">
+        <Table
+          columns={columns}
+          dataSource={filteredLeads}
+          rowKey="id"
+          loading={isLoading}
+          pagination={{ pageSize: 8 }}
+          scroll={{ x: 1080 }}
+          locale={{
+            emptyText: "当前筛选条件下没有合作线索。",
+          }}
+        />
+      </Card>
+    </div>
   );
 }

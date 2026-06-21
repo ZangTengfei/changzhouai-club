@@ -1,7 +1,11 @@
 import { notFound } from "next/navigation";
 
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
-import { canAdmin, requireAdminPermission } from "@/lib/supabase/guards";
+import {
+  canAdmin,
+  getAdminContextResult,
+  requireAdminPermission,
+} from "@/lib/supabase/guards";
 
 export type WorkflowTemplateRow = {
   id: string;
@@ -161,6 +165,8 @@ export type AdminWorkflowsData = {
   queryErrors: string[];
 };
 
+type AdminContext = Awaited<ReturnType<typeof getAdminContextResult>>;
+
 function safeDateTime(value: string | null) {
   if (!value) {
     return null;
@@ -189,6 +195,29 @@ function calculateProgress(steps: WorkflowStepRow[]) {
     blocked,
     percent: total > 0 ? Math.round((done / total) * 100) : 0,
   };
+}
+
+function summarizeWorkflowQueryErrors(errors: Array<string | undefined>) {
+  const messages = errors.filter(Boolean) as string[];
+  const missingWorkflowTables = messages.filter((message) =>
+    [
+      "public.workflow_templates",
+      "public.workflow_template_steps",
+      "public.workflow_runs",
+      "public.workflow_steps",
+      "public.workflow_artifacts",
+      "public.workflow_approvals",
+      "public.ai_jobs",
+    ].some((tableName) => message.includes(tableName)),
+  );
+  const otherMessages = messages.filter((message) => !missingWorkflowTables.includes(message));
+
+  return [
+    missingWorkflowTables.length > 0
+      ? "本地工作流数据表尚未初始化，工作流、AI 任务和审批数据暂按空数据展示。"
+      : null,
+    ...otherMessages,
+  ].filter(Boolean) as string[];
 }
 
 export function formatWorkflowDateTime(value: string | null) {
@@ -248,8 +277,10 @@ export function getWorkflowStatusTone(status: string) {
   return "neutral" as const;
 }
 
-export async function loadAdminWorkflowsData(): Promise<AdminWorkflowsData> {
-  const adminContext = await requireAdminPermission("workflows.read");
+export async function loadAdminWorkflowsData(
+  context?: AdminContext,
+): Promise<AdminWorkflowsData> {
+  const adminContext = context ?? (await requireAdminPermission("workflows.read"));
   const { supabase } = adminContext;
   const canWrite = canAdmin(adminContext, "workflows.write");
   const canRunAi = canAdmin(adminContext, "ai_jobs.run");
@@ -402,7 +433,7 @@ export async function loadAdminWorkflowsData(): Promise<AdminWorkflowsData> {
       canRunAi,
       canReview,
     },
-    queryErrors: [
+    queryErrors: summarizeWorkflowQueryErrors([
       templatesError?.message,
       templateStepsError?.message,
       runsError?.message,
@@ -412,7 +443,7 @@ export async function loadAdminWorkflowsData(): Promise<AdminWorkflowsData> {
       approvalsError?.message,
       eventsError?.message,
       profilesError?.message,
-    ].filter(Boolean) as string[],
+    ]),
   };
 }
 

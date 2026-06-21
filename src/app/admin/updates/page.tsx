@@ -8,14 +8,13 @@ import {
 import {
   AdminCheckboxRow,
   AdminField,
-  AdminMetric,
-  AdminNotice,
-  AdminPageStack,
-  AdminPanel,
-  AdminPanelBody,
-  AdminPanelHeader,
-  AdminStatusBadge,
 } from "@/components/admin-ui";
+import {
+  AdminAntdAlert,
+  AdminAntdCard,
+  AdminAntdPageHeader,
+  AdminStatusTag,
+} from "@/components/admin-antd";
 import { AdminModal } from "@/components/admin-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { Button } from "@/components/ui/button";
@@ -61,22 +60,6 @@ function formatDateTime(value: string | null) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value));
-}
-
-function getStatusTone(status: string) {
-  if (status === "published") {
-    return "completed" as const;
-  }
-
-  if (status === "changes_requested") {
-    return "scheduled" as const;
-  }
-
-  if (status === "rejected" || status === "archived") {
-    return "cancelled" as const;
-  }
-
-  return "pending" as const;
 }
 
 function UpdateForm({
@@ -231,35 +214,32 @@ export default async function AdminUpdatesPage({
   const pendingCount = updates.filter((update) => update.status === "pending").length;
 
   return (
-    <AdminPageStack>
+    <div className="grid gap-4">
       <AdminToastSignals
         success={getAdminSavedMessage(params.saved)}
         error={params.error ? getAdminErrorMessage(params.error) : null}
       />
 
-      <AdminPanel>
-        <AdminPanelHeader
-          eyebrow="Updates"
-          title="社区动态管理"
-          actions={
-            <>
-              <AdminMetric label="动态" value={updates.length} />
-              <AdminMetric label="待审核" value={pendingCount} />
-              <AdminModal title="新增社区动态" triggerLabel="新增动态">
-                <UpdateForm authorOptions={authorOptions} />
-              </AdminModal>
-            </>
-          }
-        />
-      </AdminPanel>
+      <AdminAntdPageHeader
+        eyebrow="Updates"
+        title="社区动态管理"
+        stats={[
+          { label: "动态", value: updates.length },
+          { label: "待审核", value: pendingCount },
+        ]}
+        actions={
+          <AdminModal title="新增社区动态" triggerLabel="新增动态">
+            <UpdateForm authorOptions={authorOptions} />
+          </AdminModal>
+        }
+      />
 
       {queryErrors.length > 0 ? (
-        <AdminNotice>后台数据读取出现问题：{queryErrors.join(" | ")}</AdminNotice>
+        <AdminAntdAlert message={`后台数据读取出现问题：${queryErrors.join(" | ")}`} />
       ) : null}
 
-      <AdminPanel>
-        <AdminPanelHeader eyebrow="List" title="动态列表" />
-        <AdminPanelBody className="space-y-2">
+      <AdminAntdCard eyebrow="List" title="动态列表">
+        <div className="space-y-2">
           {updates.length > 0 ? (
             updates.map((update) => (
               <article
@@ -292,14 +272,15 @@ export default async function AdminUpdatesPage({
                       <h2 className="text-base font-semibold text-foreground">
                         {update.title || communityUpdateTypeLabels[update.update_type]}
                       </h2>
-                      <AdminStatusBadge tone={getStatusTone(update.status)}>
-                        {communityUpdateStatusLabels[update.status]}
-                      </AdminStatusBadge>
+                      <AdminStatusTag
+                        status={update.status}
+                        label={communityUpdateStatusLabels[update.status]}
+                      />
                       {update.is_pinned ? (
-                        <AdminStatusBadge tone="registered">置顶</AdminStatusBadge>
+                        <AdminStatusTag status="active" label="置顶" />
                       ) : null}
                       {update.is_featured ? (
-                        <AdminStatusBadge tone="scheduled">精选</AdminStatusBadge>
+                        <AdminStatusTag status="waiting_review" label="精选" />
                       ) : null}
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -341,10 +322,10 @@ export default async function AdminUpdatesPage({
               </article>
             ))
           ) : (
-            <AdminNotice>还没有社区动态。成员提交后会在这里审核。</AdminNotice>
+            <AdminAntdAlert message="还没有社区动态。成员提交后会在这里审核。" type="info" />
           )}
-        </AdminPanelBody>
-      </AdminPanel>
-    </AdminPageStack>
+        </div>
+      </AdminAntdCard>
+    </div>
   );
 }
