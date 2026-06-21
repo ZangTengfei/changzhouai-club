@@ -149,9 +149,7 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
             title={member.displayName}
             actions={
               <>
-                <div className="rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 px-3 py-2 text-sm">
-                  活动报名 {member.registrationCount} 次
-                </div>
+                <AdminStatusBadge tone="neutral">活动报名 {member.registrationCount} 次</AdminStatusBadge>
                 <Link href={backHref}>
                   <Button>返回成员列表</Button>
                 </Link>

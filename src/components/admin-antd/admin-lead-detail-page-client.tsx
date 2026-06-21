@@ -205,9 +205,9 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
             title={lead.companyName}
             actions={
               <>
-                <div className="rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 px-3 py-2 text-sm">
+                <AdminStatusBadge tone={getAdminLeadStatusTone(lead.status) as AdminTone}>
                   当前状态：{formatAdminLeadStatus(lead.status)}
-                </div>
+                </AdminStatusBadge>
                 <Link href={backHref}>
                   <Button>返回线索列表</Button>
                 </Link>

@@ -5,6 +5,7 @@ export {
   AdminAntdAlert,
   AdminAntdCard,
   AdminAntdPageHeader,
+  AdminImageFrame,
   AdminRecordCard,
 } from "./admin-page-section";
 export { AdminStatusTag } from "./admin-status-tag";

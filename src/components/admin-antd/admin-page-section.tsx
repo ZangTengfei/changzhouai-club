@@ -83,6 +83,48 @@ export function AdminRecordCard({
   );
 }
 
+export function AdminImageFrame({
+  alt,
+  caption,
+  className,
+  fallback,
+  imgClassName,
+  src,
+}: {
+  alt: string;
+  caption?: ReactNode;
+  className?: string;
+  fallback?: ReactNode;
+  imgClassName?: string;
+  src?: string | null;
+}) {
+  return (
+    <Card
+      size="small"
+      className={className}
+      styles={{
+        body: {
+          display: "grid",
+          height: "100%",
+          overflow: "hidden",
+          padding: 0,
+        },
+      }}
+    >
+      {src ? (
+        <img src={src} alt={alt} loading="lazy" className={imgClassName ?? "h-full w-full object-cover"} />
+      ) : (
+        fallback
+      )}
+      {caption ? (
+        <Typography.Text className="border-t border-border/70 px-3 py-2 text-xs" type="secondary">
+          {caption}
+        </Typography.Text>
+      ) : null}
+    </Card>
+  );
+}
+
 export function AdminAntdAlert({
   message,
   type = "warning",

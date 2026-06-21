@@ -15,6 +15,7 @@ import {
   AdminAntdPageHeader,
   AdminCheckboxRow,
   AdminField,
+  AdminImageFrame,
   AdminModal,
   AdminRecordCard,
   AdminStatusTag,
@@ -387,19 +388,16 @@ export default async function AdminWorksPage({
             externalCards.map((card) => (
               <AdminRecordCard key={card.id}>
                 <div className="grid gap-3 p-3 lg:grid-cols-[88px_minmax(0,1fr)_auto] lg:items-center">
-                  <div className="relative size-[88px] overflow-hidden rounded-lg border border-border/70 bg-muted/30">
-                    {card.cover_image_url ? (
-                      <img
-                        src={card.cover_image_url}
-                        alt=""
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
+                  <AdminImageFrame
+                    alt=""
+                    className="size-[88px]"
+                    src={card.cover_image_url}
+                    fallback={
                       <div className="grid h-full w-full place-items-center text-lg font-semibold text-muted-foreground">
                         {card.title.slice(0, 1)}
                       </div>
-                    )}
-                  </div>
+                    }
+                  />
 
                   <div className="min-w-0 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">
@@ -467,19 +465,16 @@ export default async function AdminWorksPage({
             works.map((work) => (
               <AdminRecordCard key={work.id}>
                 <div className="grid gap-3 p-3 lg:grid-cols-[88px_minmax(0,1fr)_auto] lg:items-center">
-                  <div className="relative size-[88px] overflow-hidden rounded-lg border border-border/70 bg-muted/30">
-                    {work.cover_image_url ? (
-                      <img
-                        src={work.cover_image_url}
-                        alt=""
-                        className="h-full w-full object-cover"
-                      />
-                    ) : (
+                  <AdminImageFrame
+                    alt=""
+                    className="size-[88px]"
+                    src={work.cover_image_url}
+                    fallback={
                       <div className="grid h-full w-full place-items-center text-lg font-semibold text-muted-foreground">
                         {work.title.slice(0, 1)}
                       </div>
-                    )}
-                  </div>
+                    }
+                  />
 
                   <div className="min-w-0 space-y-1">
                     <div className="flex flex-wrap items-center gap-2">

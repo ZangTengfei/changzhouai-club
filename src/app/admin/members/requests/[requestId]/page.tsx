@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Button } from "antd";
+import { Button, Statistic } from "antd";
 import TextArea from "antd/es/input/TextArea";
 
 import {
@@ -192,15 +192,11 @@ export default async function AdminJoinRequestDetailPage({
             </p>
             <div className="mt-3 grid gap-3 md:grid-cols-2">
               {pipelineItems.map(([label, value]) => (
-                <div
+                <Statistic
                   key={label}
-                  className="rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/20 p-3"
-                >
-                  <strong className="text-sm text-foreground">{label}</strong>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {value ? formatDate(value) : "尚未记录"}
-                  </p>
-                </div>
+                  title={label}
+                  value={value ? formatDate(value) : "尚未记录"}
+                />
               ))}
             </div>
             </div>

@@ -7,7 +7,6 @@ import {
   Alert,
   Button,
   Card,
-  Image,
   Space,
   Statistic,
   Table,
@@ -15,7 +14,7 @@ import {
   type TableColumnsType,
 } from "antd";
 
-import { AdminStatusTag } from "@/components/admin-antd";
+import { AdminImageFrame, AdminStatusTag } from "@/components/admin-antd";
 import { AdminSponsorEditorModal } from "@/components/admin-antd/admin-sponsor-editor-modal";
 import { AdminToastSignals } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";
@@ -50,14 +49,12 @@ export function AdminSponsorsPageClient() {
       render: (_, sponsor) => (
         <Space>
           {sponsor.logo_url ? (
-            <span className="grid size-14 place-items-center overflow-hidden rounded-lg border border-border/70 bg-muted/30 p-2">
-              <Image
-                src={sponsor.logo_url}
-                alt={`${sponsor.name} Logo`}
-                preview={false}
-                className="max-h-full max-w-full object-contain"
-              />
-            </span>
+            <AdminImageFrame
+              alt={`${sponsor.name} Logo`}
+              className="size-14"
+              imgClassName="h-full w-full object-contain p-2"
+              src={sponsor.logo_url}
+            />
           ) : null}
           <Space orientation="vertical" size={2}>
             <Link

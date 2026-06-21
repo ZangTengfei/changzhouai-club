@@ -12,6 +12,7 @@ import {
   AdminAntdPageHeader,
   AdminCheckboxRow,
   AdminField,
+  AdminImageFrame,
   AdminModal,
   AdminRecordCard,
   AdminStatusTag,
@@ -214,15 +215,12 @@ export default async function AdminSocialPage({
               return (
                 <AdminRecordCard key={qrCode.id}>
                   <div className="grid gap-3 p-3 lg:grid-cols-[72px_minmax(0,1fr)_auto] lg:items-center">
-                    <div className="relative size-[72px] overflow-hidden rounded-lg border border-border/70 bg-muted/30">
-                      <img
-                        src={qrCode.image_url}
-                        alt={qrCode.title}
-                        width={72}
-                        height={72}
-                        className="h-full w-full object-contain p-1.5"
-                      />
-                    </div>
+                    <AdminImageFrame
+                      alt={qrCode.title}
+                      className="size-[72px]"
+                      imgClassName="h-full w-full object-contain p-1.5"
+                      src={qrCode.image_url}
+                    />
 
                     <div className="min-w-0 space-y-1">
                       <div className="flex flex-wrap items-center gap-2">

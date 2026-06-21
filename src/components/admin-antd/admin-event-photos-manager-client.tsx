@@ -10,6 +10,7 @@ import {
   AdminPanel,
   AdminPanelBody,
   AdminPanelHeader,
+  AdminImageFrame,
   AdminRecordCard,
   AdminStatusBadge,
 } from "@/components/admin-antd";
@@ -162,17 +163,13 @@ export function AdminEventPhotosManagerClient({
             </AdminRecordCard>
 
             {coverImageUrl ? (
-              <AdminRecordCard>
-                <img
-                  src={coverImageUrl}
-                  alt={`${eventTitle} 封面`}
-                  loading="lazy"
-                  className="aspect-[16/10] w-full object-cover"
-                />
-                <p className="border-t border-border/70 px-3 py-2 text-xs text-muted-foreground">
-                  {coverImageUrl}
-                </p>
-              </AdminRecordCard>
+              <AdminImageFrame
+                alt={`${eventTitle} 封面`}
+                caption={coverImageUrl}
+                className="min-w-0"
+                imgClassName="aspect-[16/10] w-full object-cover"
+                src={coverImageUrl}
+              />
             ) : (
               <AdminNotice>暂未设置封面图。</AdminNotice>
             )}
@@ -186,17 +183,13 @@ export function AdminEventPhotosManagerClient({
                 return (
                   <AdminRecordCard key={photo.id}>
                     <div className="grid gap-4 p-4 lg:grid-cols-[320px_minmax(0,1fr)]">
-                    <div className="overflow-hidden rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/30">
-                      <img
-                        src={photo.image_url}
-                        alt={photo.caption ?? eventTitle}
-                        loading="lazy"
-                        className="aspect-[4/3] w-full object-cover"
-                      />
-                      <p className="border-t border-border/70 px-3 py-2 text-xs text-muted-foreground">
-                        {photo.image_url}
-                      </p>
-                    </div>
+                    <AdminImageFrame
+                      alt={photo.caption ?? eventTitle}
+                      caption={photo.image_url}
+                      className="min-w-0"
+                      imgClassName="aspect-[4/3] w-full object-cover"
+                      src={photo.image_url}
+                    />
 
                     <div className="grid gap-4">
                       <div className="flex flex-wrap items-center gap-2">

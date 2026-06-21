@@ -10,6 +10,7 @@ import {
   AdminPanel,
   AdminPanelBody,
   AdminPanelHeader,
+  AdminImageFrame,
   AdminRecordCard,
   AdminStatusBadge,
 } from "@/components/admin-antd";
@@ -133,17 +134,13 @@ export function AdminSponsorImagesManagerClient({
               {images.map((image) => (
                 <AdminRecordCard key={image.id}>
                   <div className="grid gap-4 p-4 lg:grid-cols-[320px_minmax(0,1fr)]">
-                  <div className="overflow-hidden rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/30">
-                    <img
-                      src={image.image_url}
-                      alt={image.caption ?? sponsorName}
-                      loading="lazy"
-                      className="aspect-[4/3] w-full object-cover"
-                    />
-                    <p className="border-t border-border/70 px-3 py-2 text-xs text-muted-foreground">
-                      {image.image_url}
-                    </p>
-                  </div>
+                  <AdminImageFrame
+                    alt={image.caption ?? sponsorName}
+                    caption={image.image_url}
+                    className="min-w-0"
+                    imgClassName="aspect-[4/3] w-full object-cover"
+                    src={image.image_url}
+                  />
 
                   <form
                     className="grid gap-4"
