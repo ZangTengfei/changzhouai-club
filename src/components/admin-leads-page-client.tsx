@@ -21,7 +21,7 @@ import {
 } from "antd";
 
 import { AdminStatusTag } from "@/components/admin-antd";
-import { AdminToastSignals } from "@/components/admin-toast-signals";
+import { AdminToastSignals } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminLead, AdminLeadsData } from "@/lib/admin/leads";
 import {

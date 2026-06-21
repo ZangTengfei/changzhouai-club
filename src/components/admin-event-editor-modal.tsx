@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Button } from "antd";
 
 import { AdminEventEditorFormClient } from "@/components/admin-event-editor-form-client";
-import { AdminModal } from "@/components/admin-modal";
+import { AdminModal } from "@/components/admin-antd";
 import { AdminNotice } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminEvent } from "@/lib/admin/events";

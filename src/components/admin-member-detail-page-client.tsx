@@ -17,7 +17,7 @@ import {
   AdminStatusBadge,
   type AdminTone,
 } from "@/components/admin-antd";
-import { AdminToastSignals } from "@/components/admin-toast-signals";
+import { AdminToastSignals } from "@/components/admin-antd";
 import { MemberAvatar } from "@/components/member-avatar";
 import { NativeSelect } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";

@@ -17,7 +17,7 @@ import {
 
 import { AdminStatusTag } from "@/components/admin-antd";
 import { AdminSponsorEditorModal } from "@/components/admin-sponsor-editor-modal";
-import { AdminToastSignals } from "@/components/admin-toast-signals";
+import { AdminToastSignals } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   getAdminErrorMessage,

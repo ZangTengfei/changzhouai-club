@@ -8,19 +8,17 @@ import {
   saveAdminCommunityUpdate,
 } from "@/app/admin/actions";
 import {
-  AdminCheckboxRow,
-  AdminField,
-} from "@/components/admin-antd";
-import {
   AdminAntdAlert,
   AdminAntdCard,
   AdminAntdPageHeader,
+  AdminCheckboxRow,
+  AdminField,
+  AdminModal,
   AdminRecordCard,
   AdminStatusTag,
+  AdminToastSignals,
+  NativeSelect,
 } from "@/components/admin-antd";
-import { AdminModal } from "@/components/admin-modal";
-import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { NativeSelect } from "@/components/admin-antd";
 import {
   type AdminCommunityUpdate,
   type AdminCommunityUpdateAuthorOption,

@@ -13,16 +13,14 @@ import {
   AdminAntdAlert,
   AdminAntdCard,
   AdminAntdPageHeader,
-  AdminRecordCard,
-  AdminStatusTag,
-} from "@/components/admin-antd";
-import { AdminModal } from "@/components/admin-modal";
-import { AdminToastSignals } from "@/components/admin-toast-signals";
-import {
   AdminCheckboxRow,
   AdminField,
+  AdminModal,
+  AdminRecordCard,
+  AdminStatusTag,
+  AdminToastSignals,
+  NativeSelect,
 } from "@/components/admin-antd";
-import { NativeSelect } from "@/components/admin-antd";
 import {
   getAdminErrorMessage,
   getAdminSavedMessage,

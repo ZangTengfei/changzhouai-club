@@ -10,15 +10,13 @@ import {
   AdminAntdAlert,
   AdminAntdCard,
   AdminAntdPageHeader,
-  AdminRecordCard,
-  AdminStatusTag,
-} from "@/components/admin-antd";
-import {
   AdminCheckboxRow,
   AdminField,
+  AdminModal,
+  AdminRecordCard,
+  AdminStatusTag,
+  AdminToastSignals,
 } from "@/components/admin-antd";
-import { AdminModal } from "@/components/admin-modal";
-import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
 import {
   getAdminErrorMessage,
