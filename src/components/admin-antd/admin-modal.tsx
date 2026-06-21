@@ -20,6 +20,7 @@ export function AdminModal({
   trigger,
   open,
   onOpenChange,
+  width = 720,
   children,
 }: {
   title: string;
@@ -27,6 +28,7 @@ export function AdminModal({
   trigger?: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  width?: number;
   children: ReactNode;
 }) {
   const [innerOpen, setInnerOpen] = useState(false);
@@ -78,7 +80,7 @@ export function AdminModal({
         open={mergedOpen}
         onCancel={() => setModalOpen(false)}
         footer={null}
-        width={720}
+        width={width}
         destroyOnHidden
         styles={{
           body: {

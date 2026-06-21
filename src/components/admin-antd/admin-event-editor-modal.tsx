@@ -18,10 +18,12 @@ type AdminEventDetailData = {
 function AdminEventEditModalContent({
   eventId,
   onChanged,
+  onDeleted,
   onClose,
 }: {
   eventId: string;
   onChanged?: () => void;
+  onDeleted?: () => void;
   onClose: () => void;
 }) {
   const detail = useAdminResource<AdminEventDetailData>(`/api/admin/events/${eventId}`);
@@ -48,6 +50,11 @@ function AdminEventEditModalContent({
         }}
         onDeleted={() => {
           onClose();
+          if (onDeleted) {
+            onDeleted();
+            return;
+          }
+
           onChanged?.();
         }}
       />
@@ -66,10 +73,12 @@ export function AdminEventEditorModal({
   eventId,
   triggerLabel,
   onChanged,
+  onDeleted,
 }: {
   eventId?: string;
   triggerLabel: string;
   onChanged?: () => void;
+  onDeleted?: () => void;
 }) {
   const [open, setOpen] = useState(false);
 
@@ -88,6 +97,7 @@ export function AdminEventEditorModal({
         <AdminEventEditModalContent
           eventId={eventId}
           onChanged={onChanged}
+          onDeleted={onDeleted}
           onClose={() => setOpen(false)}
         />
       ) : (
