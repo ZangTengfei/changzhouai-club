@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Button, Input } from "antd";
+import { Button, Collapse, Input } from "antd";
 import TextArea from "antd/es/input/TextArea";
 
 import {
@@ -147,48 +147,54 @@ export default async function AdminSocialPage({
                   </AdminField>
                 </div>
 
-                <details className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/30 p-3">
-                  <summary className="cursor-pointer text-sm font-medium text-foreground">
-                    高级设置
-                  </summary>
-                  <div className="mt-3 grid gap-4 md:grid-cols-2">
-                    <AdminCheckboxRow
-                      className="self-end"
-                      name="is_active"
-                      defaultChecked
-                    >
-                      <span>立即启用</span>
-                    </AdminCheckboxRow>
+                <Collapse
+                  size="small"
+                  items={[
+                    {
+                      key: "advanced",
+                      label: "高级设置",
+                      children: (
+                        <div className="grid gap-4 md:grid-cols-2">
+                          <AdminCheckboxRow
+                            className="self-end"
+                            name="is_active"
+                            defaultChecked
+                          >
+                            <span>立即启用</span>
+                          </AdminCheckboxRow>
 
-                    <div aria-hidden="true" />
+                          <div aria-hidden="true" />
 
-                    <AdminField label="开始展示时间">
-                      <Input
-                        type="datetime-local"
-                        name="starts_at"
-                        defaultValue={toDatetimeLocal(startsAt)}
-                        required
-                      />
-                    </AdminField>
+                          <AdminField label="开始展示时间">
+                            <Input
+                              type="datetime-local"
+                              name="starts_at"
+                              defaultValue={toDatetimeLocal(startsAt)}
+                              required
+                            />
+                          </AdminField>
 
-                    <AdminField label="过期时间">
-                      <Input
-                        type="datetime-local"
-                        name="expires_at"
-                        defaultValue={toDatetimeLocal(expiresAt)}
-                        required
-                      />
-                    </AdminField>
+                          <AdminField label="过期时间">
+                            <Input
+                              type="datetime-local"
+                              name="expires_at"
+                              defaultValue={toDatetimeLocal(expiresAt)}
+                              required
+                            />
+                          </AdminField>
 
-                    <AdminField label="备注" className="md:col-span-2">
-                      <TextArea
-                        name="note"
-                        rows={3}
-                        placeholder="可选：例如这个二维码对应哪个官方微信号、何时从微信生成。备注只在后台显示。"
-                      />
-                    </AdminField>
-                  </div>
-                </details>
+                          <AdminField label="备注" className="md:col-span-2">
+                            <TextArea
+                              name="note"
+                              rows={3}
+                              placeholder="可选：例如这个二维码对应哪个官方微信号、何时从微信生成。备注只在后台显示。"
+                            />
+                          </AdminField>
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
 
                 <div className="flex flex-wrap items-center gap-2">
                   <Button htmlType="submit" type="primary">保存并发布二维码</Button>
@@ -245,68 +251,75 @@ export default async function AdminSocialPage({
                     </div>
                   </div>
 
-                  <details className="border-t border-border/70">
-                    <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-muted-foreground">
-                      展开编辑表单
-                    </summary>
-                    <form action={saveAdminWechatQrCode} className="grid gap-3 p-3 pt-1">
-                      <input type="hidden" name="qr_code_id" value={qrCode.id} />
-                      <div className="grid gap-3 md:grid-cols-2">
-                        <AdminField label="标题">
-                          <Input name="title" defaultValue={qrCode.title} required />
-                        </AdminField>
-                        <AdminCheckboxRow
-                          className="self-end"
-                          name="is_active"
-                          defaultChecked={qrCode.is_active}
-                        >
-                          <span>启用</span>
-                        </AdminCheckboxRow>
-                        <AdminField label="开始展示时间">
-                          <Input
-                            type="datetime-local"
-                            name="starts_at"
-                            defaultValue={toDatetimeLocal(new Date(qrCode.starts_at))}
-                            required
-                          />
-                        </AdminField>
-                        <AdminField label="过期时间">
-                          <Input
-                            type="datetime-local"
-                            name="expires_at"
-                            defaultValue={toDatetimeLocal(new Date(qrCode.expires_at))}
-                            required
-                          />
-                        </AdminField>
-                        <AdminField label="图片地址" className="md:col-span-2">
-                          <StorageImageUrlField
-                            name="image_url"
-                            defaultValue={qrCode.image_url}
-                            eventSlug="wechat-group"
-                            uploadScope="community"
-                            mode="upload-only"
-                            placeholder="官方微信二维码图片地址"
-                            uploadLabel="重新上传二维码"
-                            clearLabel="清空二维码"
-                            filledStatusText="已设置二维码"
-                            emptyStatusText="当前未设置二维码"
-                            compressUpload={false}
-                            required
-                          />
-                        </AdminField>
-                        <AdminField label="备注" className="md:col-span-2">
-                          <TextArea
-                            name="note"
-                            defaultValue={qrCode.note ?? ""}
-                            rows={2}
-                          />
-                        </AdminField>
-                      </div>
-                      <Button htmlType="submit" size="small">
-                        保存这张二维码
-                      </Button>
-                    </form>
-                  </details>
+                  <Collapse
+                    className="border-t border-border/70"
+                    ghost
+                    items={[
+                      {
+                        key: "edit",
+                        label: "展开编辑表单",
+                        children: (
+                          <form action={saveAdminWechatQrCode} className="grid gap-3 pt-1">
+                            <input type="hidden" name="qr_code_id" value={qrCode.id} />
+                            <div className="grid gap-3 md:grid-cols-2">
+                              <AdminField label="标题">
+                                <Input name="title" defaultValue={qrCode.title} required />
+                              </AdminField>
+                              <AdminCheckboxRow
+                                className="self-end"
+                                name="is_active"
+                                defaultChecked={qrCode.is_active}
+                              >
+                                <span>启用</span>
+                              </AdminCheckboxRow>
+                              <AdminField label="开始展示时间">
+                                <Input
+                                  type="datetime-local"
+                                  name="starts_at"
+                                  defaultValue={toDatetimeLocal(new Date(qrCode.starts_at))}
+                                  required
+                                />
+                              </AdminField>
+                              <AdminField label="过期时间">
+                                <Input
+                                  type="datetime-local"
+                                  name="expires_at"
+                                  defaultValue={toDatetimeLocal(new Date(qrCode.expires_at))}
+                                  required
+                                />
+                              </AdminField>
+                              <AdminField label="图片地址" className="md:col-span-2">
+                                <StorageImageUrlField
+                                  name="image_url"
+                                  defaultValue={qrCode.image_url}
+                                  eventSlug="wechat-group"
+                                  uploadScope="community"
+                                  mode="upload-only"
+                                  placeholder="官方微信二维码图片地址"
+                                  uploadLabel="重新上传二维码"
+                                  clearLabel="清空二维码"
+                                  filledStatusText="已设置二维码"
+                                  emptyStatusText="当前未设置二维码"
+                                  compressUpload={false}
+                                  required
+                                />
+                              </AdminField>
+                              <AdminField label="备注" className="md:col-span-2">
+                                <TextArea
+                                  name="note"
+                                  defaultValue={qrCode.note ?? ""}
+                                  rows={2}
+                                />
+                              </AdminField>
+                            </div>
+                            <Button htmlType="submit" size="small">
+                              保存这张二维码
+                            </Button>
+                          </form>
+                        ),
+                      },
+                    ]}
+                  />
                 </article>
               );
             })

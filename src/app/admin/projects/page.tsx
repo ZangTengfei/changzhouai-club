@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Button, Input } from "antd";
+import { Button, Collapse, Input } from "antd";
 import TextArea from "antd/es/input/TextArea";
 
 import {
@@ -455,33 +455,40 @@ export default async function AdminProjectsPage({
                   </div>
                 </div>
 
-                <details className="border-t border-border/70">
-                  <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-muted-foreground">
-                    展开编辑表单
-                  </summary>
-                  <div className="p-4 pt-1">
-                    <ProjectOpportunityForm opportunity={opportunity} />
-                  </div>
-                </details>
-
-                <details className="border-t border-border/70">
-                  <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-muted-foreground">
-                    查看申请记录（{opportunity.applicationCount}）
-                  </summary>
-                  <div className="grid gap-3 p-4 pt-1">
-                    {opportunity.applications.length > 0 ? (
-                      opportunity.applications.map((application) => (
-                        <ProjectApplicationCard
-                          key={application.id}
-                          application={application}
-                          opportunity={opportunity}
-                        />
-                      ))
-                    ) : (
-                      <AdminAntdAlert message="这个机会还没有收到申请。" type="info" />
-                    )}
-                  </div>
-                </details>
+                <Collapse
+                  className="border-t border-border/70"
+                  ghost
+                  items={[
+                    {
+                      key: "edit",
+                      label: "展开编辑表单",
+                      children: (
+                        <div className="pt-1">
+                          <ProjectOpportunityForm opportunity={opportunity} />
+                        </div>
+                      ),
+                    },
+                    {
+                      key: "applications",
+                      label: `查看申请记录（${opportunity.applicationCount}）`,
+                      children: (
+                        <div className="grid gap-3 pt-1">
+                          {opportunity.applications.length > 0 ? (
+                            opportunity.applications.map((application) => (
+                              <ProjectApplicationCard
+                                key={application.id}
+                                application={application}
+                                opportunity={opportunity}
+                              />
+                            ))
+                          ) : (
+                            <AdminAntdAlert message="这个机会还没有收到申请。" type="info" />
+                          )}
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
               </article>
             ))
           ) : (

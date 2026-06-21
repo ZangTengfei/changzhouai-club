@@ -1,13 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Button, Checkbox, Input } from "antd";
+import { Button } from "antd";
 import TextArea from "antd/es/input/TextArea";
 
 import {
   updateAdminJoinRequest,
   updateAdminJoinRequestPipeline,
 } from "@/app/admin/actions";
-import { AdminStatusBadge } from "@/components/admin-antd";
+import {
+  AdminAntdAlert,
+  AdminAntdCard,
+  AdminAntdPageHeader,
+  AdminCheckboxRow,
+  AdminField,
+  AdminStatusBadge,
+  type AdminTone,
+} from "@/components/admin-antd";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { NativeSelect } from "@/components/admin-antd";
 import {
@@ -17,9 +25,6 @@ import {
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 import { loadAdminJoinRequestOrThrow } from "@/lib/admin/members";
-import { cssModuleCxWithGlobals } from "@/lib/utils";
-
-import styles from "./join-request-detail-page.module.css";
 
 export const metadata: Metadata = {
   title: "加入申请详情",
@@ -31,8 +36,6 @@ type SearchParams = {
   saved?: string;
   error?: string;
 };
-
-const cx = cssModuleCxWithGlobals.bind(null, styles);
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -93,263 +96,239 @@ export default async function AdminJoinRequestDetailPage({
   const pipelineItems = getPipelineItems(joinRequest);
 
   return (
-    <div className={cx("admin-page-stack")}>
+    <div className="grid gap-4">
       <AdminToastSignals
         success={getAdminSavedMessage(query.saved)}
         error={query.error ? getAdminErrorMessage(query.error) : null}
       />
 
-      <section className={cx("surface admin-card")}>
-        <div className={cx("admin-toolbar")}>
-          <div className={cx("section-heading")}>
-            <p className={cx("eyebrow")}>Join Request Detail</p>
-            <h2>{joinRequest.displayName}</h2>
-          </div>
-
-          <div className={cx("admin-toolbar-side")}>
-            <div className={cx("admin-mini-stat")}>
-              <strong>{formatAdminJoinRequestStatus(joinRequest.status)}</strong>
-              <span>当前状态</span>
-            </div>
-
-            <Link href={backHref}>
-              <Button>返回申请列表</Button>
-            </Link>
-          </div>
-        </div>
-
-        <div className={cx("pill-row")}>
-          <span
-            className={cx(
-              "pill admin-status-pill",
-              `admin-status-pill-${getAdminJoinRequestStatusTone(joinRequest.status)}`,
-            )}
-          >
-            {formatAdminJoinRequestStatus(joinRequest.status)}
-          </span>
-          <span className={cx("pill")}>{joinRequest.city}</span>
-          <span className={cx("pill")}>{joinRequest.monthlyTime ?? "未填写可投入时间"}</span>
-        </div>
-      </section>
+      <AdminAntdPageHeader
+        eyebrow="Join Request Detail"
+        title={joinRequest.displayName}
+        stats={[
+          { label: "当前状态", value: formatAdminJoinRequestStatus(joinRequest.status) },
+          { label: "城市", value: joinRequest.city },
+          { label: "可投入", value: joinRequest.monthlyTime ?? "未填写" },
+        ]}
+        actions={
+          <Link href={backHref}>
+            <Button>返回申请列表</Button>
+          </Link>
+        }
+      />
 
       {queryErrors.length > 0 ? (
-        <div className={cx("note-strip")}>后台数据读取出现问题：{queryErrors.join(" | ")}</div>
+        <AdminAntdAlert message={`后台数据读取出现问题：${queryErrors.join(" | ")}`} />
       ) : null}
 
-      <section className={cx("surface admin-card admin-member-card")}>
-        <div className={cx("admin-join-request-header")}>
-          <div>
-            <h3>{joinRequest.displayName}</h3>
-            <p>
-              {joinRequest.roleLabel ?? "未填写角色"}
-              {joinRequest.organization ? ` · ${joinRequest.organization}` : ""}
-            </p>
+      <AdminAntdCard eyebrow="Profile" title="申请者概览">
+        <div className="grid gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="grid gap-1">
+              <h3 className="text-base font-semibold text-foreground">
+                {joinRequest.displayName}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {joinRequest.roleLabel ?? "未填写角色"}
+                {joinRequest.organization ? ` · ${joinRequest.organization}` : ""}
+              </p>
+            </div>
+
+            <AdminStatusBadge tone={getAdminJoinRequestStatusTone(joinRequest.status) as AdminTone}>
+              {formatAdminJoinRequestStatus(joinRequest.status)}
+            </AdminStatusBadge>
           </div>
 
-          <span
-            className={cx(
-              "pill admin-status-pill",
-              `admin-status-pill-${getAdminJoinRequestStatusTone(joinRequest.status)}`,
-            )}
-          >
-            {formatAdminJoinRequestStatus(joinRequest.status)}
-          </span>
+          <div className="flex flex-wrap gap-2">
+            <AdminStatusBadge tone="neutral">{joinRequest.city}</AdminStatusBadge>
+            <AdminStatusBadge tone="neutral">
+              {joinRequest.monthlyTime ?? "未填写可投入时间"}
+            </AdminStatusBadge>
+            <AdminStatusBadge tone={joinRequest.willingToAttend ? "active" : "neutral"}>
+              {joinRequest.willingToAttend ? "愿意线下参加" : "暂不线下参加"}
+            </AdminStatusBadge>
+            <AdminStatusBadge tone={joinRequest.willingToShare ? "active" : "neutral"}>
+              {joinRequest.willingToShare ? "愿意分享" : "暂不分享"}
+            </AdminStatusBadge>
+            <AdminStatusBadge tone={joinRequest.willingToJoinProjects ? "active" : "neutral"}>
+              {joinRequest.willingToJoinProjects ? "愿意共建" : "暂不共建"}
+            </AdminStatusBadge>
+          </div>
+
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/20 p-4">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                联系信息
+              </p>
+              <div className="mt-3 grid gap-2 text-sm text-muted-foreground">
+                <p>微信号：{joinRequest.wechat}</p>
+                <p>所在城市：{joinRequest.city}</p>
+                <p>可投入时间：{joinRequest.monthlyTime ?? "未填写"}</p>
+              </div>
+            </div>
+
+            <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/20 p-4">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                跟进节点
+              </p>
+              <div className="mt-3 grid gap-2 text-sm text-muted-foreground">
+                <p>提交时间：{formatDate(joinRequest.createdAt)}</p>
+                <p>最近联系：{formatDate(joinRequest.contactedAt)}</p>
+                <p>通过时间：{formatDate(joinRequest.approvedAt)}</p>
+                <p>正式成员：{joinRequest.convertedMemberDisplayName ?? "暂未关联"}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+            <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              转化进度
+            </p>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              {pipelineItems.map(([label, value]) => (
+                <div
+                  key={label}
+                  className="rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/20 p-3"
+                >
+                  <strong className="text-sm text-foreground">{label}</strong>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {value ? formatDate(value) : "尚未记录"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {joinRequest.skills.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {joinRequest.skills.map((skill) => (
+                <AdminStatusBadge key={`${joinRequest.id}-skill-${skill}`} tone="neutral">
+                  {skill}
+                </AdminStatusBadge>
+              ))}
+            </div>
+          ) : null}
+
+          {joinRequest.interests.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {joinRequest.interests.map((interest) => (
+                <AdminStatusBadge key={`${joinRequest.id}-interest-${interest}`} tone="neutral">
+                  {interest}
+                </AdminStatusBadge>
+              ))}
+            </div>
+          ) : null}
+
+          <div className="grid gap-3 md:grid-cols-2">
+            <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                申请者补充
+              </p>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                {joinRequest.note ?? "这位申请者暂未补充额外说明。"}
+              </p>
+            </div>
+
+            <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                当前跟进备注
+              </p>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                {joinRequest.adminNote ?? "暂时还没有记录跟进备注。"}
+              </p>
+            </div>
+          </div>
         </div>
+      </AdminAntdCard>
 
-        <div className={cx("admin-member-card-meta")}>
-          <div className={cx("admin-note-panel")}>
-            <span className={cx("admin-card-label")}>联系信息</span>
-            <p className={cx("admin-member-bio")}>微信号：{joinRequest.wechat}</p>
-            <p className={cx("admin-member-bio")}>所在城市：{joinRequest.city}</p>
-            <p className={cx("admin-member-bio")}>
-              可投入时间：{joinRequest.monthlyTime ?? "未填写"}
-            </p>
-          </div>
-
-          <div className={cx("admin-note-panel")}>
-            <span className={cx("admin-card-label")}>跟进节点</span>
-            <p className={cx("admin-member-bio")}>提交时间：{formatDate(joinRequest.createdAt)}</p>
-            <p className={cx("admin-member-bio")}>最近联系：{formatDate(joinRequest.contactedAt)}</p>
-            <p className={cx("admin-member-bio")}>通过时间：{formatDate(joinRequest.approvedAt)}</p>
-            <p className={cx("admin-member-bio")}>
-              正式成员：
-              {joinRequest.convertedMemberDisplayName ?? "暂未关联"}
-            </p>
-          </div>
-        </div>
-
-        <section className={cx("admin-note-panel")}>
-          <span className={cx("admin-card-label")}>转化进度</span>
-          <div className={cx("admin-progress-grid")}>
-            {pipelineItems.map(([label, value]) => (
-              <article
-                key={label}
-                className={cx(
-                  "admin-progress-item",
-                  value && "admin-progress-item-complete",
-                )}
-              >
-                <strong>{label}</strong>
-                <p>{value ? formatDate(value) : "尚未记录"}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <div className={cx("pill-row")}>
-          <span className={cx("pill member-signal-pill")}>
-            {joinRequest.willingToAttend ? "愿意线下参加" : "暂不线下参加"}
-          </span>
-          <span className={cx("pill member-signal-pill")}>
-            {joinRequest.willingToShare ? "愿意分享" : "暂不分享"}
-          </span>
-          <span className={cx("pill member-signal-pill member-signal-pill-warm")}>
-            {joinRequest.willingToJoinProjects ? "愿意共建" : "暂不共建"}
-          </span>
-        </div>
-
-        {joinRequest.skills.length > 0 ? (
-          <div className={cx("member-skill-list")}>
-            {joinRequest.skills.map((skill) => (
-              <AdminStatusBadge key={`${joinRequest.id}-skill-${skill}`} tone="neutral">
-                {skill}
-              </AdminStatusBadge>
-            ))}
-          </div>
-        ) : null}
-
-        {joinRequest.interests.length > 0 ? (
-          <div className={cx("member-skill-list")}>
-            {joinRequest.interests.map((interest) => (
-              <AdminStatusBadge key={`${joinRequest.id}-interest-${interest}`} tone="neutral">
-                {interest}
-              </AdminStatusBadge>
-            ))}
-          </div>
-        ) : null}
-
-        <div className={cx("admin-join-request-notes")}>
-          <div className={cx("admin-note-panel")}>
-            <span className={cx("admin-card-label")}>申请者补充</span>
-            <p className={cx("admin-member-bio")}>
-              {joinRequest.note ?? "这位申请者暂未补充额外说明。"}
-            </p>
-          </div>
-
-          <div className={cx("admin-note-panel")}>
-            <span className={cx("admin-card-label")}>当前跟进备注</span>
-            <p className={cx("admin-member-bio")}>
-              {joinRequest.adminNote ?? "暂时还没有记录跟进备注。"}
-            </p>
-          </div>
-        </div>
-
-        <form action={updateAdminJoinRequest} className={cx("admin-inline-form")}>
+      <AdminAntdCard eyebrow="Review" title="申请状态与备注">
+        <form action={updateAdminJoinRequest} className="grid gap-4">
           <input type="hidden" name="request_id" value={joinRequest.id} />
           <input type="hidden" name="redirect_to" value={currentPath} />
 
-          <div className={cx("form-grid admin-join-request-settings-grid")}>
-            <label className={cx("form-field")}>
-              <span>申请状态</span>
-              <NativeSelect className={cx("input")} name="status" defaultValue={joinRequest.status}>
+          <div className="grid gap-4 md:grid-cols-[240px_minmax(0,1fr)]">
+            <AdminField label="申请状态">
+              <NativeSelect name="status" defaultValue={joinRequest.status}>
                 <option value="new">新申请</option>
                 <option value="contacted">已联系</option>
                 <option value="approved">已通过</option>
                 <option value="archived">已归档</option>
               </NativeSelect>
-            </label>
+            </AdminField>
 
-            <label className={cx("form-field admin-join-request-note-field")}>
-              <span>跟进备注</span>
+            <AdminField label="跟进备注">
               <TextArea
                 name="admin_note"
                 rows={4}
                 defaultValue={joinRequest.adminNote ?? ""}
                 placeholder="例如：已加微信、适合哪类活动、是否适合项目协作"
               />
-            </label>
+            </AdminField>
           </div>
 
-          <div className={cx("cta-row")}>
-            <Button htmlType="submit">
-              保存申请状态
-            </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button htmlType="submit">保存申请状态</Button>
           </div>
         </form>
+      </AdminAntdCard>
 
-        <form action={updateAdminJoinRequestPipeline} className={cx("admin-inline-form")}>
+      <AdminAntdCard eyebrow="Pipeline" title="转化节点">
+        <form action={updateAdminJoinRequestPipeline} className="grid gap-4">
           <input type="hidden" name="request_id" value={joinRequest.id} />
           <input type="hidden" name="redirect_to" value={currentPath} />
 
-          <div className={cx("section-heading")}>
-            <p className={cx("eyebrow")}>Pipeline</p>
-            <h2>转化节点</h2>
+          <div className="grid gap-3 md:grid-cols-2">
+            <AdminCheckboxRow
+              name="mark_invited_to_register"
+              defaultChecked={Boolean(joinRequest.invitedToRegisterAt)}
+            >
+              <span>已邀请对方注册网站</span>
+            </AdminCheckboxRow>
+
+            <AdminCheckboxRow
+              name="mark_joined_group"
+              defaultChecked={Boolean(joinRequest.joinedGroupAt)}
+            >
+              <span>已加入微信社群或核心运营群</span>
+            </AdminCheckboxRow>
+
+            <AdminCheckboxRow
+              name="mark_first_attended_event"
+              defaultChecked={Boolean(joinRequest.firstAttendedEventAt)}
+            >
+              <span>已参加第一场线下活动</span>
+            </AdminCheckboxRow>
+
+            <AdminCheckboxRow
+              name="mark_converted_to_member"
+              defaultChecked={Boolean(joinRequest.convertedToMemberAt)}
+            >
+              <span>已转为正式成员</span>
+            </AdminCheckboxRow>
           </div>
 
-          <div className={cx("checkbox-list")}>
-            <div className={cx("checkbox-row")}>
-              <Checkbox
-                name="mark_invited_to_register"
-                defaultChecked={Boolean(joinRequest.invitedToRegisterAt)}
-              >
-                已邀请对方注册网站
-              </Checkbox>
-            </div>
+          <AdminField label="关联正式成员">
+            <NativeSelect
+              name="converted_member_id"
+              defaultValue={joinRequest.convertedMemberId ?? ""}
+            >
+              <option value="">暂不关联</option>
+              {memberOptions.map((member) => (
+                <option key={member.id} value={member.id}>
+                  {member.displayName}
+                  {member.email ? ` · ${member.email}` : ""}
+                </option>
+              ))}
+            </NativeSelect>
+          </AdminField>
 
-            <div className={cx("checkbox-row")}>
-              <Checkbox
-                name="mark_joined_group"
-                defaultChecked={Boolean(joinRequest.joinedGroupAt)}
-              >
-                已加入微信社群或核心运营群
-              </Checkbox>
-            </div>
-
-            <div className={cx("checkbox-row")}>
-              <Checkbox
-                name="mark_first_attended_event"
-                defaultChecked={Boolean(joinRequest.firstAttendedEventAt)}
-              >
-                已参加第一场线下活动
-              </Checkbox>
-            </div>
-
-            <div className={cx("checkbox-row")}>
-              <Checkbox
-                name="mark_converted_to_member"
-                defaultChecked={Boolean(joinRequest.convertedToMemberAt)}
-              >
-                已转为正式成员
-              </Checkbox>
-            </div>
-          </div>
-
-          <div className={cx("form-grid admin-join-request-settings-grid")}>
-            <label className={cx("form-field")}>
-              <span>关联正式成员</span>
-              <NativeSelect
-                className={cx("input")}
-                name="converted_member_id"
-                defaultValue={joinRequest.convertedMemberId ?? ""}
-              >
-                <option value="">暂不关联</option>
-                {memberOptions.map((member) => (
-                  <option key={member.id} value={member.id}>
-                    {member.displayName}
-                    {member.email ? ` · ${member.email}` : ""}
-                  </option>
-                ))}
-              </NativeSelect>
-            </label>
-          </div>
-
-          <div className={cx("cta-row")}>
+          <div className="flex flex-wrap gap-2">
             <Button htmlType="submit" type="primary">
               保存转化节点
             </Button>
           </div>
         </form>
-      </section>
+      </AdminAntdCard>
     </div>
   );
 }

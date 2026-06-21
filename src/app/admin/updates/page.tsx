@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Button, Input } from "antd";
+import { Button, Collapse, Input } from "antd";
 import TextArea from "antd/es/input/TextArea";
 
 import {
@@ -304,14 +304,21 @@ export default async function AdminUpdatesPage({
                   </div>
                 </div>
 
-                <details className="border-t border-border/70">
-                  <summary className="cursor-pointer px-3 py-2 text-sm font-medium text-muted-foreground">
-                    展开编辑表单
-                  </summary>
-                  <div className="p-3 pt-1">
-                    <UpdateForm update={update} authorOptions={authorOptions} />
-                  </div>
-                </details>
+                <Collapse
+                  className="border-t border-border/70"
+                  ghost
+                  items={[
+                    {
+                      key: "edit",
+                      label: "展开编辑表单",
+                      children: (
+                        <div className="pt-1">
+                          <UpdateForm update={update} authorOptions={authorOptions} />
+                        </div>
+                      ),
+                    },
+                  ]}
+                />
               </article>
             ))
           ) : (
