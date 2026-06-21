@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTransition } from "react";
-import { Button, Input } from "antd";
-import { toast } from "sonner";
+import { App as AntApp, Button, Input } from "antd";
 
 import {
   AdminField,
@@ -17,7 +16,6 @@ import {
   type AdminTone,
 } from "@/components/admin-antd";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { ToneBadge } from "@/components/tone-badge";
 import { NativeSelect } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
@@ -86,6 +84,7 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
     `/api/admin/leads/${leadId}`,
   );
   const [isPending, startTransition] = useTransition();
+  const { message } = AntApp.useApp();
   const lead = data?.lead;
   const staffOptions = data?.staffOptions ?? [];
   const memberOptions = data?.memberOptions ?? [];
@@ -111,10 +110,10 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
           }),
         });
         const result = await readApiResult(response);
-        toast.success(getAdminSavedMessage(result?.saved ?? "lead_detail") ?? "后台内容已更新。");
+        message.success(getAdminSavedMessage(result?.saved ?? "lead_detail") ?? "后台内容已更新。");
         reload();
       } catch (requestError) {
-        toast.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
+        message.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
       }
     });
   }
@@ -134,10 +133,10 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
           }),
         });
         const result = await readApiResult(response);
-        toast.success(getAdminSavedMessage(result?.saved ?? "lead_match") ?? "后台内容已更新。");
+        message.success(getAdminSavedMessage(result?.saved ?? "lead_match") ?? "后台内容已更新。");
         reload();
       } catch (requestError) {
-        toast.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
+        message.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
       }
     });
   }
@@ -157,10 +156,10 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
           }),
         });
         const result = await readApiResult(response);
-        toast.success(getAdminSavedMessage(result?.saved ?? "lead_match") ?? "后台内容已更新。");
+        message.success(getAdminSavedMessage(result?.saved ?? "lead_match") ?? "后台内容已更新。");
         reload();
       } catch (requestError) {
-        toast.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
+        message.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
       }
     });
   }
@@ -176,12 +175,12 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
           method: "DELETE",
         });
         const result = await readApiResult(response);
-        toast.success(
+        message.success(
           getAdminSavedMessage(result?.saved ?? "lead_match_deleted") ?? "后台内容已更新。",
         );
         reload();
       } catch (requestError) {
-        toast.error(requestError instanceof Error ? requestError.message : "删除失败，请稍后再试。");
+        message.error(requestError instanceof Error ? requestError.message : "删除失败，请稍后再试。");
       }
     });
   }
@@ -410,7 +409,9 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                       {match.memberSkills.length > 0 ? (
                         <div className="mt-3 flex flex-wrap gap-2">
                           {match.memberSkills.map((skill) => (
-                            <ToneBadge key={`${match.id}-${skill}`} label={skill} />
+                            <AdminStatusBadge key={`${match.id}-${skill}`} tone="neutral">
+                              {skill}
+                            </AdminStatusBadge>
                           ))}
                         </div>
                       ) : null}

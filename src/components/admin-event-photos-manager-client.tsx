@@ -1,8 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { Button, Input } from "antd";
-import { toast } from "sonner";
+import { App as AntApp, Button, Input } from "antd";
 
 import {
   AdminField,
@@ -51,6 +50,7 @@ export function AdminEventPhotosManagerClient({
   onChanged?: () => void;
 }) {
   const [isPending, startTransition] = useTransition();
+  const { message } = AntApp.useApp();
 
   function submitCreate(formData: FormData) {
     startTransition(async () => {
@@ -67,10 +67,10 @@ export function AdminEventPhotosManagerClient({
           }),
         });
         const result = await readApiResult(response);
-        toast.success(getAdminSavedMessage(result?.saved ?? "photo") ?? "后台内容已更新。");
+        message.success(getAdminSavedMessage(result?.saved ?? "photo") ?? "后台内容已更新。");
         onChanged?.();
       } catch (submitError) {
-        toast.error(submitError instanceof Error ? submitError.message : "保存失败，请稍后再试。");
+        message.error(submitError instanceof Error ? submitError.message : "保存失败，请稍后再试。");
       }
     });
   }
@@ -90,10 +90,10 @@ export function AdminEventPhotosManagerClient({
           }),
         });
         const result = await readApiResult(response);
-        toast.success(getAdminSavedMessage(result?.saved ?? "photo") ?? "后台内容已更新。");
+        message.success(getAdminSavedMessage(result?.saved ?? "photo") ?? "后台内容已更新。");
         onChanged?.();
       } catch (submitError) {
-        toast.error(submitError instanceof Error ? submitError.message : "保存失败，请稍后再试。");
+        message.error(submitError instanceof Error ? submitError.message : "保存失败，请稍后再试。");
       }
     });
   }
@@ -109,12 +109,12 @@ export function AdminEventPhotosManagerClient({
           method: "DELETE",
         });
         const result = await readApiResult(response);
-        toast.success(
+        message.success(
           getAdminSavedMessage(result?.saved ?? "photo_deleted") ?? "后台内容已更新。",
         );
         onChanged?.();
       } catch (submitError) {
-        toast.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
+        message.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
       }
     });
   }
@@ -132,10 +132,10 @@ export function AdminEventPhotosManagerClient({
           }),
         });
         const result = await readApiResult(response);
-        toast.success(getAdminSavedMessage(result?.saved ?? "cover") ?? "后台内容已更新。");
+        message.success(getAdminSavedMessage(result?.saved ?? "cover") ?? "后台内容已更新。");
         onChanged?.();
       } catch (submitError) {
-        toast.error(submitError instanceof Error ? submitError.message : "更新失败，请稍后再试。");
+        message.error(submitError instanceof Error ? submitError.message : "更新失败，请稍后再试。");
       }
     });
   }

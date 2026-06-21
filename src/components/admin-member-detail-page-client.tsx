@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useTransition } from "react";
-import { Button, Input } from "antd";
-import { toast } from "sonner";
+import { App as AntApp, Button, Input } from "antd";
 
 import {
   AdminCheckboxRow,
@@ -19,7 +18,6 @@ import {
 } from "@/components/admin-antd";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { MemberAvatar } from "@/components/member-avatar";
-import { ToneBadge } from "@/components/tone-badge";
 import { NativeSelect } from "@/components/admin-antd";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
@@ -71,6 +69,7 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
     `/api/admin/members/${memberId}`,
   );
   const [isPending, startTransition] = useTransition();
+  const { message } = AntApp.useApp();
   const member = data?.member;
   const querySaved = searchParams.get("saved") ?? undefined;
   const queryError = searchParams.get("error") ?? undefined;
@@ -105,10 +104,10 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
           }),
         });
         const result = await readApiResult(response);
-        toast.success(getAdminSavedMessage(result?.saved ?? "member_profile") ?? "后台内容已更新。");
+        message.success(getAdminSavedMessage(result?.saved ?? "member_profile") ?? "后台内容已更新。");
         reload();
       } catch (requestError) {
-        toast.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
+        message.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
       }
     });
   }
@@ -127,10 +126,10 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
           }),
         });
         const result = await readApiResult(response);
-        toast.success(getAdminSavedMessage(result?.saved ?? "member_roles") ?? "后台角色已更新。");
+        message.success(getAdminSavedMessage(result?.saved ?? "member_roles") ?? "后台角色已更新。");
         reload();
       } catch (requestError) {
-        toast.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
+        message.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
       }
     });
   }
@@ -313,7 +312,9 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
               {member.skills.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {member.skills.map((skill) => (
-                    <ToneBadge key={`${member.id}-${skill}`} label={skill} />
+                    <AdminStatusBadge key={`${member.id}-${skill}`} tone="neutral">
+                      {skill}
+                    </AdminStatusBadge>
                   ))}
                 </div>
               ) : (
@@ -327,7 +328,9 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {member.interests.map((interest) => (
-                      <ToneBadge key={`${member.id}-${interest}`} label={interest} />
+                      <AdminStatusBadge key={`${member.id}-${interest}`} tone="neutral">
+                        {interest}
+                      </AdminStatusBadge>
                     ))}
                   </div>
                 </div>

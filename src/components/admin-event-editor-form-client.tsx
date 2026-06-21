@@ -2,8 +2,7 @@
 
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Button, Input } from "antd";
-import { toast } from "sonner";
+import { App as AntApp, Button, Input } from "antd";
 
 import {
   AdminField,
@@ -106,6 +105,7 @@ export function AdminEventEditorFormClient({
 }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  const { message } = AntApp.useApp();
   const isEditing = Boolean(event);
 
   function handleSubmit(formData: FormData) {
@@ -125,7 +125,7 @@ export function AdminEventEditorFormClient({
 
         if (!isEditing && result?.eventId) {
           if (onCreated) {
-            toast.success(getAdminSavedMessage(result?.saved ?? "event") ?? "后台内容已更新。");
+            message.success(getAdminSavedMessage(result?.saved ?? "event") ?? "后台内容已更新。");
             onCreated(result.eventId);
           } else {
             router.push(`/admin/events/${result.eventId}`);
@@ -133,10 +133,10 @@ export function AdminEventEditorFormClient({
           return;
         }
 
-        toast.success(getAdminSavedMessage(result?.saved ?? "event") ?? "后台内容已更新。");
+        message.success(getAdminSavedMessage(result?.saved ?? "event") ?? "后台内容已更新。");
         onSaved?.();
       } catch (submitError) {
-        toast.error(submitError instanceof Error ? submitError.message : "提交失败，请稍后再试。");
+        message.error(submitError instanceof Error ? submitError.message : "提交失败，请稍后再试。");
       }
     });
   }
@@ -153,14 +153,14 @@ export function AdminEventEditorFormClient({
         });
         const result = await readApiResult(response);
         if (onDeleted) {
-          toast.success(getAdminSavedMessage(result?.saved ?? "deleted") ?? "后台内容已更新。");
+          message.success(getAdminSavedMessage(result?.saved ?? "deleted") ?? "后台内容已更新。");
           onDeleted();
           return;
         }
 
         router.push(`/admin/events?saved=${result?.saved ?? "deleted"}`);
       } catch (submitError) {
-        toast.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
+        message.error(submitError instanceof Error ? submitError.message : "删除失败，请稍后再试。");
       }
     });
   }

@@ -7,8 +7,8 @@ import {
   updateAdminJoinRequest,
   updateAdminJoinRequestPipeline,
 } from "@/app/admin/actions";
+import { AdminStatusBadge } from "@/components/admin-antd";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { ToneBadge } from "@/components/tone-badge";
 import { NativeSelect } from "@/components/admin-antd";
 import {
   formatAdminJoinRequestStatus,
@@ -211,7 +211,9 @@ export default async function AdminJoinRequestDetailPage({
         {joinRequest.skills.length > 0 ? (
           <div className={cx("member-skill-list")}>
             {joinRequest.skills.map((skill) => (
-              <ToneBadge key={`${joinRequest.id}-skill-${skill}`} label={skill} />
+              <AdminStatusBadge key={`${joinRequest.id}-skill-${skill}`} tone="neutral">
+                {skill}
+              </AdminStatusBadge>
             ))}
           </div>
         ) : null}
@@ -219,7 +221,9 @@ export default async function AdminJoinRequestDetailPage({
         {joinRequest.interests.length > 0 ? (
           <div className={cx("member-skill-list")}>
             {joinRequest.interests.map((interest) => (
-              <ToneBadge key={`${joinRequest.id}-interest-${interest}`} label={interest} />
+              <AdminStatusBadge key={`${joinRequest.id}-interest-${interest}`} tone="neutral">
+                {interest}
+              </AdminStatusBadge>
             ))}
           </div>
         ) : null}

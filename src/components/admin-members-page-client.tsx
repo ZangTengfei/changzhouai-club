@@ -6,6 +6,7 @@ import { useRef, useState } from "react";
 import { EyeOutlined, LoadingOutlined, SearchOutlined } from "@ant-design/icons";
 import {
   Alert,
+  App as AntApp,
   Button,
   Card,
   Input,
@@ -15,7 +16,6 @@ import {
   Typography,
   type TableColumnsType,
 } from "antd";
-import { toast } from "sonner";
 
 import { AdminStatusTag } from "@/components/admin-antd";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
@@ -125,6 +125,7 @@ export function AdminMembersPageClient() {
   const publishingMemberIdsRef = useRef(new Set<string>());
   const [publishingMemberIds, setPublishingMemberIds] = useState<Set<string>>(() => new Set());
   const [publishedMemberIds, setPublishedMemberIds] = useState<Set<string>>(() => new Set());
+  const { message } = AntApp.useApp();
 
   const statusFilter = searchParams.get("status") ?? "all";
   const visibilityFilter = searchParams.get("visibility") ?? "all";
@@ -221,13 +222,13 @@ export function AdminMembersPageClient() {
       const result = await readApiResult(response);
 
       setPublishedMemberIds((current) => new Set(current).add(memberId));
-      toast.success(
+      message.success(
         getAdminSavedMessage(result?.saved ?? "member_public_visibility") ??
           `${displayName} 已公开展示。`,
       );
       reload();
     } catch (requestError) {
-      toast.error(requestError instanceof Error ? requestError.message : "公开失败，请稍后再试。");
+      message.error(requestError instanceof Error ? requestError.message : "公开失败，请稍后再试。");
     } finally {
       setMemberPublishing(memberId, false);
     }

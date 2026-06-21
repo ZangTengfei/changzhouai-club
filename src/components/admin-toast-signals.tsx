@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { toast } from "sonner";
+import { App as AntApp } from "antd";
 
 export function AdminToastSignals({
   success,
@@ -10,17 +10,19 @@ export function AdminToastSignals({
   success?: string | null;
   error?: string | null;
 }) {
+  const { message } = AntApp.useApp();
+
   useEffect(() => {
     if (success) {
-      toast.success(success);
+      message.success(success);
     }
-  }, [success]);
+  }, [message, success]);
 
   useEffect(() => {
     if (error) {
-      toast.error(error);
+      message.error(error);
     }
-  }, [error]);
+  }, [error, message]);
 
   return null;
 }
