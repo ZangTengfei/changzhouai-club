@@ -10,6 +10,7 @@ import {
   AdminPanel,
   AdminPanelBody,
   AdminPanelHeader,
+  AdminRecordCard,
   AdminStatusBadge,
 } from "@/components/admin-antd";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
@@ -146,15 +147,17 @@ export function AdminEventPhotosManagerClient({
         <AdminPanelHeader eyebrow="Gallery" title={`${eventTitle} 的照片管理`} />
         <AdminPanelBody className="space-y-4">
           <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_360px]">
-            <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/30 p-4">
+            <AdminRecordCard>
+              <div className="bg-muted/30 p-4">
               <h3 className="text-sm font-semibold text-foreground">当前封面</h3>
               <p className="mt-1 text-sm text-muted-foreground">
                 封面图会优先用于活动列表展示。也可以直接把某张活动照片设成封面，减少重复维护。
               </p>
-            </div>
+              </div>
+            </AdminRecordCard>
 
             {coverImageUrl ? (
-              <div className="overflow-hidden rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background">
+              <AdminRecordCard>
                 <img
                   src={coverImageUrl}
                   alt={`${eventTitle} 封面`}
@@ -164,7 +167,7 @@ export function AdminEventPhotosManagerClient({
                 <p className="border-t border-border/70 px-3 py-2 text-xs text-muted-foreground">
                   {coverImageUrl}
                 </p>
-              </div>
+              </AdminRecordCard>
             ) : (
               <AdminNotice>暂未设置封面图。</AdminNotice>
             )}
@@ -176,10 +179,8 @@ export function AdminEventPhotosManagerClient({
                 const isCover = coverImageUrl === photo.image_url;
 
                 return (
-                  <div
-                    key={photo.id}
-                    className="grid gap-4 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4 lg:grid-cols-[320px_minmax(0,1fr)]"
-                  >
+                  <AdminRecordCard key={photo.id}>
+                    <div className="grid gap-4 p-4 lg:grid-cols-[320px_minmax(0,1fr)]">
                     <div className="overflow-hidden rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/30">
                       <img
                         src={photo.image_url}
@@ -262,7 +263,8 @@ export function AdminEventPhotosManagerClient({
                         </div>
                       </form>
                     </div>
-                  </div>
+                    </div>
+                  </AdminRecordCard>
                 );
               })}
             </div>

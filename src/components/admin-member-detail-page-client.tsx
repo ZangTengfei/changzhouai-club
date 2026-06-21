@@ -13,6 +13,7 @@ import {
   AdminPanel,
   AdminPanelBody,
   AdminPanelHeader,
+  AdminRecordCard,
   AdminStatusBadge,
   type AdminTone,
 } from "@/components/admin-antd";
@@ -240,7 +241,8 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
             <AdminPanelHeader eyebrow="Profile" title="成员概览" />
             <AdminPanelBody className="space-y-4">
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-                <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/20 p-4">
+                <AdminRecordCard>
+                  <div className="bg-muted/20 p-4">
                   <div className="flex items-start gap-3">
                     <MemberAvatar name={member.displayName} avatarUrl={member.avatarUrl} size="sm" />
                     <div className="grid gap-1">
@@ -257,10 +259,12 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                       <p className="text-sm text-muted-foreground">{member.city}</p>
                     </div>
                   </div>
-                </div>
+                  </div>
+                </AdminRecordCard>
 
                 <div className="grid gap-3">
-                  <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                  <AdminRecordCard>
+                    <div className="p-4">
                     <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                       参与概况
                     </p>
@@ -270,9 +274,11 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                       <p>活动报名：{member.registrationCount} 次</p>
                       <p>每月可投入时间：{member.monthlyTime ?? "未填写"}</p>
                     </div>
-                  </div>
+                    </div>
+                  </AdminRecordCard>
 
-                  <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                  <AdminRecordCard>
+                    <div className="p-4">
                     <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                       参与意愿
                     </p>
@@ -296,18 +302,21 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                         {member.isFeaturedOnHome ? "首页展示中" : "未在首页展示"}
                       </AdminStatusBadge>
                     </div>
-                  </div>
+                    </div>
+                  </AdminRecordCard>
                 </div>
               </div>
 
-              <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+              <AdminRecordCard>
+                <div className="p-4">
                 <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                   个人介绍
                 </p>
                 <p className="mt-3 text-sm text-muted-foreground">
                   {member.bio ?? "这位成员还没有补充个人介绍。"}
                 </p>
-              </div>
+                </div>
+              </AdminRecordCard>
 
               {member.skills.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
@@ -322,7 +331,8 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
               )}
 
               {member.interests.length > 0 ? (
-                <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                <AdminRecordCard>
+                  <div className="p-4">
                   <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                     感兴趣的主题
                   </p>
@@ -333,7 +343,8 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                       </AdminStatusBadge>
                     ))}
                   </div>
-                </div>
+                  </div>
+                </AdminRecordCard>
               ) : null}
             </AdminPanelBody>
           </AdminPanel>

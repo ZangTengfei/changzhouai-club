@@ -13,6 +13,7 @@ import {
   AdminAntdPageHeader,
   AdminCheckboxRow,
   AdminField,
+  AdminRecordCard,
   AdminStatusBadge,
   type AdminTone,
 } from "@/components/admin-antd";
@@ -156,7 +157,8 @@ export default async function AdminJoinRequestDetailPage({
           </div>
 
           <div className="grid gap-3 md:grid-cols-2">
-            <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/20 p-4">
+            <AdminRecordCard>
+              <div className="bg-muted/20 p-4">
               <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 联系信息
               </p>
@@ -165,9 +167,11 @@ export default async function AdminJoinRequestDetailPage({
                 <p>所在城市：{joinRequest.city}</p>
                 <p>可投入时间：{joinRequest.monthlyTime ?? "未填写"}</p>
               </div>
-            </div>
+              </div>
+            </AdminRecordCard>
 
-            <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/20 p-4">
+            <AdminRecordCard>
+              <div className="bg-muted/20 p-4">
               <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 跟进节点
               </p>
@@ -177,10 +181,12 @@ export default async function AdminJoinRequestDetailPage({
                 <p>通过时间：{formatDate(joinRequest.approvedAt)}</p>
                 <p>正式成员：{joinRequest.convertedMemberDisplayName ?? "暂未关联"}</p>
               </div>
-            </div>
+              </div>
+            </AdminRecordCard>
           </div>
 
-          <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+          <AdminRecordCard>
+            <div className="p-4">
             <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
               转化进度
             </p>
@@ -197,7 +203,8 @@ export default async function AdminJoinRequestDetailPage({
                 </div>
               ))}
             </div>
-          </div>
+            </div>
+          </AdminRecordCard>
 
           {joinRequest.skills.length > 0 ? (
             <div className="flex flex-wrap gap-2">
@@ -220,23 +227,27 @@ export default async function AdminJoinRequestDetailPage({
           ) : null}
 
           <div className="grid gap-3 md:grid-cols-2">
-            <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+            <AdminRecordCard>
+              <div className="p-4">
               <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 申请者补充
               </p>
               <p className="mt-3 text-sm leading-7 text-muted-foreground">
                 {joinRequest.note ?? "这位申请者暂未补充额外说明。"}
               </p>
-            </div>
+              </div>
+            </AdminRecordCard>
 
-            <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+            <AdminRecordCard>
+              <div className="p-4">
               <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                 当前跟进备注
               </p>
               <p className="mt-3 text-sm leading-7 text-muted-foreground">
                 {joinRequest.adminNote ?? "暂时还没有记录跟进备注。"}
               </p>
-            </div>
+              </div>
+            </AdminRecordCard>
           </div>
         </div>
       </AdminAntdCard>

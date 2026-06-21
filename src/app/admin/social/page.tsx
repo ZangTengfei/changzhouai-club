@@ -10,6 +10,7 @@ import {
   AdminAntdAlert,
   AdminAntdCard,
   AdminAntdPageHeader,
+  AdminRecordCard,
   AdminStatusTag,
 } from "@/components/admin-antd";
 import {
@@ -213,10 +214,7 @@ export default async function AdminSocialPage({
               );
 
               return (
-                <article
-                  key={qrCode.id}
-                  className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background"
-                >
+                <AdminRecordCard key={qrCode.id}>
                   <div className="grid gap-3 p-3 lg:grid-cols-[72px_minmax(0,1fr)_auto] lg:items-center">
                     <div className="relative size-[72px] overflow-hidden rounded-lg border border-border/70 bg-muted/30">
                       <img
@@ -320,7 +318,7 @@ export default async function AdminSocialPage({
                       },
                     ]}
                   />
-                </article>
+                </AdminRecordCard>
               );
             })
           ) : (

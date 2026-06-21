@@ -15,6 +15,7 @@ import {
   AdminAntdAlert,
   AdminAntdCard,
   AdminAntdPageHeader,
+  AdminRecordCard,
   AdminStatusTag,
 } from "@/components/admin-antd";
 import { AdminModal } from "@/components/admin-modal";
@@ -235,10 +236,7 @@ export default async function AdminUpdatesPage({
         <div className="space-y-2">
           {updates.length > 0 ? (
             updates.map((update) => (
-              <article
-                key={update.id}
-                className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background"
-              >
+              <AdminRecordCard key={update.id}>
                 <div className="grid gap-3 p-3 lg:grid-cols-[96px_minmax(0,1fr)_auto] lg:items-center">
                   <div className="relative size-24 overflow-hidden rounded-lg border border-border/70 bg-muted/30">
                     {update.images[0]?.image_url ? (
@@ -319,7 +317,7 @@ export default async function AdminUpdatesPage({
                     },
                   ]}
                 />
-              </article>
+              </AdminRecordCard>
             ))
           ) : (
             <AdminAntdAlert message="还没有社区动态。成员提交后会在这里审核。" type="info" />

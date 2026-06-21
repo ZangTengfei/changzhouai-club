@@ -17,6 +17,7 @@ import {
   AdminAntdAlert,
   AdminAntdCard,
   AdminAntdPageHeader,
+  AdminRecordCard,
   AdminStatusTag,
 } from "@/components/admin-antd";
 import { AdminModal } from "@/components/admin-modal";
@@ -386,10 +387,7 @@ export default async function AdminWorksPage({
         <div className="space-y-2">
           {externalCards.length > 0 ? (
             externalCards.map((card) => (
-              <article
-                key={card.id}
-                className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background"
-              >
+              <AdminRecordCard key={card.id}>
                 <div className="grid gap-3 p-3 lg:grid-cols-[88px_minmax(0,1fr)_auto] lg:items-center">
                   <div className="relative size-[88px] overflow-hidden rounded-lg border border-border/70 bg-muted/30">
                     {card.cover_image_url ? (
@@ -457,7 +455,7 @@ export default async function AdminWorksPage({
                     },
                   ]}
                 />
-              </article>
+              </AdminRecordCard>
             ))
           ) : (
             <AdminAntdAlert message="还没有外部展示卡片。添加后可展示到案例库。" type="info" />
@@ -469,10 +467,7 @@ export default async function AdminWorksPage({
         <div className="space-y-2">
           {works.length > 0 ? (
             works.map((work) => (
-              <article
-                key={work.id}
-                className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background"
-              >
+              <AdminRecordCard key={work.id}>
                 <div className="grid gap-3 p-3 lg:grid-cols-[88px_minmax(0,1fr)_auto] lg:items-center">
                   <div className="relative size-[88px] overflow-hidden rounded-lg border border-border/70 bg-muted/30">
                     {work.cover_image_url ? (
@@ -542,7 +537,7 @@ export default async function AdminWorksPage({
                     },
                   ]}
                 />
-              </article>
+              </AdminRecordCard>
             ))
           ) : (
             <AdminAntdAlert message="还没有成员作品。添加后可选择公开展示到案例库。" type="info" />

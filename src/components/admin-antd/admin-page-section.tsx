@@ -62,6 +62,27 @@ export function AdminAntdCard({
   );
 }
 
+export function AdminRecordCard({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <Card
+      size="small"
+      className="min-w-0"
+      styles={{
+        body: {
+          overflow: "hidden",
+          padding: 0,
+        },
+      }}
+    >
+      {children}
+    </Card>
+  );
+}
+
 export function AdminAntdAlert({
   message,
   type = "warning",

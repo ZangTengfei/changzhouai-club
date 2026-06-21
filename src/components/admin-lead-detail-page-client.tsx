@@ -12,6 +12,7 @@ import {
   AdminPanel,
   AdminPanelBody,
   AdminPanelHeader,
+  AdminRecordCard,
   AdminStatusBadge,
   type AdminTone,
 } from "@/components/admin-antd";
@@ -233,7 +234,8 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
             <AdminPanelHeader eyebrow="Overview" title="线索概览" />
             <AdminPanelBody className="space-y-4">
               <div className="grid gap-4 lg:grid-cols-2">
-                <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                <AdminRecordCard>
+                  <div className="p-4">
                   <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                     基础信息
                   </p>
@@ -242,9 +244,11 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                     <p>联系人：{lead.contactName ?? "未填写"}</p>
                     <p>需求类型：{lead.requirementType ?? "未填写"}</p>
                   </div>
-                </div>
+                  </div>
+                </AdminRecordCard>
 
-                <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                <AdminRecordCard>
+                  <div className="p-4">
                   <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                     联系与时间
                   </p>
@@ -253,18 +257,22 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                     <p>手机号：{lead.contactPhone ?? "未填写"}</p>
                     <p>期望时间：{lead.desiredTimeline ?? "待沟通"}</p>
                   </div>
-                </div>
+                  </div>
+                </AdminRecordCard>
               </div>
 
-              <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+              <AdminRecordCard>
+                <div className="p-4">
                 <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                   需求简介
                 </p>
                 <p className="mt-3 text-sm text-muted-foreground">{lead.requirementSummary}</p>
-              </div>
+                </div>
+              </AdminRecordCard>
 
               <div className="grid gap-4 lg:grid-cols-2">
-                <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                <AdminRecordCard>
+                  <div className="p-4">
                   <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                     预算与时间
                   </p>
@@ -273,9 +281,11 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                     <p>提交时间：{formatDate(lead.createdAt)}</p>
                     <p>最近更新：{formatDate(lead.updatedAt)}</p>
                   </div>
-                </div>
+                  </div>
+                </AdminRecordCard>
 
-                <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                <AdminRecordCard>
+                  <div className="p-4">
                   <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                     负责人与推进
                   </p>
@@ -290,7 +300,8 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                       {lead.nextActionAt ? ` · ${formatDate(lead.nextActionAt)}` : ""}
                     </p>
                   </div>
-                </div>
+                  </div>
+                </AdminRecordCard>
               </div>
             </AdminPanelBody>
           </AdminPanel>
@@ -377,10 +388,8 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
               {lead.matches.length > 0 ? (
                 <div className="grid gap-4">
                   {lead.matches.map((match) => (
-                    <div
-                      key={match.id}
-                      className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4"
-                    >
+                    <AdminRecordCard key={match.id}>
+                      <div className="p-4">
                       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                         <div className="grid gap-1">
                           <h3 className="text-base font-semibold text-foreground">
@@ -462,14 +471,16 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                           </Button>
                         </div>
                       </form>
-                    </div>
+                      </div>
+                    </AdminRecordCard>
                   ))}
                 </div>
               ) : (
                 <AdminNotice>这条线索暂未匹配候选成员，可先补充最合适的成员人选。</AdminNotice>
               )}
 
-              <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/20 p-4">
+              <AdminRecordCard>
+                <div className="bg-muted/20 p-4">
                 <div className="mb-4 space-y-1">
                   <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
                     New Match
@@ -515,9 +526,9 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                         name="note"
                         rows={4}
                         placeholder="例如：擅长做企业场景 AI 应用、适合参与需求澄清、已经在线下活动里交流过"
-                      />
-                    </AdminField>
-                  </div>
+                    />
+                  </AdminField>
+                </div>
 
                   <div className="flex flex-wrap gap-2">
                     <Button htmlType="submit" type="primary" disabled={isPending}>
@@ -526,6 +537,7 @@ export function AdminLeadDetailPageClient({ leadId }: { leadId: string }) {
                   </div>
                 </form>
               </div>
+              </AdminRecordCard>
             </AdminPanelBody>
           </AdminPanel>
         </>

@@ -10,6 +10,7 @@ import {
   AdminPanel,
   AdminPanelBody,
   AdminPanelHeader,
+  AdminRecordCard,
   AdminStatusBadge,
 } from "@/components/admin-antd";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
@@ -125,10 +126,8 @@ export function AdminSponsorImagesManagerClient({
           {images.length > 0 ? (
             <div className="grid gap-4">
               {images.map((image) => (
-                <div
-                  key={image.id}
-                  className="grid gap-4 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4 lg:grid-cols-[320px_minmax(0,1fr)]"
-                >
+                <AdminRecordCard key={image.id}>
+                  <div className="grid gap-4 p-4 lg:grid-cols-[320px_minmax(0,1fr)]">
                   <div className="overflow-hidden rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/30">
                     <img
                       src={image.image_url}
@@ -192,7 +191,8 @@ export function AdminSponsorImagesManagerClient({
                       </Button>
                     </div>
                   </form>
-                </div>
+                  </div>
+                </AdminRecordCard>
               ))}
             </div>
           ) : (

@@ -13,6 +13,7 @@ import {
   AdminAntdAlert,
   AdminAntdCard,
   AdminAntdPageHeader,
+  AdminRecordCard,
   AdminStatusTag,
 } from "@/components/admin-antd";
 import { AdminModal } from "@/components/admin-modal";
@@ -262,7 +263,8 @@ function ProjectApplicationCard({
   opportunity: AdminProjectOpportunity;
 }) {
   return (
-    <article className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+    <AdminRecordCard>
+      <div className="p-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="grid gap-1">
           <h3 className="text-base font-semibold text-foreground">
@@ -336,7 +338,8 @@ function ProjectApplicationCard({
           删除这条提交
         </Button>
       </form>
-    </article>
+      </div>
+    </AdminRecordCard>
   );
 }
 
@@ -377,10 +380,7 @@ export default async function AdminProjectsPage({
         <div className="space-y-3">
           {opportunities.length > 0 ? (
             opportunities.map((opportunity) => (
-              <article
-                key={opportunity.id}
-                className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background"
-              >
+              <AdminRecordCard key={opportunity.id}>
                 <div className="grid gap-3 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
                   <div className="min-w-0 space-y-2">
                     <div className="flex flex-wrap items-center gap-2">
@@ -419,12 +419,11 @@ export default async function AdminProjectsPage({
                     {[...opportunity.role_tags, ...opportunity.topic_tags].length > 0 ? (
                       <div className="flex flex-wrap gap-2">
                         {[...opportunity.role_tags, ...opportunity.topic_tags].map((tag) => (
-                          <span
-                            className="rounded-full border border-border/70 bg-muted/30 px-2 py-1 text-xs text-muted-foreground"
+                          <AdminStatusTag
                             key={`${opportunity.id}-${tag}`}
-                          >
-                            {tag}
-                          </span>
+                            status="draft"
+                            label={tag}
+                          />
                         ))}
                       </div>
                     ) : null}
@@ -489,7 +488,7 @@ export default async function AdminProjectsPage({
                     },
                   ]}
                 />
-              </article>
+              </AdminRecordCard>
             ))
           ) : (
             <AdminAntdAlert message="还没有共建机会。新增后可选择公开、成员可见或仅后台保存。" type="info" />
