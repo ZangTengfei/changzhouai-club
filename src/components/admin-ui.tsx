@@ -1,9 +1,10 @@
+"use client";
+
 import type { ReactNode } from "react";
 
 import Link from "next/link";
+import { Alert, Card as AntCard, Statistic, Tag } from "antd";
 
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, cssModuleCxWithGlobals } from "@/lib/utils";
 
 import styles from "./admin-ui.module.css";
@@ -28,25 +29,25 @@ export type AdminTone =
   | "waitlist"
   | "attended";
 
-const toneClassName: Record<AdminTone, string> = {
-  neutral: "border-stone-200 bg-stone-100 text-stone-700",
-  draft: "border-stone-200 bg-stone-100 text-stone-700",
-  scheduled: "border-teal-200 bg-teal-100 text-teal-700",
-  completed: "border-emerald-200 bg-emerald-100 text-emerald-700",
-  cancelled: "border-rose-200 bg-rose-100 text-rose-700",
-  new: "border-teal-200 bg-teal-100 text-teal-700",
-  contacted: "border-amber-200 bg-amber-100 text-amber-700",
-  qualified: "border-lime-200 bg-lime-100 text-lime-800",
-  won: "border-emerald-200 bg-emerald-100 text-emerald-700",
-  lost: "border-stone-200 bg-stone-200 text-stone-700",
-  pending: "border-amber-200 bg-amber-100 text-amber-700",
-  active: "border-emerald-200 bg-emerald-100 text-emerald-700",
-  organizer: "border-teal-200 bg-teal-100 text-teal-700",
-  admin: "border-amber-200 bg-amber-100 text-amber-800",
-  paused: "border-stone-200 bg-stone-200 text-stone-700",
-  registered: "border-teal-200 bg-teal-100 text-teal-700",
-  waitlist: "border-amber-200 bg-amber-100 text-amber-700",
-  attended: "border-emerald-200 bg-emerald-100 text-emerald-700",
+const toneColor: Record<AdminTone, string> = {
+  neutral: "default",
+  draft: "default",
+  scheduled: "green",
+  completed: "green",
+  cancelled: "red",
+  new: "cyan",
+  contacted: "blue",
+  qualified: "green",
+  won: "green",
+  lost: "default",
+  pending: "gold",
+  active: "green",
+  organizer: "cyan",
+  admin: "gold",
+  paused: "default",
+  registered: "cyan",
+  waitlist: "gold",
+  attended: "green",
 };
 
 const cx = cssModuleCxWithGlobals.bind(null, styles);
@@ -69,16 +70,17 @@ export function AdminPanel({
   children: ReactNode;
 }) {
   return (
-    <Card
+    <AntCard
       className={cn(
         cx(
-          "admin-panel border-border/70 bg-card/95 shadow-[0_10px_28px_rgba(15,23,42,0.05)] backdrop-blur",
+          "admin-panel min-w-0 bg-card/95 shadow-[0_10px_28px_rgba(15,23,42,0.05)] backdrop-blur",
         ),
         className,
       )}
+      variant="outlined"
     >
       {children}
-    </Card>
+    </AntCard>
   );
 }
 
@@ -94,7 +96,7 @@ export function AdminPanelHeader({
   className?: string;
 }) {
   return (
-    <CardHeader
+    <div
       className={cn(
         cx(
           "admin-panel-header flex flex-col gap-3 border-b border-border/70 px-4 py-4 sm:flex-row sm:items-start sm:justify-between",
@@ -108,12 +110,12 @@ export function AdminPanelHeader({
             {eyebrow}
           </p>
         ) : null}
-        <CardTitle className={cx("admin-panel-title text-lg text-foreground")}>
+        <div className={cx("admin-panel-title text-lg font-semibold text-foreground")}>
           {title}
-        </CardTitle>
+        </div>
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
-    </CardHeader>
+    </div>
   );
 }
 
@@ -125,11 +127,11 @@ export function AdminPanelBody({
   children: ReactNode;
 }) {
   return (
-    <CardContent
+    <div
       className={cn(cx("admin-panel-body px-4 pb-4 pt-4"), className)}
     >
       {children}
-    </CardContent>
+    </div>
   );
 }
 
@@ -151,10 +153,10 @@ export function AdminMetric({
         className,
       )}
     >
-      <div className="text-lg font-semibold leading-none text-foreground">{value}</div>
-      <div className="mt-1 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
-        {label}
-      </div>
+      <Statistic title={label} value={typeof value === "string" || typeof value === "number" ? value : undefined} />
+      {typeof value !== "string" && typeof value !== "number" ? (
+        <div className="text-lg font-semibold leading-none text-foreground">{value}</div>
+      ) : null}
     </div>
   );
 }
@@ -167,16 +169,7 @@ export function AdminNotice({
   children: ReactNode;
 }) {
   return (
-    <div
-      className={cn(
-        cx(
-          "admin-notice rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/50 px-3 py-2 text-sm text-muted-foreground",
-        ),
-        className,
-      )}
-    >
-      {children}
-    </div>
+    <Alert className={className} title={children} type="info" showIcon />
   );
 }
 
@@ -190,16 +183,9 @@ export function AdminStatusBadge({
   className?: string;
 }) {
   return (
-    <Badge
-      variant="outline"
-      className={cn(
-        "rounded-full border px-2.5 py-1 text-[11px] font-semibold tracking-wide",
-        toneClassName[tone],
-        className,
-      )}
-    >
+    <Tag color={toneColor[tone]} variant="filled" className={className}>
       {children}
-    </Badge>
+    </Tag>
   );
 }
 

@@ -7,19 +7,17 @@ import {
   saveAdminProjectOpportunity,
   updateAdminProjectApplication,
 } from "@/app/admin/actions";
+import {
+  AdminAntdAlert,
+  AdminAntdCard,
+  AdminAntdPageHeader,
+  AdminStatusTag,
+} from "@/components/admin-antd";
 import { AdminModal } from "@/components/admin-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import {
   AdminCheckboxRow,
   AdminField,
-  AdminMetric,
-  AdminNotice,
-  AdminPageStack,
-  AdminPanel,
-  AdminPanelBody,
-  AdminPanelHeader,
-  AdminStatusBadge,
-  type AdminTone,
 } from "@/components/admin-ui";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -76,47 +74,6 @@ function toDatetimeLocal(value: string | null) {
   const offsetMs = date.getTimezoneOffset() * 60 * 1000;
   const localDate = new Date(date.getTime() - offsetMs);
   return localDate.toISOString().slice(0, 16);
-}
-
-function getProjectStatusTone(status: string): AdminTone {
-  switch (status) {
-    case "draft":
-      return "draft";
-    case "recruiting":
-      return "scheduled";
-    case "matching":
-      return "registered";
-    case "in_progress":
-      return "completed";
-    case "filled":
-      return "qualified";
-    case "closed":
-    case "archived":
-      return "cancelled";
-    default:
-      return "neutral";
-  }
-}
-
-function getApplicationStatusTone(status: string): AdminTone {
-  switch (status) {
-    case "new":
-      return "waitlist";
-    case "reviewing":
-      return "pending";
-    case "contacted":
-      return "registered";
-    case "shortlisted":
-    case "introduced":
-      return "scheduled";
-    case "active":
-      return "completed";
-    case "not_fit":
-    case "withdrawn":
-      return "cancelled";
-    default:
-      return "neutral";
-  }
 }
 
 function ProjectOpportunityForm({
@@ -328,9 +285,7 @@ function ProjectApplicationCard({
           </p>
         </div>
 
-        <AdminStatusBadge tone={getApplicationStatusTone(application.status)}>
-          {projectApplicationStatusLabels[application.status]}
-        </AdminStatusBadge>
+        <AdminStatusTag status={application.status} label={projectApplicationStatusLabels[application.status]} />
       </div>
 
       <div className="mt-3 grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
@@ -399,37 +354,34 @@ export default async function AdminProjectsPage({
   const { opportunities, stats, queryErrors } = await loadAdminProjectsData();
 
   return (
-    <AdminPageStack>
+    <div className="grid gap-4">
       <AdminToastSignals
         success={getAdminSavedMessage(params.saved)}
         error={params.error ? getAdminErrorMessage(params.error) : null}
       />
 
-      <AdminPanel>
-        <AdminPanelHeader
-          eyebrow="Projects"
-          title="共建项目管理"
-          actions={
-            <>
-              <AdminMetric label="机会" value={stats.total} />
-              <AdminMetric label="招募中" value={stats.recruiting} />
-              <AdminMetric label="可见" value={stats.visible} />
-              <AdminMetric label="申请" value={stats.applications} />
-              <AdminModal title="新增共建机会" triggerLabel="新增机会">
-                <ProjectOpportunityForm />
-              </AdminModal>
-            </>
-          }
-        />
-      </AdminPanel>
+      <AdminAntdPageHeader
+        eyebrow="Projects"
+        title="共建项目管理"
+        stats={[
+          { label: "机会", value: stats.total },
+          { label: "招募中", value: stats.recruiting },
+          { label: "可见", value: stats.visible },
+          { label: "申请", value: stats.applications },
+        ]}
+        actions={
+          <AdminModal title="新增共建机会" triggerLabel="新增机会">
+            <ProjectOpportunityForm />
+          </AdminModal>
+        }
+      />
 
       {queryErrors.length > 0 ? (
-        <AdminNotice>后台数据读取出现问题：{queryErrors.join(" | ")}</AdminNotice>
+        <AdminAntdAlert message={`后台数据读取出现问题：${queryErrors.join(" | ")}`} />
       ) : null}
 
-      <AdminPanel>
-        <AdminPanelHeader eyebrow="List" title="机会列表" />
-        <AdminPanelBody className="space-y-3">
+      <AdminAntdCard eyebrow="List" title="机会列表">
+        <div className="space-y-3">
           {opportunities.length > 0 ? (
             opportunities.map((opportunity) => (
               <article
@@ -442,29 +394,29 @@ export default async function AdminProjectsPage({
                       <h2 className="text-base font-semibold text-foreground">
                         {opportunity.title}
                       </h2>
-                      <AdminStatusBadge tone={getProjectStatusTone(opportunity.status)}>
-                        {projectOpportunityStatusLabels[opportunity.status]}
-                      </AdminStatusBadge>
-                      <AdminStatusBadge tone="neutral">
-                        {projectOpportunityTypeLabels[opportunity.opportunity_type]}
-                      </AdminStatusBadge>
-                      <AdminStatusBadge
-                        tone={opportunity.visibility === "private" ? "draft" : "scheduled"}
-                      >
-                        {projectOpportunityVisibilityLabels[opportunity.visibility]}
-                      </AdminStatusBadge>
+                      <AdminStatusTag
+                        status={opportunity.status}
+                        label={projectOpportunityStatusLabels[opportunity.status]}
+                      />
+                      <AdminStatusTag
+                        status={opportunity.opportunity_type}
+                        label={projectOpportunityTypeLabels[opportunity.opportunity_type]}
+                      />
+                      <AdminStatusTag
+                        status={opportunity.visibility}
+                        label={projectOpportunityVisibilityLabels[opportunity.visibility]}
+                      />
                       {opportunity.is_featured ? (
-                        <AdminStatusBadge tone="registered">精选</AdminStatusBadge>
+                        <AdminStatusTag status="registered" label="精选" />
                       ) : null}
-                      <AdminStatusBadge
-                        tone={opportunity.application_requires_login ? "pending" : "neutral"}
-                      >
-                        {opportunity.external_application_url
+                      <AdminStatusTag
+                        status={opportunity.application_requires_login ? "pending" : "draft"}
+                        label={opportunity.external_application_url
                           ? "外部表单"
                           : opportunity.application_requires_login
                             ? "需登录申请"
                             : "匿名可申请"}
-                      </AdminStatusBadge>
+                      />
                     </div>
                     <p className="text-sm text-muted-foreground">{opportunity.summary}</p>
                     <p className="text-xs text-muted-foreground">
@@ -533,17 +485,17 @@ export default async function AdminProjectsPage({
                         />
                       ))
                     ) : (
-                      <AdminNotice>这个机会还没有收到申请。</AdminNotice>
+                      <AdminAntdAlert message="这个机会还没有收到申请。" type="info" />
                     )}
                   </div>
                 </details>
               </article>
             ))
           ) : (
-            <AdminNotice>还没有共建机会。新增后可选择公开、成员可见或仅后台保存。</AdminNotice>
+            <AdminAntdAlert message="还没有共建机会。新增后可选择公开、成员可见或仅后台保存。" type="info" />
           )}
-        </AdminPanelBody>
-      </AdminPanel>
-    </AdminPageStack>
+        </div>
+      </AdminAntdCard>
+    </div>
   );
 }

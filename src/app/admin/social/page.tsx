@@ -5,15 +5,14 @@ import {
   saveAdminWechatQrCode,
 } from "@/app/admin/actions";
 import {
+  AdminAntdAlert,
+  AdminAntdCard,
+  AdminAntdPageHeader,
+  AdminStatusTag,
+} from "@/components/admin-antd";
+import {
   AdminCheckboxRow,
   AdminField,
-  AdminMetric,
-  AdminNotice,
-  AdminPageStack,
-  AdminPanel,
-  AdminPanelBody,
-  AdminPanelHeader,
-  AdminStatusBadge,
 } from "@/components/admin-ui";
 import { AdminModal } from "@/components/admin-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
@@ -72,18 +71,18 @@ function getQrCodeStatus(startsAt: string, expiresAt: string, isActive: boolean)
   const expiryTime = new Date(expiresAt).getTime();
 
   if (!isActive) {
-    return { label: "已停用", tone: "neutral" as const };
+    return { label: "已停用", status: "archived" };
   }
 
   if (startTime > now) {
-    return { label: "未开始", tone: "scheduled" as const };
+    return { label: "未开始", status: "scheduled" };
   }
 
   if (expiryTime <= now) {
-    return { label: "已过期", tone: "cancelled" as const };
+    return { label: "已过期", status: "cancelled" };
   }
 
-  return { label: "展示中", tone: "completed" as const };
+  return { label: "展示中", status: "published" };
 }
 
 export default async function AdminSocialPage({
@@ -96,34 +95,30 @@ export default async function AdminSocialPage({
   expiresAt.setFullYear(expiresAt.getFullYear() + 10);
 
   return (
-    <AdminPageStack>
+    <div className="grid gap-4">
       <AdminToastSignals
         success={getAdminSavedMessage(params.saved)}
         error={params.error ? getAdminErrorMessage(params.error) : null}
       />
 
-      <AdminPanel>
-        <AdminPanelHeader
-          eyebrow="Social"
-          title="社交入口与官方微信二维码"
-          actions={
-            <>
-              <AdminMetric label="二维码" value={qrCodes.length} />
-              <AdminMetric label="当前状态" value={currentQrCode ? "可添加" : "需更新"} />
-            </>
-          }
-        />
-      </AdminPanel>
+      <AdminAntdPageHeader
+        eyebrow="Social"
+        title="社交入口与官方微信二维码"
+        stats={[
+          { label: "二维码", value: qrCodes.length },
+          { label: "当前状态", value: currentQrCode ? "可添加" : "需更新" },
+        ]}
+      />
 
       {queryErrors.length > 0 ? (
-        <AdminNotice>后台数据读取出现问题：{queryErrors.join(" | ")}</AdminNotice>
+        <AdminAntdAlert message={`后台数据读取出现问题：${queryErrors.join(" | ")}`} />
       ) : null}
 
-      <AdminPanel>
-        <AdminPanelHeader
-          eyebrow="History"
-          title="二维码历史"
-          actions={
+      <AdminAntdCard
+        eyebrow="History"
+        title="二维码历史"
+      >
+        <div className="mb-4 flex justify-end">
             <AdminModal title="发布新的官方微信二维码" triggerLabel="上传二维码">
               <form action={saveAdminWechatQrCode} className="grid gap-4">
                 <div className="grid gap-4 md:grid-cols-2">
@@ -204,9 +199,8 @@ export default async function AdminSocialPage({
                 </div>
               </form>
             </AdminModal>
-          }
-        />
-        <AdminPanelBody className="space-y-2">
+        </div>
+        <div className="space-y-2">
           {qrCodes.length > 0 ? (
             qrCodes.map((qrCode) => {
               const status = getQrCodeStatus(
@@ -234,7 +228,7 @@ export default async function AdminSocialPage({
                     <div className="min-w-0 space-y-1">
                       <div className="flex flex-wrap items-center gap-2">
                         <h2 className="text-base font-semibold text-foreground">{qrCode.title}</h2>
-                        <AdminStatusBadge tone={status.tone}>{status.label}</AdminStatusBadge>
+                        <AdminStatusTag status={status.status} label={status.label} />
                       </div>
                       <p className="text-sm text-muted-foreground">
                         {formatDateTime(qrCode.starts_at)} 至 {formatDateTime(qrCode.expires_at)}
@@ -322,10 +316,10 @@ export default async function AdminSocialPage({
               );
             })
           ) : (
-            <AdminNotice>还没有二维码记录。上传第一张后，首页会展示它。</AdminNotice>
+            <AdminAntdAlert message="还没有二维码记录。上传第一张后，首页会展示它。" type="info" />
           )}
-        </AdminPanelBody>
-      </AdminPanel>
-    </AdminPageStack>
+        </div>
+      </AdminAntdCard>
+    </div>
   );
 }
