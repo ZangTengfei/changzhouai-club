@@ -1449,39 +1449,41 @@
   position: relative;
   overflow: hidden;
   display: grid;
-  grid-template-columns: 184px minmax(300px, 1.1fr) minmax(300px, 0.92fr) auto;
-  gap: 18px;
+  grid-template-columns: minmax(320px, 1.08fr) minmax(210px, 0.62fr) minmax(260px, 0.74fr);
+  gap: 34px;
   align-items: center;
-  padding: 16px 28px 0 24px;
-  border-radius: 24px;
+  min-height: 278px;
+  padding: 34px 48px 0;
+  border: 1px solid rgba(var(--accent-rgb), 0.16);
+  border-radius: 28px;
   background:
-    radial-gradient(
-      circle at 10% 78%,
-      rgba(73, 182, 128, 0.08),
-      transparent 24%
-    ),
-    radial-gradient(
-      circle at 84% 24%,
-      rgba(255, 204, 96, 0.08),
-      transparent 18%
-    ),
-    linear-gradient(180deg, rgba(243, 243, 235, 0.92), rgba(240, 240, 232, 0.9));
-  box-shadow: none;
+    linear-gradient(135deg, rgba(232, 244, 235, 0.94), rgba(250, 247, 235, 0.94)),
+    rgba(255, 255, 255, 0.82);
+  box-shadow: 0 18px 46px rgba(var(--ink-rgb), 0.055);
   isolation: isolate;
 }
 
 .home-join-banner::after {
-  display: none;
+  position: absolute;
+  right: -8%;
+  bottom: -34%;
+  z-index: -1;
+  width: 54%;
+  height: 78%;
+  border: 1px dashed rgba(var(--accent-rgb), 0.18);
+  border-radius: 50%;
+  content: "";
+  transform: rotate(-9deg);
 }
 
 .home-join-banner-illustration {
   display: flex;
   align-items: flex-end;
-  justify-content: flex-start;
-  align-self: end;
+  justify-content: center;
+  align-self: stretch;
   position: relative;
   overflow: hidden;
-  min-height: 154px;
+  min-height: 230px;
 }
 
 .home-join-banner-illustration::before,
@@ -1490,41 +1492,69 @@
 }
 
 .home-join-banner-illustration-image {
-  width: min(100%, 196px);
+  width: min(116%, 330px);
   height: auto;
   object-fit: contain;
-  object-position: left bottom;
+  object-position: center bottom;
   filter: none;
-  margin-left: -12px;
   margin-bottom: 0;
 }
 
-.home-join-banner-copy h2,
-.home-join-banner-copy p,
-.home-join-banner-info p {
+.home-join-banner-copy h2 {
   margin: 0;
 }
 
 .home-join-banner-copy {
   display: grid;
-  gap: 10px;
+  gap: 13px;
   align-content: center;
-  padding: 20px 0 20px;
+  padding: 0 0 28px;
+}
+
+.home-join-banner-eyebrow {
+  width: fit-content;
+  padding: 7px 12px;
+  border: 1px solid rgba(var(--accent-rgb), 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--accent-strong);
+  font-size: 0.86rem;
+  font-weight: 900;
+  line-height: 1;
 }
 
 .home-join-banner-copy h2 {
   color: #152022;
-  max-width: 24ch;
-  font-size: clamp(1.45rem, 2.1vw, 1.9rem);
+  max-width: 15ch;
+  font-size: clamp(2rem, 3.6vw, 3.45rem);
   line-height: 1.14;
-  letter-spacing: -0.05em;
+  letter-spacing: 0;
 }
 
-.home-join-banner-copy p {
-  max-width: 42ch;
-  color: rgba(var(--ink-rgb), 0.56);
-  font-size: 0.9rem;
-  line-height: 1.7;
+.home-join-banner-copy h2 span {
+  color: var(--accent-strong);
+}
+
+.home-join-banner-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px 20px;
+  margin-top: 4px;
+}
+
+.home-join-banner-proof {
+  display: grid;
+  gap: 2px;
+  color: rgba(var(--ink-rgb), 0.62);
+  font-size: 0.86rem;
+  line-height: 1.32;
+}
+
+.home-join-banner-proof strong {
+  color: var(--accent-strong);
+  font-size: 1.34rem;
+  line-height: 1;
 }
 
 .home-join-banner-rule-link {
@@ -1551,71 +1581,67 @@
   flex-shrink: 0;
 }
 
-.home-join-banner-side {
+.home-join-official {
   display: grid;
-  grid-template-columns: 142px minmax(0, 1fr);
-  gap: 14px;
-  align-items: center;
-  min-width: 0;
-  padding: 16px 0;
+  gap: 12px;
+  justify-items: center;
+  padding: 0 0 26px 34px;
+  border-left: 1px dashed rgba(var(--accent-rgb), 0.22);
+  text-align: center;
 }
 
-.home-join-banner-qr img,
-.home-join-banner .home-wechat-placeholder {
-  width: 142px;
-  height: 142px;
-  padding: 6px;
-  border: 1px solid rgba(214, 217, 210, 0.82);
-  border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 6px 16px rgba(var(--ink-rgb), 0.03);
-  object-fit: contain;
-}
-
-.home-join-banner-info {
+.home-join-official-copy {
   display: grid;
-  gap: 6px;
-  align-content: center;
-  padding-top: 4px;
+  gap: 8px;
+  justify-items: center;
 }
 
-.home-join-banner-info span,
-.home-join-banner-info strong,
-.home-join-banner-info small {
-  display: block;
+.home-join-official-copy span {
+  color: var(--accent-strong);
+  font-size: 1.22rem;
+  font-weight: 950;
+  line-height: 1.12;
 }
 
-.home-join-banner-info span {
-  color: rgba(var(--ink-rgb), 0.52);
-  font-size: 0.78rem;
-  font-weight: 800;
-}
-
-.home-join-banner-info strong {
+.home-join-official-copy strong {
   color: #152022;
-  font-size: 1.02rem;
+  font-size: 1.08rem;
   line-height: 1.28;
 }
 
-.home-join-banner-info small {
-  color: rgba(var(--ink-rgb), 0.58);
-  font-size: 0.86rem;
-  font-weight: 700;
+.home-join-official-qr img {
+  width: 176px;
+  height: 176px;
+  padding: 10px;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 14px 32px rgba(var(--ink-rgb), 0.09);
+  object-fit: contain;
 }
 
-.home-join-banner-info p {
-  color: rgba(var(--ink-rgb), 0.54);
-  font-size: 0.86rem;
+.home-join-official-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--accent-strong);
+  font-size: 0.88rem;
+  font-weight: 900;
+}
+
+.home-join-official-icon {
+  width: 18px;
+  height: 18px;
 }
 
 .home-join-banner-button {
   width: fit-content;
   align-self: center;
-  justify-self: end;
+  justify-self: start;
   margin-top: 0;
   border-radius: 12px;
-  min-height: 42px;
-  padding-inline: 18px;
+  min-height: 56px;
+  padding-inline: 28px;
   white-space: nowrap;
 }
 
@@ -1790,17 +1816,16 @@
   }
 
   .home-join-banner {
-    grid-template-columns: 150px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 0.58fr);
+    padding: 38px;
   }
 
-  .home-join-banner-side {
-    grid-column: 1 / -1;
-    justify-self: end;
+  .home-join-banner-illustration {
+    display: none;
   }
 
-  .home-join-banner-button {
-    grid-column: 2;
-    justify-self: start;
+  .home-join-official {
+    padding-bottom: 0;
   }
 
   .home-hero {
@@ -1862,34 +1887,40 @@
   }
 
   .home-join-banner {
-    padding: 24px 22px;
-    gap: 18px;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding: 32px 24px;
+    gap: 24px;
+    text-align: center;
   }
 
   .home-join-banner-illustration {
-    order: 3;
-    justify-content: flex-start;
+    display: none;
   }
 
-  .home-join-banner-illustration-image {
-    width: min(100%, 150px);
+  .home-join-banner-copy {
+    justify-items: center;
+    padding: 0;
   }
 
-  .home-join-banner-side {
-    order: 2;
-    grid-template-columns: 160px minmax(0, 1fr);
-    justify-self: stretch;
+  .home-join-banner-copy h2 {
+    max-width: 100%;
   }
 
-  .home-join-banner-info {
-    order: 4;
-    grid-column: auto;
+  .home-join-banner-actions,
+  .home-join-banner-rule-link {
+    justify-content: center;
   }
 
-  .home-join-banner-button {
-    order: 5;
-    grid-column: auto;
-    justify-self: start;
+  .home-join-banner-proof {
+    justify-items: center;
+  }
+
+  .home-join-official {
+    width: min(100%, 360px);
+    padding: 24px 0 0;
+    border-left: 0;
+    border-top: 1px dashed rgba(var(--accent-rgb), 0.22);
   }
 
   .home-join-illustration {
@@ -2211,17 +2242,11 @@
     display: none;
   }
 
-  .home-join-banner-qr img,
-  .home-join-banner .home-wechat-placeholder {
-    width: 160px;
-    height: 160px;
-  }
-
   .home-join-banner {
     grid-template-columns: 1fr;
     justify-items: center;
-    gap: 18px;
-    padding: 24px 20px 22px;
+    gap: 22px;
+    padding: 30px 20px 26px;
     text-align: center;
   }
 
@@ -2232,52 +2257,28 @@
   }
 
   .home-join-banner-copy h2 {
-    max-width: 15ch;
+    max-width: 14ch;
     letter-spacing: 0;
-  }
-
-  .home-join-banner-copy p {
-    max-width: 28ch;
   }
 
   .home-join-banner-rule-link {
     justify-content: center;
   }
 
-  .home-join-banner-side {
-    grid-template-columns: 1fr;
-    gap: 16px;
+  .home-join-official {
     order: 2;
-    justify-items: center;
-    padding: 0;
-    text-align: center;
-  }
-
-  .home-join-banner-qr {
-    justify-self: center;
-  }
-
-  .home-join-banner-info {
-    justify-items: center;
-    padding-top: 0;
+    width: min(100%, 300px);
+    gap: 14px;
   }
 
   .home-join-banner-button {
-    order: 3;
     justify-self: center;
     width: min(100%, 220px);
   }
 
-  .home-join-banner-illustration {
-    order: 4;
-    justify-content: center;
-    width: 100%;
-    min-height: 112px;
-  }
-
-  .home-join-banner-illustration-image {
-    width: min(100%, 138px);
-    margin-left: 0;
+  .home-join-official-qr img {
+    width: 156px;
+    height: 156px;
   }
 
   .home-asset-plan {
@@ -2465,8 +2466,8 @@
   }
 
   .home-join-banner {
-    gap: 12px;
-    padding: 20px 16px 18px;
+    gap: 18px;
+    padding: 24px 16px 22px;
   }
 
   .home-join-banner-copy {
@@ -2474,15 +2475,9 @@
   }
 
   .home-join-banner-copy h2 {
-    max-width: 17ch;
-    font-size: 1.34rem;
+    max-width: 14ch;
+    font-size: 1.88rem;
     line-height: 1.18;
-  }
-
-  .home-join-banner-copy p {
-    max-width: 30ch;
-    font-size: 0.86rem;
-    line-height: 1.5;
   }
 
   .home-join-banner-rule-link {
@@ -2490,34 +2485,21 @@
     font-size: 0.82rem;
   }
 
-  .home-join-banner-side {
-    grid-template-columns: 124px minmax(0, 1fr);
-    gap: 12px;
-    align-items: center;
-    justify-self: center;
-    max-width: 320px;
-    text-align: left;
+  .home-join-banner-eyebrow {
+    font-size: 0.78rem;
   }
 
-  .home-join-banner-qr img,
-  .home-join-banner .home-wechat-placeholder {
-    width: 124px;
-    height: 124px;
+  .home-join-official-copy span {
+    font-size: 1.06rem;
   }
 
-  .home-join-banner-info {
-    gap: 4px;
-    justify-items: start;
-    text-align: left;
+  .home-join-official-copy strong {
+    font-size: 0.84rem;
   }
 
-  .home-join-banner-info strong {
-    font-size: 0.96rem;
-  }
-
-  .home-join-banner-info small,
-  .home-join-banner-info p {
-    font-size: 0.8rem;
+  .home-join-official-qr img {
+    width: 138px;
+    height: 138px;
   }
 
   .home-join-banner-button {
@@ -2525,9 +2507,6 @@
     min-height: 44px;
   }
 
-  .home-join-banner-illustration {
-    display: none;
-  }
 }
 
 @keyframes home-photo-fade-in {

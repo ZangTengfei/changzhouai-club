@@ -21,7 +21,7 @@ export function SiteFooter() {
             <Link
               key={item.platform}
               href={item.href}
-              className={cx("home-footer-social")}
+              className={cx("home-footer-social home-footer-social-link")}
               target="_blank"
               rel="noreferrer"
             >
@@ -41,7 +41,7 @@ export function SiteFooter() {
           ))}
           <Link
             href={siteRepositoryUrl}
-            className={cx("home-footer-social")}
+            className={cx("home-footer-social home-footer-social-link")}
             target="_blank"
             rel="noreferrer"
           >

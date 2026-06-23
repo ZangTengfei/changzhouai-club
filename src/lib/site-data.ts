@@ -11,6 +11,17 @@ export const navItems = [
 
 export const siteRepositoryUrl = "https://github.com/ZangTengfei/changzhouai-club";
 
+export const officialCommunityChannels = [
+  {
+    platform: "wechat-official",
+    label: "微信公众号",
+    description: "活动复盘、社区公告与项目进展",
+    action: "扫码关注",
+    qrImageUrl: "/wechat-official-account-qr.jpg",
+    tone: "wechat",
+  },
+] as const;
+
 export const communitySocialLinks = [
   {
     platform: "小红书",

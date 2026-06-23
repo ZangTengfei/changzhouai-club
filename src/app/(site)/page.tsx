@@ -11,6 +11,7 @@ import {
 import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { HeroPhotoCarousel } from "@/components/hero-photo-carousel";
 import { SiteSponsors } from "@/components/site-sponsors";
+import { SocialPlatformIcon } from "@/components/social-platform-icon";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import {
   getHomeCompletedEventRecaps,
@@ -19,7 +20,7 @@ import {
 } from "@/lib/community-events";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import { getEventImageUrl } from "@/lib/public-image-url";
-import { getCurrentWechatQrCode } from "@/lib/community-social";
+import { officialCommunityChannels } from "@/lib/site-data";
 import { cssModuleCx } from "@/lib/utils";
 
 import styles from "./home-page.module.css";
@@ -173,13 +174,11 @@ export default async function HomePage() {
     recentCompletedEvents,
     completedEventsCount,
     directory,
-    wechatQrCode,
   ] = await Promise.all([
     getHomeScheduledEvents(),
     getHomeCompletedEventRecaps(),
     getHomeCompletedEventsCount(),
     getPublicMembersDirectory(),
-    getCurrentWechatQrCode(),
   ]);
   const primaryScheduledEvent = scheduledEvents[0];
   const hasUpcomingEvent = Boolean(primaryScheduledEvent);
@@ -561,52 +560,56 @@ export default async function HomePage() {
       <SiteSponsors />
 
       <section className={cx("home-join-banner")} aria-labelledby="home-join-banner-title">
-        <div className={cx("home-join-banner-illustration")} aria-hidden="true">
-          <Image
-            src="/join-card-optimized.webp"
-            alt=""
-            width={1000}
-            height={577}
-            sizes="(max-width: 820px) 138px, 196px"
-            className={cx("home-join-banner-illustration-image")}
-          />
-        </div>
-
         <div className={cx("home-join-banner-copy")}>
-          <h2 id="home-join-banner-title">加入我们，把你的问题和能力带到现场</h2>
-          <p>
-            扫描二维码添加社区官方微信，备注来意后由运营同学邀请你进入交流群。
-          </p>
+          <span className={cx("home-join-banner-eyebrow")}>连接・分享・共创</span>
+          <h2 id="home-join-banner-title">
+            <span>加入社区，</span>把问题带到现场
+          </h2>
+          <div className={cx("home-join-banner-actions")}>
+            <Link href="/join" className={cx("button home-primary-button home-join-banner-button")}>
+              申请加入
+              <span aria-hidden="true">→</span>
+            </Link>
+            <div className={cx("home-join-banner-proof")}>
+              <strong>300+</strong>
+              <span>位成员已加入我们</span>
+            </div>
+          </div>
           <Link href={CO_BUILDER_RULES_PATH} className={cx("home-join-banner-rule-link")}>
             想参与社区共建？查看协作规则
             <ArrowRight aria-hidden="true" strokeWidth={2} />
           </Link>
         </div>
 
-        <div className={cx("home-join-banner-side")}>
-          <div className={cx("home-join-banner-qr")}>
-            {wechatQrCode ? (
-              <img
-                src={wechatQrCode.imageUrl}
-                alt={wechatQrCode.title}
-                width={180}
-                height={180}
-              />
-            ) : (
-              <div className={cx("home-wechat-placeholder")}>微信</div>
-            )}
-          </div>
+        <div className={cx("home-join-banner-illustration")} aria-hidden="true">
+          <Image
+            src="/join-card-optimized.webp"
+            alt=""
+            width={1000}
+            height={577}
+            sizes="(max-width: 820px) 180px, 320px"
+            className={cx("home-join-banner-illustration-image")}
+          />
+        </div>
 
-          <div className={cx("home-join-banner-info")}>
-            <span>社区官方微信</span>
-            <strong>{wechatQrCode?.title ?? "常州 AI Club 官方微信"}</strong>
-            <small>300+ 位成员</small>
-            <p>添加好友・备注来意・邀请进群</p>
+        <div className={cx("home-join-official")}>
+          <div className={cx("home-join-official-copy")}>
+            <span>关注公众号</span>
+            <strong>常州 AI Club 共创社区</strong>
+          </div>
+          <div className={cx("home-join-official-qr")}>
+            <img
+              src={officialCommunityChannels[0].qrImageUrl}
+              alt="常州 AI Club 共创社区公众号二维码"
+              width={196}
+              height={196}
+            />
+          </div>
+          <div className={cx("home-join-official-action")}>
+            <SocialPlatformIcon tone="wechat" className={cx("home-join-official-icon")} />
+            <span>扫码关注</span>
           </div>
         </div>
-        <Link href="/join" className={cx("button home-primary-button home-join-banner-button")}>
-          申请加入
-        </Link>
       </section>
     </div>
   );

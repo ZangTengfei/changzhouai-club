@@ -1,5 +1,7 @@
+import { MessageCircleMore } from "lucide-react";
+
 type SocialPlatformIconProps = {
-  tone: "github" | "rednote" | "douyin" | "bilibili";
+  tone: "github" | "rednote" | "douyin" | "bilibili" | "wechat";
   className?: string;
   src?: string;
   alt?: string;
@@ -27,6 +29,10 @@ export function SocialPlatformIcon({ tone, className, src, alt = "" }: SocialPla
         />
       </svg>
     );
+  }
+
+  if (tone === "wechat") {
+    return <MessageCircleMore aria-hidden="true" className={className} strokeWidth={1.9} />;
   }
 
   if (tone === "douyin") {
