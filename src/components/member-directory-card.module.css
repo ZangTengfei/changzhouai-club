@@ -7,7 +7,7 @@
   min-height: 236px;
   padding: 18px 18px 16px;
   border: 1px solid rgba(205, 213, 209, 0.72);
-  border-radius: 20px;
+  border-radius: var(--radius-md);
   background: linear-gradient(
     180deg,
     rgba(244, 244, 238, 0.9),
@@ -61,14 +61,14 @@
 .member-directory-header > span {
   width: 56px;
   height: 56px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 0;
   background: linear-gradient(
     135deg,
     rgba(var(--accent-rgb), 0.2),
     rgba(var(--accent-warm-rgb), 0.16)
   );
-  box-shadow: 0 8px 18px rgba(var(--ink-rgb), 0.08);
+  box-shadow: var(--shadow-md);
 }
 
 .member-directory-copy {
@@ -134,7 +134,7 @@
   max-width: 100%;
   min-height: 27px;
   padding: 0 9px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 252, 247, 0.82);
   color: rgba(var(--ink-rgb), 0.62);
   font-size: 0.76rem;

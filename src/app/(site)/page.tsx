@@ -31,7 +31,7 @@ const CO_BUILDER_RULES_PATH = "/docs/guides/co-builder-rules";
 
 function formatMetricDate(isoDate: string | null) {
   if (!isoDate) {
-    return "待更新";
+    return "时间待定";
   }
 
   const [, month, day] = isoDate.split("-");
@@ -125,37 +125,6 @@ const heroNotes = [
     className: "home-sticky-note home-sticky-note-blue",
     lines: ["每次活动", "都沉淀成", "新的上下文"],
     icon: "smile",
-  },
-] as const;
-
-const fallbackMemberStories = [
-  {
-    id: "story-1",
-    name: "社区成员",
-    meta: "AI 爱好者",
-    story: "在这里认识更多同行者，把零散想法变成可讨论、可验证的具体问题。",
-    tags: ["# 问题验证", "# 真实交流", "# 本地连接"],
-  },
-  {
-    id: "story-2",
-    name: "社区成员",
-    meta: "技术探索者",
-    story: "通过活动里的案例和场景拆解，把抽象 AI 能力变成自己能上手的原型。",
-    tags: ["# 原型共创", "# AI 实践", "# 知识分享"],
-  },
-  {
-    id: "story-3",
-    name: "社区成员",
-    meta: "项目参与者",
-    story: "一次线下碰面可能带来新的伙伴、资源连接，甚至一次试点项目的开始。",
-    tags: ["# 场景试点", "# 资源对接", "# 项目协作"],
-  },
-  {
-    id: "story-4",
-    name: "社区成员",
-    meta: "本地 AI 连接者",
-    story: "社区让本地 OPC、开发者、产品人、企业场景方有了更稳定的相遇和协作现场。",
-    tags: ["# 灵感碰撞", "# 常州 AI", "# 社区成长"],
   },
 ] as const;
 
@@ -293,7 +262,7 @@ export default async function HomePage() {
         tags: storyTags,
       };
     });
-  const memberStories = storyMembers.length > 0 ? storyMembers : fallbackMemberStories;
+  const memberStories = storyMembers;
 
   return (
     <div className={cx("home-page-stack")}>
@@ -312,7 +281,7 @@ export default async function HomePage() {
 
           <div className={cx("home-hero-actions")}>
             <Link href="/join" className={cx("button home-primary-button")}>
-              加入社区
+              申请加入
               <span aria-hidden="true">→</span>
             </Link>
             <Link href="/events" className={cx("button home-ghost-button")}>
@@ -478,37 +447,43 @@ export default async function HomePage() {
           <Link href="/members">查看更多故事 →</Link>
         </div>
 
-        <div className={cx("home-member-story-grid")}>
-          {memberStories.map((item) => (
-            <Link
-              href={"href" in item ? item.href : "/members"}
-              className={cx("home-member-story-card")}
-              key={item.id}
-            >
-              <div className={cx("home-member-story-head")}>
-                <div className={cx("home-member-story-avatar")} aria-hidden="true">
-                  {"avatarUrl" in item && item.avatarUrl ? (
-                    <img
-                      src={item.avatarUrl}
-                      alt=""
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    <span>{item.name.slice(0, 1)}</span>
-                  )}
+        {memberStories.length > 0 ? (
+          <div className={cx("home-member-story-grid")}>
+            {memberStories.map((item) => (
+              <Link
+                href={"href" in item ? item.href : "/members"}
+                className={cx("home-member-story-card")}
+                key={item.id}
+              >
+                <div className={cx("home-member-story-head")}>
+                  <div className={cx("home-member-story-avatar")} aria-hidden="true">
+                    {"avatarUrl" in item && item.avatarUrl ? (
+                      <img
+                        src={item.avatarUrl}
+                        alt=""
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <span>{item.name.slice(0, 1)}</span>
+                    )}
+                  </div>
+                  <div>
+                    <strong>{item.name}</strong>
+                    <small>{item.meta}</small>
+                  </div>
                 </div>
-                <div>
-                  <strong>{item.name}</strong>
-                  <small>{item.meta}</small>
+                <p>{item.story}</p>
+                <div className={cx("home-member-story-tags")} aria-label="成员技能标签">
+                  {item.tags[0] ? <span>{item.tags[0]}</span> : null}
                 </div>
-              </div>
-              <p>{item.story}</p>
-              <div className={cx("home-member-story-tags")} aria-label="成员技能标签">
-                {item.tags[0] ? <span>{item.tags[0]}</span> : null}
-              </div>
-            </Link>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className={cx("home-empty-state")}>
+            暂无成员故事，期待你加入后在这里分享经验。
+          </div>
+        )}
       </section>
 
       <section className={cx("home-event-review-section")} aria-labelledby="home-event-review-title">

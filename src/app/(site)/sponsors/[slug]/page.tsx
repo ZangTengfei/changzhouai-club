@@ -120,8 +120,6 @@ export default async function SponsorDetailPage({
             <li>展示名称：{sponsor.name}</li>
             <li>赞助等级：{sponsor.tierLabel}</li>
             <li>赞助标签：{sponsor.sponsorLabel}</li>
-            <li>展示排序：{sponsor.displayOrder}</li>
-            <li>赞助者链接：/sponsors/{sponsor.slug}</li>
           </ul>
         </article>
       </section>

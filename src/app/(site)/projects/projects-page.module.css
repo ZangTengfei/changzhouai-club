@@ -44,9 +44,9 @@
   overflow: hidden;
   padding: 22px;
   border: 1px solid rgba(208, 214, 207, 0.7);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: linear-gradient(180deg, rgba(248, 250, 246, 0.95), rgba(240, 246, 244, 0.9));
-  box-shadow: 0 12px 28px rgba(var(--ink-rgb), 0.035);
+  box-shadow: var(--shadow-sm);
 }
 
 .projectsOpportunityCard::after {
@@ -56,7 +56,7 @@
   bottom: -30px;
   width: 118px;
   height: 118px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(var(--accent-rgb), 0.08);
 }
 
@@ -74,7 +74,7 @@
   aspect-ratio: 16 / 9;
   margin: -6px -6px 0;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 14px;
+  border-radius: var(--radius-sm);
   background: rgba(255, 252, 247, 0.62);
 }
 
@@ -103,7 +103,7 @@
   align-items: center;
   min-height: 28px;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 252, 247, 0.72);
   color: rgba(var(--ink-rgb), 0.64);
   font-size: 0.78rem;
@@ -189,9 +189,9 @@
   justify-items: start;
   padding: 26px;
   border: 1px solid rgba(208, 214, 207, 0.7);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: linear-gradient(180deg, rgba(245, 244, 238, 0.92), rgba(240, 239, 232, 0.9));
-  box-shadow: 0 12px 28px rgba(var(--ink-rgb), 0.035);
+  box-shadow: var(--shadow-sm);
 }
 
 .projectsOpportunityEmpty svg {
@@ -251,9 +251,9 @@
   min-height: 124px;
   padding: 18px;
   border: 1px solid rgba(126, 170, 151, 0.18);
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   background: rgba(248, 250, 246, 0.74);
-  box-shadow: 0 10px 22px rgba(var(--ink-rgb), 0.028);
+  box-shadow: var(--shadow-sm);
 }
 
 .projectsNote h3,

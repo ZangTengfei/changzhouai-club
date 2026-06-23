@@ -47,7 +47,7 @@
   max-width: 45rem;
   padding: 14px 16px;
   border-left: 4px solid rgba(var(--accent-rgb), 0.62);
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   background: rgba(255, 252, 247, 0.7);
 }
 
@@ -64,7 +64,7 @@
   min-height: 32px;
   padding: 0 11px;
   border: 1px solid rgba(var(--accent-rgb), 0.14);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 252, 247, 0.78);
   color: var(--accent-strong);
   font-size: 0.84rem;
@@ -91,7 +91,7 @@
 .memberWorksSection,
 .memberJoinPanel {
   border: 1px solid rgba(208, 214, 207, 0.72);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: linear-gradient(180deg, rgba(246, 244, 238, 0.94), rgba(241, 239, 232, 0.88));
   box-shadow:
     0 12px 28px rgba(var(--ink-rgb), 0.045),
@@ -112,7 +112,7 @@
   min-width: 0;
   padding: 14px;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 14px;
+  border-radius: var(--radius-sm);
   background: rgba(255, 252, 247, 0.74);
 }
 
@@ -120,8 +120,8 @@
   grid-row: 1 / span 2;
   width: 96px;
   height: 96px;
-  border-radius: 22px;
-  box-shadow: 0 14px 28px rgba(var(--ink-rgb), 0.1);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
 }
 
 .memberAvatarStage :global(.member-avatar-fallback) {
@@ -164,7 +164,7 @@
   min-width: 0;
   padding: 12px;
   border: 1px solid rgba(var(--ink-rgb), 0.07);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: rgba(255, 252, 247, 0.6);
 }
 
@@ -250,7 +250,7 @@
   min-width: 0;
   padding: 13px;
   border: 1px solid rgba(var(--ink-rgb), 0.07);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: rgba(255, 252, 247, 0.6);
 }
 
@@ -310,7 +310,7 @@
   align-items: center;
   padding: 14px;
   border: 1px dashed rgba(var(--accent-rgb), 0.2);
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   background: rgba(var(--accent-rgb), 0.07);
   color: rgba(var(--ink-rgb), 0.68);
   font-size: 0.92rem;

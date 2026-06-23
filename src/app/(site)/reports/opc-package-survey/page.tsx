@@ -81,7 +81,7 @@ const roleLegend: LegendItem[] = [
 const workflowLegend: LegendItem[] = [
   { label: "Agent 模式", value: "9人 · 56%", color: "#0f7a6a" },
   { label: "架构/总控模式", value: "7人 · 44%", color: "#2f82ed" },
-  { label: "Copilot 模式", value: "0人", color: "#87908c" },
+  { label: "Copilot 模式", value: "0人 · 样本未出现", color: "#87908c" },
 ];
 
 const modelItems: BarItem[] = [
@@ -503,8 +503,9 @@ export default function OpcPackageSurveyPage() {
       </section>
 
       <footer className={styles.reportFooter}>
-        <span>报告生成时间：2026 年 4 月 9 日 17:02:55</span>
+        <span>报告生成时间：2026 年 4 月 9 日</span>
         <span>样本量：16 份有效问卷</span>
+        <span>调研渠道：常州 AI 交流群与线下活动</span>
       </footer>
     </div>
   );

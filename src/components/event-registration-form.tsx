@@ -123,7 +123,7 @@ export function EventRegistrationForm({
           </button>
         </form>
       ) : authState === "loading" ? (
-        <div className="note-strip">正在检查你的报名状态...</div>
+        <div className="note-strip">正在检查你的报名状态……</div>
       ) : (
         <div className="cta-row">
           <Link href={`/login?next=${encodeURIComponent(nextPath)}`} className="button">

@@ -147,7 +147,7 @@ export default async function EventProposalPage({
                 <input
                   className="input"
                   name="contact_wechat"
-                  placeholder="微信或手机号至少填一项"
+                  placeholder="用于沟通活动排期（与手机号至少填一项）"
                 />
               </label>
 
@@ -156,7 +156,7 @@ export default async function EventProposalPage({
                 <input
                   className="input"
                   name="contact_phone"
-                  placeholder="微信或手机号至少填一项"
+                  placeholder="用于紧急联系（与微信号至少填一项）"
                 />
               </label>
 

@@ -23,7 +23,7 @@ import { SiteAccountEntry } from "@/components/site-account-entry";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { SocialPlatformIcon } from "@/components/social-platform-icon";
 import { hasSupabaseEnv } from "@/lib/env";
-import { navItems, siteRepositoryUrl } from "@/lib/site-data";
+import { navItems, siteNameEn, siteRepositoryUrl } from "@/lib/site-data";
 import { cssModuleCx } from "@/lib/utils";
 import styles from "./site-header.module.css";
 
@@ -120,7 +120,7 @@ export function SiteHeader() {
           </span>
           <span className={cx("brand-copy")}>
             <strong>常州 AI Club</strong>
-            <small>ChangzhouAI.Club</small>
+            <small>{siteNameEn}</small>
           </span>
         </Link>
 
@@ -257,7 +257,7 @@ export function SiteHeader() {
         {shouldShowJoinButton ? (
           <div className={cx("header-actions")}>
             <Link href="/join" className={cx("button header-join-button")}>
-              加入社区
+              申请加入
             </Link>
           </div>
         ) : null}

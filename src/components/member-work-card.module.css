@@ -3,9 +3,9 @@
   display: grid;
   min-width: 0;
   border: 1px solid rgba(208, 214, 207, 0.74);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: rgba(255, 252, 247, 0.78);
-  box-shadow: 0 12px 28px rgba(var(--ink-rgb), 0.045);
+  box-shadow: var(--shadow-sm);
 }
 
 .workCardLink {
@@ -45,7 +45,7 @@
   width: 74px;
   height: 74px;
   border: 1px solid rgba(255, 255, 255, 0.72);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: rgba(255, 252, 247, 0.82);
   color: var(--accent-strong);
   font-family: var(--font-latin-rounded);
@@ -81,7 +81,7 @@
   min-height: 26px;
   padding: 0 9px;
   border: 1px solid rgba(var(--accent-rgb), 0.14);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 252, 247, 0.86);
   color: var(--accent-strong);
   font-size: 0.76rem;
@@ -128,7 +128,7 @@
   width: 30px;
   height: 30px;
   border: 1px solid rgba(var(--accent-rgb), 0.16);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 252, 247, 0.82);
 }
 

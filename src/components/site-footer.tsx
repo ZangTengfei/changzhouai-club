@@ -65,7 +65,7 @@ export function SiteFooter() {
           </span>
           <nav aria-label="页脚导航">
             <Link href="/about">关于我们</Link>
-            <Link href="/join">加入我们</Link>
+            <Link href="/join">申请加入</Link>
             <Link href="/cooperate">联系我们</Link>
           </nav>
         </div>

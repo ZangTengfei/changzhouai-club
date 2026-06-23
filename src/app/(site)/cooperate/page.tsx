@@ -128,12 +128,12 @@ export default async function CooperatePage({
 
               <label className={styles.formField}>
                 <span>微信号</span>
-                <input className="input" name="contact_wechat" placeholder="微信或手机号至少填一项" />
+                <input className="input" name="contact_wechat" placeholder="用于后续沟通（与手机号至少填一项）" />
               </label>
 
               <label className={styles.formField}>
                 <span>手机号</span>
-                <input className="input" name="contact_phone" placeholder="微信或手机号至少填一项" />
+                <input className="input" name="contact_phone" placeholder="用于电话联系（与微信号至少填一项）" />
               </label>
 
               <label className={styles.formField}>
@@ -173,6 +173,9 @@ export default async function CooperatePage({
                 <ArrowRight aria-hidden="true" strokeWidth={2} />
               </button>
             </div>
+            <p className="section-note">
+              提交即表示同意我们使用以上信息与你沟通合作事宜，我们不会向第三方公开你的联系方式。
+            </p>
           </form>
         </div>
       </section>

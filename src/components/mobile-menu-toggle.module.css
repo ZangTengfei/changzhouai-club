@@ -7,9 +7,9 @@
   height: 46px;
   padding: 0;
   border: 1px solid rgba(var(--accent-rgb), 0.16);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(var(--surface-muted-rgb), 0.84);
-  box-shadow: 0 10px 24px rgba(var(--ink-rgb), 0.08);
+  box-shadow: var(--shadow-md);
   color: var(--ink);
   cursor: pointer;
   transition:
@@ -30,7 +30,7 @@
   display: block;
   width: 18px;
   height: 2px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: currentColor;
   transition:
     transform 0.18s ease,

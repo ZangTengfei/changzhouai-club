@@ -115,7 +115,7 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
               <ArrowRight aria-hidden="true" strokeWidth={2} />
             </Link>
             <Link href="/join" className="button home-ghost-button">
-              加入社区
+              申请加入
             </Link>
           </div>
         </div>

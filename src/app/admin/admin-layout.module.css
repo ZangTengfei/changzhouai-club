@@ -8,7 +8,7 @@
   --admin-panel: rgba(255, 251, 245, 0.94);
   --admin-panel-alt: rgba(255, 249, 239, 0.88);
   --admin-panel-muted: rgba(243, 235, 222, 0.9);
-  --admin-border: rgba(var(--ink-rgb), 0.12);
+  --admin-border: var(--border);
   --admin-border-strong: rgba(var(--ink-rgb), 0.18);
   --admin-text: var(--ink);
   --admin-text-muted: var(--muted);
@@ -16,7 +16,7 @@
   --admin-shadow-hover: 0 18px 42px rgba(var(--ink-rgb), 0.1);
   --admin-radius-lg: 22px;
   --admin-radius-md: 16px;
-  --admin-radius-sm: 12px;
+  --admin-radius-sm: var(--radius-sm);
   --background: #f7f3ed;
   --foreground: var(--ink);
   --card: rgba(255, 251, 245, 0.94);

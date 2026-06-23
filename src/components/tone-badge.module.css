@@ -3,7 +3,7 @@
   align-items: center;
   min-height: 34px;
   padding: 9px 12px;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
   font-size: 0.9rem;
   font-weight: 600;

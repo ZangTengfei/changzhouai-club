@@ -57,6 +57,18 @@ const reports = [
       { label: "上下文瓶颈", value: "63%", icon: Network },
     ],
   },
+  {
+    title: "常州科教城 OPC 共创社区运营经费申请汇报",
+    description:
+      "面向常州科教城的 OPC 共创社区运营经费申请演示稿，覆盖社区介绍、已有基础、园区价值、年度计划与经费预算。",
+    href: "/reports/opc-community-funding",
+    date: "2026-05",
+    stats: [
+      { label: "全网成员", value: "300+", icon: UsersRound },
+      { label: "年度预算", value: "100万", icon: CircleDollarSign },
+      { label: "申请机制", value: "50+50", icon: WalletCards },
+    ],
+  },
 ] as const;
 
 export default function ReportsPage() {

@@ -37,7 +37,7 @@
 .projectContentPanel,
 .applicationPanel {
   border: 1px solid rgba(212, 216, 209, 0.7);
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   background: linear-gradient(180deg, rgba(246, 244, 238, 0.94), rgba(241, 239, 232, 0.88));
   box-shadow:
     0 16px 34px rgba(var(--ink-rgb), 0.055),
@@ -63,7 +63,7 @@
   min-height: 34px;
   padding: 0 12px;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 252, 247, 0.74);
   color: rgba(var(--ink-rgb), 0.64);
   font-size: 0.84rem;
@@ -134,7 +134,7 @@
   overflow: hidden;
   aspect-ratio: 16 / 10;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: rgba(255, 252, 247, 0.7);
 }
 
@@ -153,7 +153,7 @@
   min-height: 70px;
   padding: 12px;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: rgba(255, 252, 247, 0.7);
 }
 
@@ -181,7 +181,7 @@
   gap: 8px;
   padding: 18px;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: rgba(255, 252, 247, 0.7);
 }
 
@@ -200,7 +200,7 @@
   gap: 0;
   padding: 24px 26px;
   border: 1px solid rgba(212, 216, 209, 0.7);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: linear-gradient(180deg, rgba(246, 244, 238, 0.94), rgba(241, 239, 232, 0.88));
   box-shadow:
     0 12px 28px rgba(var(--ink-rgb), 0.04),
@@ -299,7 +299,7 @@
 .projectSoftNote {
   padding: 14px 16px;
   border: 1px dashed rgba(var(--accent-rgb), 0.22);
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   background: rgba(var(--accent-rgb), 0.07);
   color: rgba(var(--ink-rgb), 0.68);
   font-weight: 700;
@@ -318,7 +318,7 @@
   min-height: 30px;
   padding: 0 11px;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 252, 247, 0.72);
   color: rgba(var(--ink-rgb), 0.66);
   font-size: 0.82rem;
@@ -347,7 +347,7 @@
   gap: 14px;
   padding: 18px;
   border: 1px solid rgba(var(--accent-rgb), 0.2);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: rgba(var(--accent-rgb), 0.08);
 }
 

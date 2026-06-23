@@ -1,3 +1,5 @@
+export const siteNameEn = "Changzhou AI Club";
+
 export const navItems = [
   { href: "/", label: "首页" },
   { href: "/events", label: "活动" },

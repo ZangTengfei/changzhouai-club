@@ -50,7 +50,7 @@ function getErrorMessage(error?: string) {
   }
 
   if (error === "missing_contact_channel") {
-    return "请填写微信号和手机号，邮箱可以选填。";
+    return "请填写微信号和手机号。";
   }
 
   if (error === "applications_closed") {

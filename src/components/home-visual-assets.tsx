@@ -82,7 +82,7 @@ export function HandDrawnArrow({ className }: HomeIllustrationProps) {
 
 export function FlowPeopleIllustration({ tone, className }: FlowIllustrationProps) {
   const accent = {
-    green: "#11835f",
+    green: "#0f7a6a",
     orange: "#ec8e2f",
     blue: "#2d80d8",
   }[tone];
@@ -162,11 +162,11 @@ export function JoinCommunityIllustration({ className }: HomeIllustrationProps) 
       <circle cx="72" cy="72" r="23" fill="#f0bd88" />
       <path d="M52 65C56 42 86 42 96 63C84 58 71 58 59 75" fill="#2b211b" />
       <path d="M40 151C43 110 55 93 75 93C95 93 107 111 111 151" fill="#f6b85a" />
-      <path d="M113 103C119 90 133 88 145 96L158 105" stroke="#11835f" strokeWidth="8" strokeLinecap="round" />
+      <path d="M113 103C119 90 133 88 145 96L158 105" stroke="#0f7a6a" strokeWidth="8" strokeLinecap="round" />
       <circle cx="151" cy="72" r="22" fill="#f0bd88" />
       <path d="M134 59C141 43 164 44 172 63C159 58 147 61 139 75" fill="#2b211b" />
       <path d="M122 151C126 111 137 93 155 93C175 93 187 111 190 151" fill="#76c88a" />
-      <path d="M96 110C104 100 115 99 126 108" stroke="#11835f" strokeWidth="8" strokeLinecap="round" />
+      <path d="M96 110C104 100 115 99 126 108" stroke="#0f7a6a" strokeWidth="8" strokeLinecap="round" />
       <path d="M82 27H113" stroke="#ffd25c" strokeWidth="6" strokeLinecap="round" />
       <path d="M98 14V43" stroke="#ffd25c" strokeWidth="6" strokeLinecap="round" />
       <path d="M174 27L187 14" stroke="#5aa7e8" strokeWidth="5" strokeLinecap="round" />

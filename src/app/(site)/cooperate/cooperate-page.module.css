@@ -56,7 +56,7 @@
   min-width: 0;
   padding: 22px;
   border: 1px solid rgba(126, 170, 151, 0.18);
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   background:
     radial-gradient(circle at 92% 10%, rgba(255, 199, 81, 0.14), transparent 18%),
     linear-gradient(180deg, rgba(242, 249, 245, 0.96), rgba(248, 251, 248, 0.92));
@@ -89,7 +89,7 @@
   align-items: center;
   padding: 14px 16px;
   border: 1px dashed rgba(var(--accent-rgb), 0.28);
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   background: rgba(var(--accent-rgb), 0.08);
   color: var(--accent-strong);
   font-weight: 800;
@@ -112,7 +112,7 @@
   min-width: 0;
   padding: 20px;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: rgba(255, 252, 247, 0.78);
 }
 
@@ -187,9 +187,9 @@
   min-height: 124px;
   padding: 18px;
   border: 1px solid rgba(126, 170, 151, 0.18);
-  border-radius: 16px;
+  border-radius: var(--radius-md);
   background: rgba(248, 250, 246, 0.74);
-  box-shadow: 0 10px 22px rgba(var(--ink-rgb), 0.028);
+  box-shadow: var(--shadow-sm);
 }
 
 .followUpCard h3,
@@ -220,7 +220,7 @@
   align-items: center;
   overflow: hidden;
   padding: 16px 28px 0 24px;
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   background:
     radial-gradient(circle at 10% 78%, rgba(73, 182, 128, 0.08), transparent 24%),
     radial-gradient(circle at 84% 24%, rgba(255, 204, 96, 0.08), transparent 18%),
@@ -316,9 +316,9 @@
   height: 142px;
   padding: 6px;
   border: 1px solid rgba(214, 217, 210, 0.82);
-  border-radius: 14px;
+  border-radius: var(--radius-sm);
   background: #ffffff;
-  box-shadow: 0 6px 16px rgba(var(--ink-rgb), 0.03);
+  box-shadow: var(--shadow-sm);
   object-fit: contain;
 }
 
@@ -371,7 +371,7 @@
   width: fit-content;
   min-height: 42px;
   padding-inline: 18px;
-  border-radius: 12px;
+  border-radius: var(--radius-sm);
   white-space: nowrap;
 }
 

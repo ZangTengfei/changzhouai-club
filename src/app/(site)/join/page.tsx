@@ -15,7 +15,7 @@ import {
 
 import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { hasSupabaseEnv } from "@/lib/env";
-import { joinSteps } from "@/lib/site-data";
+import { joinSteps, siteNameEn } from "@/lib/site-data";
 import { createClient } from "@/lib/supabase/server";
 
 import styles from "./join-page.module.css";
@@ -128,7 +128,7 @@ export default async function JoinPage() {
 
           <div className={styles.joinPassCard}>
             <div>
-              <span>Changzhou AI Club</span>
+              <span>{siteNameEn}</span>
               <strong>Community Member</strong>
             </div>
             <BadgeCheck aria-hidden="true" strokeWidth={1.8} />

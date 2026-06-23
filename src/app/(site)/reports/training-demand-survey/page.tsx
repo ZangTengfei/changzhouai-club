@@ -494,8 +494,9 @@ export default function TrainingDemandSurveyPage() {
       </section>
 
       <footer className={styles.reportFooter}>
-        <span>报告整理时间：2026 年 5 月 25 日</span>
+        <span>报告生成时间：2026 年 5 月 25 日</span>
         <span>样本量：23 份回收问卷</span>
+        <span>调研渠道：常州 AI 交流群与线下活动</span>
       </footer>
     </div>
   );

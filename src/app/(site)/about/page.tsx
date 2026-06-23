@@ -69,7 +69,7 @@ export default function AboutPage() {
 
           <div className={styles.aboutHeroActions}>
             <Link href="/join" className="button home-primary-button">
-              加入社区
+              申请加入
               <ArrowRight aria-hidden="true" strokeWidth={2} />
             </Link>
             <Link href="/events" className="button home-ghost-button">
@@ -113,7 +113,7 @@ export default function AboutPage() {
           <p className="home-kicker">Identity</p>
           <div>
             <h2>Logo 背后的社区理念</h2>
-            <p>你给的设计理念图里最重要的不是一个图形，而是一套关于连接的解释。</p>
+            <p>这套标识的核心不是图形本身，而是一套关于连接的解释。</p>
           </div>
         </div>
 
@@ -162,7 +162,7 @@ export default function AboutPage() {
 
         <div className={styles.aboutJoinActions}>
           <Link href="/join" className="button home-primary-button">
-            加入社区
+            申请加入
             <ArrowRight aria-hidden="true" strokeWidth={2} />
           </Link>
           <Link href="/cooperate" className="button home-ghost-button">

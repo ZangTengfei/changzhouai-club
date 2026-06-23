@@ -57,7 +57,7 @@
 
 .worksEmptyNote {
   border: 1px solid rgba(208, 214, 207, 0.72);
-  border-radius: 18px;
+  border-radius: var(--radius-md);
   background: linear-gradient(180deg, rgba(246, 244, 238, 0.94), rgba(241, 239, 232, 0.88));
   box-shadow:
     0 12px 28px rgba(var(--ink-rgb), 0.045),
@@ -75,9 +75,9 @@
   min-width: 0;
   padding: 14px 16px;
   border: 1px solid rgba(208, 214, 207, 0.72);
-  border-radius: 14px;
+  border-radius: var(--radius-sm);
   background: rgba(255, 252, 247, 0.72);
-  box-shadow: 0 10px 22px rgba(var(--ink-rgb), 0.035);
+  box-shadow: var(--shadow-sm);
 }
 
 .worksFilterHeader,
@@ -126,7 +126,7 @@
   min-height: 30px;
   padding: 0 10px;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 252, 247, 0.78);
   color: rgba(var(--ink-rgb), 0.58);
   font-size: 0.8rem;
@@ -187,7 +187,7 @@
   min-height: 28px;
   padding: 0 10px;
   border: 1px solid rgba(var(--ink-rgb), 0.08);
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: rgba(255, 252, 247, 0.8);
   color: rgba(var(--ink-rgb), 0.72);
   font-size: 0.8rem;

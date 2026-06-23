@@ -80,6 +80,13 @@ export function HeroPhotoCarousel({
       return undefined;
     }
 
+    if (
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return undefined;
+    }
+
     const timer = window.setInterval(() => {
       setActiveIndex(
         (currentIndex) => (currentIndex + 1) % visibleImages.length,
