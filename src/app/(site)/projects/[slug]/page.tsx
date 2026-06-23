@@ -46,7 +46,7 @@ function getErrorMessage(error?: string) {
   }
 
   if (error === "missing_required_fields") {
-    return "请填写称呼和职业 / 当前身份。";
+    return "请填写姓名和职业 / 当前身份。";
   }
 
   if (error === "missing_contact_channel") {
@@ -415,8 +415,8 @@ export default async function ProjectDetailPage({
               <input type="hidden" name="submission_key" value={submissionKey} />
 
               <label>
-                <span>称呼</span>
-                <input className="input" name="applicant_name" placeholder="怎么称呼你" required />
+                <span>姓名</span>
+                <input className="input" name="applicant_name" placeholder="请输入姓名" required />
               </label>
 
               <label>
