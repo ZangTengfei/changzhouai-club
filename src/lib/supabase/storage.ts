@@ -31,6 +31,14 @@ export function buildSponsorAssetPath(sponsorSlug: string, fileName: string) {
   return `sponsors/${safeSponsorSlug}/${timestamp}-${safeFileName}`;
 }
 
+export function buildProjectAssetPath(projectSlug: string, fileName: string) {
+  const safeProjectSlug = sanitizeSegment(projectSlug || "project");
+  const safeFileName = sanitizeSegment(fileName || "upload.jpg");
+  const timestamp = Date.now();
+
+  return `projects/${safeProjectSlug}/${timestamp}-${safeFileName}`;
+}
+
 export function buildCommunityQrCodePath(fileName: string) {
   const safeFileName = sanitizeSegment(fileName || "wechat-qr.jpg");
   const timestamp = Date.now();

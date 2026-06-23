@@ -130,6 +130,21 @@
   gap: 12px;
 }
 
+.projectCover {
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  border: 1px solid rgba(var(--ink-rgb), 0.08);
+  border-radius: 18px;
+  background: rgba(255, 252, 247, 0.7);
+}
+
+.projectCover img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .projectDetailList div {
   display: grid;
   grid-template-columns: 38px minmax(0, 1fr);

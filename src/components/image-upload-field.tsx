@@ -23,7 +23,7 @@ import styles from "./image-upload-field.module.css";
 
 type UploadMode = "upload-only" | "upload-or-url";
 type UploadAppearance = "site" | "admin";
-type StorageUploadScope = "event" | "sponsor" | "community";
+type StorageUploadScope = "event" | "sponsor" | "community" | "project";
 type UploadStage = "idle" | "compressing" | "uploading";
 
 type UploadTarget =
@@ -65,6 +65,8 @@ function getStorageUploadUrl(scope: StorageUploadScope) {
   switch (scope) {
     case "community":
       return "/api/admin/storage/community-assets";
+    case "project":
+      return "/api/admin/storage/project-assets";
     case "sponsor":
       return "/api/admin/storage/sponsor-assets";
     default:

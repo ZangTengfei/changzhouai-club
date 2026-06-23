@@ -961,6 +961,7 @@ export async function saveAdminProjectOpportunity(formData: FormData) {
     slug,
     title,
     summary,
+    cover_image_url: normalizeOptionalUrlValue(getOptionalValue(formData, "cover_image_url")),
     description: getOptionalValue(formData, "description"),
     opportunity_type: getProjectType(String(formData.get("opportunity_type") ?? "")),
     status: getProjectStatus(String(formData.get("status") ?? "")),

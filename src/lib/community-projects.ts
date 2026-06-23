@@ -48,6 +48,7 @@ type PublicProjectOpportunityRow = {
   slug: string;
   title: string;
   summary: string;
+  cover_image_url: string | null;
   description: string | null;
   opportunity_type: PublicProjectOpportunityType;
   status: PublicProjectOpportunityStatus;
@@ -75,6 +76,7 @@ export type PublicProjectOpportunity = {
   href: string;
   title: string;
   summary: string;
+  coverImageUrl: string | null;
   description: string | null;
   type: PublicProjectOpportunityType;
   typeLabel: string;
@@ -116,6 +118,7 @@ const visibleProjectSelect = [
   "slug",
   "title",
   "summary",
+  "cover_image_url",
   "description",
   "opportunity_type",
   "status",
@@ -156,6 +159,7 @@ function mapProjectOpportunity(row: PublicProjectOpportunityRow): PublicProjectO
     href: `/projects/${row.slug}`,
     title: row.title.trim(),
     summary: row.summary.trim(),
+    coverImageUrl: row.cover_image_url,
     description: row.description,
     type: row.opportunity_type,
     typeLabel: projectOpportunityTypeLabels[row.opportunity_type] ?? row.opportunity_type,

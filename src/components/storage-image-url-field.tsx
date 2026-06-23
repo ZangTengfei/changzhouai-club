@@ -17,7 +17,7 @@ export function StorageImageUrlField({
   name: string;
   defaultValue?: string;
   eventSlug: string;
-  uploadScope?: "event" | "sponsor" | "community";
+  uploadScope?: "event" | "sponsor" | "community" | "project";
   placeholder: string;
   uploadLabel?: string;
   required?: boolean;

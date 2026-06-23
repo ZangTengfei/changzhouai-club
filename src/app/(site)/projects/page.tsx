@@ -53,6 +53,12 @@ export default async function ProjectsPage() {
           <div className={styles.projectsOpportunityGrid}>
             {openOpportunities.map((opportunity) => (
               <article className={styles.projectsOpportunityCard} key={opportunity.id}>
+                {opportunity.coverImageUrl ? (
+                  <div className={styles.projectsOpportunityCover}>
+                    <img src={opportunity.coverImageUrl} alt="" loading="lazy" />
+                  </div>
+                ) : null}
+
                 <div className={styles.projectsOpportunityHeader}>
                   <div className={styles.projectsOpportunityBadges}>
                     <span>{opportunity.typeLabel}</span>

@@ -9,6 +9,7 @@ import {
 } from "@/app/admin/actions";
 import { AdminModal } from "@/components/admin-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
+import { StorageImageUrlField } from "@/components/storage-image-url-field";
 import {
   AdminCheckboxRow,
   AdminField,
@@ -186,6 +187,17 @@ function ProjectOpportunityForm({
 
         <AdminField label="一句话摘要" className="md:col-span-2">
           <Textarea name="summary" rows={2} defaultValue={opportunity?.summary ?? ""} required />
+        </AdminField>
+
+        <AdminField label="封面图" className="md:col-span-2">
+          <StorageImageUrlField
+            name="cover_image_url"
+            defaultValue={opportunity?.cover_image_url ?? ""}
+            eventSlug={opportunity?.slug ?? "project-opportunity"}
+            uploadScope="project"
+            placeholder="https://... 或上传项目封面图"
+            uploadLabel="上传封面"
+          />
         </AdminField>
 
         <AdminField label="项目说明" className="md:col-span-2">
@@ -438,6 +450,14 @@ export default async function AdminProjectsPage({
               >
                 <div className="grid gap-3 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
                   <div className="min-w-0 space-y-2">
+                    {opportunity.cover_image_url ? (
+                      <img
+                        src={opportunity.cover_image_url}
+                        alt=""
+                        loading="lazy"
+                        className="mb-3 aspect-[16/9] w-full max-w-80 rounded-[calc(var(--radius)-4px)] border border-border/70 object-cover"
+                      />
+                    ) : null}
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-base font-semibold text-foreground">
                         {opportunity.title}

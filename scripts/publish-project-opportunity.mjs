@@ -34,6 +34,7 @@ const PROJECT_FIELDS = new Set([
   "title",
   "slug",
   "summary",
+  "cover_image_url",
   "description",
   "opportunity_type",
   "status",
@@ -88,7 +89,7 @@ Required JSON fields:
 
 Common JSON fields:
   description, opportunity_type, status, visibility, role_tags, topic_tags,
-  headcount_label, time_commitment, compensation, deadline_at, location,
+  cover_image_url, headcount_label, time_commitment, compensation, deadline_at, location,
   application_cta, application_note, external_application_url,
   application_requires_login, is_featured, sort_order
 `);
@@ -439,6 +440,7 @@ function normalizePayload(rawPayload, options) {
     slug,
     summary,
     description: getParagraphField(rawPayload.description),
+    cover_image_url: normalizeOptionalUrlValue(rawPayload.cover_image_url, "cover_image_url"),
     opportunity_type: normalizeEnum(
       rawPayload.opportunity_type,
       "project",

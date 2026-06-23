@@ -256,6 +256,12 @@ export default async function ProjectDetailPage({
         </div>
 
         <aside className={styles.projectHeroBoard} aria-label="项目关键信息">
+          {opportunity.coverImageUrl ? (
+            <div className={styles.projectCover}>
+              <img src={opportunity.coverImageUrl} alt="" loading="eager" />
+            </div>
+          ) : null}
+
           {detailItems.length > 0 ? (
             <div className={styles.projectDetailList}>
               {detailItems.map((item) => {
