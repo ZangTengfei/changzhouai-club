@@ -58,6 +58,7 @@ export function SiteFooter() {
         <div className={cx("home-footer-bottom")}>
           <span className={cx("home-footer-legal")}>
             <span>© 2026 常州 AI Club. All rights reserved.</span>
+            <span>连接点（常州）科技服务有限公司</span>
             <Link href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer">
               苏ICP备2026038990号-3
             </Link>
