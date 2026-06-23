@@ -50,7 +50,7 @@ function getErrorMessage(error?: string) {
   }
 
   if (error === "missing_contact_channel") {
-    return "请至少填写微信、手机号或邮箱中的一种联系方式。";
+    return "请填写微信号和手机号，邮箱可以选填。";
   }
 
   if (error === "applications_closed") {
@@ -436,18 +436,18 @@ export default async function ProjectDetailPage({
               </label>
 
               <label>
-                <span>微信号</span>
-                <input className="input" name="contact_wechat" placeholder="微信、手机号、邮箱至少填一项" />
+                <span>微信号（必填）</span>
+                <input className="input" name="contact_wechat" placeholder="用于后续沟通和对接" required />
               </label>
 
               <label>
-                <span>手机号</span>
-                <input className="input" name="contact_phone" placeholder="微信、手机号、邮箱至少填一项" />
+                <span>手机号（必填）</span>
+                <input className="input" name="contact_phone" type="tel" placeholder="用于确认身份和紧急联系" required />
               </label>
 
               <label>
-                <span>邮箱</span>
-                <input className="input" type="email" name="contact_email" placeholder="微信、手机号、邮箱至少填一项" />
+                <span>邮箱（选填）</span>
+                <input className="input" type="email" name="contact_email" placeholder="可用于接收后续资料" />
               </label>
 
               <label>

@@ -134,7 +134,7 @@ export async function submitProjectApplication(formData: FormData) {
     redirect(buildProjectRedirect(projectSlug, { error: "missing_required_fields" }));
   }
 
-  if (!contactWechat && !contactPhone && !contactEmail) {
+  if (!contactWechat || !contactPhone) {
     redirect(buildProjectRedirect(projectSlug, { error: "missing_contact_channel" }));
   }
 
