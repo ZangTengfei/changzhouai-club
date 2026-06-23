@@ -98,6 +98,40 @@ npx supabase db reset
 psql "<local database url>" -f supabase/seed/202603290002_seed_existing_events.sql
 ```
 
+## 2.1 腾讯云自建 Supabase 迁移执行
+
+正式腾讯云环境默认不要使用旧 Supabase Cloud link。仓库提供了一个本地触发、服务器内执行的脚本：
+
+```bash
+npm run db:migrate:selfhost
+```
+
+默认只做 dry-run：读取本地 `.env.local` 里的腾讯云 SSH 信息，登录服务器后在 `/opt/changzhouai/supabase` 内读取数据库密码，并通过 `supabase-db` 容器检查远程迁移历史；不会把数据库密码拉回本地，也不会执行 SQL。
+
+确认待执行项无误后再执行：
+
+```bash
+npm run db:migrate:selfhost -- --apply
+```
+
+如果只想执行某一个 migration：
+
+```bash
+npm run db:migrate:selfhost -- --apply --only 20260623100131_project_opportunity_cover_image.sql
+```
+
+如果目标库是从历史生产库恢复而来，且远程没有 `supabase_migrations.schema_migrations` 记录表，需要先人工确认当前 schema 已经包含本地 migrations 的效果，再只修复迁移记录：
+
+```bash
+npm run db:migrate:selfhost -- --mark-applied-all
+```
+
+对于已经手工执行过的单个 migration，也可以只记录这一条：
+
+```bash
+npm run db:migrate:selfhost -- --mark-applied 20260623100131_project_opportunity_cover_image.sql
+```
+
 本地启动 Next.js：
 
 ```bash
