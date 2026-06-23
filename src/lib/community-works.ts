@@ -162,6 +162,125 @@ export type PublicWorksDirectory = {
 
 const PUBLIC_WORKS_REVALIDATE_SECONDS = 60;
 const PUBLIC_WORK_TAG_LIMIT = 18;
+const REMOTE_CASE_LIBRARY_BASE_URL = "http://abbs.fun:25181";
+export const remoteCaseLibraryUrl = `${REMOTE_CASE_LIBRARY_BASE_URL}/?tab=library`;
+const REMOTE_CASE_LIBRARY_SOURCE_LABEL = "AI 应用案例档案库";
+const REMOTE_CASE_LIBRARY_SUMMARY_LENGTH = 132;
+const REMOTE_IMAGE_EXTENSION_PATTERN = /\.(avif|gif|jpe?g|png|webp)$/i;
+
+type RemoteCaseLibraryTag = {
+  name?: string | null;
+};
+
+type RemoteCaseLibraryCase = {
+  id?: number | string | null;
+  name?: string | null;
+  description?: string | null;
+  images?: string[] | null;
+  tags?: RemoteCaseLibraryTag[] | null;
+  sort_order?: number | string | null;
+  upload_time?: string | null;
+  is_hidden?: boolean | null;
+};
+
+function isRemoteCaseLibraryCase(value: unknown): value is RemoteCaseLibraryCase {
+  return typeof value === "object" && value !== null;
+}
+
+function normalizeRemoteText(value: number | string | null | undefined) {
+  return String(value ?? "").replace(/\s+/g, " ").trim();
+}
+
+function toRemoteNumber(value: number | string | null | undefined) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+
+  return null;
+}
+
+function buildRemoteCaseUrl(caseId: string) {
+  const url = new URL(REMOTE_CASE_LIBRARY_BASE_URL);
+  url.searchParams.set("tab", "library");
+  url.searchParams.set("caseId", caseId);
+
+  return url.toString();
+}
+
+function toRemoteAssetUrl(value: string) {
+  const assetPath = normalizeRemoteText(value);
+
+  if (!assetPath) {
+    return null;
+  }
+
+  try {
+    const assetUrl = new URL(assetPath, REMOTE_CASE_LIBRARY_BASE_URL);
+
+    if (assetUrl.protocol !== "http:" && assetUrl.protocol !== "https:") {
+      return null;
+    }
+
+    return assetUrl.toString();
+  } catch {
+    return null;
+  }
+}
+
+function isRemoteImageUrl(url: string) {
+  try {
+    return REMOTE_IMAGE_EXTENSION_PATTERN.test(new URL(url).pathname);
+  } catch {
+    return false;
+  }
+}
+
+function getRemoteCaseCoverImageUrl(images: string[] | null | undefined) {
+  for (const image of images ?? []) {
+    const url = toRemoteAssetUrl(image);
+
+    if (url && isRemoteImageUrl(url)) {
+      return url;
+    }
+  }
+
+  return null;
+}
+
+function getRemoteCaseTags(tags: RemoteCaseLibraryTag[] | null | undefined) {
+  const seen = new Set<string>();
+  const tagNames: string[] = [];
+
+  (tags ?? []).forEach((tag) => {
+    const name = normalizeRemoteText(tag.name);
+
+    if (!name || seen.has(name)) {
+      return;
+    }
+
+    seen.add(name);
+    tagNames.push(name);
+  });
+
+  return tagNames;
+}
+
+function getRemoteCaseSummary(description: string) {
+  if (!description) {
+    return "来自 AI 应用案例档案库的公开案例。";
+  }
+
+  if (description.length <= REMOTE_CASE_LIBRARY_SUMMARY_LENGTH) {
+    return description;
+  }
+
+  return `${description.slice(0, REMOTE_CASE_LIBRARY_SUMMARY_LENGTH)}...`;
+}
 
 function mapPublicMember(row: PublicMemberRow): PublicMember {
   return {
@@ -240,6 +359,62 @@ function mapPublicExternalCaseCard(
     isFeatured: row.is_featured,
     createdAt: row.created_at,
   };
+}
+
+function mapRemoteCaseLibraryCard(
+  row: RemoteCaseLibraryCase,
+  index: number,
+): PublicExternalCaseCard | null {
+  const remoteId = normalizeRemoteText(row.id);
+  const title = normalizeRemoteText(row.name);
+  const description = normalizeRemoteText(row.description);
+
+  if (!remoteId || !title || row.is_hidden === true) {
+    return null;
+  }
+
+  return {
+    id: `remote-case-library-${remoteId}`,
+    slug: `remote-case-library-${remoteId}`,
+    title,
+    summary: getRemoteCaseSummary(description),
+    description: description || null,
+    type: "case",
+    typeLabel: externalCaseCardTypeLabels.case,
+    sourceLabel: REMOTE_CASE_LIBRARY_SOURCE_LABEL,
+    coverImageUrl: getRemoteCaseCoverImageUrl(row.images),
+    externalUrl: buildRemoteCaseUrl(remoteId),
+    ctaLabel: "查看档案详情",
+    tags: getRemoteCaseTags(row.tags),
+    sortOrder: toRemoteNumber(row.sort_order) ?? index,
+    isFeatured: false,
+    createdAt: normalizeRemoteText(row.upload_time),
+  };
+}
+
+async function loadRemoteCaseLibraryCards() {
+  try {
+    const response = await fetch(`${REMOTE_CASE_LIBRARY_BASE_URL}/api/cases`, {
+      next: { revalidate: PUBLIC_WORKS_REVALIDATE_SECONDS },
+    });
+
+    if (!response.ok) {
+      return [];
+    }
+
+    const data: unknown = await response.json();
+
+    if (!Array.isArray(data)) {
+      return [];
+    }
+
+    return data
+      .filter(isRemoteCaseLibraryCase)
+      .map((caseItem, index) => mapRemoteCaseLibraryCard(caseItem, index))
+      .filter(Boolean) as PublicExternalCaseCard[];
+  } catch {
+    return [];
+  }
 }
 
 function buildTags(items: Array<{ tags: string[] }>) {
@@ -323,20 +498,33 @@ async function loadPublicExternalCaseCards() {
   return ((data ?? []) as PublicExternalCaseCardRow[]).map(mapPublicExternalCaseCard);
 }
 
+function buildPublicWorksDirectory(
+  works: PublicMemberWork[],
+  externalCards: PublicExternalCaseCard[],
+): PublicWorksDirectory {
+  const makerIds = new Set(works.map((work) => work.memberId));
+
+  return {
+    works,
+    externalCards,
+    featuredWorks: works.filter((work) => work.isFeatured).slice(0, 6),
+    tags: buildTags([...works, ...externalCards]),
+    stats: {
+      works: works.length + externalCards.length,
+      featuredWorks:
+        works.filter((work) => work.isFeatured).length +
+        externalCards.filter((card) => card.isFeatured).length,
+      makers: makerIds.size,
+      launchedWorks: works.filter((work) => work.status === "launched").length,
+    },
+  };
+}
+
 export async function getPublicWorksDirectory(): Promise<PublicWorksDirectory> {
   if (!hasSupabaseEnv()) {
-    return {
-      works: [],
-      externalCards: [],
-      featuredWorks: [],
-      tags: [],
-      stats: {
-        works: 0,
-        featuredWorks: 0,
-        makers: 0,
-        launchedWorks: 0,
-      },
-    };
+    const remoteCaseCards = await loadRemoteCaseLibraryCards();
+
+    return buildPublicWorksDirectory([], remoteCaseCards);
   }
 
   return getCachedPublicWorksDirectory();
@@ -352,26 +540,13 @@ export async function getPublicWorksByMemberId(memberId: string) {
 
 const getCachedPublicWorksDirectory = unstable_cache(
   async (): Promise<PublicWorksDirectory> => {
-    const [works, externalCards] = await Promise.all([
+    const [works, externalCards, remoteCaseCards] = await Promise.all([
       loadPublicWorks(),
       loadPublicExternalCaseCards(),
+      loadRemoteCaseLibraryCards(),
     ]);
-    const makerIds = new Set(works.map((work) => work.memberId));
 
-    return {
-      works,
-      externalCards,
-      featuredWorks: works.filter((work) => work.isFeatured).slice(0, 6),
-      tags: buildTags([...works, ...externalCards]),
-      stats: {
-        works: works.length + externalCards.length,
-        featuredWorks:
-          works.filter((work) => work.isFeatured).length +
-          externalCards.filter((card) => card.isFeatured).length,
-        makers: makerIds.size,
-        launchedWorks: works.filter((work) => work.status === "launched").length,
-      },
-    };
+    return buildPublicWorksDirectory(works, [...externalCards, ...remoteCaseCards]);
   },
   ["public-works-directory"],
   { revalidate: PUBLIC_WORKS_REVALIDATE_SECONDS },
