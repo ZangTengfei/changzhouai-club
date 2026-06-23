@@ -164,6 +164,7 @@ const PUBLIC_WORKS_REVALIDATE_SECONDS = 60;
 const PUBLIC_WORK_TAG_LIMIT = 18;
 const REMOTE_CASE_LIBRARY_BASE_URL = "http://abbs.fun:25181";
 export const remoteCaseLibraryUrl = `${REMOTE_CASE_LIBRARY_BASE_URL}/?tab=library`;
+const REMOTE_CASE_IMAGE_PROXY_PATH = "/api/external-case-image";
 const REMOTE_CASE_LIBRARY_SOURCE_LABEL = "AI 应用案例档案库";
 const REMOTE_CASE_LIBRARY_SUMMARY_LENGTH = 132;
 const REMOTE_IMAGE_EXTENSION_PATTERN = /\.(avif|gif|jpe?g|png|webp)$/i;
@@ -240,12 +241,18 @@ function isRemoteImageUrl(url: string) {
   }
 }
 
+function toRemoteCaseImageProxyUrl(url: string) {
+  const params = new URLSearchParams({ src: url });
+
+  return `${REMOTE_CASE_IMAGE_PROXY_PATH}?${params.toString()}`;
+}
+
 function getRemoteCaseCoverImageUrl(images: string[] | null | undefined) {
   for (const image of images ?? []) {
     const url = toRemoteAssetUrl(image);
 
     if (url && isRemoteImageUrl(url)) {
-      return url;
+      return toRemoteCaseImageProxyUrl(url);
     }
   }
 
