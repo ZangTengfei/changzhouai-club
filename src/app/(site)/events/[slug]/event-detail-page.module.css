@@ -122,6 +122,30 @@
   line-height: 1.82;
 }
 
+.eventHeroActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.eventHeroRegistrationButton {
+  min-height: 46px;
+}
+
+.eventHeroRegistrationButton span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eventHeroRegistrationButton svg {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+}
+
 .eventHeroVisual {
   position: relative;
   overflow: hidden;
@@ -752,6 +776,15 @@
   .eventHeroHeading h1::after {
     width: 154px;
     margin-left: 34%;
+  }
+
+  .eventHeroActions,
+  .eventHeroRegistrationButton {
+    width: 100%;
+  }
+
+  .eventHeroRegistrationButton {
+    justify-content: center;
   }
 
   .eventQuickFacts,

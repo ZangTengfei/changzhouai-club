@@ -18,7 +18,11 @@ import {
 
 import { EventDetailRegistrationPanel } from "@/components/event-detail-registration-panel";
 import { getPublicEventBySlug } from "@/lib/community-events";
-import { getRegistrationNoteWithoutUrl } from "@/lib/event-registration-link";
+import {
+  getExternalRegistrationLabel,
+  getExternalRegistrationUrl,
+  getRegistrationNoteWithoutUrl,
+} from "@/lib/event-registration-link";
 import { getEventImageUrl } from "@/lib/public-image-url";
 
 import styles from "./event-detail-page.module.css";
@@ -84,6 +88,10 @@ export default async function EventDetailPage({
     event.registrationNote,
     event.registrationUrl,
   );
+  const externalRegistrationUrl =
+    event.status === "scheduled"
+      ? getExternalRegistrationUrl(event.registrationUrl, event.registrationNote)
+      : null;
   const eventHighlights = [
     {
       label: "活动状态",
@@ -144,6 +152,21 @@ export default async function EventDetailPage({
             <h1 id="event-detail-title">{event.title}</h1>
             <p>{event.summary}</p>
           </div>
+
+          {externalRegistrationUrl ? (
+            <div className={styles.eventHeroActions}>
+              <a
+                href={externalRegistrationUrl}
+                className={`button home-primary-button ${styles.eventHeroRegistrationButton}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Ticket aria-hidden="true" strokeWidth={2} />
+                <span>{getExternalRegistrationLabel(externalRegistrationUrl)}</span>
+                <ArrowRight aria-hidden="true" strokeWidth={2} />
+              </a>
+            </div>
+          ) : null}
         </div>
 
         <div className={styles.eventHeroVisual}>
