@@ -1,56 +1,84 @@
 ---
 name: changzhou-event-publisher
-description: End-to-end Changzhou AI Club event launch workflow. Use when the user asks Codex to plan, draft, publish, schedule, update, or validate a 常州 AI Club / Changzhou AI Club event, including confirming the event theme, generating a Feishu registration-form prompt, creating or preparing the Feishu form link and QR code, making an event poster with community logo and registration QR, uploading the poster cover, and publishing the event to the community website without manually filling the admin website.
+description: End-to-end Changzhou AI Club event planning, launch, publishing, and promotion workflow. Use when the user asks Codex to plan, draft, prepare, publish, schedule, promote, update, or validate a 常州 AI Club / Changzhou AI Club event, including theme selection, agenda and venue/time confirmation, Feishu registration form prompts, registration links and QR codes, poster creation or QR overlay, website event publishing, WeChat group notices, and WeChat Official Account / Xiaohongshu / social platform copy packages.
 ---
 
 # Changzhou Event Publisher
 
-## Core Workflow
+## Default Launch Workflow
 
 Use the current repository root.
 
-1. Confirm the public event theme and minimum facts: title, date/time, venue, city, target audience, topic scope, host/partner, and whether it should be public now.
-2. Draft public copy: one-line summary, 1-2 paragraph description, agenda, speaker/host line, registration note, and poster copy. For Changzhou AI Club community-hosted events, also remind the user to include the community platform angle: speakers share real practice and may connect to cooperation opportunities, while the community structures demand, matches capabilities, and can support workflow customization/development rather than only serving as a free event organizer.
-3. Generate a Feishu form prompt if the form does not already exist. Keep it mobile-friendly and collect only necessary fields.
-4. Create or obtain the Feishu registration URL and QR code:
+Use this workflow whenever the user is preparing a repeatable community event:
+
+1. **Event framing**
+   - Confirm the public event theme, title, target audience, topic scope, host/partner, and whether it should be public now.
+   - Ask only for missing high-impact facts. If the user has already implied the pattern, proceed with reasonable assumptions and state them.
+   - Keep internal motives, leadership visits, private sponsor discussions, and unconfirmed partner details out of public copy.
+2. **Basic logistics**
+   - Confirm or propose date/time, duration, venue, city, capacity if known, and whether parking details are needed.
+   - If only “周六下午” or similar is known, use an explicit assumption such as `14:00-17:00` and make it easy to update later.
+3. **Public copy package**
+   - Draft a one-line summary, 1-2 paragraph description, agenda, speaker/host line, registration note, poster copy, and short CTA.
+   - For Changzhou AI Club community-hosted events, include the community platform angle when appropriate: speakers share real practice and may connect to cooperation opportunities; the community structures demand, matches capabilities, and can support workflow customization/development rather than only serving as a free event organizer.
+4. **Registration form**
+   - Generate a Feishu form prompt if the form does not already exist. Keep it mobile-friendly and collect only necessary fields.
+   - Include optional parking/license-plate collection only when the venue needs it. State that it is only for this event's parking registration.
+5. **Registration URL and QR**
    - If a Feishu/browser session is available and the user asked you to operate it, use the browser/Chrome workflow to create the form.
    - If authentication or workspace access is not available, provide the generated prompt and ask the user to create/export the form link or QR code.
    - Decode or verify the final QR when possible, for example with OpenCV `QRCodeDetector`.
-5. Make the poster:
+6. **Poster**
    - Put working assets under `output/posters/<slug>/`.
    - Use the community logo from `public/logo.png` unless a stronger current brand asset is provided.
    - For production posters, keep text and QR reliable: generated backgrounds are fine, but place exact text, logo, and real QR with deterministic local rendering.
    - If the user explicitly asks for a full image-generated poster, warn that model-drawn QR codes may not scan; replace with the real QR before publishing.
-6. Upload the finished poster cover to Supabase Storage when publishing:
+7. **Website publishing**
+   - Upload the finished poster cover to Supabase Storage when publishing:
 
 ```bash
 node .codex/skills/changzhou-event-publisher/scripts/upload-event-cover.mjs \
   --slug <slug> \
-  --file output/posters/<slug>/<poster>.jpg
+  --file output/posters/<slug>/<poster>.png
 ```
 
-7. Create an event JSON file under `output/event-publish/`. Use a lowercase ASCII slug such as `2026-05-15-opc-ai-manufacturing`.
-8. Run a dry run first:
+   - Create an event JSON file under `output/event-publish/`. Use a lowercase ASCII slug such as `2026-05-15-opc-ai-manufacturing`.
+   - Run a dry run first:
 
 ```bash
 npm run event:publish -- --file output/event-publish/<slug>.json --dry-run
 ```
 
-9. If validation passes and the user asked to publish, run:
+   - If validation passes and the user asked to publish, run:
 
 ```bash
 npm run event:publish -- --file output/event-publish/<slug>.json
 ```
 
-10. If the script reports that the slug already exists, do not overwrite by default. Ask once whether to update the existing event, then rerun with `--upsert` only if the user confirms or clearly asked to update.
-11. Verify the public site. Check the detail page and `/events` separately because page caches may refresh on different schedules:
+   - If the script reports that the slug already exists, do not overwrite by default. Ask once whether to update the existing event, then rerun with `--upsert` only if the user confirms or clearly asked to update.
+8. **Promotion package**
+   - Draft a WeChat group notice, usually with emoji when the user asks for group copy.
+   - Draft platform-ready copy for WeChat Official Account, Xiaohongshu, or other social channels when requested. Do not post to external social platforms unless the user explicitly asks and a trusted authenticated workflow is available.
+   - Use the final poster and website/event link in all public-facing materials.
+9. **Verification and handoff**
+   - Verify the public site. Check the detail page and `/events` separately because page caches may refresh on different schedules:
 
 ```bash
 env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u http_proxy -u https_proxy -u all_proxy \
-  curl --noproxy '*' -L https://club.occcc.cc/events/<slug>
+  curl --noproxy '*' -L https://changzhouai.club/events/<slug>
 ```
 
-12. Return the public path `/events/<slug>`, the registration URL, the poster path/cover URL, and any cache note.
+   - Return the public path `/events/<slug>`, the registration URL, poster path/cover URL, group notice, social copy paths if generated, verification result, and any cache note.
+   - If durable event decisions or reusable operation notes were produced, create a concise draft under `output/session-knowledge/`.
+
+## Standard Outputs
+
+Use these locations unless the user asks otherwise:
+
+- `output/event-publish/<slug>.json` for website publishing payloads.
+- `output/posters/<slug>/` for poster source files, generated images, final poster, and QR assets.
+- `output/social/<slug>/` for WeChat group notices, Official Account drafts, Xiaohongshu copy, short video captions, and captions for reposting.
+- `output/session-knowledge/<date>-<slug>.md` for reviewable durable session notes.
 
 ## Feishu Registration Form Prompt
 
@@ -70,18 +98,61 @@ Use this structure and adapt fields to the event. Do not add private or excessiv
 1. 昵称 / 姓名，必填，单行文本
 2. 手机号，必填，手机号格式
 3. 微信号，选填，单行文本
-4. 所在行业 / 职业方向，必填，单选：内容创作、电商运营、品牌/市场、产品/设计、技术开发、企业经营者、学生、其他
-5. 当前相关经验，必填，单选：还没接触、尝试过工具、已在日常工作中使用、正在做商业化或项目落地
-6. 最感兴趣的话题，必填，多选：<按活动主题列 6-8 个选项>
-7. 希望现场交流的问题，选填，长文本
-8. 是否愿意做 3-5 分钟简短分享，必填，单选：愿意、不确定、暂不分享
-9. 备注，选填，长文本
+4. 车牌号，选填，单行文本。说明：如开车前往，可填写车牌号，便于提前登记停车入场；不开车可不填。车牌号仅用于本次活动停车登记，不作其他用途。
+5. 所在行业 / 职业方向，必填，单选：内容创作、电商运营、品牌/市场、产品/设计、技术开发、企业经营者、学生、其他
+6. 当前相关经验，必填，单选：还没接触、尝试过工具、已在日常工作中使用、正在做商业化或项目落地
+7. 最感兴趣的话题，必填，多选：<按活动主题列 6-8 个选项>
+8. 希望现场交流的问题，选填，长文本
+9. 是否愿意做 3-5 分钟简短分享，必填，单选：愿意、不确定、暂不分享
+10. 备注，选填，长文本
 
 提交成功页文案：
 报名已提交，感谢关注 <活动标题>。活动具体安排以组织方后续通知为准，请保持手机或微信畅通。
 
 表单风格要求：简洁、专业、偏科技感，不要收集不必要的隐私信息。
 ```
+
+## WeChat Group Notice
+
+Use this shape for group announcements and adapt the tone to the group:
+
+```text
+🚀 常州 AI Club 本周活动报名开启
+
+🎯《<活动标题>》
+
+这次我们会围绕 <一句话主题>，从真实案例和现场讨论出发，看看 AI 怎么真正进入工作流和项目落地。
+
+📅 时间：<日期 + 星期 + 时间>
+📍 地点：<地点>
+🤝 举办：<主办/联合举办>
+🌐 详情：<官网活动链接>
+
+适合这些朋友：
+✅ <人群 1>
+✅ <人群 2>
+✅ <人群 3>
+
+现场会聊：
+1. <话题 1>
+2. <话题 2>
+3. <话题 3>
+
+🚗 如需开车前往，可在报名表填写车牌号，便于提前登记停车。
+
+👇 扫码或点击链接报名
+<报名链接>
+```
+
+## Social Promotion Package
+
+When the user asks for公众号/小红书/社媒发布素材, produce a compact package:
+
+- **公众号**: title options, intro paragraph, event highlights, agenda, registration CTA, poster placement note, and concise closing.
+- **小红书**: 2-3 title options, short hook, bullet highlights, who should join, registration CTA, hashtags.
+- **朋友圈/视频号/短视频 caption**: one short version under 120 Chinese characters plus a slightly longer version.
+- Include the event URL, registration URL, poster path, and whether the QR was decoded/verified.
+- Do not claim official endorsement, guaranteed project opportunities, or partner commitments beyond confirmed facts.
 
 ## Community Platform Messaging
 

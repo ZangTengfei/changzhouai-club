@@ -1,4 +1,4 @@
 interface:
-  display_name: "常州活动发布全流程"
-  short_description: "Plan, promote, and publish Changzhou AI Club events"
-  default_prompt: "Use $changzhou-event-publisher to launch this Changzhou AI Club event from theme and registration form through poster and website publishing."
+  display_name: "常州活动筹备发布全流程"
+  short_description: "筹备、发布、推广常州 AI Club 线下活动全流程"
+  default_prompt: "Use $changzhou-event-publisher to plan, publish, and promote this Changzhou AI Club event from theme through registration, poster, website, and social copy."
