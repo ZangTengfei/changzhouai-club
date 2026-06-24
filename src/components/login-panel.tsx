@@ -1,10 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, CalendarDays, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  BadgeCheck,
+  CalendarDays,
+  KeyRound,
+  Link2,
+  Mail,
+  Sparkles,
+  UserCheck,
+  UserPlus,
+} from "lucide-react";
 
 import { EmailAuthForm } from "@/components/email-auth-form";
-import { WechatAuthButton } from "@/components/wechat-auth-button";
+import { WechatQrLogin } from "@/components/wechat-qr-login";
 
 import styles from "./login-panel.module.css";
 
@@ -37,50 +47,82 @@ export function LoginPanel({
         </div>
       ) : null}
 
-      <div className={`auth-card ${styles.primaryCard}`}>
-        <div className={styles.cardHeading}>
-          <p className="home-kicker">Account</p>
-          <div>
-            <h2>{isOnboardingFlow ? "先登录，再完善加入资料" : "登录或注册社区账号"}</h2>
-            <p>
-              {isOnboardingFlow
-                ? "登录后会直接进入资料完善页。显示名和微信号是必填项，其他内容可以稍后继续补充。"
-                : "登录后可进入社区账号中心，完善资料、查看活动报名记录，并参与社区活动与协作。"}
-            </p>
+      <div className={styles.entryGrid}>
+        <section className={`auth-card ${styles.entryCard} ${styles.newUserCard}`}>
+          <div className={styles.cardHeading}>
+            <p className="home-kicker">New members</p>
+            <div>
+              <h2>{isOnboardingFlow ? "新用户，用微信加入" : "新用户，用微信登录"}</h2>
+              <p>
+                {isOnboardingFlow
+                  ? "第一次加入社区时，直接使用微信创建账号，随后进入资料完善页。"
+                  : "第一次使用社区账号时，直接使用微信创建账号，后续都可以用微信回来。"}
+              </p>
+            </div>
           </div>
-        </div>
 
-        <EmailAuthForm enabled={enabled} nextPath={nextPath} />
-        <WechatAuthButton
-          enabled={enabled && wechatEnabled}
-          mode="sign-in"
-          nextPath={nextPath}
-        />
+          <WechatQrLogin
+            enabled={enabled && wechatEnabled}
+            nextPath={nextPath}
+          />
 
-        <p className={styles.recoveryNote}>
-          原 Google 登录用户请使用同一个邮箱找回密码，设置完成后即可用邮箱密码登录。
-        </p>
+          <div className={styles.entryNotice}>
+            <UserPlus aria-hidden="true" strokeWidth={1.9} />
+            <span>适合第一次注册、第一次报名活动或第一次完善成员资料。</span>
+          </div>
 
-        {!enabled ? (
-          <p className={styles.hint}>
-            当前登录服务暂未启用，请稍后再试。
+          <p className={styles.cautionNote}>
+            已有邮箱账号或原 Google 账号时，请走右侧入口，避免创建出第二个账号。
           </p>
-        ) : null}
+        </section>
+
+        <section className={`auth-card ${styles.entryCard} ${styles.existingUserCard}`}>
+          <div className={styles.cardHeading}>
+            <p className="home-kicker">Existing account</p>
+            <div>
+              <h2>已有账号，先用原方式登录</h2>
+              <p>登录到账号中心后，再在账号页绑定微信。绑定完成后，下次就能直接用微信进入同一个账号。</p>
+            </div>
+          </div>
+
+          <ul className={styles.legacyFlowList}>
+            <li>
+              <Mail aria-hidden="true" strokeWidth={1.9} />
+              邮箱密码账号：直接用邮箱登录。
+            </li>
+            <li>
+              <KeyRound aria-hidden="true" strokeWidth={1.9} />
+              原 Google 登录账号：输入同一个 Google 邮箱，先找回并设置邮箱密码。
+            </li>
+            <li>
+              <Link2 aria-hidden="true" strokeWidth={1.9} />
+              登录成功后进入账号中心，点击「绑定微信」。
+            </li>
+          </ul>
+
+          <EmailAuthForm enabled={enabled} allowSignUp={false} nextPath={nextPath} />
+        </section>
       </div>
+
+      {!enabled ? (
+        <p className={styles.hint}>
+          当前登录服务暂未启用，请稍后再试。
+        </p>
+      ) : null}
 
       <aside className={styles.sideStack}>
         <div className={`auth-card ${styles.infoCard}`}>
-          <Sparkles aria-hidden="true" strokeWidth={1.9} />
-          <h2>{isOnboardingFlow ? "加入后你可以做什么" : "账号能力"}</h2>
+          <UserCheck aria-hidden="true" strokeWidth={1.9} />
+          <h2>{isOnboardingFlow ? "加入后你可以做什么" : "账号绑定以后"}</h2>
           <p>
             {isOnboardingFlow
               ? "社区账号会承载你的成员资料、活动参与记录与协作信息，后续都在同一个个人页里持续更新。"
-              : "社区账号会承载成员资料、活动参与记录与协作信息，帮助你在社区内持续积累个人档案。"}
+              : "绑定微信不会覆盖原账号，只是给同一个社区账号增加一种更方便的登录方式。"}
           </p>
           <ul className={styles.capabilityList}>
             <li>
               <BadgeCheck aria-hidden="true" strokeWidth={1.9} />
-              {isOnboardingFlow ? "完成加入资料并持续更新" : "完善个人资料与技能方向"}
+              {isOnboardingFlow ? "完成加入资料并持续更新" : "保留个人资料与报名记录"}
             </li>
             <li>
               <CalendarDays aria-hidden="true" strokeWidth={1.9} />
@@ -88,17 +130,17 @@ export function LoginPanel({
             </li>
             <li>
               <Sparkles aria-hidden="true" strokeWidth={1.9} />
-              逐步接入更多社区身份与协作能力
+              后续用微信更快回到账号中心
             </li>
           </ul>
         </div>
 
         <div className={`auth-card ${styles.accountCard}`}>
-          <h2>{isOnboardingFlow ? "资料提交后还能继续更新" : "登录后将进入账号中心"}</h2>
+          <h2>{isOnboardingFlow ? "资料提交后还能继续更新" : "不确定自己是哪类账号？"}</h2>
           <p>
             {isOnboardingFlow
               ? "这不是一次性申请。你之后仍然可以在个人页维护资料、查看活动记录，并持续参与社区交流与合作。"
-              : "你可以在账号中心维护个人资料、查看活动记录，并持续参与社区交流与合作。"}
+              : "如果你以前报名过活动、填过成员资料或用 Google 登录过，优先按已有账号处理。"}
           </p>
           <Link href="/account" className="button button-secondary auth-link">
             {isOnboardingFlow ? "查看个人页" : "查看账号中心"}

@@ -1,0 +1,58 @@
+.stack {
+  display: grid;
+  gap: 12px;
+}
+
+.qrBox {
+  display: grid;
+  place-items: center;
+  min-height: 320px;
+  overflow: hidden;
+  border: 1px solid rgba(var(--accent-rgb), 0.14);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.frame {
+  width: 300px;
+  height: 400px;
+  max-width: 100%;
+  border: 0;
+}
+
+.placeholder {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 260px;
+  padding: 22px;
+  color: rgba(var(--ink-rgb), 0.58);
+  font-size: 0.94rem;
+  font-weight: 750;
+  line-height: 1.56;
+  text-align: center;
+}
+
+.caption {
+  margin: 0;
+  color: rgba(var(--ink-rgb), 0.64);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.58;
+}
+
+.stack :global(.auth-button) {
+  width: 100%;
+  min-height: 44px;
+  justify-content: center;
+}
+
+@media (max-width: 640px) {
+  .qrBox {
+    min-height: 300px;
+  }
+
+  .frame {
+    transform: scale(0.92);
+  }
+}

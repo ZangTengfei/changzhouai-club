@@ -12,6 +12,7 @@ type EmailAuthMode = "sign-in" | "sign-up" | "reset";
 
 type EmailAuthFormProps = {
   enabled: boolean;
+  allowSignUp?: boolean;
   nextPath?: string;
 };
 
@@ -71,6 +72,7 @@ function getAuthErrorMessage(message: string) {
 
 export function EmailAuthForm({
   enabled,
+  allowSignUp = true,
   nextPath = "/account",
 }: EmailAuthFormProps) {
   const [mode, setMode] = useState<EmailAuthMode>("sign-in");
@@ -328,7 +330,7 @@ export function EmailAuthForm({
           <strong>找回或设置邮箱密码</strong>
           <span>原 Google 登录用户也可以输入同一个邮箱，收到邮件后设置新的邮箱密码。</span>
         </div>
-      ) : (
+      ) : allowSignUp ? (
         <div className={styles.modeTabs} role="tablist" aria-label="邮箱认证方式">
           <button
             type="button"
@@ -358,9 +360,14 @@ export function EmailAuthForm({
             注册
           </button>
         </div>
+      ) : (
+        <div className={styles.resetHeading}>
+          <strong>邮箱账号登录</strong>
+          <span>使用原邮箱账号进入账号中心，再绑定微信作为新的登录方式。</span>
+        </div>
       )}
 
-      {mode === "sign-up" ? (
+      {allowSignUp && mode === "sign-up" ? (
         <label className="form-field">
           <span>昵称</span>
           <input
@@ -413,7 +420,7 @@ export function EmailAuthForm({
         </label>
       ) : null}
 
-      {mode === "sign-up" ? (
+      {allowSignUp && mode === "sign-up" ? (
         <label className="form-field">
           <span>确认密码</span>
           <span className={styles.passwordField}>
