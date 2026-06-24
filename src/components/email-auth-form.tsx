@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useMemo, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, KeyRound } from "lucide-react";
 
 import { getPublicSiteUrl } from "@/lib/env";
 import { createClient } from "@/lib/supabase/client";
@@ -310,6 +310,15 @@ export function EmailAuthForm({
   const passwordInputType = showPassword ? "text" : "password";
   const PasswordIcon = showPassword ? EyeOff : Eye;
   const passwordToggleLabel = showPassword ? "隐藏密码" : "显示密码";
+  function openPasswordReset() {
+    setMode("reset");
+    setPassword("");
+    setConfirmPassword("");
+    resetRecoveryState();
+    setError(null);
+    setMessage(null);
+  }
+
   const renderPasswordToggle = () => (
     <button
       type="button"
@@ -498,21 +507,29 @@ export function EmailAuthForm({
       ) : null}
 
       {mode === "sign-in" ? (
-        <button
-          type="button"
-          className={styles.textButton}
-          onClick={() => {
-            setMode("reset");
-            setPassword("");
-            setConfirmPassword("");
-            resetRecoveryState();
-            setError(null);
-            setMessage(null);
-          }}
-          disabled={!enabled || pending}
-        >
-          忘记密码，或为原 Google 账号设置邮箱密码
-        </button>
+        <div className={styles.signInActions}>
+          <button
+            type="button"
+            className={styles.googleRecoveryButton}
+            onClick={openPasswordReset}
+            disabled={!enabled || pending}
+          >
+            <KeyRound aria-hidden="true" strokeWidth={1.9} />
+            <span>
+              <strong>原 Google 登录用户</strong>
+              <small>发送邮件，设置邮箱密码后登录原账号</small>
+            </span>
+          </button>
+
+          <button
+            type="button"
+            className={styles.textButton}
+            onClick={openPasswordReset}
+            disabled={!enabled || pending}
+          >
+            忘记邮箱密码
+          </button>
+        </div>
       ) : null}
 
       {mode === "reset" ? (

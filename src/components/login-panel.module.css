@@ -94,13 +94,6 @@
     box-shadow 0.18s ease;
 }
 
-.newUserCard :global(.auth-button) {
-  width: 100%;
-  min-height: 50px;
-  justify-content: center;
-  font-size: 1rem;
-}
-
 .entryCard :global(.auth-button:hover),
 .entryCard :global(.auth-button:focus-visible) {
   border-color: rgba(var(--accent-strong-rgb), 0.34);
@@ -256,7 +249,4 @@
     padding: 20px;
   }
 
-  .newUserCard :global(.auth-button) {
-    min-height: 48px;
-  }
 }

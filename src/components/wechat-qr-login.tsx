@@ -128,13 +128,15 @@ export function WechatQrLogin({
     <div className={styles.stack}>
       <div className={styles.qrBox}>
         {frameUrl ? (
-          <iframe
-            title="微信扫码登录"
-            src={frameUrl}
-            className={styles.frame}
-            loading="eager"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
+          <div className={styles.frameCrop}>
+            <iframe
+              title="微信扫码登录"
+              src={frameUrl}
+              className={styles.frame}
+              loading="eager"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
         ) : (
           <div className={styles.placeholder}>
             {loading ? "正在准备微信二维码..." : "微信二维码暂不可用"}
@@ -142,16 +144,19 @@ export function WechatQrLogin({
         )}
       </div>
 
-      <p className={styles.caption}>用微信扫码确认后，会自动回到社区账号页面。</p>
+      <p className={styles.caption}>扫码确认后自动回到社区账号页。</p>
 
       {error ? <p className="note-strip">{error}</p> : null}
 
-      <WechatAuthButton
-        enabled={enabled}
-        mode="sign-in"
-        nextPath={safeNextPath}
-        className="button button-secondary auth-button"
-      />
+      <div className={styles.fallbackAction}>
+        <span>二维码加载异常时</span>
+        <WechatAuthButton
+          enabled={enabled}
+          mode="sign-in"
+          nextPath={safeNextPath}
+          className="button button-secondary auth-button"
+        />
+      </div>
     </div>
   );
 }
