@@ -28,6 +28,7 @@ import { AccountProfileForm } from "@/components/account-profile-form";
 import { ImageUploadField } from "@/components/image-upload-field";
 import { MemberAvatar } from "@/components/member-avatar";
 import { SignOutButton } from "@/components/sign-out-button";
+import { WechatAuthButton } from "@/components/wechat-auth-button";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import {
   workReviewStatusLabels,
@@ -40,6 +41,7 @@ import {
 import { hasSupabaseEnv } from "@/lib/env";
 import { getMemberPublicSlugPath } from "@/lib/member-public-slug";
 import { createClient } from "@/lib/supabase/server";
+import { getWechatProviderName, hasWechatOAuthEnv } from "@/lib/wechat-oauth";
 
 import styles from "./account-page.module.css";
 
@@ -49,7 +51,23 @@ export const metadata: Metadata = {
 };
 
 function formatProviderList(providers: string[]) {
-  return providers.length > 0 ? providers.join(", ") : "邮箱登录";
+  if (providers.length === 0) {
+    return "邮箱登录";
+  }
+
+  return providers
+    .map((provider) => {
+      if (provider === getWechatProviderName()) {
+        return "微信";
+      }
+
+      if (provider === "email" || provider === "password") {
+        return "邮箱登录";
+      }
+
+      return provider;
+    })
+    .join(", ");
 }
 
 function formatEventDate(value: string | null | undefined) {
@@ -278,6 +296,8 @@ export default async function AccountPage({
 
   const identities = identityData?.identities ?? [];
   const providers = identities.map((item) => item.provider);
+  const wechatEnabled = hasWechatOAuthEnv();
+  const wechatLinked = providers.includes(getWechatProviderName());
   const displayName =
     profile?.display_name?.trim() || user.email?.split("@")[0] || "社区成员";
   const profileComplete = Boolean(
@@ -408,6 +428,13 @@ export default async function AccountPage({
           </div>
 
           <div className={styles.accountSecurityActions}>
+            <WechatAuthButton
+              enabled={wechatEnabled}
+              mode="link"
+              linked={wechatLinked}
+              nextPath="/account?updated=wechat_identity"
+              className={`button button-secondary auth-button ${styles.accountSecurityAction}`}
+            />
             <Link
               href="/account/password"
               className={`button button-secondary ${styles.accountSecurityAction}`}
@@ -452,6 +479,8 @@ export default async function AccountPage({
               ? "成员资料已保存。"
               : params.updated === "password"
                 ? "邮箱登录密码已更新。"
+              : params.updated === "wechat_identity"
+                ? "微信已绑定。"
               : params.updated === "work"
                 ? "作品已提交，等待管理员审核。"
                 : params.updated === "work_deleted"

@@ -292,7 +292,7 @@ read_env_value() {
 
 POSTGRES_PASSWORD="$(read_env_value POSTGRES_PASSWORD)"
 DB_NAME="$(read_env_value POSTGRES_DB || true)"
-DB_NAME="\${DB_NAME:-postgres}"
+DB_NAME="${"${DB_NAME:-postgres}"}"
 
 psql_db() {
   sudo docker exec -e PGPASSWORD="$POSTGRES_PASSWORD" supabase-db \
@@ -357,10 +357,11 @@ esac
 
 function uploadMigration(sshConfig, migration, tempDir) {
   const sql = readFileSync(migration.path, "utf8");
+  const encodedSql = Buffer.from(sql, "utf8").toString("base64");
 
   runRemote(
     sshConfig,
-    String.raw`
+    `
 set -eu
 TEMP_DIR="$1"
 FILE_NAME="$2"
@@ -372,7 +373,9 @@ case "$FILE_NAME" in
   *[!A-Za-z0-9_.-]*) printf "Unexpected file name: %s\n" "$FILE_NAME" >&2; exit 1 ;;
 esac
 umask 077
-cat > "$TEMP_DIR/$FILE_NAME"
+base64 -d > "$TEMP_DIR/$FILE_NAME" <<'MIGRATION_SQL'
+${encodedSql}
+MIGRATION_SQL
 `,
     [tempDir, migration.fileName],
     { errorMessage: `Failed to upload migration: ${migration.fileName}` },
@@ -397,7 +400,7 @@ read_env_value() {
 
 POSTGRES_PASSWORD="$(read_env_value POSTGRES_PASSWORD)"
 DB_NAME="$(read_env_value POSTGRES_DB || true)"
-DB_NAME="\${DB_NAME:-postgres}"
+DB_NAME="${"${DB_NAME:-postgres}"}"
 
 psql_db() {
   sudo docker exec -i -e PGPASSWORD="$POSTGRES_PASSWORD" supabase-db \
@@ -459,7 +462,7 @@ while IFS="$(printf '\t')" read -r version name file_name; do
     fi
 
     printf "apply %s\n" "$file_name"
-    psql_db -f "$migration_file"
+    psql_db < "$migration_file"
     record_migration "$version" "$name"
     continue
   fi

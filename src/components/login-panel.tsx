@@ -4,11 +4,13 @@ import Link from "next/link";
 import { ArrowRight, BadgeCheck, CalendarDays, Sparkles } from "lucide-react";
 
 import { EmailAuthForm } from "@/components/email-auth-form";
+import { WechatAuthButton } from "@/components/wechat-auth-button";
 
 import styles from "./login-panel.module.css";
 
 type LoginPanelProps = {
   enabled: boolean;
+  wechatEnabled?: boolean;
   nextPath?: string;
   error?: string;
 };
@@ -21,6 +23,7 @@ const errorMap: Record<string, string> = {
 
 export function LoginPanel({
   enabled,
+  wechatEnabled = false,
   nextPath = "/account",
   error,
 }: LoginPanelProps) {
@@ -48,6 +51,11 @@ export function LoginPanel({
         </div>
 
         <EmailAuthForm enabled={enabled} nextPath={nextPath} />
+        <WechatAuthButton
+          enabled={enabled && wechatEnabled}
+          mode="sign-in"
+          nextPath={nextPath}
+        />
 
         <p className={styles.recoveryNote}>
           原 Google 登录用户请使用同一个邮箱找回密码，设置完成后即可用邮箱密码登录。

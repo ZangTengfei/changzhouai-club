@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { LoginPanel } from "@/components/login-panel";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { hasSupabaseEnv } from "@/lib/env";
+import { hasWechatOAuthEnv } from "@/lib/wechat-oauth";
 
 import styles from "./login-page.module.css";
 
@@ -35,6 +36,7 @@ export default async function LoginPage({
 
         <LoginPanel
           enabled={enabled}
+          wechatEnabled={hasWechatOAuthEnv()}
           nextPath={params.next ?? "/account"}
           error={params.error}
         />
