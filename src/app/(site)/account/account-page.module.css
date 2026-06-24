@@ -161,6 +161,37 @@
   justify-content: flex-end;
 }
 
+.wechatIdentityAction {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.wechatIdentitySummary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  max-width: 190px;
+  min-height: 42px;
+  padding: 6px 10px 6px 6px;
+  border: 1px solid rgba(var(--ink-rgb), 0.07);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.48);
+  color: rgba(var(--ink-rgb), 0.72);
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.wechatIdentitySummary span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .accountSummaryActions :global(.button),
 .accountSummaryActions :global(.auth-button) {
   min-height: 42px;
@@ -741,7 +772,8 @@
 
   .accountPrimaryActions,
   .accountNavActions,
-  .accountSecurityActions {
+  .accountSecurityActions,
+  .wechatIdentityAction {
     justify-content: flex-start;
   }
 
@@ -806,7 +838,8 @@
 
   .accountPrimaryActions,
   .accountNavActions,
-  .accountSecurityActions {
+  .accountSecurityActions,
+  .wechatIdentityAction {
     display: grid;
     grid-template-columns: 1fr;
   }
@@ -817,6 +850,11 @@
   .accountWorkFormFooter :global(.button),
   .accountWorkCard :global(.button),
   .emptyRegistrationPanel :global(.button) {
+    width: 100%;
+  }
+
+  .wechatIdentitySummary {
+    max-width: none;
     width: 100%;
   }
 

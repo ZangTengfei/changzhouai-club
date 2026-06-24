@@ -45,6 +45,8 @@ import { getWechatProviderName, hasWechatOAuthEnv } from "@/lib/wechat-oauth";
 
 import styles from "./account-page.module.css";
 
+type IdentityData = Record<string, unknown>;
+
 export const metadata: Metadata = {
   title: "账号",
   description: "查看当前登录账号、成员资料状态和活动报名记录。",
@@ -82,6 +84,43 @@ function formatEventDate(value: string | null | undefined) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function getStringValue(data: IdentityData | null | undefined, keys: string[]) {
+  if (!data) {
+    return null;
+  }
+
+  for (const key of keys) {
+    const value = data[key];
+
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return null;
+}
+
+function getWechatProfile(
+  wechatIdentityData: IdentityData | null | undefined,
+  userMetadata: IdentityData | null | undefined,
+) {
+  const displayName =
+    getStringValue(wechatIdentityData, ["nickname", "name", "full_name", "user_name"]) ??
+    getStringValue(userMetadata, ["nickname", "name", "full_name", "user_name"]);
+  const avatarUrl =
+    getStringValue(wechatIdentityData, ["avatar_url", "picture"]) ??
+    getStringValue(userMetadata, ["avatar_url", "picture"]);
+
+  if (!displayName && !avatarUrl) {
+    return null;
+  }
+
+  return {
+    displayName: displayName ?? "微信账号",
+    avatarUrl,
+  };
 }
 
 function getStatusMessage(error?: string) {
@@ -296,8 +335,17 @@ export default async function AccountPage({
 
   const identities = identityData?.identities ?? [];
   const providers = identities.map((item) => item.provider);
+  const wechatIdentity = identities.find(
+    (item) => item.provider === getWechatProviderName(),
+  );
   const wechatEnabled = hasWechatOAuthEnv();
   const wechatLinked = providers.includes(getWechatProviderName());
+  const wechatProfile = wechatLinked
+    ? getWechatProfile(
+        wechatIdentity?.identity_data as IdentityData | null | undefined,
+        user.user_metadata as IdentityData | null | undefined,
+      )
+    : null;
   const displayName =
     profile?.display_name?.trim() || user.email?.split("@")[0] || "社区成员";
   const profileComplete = Boolean(
@@ -428,13 +476,25 @@ export default async function AccountPage({
           </div>
 
           <div className={styles.accountSecurityActions}>
-            <WechatAuthButton
-              enabled={wechatEnabled}
-              mode="link"
-              linked={wechatLinked}
-              nextPath="/account?updated=wechat_identity"
-              className={`button button-secondary auth-button ${styles.accountSecurityAction}`}
-            />
+            <div className={styles.wechatIdentityAction}>
+              <WechatAuthButton
+                enabled={wechatEnabled}
+                mode="link"
+                linked={wechatLinked}
+                nextPath="/account?updated=wechat_identity"
+                className={`button button-secondary auth-button ${styles.accountSecurityAction}`}
+              />
+              {wechatProfile ? (
+                <div className={styles.wechatIdentitySummary}>
+                  <MemberAvatar
+                    name={wechatProfile.displayName}
+                    avatarUrl={wechatProfile.avatarUrl}
+                    size="sm"
+                  />
+                  <span>{wechatProfile.displayName}</span>
+                </div>
+              ) : null}
+            </div>
             <Link
               href="/account/password"
               className={`button button-secondary ${styles.accountSecurityAction}`}
