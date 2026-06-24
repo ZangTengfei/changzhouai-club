@@ -26,6 +26,13 @@ import {
   type AiHotMode,
   type AiNewsItem,
 } from "@/lib/aihot";
+import {
+  getWeDailyReports,
+  type WeDailyDiscussion,
+  type WeDailyHighlight,
+  type WeDailyReport,
+  type WeDailyResource,
+} from "@/lib/wedaily";
 
 import { DailyReportExportButton } from "./daily-report-export-button";
 import styles from "./ai-news-page.module.css";
@@ -41,11 +48,12 @@ const dailyReportUrl = "https://changzhouai.club/news?view=daily";
 
 type AiNewsSearchParams = {
   category?: string;
+  date?: string;
   mode?: string;
   view?: string;
 };
 
-type AiNewsView = "feed" | "daily";
+type AiNewsView = "feed" | "daily" | "local";
 
 const categoryToneClassNames: Record<AiHotCategory, string> = {
   "ai-models": styles.categoryToneGreen,
@@ -68,7 +76,11 @@ function normalizeMode(value?: string): AiHotMode {
 }
 
 function normalizeView(value?: string): AiNewsView {
-  return value === "daily" ? "daily" : "feed";
+  if (value === "daily" || value === "local") {
+    return value;
+  }
+
+  return "feed";
 }
 
 function normalizeCategory(value?: string): AiHotFeedCategory {
@@ -93,8 +105,8 @@ function buildFeedHref(
   };
   const params = new URLSearchParams();
 
-  if (next.view === "daily") {
-    params.set("view", "daily");
+  if (next.view !== "feed") {
+    params.set("view", next.view);
     return `/news?${params.toString()}`;
   }
 
@@ -153,6 +165,39 @@ function formatDailyFullDate(value?: string | null) {
 
 function getDailySectionEnglishLabel(label: string) {
   return dailySectionEnglishLabels[label] ?? "Daily Brief";
+}
+
+function formatWeDailyGeneratedAt(value?: string | null) {
+  if (!value) {
+    return "生成时间待确认";
+  }
+
+  const date = new Date(value.includes("T") ? value : `${value.replace(" ", "T")}+08:00`);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("zh-CN", {
+    timeZone: "Asia/Shanghai",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function buildLocalReportHref(date: string) {
+  const params = new URLSearchParams({
+    date,
+    view: "local",
+  });
+
+  return `/news?${params.toString()}`;
+}
+
+function formatCompactNumber(value?: number) {
+  return typeof value === "number" ? value.toLocaleString("zh-CN") : "0";
 }
 
 function FeedItem({ item, index }: { item: AiNewsItem; index: number }) {
@@ -331,6 +376,212 @@ function DailyReportView({
   );
 }
 
+function GroupHighlightCard({ highlight }: { highlight: WeDailyHighlight }) {
+  return (
+    <article className={styles.groupHighlightCard}>
+      <div className={styles.groupCardMeta}>
+        <span>{String(highlight.index).padStart(2, "0")}</span>
+        {highlight.timeRange ? <time>{highlight.timeRange}</time> : null}
+      </div>
+      <h3>{highlight.title}</h3>
+      {highlight.summary ? <p>{highlight.summary}</p> : null}
+      {highlight.participants.length > 0 ? (
+        <div className={styles.groupPeopleList}>
+          {highlight.participants.slice(0, 4).map((person) => (
+            <span key={person}>{person}</span>
+          ))}
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+function GroupDiscussionCard({ discussion }: { discussion: WeDailyDiscussion }) {
+  return (
+    <article className={styles.groupDiscussionCard}>
+      <span>TOPIC {String(discussion.index).padStart(2, "0")}</span>
+      <h3>
+        {discussion.title}
+        {discussion.timeRange ? <small>{discussion.timeRange}</small> : null}
+      </h3>
+      <p>{discussion.conclusion}</p>
+      {discussion.people.length > 0 ? (
+        <div className={styles.groupPeopleList}>
+          {discussion.people.slice(0, 5).map((person) => (
+            <span key={person}>{person}</span>
+          ))}
+        </div>
+      ) : null}
+      {discussion.quote ? <blockquote>{discussion.quote}</blockquote> : null}
+    </article>
+  );
+}
+
+function GroupResourceCard({ resource }: { resource: WeDailyResource }) {
+  return (
+    <article className={styles.groupResourceCard}>
+      <span>{String(resource.index).padStart(2, "0")}</span>
+      <div>
+        <h3>{resource.title}</h3>
+        <p>{resource.body}</p>
+        {resource.url ? (
+          <Link href={resource.url} target="_blank" rel="noreferrer">
+            打开链接
+            <ArrowUpRight aria-hidden="true" strokeWidth={1.8} />
+          </Link>
+        ) : null}
+      </div>
+    </article>
+  );
+}
+
+function LocalGroupDailyView({
+  activeDate,
+  error,
+  report,
+  reports,
+}: {
+  activeDate?: string;
+  error: string | null;
+  report: WeDailyReport | null;
+  reports: WeDailyReport[];
+}) {
+  if (!report) {
+    return (
+      <section className={styles.dailyEmpty}>
+        <span>LOCAL DIGEST</span>
+        <h2>群聊日报暂时不可用</h2>
+        <p>{error ? "接口暂时无法加载，可以稍后刷新重试。" : "还没有可展示的群聊日报。"}</p>
+        <Link href="/news">查看 AI 资讯</Link>
+      </section>
+    );
+  }
+
+  const stats = report.stats;
+
+  return (
+    <section className={styles.groupDailyView} aria-labelledby="group-daily-title">
+      <aside className={styles.groupReportNav} aria-label="最近群聊日报">
+        <div className={styles.sideCardTitle}>
+          <span>Archive</span>
+          <h2>最近日报</h2>
+        </div>
+        <div className={styles.groupReportLinks}>
+          {reports.map((item) => (
+            <Link
+              className={item.date === (activeDate ?? report.date) ? styles.groupReportLinkActive : ""}
+              href={buildLocalReportHref(item.date)}
+              key={item.id}
+              aria-current={item.date === (activeDate ?? report.date) ? "page" : undefined}
+            >
+              <strong>{formatAiNewsDate(item.date)}</strong>
+              <small>{formatCompactNumber(item.stats?.message_count)} 条消息</small>
+            </Link>
+          ))}
+        </div>
+      </aside>
+
+      <article className={styles.groupReportPoster}>
+        <header className={styles.groupPosterHeader}>
+          <div className={styles.groupPosterEyebrow}>
+            <span>群聊手记 · {report.date}</span>
+            <strong>AI</strong>
+          </div>
+          <h2 id="group-daily-title">{report.parsed.title}</h2>
+          <p>
+            {report.chat} · {formatWeDailyGeneratedAt(report.created_at)} · {report.generated_by ?? "WeDaily"} · 工具原作者：小淳
+          </p>
+        </header>
+
+        {report.parsed.quote ? <blockquote className={styles.groupPosterQuote}>{report.parsed.quote}</blockquote> : null}
+
+        <div className={styles.groupStatGrid} aria-label="群聊日报统计">
+          <span>
+            <strong>{formatCompactNumber(stats?.message_count)}</strong>
+            今日消息
+          </span>
+          <span>
+            <strong>{formatCompactNumber(stats?.speaker_count)}</strong>
+            参与成员
+          </span>
+          <span>
+            <strong>{report.parsed.highlights.length}</strong>
+            话题要点
+          </span>
+          <span>
+            <strong>{report.parsed.resources.length}</strong>
+            干货机会
+          </span>
+        </div>
+
+        {report.parsed.overview ? (
+          <section className={styles.groupPosterSection}>
+            <span>ONE-LINE BRIEF</span>
+            <h3>一句话概览</h3>
+            <p className={styles.groupOverview}>{report.parsed.overview}</p>
+          </section>
+        ) : null}
+
+        {report.parsed.highlights.length > 0 ? (
+          <section className={styles.groupPosterSection}>
+            <span>TODAY HIGHLIGHTS</span>
+            <h3>今日要点 · {report.parsed.highlights.length} 个话题</h3>
+            <div className={styles.groupHighlightGrid}>
+              {report.parsed.highlights.map((highlight) => (
+                <GroupHighlightCard highlight={highlight} key={highlight.index} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {report.parsed.discussions.length > 0 ? (
+          <section className={styles.groupPosterSection}>
+            <span>KEY DISCUSSIONS</span>
+            <h3>重点讨论</h3>
+            <div className={styles.groupDiscussionList}>
+              {report.parsed.discussions.map((discussion) => (
+                <GroupDiscussionCard discussion={discussion} key={discussion.index} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {report.parsed.resources.length > 0 ? (
+          <section className={styles.groupPosterSection}>
+            <span>RESOURCES & ACTIONS</span>
+            <h3>干货 / 行动 / 机会</h3>
+            <div className={styles.groupResourceList}>
+              {report.parsed.resources.map((resource) => (
+                <GroupResourceCard resource={resource} key={resource.index} />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {report.parsed.vibe ? (
+          <section className={styles.groupPosterSection}>
+            <span>TODAY'S VIBE</span>
+            <h3>高光时刻 / 群氛围</h3>
+            <p className={styles.groupVibe}>{report.parsed.vibe}</p>
+          </section>
+        ) : null}
+
+        {report.parsed.tags.length > 0 ? (
+          <section className={styles.groupPosterSection}>
+            <span>DAILY NOTES</span>
+            <h3>标签</h3>
+            <div className={styles.groupTagList}>
+              {report.parsed.tags.map((tag) => (
+                <span key={tag}>#{tag}</span>
+              ))}
+            </div>
+          </section>
+        ) : null}
+      </article>
+    </section>
+  );
+}
+
 export default async function AiNewsPage({
   searchParams,
 }: {
@@ -341,9 +592,10 @@ export default async function AiNewsPage({
   const mode = normalizeMode(params.mode);
   const category = normalizeCategory(params.category);
   const isDailyView = view === "daily";
+  const isLocalView = view === "local";
   const currentQuery = { category, mode, view };
-  const [feed, daily] = await Promise.all([
-    isDailyView
+  const [feed, daily, groupDaily] = await Promise.all([
+    isDailyView || isLocalView
       ? Promise.resolve(null)
       : getAiHotFeed({
           category,
@@ -351,17 +603,25 @@ export default async function AiNewsPage({
           take: mode === "all" ? 60 : 42,
         }),
     getAiHotDailyReport(),
+    isLocalView ? getWeDailyReports({ limit: 20 }) : Promise.resolve({ error: null, reports: [] }),
   ]);
   const visibleItems = feed?.items ?? [];
   const leadItems = visibleItems.slice(0, 5);
   const dailyReport = daily.dailyReport;
   const dailyItemCount = dailyReport ? countDailyItems(dailyReport.sections) : 0;
-  const headerItemLabel = isDailyView ? "日报条目" : "资讯条目";
-  const headerItemCount = isDailyView ? dailyItemCount : visibleItems.length;
-  const hasLoadError = Boolean(feed?.error || daily.error);
-  const activeModeLabel = isDailyView ? "AI 日报" : mode === "all" ? "全部动态" : "精选";
+  const groupReports = groupDaily.reports;
+  const activeGroupReport = groupReports.find((report) => report.date === params.date) ?? groupReports[0] ?? null;
+  const groupHighlightCount = activeGroupReport?.parsed.highlights.length ?? 0;
+  const headerItemLabel = isLocalView ? "群聊要点" : isDailyView ? "日报条目" : "资讯条目";
+  const headerItemCount = isLocalView ? groupHighlightCount : isDailyView ? dailyItemCount : visibleItems.length;
+  const hasLoadError = Boolean(feed?.error || daily.error || (isLocalView && groupDaily.error));
+  const activeModeLabel = isLocalView ? "本地与群聊" : isDailyView ? "AI 日报" : mode === "all" ? "全部动态" : "精选";
   const activeCategoryLabel = category === "all" ? "全部分类" : getAiHotCategoryLabel(category);
-  const subtitle = isDailyView
+  const subtitle = isLocalView
+    ? activeGroupReport
+      ? `${formatAiNewsDate(activeGroupReport.date)} · ${groupHighlightCount} 个要点`
+      : "群聊日报"
+    : isDailyView
     ? `${formatDailyVolume(dailyReport?.date)} · ${dailyItemCount} 条`
     : `${activeModeLabel} · ${activeCategoryLabel}`;
 
@@ -378,7 +638,7 @@ export default async function AiNewsPage({
           <div>
             <RadioTower aria-hidden="true" strokeWidth={1.8} />
             <span>当前来源</span>
-            <strong>AI HOT</strong>
+            <strong>{isLocalView ? "WeDaily" : "AI HOT"}</strong>
           </div>
           <div>
             <Sparkles aria-hidden="true" strokeWidth={1.8} />
@@ -387,8 +647,16 @@ export default async function AiNewsPage({
           </div>
           <div>
             <CalendarDays aria-hidden="true" strokeWidth={1.8} />
-            <span>AI 日报</span>
-            <strong>{dailyReport ? formatAiNewsDate(dailyReport.date) : "整理中"}</strong>
+            <span>{isLocalView ? "群聊日报" : "AI 日报"}</span>
+            <strong>
+              {isLocalView
+                ? activeGroupReport
+                  ? formatAiNewsDate(activeGroupReport.date)
+                  : "整理中"
+                : dailyReport
+                ? formatAiNewsDate(dailyReport.date)
+                : "整理中"}
+            </strong>
           </div>
         </aside>
       </section>
@@ -396,16 +664,16 @@ export default async function AiNewsPage({
       <section className={styles.controlPanel} aria-label="AI 资讯筛选">
         <nav className={styles.modeTabs} aria-label="资讯类型">
           <Link
-            className={!isDailyView && mode === "selected" ? styles.modeTabActive : ""}
+            className={!isDailyView && !isLocalView && mode === "selected" ? styles.modeTabActive : ""}
             href={buildFeedHref(currentQuery, { category: "all", mode: "selected", view: "feed" })}
-            aria-current={!isDailyView && mode === "selected" ? "page" : undefined}
+            aria-current={!isDailyView && !isLocalView && mode === "selected" ? "page" : undefined}
           >
             精选
           </Link>
           <Link
-            className={!isDailyView && mode === "all" ? styles.modeTabActive : ""}
+            className={!isDailyView && !isLocalView && mode === "all" ? styles.modeTabActive : ""}
             href={buildFeedHref(currentQuery, { category: "all", mode: "all", view: "feed" })}
-            aria-current={!isDailyView && mode === "all" ? "page" : undefined}
+            aria-current={!isDailyView && !isLocalView && mode === "all" ? "page" : undefined}
           >
             全部动态
           </Link>
@@ -416,10 +684,16 @@ export default async function AiNewsPage({
           >
             AI 日报
           </Link>
-          <Link href="#future-sources">本地与群聊</Link>
+          <Link
+            className={isLocalView ? styles.modeTabActive : ""}
+            href={buildFeedHref(currentQuery, { view: "local" })}
+            aria-current={isLocalView ? "page" : undefined}
+          >
+            本地与群聊
+          </Link>
         </nav>
 
-        {!isDailyView ? (
+        {!isDailyView && !isLocalView ? (
           <div className={styles.filterGroups}>
             <div className={styles.filterGroup}>
               <span>
@@ -454,7 +728,14 @@ export default async function AiNewsPage({
         <div className={styles.loadNotice}>部分内容暂时无法加载。已返回的资讯会继续展示，稍后可刷新重试。</div>
       ) : null}
 
-      {isDailyView ? (
+      {isLocalView ? (
+        <LocalGroupDailyView
+          activeDate={params.date}
+          error={groupDaily.error}
+          report={activeGroupReport}
+          reports={groupReports}
+        />
+      ) : isDailyView ? (
         <>
           <DailyReportView dailyItemCount={dailyItemCount} report={dailyReport} />
 
