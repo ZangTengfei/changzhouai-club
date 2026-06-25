@@ -17,6 +17,13 @@ type EventImageVariant =
 const SUPABASE_OBJECT_PUBLIC_PATH = "/storage/v1/object/public/";
 const SUPABASE_RENDER_PUBLIC_PATH = "/storage/v1/render/image/public/";
 
+function isGoogleUserContentUrl(url: URL) {
+  return (
+    url.hostname === "googleusercontent.com" ||
+    url.hostname.endsWith(".googleusercontent.com")
+  );
+}
+
 const eventImageVariantMap: Record<EventImageVariant, PublicImageTransformOptions> = {
   "hero-main": {
     width: 1120,
@@ -143,6 +150,20 @@ export function getEventImageUrl(
 }
 
 export function getAvatarImageUrl(imageUrl: string | null | undefined) {
+  if (!imageUrl) {
+    return null;
+  }
+
+  try {
+    const url = new URL(imageUrl);
+
+    if (isGoogleUserContentUrl(url)) {
+      return null;
+    }
+  } catch {
+    return getPublicImageUrl(imageUrl);
+  }
+
   return getPublicImageUrl(imageUrl, {
     width: 160,
     height: 160,
