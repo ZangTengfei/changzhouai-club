@@ -111,7 +111,7 @@ export default async function WorksPage({ searchParams }: WorksPageProps) {
               浏览案例
               <ArrowRight aria-hidden="true" strokeWidth={2} />
             </Link>
-            <Link href="/account?submit=work#works" className="button home-ghost-button">
+            <Link href="/account/works/new" className="button home-ghost-button">
               <Plus aria-hidden="true" strokeWidth={2} />
               提交作品/案例
             </Link>

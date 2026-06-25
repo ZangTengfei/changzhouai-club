@@ -25,6 +25,7 @@ import {
 } from "@/app/(site)/account/actions";
 import { AccountActionModal } from "@/components/account-action-modal";
 import { AccountProfileForm } from "@/components/account-profile-form";
+import { AccountWorkDraftCleaner } from "@/components/account-work-draft-cleaner";
 import { ImageUploadField } from "@/components/image-upload-field";
 import { MemberAvatar } from "@/components/member-avatar";
 import { SignOutButton } from "@/components/sign-out-button";
@@ -149,7 +150,7 @@ function getStatusMessage(error?: string) {
   }
 
   if (error === "invalid_work_url") {
-    return "作品链接格式无效，请填写以 http 或 https 开头的公开链接。";
+    return "图片地址或作品链接格式无效；作品/Demo 可填写 http(s) 链接或 #小程序://名称/路径，图片和代码仓库请使用 http(s)。";
   }
 
   if (error === "work_save_failed") {
@@ -245,12 +246,6 @@ const profileModalErrorCodes = new Set([
   "save_failed",
 ]);
 
-const workModalErrorCodes = new Set([
-  "missing_work_fields",
-  "invalid_work_url",
-  "work_save_failed",
-]);
-
 export default async function AccountPage({
   searchParams,
 }: {
@@ -292,9 +287,13 @@ export default async function AccountPage({
     const nextPath = params.onboarding
       ? "/account?onboarding=1"
       : params.submit === "work"
-        ? "/account?submit=work#works"
+        ? "/account/works/new"
         : "/account";
     redirect(`/login?next=${encodeURIComponent(nextPath)}`);
+  }
+
+  if (params.submit === "work") {
+    redirect("/account/works/new");
   }
 
   const [
@@ -367,8 +366,6 @@ export default async function AccountPage({
   const statusMessage = getStatusMessage(params.error);
   const shouldOpenProfileModal =
     Boolean(params.onboarding) || profileModalErrorCodes.has(params.error ?? "");
-  const shouldOpenWorkModal =
-    params.submit === "work" || workModalErrorCodes.has(params.error ?? "");
   const accountSummaryItems = [
     {
       label: "资料状态",
@@ -398,6 +395,8 @@ export default async function AccountPage({
 
   return (
     <div className={styles.accountPage}>
+      <AccountWorkDraftCleaner enabled={params.updated === "work"} />
+
       <section className={styles.accountSummary} aria-labelledby="account-title">
         <div className={styles.accountSummaryHero}>
           <div className={styles.accountAvatarCard}>
@@ -572,104 +571,13 @@ export default async function AccountPage({
                 管理员通过后会展示到案例库和你的成员主页。
               </p>
             </div>
-            <AccountActionModal
-              title="提交作品"
-              description="补充作品名称、链接、标签和你的参与角色，提交后会进入管理员审核。"
-              defaultOpen={shouldOpenWorkModal}
-              trigger={
-                <button
-                  type="button"
-                  className={`button home-primary-button ${styles.accountSectionAction}`}
-                >
-                  <Plus aria-hidden="true" strokeWidth={2} />
-                  提交作品
-                </button>
-              }
+            <Link
+              href="/account/works/new"
+              className={`button home-primary-button ${styles.accountSectionAction}`}
             >
-              <form
-                action={saveAccountMemberWork}
-                className={`${styles.accountWorkForm} ${styles.accountWorkDialogForm}`}
-              >
-                <label>
-                  <span>作品名称</span>
-                  <input className="input" name="title" required />
-                </label>
-
-                <label>
-                  <span>作品类型</span>
-                  <select className="input" name="work_type" defaultValue="product">
-                    {Object.entries(workTypeLabels).map(([value, label]) => (
-                      <option value={value} key={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  <span>当前状态</span>
-                  <select className="input" name="status" defaultValue="building">
-                    {Object.entries(workStatusLabels).map(([value, label]) => (
-                      <option value={value} key={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  <span>我在其中的角色</span>
-                  <input
-                    className="input"
-                    name="role_label"
-                    placeholder="例如：发起人 / 开发者 / 产品负责人"
-                  />
-                </label>
-
-                <label className={styles.accountWorkWideField}>
-                  <span>一句话介绍</span>
-                  <textarea className="input textarea" name="summary" rows={2} required />
-                </label>
-
-                <label className={styles.accountWorkWideField}>
-                  <span>详细说明</span>
-                  <textarea className="input textarea" name="description" rows={4} />
-                </label>
-
-                <WorkImageField userId={user.id} />
-
-                <label>
-                  <span>官网 / 产品链接</span>
-                  <input className="input" name="website_url" placeholder="https://..." />
-                </label>
-
-                <label>
-                  <span>Demo 链接</span>
-                  <input className="input" name="demo_url" placeholder="https://..." />
-                </label>
-
-                <label>
-                  <span>代码仓库</span>
-                  <input className="input" name="repo_url" placeholder="https://..." />
-                </label>
-
-                <label className={styles.accountWorkWideField}>
-                  <span>标签</span>
-                  <input
-                    className="input"
-                    name="tags"
-                    placeholder="例如：AI 工具、OPC、自动化"
-                  />
-                </label>
-
-                <div className={styles.accountWorkFormFooter}>
-                  <button type="submit" className="button home-primary-button">
-                    提交审核
-                  </button>
-                  <span>提交后会暂时隐藏，审核通过后才会公开展示。</span>
-                </div>
-              </form>
-            </AccountActionModal>
+              <Plus aria-hidden="true" strokeWidth={2} />
+              提交作品/案例
+            </Link>
           </div>
         </div>
 
@@ -821,8 +729,9 @@ export default async function AccountPage({
               <strong>你还没有提交作品</strong>
               <p>可以先把自己的产品、工具、开源项目或案例补充进来，审核后进入案例库。</p>
             </div>
-            <Link href="/works" className="button home-ghost-button">
-              查看案例库
+            <Link href="/account/works/new" className="button home-primary-button">
+              <Plus aria-hidden="true" strokeWidth={2} />
+              提交作品/案例
             </Link>
           </div>
         )}

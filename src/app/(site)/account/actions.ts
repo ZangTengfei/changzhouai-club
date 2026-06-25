@@ -21,6 +21,7 @@ const WORK_TYPES = new Set([
   "service",
 ]);
 const WORK_STATUSES = new Set(["idea", "building", "launched", "paused", "archived"]);
+const ACCOUNT_WORK_NEW_PATH = "/account/works/new";
 
 function isMissingSchemaColumnError(error: { code?: string | null } | null | undefined) {
   return error?.code === "PGRST204";
@@ -60,7 +61,7 @@ function normalizeAvatarUrl(raw: string) {
   }
 }
 
-function normalizeOptionalUrl(raw: string) {
+function normalizeOptionalHttpUrl(raw: string) {
   const value = raw.trim();
 
   if (!value) {
@@ -78,6 +79,39 @@ function normalizeOptionalUrl(raw: string) {
   } catch {
     return null;
   }
+}
+
+function normalizeOptionalWorkLink(raw: string) {
+  const value = raw.trim();
+
+  if (!value) {
+    return null;
+  }
+
+  if (value.startsWith("#小程序://")) {
+    const miniProgramPath = value.slice("#小程序://".length);
+    return miniProgramPath && miniProgramPath.includes("/") && !/\s/.test(value)
+      ? value
+      : null;
+  }
+
+  return normalizeOptionalHttpUrl(value);
+}
+
+function getAccountWorkFormPath(formData: FormData) {
+  return String(formData.get("redirect_to") ?? "").trim() === ACCOUNT_WORK_NEW_PATH
+    ? ACCOUNT_WORK_NEW_PATH
+    : "/account";
+}
+
+function redirectAccountWorkError(formData: FormData, error: string): never {
+  const formPath = getAccountWorkFormPath(formData);
+
+  if (formPath === ACCOUNT_WORK_NEW_PATH) {
+    redirect(`${ACCOUNT_WORK_NEW_PATH}?error=${error}`);
+  }
+
+  redirect(`/account?error=${error}#works`);
 }
 
 function getWorkType(value: string) {
@@ -277,18 +311,19 @@ export async function saveAccountMemberWork(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const formPath = getAccountWorkFormPath(formData);
 
   if (!user) {
-    redirect("/login?next=/account");
+    redirect(`/login?next=${encodeURIComponent(formPath)}`);
   }
 
   const workId = String(formData.get("work_id") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
   const summary = String(formData.get("summary") ?? "").trim();
-  const websiteUrl = normalizeOptionalUrl(String(formData.get("website_url") ?? ""));
-  const demoUrl = normalizeOptionalUrl(String(formData.get("demo_url") ?? ""));
-  const repoUrl = normalizeOptionalUrl(String(formData.get("repo_url") ?? ""));
-  const coverImageUrl = normalizeOptionalUrl(String(formData.get("cover_image_url") ?? ""));
+  const websiteUrl = normalizeOptionalWorkLink(String(formData.get("website_url") ?? ""));
+  const demoUrl = normalizeOptionalWorkLink(String(formData.get("demo_url") ?? ""));
+  const repoUrl = normalizeOptionalHttpUrl(String(formData.get("repo_url") ?? ""));
+  const coverImageUrl = normalizeOptionalHttpUrl(String(formData.get("cover_image_url") ?? ""));
   const hasInvalidUrl =
     (String(formData.get("website_url") ?? "").trim() && !websiteUrl) ||
     (String(formData.get("demo_url") ?? "").trim() && !demoUrl) ||
@@ -296,11 +331,11 @@ export async function saveAccountMemberWork(formData: FormData) {
     (String(formData.get("cover_image_url") ?? "").trim() && !coverImageUrl);
 
   if (!title || !summary) {
-    redirect("/account?error=missing_work_fields#works");
+    redirectAccountWorkError(formData, "missing_work_fields");
   }
 
   if (hasInvalidUrl) {
-    redirect("/account?error=invalid_work_url#works");
+    redirectAccountWorkError(formData, "invalid_work_url");
   }
 
   const payload = {
@@ -335,7 +370,7 @@ export async function saveAccountMemberWork(formData: FormData) {
         workId,
         userId: user.id,
       });
-      redirect("/account?error=work_save_failed#works");
+      redirectAccountWorkError(formData, "work_save_failed");
     }
   } else {
     const { error } = await supabase.from("member_works").insert({
@@ -348,7 +383,7 @@ export async function saveAccountMemberWork(formData: FormData) {
         error,
         userId: user.id,
       });
-      redirect("/account?error=work_save_failed#works");
+      redirectAccountWorkError(formData, "work_save_failed");
     }
   }
 

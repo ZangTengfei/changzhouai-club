@@ -6,6 +6,7 @@
 .disabledPanel,
 .accountSummary,
 .accountWorksSection,
+.accountWorkSubmitSection,
 .registrationSection {
   display: grid;
   gap: 20px;
@@ -457,6 +458,46 @@
   gap: 18px;
 }
 
+.accountWorkSubmitSection {
+  display: grid;
+  gap: 18px;
+}
+
+.accountWorkSubmitHeader {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.accountWorkSubmitHeader > div {
+  display: grid;
+  gap: 10px;
+  max-width: 720px;
+  min-width: 0;
+}
+
+.accountWorkSubmitHeader h1,
+.accountWorkSubmitHeader p {
+  margin: 0;
+}
+
+.accountWorkSubmitHeader h1 {
+  color: #111a1d;
+  font-size: clamp(2rem, 3vw, 2.55rem);
+  font-weight: 900;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.accountWorkSubmitHeader > div > p:not(:global(.home-kicker)) {
+  color: rgba(var(--ink-rgb), 0.66);
+  font-size: 0.98rem;
+  font-weight: 650;
+  line-height: 1.7;
+}
+
 .accountWorkCard {
   border: 1px solid rgba(var(--ink-rgb), 0.08);
   border-radius: var(--radius-md);
@@ -476,7 +517,7 @@
   padding: 0 18px 18px;
 }
 
-.accountWorkDialogForm {
+.accountWorkSubmitForm {
   padding: 0;
 }
 
@@ -522,6 +563,11 @@
   color: rgba(var(--ink-rgb), 0.58);
   font-size: 0.88rem;
   font-weight: 700;
+}
+
+.accountWorkFormFooter svg {
+  width: 17px;
+  height: 17px;
 }
 
 .accountWorkList {
@@ -795,6 +841,14 @@
     grid-template-columns: 48px minmax(0, 1fr);
   }
 
+  .accountWorkSubmitHeader {
+    display: grid;
+  }
+
+  .accountWorkSubmitHeader :global(.button) {
+    width: fit-content;
+  }
+
   .registrationCard form {
     grid-column: 1 / -1;
   }
@@ -812,6 +866,7 @@
   .accountSummary,
   .accountProfileForm,
   .accountWorksSection,
+  .accountWorkSubmitSection,
   .registrationSection,
   .disabledPanel {
     padding: 20px;
@@ -846,6 +901,7 @@
 
   .accountSummaryActions :global(.button),
   .accountSummaryActions :global(.auth-button),
+  .accountWorkSubmitHeader :global(.button),
   .accountSectionAction,
   .accountWorkFormFooter :global(.button),
   .accountWorkCard :global(.button),

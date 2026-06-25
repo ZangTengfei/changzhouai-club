@@ -44,7 +44,9 @@ type UploadTarget =
 
 type ImageUploadFieldProps = {
   name: string;
+  value?: string;
   defaultValue?: string;
+  onValueChange?: (value: string) => void;
   uploadTarget: UploadTarget;
   mode?: UploadMode;
   appearance?: UploadAppearance;
@@ -78,7 +80,9 @@ const cx = cssModuleCx.bind(null, styles);
 
 export function ImageUploadField({
   name,
+  value: controlledValue,
   defaultValue = "",
+  onValueChange,
   uploadTarget,
   mode = "upload-or-url",
   appearance = "admin",
@@ -94,12 +98,22 @@ export function ImageUploadField({
   preview,
   compressUpload = true,
 }: ImageUploadFieldProps) {
-  const [value, setValue] = useState(defaultValue);
+  const [internalValue, setInternalValue] = useState(defaultValue);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [uploadStage, setUploadStage] = useState<UploadStage>("idle");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isControlled = controlledValue !== undefined;
+  const value = controlledValue ?? internalValue;
   const isUploading = uploadStage !== "idle";
+
+  function updateValue(nextValue: string) {
+    if (!isControlled) {
+      setInternalValue(nextValue);
+    }
+
+    onValueChange?.(nextValue);
+  }
 
   async function handleUpload(file: File | null) {
     if (!file) {
@@ -149,7 +163,7 @@ export function ImageUploadField({
           .from(MEMBER_AVATARS_BUCKET)
           .getPublicUrl(assetPath);
 
-        setValue(
+        updateValue(
           uploadTarget.cacheBust === false
             ? data.publicUrl
             : `${data.publicUrl}?v=${Date.now()}`,
@@ -174,7 +188,7 @@ export function ImageUploadField({
           .from(MEMBER_WORK_ASSETS_BUCKET)
           .getPublicUrl(assetPath);
 
-        setValue(data.publicUrl);
+        updateValue(data.publicUrl);
       } else {
         const payload = new FormData();
         payload.append("eventSlug", uploadTarget.eventSlug);
@@ -192,7 +206,7 @@ export function ImageUploadField({
           throw new Error(result?.message || "图片上传失败，请稍后再试。");
         }
 
-        setValue(result.publicUrl);
+        updateValue(result.publicUrl);
       }
     } catch (uploadError) {
       const message =
@@ -247,7 +261,7 @@ export function ImageUploadField({
             <Input
               name={name}
               value={value}
-              onChange={(event) => setValue(event.target.value)}
+              onChange={(event) => updateValue(event.target.value)}
               placeholder={placeholder}
               required={required}
             />
@@ -256,7 +270,7 @@ export function ImageUploadField({
               className="input"
               name={name}
               value={value}
-              onChange={(event) => setValue(event.target.value)}
+              onChange={(event) => updateValue(event.target.value)}
               placeholder={placeholder}
               required={required}
             />
@@ -300,7 +314,7 @@ export function ImageUploadField({
                   type="button"
                   variant="ghost"
                   size="sm"
-                  onClick={() => setValue("")}
+                  onClick={() => updateValue("")}
                   disabled={isUploading || !value}
                 >
                   {clearLabel}
@@ -309,7 +323,7 @@ export function ImageUploadField({
                 <button
                   type="button"
                   className="button button-secondary"
-                  onClick={() => setValue("")}
+                  onClick={() => updateValue("")}
                   disabled={isUploading || !value}
                 >
                   {clearLabel}
