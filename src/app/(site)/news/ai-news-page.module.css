@@ -1234,6 +1234,83 @@
   gap: 12px;
 }
 
+.groupLockedSection {
+  position: relative;
+  margin-top: -4px;
+}
+
+.groupLockedPanel {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(15, 122, 106, 0.16);
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.82), rgba(255, 247, 235, 0.92)),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(15, 122, 106, 0.055) 0,
+      rgba(15, 122, 106, 0.055) 1px,
+      transparent 1px,
+      transparent 10px
+    );
+  box-shadow: 0 14px 30px rgba(79, 48, 20, 0.08);
+}
+
+.groupLockedIcon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(15, 122, 106, 0.14);
+  border-radius: var(--radius-pill);
+  background: rgba(var(--accent-rgb), 0.1);
+  color: var(--accent-strong);
+}
+
+.groupLockedIcon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.groupLockedPanel strong {
+  margin: 0;
+}
+
+.groupLockedPanel strong {
+  color: #1f2524;
+  font-size: 1.02rem;
+  font-weight: 950;
+  line-height: 1.35;
+}
+
+.groupLockedPanel a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+  color: #ffffff;
+  font-size: 0.88rem;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: 0 10px 20px rgba(var(--accent-rgb), 0.16);
+  transition:
+    background-color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.groupLockedPanel a:hover,
+.groupLockedPanel a:focus-visible {
+  background: var(--accent-strong);
+  transform: translateY(-1px);
+}
+
 .groupHighlightCard,
 .groupDiscussionCard,
 .groupResourceCard {
@@ -1613,6 +1690,15 @@
 
   .groupPosterSection h3 {
     font-size: 1.35rem;
+  }
+
+  .groupLockedPanel {
+    grid-template-columns: 1fr;
+    justify-items: start;
+  }
+
+  .groupLockedPanel a {
+    width: 100%;
   }
 
   .dailyHeroTop {
