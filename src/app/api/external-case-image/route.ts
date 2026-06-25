@@ -4,6 +4,7 @@ const REMOTE_CASE_LIBRARY_BASE_URL = "http://abbs.fun:25181";
 const REMOTE_IMAGE_EXTENSION_PATTERN = /\.(avif|gif|jpe?g|png|webp)$/i;
 const IMAGE_CACHE_CONTROL =
   "public, max-age=3600, s-maxage=86400, stale-while-revalidate=604800";
+const REMOTE_IMAGE_TIMEOUT_MS = 8_000;
 
 function getAllowedRemoteImageUrl(src: string | null) {
   if (!src) {
@@ -42,6 +43,7 @@ export async function GET(request: Request) {
 
   try {
     const response = await fetch(imageUrl, {
+      signal: AbortSignal.timeout(REMOTE_IMAGE_TIMEOUT_MS),
       next: { revalidate: 86400 },
     });
 

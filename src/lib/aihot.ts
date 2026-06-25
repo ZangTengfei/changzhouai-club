@@ -1,6 +1,7 @@
 const AIHOT_BASE_URL = "https://aihot.virxact.com";
 const AIHOT_USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+const AIHOT_REQUEST_TIMEOUT_MS = 8_000;
 
 export const aiHotCategories = [
   {
@@ -341,6 +342,7 @@ async function fetchAiHotJson<T>(path: string, revalidate: number): Promise<Fetc
         accept: "application/json",
         "user-agent": AIHOT_USER_AGENT,
       },
+      signal: AbortSignal.timeout(AIHOT_REQUEST_TIMEOUT_MS),
       next: {
         revalidate,
       },

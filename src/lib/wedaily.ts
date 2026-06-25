@@ -1,6 +1,7 @@
 const WEDAILY_BASE_URL = "https://wedaily.occcc.cc";
 const WEDAILY_USER_AGENT =
   "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+const WEDAILY_REQUEST_TIMEOUT_MS = 8_000;
 
 export type WeDailyReportStats = {
   message_count?: number;
@@ -365,6 +366,7 @@ async function fetchWeDailyJson<T>(path: string): Promise<FetchResult<T>> {
         accept: "application/json",
         "user-agent": WEDAILY_USER_AGENT,
       },
+      signal: AbortSignal.timeout(WEDAILY_REQUEST_TIMEOUT_MS),
       next: {
         revalidate: 300,
       },

@@ -168,6 +168,7 @@ const REMOTE_CASE_IMAGE_PROXY_PATH = "/api/external-case-image";
 const REMOTE_CASE_LIBRARY_SOURCE_LABEL = "AI 应用案例档案库";
 const REMOTE_CASE_LIBRARY_SUMMARY_LENGTH = 132;
 const REMOTE_IMAGE_EXTENSION_PATTERN = /\.(avif|gif|jpe?g|png|webp)$/i;
+const REMOTE_CASE_LIBRARY_TIMEOUT_MS = 5_000;
 
 type RemoteCaseLibraryTag = {
   name?: string | null;
@@ -402,6 +403,7 @@ function mapRemoteCaseLibraryCard(
 async function loadRemoteCaseLibraryCards() {
   try {
     const response = await fetch(`${REMOTE_CASE_LIBRARY_BASE_URL}/api/cases`, {
+      signal: AbortSignal.timeout(REMOTE_CASE_LIBRARY_TIMEOUT_MS),
       next: { revalidate: PUBLIC_WORKS_REVALIDATE_SECONDS },
     });
 
