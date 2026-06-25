@@ -1,63 +1,40 @@
 .grid {
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   justify-items: center;
   width: 100%;
-  max-width: 980px;
+  max-width: 456px;
   align-items: start;
-  gap: 22px;
+  gap: 16px;
 }
 
 .errorNote {
-  grid-column: 1 / -1;
+  width: 100%;
 }
 
-.entryCard,
-.infoCard,
-.accountCard {
+.flowCard {
+  position: relative;
+  display: grid;
+  gap: 22px;
+  width: 100%;
+  overflow: hidden;
+  padding: 28px 28px 24px;
   border: 1px solid rgba(var(--ink-rgb), 0.12);
+  border-radius: var(--radius-lg);
   background:
-    radial-gradient(circle at 92% 8%, rgba(var(--accent-warm-rgb), 0.12), transparent 24%),
-    rgba(var(--surface-rgb), 0.9);
+    radial-gradient(circle at 96% 6%, rgba(var(--accent-rgb), 0.12), transparent 28%),
+    rgba(var(--surface-rgb), 0.92);
   box-shadow: var(--shadow-md);
 }
 
-.entryGrid {
+.authHeader {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: 18px;
-  width: 100%;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
   align-items: start;
-}
-
-.entryCard {
-  display: grid;
-  gap: 16px;
   min-width: 0;
-  padding: 22px;
-  border-radius: var(--radius-lg);
 }
 
-.newUserCard {
-  border-color: rgba(var(--accent-strong-rgb), 0.22);
-  background:
-    radial-gradient(circle at 92% 8%, rgba(var(--accent-rgb), 0.16), transparent 28%),
-    rgba(247, 250, 246, 0.92);
-}
-
-.existingUserCard {
-  background:
-    radial-gradient(circle at 92% 8%, rgba(42, 123, 211, 0.08), transparent 26%),
-    rgba(var(--surface-rgb), 0.9);
-}
-
-.cardHeading {
-  display: grid;
-  gap: 10px;
-}
-
-.cardHeading h2,
-.infoCard h2,
-.accountCard h2 {
+.authHeader h1 {
   margin: 0;
   color: var(--ink);
   font-weight: 900;
@@ -65,22 +42,118 @@
   letter-spacing: 0;
 }
 
-.cardHeading p,
-.infoCard p,
-.accountCard p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.94rem;
-  line-height: 1.72;
+.authHeader h1 {
+  font-size: 1.42rem;
 }
 
-.entryCard :global(.input) {
+.intentSwitch {
+  min-width: 78px;
+  min-height: 48px;
+  margin: -28px -28px 0 0;
+  padding: 0 18px 0 24px;
+  border: 0;
+  border-bottom-left-radius: var(--radius-lg);
+  background: rgba(var(--accent-rgb), 0.12);
+  color: var(--accent-strong);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 900;
+  line-height: 1;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.intentSwitch:hover,
+.intentSwitch:focus-visible {
+  background: rgba(var(--accent-rgb), 0.18);
+  color: var(--accent);
+}
+
+.intentSwitch:focus-visible {
+  outline: 2px solid rgba(var(--accent-rgb), 0.28);
+  outline-offset: -4px;
+}
+
+.methodTabs {
+  display: flex;
+  justify-content: center;
+  gap: clamp(28px, 8vw, 64px);
+  min-width: 0;
+  border-bottom: 1px solid rgba(var(--ink-rgb), 0.1);
+}
+
+.methodTabsSingle {
+  justify-content: center;
+}
+
+.methodTab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 2px 12px;
+  border: 0;
+  background: transparent;
+  color: rgba(var(--ink-rgb), 0.62);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1.08rem;
+  font-weight: 850;
+  line-height: 1.2;
+}
+
+.methodTab::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: -1px;
+  left: 0;
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  transition: background-color 0.18s ease;
+}
+
+.methodTab:hover,
+.methodTab:focus-visible {
+  color: var(--ink);
+}
+
+.methodTab:focus-visible {
+  outline: 2px solid rgba(var(--accent-rgb), 0.26);
+  outline-offset: 4px;
+}
+
+.methodTabActive {
+  color: var(--accent-strong);
+}
+
+.methodTabActive::after {
+  background: var(--accent);
+}
+
+.methodTab svg {
+  width: 18px;
+  height: 18px;
+  color: currentColor;
+}
+
+.activePane {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.flowCard :global(.input) {
   min-height: 46px;
   border-radius: var(--radius-md);
   background: rgba(255, 252, 247, 0.94);
 }
 
-.entryCard :global(.auth-button) {
+.flowCard :global(.auth-button) {
   min-height: 44px;
   border-color: rgba(var(--accent-strong-rgb), 0.22);
   background: #0f6f62;
@@ -94,8 +167,8 @@
     box-shadow 0.18s ease;
 }
 
-.entryCard :global(.auth-button:hover),
-.entryCard :global(.auth-button:focus-visible) {
+.flowCard :global(.auth-button:hover),
+.flowCard :global(.auth-button:focus-visible) {
   border-color: rgba(var(--accent-strong-rgb), 0.34);
   background: var(--accent-strong);
   box-shadow:
@@ -103,60 +176,8 @@
     0 14px 28px rgba(var(--accent-strong-rgb), 0.2);
 }
 
-.entryCard :global(.auth-button:disabled) {
+.flowCard :global(.auth-button:disabled) {
   box-shadow: none;
-}
-
-.entryNotice,
-.legacyFlowList li {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 10px;
-  align-items: start;
-  min-width: 0;
-  color: rgba(var(--ink-rgb), 0.72);
-  font-size: 0.92rem;
-  font-weight: 750;
-  line-height: 1.56;
-}
-
-.entryNotice {
-  padding: 12px 14px;
-  border: 1px solid rgba(var(--accent-rgb), 0.12);
-  border-radius: var(--radius-md);
-  background: rgba(var(--accent-rgb), 0.07);
-}
-
-.entryNotice svg,
-.legacyFlowList svg {
-  width: 18px;
-  height: 18px;
-  margin-top: 2px;
-  color: var(--accent);
-}
-
-.cautionNote {
-  margin: 0;
-  color: #a55712;
-  font-size: 0.9rem;
-  font-weight: 800;
-  line-height: 1.62;
-}
-
-.legacyFlowList {
-  display: grid;
-  gap: 10px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.legacyFlowList li:nth-child(2) svg {
-  color: #ee7f18;
-}
-
-.legacyFlowList li:nth-child(3) svg {
-  color: #2a7bd3;
 }
 
 .hint {
@@ -165,88 +186,28 @@
   color: var(--muted);
 }
 
-.recoveryNote {
-  margin: 0;
-  color: rgba(var(--ink-rgb), 0.68);
-  font-size: 0.9rem;
-  font-weight: 650;
-  line-height: 1.68;
-}
-
-.sideStack {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-  width: 100%;
-  max-width: 900px;
-  margin-top: 2px;
-}
-
-.infoCard,
-.accountCard {
-  display: grid;
-  gap: 14px;
-  padding: 22px;
-  border-radius: var(--radius-lg);
-}
-
-.infoCard > svg {
-  width: 34px;
-  height: 34px;
-  padding: 8px;
-  border-radius: var(--radius-sm);
-  background: rgba(var(--accent-rgb), 0.11);
-  color: var(--accent);
-}
-
-.capabilityList {
-  display: grid;
-  gap: 10px;
-  margin: 2px 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.capabilityList li {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 10px;
-  align-items: start;
-  color: var(--ink);
-  font-size: 0.92rem;
-  font-weight: 750;
-  line-height: 1.5;
-}
-
-.capabilityList svg {
-  width: 18px;
-  height: 18px;
-  margin-top: 2px;
-  color: var(--accent);
-}
-
-.accountCard {
-  background:
-    radial-gradient(circle at 92% 12%, rgba(var(--accent-warm-rgb), 0.16), transparent 34%),
-    rgba(255, 251, 245, 0.92);
-}
-
-.accountCard :global(.auth-link) {
-  margin-top: 2px;
-}
-
-@media (max-width: 860px) {
-  .entryGrid,
-  .sideStack {
-    grid-template-columns: 1fr;
-  }
-}
-
 @media (max-width: 640px) {
-  .entryCard,
-  .infoCard,
-  .accountCard {
-    padding: 20px;
+  .grid {
+    gap: 14px;
   }
 
+  .flowCard {
+    padding: 22px 18px 18px;
+  }
+
+  .authHeader h1 {
+    font-size: 1.3rem;
+  }
+
+  .intentSwitch {
+    min-width: 68px;
+    min-height: 44px;
+    margin: -22px -18px 0 0;
+    padding: 0 14px 0 18px;
+    font-size: 0.9rem;
+  }
+
+  .methodTabs {
+    gap: 24px;
+  }
 }

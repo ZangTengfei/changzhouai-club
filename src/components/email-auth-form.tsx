@@ -14,6 +14,14 @@ type EmailAuthFormProps = {
   enabled: boolean;
   allowSignUp?: boolean;
   nextPath?: string;
+  compact?: boolean;
+  initialMode?: EmailAuthMode;
+  resetTitle?: string;
+  resetDescription?: string;
+  resetBackLabel?: string;
+  showGoogleRecoveryAction?: boolean;
+  showModeTabs?: boolean;
+  onResetBack?: () => void;
 };
 
 function getSafeNextPath(nextPath: string) {
@@ -74,8 +82,16 @@ export function EmailAuthForm({
   enabled,
   allowSignUp = true,
   nextPath = "/account",
+  compact = false,
+  initialMode = "sign-in",
+  resetTitle = "找回或设置邮箱密码",
+  resetDescription = "原 Google 登录用户也可以输入同一个邮箱，收到邮件后设置新的邮箱密码。",
+  resetBackLabel = "返回邮箱登录",
+  showGoogleRecoveryAction = true,
+  showModeTabs = true,
+  onResetBack,
 }: EmailAuthFormProps) {
-  const [mode, setMode] = useState<EmailAuthMode>("sign-in");
+  const [mode, setMode] = useState<EmailAuthMode>(initialMode);
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [resetCode, setResetCode] = useState("");
@@ -319,6 +335,18 @@ export function EmailAuthForm({
     setMessage(null);
   }
 
+  function handleResetBack() {
+    if (onResetBack) {
+      onResetBack();
+      return;
+    }
+
+    setMode("sign-in");
+    resetRecoveryState();
+    setError(null);
+    setMessage(null);
+  }
+
   const renderPasswordToggle = () => (
     <button
       type="button"
@@ -336,10 +364,10 @@ export function EmailAuthForm({
     <form className={styles.form} onSubmit={handleSubmit}>
       {mode === "reset" ? (
         <div className={styles.resetHeading}>
-          <strong>找回或设置邮箱密码</strong>
-          <span>原 Google 登录用户也可以输入同一个邮箱，收到邮件后设置新的邮箱密码。</span>
+          <strong>{resetTitle}</strong>
+          <span>{resetDescription}</span>
         </div>
-      ) : allowSignUp ? (
+      ) : allowSignUp && showModeTabs ? (
         <div className={styles.modeTabs} role="tablist" aria-label="邮箱认证方式">
           <button
             type="button"
@@ -369,7 +397,7 @@ export function EmailAuthForm({
             注册
           </button>
         </div>
-      ) : (
+      ) : compact ? null : (
         <div className={styles.resetHeading}>
           <strong>邮箱账号登录</strong>
           <span>使用原邮箱账号进入账号中心，再绑定微信作为新的登录方式。</span>
@@ -496,7 +524,7 @@ export function EmailAuthForm({
         </div>
       ) : null}
 
-      {mode !== "reset" || !resetEmailSent ? (
+      {mode === "sign-up" ? (
         <button
           type="submit"
           className="button auth-button"
@@ -506,45 +534,73 @@ export function EmailAuthForm({
         </button>
       ) : null}
 
-      {mode === "sign-in" ? (
-        <div className={styles.signInActions}>
+      {mode === "reset" && !resetEmailSent ? (
+        <div className={styles.actionRow}>
           <button
-            type="button"
-            className={styles.googleRecoveryButton}
-            onClick={openPasswordReset}
+            type="submit"
+            className="button auth-button"
             disabled={!enabled || pending}
           >
-            <KeyRound aria-hidden="true" strokeWidth={1.9} />
-            <span>
-              <strong>原 Google 登录用户</strong>
-              <small>发送邮件，设置邮箱密码后登录原账号</small>
-            </span>
+            {submitText}
           </button>
 
           <button
             type="button"
             className={styles.textButton}
-            onClick={openPasswordReset}
+            onClick={handleResetBack}
             disabled={!enabled || pending}
           >
-            忘记邮箱密码
+            {resetBackLabel}
           </button>
         </div>
       ) : null}
 
-      {mode === "reset" ? (
+      {mode === "sign-in" ? (
+        <div className={styles.signInActions}>
+          {showGoogleRecoveryAction ? (
+            <button
+              type="button"
+              className={styles.googleRecoveryButton}
+              onClick={openPasswordReset}
+              disabled={!enabled || pending}
+            >
+              <KeyRound aria-hidden="true" strokeWidth={1.9} />
+              <span>
+                <strong>原 Google 登录用户</strong>
+                <small>发送邮件，设置邮箱密码后登录原账号</small>
+              </span>
+            </button>
+          ) : null}
+
+          <div className={styles.actionRow}>
+            <button
+              type="submit"
+              className="button auth-button"
+              disabled={!enabled || pending}
+            >
+              {submitText}
+            </button>
+
+            <button
+              type="button"
+              className={styles.textButton}
+              onClick={openPasswordReset}
+              disabled={!enabled || pending}
+            >
+              忘记邮箱密码
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {mode === "reset" && resetEmailSent ? (
         <button
           type="button"
           className={styles.textButton}
-          onClick={() => {
-            setMode("sign-in");
-            resetRecoveryState();
-            setError(null);
-            setMessage(null);
-          }}
+          onClick={handleResetBack}
           disabled={!enabled || pending}
         >
-          返回邮箱登录
+          {resetBackLabel}
         </button>
       ) : null}
     </form>

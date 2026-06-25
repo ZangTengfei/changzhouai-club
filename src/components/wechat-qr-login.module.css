@@ -3,6 +3,29 @@
   gap: 10px;
 }
 
+.mobileNotice {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid rgba(var(--accent-rgb), 0.14);
+  border-radius: var(--radius-md);
+  background: rgba(var(--accent-rgb), 0.07);
+}
+
+.mobileNotice strong {
+  color: var(--ink);
+  font-size: 0.98rem;
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.mobileNotice span {
+  color: rgba(var(--ink-rgb), 0.68);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.62;
+}
+
 .qrBox {
   display: grid;
   place-items: center;

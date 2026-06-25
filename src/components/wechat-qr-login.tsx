@@ -18,6 +18,8 @@ type EmbeddedUrlResponse = {
   error?: string;
 };
 
+type QrEnvironment = "checking" | "supported" | "unsupported";
+
 function getSafeNextPath(nextPath: string) {
   if (!nextPath.startsWith("/") || nextPath.startsWith("//")) {
     return "/account";
@@ -42,6 +44,19 @@ function getAuthCallbackUrl(nextPath: string) {
   return callbackUrl.toString();
 }
 
+function canShowWechatQrLogin() {
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  const userAgent = navigator.userAgent;
+  const isWechatBrowser = /MicroMessenger/i.test(userAgent);
+  const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent);
+  const isNarrowViewport = window.matchMedia("(max-width: 720px)").matches;
+
+  return !isWechatBrowser && !isMobileDevice && !isNarrowViewport;
+}
+
 function getEmbeddedFrameUrl(value: string) {
   const url = new URL(value);
   url.hash = "";
@@ -59,11 +74,28 @@ export function WechatQrLogin({
   const [frameUrl, setFrameUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [qrEnvironment, setQrEnvironment] =
+    useState<QrEnvironment>("checking");
   const safeNextPath = getSafeNextPath(nextPath);
   const redirectTo = useMemo(() => getAuthCallbackUrl(safeNextPath), [safeNextPath]);
 
   useEffect(() => {
-    if (!enabled || !redirectTo) {
+    function updateQrEnvironment() {
+      setQrEnvironment(canShowWechatQrLogin() ? "supported" : "unsupported");
+    }
+
+    updateQrEnvironment();
+
+    const mediaQuery = window.matchMedia("(max-width: 720px)");
+    mediaQuery.addEventListener("change", updateQrEnvironment);
+
+    return () => {
+      mediaQuery.removeEventListener("change", updateQrEnvironment);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!enabled || !redirectTo || qrEnvironment !== "supported") {
       setFrameUrl(null);
       setError(null);
       setLoading(false);
@@ -122,7 +154,20 @@ export function WechatQrLogin({
     return () => {
       cancelled = true;
     };
-  }, [enabled, redirectTo]);
+  }, [enabled, redirectTo, qrEnvironment]);
+
+  if (qrEnvironment !== "supported") {
+    return (
+      <div className={styles.mobileNotice}>
+        <strong>
+          {qrEnvironment === "checking" ? "正在判断当前设备..." : "手机端暂不显示扫码登录"}
+        </strong>
+        <span>
+          微信扫码登录更适合电脑浏览器。手机上请先使用邮箱登录已有账号；第一次加入可稍后在电脑端完成微信确认。
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.stack}>

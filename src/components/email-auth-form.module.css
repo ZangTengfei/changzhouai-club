@@ -96,6 +96,25 @@
   gap: 10px;
 }
 
+.actionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.actionRow :global(.auth-button) {
+  flex: 0 0 auto;
+  min-width: 132px;
+}
+
+.actionRow .textButton {
+  flex: 0 0 auto;
+  margin-left: auto;
+  text-align: right;
+  white-space: nowrap;
+}
+
 .googleRecoveryButton {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -244,4 +263,16 @@
 .textButton:disabled {
   cursor: not-allowed;
   opacity: 0.5;
+}
+
+@media (max-width: 360px) {
+  .actionRow {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .actionRow .textButton {
+    margin-left: 0;
+    text-align: left;
+  }
 }
