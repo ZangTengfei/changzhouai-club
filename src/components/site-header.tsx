@@ -157,6 +157,7 @@ export function SiteHeader() {
                 >
                   <Link
                     href="/docs"
+                    prefetch={false}
                     ref={docsTriggerRef}
                     className={cx(
                       "nav-dropdown-trigger",
@@ -184,6 +185,7 @@ export function SiteHeader() {
                   >
                     <Link
                       href="/docs"
+                      prefetch={false}
                       className={cx("nav-dropdown-item mobile-dropdown-item")}
                       aria-current={pathname === "/docs" ? "page" : undefined}
                       onClick={closeAllMenus}
@@ -193,6 +195,7 @@ export function SiteHeader() {
                     </Link>
                     <Link
                       href="/docs/guides/co-builder-rules"
+                      prefetch={false}
                       className={cx("nav-dropdown-item")}
                       aria-current={
                         pathname === "/docs/guides/co-builder-rules" ? "page" : undefined
@@ -207,6 +210,7 @@ export function SiteHeader() {
                     </Link>
                     <Link
                       href="/reports"
+                      prefetch={false}
                       className={cx("nav-dropdown-item")}
                       aria-current={pathname === "/reports" ? "page" : undefined}
                       onClick={closeAllMenus}
@@ -216,6 +220,7 @@ export function SiteHeader() {
                     </Link>
                     <Link
                       href="/about"
+                      prefetch={false}
                       className={cx("nav-dropdown-item")}
                       aria-current={pathname === "/about" ? "page" : undefined}
                       onClick={closeAllMenus}
@@ -245,6 +250,7 @@ export function SiteHeader() {
               <Link
                 key={item.href}
                 href={item.href}
+                prefetch={false}
                 className={isActive ? styles["nav-link-active"] : undefined}
                 aria-current={isActive ? "page" : undefined}
               >

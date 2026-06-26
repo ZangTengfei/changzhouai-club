@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { AppToaster } from "@/components/app-toaster";
+import { StaleBuildReloadGuard } from "@/components/stale-build-reload-guard";
 
 import "./globals.css";
 
@@ -76,6 +77,7 @@ export default function RootLayout({
     >
       <body>
         <AppToaster />
+        <StaleBuildReloadGuard />
         {children}
         {umamiConfig ? (
           <Script
