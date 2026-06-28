@@ -265,7 +265,27 @@ function mapUpdate(
   };
 }
 
-async function loadPublicCommunityUpdates(type?: CommunityUpdateType | null, limit?: number) {
+function normalizeRelatedPath(value: string | null | undefined) {
+  const trimmed = value?.trim();
+
+  if (!trimmed) {
+    return null;
+  }
+
+  try {
+    const url = new URL(trimmed, "https://changzhouai.club");
+    const path = url.pathname.replace(/\/+$/, "");
+    return path || "/";
+  } catch {
+    return trimmed.replace(/\/+$/, "");
+  }
+}
+
+async function loadPublicCommunityUpdates(
+  type?: CommunityUpdateType | null,
+  limit?: number,
+  relatedType?: CommunityUpdateRelatedType | null,
+) {
   const supabase = createPublicCommunityUpdatesReadClient();
   let query = supabase
     .from("community_updates")
@@ -279,6 +299,10 @@ async function loadPublicCommunityUpdates(type?: CommunityUpdateType | null, lim
 
   if (type) {
     query = query.eq("update_type", type);
+  }
+
+  if (relatedType) {
+    query = query.eq("related_type", relatedType);
   }
 
   if (limit) {
@@ -369,6 +393,15 @@ async function buildCommunityUpdatesDirectory(type?: CommunityUpdateType | null)
   };
 }
 
+async function buildCommunityUpdatesForEvent(eventSlug: string) {
+  const targetPath = normalizeRelatedPath(`/events/${eventSlug}`);
+  const updates = await loadPublicCommunityUpdates(null, undefined, "event");
+
+  return updates
+    .filter((update) => normalizeRelatedPath(update.relatedUrl) === targetPath)
+    .slice(0, 4);
+}
+
 const getCachedPublicCommunityUpdatesDirectory = unstable_cache(
   buildCommunityUpdatesDirectory,
   ["public-community-updates-directory"],
@@ -378,6 +411,12 @@ const getCachedPublicCommunityUpdatesDirectory = unstable_cache(
 const getCachedHomeCommunityUpdates = unstable_cache(
   () => loadPublicCommunityUpdates(null, 3),
   ["home-community-updates"],
+  { revalidate: PUBLIC_COMMUNITY_UPDATES_REVALIDATE_SECONDS },
+);
+
+const getCachedPublicCommunityUpdatesForEvent = unstable_cache(
+  buildCommunityUpdatesForEvent,
+  ["public-community-updates-for-event"],
   { revalidate: PUBLIC_COMMUNITY_UPDATES_REVALIDATE_SECONDS },
 );
 
@@ -397,6 +436,14 @@ export async function getHomeCommunityUpdates() {
   }
 
   return getCachedHomeCommunityUpdates();
+}
+
+export async function getPublicCommunityUpdatesForEvent(eventSlug: string) {
+  if (!hasSupabaseEnv()) {
+    return [];
+  }
+
+  return getCachedPublicCommunityUpdatesForEvent(eventSlug);
 }
 
 export async function getPublicCommunityUpdateById(id: string) {

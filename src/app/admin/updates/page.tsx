@@ -167,7 +167,11 @@ function UpdateForm({
         </AdminField>
 
         <AdminField label="关联链接">
-          <Input name="related_url" defaultValue={update?.related_url ?? ""} />
+          <Input
+            name="related_url"
+            defaultValue={update?.related_url ?? ""}
+            placeholder="例如：https://changzhouai.club/events/2026-06-27-codex-ppt-real-projects"
+          />
         </AdminField>
 
         <AdminField label="标签">

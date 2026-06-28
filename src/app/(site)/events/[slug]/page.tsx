@@ -18,6 +18,7 @@ import {
 
 import { EventDetailRegistrationPanel } from "@/components/event-detail-registration-panel";
 import { getPublicEventBySlug } from "@/lib/community-events";
+import { getPublicCommunityUpdatesForEvent } from "@/lib/community-updates";
 import {
   getExternalRegistrationLabel,
   getExternalRegistrationUrl,
@@ -37,6 +38,14 @@ const statusToneMap: Record<string, string> = {
   completed: "orange",
   cancelled: "blue",
 };
+
+function formatRelatedUpdateDate(value: string | null) {
+  if (!value) {
+    return "发布时间待定";
+  }
+
+  return value.split("T")[0]?.replaceAll("-", ".") ?? value.replaceAll("-", ".");
+}
 
 export async function generateMetadata({
   params,
@@ -73,11 +82,13 @@ export default async function EventDetailPage({
     notFound();
   }
 
+  const relatedUpdates = await getPublicCommunityUpdatesForEvent(event.slug);
   const detailHref = `/events/${event.slug}`;
   const hasOverview = event.descriptionParagraphs.length > 0;
   const hasAgenda = event.agendaItems.length > 0;
   const hasSpeakers = event.speakerItems.length > 0;
   const hasRecap = event.recapParagraphs.length > 0;
+  const hasRelatedUpdates = relatedUpdates.length > 0;
   const statusTone = statusToneMap[event.status] ?? "green";
   const eventDocsHref = event.docsUrl;
   const isExternalDocsHref = eventDocsHref?.startsWith("http") ?? false;
@@ -375,6 +386,13 @@ export default async function EventDetailPage({
                   <strong>已发布</strong>
                 </li>
               ) : null}
+              {hasRelatedUpdates ? (
+                <li>
+                  <FileText aria-hidden="true" strokeWidth={1.8} />
+                  <span>活动报道</span>
+                  <strong>{relatedUpdates.length} 篇</strong>
+                </li>
+              ) : null}
             </ul>
 
             {registrationNote ? (
@@ -431,6 +449,58 @@ export default async function EventDetailPage({
           )}
         </aside>
       </div>
+
+      {hasRelatedUpdates ? (
+        <section className={styles.eventRelatedUpdatesPanel}>
+          <div className={styles.eventSectionHeading}>
+            <p className="home-kicker">Updates</p>
+            <div>
+              <h2>活动报道与社区动态</h2>
+              <p>完整推文、复盘文章和成员视角会在这里关联到本场活动。</p>
+            </div>
+          </div>
+
+          <div className={styles.eventRelatedUpdateList}>
+            {relatedUpdates.map((update) => {
+              const coverImage = update.images[0];
+
+              return (
+                <Link
+                  href={update.href}
+                  className={
+                    coverImage
+                      ? styles.eventRelatedUpdateCard
+                      : `${styles.eventRelatedUpdateCard} ${styles.eventRelatedUpdateCardNoMedia}`
+                  }
+                  key={update.id}
+                >
+                  {coverImage ? (
+                    <span className={styles.eventRelatedUpdateMedia}>
+                      <img
+                        src={coverImage.imageUrl}
+                        alt={coverImage.alt ?? update.title ?? update.typeLabel}
+                        loading="lazy"
+                      />
+                    </span>
+                  ) : null}
+                  <span className={styles.eventRelatedUpdateCopy}>
+                    <small>
+                      {update.typeLabel} ·{" "}
+                      {formatRelatedUpdateDate(update.publishedAt ?? update.createdAt)}
+                    </small>
+                    <strong>{update.title ?? update.typeLabel}</strong>
+                    <span>{update.excerpt}</span>
+                  </span>
+                  <i>
+                    阅读全文
+                    <ArrowRight aria-hidden="true" strokeWidth={1.8} />
+                  </i>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
 
       {event.gallery.length > 0 ? (
         <section className={styles.eventGallerySection}>
