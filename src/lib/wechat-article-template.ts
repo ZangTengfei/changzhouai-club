@@ -12,6 +12,13 @@ export type WechatArticleTemplate = {
   background: string;
   label: string;
   footer: string;
+  footerTitle: string;
+  footerDescription: string;
+  footerLinkLabel: string;
+  footerLinkUrl: string;
+  qrImageUrl: string;
+  qrTitle: string;
+  qrDescription: string;
 };
 
 type MarkdownBlock =
@@ -26,6 +33,8 @@ type RenderWechatArticleOptions = {
   title?: string | null;
 };
 
+const officialAccountQrUrl = "https://changzhouai.club/wechat-official-account-qr.jpg";
+
 export const wechatArticleTemplates: WechatArticleTemplate[] = [
   {
     id: "community",
@@ -39,6 +48,13 @@ export const wechatArticleTemplates: WechatArticleTemplate[] = [
     background: "#fffdf8",
     label: "Changzhou AI Club",
     footer: "常州 AI Club｜连接、分享、共创",
+    footerTitle: "继续和常州 AI Club 一起共创",
+    footerDescription: "关注公众号，获取活动回顾、项目机会和本地 AI 实践者故事。",
+    footerLinkLabel: "官网 changzhouai.club",
+    footerLinkUrl: "https://changzhouai.club",
+    qrImageUrl: officialAccountQrUrl,
+    qrTitle: "扫码关注公众号",
+    qrDescription: "不错过下一场线下活动",
   },
   {
     id: "official",
@@ -52,6 +68,13 @@ export const wechatArticleTemplates: WechatArticleTemplate[] = [
     background: "#ffffff",
     label: "常州 AI Club",
     footer: "共同推动 AI 创客交流与场景落地",
+    footerTitle: "常州 AI Club",
+    footerDescription: "连接本地 AI 创客、产业场景与真实项目，持续推动交流与落地。",
+    footerLinkLabel: "官网 changzhouai.club",
+    footerLinkUrl: "https://changzhouai.club",
+    qrImageUrl: officialAccountQrUrl,
+    qrTitle: "关注公众号",
+    qrDescription: "了解后续活动与社区动态",
   },
   {
     id: "opportunity",
@@ -65,6 +88,13 @@ export const wechatArticleTemplates: WechatArticleTemplate[] = [
     background: "#fbfdff",
     label: "项目合作机会",
     footer: "欢迎带着真实问题、真实能力和真实项目一起共创",
+    footerTitle: "带着能力进入真实项目",
+    footerDescription: "关注社区后续项目发布、揭榜报名和小范围需求澄清信息。",
+    footerLinkLabel: "官网 changzhouai.club",
+    footerLinkUrl: "https://changzhouai.club",
+    qrImageUrl: officialAccountQrUrl,
+    qrTitle: "扫码关注公众号",
+    qrDescription: "获取项目机会更新",
   },
 ];
 
@@ -121,6 +151,50 @@ function renderInline(text: string, template: WechatArticleTemplate) {
 
   html += escapeHtml(text.slice(cursor));
   return html;
+}
+
+function renderFooter(template: WechatArticleTemplate) {
+  const qrImage = template.qrImageUrl.trim()
+    ? `<img src="${escapeAttribute(
+        template.qrImageUrl,
+      )}" alt="${escapeAttribute(
+        template.qrTitle,
+      )}" style="display:block;width:92px;height:92px;margin:0 auto;border-radius:8px;"/>`
+    : `<section style="width:92px;height:92px;margin:0 auto;border:1px dashed ${template.accent};border-radius:8px;background:#ffffff;"></section>`;
+
+  return `<section style="margin:6px 20px 0;padding:18px 0 28px;border-top:1px solid #ece4d8;">
+    <section style="margin:0 0 14px;color:${template.muted};font-size:13px;line-height:1.7;text-align:center;">${escapeHtml(
+      template.footer,
+    )}</section>
+    <section style="padding:16px;border:1px solid ${template.accentSoft};border-radius:14px;background:${template.accentSoft};">
+      <section style="display:table;width:100%;border-collapse:collapse;">
+        <section style="display:table-cell;padding:0 14px 0 0;vertical-align:middle;">
+          <strong style="display:block;margin:0 0 6px;color:${template.text};font-size:16px;line-height:1.45;font-weight:800;">${escapeHtml(
+            template.footerTitle,
+          )}</strong>
+          <span style="display:block;margin:0 0 10px;color:${template.muted};font-size:13px;line-height:1.7;">${escapeHtml(
+            template.footerDescription,
+          )}</span>
+          <a href="${escapeAttribute(
+            template.footerLinkUrl,
+          )}" style="display:inline-block;color:${template.accent};font-size:13px;font-weight:700;text-decoration:none;border-bottom:1px solid ${template.accent};">${escapeHtml(
+            template.footerLinkLabel,
+          )}</a>
+        </section>
+        <section style="display:table-cell;width:112px;padding:0;vertical-align:middle;text-align:center;">
+          <section style="display:inline-block;padding:9px;border-radius:12px;background:#ffffff;">
+            ${qrImage}
+          </section>
+          <strong style="display:block;margin:7px 0 0;color:${template.text};font-size:12px;line-height:1.5;font-weight:800;">${escapeHtml(
+            template.qrTitle,
+          )}</strong>
+          <span style="display:block;color:${template.muted};font-size:11px;line-height:1.45;">${escapeHtml(
+            template.qrDescription,
+          )}</span>
+        </section>
+      </section>
+    </section>
+  </section>`;
 }
 
 function parseMarkdown(markdown: string) {
@@ -335,8 +409,6 @@ export function renderWechatArticleHtml(
   <section style="padding:8px 20px 18px;">
     ${bodyHtml}
   </section>
-  <section style="margin:6px 20px 0;padding:16px 0 26px;border-top:1px solid #ece4d8;color:${template.muted};font-size:13px;line-height:1.7;text-align:center;">${escapeHtml(
-    template.footer,
-  )}</section>
+  ${renderFooter(template)}
 </section>`;
 }
