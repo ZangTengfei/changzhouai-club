@@ -21,6 +21,7 @@ import { StorageImageUrlField } from "@/components/storage-image-url-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { WechatArticleComposer } from "@/components/wechat-article-composer";
 import {
   getAdminErrorMessage,
   getAdminSavedMessage,
@@ -28,8 +29,8 @@ import {
 import { loadAdminSocialData } from "@/lib/admin/social";
 
 export const metadata: Metadata = {
-  title: "社交入口管理",
-  description: "管理社区外部平台入口和官方微信二维码。",
+  title: "社媒发布工具",
+  description: "管理社区公众号排版、外部平台入口和官方微信二维码。",
 };
 
 type AdminSocialPageProps = {
@@ -105,7 +106,7 @@ export default async function AdminSocialPage({
       <AdminPanel>
         <AdminPanelHeader
           eyebrow="Social"
-          title="社交入口与官方微信二维码"
+          title="社媒发布工具"
           actions={
             <>
               <AdminMetric label="二维码" value={qrCodes.length} />
@@ -118,6 +119,22 @@ export default async function AdminSocialPage({
       {queryErrors.length > 0 ? (
         <AdminNotice>后台数据读取出现问题：{queryErrors.join(" | ")}</AdminNotice>
       ) : null}
+
+      <AdminPanel>
+        <AdminPanelHeader
+          eyebrow="Wechat"
+          title="公众号排版复制"
+          actions={
+            <>
+              <AdminMetric label="模板" value="3" />
+              <AdminMetric label="格式" value="富文本" />
+            </>
+          }
+        />
+        <AdminPanelBody>
+          <WechatArticleComposer />
+        </AdminPanelBody>
+      </AdminPanel>
 
       <AdminPanel>
         <AdminPanelHeader
