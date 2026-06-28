@@ -8,9 +8,9 @@ import type { WeDailyDiscussion, WeDailyHighlight, WeDailyReport, WeDailyResourc
 import styles from "./ai-news-page.module.css";
 
 const POSTER_WIDTH = 1080;
-const POSTER_PADDING = 64;
+const POSTER_PADDING = 76;
 const POSTER_CONTENT_WIDTH = POSTER_WIDTH - POSTER_PADDING * 2;
-const CARD_INSET = 30;
+const CARD_INSET = 28;
 const POSTER_BACKGROUND = "#fff7ed";
 const POSTER_INK = "#1f2524";
 const POSTER_MUTED = "#745f48";
@@ -18,11 +18,11 @@ const POSTER_MUTED_LIGHT = "#8a7661";
 const POSTER_ACCENT = "#0f7a6a";
 const POSTER_ORANGE = "#bc6d2a";
 const POSTER_ORANGE_DARK = "#7d3f12";
-const POSTER_LINE = "#e5d2b8";
+const POSTER_LINE = "#eadfce";
 const POSTER_CARD = "#fffdf8";
 const POSTER_SOFT = "#fdf1df";
-const POSTER_FONT = "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
-const EXPORT_PIXEL_RATIO = 2;
+const POSTER_FONT = "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', system-ui, sans-serif";
+const EXPORT_PIXEL_RATIO = 3;
 const MAX_CANVAS_EDGE = 32_000;
 
 type ExportState = "idle" | "exporting" | "done" | "error";
@@ -88,23 +88,20 @@ function buildGroupDailyReportPosterSvg(report: WeDailyReport): PosterSvg {
 
   body.push(renderText(["常州 AI Club"], POSTER_PADDING, y + 8, 22, 900, POSTER_ACCENT, 30));
   body.push(renderBadge(POSTER_WIDTH - POSTER_PADDING - 210, y - 10, 210, 44, "GROUP DAILY"));
-  y += 92;
+  y += 84;
 
-  body.push(renderText(["群聊日报"], POSTER_PADDING, y, 68, 950, POSTER_INK, 78));
-  y += 86;
-
-  const titleLines = wrapTextToWidth(report.parsed.title, 36, POSTER_CONTENT_WIDTH, 3);
-  body.push(renderText(titleLines, POSTER_PADDING, y, 36, 950, POSTER_INK, 46));
-  y += titleLines.length * 46 + 18;
+  const titleLines = wrapTextToWidth(report.parsed.title, 44, POSTER_CONTENT_WIDTH, 3);
+  body.push(renderText(titleLines, POSTER_PADDING, y, 44, 950, POSTER_INK, 54));
+  y += titleLines.length * 54 + 20;
 
   const metaLines = wrapTextToWidth(
     `${report.chat} · ${report.date} · ${report.generated_by ?? "WeDaily"} · 工具原作者：小淳`,
-    22,
+    20,
     POSTER_CONTENT_WIDTH,
     2,
   );
-  body.push(renderText(metaLines, POSTER_PADDING, y, 22, 850, POSTER_MUTED, 32));
-  y += metaLines.length * 32 + 28;
+  body.push(renderText(metaLines, POSTER_PADDING, y, 20, 850, POSTER_MUTED, 30));
+  y += metaLines.length * 30 + 28;
 
   y = renderStats(body, y, report);
 
@@ -140,7 +137,7 @@ function buildGroupDailyReportPosterSvg(report: WeDailyReport): PosterSvg {
 
   const height = y + POSTER_PADDING;
   const svg = [
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${POSTER_WIDTH}" height="${height}" viewBox="0 0 ${POSTER_WIDTH} ${height}">`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${POSTER_WIDTH}" height="${height}" viewBox="0 0 ${POSTER_WIDTH} ${height}" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">`,
     `<rect width="${POSTER_WIDTH}" height="${height}" fill="${POSTER_BACKGROUND}"/>`,
     ...body,
     "</svg>",
@@ -196,31 +193,27 @@ function renderHighlightSection(body: string[], y: number, highlights: WeDailyHi
   y = renderSectionHeader(body, y, "TODAY HIGHLIGHTS", `今日要点 · ${highlights.length} 个话题`, POSTER_ORANGE);
 
   const columnGap = 14;
-  const rowGap = 14;
+  const cardGap = 14;
   const cardWidth = (POSTER_CONTENT_WIDTH - columnGap) / 2;
   const layouts = highlights.map((highlight) => getHighlightCardLayout(highlight, cardWidth));
+  const columns = [
+    { x: POSTER_PADDING, y },
+    { x: POSTER_PADDING + cardWidth + columnGap, y },
+  ];
 
-  for (let index = 0; index < layouts.length; index += 2) {
-    const left = layouts[index];
-    const right = layouts[index + 1];
-    const rowHeight = Math.max(left.height, right?.height ?? 0);
+  layouts.forEach((layout) => {
+    const column = columns[0].y <= columns[1].y ? columns[0] : columns[1];
+    renderHighlightCard(body, layout, column.x, column.y, cardWidth, layout.height);
+    column.y += layout.height + cardGap;
+  });
 
-    renderHighlightCard(body, left, POSTER_PADDING, y, cardWidth, rowHeight);
-
-    if (right) {
-      renderHighlightCard(body, right, POSTER_PADDING + cardWidth + columnGap, y, cardWidth, rowHeight);
-    }
-
-    y += rowHeight + rowGap;
-  }
-
-  return y + 12;
+  return Math.max(columns[0].y, columns[1].y) + 18;
 }
 
 function getHighlightCardLayout(highlight: WeDailyHighlight, cardWidth: number) {
   const textWidth = cardWidth - CARD_INSET * 2;
   const titleLines = wrapTextToWidth(highlight.title, 22, textWidth - 52, 2);
-  const summaryLines = highlight.summary ? wrapTextToWidth(highlight.summary, 18, textWidth, 4) : [];
+  const summaryLines = highlight.summary ? wrapTextToWidth(highlight.summary, 18, textWidth, 3) : [];
   const people = highlight.participants.length > 0 ? `参与：${highlight.participants.slice(0, 4).join("、")}` : "";
   const peopleLines = people ? wrapTextToWidth(people, 15, textWidth, 1) : [];
   const metaLines = highlight.timeRange ? [highlight.timeRange] : [];
@@ -278,12 +271,12 @@ function renderDiscussionSection(body: string[], y: number, discussions: WeDaily
 
   discussions.forEach((discussion) => {
     const title = discussion.timeRange ? `${discussion.title}（${discussion.timeRange}）` : discussion.title;
-    const titleLines = wrapTextToWidth(title, 25, POSTER_CONTENT_WIDTH - CARD_INSET * 2, 2);
-    const conclusionLines = wrapTextToWidth(discussion.conclusion, 21, POSTER_CONTENT_WIDTH - CARD_INSET * 2, 3);
+    const titleLines = wrapTextToWidth(title, 25, POSTER_CONTENT_WIDTH - CARD_INSET * 2, 3);
+    const conclusionLines = wrapTextToWidth(discussion.conclusion, 21, POSTER_CONTENT_WIDTH - CARD_INSET * 2, 4);
     const people = discussion.people.length > 0 ? `相关人物：${discussion.people.slice(0, 6).join("、")}` : "";
-    const peopleLines = people ? wrapTextToWidth(people, 18, POSTER_CONTENT_WIDTH - CARD_INSET * 2, 1) : [];
+    const peopleLines = people ? wrapTextToWidth(people, 18, POSTER_CONTENT_WIDTH - CARD_INSET * 2, 2) : [];
     const quoteLines = discussion.quote
-      ? wrapTextToWidth(`代表性原话：${discussion.quote}`, 18, POSTER_CONTENT_WIDTH - CARD_INSET * 2, 2)
+      ? wrapTextToWidth(`代表性原话：${discussion.quote}`, 18, POSTER_CONTENT_WIDTH - CARD_INSET * 2, 3)
       : [];
     const height =
       34 +
@@ -324,7 +317,7 @@ function renderResourceSection(body: string[], y: number, resources: WeDailyReso
 
   resources.forEach((resource) => {
     const titleLines = wrapTextToWidth(resource.title, 23, POSTER_CONTENT_WIDTH - CARD_INSET * 2 - 54, 2);
-    const bodyLines = wrapTextToWidth(resource.body, 20, POSTER_CONTENT_WIDTH - CARD_INSET * 2 - 54, 3);
+    const bodyLines = wrapTextToWidth(resource.body, 20, POSTER_CONTENT_WIDTH - CARD_INSET * 2 - 54, 4);
     const height = 34 + titleLines.length * 32 + 12 + bodyLines.length * 29 + 24;
 
     body.push(renderRoundedRect(POSTER_PADDING, y, POSTER_CONTENT_WIDTH, height, 18, POSTER_CARD, "rgba(188,109,42,0.14)"));
@@ -423,48 +416,132 @@ function renderText(
   lineHeight: number,
   options: { textAnchor?: "start" | "middle" | "end" } = {},
 ) {
-  const anchor = options.textAnchor ?? "start";
-  const tspans = lines
-    .map(
-      (line, index) =>
-        `<tspan x="${round(x)}" y="${round(y + index * lineHeight)}">${escapeXml(cleanText(line))}</tspan>`,
-    )
+  const normalizedLines = lines.map(cleanText).filter(Boolean);
+
+  if (normalizedLines.length === 0) {
+    return "";
+  }
+
+  const anchor = options.textAnchor ? ` text-anchor="${options.textAnchor}"` : "";
+  const tspans = normalizedLines
+    .map((line, index) => {
+      const position = index === 0 ? `x="${round(x)}" y="${round(y)}"` : `x="${round(x)}" dy="${lineHeight}"`;
+      return `<tspan ${position}>${escapeXml(line)}</tspan>`;
+    })
     .join("");
 
-  return `<text font-family="${POSTER_FONT}" font-size="${fontSize}" font-weight="${fontWeight}" fill="${fill}" text-anchor="${anchor}">${tspans}</text>`;
+  return `<text${anchor} style="font-family: ${POSTER_FONT}; font-size: ${fontSize}px; font-weight: ${fontWeight}; fill: ${fill};">${tspans}</text>`;
 }
 
 function wrapTextToWidth(value: string, fontSize: number, maxWidth: number, maxLines = Number.POSITIVE_INFINITY) {
   const source = cleanText(value);
+
+  if (!source) {
+    return [];
+  }
+
   const lines: string[] = [];
-  let current = "";
+  let line = "";
+  const tokens = tokenizeText(source);
 
-  for (const char of source) {
-    const next = `${current}${char}`;
+  for (const token of tokens) {
+    const candidate = line + token;
 
-    if (current && measureTextWidth(next, fontSize) > maxWidth) {
-      lines.push(current);
-      current = char;
+    if (line && measureTextWidth(candidate, fontSize) > maxWidth) {
+      lines.push(line.trimEnd());
+      line = token.trimStart();
 
-      if (lines.length === maxLines) {
-        break;
+      if (lines.length >= maxLines) {
+        return addEllipsis(lines, fontSize, maxWidth);
       }
 
+      while (line && measureTextWidth(line, fontSize) > maxWidth) {
+        const split = splitTokenToWidth(line, fontSize, maxWidth);
+        lines.push(split.head.trimEnd());
+        line = split.tail.trimStart();
+
+        if (lines.length >= maxLines) {
+          return addEllipsis(lines, fontSize, maxWidth);
+        }
+      }
+    } else {
+      line = candidate;
+    }
+  }
+
+  if (line.trim()) {
+    lines.push(line.trim());
+  }
+
+  return lines.length > maxLines ? addEllipsis(lines.slice(0, maxLines), fontSize, maxWidth) : lines;
+}
+
+function tokenizeText(value: string) {
+  const tokens: string[] = [];
+  let latinToken = "";
+
+  for (const char of Array.from(value)) {
+    if (isLatinTokenChar(char)) {
+      latinToken += char;
       continue;
     }
 
-    current = next;
+    if (latinToken) {
+      tokens.push(latinToken);
+      latinToken = "";
+    }
+
+    tokens.push(char);
   }
 
-  if (current && lines.length < maxLines) {
-    lines.push(current);
+  if (latinToken) {
+    tokens.push(latinToken);
   }
 
-  if (lines.length === maxLines && measureTextWidth(current, fontSize) > maxWidth && lines[lines.length - 1]) {
-    lines[lines.length - 1] = `${lines[lines.length - 1].slice(0, -1)}…`;
+  return tokens;
+}
+
+function splitTokenToWidth(value: string, fontSize: number, maxWidth: number) {
+  let head = "";
+  let tail = "";
+  const chars = Array.from(value);
+
+  for (let index = 0; index < chars.length; index += 1) {
+    const candidate = head + chars[index];
+
+    if (head && measureTextWidth(candidate, fontSize) > maxWidth) {
+      tail = chars.slice(index).join("");
+      break;
+    }
+
+    head = candidate;
   }
 
-  return lines.length > 0 ? lines : [""];
+  return {
+    head: head || chars[0] || "",
+    tail,
+  };
+}
+
+function addEllipsis(lines: string[], fontSize: number, maxWidth: number) {
+  const next = [...lines];
+  const last = next.length - 1;
+
+  if (last >= 0) {
+    next[last] = truncateLine(`${next[last].replace(/[，。,.、\s]+$/u, "")}…`, fontSize, maxWidth);
+  }
+
+  return next;
+}
+
+function truncateLine(value: string, fontSize: number, maxWidth: number) {
+  let next = value;
+
+  while (next.length > 1 && measureTextWidth(next, fontSize) > maxWidth) {
+    next = `${Array.from(next).slice(0, -2).join("").trimEnd()}…`;
+  }
+
+  return next;
 }
 
 function layoutTags(tags: string[], fontSize: number, maxWidth: number) {
@@ -493,7 +570,31 @@ function layoutTags(tags: string[], fontSize: number, maxWidth: number) {
 }
 
 function measureTextWidth(value: string, fontSize: number) {
-  return Array.from(value).reduce((total, char) => total + (isLatinTokenChar(char) ? fontSize * 0.56 : fontSize), 0);
+  return Array.from(value).reduce((total, char) => total + getCharWidth(char, fontSize), 0);
+}
+
+function getCharWidth(char: string, fontSize: number) {
+  if (/[A-Z]/.test(char)) {
+    return fontSize * 0.68;
+  }
+
+  if (/[a-z0-9]/.test(char)) {
+    return fontSize * 0.58;
+  }
+
+  if (/\s/.test(char)) {
+    return fontSize * 0.34;
+  }
+
+  if (/[-_/.:@+()[\],]/.test(char)) {
+    return fontSize * 0.38;
+  }
+
+  if (/[，。；：！？、（）《》“”‘’]/u.test(char)) {
+    return fontSize * 0.56;
+  }
+
+  return fontSize;
 }
 
 function isLatinTokenChar(char: string) {
