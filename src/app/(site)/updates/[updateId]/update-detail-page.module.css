@@ -119,16 +119,6 @@
   color: #a76b12;
 }
 
-.updateHeader h1 {
-  max-width: 760px;
-  margin: 0;
-  color: #111b1f;
-  font-size: clamp(2rem, 4.5vw, 3rem);
-  font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: 0;
-}
-
 .updateMetrics {
   gap: 14px;
   padding-top: 4px;
@@ -173,22 +163,16 @@
   height: 16px;
 }
 
-.updateGallery {
-  display: grid;
-  gap: 10px;
+.updateWechatArticle {
+  overflow: hidden;
+  max-width: 677px;
+  border: 1px solid rgba(225, 219, 206, 0.88);
+  border-radius: var(--radius-md);
+  background: transparent;
 }
 
-.updateGallery img {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 620px;
-  border-radius: var(--radius-sm);
-  object-fit: cover;
-}
-
-.updateContent {
-  max-width: 760px;
+.updateWechatArticle > section {
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .updateTags span {

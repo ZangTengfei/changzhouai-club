@@ -9,11 +9,19 @@ import {
 } from "lucide-react";
 
 import { toggleCommunityUpdateLike } from "@/app/(site)/updates/actions";
-import { MarkdownContent } from "@/components/markdown-content";
 import { MemberAvatar } from "@/components/member-avatar";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import { getViewerCommunityUpdateLike } from "@/lib/community-update-interactions";
-import { getPublicCommunityUpdateById } from "@/lib/community-updates";
+import {
+  getPublicCommunityUpdateById,
+  type CommunityUpdateType,
+  type PublicCommunityUpdate,
+} from "@/lib/community-updates";
+import {
+  getWechatArticleTemplate,
+  renderWechatArticleHtml,
+  type WechatArticleTemplateId,
+} from "@/lib/wechat-article-template";
 
 import { CommunityUpdateViewTracker } from "./community-update-view-tracker";
 import styles from "./update-detail-page.module.css";
@@ -36,6 +44,30 @@ function formatDateTime(value: string | null) {
     hour: "2-digit",
     minute: "2-digit",
   });
+}
+
+function getTemplateIdForUpdateType(type: CommunityUpdateType): WechatArticleTemplateId {
+  if (type === "official") {
+    return "official";
+  }
+
+  if (type === "project" || type === "collab" || type === "help") {
+    return "opportunity";
+  }
+
+  return "community";
+}
+
+function buildWechatArticleMarkdown(update: PublicCommunityUpdate) {
+  const imageMarkdown = update.images
+    .filter((image) => !update.content.includes(image.imageUrl))
+    .map((image) => {
+      const alt = image.alt ?? update.title ?? update.typeLabel;
+      return `![${alt}](${image.imageUrl})`;
+    })
+    .join("\n\n");
+
+  return [imageMarkdown, update.content].filter(Boolean).join("\n\n");
 }
 
 export async function generateMetadata({
@@ -68,6 +100,14 @@ export default async function UpdateDetailPage({
   }
 
   const viewerHasLiked = await getViewerCommunityUpdateLike(update.id);
+  const template = getWechatArticleTemplate(getTemplateIdForUpdateType(update.type));
+  const articleHtml = renderWechatArticleHtml(
+    buildWechatArticleMarkdown(update),
+    template,
+    {
+      title: update.title || update.typeLabel,
+    },
+  );
 
   return (
     <div className={styles.updateDetailPage}>
@@ -106,8 +146,6 @@ export default async function UpdateDetailPage({
             {update.isPinned ? <i>置顶</i> : null}
           </div>
 
-          <h1>{update.title || update.typeLabel}</h1>
-
           <div className={styles.updateMetrics} aria-label="动态互动数据">
             <form action={toggleCommunityUpdateLike}>
               <input type="hidden" name="update_id" value={update.id} />
@@ -135,19 +173,10 @@ export default async function UpdateDetailPage({
           </div>
         </header>
 
-        {update.images.length > 0 ? (
-          <div className={styles.updateGallery}>
-            {update.images.map((image) => (
-              <img
-                key={image.id}
-                src={image.imageUrl}
-                alt={image.alt ?? update.title ?? update.typeLabel}
-              />
-            ))}
-          </div>
-        ) : null}
-
-        <MarkdownContent content={update.content} className={styles.updateContent} />
+        <div
+          className={styles.updateWechatArticle}
+          dangerouslySetInnerHTML={{ __html: articleHtml }}
+        />
 
         {update.tags.length > 0 ? (
           <div className={styles.updateTags}>
