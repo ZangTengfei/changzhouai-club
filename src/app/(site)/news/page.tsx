@@ -6,6 +6,7 @@ import {
   ExternalLink,
   ListFilter,
   Lock,
+  PencilLine,
   RadioTower,
   Sparkles,
 } from "lucide-react";
@@ -28,6 +29,7 @@ import {
   type AiNewsItem,
 } from "@/lib/aihot";
 import { hasSupabaseEnv } from "@/lib/env";
+import { getAdminContextResult } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 import {
   getWeDailyReports,
@@ -227,6 +229,16 @@ async function getLocalViewerUser() {
   } = await supabase.auth.getUser();
 
   return user;
+}
+
+async function getLocalViewerCanEditReports() {
+  if (!hasSupabaseEnv()) {
+    return false;
+  }
+
+  const context = await getAdminContextResult("updates.publish");
+
+  return context.isAuthorized;
 }
 
 function FeedItem({ item, index }: { item: AiNewsItem; index: number }) {
@@ -492,12 +504,14 @@ function GroupReportLockedSection({
 
 function LocalGroupDailyView({
   activeDate,
+  canEditReport,
   canViewFullReport,
   error,
   report,
   reports,
 }: {
   activeDate?: string;
+  canEditReport: boolean;
   canViewFullReport: boolean;
   error: string | null;
   report: WeDailyReport | null;
@@ -545,7 +559,20 @@ function LocalGroupDailyView({
               <span>群聊手记 · {report.date}</span>
               <strong>AI</strong>
             </div>
-            {canViewFullReport ? <GroupDailyReportExportButton report={report} /> : null}
+            {canViewFullReport ? (
+              <div className={styles.groupPosterHeaderActions}>
+                {canEditReport ? (
+                  <Link
+                    className={styles.dailyExportButton}
+                    href={`/admin/reports?reportId=${encodeURIComponent(String(report.id))}`}
+                  >
+                    <PencilLine aria-hidden="true" strokeWidth={1.9} />
+                    <span>编辑日报</span>
+                  </Link>
+                ) : null}
+                <GroupDailyReportExportButton report={report} />
+              </div>
+            ) : null}
           </div>
           <h2 id="group-daily-title">{report.parsed.title}</h2>
           <p>
@@ -663,6 +690,7 @@ export default async function AiNewsPage({
   const isDailyView = view === "daily";
   const isLocalView = view === "local";
   const localViewerUser = isLocalView ? await getLocalViewerUser() : null;
+  const localViewerCanEditReports = isLocalView ? await getLocalViewerCanEditReports() : false;
 
   const currentQuery = { category, mode, view };
   const [feed, daily, groupDaily] = await Promise.all([
@@ -802,6 +830,7 @@ export default async function AiNewsPage({
       {isLocalView ? (
         <LocalGroupDailyView
           activeDate={params.date}
+          canEditReport={localViewerCanEditReports}
           canViewFullReport={Boolean(localViewerUser)}
           error={groupDaily.error}
           report={activeGroupReport}
