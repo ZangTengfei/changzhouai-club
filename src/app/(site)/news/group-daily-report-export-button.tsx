@@ -5,6 +5,7 @@ import { Download, LoaderCircle } from "lucide-react";
 
 import type { WeDailyReport } from "@/lib/wedaily";
 import { downloadWeDailyReportTemplatePng } from "@/lib/wedaily-report-export";
+import { appendWeDailyReportQrCode } from "@/lib/wedaily-report-qr";
 
 import styles from "./ai-news-page.module.css";
 
@@ -34,7 +35,8 @@ export function GroupDailyReportExportButton({ report }: GroupDailyReportExportB
         throw new Error(payload?.error || "导出图片失败");
       }
 
-      await downloadWeDailyReportTemplatePng(payload, `changzhou-group-daily-${report.date || "latest"}.png`);
+      const template = await appendWeDailyReportQrCode(payload, { date: report.date });
+      await downloadWeDailyReportTemplatePng(template, `changzhou-group-daily-${report.date || "latest"}.png`);
 
       setState("done");
       window.setTimeout(() => setState("idle"), 2200);
