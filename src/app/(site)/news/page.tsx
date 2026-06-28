@@ -38,6 +38,7 @@ import {
 } from "@/lib/wedaily";
 
 import { DailyReportExportButton } from "./daily-report-export-button";
+import { GroupDailyReportExportButton } from "./group-daily-report-export-button";
 import styles from "./ai-news-page.module.css";
 
 export const metadata: Metadata = {
@@ -539,9 +540,12 @@ function LocalGroupDailyView({
 
       <article className={styles.groupReportPoster}>
         <header className={styles.groupPosterHeader}>
-          <div className={styles.groupPosterEyebrow}>
-            <span>群聊手记 · {report.date}</span>
-            <strong>AI</strong>
+          <div className={styles.groupPosterHeaderTop}>
+            <div className={styles.groupPosterEyebrow}>
+              <span>群聊手记 · {report.date}</span>
+              <strong>AI</strong>
+            </div>
+            {canViewFullReport ? <GroupDailyReportExportButton report={report} /> : null}
           </div>
           <h2 id="group-daily-title">{report.parsed.title}</h2>
           <p>

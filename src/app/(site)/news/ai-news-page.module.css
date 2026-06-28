@@ -1104,6 +1104,14 @@
   border-bottom: 1px solid rgba(119, 84, 48, 0.12);
 }
 
+.groupPosterHeaderTop {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  min-width: 0;
+}
+
 .groupPosterHeader h2,
 .groupPosterHeader p {
   margin: 0;
@@ -1129,7 +1137,8 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  min-width: 0;
 }
 
 .groupPosterEyebrow span,
@@ -1677,6 +1686,10 @@
 
   .groupPosterHeader h2 {
     font-size: 1.75rem;
+  }
+
+  .groupPosterHeaderTop {
+    flex-direction: column;
   }
 
   .groupPosterEyebrow {
