@@ -1112,6 +1112,14 @@
   min-width: 0;
 }
 
+.groupPosterHeaderActions {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 .groupPosterHeader h2,
 .groupPosterHeader p {
   margin: 0;
