@@ -22,7 +22,7 @@ const POSTER_LINE = "#eadfce";
 const POSTER_CARD = "#fffdf8";
 const POSTER_SOFT = "#fdf1df";
 const POSTER_FONT = "'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans CJK SC', system-ui, sans-serif";
-const EXPORT_PIXEL_RATIO = 3;
+const EXPORT_PIXEL_RATIO = 2.5;
 const MAX_CANVAS_EDGE = 32_000;
 
 type ExportState = "idle" | "exporting" | "done" | "error";
@@ -212,18 +212,30 @@ function renderHighlightSection(body: string[], y: number, highlights: WeDailyHi
 
 function getHighlightCardLayout(highlight: WeDailyHighlight, cardWidth: number) {
   const textWidth = cardWidth - CARD_INSET * 2;
-  const titleLines = wrapTextToWidth(highlight.title, 22, textWidth - 52, 2);
+  const titleLines = wrapTextToWidth(highlight.title, 22, textWidth, 2);
   const summaryLines = highlight.summary ? wrapTextToWidth(highlight.summary, 18, textWidth, 3) : [];
   const people = highlight.participants.length > 0 ? `参与：${highlight.participants.slice(0, 4).join("、")}` : "";
   const peopleLines = people ? wrapTextToWidth(people, 15, textWidth, 1) : [];
   const metaLines = highlight.timeRange ? [highlight.timeRange] : [];
-  const height =
-    28 +
-    titleLines.length * 30 +
-    metaLines.length * 21 +
-    (summaryLines.length > 0 ? 10 + summaryLines.length * 25 : 0) +
-    (peopleLines.length > 0 ? 10 + peopleLines.length * 21 : 0) +
-    22;
+  const titleBaseline = 56;
+  const titleLineHeight = 28;
+  const summaryLineHeight = 23;
+  const peopleLineHeight = 20;
+  let nextBaseline = titleBaseline + titleLines.length * titleLineHeight;
+  let lastBaseline = titleBaseline + Math.max(titleLines.length - 1, 0) * titleLineHeight;
+
+  if (summaryLines.length > 0) {
+    const summaryBaseline = nextBaseline + 8;
+    lastBaseline = summaryBaseline + Math.max(summaryLines.length - 1, 0) * summaryLineHeight;
+    nextBaseline = summaryBaseline + summaryLines.length * summaryLineHeight;
+  }
+
+  if (peopleLines.length > 0) {
+    const peopleBaseline = nextBaseline + 8;
+    lastBaseline = peopleBaseline + Math.max(peopleLines.length - 1, 0) * peopleLineHeight;
+  }
+
+  const height = Math.max(150, lastBaseline + 28);
 
   return {
     height,
@@ -244,25 +256,26 @@ function renderHighlightCard(
   height: number,
 ) {
   body.push(renderRoundedRect(x, y, width, height, 18, POSTER_CARD, "rgba(188,109,42,0.14)"));
-  body.push(renderNumberBadge(x + CARD_INSET, y + 30, String(layout.highlight.index).padStart(2, "0"), POSTER_ORANGE));
-  body.push(renderText(layout.titleLines, x + CARD_INSET + 52, y + 32, 22, 950, POSTER_INK, 30));
-
-  let textY = y + 32 + layout.titleLines.length * 30;
+  body.push(renderNumberBadge(x + CARD_INSET, y + 32, String(layout.highlight.index).padStart(2, "0"), POSTER_ORANGE));
 
   if (layout.metaLines.length > 0) {
-    body.push(renderText(layout.metaLines, x + CARD_INSET + 52, textY, 15, 850, POSTER_ORANGE_DARK, 21));
-    textY += 21;
+    body.push(renderText(layout.metaLines, x + width - CARD_INSET, y + 31, 15, 850, POSTER_ORANGE_DARK, 21, { textAnchor: "end" }));
   }
 
+  const titleY = y + 56;
+  body.push(renderText(layout.titleLines, x + CARD_INSET, titleY, 22, 950, POSTER_INK, 28));
+
+  let textY = titleY + layout.titleLines.length * 28;
+
   if (layout.summaryLines.length > 0) {
-    textY += 10;
-    body.push(renderText(layout.summaryLines, x + CARD_INSET, textY, 18, 700, POSTER_MUTED, 25));
-    textY += layout.summaryLines.length * 25;
+    textY += 8;
+    body.push(renderText(layout.summaryLines, x + CARD_INSET, textY, 18, 700, POSTER_MUTED, 23));
+    textY += layout.summaryLines.length * 23;
   }
 
   if (layout.peopleLines.length > 0) {
-    textY += 10;
-    body.push(renderText(layout.peopleLines, x + CARD_INSET, textY, 15, 850, POSTER_ACCENT, 21));
+    textY += 8;
+    body.push(renderText(layout.peopleLines, x + CARD_INSET, textY, 15, 850, POSTER_ACCENT, 20));
   }
 }
 
