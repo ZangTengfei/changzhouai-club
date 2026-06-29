@@ -1,6 +1,8 @@
+import { unstable_cache } from "next/cache";
+
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import { hasSupabaseEnv } from "@/lib/env";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 export const projectOpportunityTypeLabels = {
   crowdsource: "众包任务",
@@ -69,6 +71,8 @@ type PublicProjectOpportunityRow = {
   created_at: string;
   updated_at: string;
 };
+
+const PUBLIC_PROJECTS_REVALIDATE_SECONDS = 60;
 
 export type PublicProjectOpportunity = {
   id: string;
@@ -208,61 +212,79 @@ export async function getVisibleProjectOpportunities(): Promise<PublicProjectOpp
     return emptyProjectOpportunityDirectory();
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("project_opportunities")
-    .select(visibleProjectSelect)
-    .neq("status", "draft")
-    .neq("status", "archived")
-    .order("is_featured", { ascending: false })
-    .order("sort_order", { ascending: true })
-    .order("created_at", { ascending: false });
+  return getCachedVisibleProjectOpportunities();
+}
 
-  if (error) {
-    if (!shouldIgnoreProjectOpportunityError(error)) {
-      console.error("Failed to load public project opportunities.", error);
+const getCachedVisibleProjectOpportunities = unstable_cache(
+  async (): Promise<PublicProjectOpportunityDirectory> => {
+    const supabase = createPublicServerClient();
+    const { data, error } = await supabase
+      .from("project_opportunities")
+      .select(visibleProjectSelect)
+      .neq("status", "draft")
+      .neq("status", "archived")
+      .order("is_featured", { ascending: false })
+      .order("sort_order", { ascending: true })
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      if (!shouldIgnoreProjectOpportunityError(error)) {
+        console.error("Failed to load public project opportunities.", error);
+      }
+
+      return emptyProjectOpportunityDirectory();
     }
 
-    return emptyProjectOpportunityDirectory();
-  }
+    const opportunities = ((data ?? []) as unknown as PublicProjectOpportunityRow[]).map(
+      mapProjectOpportunity,
+    );
+    const roleTags = new Set(opportunities.flatMap((opportunity) => opportunity.roleTags));
 
-  const opportunities = ((data ?? []) as unknown as PublicProjectOpportunityRow[]).map(
-    mapProjectOpportunity,
-  );
-  const roleTags = new Set(opportunities.flatMap((opportunity) => opportunity.roleTags));
-
-  return {
-    opportunities,
-    featuredOpportunities: opportunities.filter((opportunity) => opportunity.isFeatured).slice(0, 3),
-    stats: {
-      opportunities: opportunities.length,
-      recruiting: opportunities.filter((opportunity) => opportunity.status === "recruiting").length,
-      enterprise: opportunities.filter((opportunity) => opportunity.type === "enterprise").length,
-      roleCount: roleTags.size,
-    },
-  };
-}
+    return {
+      opportunities,
+      featuredOpportunities: opportunities
+        .filter((opportunity) => opportunity.isFeatured)
+        .slice(0, 3),
+      stats: {
+        opportunities: opportunities.length,
+        recruiting: opportunities.filter((opportunity) => opportunity.status === "recruiting").length,
+        enterprise: opportunities.filter((opportunity) => opportunity.type === "enterprise").length,
+        roleCount: roleTags.size,
+      },
+    };
+  },
+  ["public-project-opportunities"],
+  { revalidate: PUBLIC_PROJECTS_REVALIDATE_SECONDS },
+);
 
 export async function getVisibleProjectOpportunityBySlug(slug: string) {
   if (!hasSupabaseEnv()) {
     return null;
   }
 
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("project_opportunities")
-    .select(visibleProjectSelect)
-    .eq("slug", slug)
-    .neq("status", "draft")
-    .maybeSingle();
+  return getCachedVisibleProjectOpportunityBySlug(slug);
+}
 
-  if (error) {
-    if (!shouldIgnoreProjectOpportunityError(error)) {
-      console.error("Failed to load project opportunity.", { slug, error });
+const getCachedVisibleProjectOpportunityBySlug = unstable_cache(
+  async (slug: string) => {
+    const supabase = createPublicServerClient();
+    const { data, error } = await supabase
+      .from("project_opportunities")
+      .select(visibleProjectSelect)
+      .eq("slug", slug)
+      .neq("status", "draft")
+      .maybeSingle();
+
+    if (error) {
+      if (!shouldIgnoreProjectOpportunityError(error)) {
+        console.error("Failed to load project opportunity.", { slug, error });
+      }
+
+      return null;
     }
 
-    return null;
-  }
-
-  return data ? mapProjectOpportunity(data as unknown as PublicProjectOpportunityRow) : null;
-}
+    return data ? mapProjectOpportunity(data as unknown as PublicProjectOpportunityRow) : null;
+  },
+  ["public-project-opportunity-by-slug"],
+  { revalidate: PUBLIC_PROJECTS_REVALIDATE_SECONDS },
+);
