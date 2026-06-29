@@ -27,6 +27,7 @@ export async function SiteSponsors() {
               <Link
                 key={sponsor.id}
                 href={`/sponsors/${sponsor.slug}`}
+                prefetch={false}
                 className={cx("home-sponsor-featured-card")}
               >
                 <div className={cx("home-sponsor-card-head")}>
@@ -51,6 +52,7 @@ export async function SiteSponsors() {
               <Link
                 key={sponsor.id}
                 href={`/sponsors/${sponsor.slug}`}
+                prefetch={false}
                 className={cx("home-sponsor-compact-card")}
                 aria-label={`${sponsor.name}，${sponsor.tierLabel}`}
                 title={`${sponsor.name} · ${sponsor.tierLabel}`}

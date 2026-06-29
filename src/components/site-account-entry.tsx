@@ -191,6 +191,7 @@ export function SiteAccountEntry({
     return (
       <Link
         href={account.href}
+        prefetch={false}
         className={`${styles["account-entry"]} ${styles["account-entry-login"]}`}
         aria-label={account.label}
         title={account.label}
@@ -232,6 +233,7 @@ export function SiteAccountEntry({
         <div className={styles["account-dropdown"]} role="menu" aria-label="账号菜单">
           <Link
             href="/account"
+            prefetch={false}
             className={styles["account-dropdown-item"]}
             role="menuitem"
             onClick={() => setMenuOpen(false)}
@@ -242,6 +244,7 @@ export function SiteAccountEntry({
           {account.isStaff ? (
             <Link
               href="/admin"
+              prefetch={false}
               className={styles["account-dropdown-item"]}
               role="menuitem"
               onClick={() => setMenuOpen(false)}

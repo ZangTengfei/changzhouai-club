@@ -283,11 +283,11 @@ export default async function HomePage() {
           </p>
 
           <div className={cx("home-hero-actions")}>
-            <Link href="/join" className={cx("button home-primary-button")}>
+            <Link href="/join" prefetch={false} className={cx("button home-primary-button")}>
               申请加入
               <span aria-hidden="true">→</span>
             </Link>
-            <Link href="/events" className={cx("button home-ghost-button")}>
+            <Link href="/events" prefetch={false} className={cx("button home-ghost-button")}>
               参加活动
             </Link>
           </div>
@@ -420,6 +420,7 @@ export default async function HomePage() {
               </p>
               <Link
                 href={primaryScheduledEvent ? `/events/${primaryScheduledEvent.slug}` : "/events"}
+                prefetch={false}
                 className={cx("button home-primary-button home-next-event-button")}
               >
                 {hasUpcomingEvent ? "查看活动详情" : "查看活动列表"}
@@ -447,7 +448,7 @@ export default async function HomePage() {
             <h2 id="home-member-stories-title">成员故事</h2>
             <p>他们在这里把经验、问题和 AI 能力连接起来</p>
           </div>
-          <Link href="/members">查看更多故事 →</Link>
+          <Link href="/members" prefetch={false}>查看更多故事 →</Link>
         </div>
 
         {memberStories.length > 0 ? (
@@ -455,6 +456,7 @@ export default async function HomePage() {
             {memberStories.map((item) => (
               <Link
                 href={"href" in item ? item.href : "/members"}
+                prefetch={false}
                 className={cx("home-member-story-card")}
                 key={item.id}
               >
@@ -495,7 +497,7 @@ export default async function HomePage() {
             <h2 id="home-community-updates-title">社区动态</h2>
             <p>活动报道、成员分享和项目进展，会先在这里轻量沉淀</p>
           </div>
-          <Link href="/updates">查看全部动态 →</Link>
+          <Link href="/updates" prefetch={false}>查看全部动态 →</Link>
         </div>
 
         {recentCommunityUpdates.length > 0 ? (
@@ -507,6 +509,7 @@ export default async function HomePage() {
               return (
                 <Link
                   href={update.href}
+                  prefetch={false}
                   className={cx("home-community-update-card")}
                   key={update.id}
                 >
@@ -569,7 +572,7 @@ export default async function HomePage() {
             <h2 id="home-event-review-title">近期活动回顾</h2>
             <p>看看最近几场线下活动如何沉淀问题、案例和连接</p>
           </div>
-          <Link href="/events">查看更多 →</Link>
+          <Link href="/events" prefetch={false}>查看更多 →</Link>
         </div>
 
         {recentEvents.length > 0 ? (
@@ -577,6 +580,7 @@ export default async function HomePage() {
             {recentEvents.map((item) => (
               <Link
                 href={`/events/${item.slug}`}
+                prefetch={false}
                 className={cx("home-event-review-card")}
                 key={item.id}
               >
@@ -618,7 +622,7 @@ export default async function HomePage() {
             <span>加入社区，</span>把问题带到现场
           </h2>
           <div className={cx("home-join-banner-actions")}>
-            <Link href="/join" className={cx("button home-primary-button home-join-banner-button")}>
+            <Link href="/join" prefetch={false} className={cx("button home-primary-button home-join-banner-button")}>
               申请加入
               <span aria-hidden="true">→</span>
             </Link>
@@ -627,7 +631,7 @@ export default async function HomePage() {
               <span>位成员已加入我们</span>
             </div>
           </div>
-          <Link href={CO_BUILDER_RULES_PATH} className={cx("home-join-banner-rule-link")}>
+          <Link href={CO_BUILDER_RULES_PATH} prefetch={false} className={cx("home-join-banner-rule-link")}>
             想参与社区共建？查看协作规则
             <ArrowRight aria-hidden="true" strokeWidth={2} />
           </Link>

@@ -131,7 +131,7 @@ export function HeroPhotoCarousel({
               className={cx("home-photo-main-video")}
               controls
               playsInline
-              preload="metadata"
+              preload="none"
               poster={activeImage.videoPosterSrc ?? activeImageSrc}
               aria-label={activeImage.videoTitle ?? activeLabel}
             >
@@ -140,6 +140,7 @@ export function HeroPhotoCarousel({
             </video>
             <Link
               href={activeImage.href}
+              prefetch={false}
               className={cx("home-photo-main-detail-link")}
               aria-label={`查看${activeLabel}详情`}
             >
@@ -150,6 +151,7 @@ export function HeroPhotoCarousel({
         ) : activeImage && activeImageSrc ? (
           <Link
             href={activeImage.href}
+            prefetch={false}
             className={cx("home-photo-main-link")}
             aria-label={`查看${activeLabel}详情`}
           >

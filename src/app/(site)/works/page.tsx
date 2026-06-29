@@ -106,16 +106,17 @@ export default async function WorksPage({ searchParams }: WorksPageProps) {
           <div className={styles.worksHeroActions}>
             <Link
               href="#works-directory"
+              prefetch={false}
               className={`${styles.worksHeroBrowseAction} button home-primary-button`}
             >
               浏览案例
               <ArrowRight aria-hidden="true" strokeWidth={2} />
             </Link>
-            <Link href="/account/works/new" className="button home-ghost-button">
+            <Link href="/account/works/new" prefetch={false} className="button home-ghost-button">
               <Plus aria-hidden="true" strokeWidth={2} />
               提交作品/案例
             </Link>
-            <Link href="/members" className="button home-ghost-button">
+            <Link href="/members" prefetch={false} className="button home-ghost-button">
               找到创作者
             </Link>
             <a
@@ -157,6 +158,7 @@ export default async function WorksPage({ searchParams }: WorksPageProps) {
                     href={getWorksFilterHref({
                       tag: selectedTag || undefined,
                     })}
+                    prefetch={false}
                   >
                     全部
                   </Link>
@@ -168,6 +170,7 @@ export default async function WorksPage({ searchParams }: WorksPageProps) {
                         type: selectedType === type ? undefined : type,
                         tag: selectedTag || undefined,
                       })}
+                      prefetch={false}
                       key={type}
                     >
                       {label}
@@ -186,6 +189,7 @@ export default async function WorksPage({ searchParams }: WorksPageProps) {
                       href={getWorksFilterHref({
                         type: selectedType || undefined,
                       })}
+                      prefetch={false}
                     >
                       全部
                     </Link>
@@ -198,6 +202,7 @@ export default async function WorksPage({ searchParams }: WorksPageProps) {
                           type: selectedType || undefined,
                           tag: selectedTag === tag ? undefined : tag,
                         })}
+                        prefetch={false}
                         key={tag}
                       >
                         <ToneBadge className={styles.worksFilterTagBadge} label={tag} />

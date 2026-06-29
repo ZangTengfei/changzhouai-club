@@ -62,6 +62,7 @@ export function MemberDirectoryCard({
   return (
     <Link
       href={href}
+      prefetch={false}
       className={cx("member-directory-card member-directory-card-link")}
       aria-label={`查看 ${member.displayName} 的成员主页`}
     >

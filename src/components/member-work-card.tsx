@@ -65,7 +65,7 @@ export function MemberWorkCard({ work, compact = false }: MemberWorkCardProps) {
         ) : null}
 
         <div className={styles.workFooter}>
-          <Link href={work.member.href} className={styles.workMaker}>
+          <Link href={work.member.href} prefetch={false} className={styles.workMaker}>
             <MemberAvatar
               name={work.member.displayName}
               avatarUrl={work.member.avatarUrl}

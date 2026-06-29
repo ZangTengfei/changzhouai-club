@@ -114,7 +114,7 @@ export function SiteHeader() {
         className={cx("container header-inner")}
         data-mobile-menu-open={mobileMenuOpen ? "true" : "false"}
       >
-        <Link href="/" className={cx("brand")}>
+        <Link href="/" prefetch={false} className={cx("brand")}>
           <span className={cx("brand-mark")}>
             <SiteLogoMark className={cx("brand-mark-icon")} />
           </span>
@@ -262,7 +262,7 @@ export function SiteHeader() {
 
         {shouldShowJoinButton ? (
           <div className={cx("header-actions")}>
-            <Link href="/join" className={cx("button header-join-button")}>
+            <Link href="/join" prefetch={false} className={cx("button header-join-button")}>
               申请加入
             </Link>
           </div>
