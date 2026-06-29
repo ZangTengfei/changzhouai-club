@@ -7,10 +7,16 @@ import styles from "./mobile-menu-toggle.module.css";
 type MobileMenuToggleProps = {
   controlsId: string;
   open: boolean;
+  pending?: boolean;
   onToggle: () => void;
 };
 
-export function MobileMenuToggle({ controlsId, open, onToggle }: MobileMenuToggleProps) {
+export function MobileMenuToggle({
+  controlsId,
+  open,
+  pending = false,
+  onToggle,
+}: MobileMenuToggleProps) {
   const buttonId = useId();
 
   return (
@@ -22,6 +28,7 @@ export function MobileMenuToggle({ controlsId, open, onToggle }: MobileMenuToggl
       aria-expanded={open}
       aria-label={open ? "收起主导航" : "展开主导航"}
       data-open={open ? "true" : "false"}
+      data-pending={pending ? "true" : "false"}
       data-site-menu-toggle
       onClick={onToggle}
     >

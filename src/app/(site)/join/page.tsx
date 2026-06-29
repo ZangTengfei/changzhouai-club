@@ -102,11 +102,11 @@ export default async function JoinPage() {
           </p>
 
           <div className={styles.joinHeroActions}>
-            <Link href={primaryHref} className="button home-primary-button">
+            <Link href={primaryHref} prefetch={false} className="button home-primary-button">
               {primaryLabel}
               <ArrowRight aria-hidden="true" strokeWidth={2} />
             </Link>
-            <Link href="/members" className="button home-ghost-button">
+            <Link href="/members" prefetch={false} className="button home-ghost-button">
               先看看社区成员
             </Link>
           </div>
@@ -226,11 +226,11 @@ export default async function JoinPage() {
           </p>
 
           <div className={styles.coBuilderActions}>
-            <Link href={coBuilderRulesPath} className="button home-primary-button">
+            <Link href={coBuilderRulesPath} prefetch={false} className="button home-primary-button">
               阅读共建规则
               <BookOpenText aria-hidden="true" strokeWidth={2} />
             </Link>
-            <Link href={primaryHref} className="button home-ghost-button">
+            <Link href={primaryHref} prefetch={false} className="button home-ghost-button">
               报名参与共建
               <ArrowRight aria-hidden="true" strokeWidth={2} />
             </Link>
@@ -263,11 +263,11 @@ export default async function JoinPage() {
         </div>
 
         <div className={styles.joinCtaActions}>
-          <Link href={primaryHref} className="button home-primary-button">
+          <Link href={primaryHref} prefetch={false} className="button home-primary-button">
             {primaryLabel}
             <ArrowRight aria-hidden="true" strokeWidth={2} />
           </Link>
-          <Link href="/events" className="button home-ghost-button">
+          <Link href="/events" prefetch={false} className="button home-ghost-button">
             查看近期活动
           </Link>
         </div>

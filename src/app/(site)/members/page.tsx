@@ -110,11 +110,11 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
           </p>
 
           <div className={styles.membersHeroActions}>
-            <Link href="#member-directory" className="button home-primary-button">
+            <Link href="#member-directory" prefetch={false} className="button home-primary-button">
               浏览成员
               <ArrowRight aria-hidden="true" strokeWidth={2} />
             </Link>
-            <Link href="/join" className="button home-ghost-button">
+            <Link href="/join" prefetch={false} className="button home-ghost-button">
               申请加入
             </Link>
           </div>
@@ -165,7 +165,7 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
           {totalPages > 1 ? (
             <nav className={styles.membersPagination} aria-label="公开成员分页">
               {currentPage > 1 ? (
-                <Link href={getMemberPageHref(currentPage - 1)}>上一页</Link>
+                <Link href={getMemberPageHref(currentPage - 1)} prefetch={false}>上一页</Link>
               ) : (
                 <span aria-disabled="true">上一页</span>
               )}
@@ -179,7 +179,7 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
                       {page}
                     </span>
                   ) : (
-                    <Link href={getMemberPageHref(page)} key={page}>
+                    <Link href={getMemberPageHref(page)} prefetch={false} key={page}>
                       {page}
                     </Link>
                   );
@@ -187,7 +187,7 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
               </div>
 
               {currentPage < totalPages ? (
-                <Link href={getMemberPageHref(currentPage + 1)}>下一页</Link>
+                <Link href={getMemberPageHref(currentPage + 1)} prefetch={false}>下一页</Link>
               ) : (
                 <span aria-disabled="true">下一页</span>
               )}

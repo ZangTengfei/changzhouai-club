@@ -39,6 +39,7 @@ export function SiteHeader() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [docsMenuOpen, setDocsMenuOpen] = useState(false);
+  const [pendingNavHref, setPendingNavHref] = useState<string | null>(null);
   const docsDropdownRef = useRef<HTMLDivElement>(null);
   const docsTriggerRef = useRef<HTMLAnchorElement>(null);
   const shouldShowJoinButton = authReady && !isAuthenticated;
@@ -50,6 +51,15 @@ export function SiteHeader() {
     setMobileMenuOpen(false);
     setDocsMenuOpen(false);
   }, []);
+  const handleNavLinkClick = useCallback((href: string) => {
+    if (isMobileNavigationMode()) {
+      closeAllMenus();
+
+      if (!href.startsWith("#") && href !== pathname) {
+        setPendingNavHref(href);
+      }
+    }
+  }, [closeAllMenus, pathname]);
   const handleMobileMenuToggle = useCallback(() => {
     setMobileMenuOpen((current) => {
       const nextOpen = !current;
@@ -81,7 +91,22 @@ export function SiteHeader() {
 
   useEffect(() => {
     closeAllMenus();
+    setPendingNavHref(null);
   }, [closeAllMenus, pathname]);
+
+  useEffect(() => {
+    if (!pendingNavHref) {
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setPendingNavHref(null);
+    }, 4000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [pendingNavHref]);
 
   useEffect(() => {
     if (!mobileMenuOpen && !docsMenuOpen) {
@@ -113,6 +138,7 @@ export function SiteHeader() {
       <div
         className={cx("container header-inner")}
         data-mobile-menu-open={mobileMenuOpen ? "true" : "false"}
+        data-nav-pending={pendingNavHref ? "true" : "false"}
       >
         <Link href="/" prefetch={false} className={cx("brand")}>
           <span className={cx("brand-mark")}>
@@ -188,7 +214,7 @@ export function SiteHeader() {
                       prefetch={false}
                       className={cx("nav-dropdown-item mobile-dropdown-item")}
                       aria-current={pathname === "/docs" ? "page" : undefined}
-                      onClick={closeAllMenus}
+                      onClick={() => handleNavLinkClick("/docs")}
                     >
                       <FileText aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
                       <span>文档首页</span>
@@ -200,7 +226,7 @@ export function SiteHeader() {
                       aria-current={
                         pathname === "/docs/guides/co-builder-rules" ? "page" : undefined
                       }
-                      onClick={closeAllMenus}
+                      onClick={() => handleNavLinkClick("/docs/guides/co-builder-rules")}
                     >
                       <BookOpenText
                         aria-hidden="true"
@@ -213,7 +239,7 @@ export function SiteHeader() {
                       prefetch={false}
                       className={cx("nav-dropdown-item")}
                       aria-current={pathname === "/reports" ? "page" : undefined}
-                      onClick={closeAllMenus}
+                      onClick={() => handleNavLinkClick("/reports")}
                     >
                       <BarChart3 aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
                       <span>研究与报告</span>
@@ -223,7 +249,7 @@ export function SiteHeader() {
                       prefetch={false}
                       className={cx("nav-dropdown-item")}
                       aria-current={pathname === "/about" ? "page" : undefined}
-                      onClick={closeAllMenus}
+                      onClick={() => handleNavLinkClick("/about")}
                     >
                       <Info aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
                       <span>关于我们</span>
@@ -253,6 +279,8 @@ export function SiteHeader() {
                 prefetch={false}
                 className={isActive ? styles["nav-link-active"] : undefined}
                 aria-current={isActive ? "page" : undefined}
+                data-pending={pendingNavHref === item.href ? "true" : undefined}
+                onClick={() => handleNavLinkClick(item.href)}
               >
                 {item.label}
               </Link>
@@ -273,6 +301,7 @@ export function SiteHeader() {
           <MobileMenuToggle
             controlsId="site-navigation"
             open={mobileMenuOpen}
+            pending={Boolean(pendingNavHref)}
             onToggle={handleMobileMenuToggle}
           />
         </div>

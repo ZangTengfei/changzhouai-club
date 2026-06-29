@@ -126,7 +126,7 @@ export function EventRegistrationForm({
         <div className="note-strip">正在检查你的报名状态……</div>
       ) : (
         <div className="cta-row">
-          <Link href={`/login?next=${encodeURIComponent(nextPath)}`} className="button">
+          <Link href={`/login?next=${encodeURIComponent(nextPath)}`} prefetch={false} className="button">
             登录后报名
           </Link>
         </div>
@@ -134,7 +134,7 @@ export function EventRegistrationForm({
 
       {showDetailLink ? (
         <div className="cta-row">
-          <Link href={detailHref} className="button button-secondary">
+          <Link href={detailHref} prefetch={false} className="button button-secondary">
             查看活动详情
           </Link>
         </div>

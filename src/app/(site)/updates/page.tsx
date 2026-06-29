@@ -97,7 +97,7 @@ function TimelineUpdate({ update }: { update: PublicCommunityUpdate }) {
   return (
     <article className={styles.updateCard}>
       <div className={styles.updateCardHead}>
-        <Link href={update.author.href} className={styles.updateAuthor}>
+        <Link href={update.author.href} prefetch={false} className={styles.updateAuthor}>
           <MemberAvatar
             name={update.author.displayName}
             avatarUrl={update.author.avatarUrl}
@@ -120,7 +120,7 @@ function TimelineUpdate({ update }: { update: PublicCommunityUpdate }) {
 
       <div className={styles.updateCardBody}>
         {update.title ? (
-          <Link href={update.href} className={styles.updateTitleLink}>
+          <Link href={update.href} prefetch={false} className={styles.updateTitleLink}>
             <h2>{update.title}</h2>
           </Link>
         ) : null}
@@ -131,6 +131,7 @@ function TimelineUpdate({ update }: { update: PublicCommunityUpdate }) {
       {previewImages.length > 0 ? (
         <Link
           href={update.href}
+          prefetch={false}
           className={cn(
             styles.updateImageGrid,
             previewImages.length === 1 ? styles.updateImageGridSingle : null,
@@ -165,7 +166,7 @@ function TimelineUpdate({ update }: { update: PublicCommunityUpdate }) {
           <Eye aria-hidden="true" strokeWidth={1.8} />
           {update.viewCount}
         </span>
-        <Link href={update.href}>
+        <Link href={update.href} prefetch={false}>
           查看详情
           <ArrowRight aria-hidden="true" strokeWidth={2} />
         </Link>
@@ -202,6 +203,7 @@ export default async function UpdatesPage({ searchParams }: UpdatesPageProps) {
         <nav className={styles.typeFilters}>
           <Link
             href="/updates"
+            prefetch={false}
             className={!activeType ? styles.activeFilter : undefined}
           >
             全部
@@ -209,6 +211,7 @@ export default async function UpdatesPage({ searchParams }: UpdatesPageProps) {
           {typeEntries.map(([type, label]) => (
             <Link
               href={`/updates?type=${type}`}
+              prefetch={false}
               className={activeType === type ? styles.activeFilter : undefined}
               key={type}
             >

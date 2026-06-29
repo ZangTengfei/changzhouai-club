@@ -213,7 +213,11 @@ export default async function CooperatePage({
           <p>
             扫描二维码添加社区官方微信，备注来意后由运营同学邀请你进入交流群。
           </p>
-          <Link href={CO_BUILDER_RULES_PATH} className={styles.joinBannerRuleLink}>
+          <Link
+            href={CO_BUILDER_RULES_PATH}
+            prefetch={false}
+            className={styles.joinBannerRuleLink}
+          >
             想参与社区共建？查看协作规则
             <ArrowRight aria-hidden="true" strokeWidth={2} />
           </Link>
@@ -241,7 +245,11 @@ export default async function CooperatePage({
           </div>
         </div>
 
-        <Link href="/join" className={`button home-primary-button ${styles.joinBannerButton}`}>
+        <Link
+          href="/join"
+          prefetch={false}
+          className={`button home-primary-button ${styles.joinBannerButton}`}
+        >
           申请加入
         </Link>
       </section>

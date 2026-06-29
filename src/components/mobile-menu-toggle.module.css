@@ -20,10 +20,15 @@
 
 .mobile-menu-toggle:hover,
 .mobile-menu-toggle:focus-visible,
-.mobile-menu-toggle[data-open="true"] {
+.mobile-menu-toggle[data-open="true"],
+.mobile-menu-toggle[data-pending="true"] {
   transform: translateY(-1px);
   border-color: rgba(var(--accent-rgb), 0.28);
   background: rgba(var(--accent-rgb), 0.08);
+}
+
+.mobile-menu-toggle[data-pending="true"] {
+  color: #087a52;
 }
 
 .mobile-menu-toggle span {

@@ -169,7 +169,7 @@ export default async function EventsPage({
             <Link href="#reviews" className="button home-ghost-button">
               往期回顾
             </Link>
-            <Link href="/events/propose" className="button home-ghost-button">
+            <Link href="/events/propose" prefetch={false} className="button home-ghost-button">
               发起活动申请
             </Link>
           </div>
@@ -222,7 +222,7 @@ export default async function EventsPage({
                   : "常州 · 线下空间待公布"}
               </span>
             </div>
-            <Link href={nextEvent ? `/events/${nextEvent.slug}` : "#upcoming"}>
+            <Link href={nextEvent ? `/events/${nextEvent.slug}` : "#upcoming"} prefetch={false}>
               查看详情 <ArrowRight aria-hidden="true" strokeWidth={2} />
             </Link>
           </article>
@@ -273,7 +273,11 @@ export default async function EventsPage({
           })}
         </div>
 
-        <Link href="/events/propose" className={`button home-primary-button ${styles.proposalCta}`}>
+        <Link
+          href="/events/propose"
+          prefetch={false}
+          className={`button home-primary-button ${styles.proposalCta}`}
+        >
           提交活动申请
           <ArrowRight aria-hidden="true" strokeWidth={2} />
         </Link>
@@ -313,7 +317,11 @@ export default async function EventsPage({
           <div className={styles.recapList}>
             {completedEvents.map((item, index) => (
               <article className={styles.recapCard} key={item.id}>
-                <Link className={styles.recapMedia} href={`/events/${item.slug}`}>
+                <Link
+                  className={styles.recapMedia}
+                  href={`/events/${item.slug}`}
+                  prefetch={false}
+                >
                   <span>{item.dateLabel}</span>
                   <strong>{String(index + 1).padStart(2, "0")}</strong>
                   <ArrowRight aria-hidden="true" strokeWidth={2} />
@@ -351,7 +359,11 @@ export default async function EventsPage({
                   </div>
                   <h2>{item.title}</h2>
                   <p>{item.summary}</p>
-                  <Link href={`/events/${item.slug}`} className={styles.recapLink}>
+                  <Link
+                    href={`/events/${item.slug}`}
+                    prefetch={false}
+                    className={styles.recapLink}
+                  >
                     查看活动详情
                     <ArrowRight aria-hidden="true" strokeWidth={2} />
                   </Link>

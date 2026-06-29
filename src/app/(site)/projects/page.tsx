@@ -114,7 +114,7 @@ export default async function ProjectsPage() {
                 ) : null}
 
                 <div className={styles.projectsOpportunityActions}>
-                  <Link href={opportunity.href} className="button home-primary-button">
+                  <Link href={opportunity.href} prefetch={false} className="button home-primary-button">
                     查看详情
                     <ArrowRight aria-hidden="true" strokeWidth={2} />
                   </Link>
@@ -127,7 +127,7 @@ export default async function ProjectsPage() {
             <BriefcaseBusiness aria-hidden="true" strokeWidth={1.8} />
             <strong>暂未开放公开招募项目</strong>
             <p>有真实场景、项目线索或合作需求，可以先提交给社区，我们确认后再决定是否公开招募。</p>
-            <Link href="/cooperate" className="button home-ghost-button">
+            <Link href="/cooperate" prefetch={false} className="button home-ghost-button">
               提交合作需求
             </Link>
           </div>

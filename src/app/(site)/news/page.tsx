@@ -339,7 +339,7 @@ function DailyReportView({
         <span>AI HOT DAILY</span>
         <h2>AI 日报暂时不可用</h2>
         <p>可以先查看精选或全部动态，稍后再回来刷新日报内容。</p>
-        <Link href="/news">查看精选资讯</Link>
+        <Link href="/news" prefetch={false}>查看精选资讯</Link>
       </section>
     );
   }
@@ -384,7 +384,7 @@ function DailyReportView({
           <span>本期目录</span>
           <div className={styles.dailyTocLinks}>
             {report.sections.map((section, index) => (
-              <Link href={`#daily-section-${index + 1}`} key={section.label}>
+              <Link href={`#daily-section-${index + 1}`} prefetch={false} key={section.label}>
                 <strong>{String(index + 1).padStart(2, "0")} {section.label}</strong>
                 <small>{section.items.length} 篇</small>
               </Link>
@@ -496,7 +496,7 @@ function GroupReportLockedSection({
         <div>
           <strong>为保护隐私，登录后可查看完整群聊日报</strong>
         </div>
-        <Link href={loginHref}>登录查看</Link>
+        <Link href={loginHref} prefetch={false}>登录查看</Link>
       </div>
     </section>
   );
@@ -523,7 +523,7 @@ function LocalGroupDailyView({
         <span>LOCAL DIGEST</span>
         <h2>群聊日报暂时不可用</h2>
         <p>{error ? "接口暂时无法加载，可以稍后刷新重试。" : "还没有可展示的群聊日报。"}</p>
-        <Link href="/news">查看 AI 资讯</Link>
+        <Link href="/news" prefetch={false}>查看 AI 资讯</Link>
       </section>
     );
   }
@@ -542,6 +542,7 @@ function LocalGroupDailyView({
             <Link
               className={item.date === (activeDate ?? report.date) ? styles.groupReportLinkActive : ""}
               href={buildLocalReportHref(item.date)}
+              prefetch={false}
               key={item.id}
               aria-current={item.date === (activeDate ?? report.date) ? "page" : undefined}
             >
@@ -565,6 +566,7 @@ function LocalGroupDailyView({
                   <Link
                     className={styles.dailyExportButton}
                     href={`/admin/reports?reportId=${encodeURIComponent(String(report.id))}`}
+                    prefetch={false}
                   >
                     <PencilLine aria-hidden="true" strokeWidth={1.9} />
                     <span>编辑日报</span>
@@ -765,6 +767,7 @@ export default async function AiNewsPage({
           <Link
             className={!isDailyView && !isLocalView && mode === "selected" ? styles.modeTabActive : ""}
             href={buildFeedHref(currentQuery, { category: "all", mode: "selected", view: "feed" })}
+            prefetch={false}
             aria-current={!isDailyView && !isLocalView && mode === "selected" ? "page" : undefined}
           >
             精选
@@ -772,6 +775,7 @@ export default async function AiNewsPage({
           <Link
             className={!isDailyView && !isLocalView && mode === "all" ? styles.modeTabActive : ""}
             href={buildFeedHref(currentQuery, { category: "all", mode: "all", view: "feed" })}
+            prefetch={false}
             aria-current={!isDailyView && !isLocalView && mode === "all" ? "page" : undefined}
           >
             全部动态
@@ -779,6 +783,7 @@ export default async function AiNewsPage({
           <Link
             className={isDailyView ? styles.modeTabActive : ""}
             href={buildFeedHref(currentQuery, { view: "daily" })}
+            prefetch={false}
             aria-current={isDailyView ? "page" : undefined}
           >
             AI 日报
@@ -786,6 +791,7 @@ export default async function AiNewsPage({
           <Link
             className={isLocalView ? styles.modeTabActive : ""}
             href={buildFeedHref(currentQuery, { view: "local" })}
+            prefetch={false}
             aria-current={isLocalView ? "page" : undefined}
           >
             群聊日报
@@ -803,6 +809,7 @@ export default async function AiNewsPage({
                 <Link
                   className={category === "all" ? styles.filterChipActive : ""}
                   href={buildFeedHref(currentQuery, { category: "all" })}
+                  prefetch={false}
                   aria-current={category === "all" ? "page" : undefined}
                 >
                   全部
@@ -811,6 +818,7 @@ export default async function AiNewsPage({
                   <Link
                     className={category === item.id ? styles.filterChipActive : ""}
                     href={buildFeedHref(currentQuery, { category: item.id })}
+                    prefetch={false}
                     aria-current={category === item.id ? "page" : undefined}
                     key={item.id}
                   >
@@ -869,7 +877,7 @@ export default async function AiNewsPage({
                 <div className={styles.emptyState}>
                   <strong>当前筛选下没有资讯</strong>
                   <p>可以切回精选或调整分类重新查看。</p>
-                  <Link href="/news">回到默认资讯流</Link>
+                  <Link href="/news" prefetch={false}>回到默认资讯流</Link>
                 </div>
               )}
             </main>
@@ -910,7 +918,11 @@ export default async function AiNewsPage({
                         </span>
                       ))}
                     </div>
-                    <Link className={styles.sideActionLink} href={buildFeedHref(currentQuery, { view: "daily" })}>
+                    <Link
+                      className={styles.sideActionLink}
+                      href={buildFeedHref(currentQuery, { view: "daily" })}
+                      prefetch={false}
+                    >
                       阅读完整日报
                       <ArrowUpRight aria-hidden="true" strokeWidth={1.8} />
                     </Link>
@@ -958,7 +970,11 @@ export default async function AiNewsPage({
                     </article>
                   ))}
                 </div>
-                <Link className={styles.sideActionLink} href={buildFeedHref(currentQuery, { view: "daily" })}>
+                <Link
+                  className={styles.sideActionLink}
+                  href={buildFeedHref(currentQuery, { view: "daily" })}
+                  prefetch={false}
+                >
                   阅读完整日报
                   <ArrowUpRight aria-hidden="true" strokeWidth={1.8} />
                 </Link>
