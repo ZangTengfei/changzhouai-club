@@ -23,7 +23,12 @@ import styles from "./image-upload-field.module.css";
 
 type UploadMode = "upload-only" | "upload-or-url";
 type UploadAppearance = "site" | "admin";
-type StorageUploadScope = "event" | "sponsor" | "community" | "project";
+type StorageUploadScope =
+  | "event"
+  | "sponsor"
+  | "community"
+  | "project"
+  | "wechat-article";
 type UploadStage = "idle" | "compressing" | "uploading";
 
 type UploadTarget =
@@ -69,6 +74,8 @@ function getStorageUploadUrl(scope: StorageUploadScope) {
       return "/api/admin/storage/community-assets";
     case "project":
       return "/api/admin/storage/project-assets";
+    case "wechat-article":
+      return "/api/admin/storage/wechat-article-assets";
     case "sponsor":
       return "/api/admin/storage/sponsor-assets";
     default:

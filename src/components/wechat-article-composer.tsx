@@ -1,10 +1,12 @@
 "use client";
 
-import { Clipboard, ClipboardCheck, RotateCcw } from "lucide-react";
+import { Clipboard, ClipboardCheck, ImagePlus, RotateCcw } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 
 import { AdminNotice } from "@/components/admin-ui";
+import { ImageUploadField } from "@/components/image-upload-field";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -40,12 +42,44 @@ const sampleMarkdown = `# 从 Codex 到真实项目：一次常州 AI Club 的�
 
 如果你也在常州，正在做 AI 相关产品、项目或工具探索，欢迎加入常州 AI Club。`;
 
+function getImageMarkdown(url: string, alt: string) {
+  const safeAlt = (alt || "图片").replace(/[\[\]\r\n]/g, " ").trim() || "图片";
+
+  return `![${safeAlt}](${url})`;
+}
+
+function getSeparatedInsertion(before: string, after: string, value: string) {
+  const prefix = before
+    ? before.endsWith("\n\n")
+      ? ""
+      : before.endsWith("\n")
+        ? "\n"
+        : "\n\n"
+    : "";
+  const suffix = after
+    ? after.startsWith("\n\n")
+      ? ""
+      : after.startsWith("\n")
+        ? "\n"
+        : "\n\n"
+    : "";
+
+  return {
+    text: `${prefix}${value}${suffix}`,
+    cursorOffset: prefix.length + value.length,
+  };
+}
+
 export function WechatArticleComposer() {
   const [templateId, setTemplateId] = useState<WechatArticleTemplateId>("community");
   const [markdown, setMarkdown] = useState(sampleMarkdown);
+  const [imageAlt, setImageAlt] = useState("文章配图");
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageUploadError, setImageUploadError] = useState<string | null>(null);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "fallback" | "error">(
     "idle",
   );
+  const markdownTextareaRef = useRef<HTMLTextAreaElement>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const template = getWechatArticleTemplate(templateId);
   const html = useMemo(
@@ -53,6 +87,34 @@ export function WechatArticleComposer() {
     [markdown, template],
   );
   const plainText = useMemo(() => toWechatArticlePlainText(markdown), [markdown]);
+
+  function insertImageMarkdown(url = imageUrl, alt = imageAlt) {
+    const trimmedUrl = url.trim();
+
+    if (!trimmedUrl) {
+      setImageUploadError("请先上传图片或填写图片链接。");
+      return;
+    }
+
+    const textarea = markdownTextareaRef.current;
+    const start = textarea?.selectionStart ?? markdown.length;
+    const end = textarea?.selectionEnd ?? markdown.length;
+    const before = markdown.slice(0, start);
+    const after = markdown.slice(end);
+    const imageMarkdown = getImageMarkdown(trimmedUrl, alt);
+    const insertion = getSeparatedInsertion(before, after, imageMarkdown);
+    const nextMarkdown = `${before}${insertion.text}${after}`;
+
+    setMarkdown(nextMarkdown);
+    setCopyState("idle");
+    setImageUploadError(null);
+
+    requestAnimationFrame(() => {
+      const nextCursor = start + insertion.cursorOffset;
+      markdownTextareaRef.current?.focus();
+      markdownTextareaRef.current?.setSelectionRange(nextCursor, nextCursor);
+    });
+  }
 
   async function copyRichText() {
     const content = previewRef.current?.innerHTML ?? html;
@@ -110,11 +172,61 @@ export function WechatArticleComposer() {
           </div>
         </div>
 
+        <div className="grid gap-3 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background/70 p-3">
+          <div className="grid gap-3 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1fr)]">
+            <label className="grid gap-2">
+              <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                图片说明
+              </span>
+              <Input
+                value={imageAlt}
+                onChange={(event) => setImageAlt(event.target.value)}
+                placeholder="例如：活动现场照片"
+              />
+            </label>
+            <ImageUploadField
+              name="wechat_article_image_url"
+              value={imageUrl}
+              onValueChange={(value) => {
+                setImageUrl(value);
+                setImageUploadError(null);
+                setCopyState("idle");
+              }}
+              uploadTarget={{
+                kind: "storage",
+                scope: "wechat-article",
+                eventSlug: "wechat-article",
+              }}
+              panelTitle="图片链接"
+              placeholder="上传后自动生成，也可粘贴公开 HTTPS 图片地址"
+              uploadLabel="上传公众号图片"
+              clearLabel="清空链接"
+              filledStatusText="图片链接已准备好"
+              emptyStatusText="当前未设置图片"
+            />
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => insertImageMarkdown()}
+              disabled={!imageUrl.trim()}
+            >
+              <ImagePlus className="size-4" />
+              插入图片
+            </Button>
+          </div>
+
+          {imageUploadError ? <AdminNotice>{imageUploadError}</AdminNotice> : null}
+        </div>
+
         <label className="grid gap-2">
           <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
             Markdown 原稿
           </span>
           <Textarea
+            ref={markdownTextareaRef}
             value={markdown}
             onChange={(event) => {
               setMarkdown(event.target.value);

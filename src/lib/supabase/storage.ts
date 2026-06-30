@@ -46,6 +46,18 @@ export function buildCommunityQrCodePath(fileName: string) {
   return `community/wechat-qr/${timestamp}-${safeFileName}`;
 }
 
+export function buildWechatArticleAssetPath(fileName: string) {
+  const safeFileName =
+    sanitizeSegment(fileName || "wechat-article-image.jpg") ||
+    "wechat-article-image.jpg";
+  const timestamp = Date.now();
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+
+  return `wechat-articles/${year}/${month}/${timestamp}-${safeFileName}`;
+}
+
 export function buildCommunityUpdateAssetPath(userId: string, fileName: string) {
   const safeUserId = sanitizeSegment(userId || "member");
   const safeFileName = sanitizeSegment(fileName || "upload.jpg") || "upload.jpg";
