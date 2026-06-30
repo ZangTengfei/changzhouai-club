@@ -21,6 +21,19 @@ export type WechatArticleTemplate = {
   qrDescription: string;
 };
 
+export type WechatArticleFooterLink = {
+  title: string;
+  url: string;
+  description?: string;
+};
+
+export type WechatArticleVideoChannel = {
+  title: string;
+  description: string;
+  actionLabel: string;
+  url?: string;
+};
+
 type MarkdownBlock =
   | { type: "heading"; depth: 1 | 2 | 3; text: string }
   | { type: "paragraph"; lines: string[] }
@@ -31,6 +44,8 @@ type MarkdownBlock =
 
 type RenderWechatArticleOptions = {
   title?: string | null;
+  relatedLinks?: WechatArticleFooterLink[];
+  videoChannel?: WechatArticleVideoChannel | null;
 };
 
 const officialAccountQrUrl = "https://changzhouai.club/wechat-official-account-qr.jpg";
@@ -50,7 +65,7 @@ export const wechatArticleTemplates: WechatArticleTemplate[] = [
     footer: "常州 AI Club｜连接、分享、共创",
     footerTitle: "继续和常州 AI Club 一起共创",
     footerDescription: "关注公众号，获取活动回顾、项目机会和本地 AI 实践者故事。",
-    footerLinkLabel: "官网 changzhouai.club",
+    footerLinkLabel: "changzhouai.club",
     footerLinkUrl: "https://changzhouai.club",
     qrImageUrl: officialAccountQrUrl,
     qrTitle: "扫码关注公众号",
@@ -70,7 +85,7 @@ export const wechatArticleTemplates: WechatArticleTemplate[] = [
     footer: "共同推动 AI 创客交流与场景落地",
     footerTitle: "常州 AI Club",
     footerDescription: "连接本地 AI 创客、产业场景与真实项目，持续推动交流与落地。",
-    footerLinkLabel: "官网 changzhouai.club",
+    footerLinkLabel: "changzhouai.club",
     footerLinkUrl: "https://changzhouai.club",
     qrImageUrl: officialAccountQrUrl,
     qrTitle: "关注公众号",
@@ -90,7 +105,7 @@ export const wechatArticleTemplates: WechatArticleTemplate[] = [
     footer: "欢迎带着真实问题、真实能力和真实项目一起共创",
     footerTitle: "带着能力进入真实项目",
     footerDescription: "关注社区后续项目发布、揭榜报名和小范围需求澄清信息。",
-    footerLinkLabel: "官网 changzhouai.club",
+    footerLinkLabel: "changzhouai.club",
     footerLinkUrl: "https://changzhouai.club",
     qrImageUrl: officialAccountQrUrl,
     qrTitle: "扫码关注公众号",
@@ -117,6 +132,17 @@ function escapeAttribute(value: string) {
 
 function isPublicUrl(value: string) {
   return /^https?:\/\//i.test(value.trim());
+}
+
+function normalizeFooterLinks(links: WechatArticleFooterLink[] | undefined) {
+  return (links ?? [])
+    .map((link) => ({
+      title: link.title.trim(),
+      url: link.url.trim(),
+      description: link.description?.trim() ?? "",
+    }))
+    .filter((link) => link.title && isPublicUrl(link.url))
+    .slice(0, 3);
 }
 
 function renderInline(text: string, template: WechatArticleTemplate) {
@@ -153,7 +179,90 @@ function renderInline(text: string, template: WechatArticleTemplate) {
   return html;
 }
 
-function renderFooter(template: WechatArticleTemplate) {
+function renderRelatedLinks(
+  template: WechatArticleTemplate,
+  links: WechatArticleFooterLink[] | undefined,
+) {
+  const relatedLinks = normalizeFooterLinks(links);
+
+  if (relatedLinks.length === 0) {
+    return "";
+  }
+
+  const items = relatedLinks
+    .map((link, index) => {
+      const description = link.description
+        ? `<span style="display:block;margin:3px 0 0;color:${template.muted};font-size:12px;line-height:1.5;">${escapeHtml(
+            link.description,
+          )}</span>`
+        : "";
+
+      return `<a href="${escapeAttribute(
+        link.url,
+      )}" style="display:block;margin:0;padding:11px 0;color:${template.text};text-decoration:none;border-top:${
+        index === 0 ? "0" : "1px solid #efe7dc"
+      };">
+        <section style="display:table;width:100%;border-collapse:collapse;">
+          <section style="display:table-cell;width:34px;vertical-align:top;">
+            <span style="display:inline-block;width:24px;height:24px;line-height:24px;border-radius:999px;background:${template.accentSoft};color:${template.accent};font-size:12px;font-weight:800;text-align:center;">${String(
+              index + 1,
+            ).padStart(2, "0")}</span>
+          </section>
+          <section style="display:table-cell;vertical-align:top;">
+            <strong style="display:block;color:${template.text};font-size:14px;line-height:1.55;font-weight:800;">${escapeHtml(
+              link.title,
+            )}</strong>
+            ${description}
+          </section>
+        </section>
+      </a>`;
+    })
+    .join("");
+
+  return `<section style="margin:0 0 14px;padding:14px 16px;border:1px solid #efe7dc;border-radius:12px;background:#ffffff;">
+    <section style="margin:0 0 4px;color:${template.accent};font-size:13px;line-height:1.4;font-weight:800;">延伸阅读</section>
+    ${items}
+  </section>`;
+}
+
+function renderVideoChannel(
+  template: WechatArticleTemplate,
+  videoChannel: WechatArticleVideoChannel | null | undefined,
+) {
+  const title = videoChannel?.title.trim() ?? "";
+  const description = videoChannel?.description.trim() ?? "";
+  const actionLabel = videoChannel?.actionLabel.trim() ?? "";
+  const url = videoChannel?.url?.trim() ?? "";
+
+  if (!title && !description && !actionLabel) {
+    return "";
+  }
+
+  const action = isPublicUrl(url)
+    ? `<a href="${escapeAttribute(
+        url,
+      )}" style="display:inline-block;white-space:nowrap;color:${template.accent};font-size:12px;line-height:1.4;font-weight:800;text-decoration:none;border-bottom:1px solid ${template.accent};">${escapeHtml(
+        actionLabel || "打开视频号",
+      )}</a>`
+    : `<span style="display:inline-block;white-space:nowrap;color:${template.accent};font-size:12px;line-height:1.4;font-weight:800;">${escapeHtml(
+        actionLabel || "搜索：常州 AI Club",
+      )}</span>`;
+
+  return `<section style="margin:0 0 14px;padding:6px 0 2px;text-align:center;">
+    <span style="display:inline-block;margin:0 0 8px;padding:3px 9px;border-radius:999px;background:${template.accentWarm};color:${template.text};font-size:11px;line-height:1.4;font-weight:800;">视频号</span>
+    <strong style="display:block;margin:0;color:${template.text};font-size:15px;line-height:1.5;font-weight:800;">${escapeHtml(
+      title || "看现场片段与活动花絮",
+    )}</strong>
+    <span style="display:block;margin:4px auto 0;max-width:420px;color:${template.muted};font-size:12px;line-height:1.6;">${escapeHtml(
+      description || "短视频、直播回放和活动花絮会优先沉淀到视频号。",
+    )}</span>
+    <section style="margin:8px 0 0;">
+      ${action}
+    </section>
+  </section>`;
+}
+
+function renderFooter(template: WechatArticleTemplate, options: RenderWechatArticleOptions) {
   const qrImage = template.qrImageUrl.trim()
     ? `<img src="${escapeAttribute(
         template.qrImageUrl,
@@ -163,36 +272,28 @@ function renderFooter(template: WechatArticleTemplate) {
     : `<section style="width:92px;height:92px;margin:0 auto;border:1px dashed ${template.accent};border-radius:8px;background:#ffffff;"></section>`;
 
   return `<section style="margin:6px 20px 0;padding:18px 0 28px;border-top:1px solid #ece4d8;">
+    ${renderRelatedLinks(template, options.relatedLinks)}
+    ${renderVideoChannel(template, options.videoChannel)}
     <section style="margin:0 0 14px;color:${template.muted};font-size:13px;line-height:1.7;text-align:center;">${escapeHtml(
       template.footer,
     )}</section>
-    <section style="padding:16px;border:1px solid ${template.accentSoft};border-radius:14px;background:${template.accentSoft};">
-      <section style="display:table;width:100%;border-collapse:collapse;">
-        <section style="display:table-cell;padding:0 14px 0 0;vertical-align:middle;">
-          <strong style="display:block;margin:0 0 6px;color:${template.text};font-size:16px;line-height:1.45;font-weight:800;">${escapeHtml(
-            template.footerTitle,
-          )}</strong>
-          <span style="display:block;margin:0 0 10px;color:${template.muted};font-size:13px;line-height:1.7;">${escapeHtml(
-            template.footerDescription,
-          )}</span>
-          <a href="${escapeAttribute(
-            template.footerLinkUrl,
-          )}" style="display:inline-block;color:${template.accent};font-size:13px;font-weight:700;text-decoration:none;border-bottom:1px solid ${template.accent};">${escapeHtml(
-            template.footerLinkLabel,
-          )}</a>
-        </section>
-        <section style="display:table-cell;width:112px;padding:0;vertical-align:middle;text-align:center;">
-          <section style="display:inline-block;padding:9px;border-radius:12px;background:#ffffff;">
-            ${qrImage}
-          </section>
-          <strong style="display:block;margin:7px 0 0;color:${template.text};font-size:12px;line-height:1.5;font-weight:800;">${escapeHtml(
-            template.qrTitle,
-          )}</strong>
-          <span style="display:block;color:${template.muted};font-size:11px;line-height:1.45;">${escapeHtml(
-            template.qrDescription,
-          )}</span>
-        </section>
+    <section style="max-width:230px;margin:0 auto;padding:14px 14px 13px;border:1px solid ${template.accentSoft};border-radius:14px;background:${template.accentSoft};text-align:center;">
+      <section style="display:inline-block;padding:9px;border-radius:12px;background:#ffffff;">
+        ${qrImage}
       </section>
+      <strong style="display:block;margin:7px 0 0;color:${template.text};font-size:12px;line-height:1.5;font-weight:800;">${escapeHtml(
+        template.qrTitle,
+      )}</strong>
+      <span style="display:block;color:${template.muted};font-size:11px;line-height:1.45;">${escapeHtml(
+        template.qrDescription,
+      )}</span>
+    </section>
+    <section style="margin:12px 0 0;color:${template.muted};font-size:12px;line-height:1.7;text-align:center;">
+      <span style="display:inline-block;">官网：</span><a href="${escapeAttribute(
+        template.footerLinkUrl,
+      )}" style="display:inline-block;white-space:nowrap;word-break:keep-all;color:${template.accent};font-size:12px;font-weight:800;text-decoration:none;border-bottom:1px solid ${template.accent};">${escapeHtml(
+        template.footerLinkLabel,
+      )}</a>
     </section>
   </section>`;
 }
@@ -409,6 +510,6 @@ export function renderWechatArticleHtml(
   <section style="padding:8px 20px 18px;">
     ${bodyHtml}
   </section>
-  ${renderFooter(template)}
+  ${renderFooter(template, options)}
 </section>`;
 }
