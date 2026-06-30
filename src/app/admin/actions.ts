@@ -1260,6 +1260,7 @@ export async function saveAdminMemberWork(formData: FormData) {
     review_status: requestedReviewStatus,
     role_label: getOptionalValue(formData, "role_label"),
     cover_image_url: getOptionalValue(formData, "cover_image_url"),
+    qr_code_image_url: getOptionalValue(formData, "qr_code_image_url"),
     website_url: getOptionalValue(formData, "website_url"),
     repo_url: getOptionalValue(formData, "repo_url"),
     demo_url: getOptionalValue(formData, "demo_url"),

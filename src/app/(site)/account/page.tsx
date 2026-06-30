@@ -150,7 +150,7 @@ function getStatusMessage(error?: string) {
   }
 
   if (error === "invalid_work_url") {
-    return "图片地址或作品链接格式无效；作品/Demo 可填写 http(s) 链接或 #小程序://名称/路径，图片和代码仓库请使用 http(s)。";
+    return "封面、二维码或作品链接格式无效；作品/Demo 可填写 http(s) 链接或 #小程序://名称/路径，图片和代码仓库请使用 http(s)。";
   }
 
   if (error === "work_save_failed") {
@@ -182,6 +182,7 @@ type AccountMemberWork = {
   review_status: PublicWorkReviewStatus;
   role_label: string | null;
   cover_image_url: string | null;
+  qr_code_image_url: string | null;
   website_url: string | null;
   repo_url: string | null;
   demo_url: string | null;
@@ -209,16 +210,32 @@ function getReviewTone(status: PublicWorkReviewStatus, isPublic: boolean) {
 
 function WorkImageField({
   userId,
+  name,
+  label,
   defaultValue = "",
+  uploadLabel,
+  clearLabel,
+  panelTitle,
+  panelDescription,
+  filledStatusText,
+  emptyStatusText,
 }: {
   userId: string;
+  name: string;
+  label: string;
   defaultValue?: string;
+  uploadLabel: string;
+  clearLabel: string;
+  panelTitle: string;
+  panelDescription: string;
+  filledStatusText: string;
+  emptyStatusText: string;
 }) {
   return (
     <div className={`${styles.accountWorkWideField} ${styles.accountWorkFieldGroup}`}>
-      <span className={styles.accountWorkFieldLabel}>封面 / 产品图片</span>
+      <span className={styles.accountWorkFieldLabel}>{label}</span>
       <ImageUploadField
-        name="cover_image_url"
+        name={name}
         defaultValue={defaultValue}
         uploadTarget={{
           kind: "member-work-asset",
@@ -227,12 +244,12 @@ function WorkImageField({
         mode="upload-or-url"
         appearance="site"
         placeholder="可上传图片，也可填写 https://..."
-        uploadLabel="上传图片"
-        clearLabel="清空图片"
-        panelTitle="上传封面、产品截图或小程序二维码"
-        panelDescription="没有官网链接也没关系，可以直接上传截图或二维码，审核通过后会展示在案例库。"
-        filledStatusText="已设置图片"
-        emptyStatusText="当前未设置图片"
+        uploadLabel={uploadLabel}
+        clearLabel={clearLabel}
+        panelTitle={panelTitle}
+        panelDescription={panelDescription}
+        filledStatusText={filledStatusText}
+        emptyStatusText={emptyStatusText}
       />
     </div>
   );
@@ -326,7 +343,7 @@ export default async function AccountPage({
       supabase
         .from("member_works")
         .select(
-          "id, title, summary, description, work_type, status, review_status, role_label, cover_image_url, website_url, repo_url, demo_url, tags, is_public, is_featured, updated_at",
+          "id, title, summary, description, work_type, status, review_status, role_label, cover_image_url, qr_code_image_url, website_url, repo_url, demo_url, tags, is_public, is_featured, updated_at",
         )
         .eq("member_id", user.id)
         .order("updated_at", { ascending: false }),
@@ -677,7 +694,27 @@ export default async function AccountPage({
                     </label>
                     <WorkImageField
                       userId={user.id}
+                      name="cover_image_url"
+                      label="封面 / 产品图片"
                       defaultValue={work.cover_image_url ?? ""}
+                      uploadLabel="上传图片"
+                      clearLabel="清空图片"
+                      panelTitle="上传案例封面或产品截图"
+                      panelDescription="用于案例库卡片展示。建议上传产品界面、项目截图或品牌视觉图。"
+                      filledStatusText="已设置图片"
+                      emptyStatusText="当前未设置图片"
+                    />
+                    <WorkImageField
+                      userId={user.id}
+                      name="qr_code_image_url"
+                      label="小程序码 / 二维码"
+                      defaultValue={work.qr_code_image_url ?? ""}
+                      uploadLabel="上传二维码"
+                      clearLabel="清空二维码"
+                      panelTitle="上传小程序码或二维码"
+                      panelDescription="用于公开案例卡片的扫码入口，点击后会展示完整图片。"
+                      filledStatusText="已设置二维码"
+                      emptyStatusText="当前未设置二维码"
                     />
                     <label>
                       <span>官网 / 产品链接</span>

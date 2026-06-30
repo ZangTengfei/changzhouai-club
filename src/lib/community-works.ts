@@ -55,6 +55,7 @@ type PublicMemberWorkRow = {
   status: PublicWorkStatus;
   role_label: string | null;
   cover_image_url: string | null;
+  qr_code_image_url: string | null;
   website_url: string | null;
   repo_url: string | null;
   demo_url: string | null;
@@ -119,6 +120,7 @@ export type PublicMemberWork = {
   statusLabel: string;
   roleLabel: string | null;
   coverImageUrl: string | null;
+  qrCodeImageUrl: string | null;
   websiteUrl: string | null;
   repoUrl: string | null;
   demoUrl: string | null;
@@ -327,6 +329,7 @@ function mapPublicWork(
     statusLabel: workStatusLabels[row.status] ?? row.status,
     roleLabel: row.role_label?.trim() || null,
     coverImageUrl: getWorkCoverImageUrl(row.cover_image_url),
+    qrCodeImageUrl: getWorkCoverImageUrl(row.qr_code_image_url),
     websiteUrl: row.website_url,
     repoUrl: row.repo_url,
     demoUrl: row.demo_url,
@@ -463,7 +466,7 @@ async function loadPublicWorks() {
     supabase
       .from("member_works")
       .select(
-        "id, member_id, title, summary, description, work_type, status, role_label, cover_image_url, website_url, repo_url, demo_url, tags, sort_order, is_featured, created_at",
+        "id, member_id, title, summary, description, work_type, status, role_label, cover_image_url, qr_code_image_url, website_url, repo_url, demo_url, tags, sort_order, is_featured, created_at",
       )
       .eq("is_public", true)
       .order("is_featured", { ascending: false })

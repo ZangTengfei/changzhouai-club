@@ -24,7 +24,7 @@ function getWorkErrorMessage(error?: string) {
   }
 
   if (error === "invalid_work_url") {
-    return "图片地址或作品链接格式无效；作品/Demo 可填写 http(s) 链接或 #小程序://名称/路径，图片和代码仓库请使用 http(s)。";
+    return "封面、二维码或作品链接格式无效；作品/Demo 可填写 http(s) 链接或 #小程序://名称/路径，图片和代码仓库请使用 http(s)。";
   }
 
   if (error === "work_save_failed") {

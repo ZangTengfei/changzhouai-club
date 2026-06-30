@@ -161,6 +161,21 @@ function WorkForm({
           />
         </AdminField>
 
+        <AdminField label="小程序码 / 二维码" className="md:col-span-2">
+          <StorageImageUrlField
+            name="qr_code_image_url"
+            defaultValue={work?.qr_code_image_url ?? ""}
+            eventSlug="member-work-qr"
+            uploadScope="community"
+            mode="upload-only"
+            placeholder="小程序码或二维码图片地址"
+            uploadLabel="上传二维码"
+            clearLabel="清空二维码"
+            filledStatusText="已设置二维码"
+            emptyStatusText="当前未设置二维码"
+          />
+        </AdminField>
+
         <AdminField label="成员角色">
           <Input
             name="role_label"
@@ -525,6 +540,9 @@ export default async function AdminWorksPage({
                       </AdminStatusBadge>
                       {work.is_featured ? (
                         <AdminStatusBadge tone="scheduled">精选</AdminStatusBadge>
+                      ) : null}
+                      {work.qr_code_image_url ? (
+                        <AdminStatusBadge tone="neutral">二维码</AdminStatusBadge>
                       ) : null}
                     </div>
                     <p className="text-sm text-muted-foreground">

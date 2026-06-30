@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { MemberAvatar } from "@/components/member-avatar";
+import { WorkQrCodePreview } from "@/components/work-qr-code-preview";
 import type {
   PublicExternalCaseCard,
   PublicMemberWork,
@@ -30,12 +31,15 @@ export function MemberWorkCard({ work, compact = false }: MemberWorkCardProps) {
 
   return (
     <article className={cn(styles.workCard, compact ? styles.workCardCompact : null)}>
-      <div className={styles.workCover} aria-hidden="true">
+      <div className={styles.workCover}>
         {work.coverImageUrl ? (
           <img src={work.coverImageUrl} alt="" loading="lazy" />
         ) : (
           <span>{getWorkInitial(work.title)}</span>
         )}
+        {work.qrCodeImageUrl ? (
+          <WorkQrCodePreview imageUrl={work.qrCodeImageUrl} title={work.title} />
+        ) : null}
       </div>
 
       <div className={styles.workBody}>

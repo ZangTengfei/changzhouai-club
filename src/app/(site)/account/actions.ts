@@ -324,11 +324,13 @@ export async function saveAccountMemberWork(formData: FormData) {
   const demoUrl = normalizeOptionalWorkLink(String(formData.get("demo_url") ?? ""));
   const repoUrl = normalizeOptionalHttpUrl(String(formData.get("repo_url") ?? ""));
   const coverImageUrl = normalizeOptionalHttpUrl(String(formData.get("cover_image_url") ?? ""));
+  const qrCodeImageUrl = normalizeOptionalHttpUrl(String(formData.get("qr_code_image_url") ?? ""));
   const hasInvalidUrl =
     (String(formData.get("website_url") ?? "").trim() && !websiteUrl) ||
     (String(formData.get("demo_url") ?? "").trim() && !demoUrl) ||
     (String(formData.get("repo_url") ?? "").trim() && !repoUrl) ||
-    (String(formData.get("cover_image_url") ?? "").trim() && !coverImageUrl);
+    (String(formData.get("cover_image_url") ?? "").trim() && !coverImageUrl) ||
+    (String(formData.get("qr_code_image_url") ?? "").trim() && !qrCodeImageUrl);
 
   if (!title || !summary) {
     redirectAccountWorkError(formData, "missing_work_fields");
@@ -348,6 +350,7 @@ export async function saveAccountMemberWork(formData: FormData) {
     review_status: "pending",
     role_label: String(formData.get("role_label") ?? "").trim() || null,
     cover_image_url: coverImageUrl,
+    qr_code_image_url: qrCodeImageUrl,
     website_url: websiteUrl,
     repo_url: repoUrl,
     demo_url: demoUrl,

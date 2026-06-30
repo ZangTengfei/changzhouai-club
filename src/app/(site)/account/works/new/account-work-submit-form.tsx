@@ -20,6 +20,7 @@ type WorkDraft = {
   summary: string;
   description: string;
   cover_image_url: string;
+  qr_code_image_url: string;
   website_url: string;
   demo_url: string;
   repo_url: string;
@@ -34,6 +35,7 @@ const initialDraft: WorkDraft = {
   summary: "",
   description: "",
   cover_image_url: "",
+  qr_code_image_url: "",
   website_url: "",
   demo_url: "",
   repo_url: "",
@@ -272,10 +274,32 @@ export function AccountWorkSubmitForm({ userId }: { userId: string }) {
           placeholder="可上传图片，也可填写 https://..."
           uploadLabel="上传图片"
           clearLabel="清空图片"
-          panelTitle="上传封面、产品截图或小程序二维码"
-          panelDescription="没有官网链接也没关系，可以直接上传截图或二维码，审核通过后会展示在案例库。"
+          panelTitle="上传案例封面或产品截图"
+          panelDescription="用于案例库卡片展示。建议上传产品界面、项目截图或品牌视觉图。"
           filledStatusText="已设置图片"
           emptyStatusText="当前未设置图片"
+        />
+      </div>
+
+      <div className={`${styles.accountWorkWideField} ${styles.accountWorkFieldGroup}`}>
+        <span className={styles.accountWorkFieldLabel}>小程序码 / 二维码</span>
+        <ImageUploadField
+          name="qr_code_image_url"
+          value={values.qr_code_image_url}
+          onValueChange={(value) => updateField("qr_code_image_url", value)}
+          uploadTarget={{
+            kind: "member-work-asset",
+            userId,
+          }}
+          mode="upload-or-url"
+          appearance="site"
+          placeholder="可上传图片，也可填写 https://..."
+          uploadLabel="上传二维码"
+          clearLabel="清空二维码"
+          panelTitle="上传小程序码或二维码"
+          panelDescription="用于公开案例卡片的扫码入口，点击后会展示完整图片，避免封面裁切影响扫码。"
+          filledStatusText="已设置二维码"
+          emptyStatusText="当前未设置二维码"
         />
       </div>
 
