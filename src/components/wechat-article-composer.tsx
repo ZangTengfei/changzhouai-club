@@ -188,10 +188,18 @@ export function WechatArticleComposer() {
   }
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[minmax(0,0.96fr)_minmax(360px,0.84fr)]">
-      <section className="grid gap-4">
-        <div className="grid gap-3 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background/70 p-3 md:grid-cols-[220px_minmax(0,1fr)]">
-          <label className="grid gap-2">
+    <div className="grid gap-4">
+      <section className="grid gap-4 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background/70 p-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="grid gap-1">
+            <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              辅助设置
+            </span>
+            <p className="text-sm leading-6 text-muted-foreground">
+              模板、图片插入和底部模块统一在这里设置，正文区只保留 Markdown。
+            </p>
+          </div>
+          <label className="grid min-w-[220px] gap-2">
             <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
               模板
             </span>
@@ -209,206 +217,220 @@ export function WechatArticleComposer() {
               ))}
             </NativeSelect>
           </label>
-          <div className="flex min-w-0 items-end text-sm leading-6 text-muted-foreground">
-            {template.description}
-          </div>
         </div>
 
-        <div className="grid gap-3 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background/70 p-3">
-          <div className="grid gap-3 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1fr)]">
+        <div className="grid gap-4 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
+          <div className="grid gap-3 rounded-[calc(var(--radius)-3px)] border border-border/60 bg-muted/20 p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="grid gap-1">
+                <span className="text-sm font-semibold text-foreground">图片插入</span>
+                <span className="text-xs leading-5 text-muted-foreground">{template.description}</span>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => insertImageMarkdown()}
+                disabled={!imageUrl.trim()}
+              >
+                <ImagePlus className="size-4" />
+                插入图片
+              </Button>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-[minmax(0,0.62fr)_minmax(0,1fr)]">
+              <label className="grid gap-2">
+                <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  图片说明
+                </span>
+                <Input
+                  value={imageAlt}
+                  onChange={(event) => setImageAlt(event.target.value)}
+                  placeholder="例如：活动现场照片"
+                />
+              </label>
+              <ImageUploadField
+                name="wechat_article_image_url"
+                value={imageUrl}
+                onValueChange={(value) => {
+                  setImageUrl(value);
+                  setImageUploadError(null);
+                  setCopyState("idle");
+                }}
+                uploadTarget={{
+                  kind: "storage",
+                  scope: "wechat-article",
+                  eventSlug: "wechat-article",
+                }}
+                panelTitle="图片链接"
+                placeholder="上传后自动生成，也可粘贴公开 HTTPS 图片地址"
+                uploadLabel="上传公众号图片"
+                clearLabel="清空链接"
+                filledStatusText="图片链接已准备好"
+                emptyStatusText="当前未设置图片"
+              />
+            </div>
+
+            {imageUploadError ? <AdminNotice>{imageUploadError}</AdminNotice> : null}
+          </div>
+
+          <div className="grid gap-3 rounded-[calc(var(--radius)-3px)] border border-border/60 bg-muted/20 p-3">
+            <div className="grid gap-1">
+              <span className="text-sm font-semibold text-foreground">底部模块</span>
+              <span className="text-xs leading-5 text-muted-foreground">
+                视频号和延伸阅读会进入右侧预览，不写入左侧 Markdown。
+              </span>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <label className="grid gap-2">
+                <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  视频号标题
+                </span>
+                <Input
+                  value={videoTitle}
+                  onChange={(event) => {
+                    setVideoTitle(event.target.value);
+                    setCopyState("idle");
+                  }}
+                  placeholder="看现场片段与活动花絮"
+                />
+              </label>
+              <label className="grid gap-2">
+                <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  视频号说明
+                </span>
+                <Input
+                  value={videoDescription}
+                  onChange={(event) => {
+                    setVideoDescription(event.target.value);
+                    setCopyState("idle");
+                  }}
+                  placeholder="短视频、直播回放和活动花絮会优先沉淀到视频号。"
+                />
+              </label>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <label className="grid gap-2">
+                <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  视频号动作
+                </span>
+                <Input
+                  value={videoActionLabel}
+                  onChange={(event) => {
+                    setVideoActionLabel(event.target.value);
+                    setCopyState("idle");
+                  }}
+                  placeholder="搜索：常州 AI Club"
+                />
+              </label>
+              <label className="grid gap-2">
+                <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                  视频号链接
+                </span>
+                <Input
+                  value={videoUrl}
+                  onChange={(event) => {
+                    setVideoUrl(event.target.value);
+                    setCopyState("idle");
+                  }}
+                  placeholder="可留空，复制后把视频号卡片插在标题下方"
+                />
+              </label>
+            </div>
+
             <label className="grid gap-2">
               <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                图片说明
+                延伸阅读
               </span>
-              <Input
-                value={imageAlt}
-                onChange={(event) => setImageAlt(event.target.value)}
-                placeholder="例如：活动现场照片"
+              <Textarea
+                value={relatedLinksText}
+                onChange={(event) => {
+                  setRelatedLinksText(event.target.value);
+                  setCopyState("idle");
+                }}
+                className="min-h-[72px] resize-y font-mono text-[13px] leading-6"
+                placeholder="标题 | https://example.com | 可选说明"
+                spellCheck={false}
               />
             </label>
-            <ImageUploadField
-              name="wechat_article_image_url"
-              value={imageUrl}
-              onValueChange={(value) => {
-                setImageUrl(value);
-                setImageUploadError(null);
-                setCopyState("idle");
-              }}
-              uploadTarget={{
-                kind: "storage",
-                scope: "wechat-article",
-                eventSlug: "wechat-article",
-              }}
-              panelTitle="图片链接"
-              placeholder="上传后自动生成，也可粘贴公开 HTTPS 图片地址"
-              uploadLabel="上传公众号图片"
-              clearLabel="清空链接"
-              filledStatusText="图片链接已准备好"
-              emptyStatusText="当前未设置图片"
-            />
           </div>
-
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => insertImageMarkdown()}
-              disabled={!imageUrl.trim()}
-            >
-              <ImagePlus className="size-4" />
-              插入图片
-            </Button>
-          </div>
-
-          {imageUploadError ? <AdminNotice>{imageUploadError}</AdminNotice> : null}
         </div>
+      </section>
 
-        <div className="grid gap-3 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background/70 p-3">
-          <div className="grid gap-3 md:grid-cols-[minmax(0,0.72fr)_minmax(0,1fr)]">
-            <label className="grid gap-2">
-              <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                视频号标题
-              </span>
-              <Input
-                value={videoTitle}
-                onChange={(event) => {
-                  setVideoTitle(event.target.value);
-                  setCopyState("idle");
-                }}
-                placeholder="看现场片段与活动花絮"
-              />
-            </label>
-            <label className="grid gap-2">
-              <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                视频号说明
-              </span>
-              <Input
-                value={videoDescription}
-                onChange={(event) => {
-                  setVideoDescription(event.target.value);
-                  setCopyState("idle");
-                }}
-                placeholder="短视频、直播回放和活动花絮会优先沉淀到视频号。"
-              />
-            </label>
-          </div>
-
-          <div className="grid gap-3 md:grid-cols-[minmax(0,0.72fr)_minmax(0,1fr)]">
-            <label className="grid gap-2">
-              <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                视频号动作
-              </span>
-              <Input
-                value={videoActionLabel}
-                onChange={(event) => {
-                  setVideoActionLabel(event.target.value);
-                  setCopyState("idle");
-                }}
-                placeholder="搜索：常州 AI Club"
-              />
-            </label>
-            <label className="grid gap-2">
-              <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                视频号链接
-              </span>
-              <Input
-                value={videoUrl}
-                onChange={(event) => {
-                  setVideoUrl(event.target.value);
-                  setCopyState("idle");
-                }}
-                placeholder="可留空，复制后把视频号卡片插在标题下方"
-              />
-            </label>
-          </div>
-
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,0.96fr)_minmax(360px,0.84fr)]">
+        <section className="grid content-start gap-4">
           <label className="grid gap-2">
             <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              延伸阅读
+              Markdown 原稿
             </span>
             <Textarea
-              value={relatedLinksText}
+              ref={markdownTextareaRef}
+              value={markdown}
               onChange={(event) => {
-                setRelatedLinksText(event.target.value);
+                setMarkdown(event.target.value);
                 setCopyState("idle");
               }}
-              className="min-h-[92px] resize-y font-mono text-[13px] leading-6"
-              placeholder="标题 | https://example.com | 可选说明"
+              className="min-h-[620px] resize-y font-mono text-[13px] leading-6"
               spellCheck={false}
             />
           </label>
-        </div>
 
-        <label className="grid gap-2">
-          <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-            Markdown 原稿
-          </span>
-          <Textarea
-            ref={markdownTextareaRef}
-            value={markdown}
-            onChange={(event) => {
-              setMarkdown(event.target.value);
-              setCopyState("idle");
-            }}
-            className="min-h-[520px] resize-y font-mono text-[13px] leading-6"
-            spellCheck={false}
-          />
-        </label>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button type="button" onClick={copyRichText}>
+              {copyState === "copied" ? (
+                <ClipboardCheck className="size-4" />
+              ) : (
+                <Clipboard className="size-4" />
+              )}
+              {copyState === "copied"
+                ? "已复制富文本"
+                : copyState === "fallback"
+                  ? "已复制纯文本"
+                  : "复制到公众号"}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setMarkdown(sampleMarkdown);
+                setVideoTitle(defaultVideoTitle);
+                setVideoDescription(defaultVideoDescription);
+                setVideoActionLabel(defaultVideoActionLabel);
+                setVideoUrl("");
+                setRelatedLinksText(defaultRelatedLinksText);
+                setCopyState("idle");
+              }}
+            >
+              <RotateCcw className="size-4" />
+              恢复示例
+            </Button>
+            {copyState === "error" ? (
+              <span className="text-sm text-destructive">浏览器没有开放剪贴板权限。</span>
+            ) : null}
+          </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <Button type="button" onClick={copyRichText}>
-            {copyState === "copied" ? (
-              <ClipboardCheck className="size-4" />
-            ) : (
-              <Clipboard className="size-4" />
-            )}
-            {copyState === "copied"
-              ? "已复制富文本"
-              : copyState === "fallback"
-                ? "已复制纯文本"
-                : "复制到公众号"}
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              setMarkdown(sampleMarkdown);
-              setVideoTitle(defaultVideoTitle);
-              setVideoDescription(defaultVideoDescription);
-              setVideoActionLabel(defaultVideoActionLabel);
-              setVideoUrl("");
-              setRelatedLinksText(defaultRelatedLinksText);
-              setCopyState("idle");
-            }}
-          >
-            <RotateCcw className="size-4" />
-            恢复示例
-          </Button>
-          {copyState === "error" ? (
-            <span className="text-sm text-destructive">浏览器没有开放剪贴板权限。</span>
-          ) : null}
-        </div>
+          <AdminNotice>
+            图片建议使用官网、公众号素材库或其他公开 HTTPS 地址；本地文件路径复制到公众号后通常无法显示。
+          </AdminNotice>
+        </section>
 
-        <AdminNotice>
-          图片建议使用官网、公众号素材库或其他公开 HTTPS 地址；本地文件路径复制到公众号后通常无法显示。
-        </AdminNotice>
-      </section>
-
-      <section className="min-w-0 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-[#f5f2eb] p-3">
-        <div className="mb-3 flex items-center justify-between gap-3">
-          <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-            公众号预览
-          </span>
-          <span className="text-xs text-muted-foreground">宽度按公众号正文区域模拟</span>
-        </div>
-        <div className="max-h-[760px] overflow-auto rounded-[calc(var(--radius)-4px)] bg-white shadow-sm">
-          <div
-            ref={previewRef}
-            className="mx-auto w-full max-w-[677px]"
-            dangerouslySetInnerHTML={{ __html: html }}
-          />
-        </div>
-      </section>
+        <section className="min-w-0 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-[#f5f2eb] p-3">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              公众号预览
+            </span>
+            <span className="text-xs text-muted-foreground">宽度按公众号正文区域模拟</span>
+          </div>
+          <div className="max-h-[760px] overflow-auto rounded-[calc(var(--radius)-4px)] bg-white shadow-sm">
+            <div
+              ref={previewRef}
+              className="mx-auto w-full max-w-[677px]"
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
