@@ -458,18 +458,26 @@ export function renderWechatArticleHtml(
         const items = block.items
           .map((item, itemIndex) => {
             const marker = block.ordered ? `${itemIndex + 1}` : "";
+            const markerWidth = block.ordered ? "34px" : "24px";
+            const itemHtml = renderInline(item, template);
             const markerHtml = block.ordered
               ? `<span style="display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:999px;background:${template.accent};color:#ffffff;font-size:12px;font-weight:700;">${marker}</span>`
               : `<span style="display:inline-block;width:8px;height:8px;margin-top:9px;border-radius:999px;background:${template.accent};"></span>`;
 
-            return `<li style="display:flex;gap:10px;margin:0 0 10px;align-items:flex-start;color:${template.text};font-size:16px;line-height:1.75;">${markerHtml}<span style="flex:1;">${renderInline(
-              item,
-              template,
-            )}</span></li>`;
+            return `<section style="margin:0 0 10px;padding:0;color:${template.text};font-size:16px;line-height:1.75;">
+              <section style="display:table;width:100%;border-collapse:collapse;">
+                <section style="display:table-cell;width:${markerWidth};vertical-align:top;padding:2px 0 0;">
+                  ${markerHtml}
+                </section>
+                <section style="display:table-cell;vertical-align:top;">
+                  ${itemHtml}
+                </section>
+              </section>
+            </section>`;
           })
           .join("");
 
-        return `<ul style="list-style:none;margin:0 0 18px;padding:0;">${items}</ul>`;
+        return `<section style="margin:0 0 18px;padding:0;">${items}</section>`;
       }
 
       if (block.type === "image") {
