@@ -450,9 +450,17 @@ export function renderWechatArticleHtml(
       }
 
       if (block.type === "quote") {
-        return `<section style="margin:18px 0;padding:14px 16px;border-left:4px solid ${template.accentWarm};border-radius:8px;background:${template.accentSoft};"><p style="margin:0;color:${template.text};font-size:15px;line-height:1.8;">${block.lines
+        return `<section style="margin:20px 0;padding:16px 17px 16px;border:1px solid ${template.accentSoft};border-radius:12px;background:${template.accentSoft};">
+          <section style="width:38px;height:3px;margin:0 0 12px;border-radius:999px;background:${template.accentWarm};"></section>
+          <section style="display:table;width:100%;border-collapse:collapse;">
+            <section style="display:table-cell;width:26px;vertical-align:top;color:${template.accent};font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1;font-weight:700;">“</section>
+            <section style="display:table-cell;vertical-align:top;">
+              <p style="margin:0;color:${template.text};font-size:15px;line-height:1.85;">${block.lines
           .map((line) => renderInline(line, template))
-          .join("<br/>")}</p></section>`;
+          .join("<br/>")}</p>
+            </section>
+          </section>
+        </section>`;
       }
 
       if (block.type === "list") {
