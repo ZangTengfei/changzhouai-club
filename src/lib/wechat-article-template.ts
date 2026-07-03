@@ -461,8 +461,8 @@ export function renderWechatArticleHtml(
             const markerWidth = block.ordered ? "34px" : "24px";
             const itemHtml = renderInline(item, template);
             const markerHtml = block.ordered
-              ? `<span style="display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;border-radius:999px;background:${template.accent};color:#ffffff;font-size:12px;font-weight:700;">${marker}</span>`
-              : `<span style="display:inline-block;width:8px;height:8px;margin-top:9px;border-radius:999px;background:${template.accent};"></span>`;
+              ? `<span style="display:inline-block;width:24px;line-height:24px;color:${template.accent};font-size:14px;font-weight:800;">${marker}.</span>`
+              : `<span style="display:inline-block;width:18px;line-height:24px;color:${template.accent};font-size:13px;font-weight:900;">&#9679;</span>`;
 
             return `<section style="margin:0 0 10px;padding:0;color:${template.text};font-size:16px;line-height:1.75;">
               <section style="display:table;width:100%;border-collapse:collapse;">
