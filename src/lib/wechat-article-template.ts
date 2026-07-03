@@ -38,7 +38,7 @@ type MarkdownBlock =
   | { type: "heading"; depth: 1 | 2 | 3; text: string }
   | { type: "paragraph"; lines: string[] }
   | { type: "quote"; lines: string[] }
-  | { type: "list"; ordered: boolean; items: string[] }
+  | { type: "list"; ordered: boolean; items: string[]; start?: number }
   | { type: "image"; alt: string; src: string }
   | { type: "hr" };
 
@@ -302,7 +302,7 @@ function parseMarkdown(markdown: string) {
   const blocks: MarkdownBlock[] = [];
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
   let paragraph: string[] = [];
-  let list: { ordered: boolean; items: string[] } | null = null;
+  let list: { ordered: boolean; items: string[]; start?: number } | null = null;
   let quote: string[] = [];
 
   const flushParagraph = () => {
@@ -377,15 +377,16 @@ function parseMarkdown(markdown: string) {
     }
 
     const unorderedMatch = line.match(/^[-*]\s+(.+)$/);
-    const orderedMatch = line.match(/^\d+\.\s+(.+)$/);
+    const orderedMatch = line.match(/^(\d+)\.\s+(.+)$/);
     if (unorderedMatch || orderedMatch) {
       flushParagraph();
       flushQuote();
       const ordered = Boolean(orderedMatch);
-      const value = (unorderedMatch?.[1] ?? orderedMatch?.[1] ?? "").trim();
+      const value = (unorderedMatch?.[1] ?? orderedMatch?.[2] ?? "").trim();
+      const start = orderedMatch ? Number.parseInt(orderedMatch[1], 10) : undefined;
       if (!list || list.ordered !== ordered) {
         flushList();
-        list = { ordered, items: [] };
+        list = { ordered, items: [], start };
       }
       list.items.push(value);
       continue;
@@ -457,7 +458,7 @@ export function renderWechatArticleHtml(
       if (block.type === "list") {
         const items = block.items
           .map((item, itemIndex) => {
-            const marker = block.ordered ? `${itemIndex + 1}` : "";
+            const marker = block.ordered ? `${(block.start ?? 1) + itemIndex}` : "";
             const markerWidth = block.ordered ? "34px" : "24px";
             const itemHtml = renderInline(item, template);
             const markerHtml = block.ordered
