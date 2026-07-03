@@ -303,6 +303,7 @@ function parseMarkdown(markdown: string) {
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
   let paragraph: string[] = [];
   let list: { ordered: boolean; items: string[]; start?: number } | null = null;
+  let listHasPendingBlank = false;
   let quote: string[] = [];
 
   const flushParagraph = () => {
@@ -314,8 +315,14 @@ function parseMarkdown(markdown: string) {
 
   const flushList = () => {
     if (list) {
-      blocks.push({ type: "list", ordered: list.ordered, items: list.items });
+      blocks.push({
+        type: "list",
+        ordered: list.ordered,
+        items: list.items,
+        start: list.start,
+      });
       list = null;
+      listHasPendingBlank = false;
     }
   };
 
@@ -336,7 +343,20 @@ function parseMarkdown(markdown: string) {
     const line = rawLine.trim();
 
     if (!line) {
-      flushAll();
+      flushParagraph();
+      flushQuote();
+      if (list) {
+        listHasPendingBlank = true;
+      } else {
+        flushList();
+      }
+      continue;
+    }
+
+    if (list && /^\s{2,}\S/.test(rawLine) && list.items.length > 0) {
+      const lastItemIndex = list.items.length - 1;
+      list.items[lastItemIndex] = `${list.items[lastItemIndex]}\n${line}`;
+      listHasPendingBlank = false;
       continue;
     }
 
@@ -389,9 +409,13 @@ function parseMarkdown(markdown: string) {
         list = { ordered, items: [], start };
       }
       list.items.push(value);
+      listHasPendingBlank = false;
       continue;
     }
 
+    if (listHasPendingBlank) {
+      flushList();
+    }
     flushList();
     flushQuote();
     paragraph.push(line);
@@ -468,7 +492,19 @@ export function renderWechatArticleHtml(
           .map((item, itemIndex) => {
             const marker = block.ordered ? `${(block.start ?? 1) + itemIndex}` : "";
             const markerWidth = block.ordered ? "34px" : "24px";
-            const itemHtml = renderInline(item, template);
+            const itemHtml = item
+              .split("\n")
+              .map((line) => line.trim())
+              .filter(Boolean)
+              .map((line, lineIndex) => {
+                const margin = lineIndex === 0 ? "0" : "4px 0 0";
+
+                return `<span style="display:block;margin:${margin};">${renderInline(
+                  line,
+                  template,
+                )}</span>`;
+              })
+              .join("");
             const markerHtml = block.ordered
               ? `<span style="display:inline-block;width:24px;line-height:24px;color:${template.accent};font-size:14px;font-weight:800;">${marker}.</span>`
               : `<span style="display:inline-block;width:18px;line-height:24px;color:${template.accent};font-size:13px;font-weight:900;">&#9679;</span>`;
