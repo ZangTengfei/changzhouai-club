@@ -1,0 +1,4 @@
+interface:
+  display_name: "常州官网线上版本发布"
+  short_description: "发布常州 AI Club 官网当前版本到线上并验收"
+  default_prompt: "Use $changzhou-production-deploy to publish the current Changzhou AI Club website version to production and verify the live site."
