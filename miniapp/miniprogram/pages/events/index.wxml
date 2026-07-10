@@ -1,0 +1,30 @@
+<view class="page-shell events-page">
+  <view class="page-heading">
+    <text class="section-title">近期活动</text>
+    <text class="page-summary">线下见面，分享真实实践，也一起寻找可以继续推进的协作。</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty-state">正在加载活动</view>
+  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">活动加载失败，轻触重试</view>
+  <view wx:elif="{{events.length === 0}}" class="empty-state">暂时没有开放报名的活动</view>
+  <view wx:else class="event-grid">
+    <view
+      wx:for="{{events}}"
+      wx:key="id"
+      class="event-item"
+      data-slug="{{item.slug}}"
+      bindtap="openEvent"
+    >
+      <image wx:if="{{item.cover_image_url}}" class="event-image" src="{{item.cover_image_url}}" mode="aspectFill" />
+      <view class="event-content">
+        <text class="event-type">{{item.eventTypeLabel}}</text>
+        <text class="event-name">{{item.title}}</text>
+        <text wx:if="{{item.summary}}" class="event-summary">{{item.summary}}</text>
+        <view class="event-facts">
+          <text>{{item.dateLabel}}</text>
+          <text>{{item.locationLabel}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

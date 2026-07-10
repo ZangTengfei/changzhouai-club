@@ -1,0 +1,104 @@
+.account-error,
+.account-content {
+  display: flex;
+  flex-direction: column;
+  gap: 28rpx;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 24rpx 0 36rpx;
+  border-bottom: 2rpx solid #dce2df;
+}
+
+.avatar {
+  display: flex;
+  width: 112rpx;
+  height: 112rpx;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #dcefe8;
+}
+
+.avatar-placeholder {
+  color: #0d654a;
+  font-size: 42rpx;
+  font-weight: 720;
+}
+
+.profile-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10rpx;
+}
+
+.profile-name {
+  overflow: hidden;
+  font-size: 40rpx;
+  font-weight: 720;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-meta {
+  color: #68716d;
+  font-size: 25rpx;
+}
+
+.profile-prompt {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  padding: 28rpx;
+  border-left: 8rpx solid #e55f3c;
+  background: #fff4ef;
+}
+
+.profile-prompt-title {
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.profile-prompt-copy {
+  color: #603225;
+  font-size: 25rpx;
+  line-height: 1.6;
+}
+
+.account-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24rpx;
+  margin-top: 16rpx;
+}
+
+.channel-list {
+  border-top: 2rpx solid #dce2df;
+}
+
+.channel-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 92rpx;
+  border-bottom: 2rpx solid #dce2df;
+  font-size: 28rpx;
+}
+
+.secondary-channel {
+  text-transform: none;
+}
+
+.channel-status {
+  color: #147a5b;
+  font-size: 24rpx;
+}
+
+.logout-button {
+  margin-top: 32rpx;
+}

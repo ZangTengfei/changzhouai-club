@@ -1,0 +1,4 @@
+node_modules/
+project.private.config.json
+*.private.key
+*.upload.key

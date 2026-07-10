@@ -1,0 +1,46 @@
+<view class="page-shell account-page">
+  <view wx:if="{{loading}}" class="empty-state">正在进入社区账号</view>
+
+  <view wx:elif="{{loggedOut}}" class="account-error">
+    <text class="section-title">已退出当前账号</text>
+    <button class="primary-button" bindtap="loadAccount">重新登录</button>
+  </view>
+
+  <view wx:elif="{{loginFailed}}" class="account-error">
+    <text class="section-title">暂时无法登录</text>
+    <text class="muted">请检查网络后重新尝试。</text>
+    <button class="primary-button" bindtap="loadAccount">重新登录</button>
+  </view>
+
+  <view wx:elif="{{user}}" class="account-content">
+    <view class="profile-header">
+      <image wx:if="{{user.avatarUrl}}" class="avatar" src="{{user.avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="avatar avatar-placeholder">{{avatarInitial}}</view>
+      <view class="profile-copy">
+        <text class="profile-name">{{user.displayName}}</text>
+        <text class="profile-meta">{{user.city}} · {{user.memberStatus}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{!user.profileComplete}}" class="profile-prompt">
+      <text class="profile-prompt-title">完善社区资料</text>
+      <text class="profile-prompt-copy">补充昵称和微信号后，报名活动时会更方便联系。</text>
+    </view>
+
+    <view class="account-section">
+      <text class="section-title">账号连接</text>
+      <view class="channel-list">
+        <view class="channel-row">
+          <text>微信小程序</text>
+          <text class="channel-status">已连接</text>
+        </view>
+        <view wx:for="{{linkedChannels}}" wx:key="*this" class="channel-row secondary-channel">
+          <text>{{item}}</text>
+          <text class="channel-status">已连接</text>
+        </view>
+      </view>
+    </view>
+
+    <button class="secondary-button logout-button" bindtap="handleLogout">退出当前账号</button>
+  </view>
+</view>

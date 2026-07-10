@@ -1,0 +1,9 @@
+{
+  "desc": "常州 AI Club 小程序页面索引",
+  "rules": [
+    {
+      "action": "allow",
+      "page": "*"
+    }
+  ]
+}

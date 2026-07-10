@@ -1,0 +1,12 @@
+{
+  "name": "changzhouai-club-miniapp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "miniprogram-api-typings": "^5.2.1",
+    "typescript": "^5.9.3"
+  }
+}

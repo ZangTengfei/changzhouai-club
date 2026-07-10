@@ -1,0 +1,111 @@
+.detail-page {
+  min-height: 100vh;
+}
+
+.detail-cover {
+  display: block;
+  width: 100%;
+  height: 480rpx;
+  background: #e5eae7;
+}
+
+.detail-content {
+  padding-top: 40rpx;
+}
+
+.detail-header {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.detail-type {
+  color: #147a5b;
+  font-size: 24rpx;
+  font-weight: 650;
+}
+
+.detail-title {
+  font-size: 46rpx;
+  font-weight: 760;
+  line-height: 1.3;
+}
+
+.detail-summary {
+  color: #4e5954;
+  font-size: 28rpx;
+  line-height: 1.7;
+}
+
+.fact-band {
+  display: flex;
+  flex-direction: column;
+  gap: 22rpx;
+  margin: 36rpx 0 52rpx;
+  padding: 28rpx;
+  border-top: 2rpx solid #cbd3cf;
+  border-bottom: 2rpx solid #cbd3cf;
+}
+
+.fact-row {
+  display: flex;
+  gap: 16rpx;
+  font-size: 27rpx;
+  line-height: 1.5;
+}
+
+.fact-label {
+  width: 96rpx;
+  flex: 0 0 auto;
+  color: #68716d;
+}
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 22rpx;
+  margin-top: 48rpx;
+}
+
+.paragraph {
+  color: #35413b;
+  font-size: 28rpx;
+  line-height: 1.8;
+}
+
+.list-row {
+  display: flex;
+  gap: 20rpx;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #dce2df;
+}
+
+.list-index {
+  display: flex;
+  width: 44rpx;
+  height: 44rpx;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #dcefe8;
+  color: #0d654a;
+  font-size: 22rpx;
+}
+
+.list-text {
+  min-width: 0;
+  flex: 1;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.registration-note {
+  margin-top: 48rpx;
+  padding: 28rpx;
+  border-left: 8rpx solid #e55f3c;
+  background: #fff4ef;
+  color: #603225;
+  font-size: 27rpx;
+  line-height: 1.7;
+}

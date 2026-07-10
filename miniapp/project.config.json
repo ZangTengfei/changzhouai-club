@@ -1,0 +1,16 @@
+{
+  "appid": "wx6aa96a39d412d483",
+  "compileType": "miniprogram",
+  "libVersion": "trial",
+  "miniprogramRoot": "miniprogram/",
+  "projectname": "changzhouai-club-miniapp",
+  "setting": {
+    "checkSiteMap": true,
+    "coverView": true,
+    "es6": true,
+    "minified": true,
+    "postcss": true,
+    "showShadowRootInWxmlPanel": true,
+    "useCompilerPlugins": ["typescript"]
+  }
+}

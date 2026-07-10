@@ -1,0 +1,39 @@
+<view class="page-shell home-page">
+  <view class="brand-band">
+    <image class="brand-mark" src="https://changzhouai.club/logo-mark.webp" mode="aspectFit" />
+    <view class="brand-copy">
+      <text class="brand-title">常州 AI Club</text>
+      <text class="brand-subtitle">在常州，和认真做事的人一起把 AI 用起来</text>
+    </view>
+  </view>
+
+  <view class="focus-band">
+    <text class="focus-label">社区正在发生</text>
+    <text class="focus-title">见面、分享、协作，把想法推进到真实项目</text>
+  </view>
+
+  <view class="section-heading">
+    <text class="section-title">近期活动</text>
+    <button class="text-action" bindtap="openEvents">查看全部</button>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty-state">正在加载活动</view>
+  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">活动加载失败，轻触重试</view>
+  <view wx:elif="{{events.length === 0}}" class="empty-state">暂时没有开放报名的活动</view>
+  <view wx:else class="event-list">
+    <view
+      wx:for="{{events}}"
+      wx:key="id"
+      class="event-row"
+      data-slug="{{item.slug}}"
+      bindtap="openEvent"
+    >
+      <image wx:if="{{item.cover_image_url}}" class="event-cover" src="{{item.cover_image_url}}" mode="aspectFill" />
+      <view class="event-body">
+        <text class="event-meta">{{item.eventTypeLabel}} · {{item.dateLabel}}</text>
+        <text class="event-title">{{item.title}}</text>
+        <text class="event-location">{{item.locationLabel}}</text>
+      </view>
+    </view>
+  </view>
+</view>
