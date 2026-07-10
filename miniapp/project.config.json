@@ -10,7 +10,11 @@
     "es6": true,
     "minified": true,
     "postcss": true,
+    "urlCheck": false,
     "showShadowRootInWxmlPanel": true,
-    "useCompilerPlugins": ["typescript"]
+    "useCompilerPlugins": [
+      "typescript"
+    ],
+    "minifyWXML": true
   }
 }
