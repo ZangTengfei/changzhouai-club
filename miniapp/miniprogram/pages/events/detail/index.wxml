@@ -29,6 +29,38 @@
       </view>
 
       <view wx:if="{{event.registrationNote}}" class="registration-note">{{event.registrationNote}}</view>
+
+      <view class="share-row">
+        <button class="secondary-button share-button" open-type="share">分享活动</button>
+      </view>
+
+      <view wx:if="{{event.status === 'scheduled'}}" class="registration-panel">
+        <block wx:if="{{event.registrationUrl}}">
+          <text class="registration-title">外部活动报名</text>
+          <text class="muted registration-copy">该活动使用外部报名入口，复制链接后在浏览器打开。</text>
+          <button class="primary-button" bindtap="copyExternalLink">复制报名链接</button>
+        </block>
+        <block wx:elif="{{registrationLoading}}">
+          <text class="muted">正在检查报名状态</text>
+        </block>
+        <block wx:elif="{{registration && registration.status === 'registered'}}">
+          <text class="registration-title">你已报名</text>
+          <text class="muted registration-copy">活动开始前可以在“我的活动”中再次查看。</text>
+          <button wx:if="{{reminder && reminder.available && (!reminder.subscription || reminder.subscription.status !== 'accepted')}}" class="primary-button" loading="{{reminderSubmitting}}" disabled="{{reminderSubmitting}}" bindtap="enableReminder">开启活动提醒</button>
+          <view wx:elif="{{reminder && reminder.subscription && reminder.subscription.status === 'accepted'}}" class="reminder-status">活动提醒已开启</view>
+          <button class="secondary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="cancelRegistration">取消报名</button>
+        </block>
+        <block wx:elif="{{!user || !user.profileComplete}}">
+          <text class="registration-title">完善资料后报名</text>
+          <text class="muted registration-copy">昵称和微信号用于活动联系，只需填写一次。</text>
+          <button class="primary-button" bindtap="openProfile">完善社区资料</button>
+        </block>
+        <block wx:else>
+          <text class="registration-title">报名这场活动</text>
+          <textarea class="registration-textarea" maxlength="500" value="{{registrationNote}}" bindinput="handleNoteInput" placeholder="可选：写下你特别想交流的话题" />
+          <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitRegistration">确认报名</button>
+        </block>
+      </view>
     </view>
   </block>
 </view>

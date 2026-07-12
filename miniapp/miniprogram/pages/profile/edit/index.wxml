@@ -1,0 +1,39 @@
+<view class="page-shell profile-page">
+  <view wx:if="{{loading}}" class="empty-state">正在加载资料</view>
+  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">资料加载失败，轻触重试</view>
+
+  <view wx:else class="profile-form">
+    <view class="form-heading">
+      <text class="section-title">社区资料</text>
+      <text class="muted form-summary">昵称和微信号用于活动报名联系，其他信息可以帮助社区找到更合适的连接。</text>
+    </view>
+
+    <button class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="chooseAvatar" loading="{{avatarUploading}}">
+      <image wx:if="{{avatarUrl}}" class="avatar-preview" src="{{avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="avatar-preview avatar-empty">选择头像</view>
+      <text class="avatar-action">更换头像</text>
+    </button>
+
+    <label class="form-field"><text class="field-label">昵称 *</text><input class="field-input" maxlength="60" value="{{displayName}}" data-field="displayName" bindinput="handleInput" /></label>
+    <label class="form-field"><text class="field-label">微信号 *</text><input class="field-input" maxlength="80" value="{{wechat}}" data-field="wechat" bindinput="handleInput" /></label>
+    <label class="form-field"><text class="field-label">所在城市</text><input class="field-input" maxlength="40" value="{{city}}" data-field="city" bindinput="handleInput" /></label>
+    <label class="form-field"><text class="field-label">职业方向</text><input class="field-input" maxlength="80" value="{{roleLabel}}" data-field="roleLabel" bindinput="handleInput" placeholder="例如：产品经理、开发者" /></label>
+    <label class="form-field"><text class="field-label">组织或公司</text><input class="field-input" maxlength="120" value="{{organization}}" data-field="organization" bindinput="handleInput" /></label>
+    <label class="form-field"><text class="field-label">每月可投入时间</text><input class="field-input" maxlength="80" value="{{monthlyTime}}" data-field="monthlyTime" bindinput="handleInput" placeholder="例如：每月 4 小时" /></label>
+    <label class="form-field"><text class="field-label">技能标签</text><input class="field-input" value="{{skillsText}}" data-field="skillsText" bindinput="handleInput" placeholder="多个标签用逗号分隔" /></label>
+    <label class="form-field"><text class="field-label">感兴趣的方向</text><input class="field-input" value="{{interestsText}}" data-field="interestsText" bindinput="handleInput" placeholder="多个方向用逗号分隔" /></label>
+    <label class="form-field"><text class="field-label">个人介绍</text><textarea class="field-textarea" maxlength="500" value="{{bio}}" data-field="bio" bindinput="handleInput" placeholder="简单介绍你正在做的事情" /></label>
+
+    <view class="preference-list">
+      <view class="preference-row"><text>愿意参加社区活动</text><switch checked="{{willingToAttend}}" data-field="willingToAttend" bindchange="handleSwitch" color="#147a5b" /></view>
+      <view class="preference-row"><text>愿意分享实践经验</text><switch checked="{{willingToShare}}" data-field="willingToShare" bindchange="handleSwitch" color="#147a5b" /></view>
+      <view class="preference-row"><text>愿意参与共创项目</text><switch checked="{{willingToJoinProjects}}" data-field="willingToJoinProjects" bindchange="handleSwitch" color="#147a5b" /></view>
+    </view>
+
+    <checkbox-group bindchange="handlePrivacyChange">
+      <label class="privacy-row"><checkbox value="accepted" checked="{{privacyAccepted}}" color="#147a5b" /><text>我已阅读并同意</text><text class="privacy-link" catchtap="openPrivacy">隐私说明</text></label>
+    </checkbox-group>
+
+    <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveProfile">保存资料</button>
+  </view>
+</view>

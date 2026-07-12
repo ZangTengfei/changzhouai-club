@@ -1,0 +1,18 @@
+.page-heading { display: flex; flex-direction: column; gap: 12rpx; margin-bottom: 32rpx; }
+.page-summary { font-size: 26rpx; }
+.registration-list { border-top: 2rpx solid #dce2df; }
+
+.registration-row {
+  display: flex;
+  gap: 22rpx;
+  padding: 28rpx 0;
+  border-bottom: 2rpx solid #dce2df;
+}
+
+.registration-cover { width: 176rpx; height: 132rpx; flex: 0 0 auto; border-radius: 6rpx; background: #e5eae7; }
+.registration-content { display: flex; min-width: 0; flex: 1; flex-direction: column; gap: 12rpx; }
+.registration-meta { display: flex; align-items: center; justify-content: space-between; color: #68716d; font-size: 23rpx; }
+.registration-title { font-size: 30rpx; font-weight: 700; line-height: 1.4; }
+.registration-location, .status { font-size: 23rpx; }
+.status-registered { color: #147a5b; }
+.status-cancelled { color: #8a4b3b; }

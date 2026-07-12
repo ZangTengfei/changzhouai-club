@@ -1,4 +1,6 @@
 import { formatEventDate, loadEvents, type EventSummary } from "../../services/events";
+import { trackEvent } from "../../services/analytics";
+import { ensureSession } from "../../services/auth";
 
 type EventListItem = EventSummary & {
   dateLabel: string;
@@ -13,6 +15,9 @@ Page({
   },
 
   onShow() {
+    void ensureSession().then(() =>
+      trackEvent("event_list_view", "/pages/events/index"),
+    ).catch(() => undefined);
     void this.loadPage();
   },
 

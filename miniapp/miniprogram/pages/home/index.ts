@@ -1,4 +1,6 @@
 import { formatEventDate, loadEvents, type EventSummary } from "../../services/events";
+import { trackEvent } from "../../services/analytics";
+import { ensureSession } from "../../services/auth";
 
 type HomeEvent = EventSummary & {
   dateLabel: string;
@@ -13,6 +15,9 @@ Page({
   },
 
   onLoad() {
+    void ensureSession().then(() =>
+      trackEvent("home_view", "/pages/home/index"),
+    ).catch(() => undefined);
     void this.loadPage();
   },
 

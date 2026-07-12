@@ -2,7 +2,7 @@ import { getApiBaseUrl } from "./config";
 
 const SESSION_TOKEN_STORAGE_KEY = "miniapp_session_token";
 
-type RequestMethod = "GET" | "POST" | "PUT";
+type RequestMethod = "GET" | "POST" | "PUT" | "DELETE";
 
 export class ApiError extends Error {
   constructor(

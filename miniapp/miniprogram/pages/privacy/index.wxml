@@ -1,0 +1,7 @@
+<view class="page-shell privacy-page">
+  <text class="section-title">隐私说明</text>
+  <view class="privacy-section"><text class="privacy-title">我们收集什么</text><text class="privacy-copy">当你完善社区资料时，我们会保存昵称、微信号、城市以及你主动填写的职业、技能和兴趣信息。微信登录标识仅用于识别账号。</text></view>
+  <view class="privacy-section"><text class="privacy-title">如何使用</text><text class="privacy-copy">这些信息用于活动报名联系、社区成员服务和你主动参与的项目协作。微信号不会在公开成员页面直接展示。</text></view>
+  <view class="privacy-section"><text class="privacy-title">保存与退出</text><text class="privacy-copy">数据保存在常州 AI Club 的社区账号系统中。你可以随时修改资料；如需删除账号和相关数据，可通过社区官方联系方式提出申请。</text></view>
+  <text class="privacy-version">版本：2026-07-13</text>
+</view>

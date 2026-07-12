@@ -26,6 +26,9 @@ export type EventDetail = {
   agendaItems: string[];
   speakerItems: string[];
   registrationNote: string | null;
+  registrationUrl: string | null;
+  status: string;
+  eventType: string;
 };
 
 export async function loadEvents() {

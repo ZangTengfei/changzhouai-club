@@ -3,7 +3,10 @@
     "pages/home/index",
     "pages/events/index",
     "pages/me/index",
-    "pages/events/detail/index"
+    "pages/events/detail/index",
+    "pages/profile/edit/index",
+    "pages/registrations/index",
+    "pages/privacy/index"
   ],
   "window": {
     "backgroundColor": "#f5f7f6",

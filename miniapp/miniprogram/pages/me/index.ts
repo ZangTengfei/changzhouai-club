@@ -50,4 +50,12 @@ Page({
       loggedOut: true,
     });
   },
+
+  openProfile() {
+    void wx.navigateTo({ url: "/pages/profile/edit/index" });
+  },
+
+  openRegistrations() {
+    void wx.navigateTo({ url: "/pages/registrations/index" });
+  },
 });

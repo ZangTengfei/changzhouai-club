@@ -109,3 +109,50 @@
   font-size: 27rpx;
   line-height: 1.7;
 }
+
+.share-row {
+  margin-top: 40rpx;
+}
+
+.share-button {
+  width: 100%;
+}
+
+.registration-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  margin-top: 32rpx;
+  padding: 30rpx 0 10rpx;
+  border-top: 2rpx solid #cbd3cf;
+}
+
+.registration-title {
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.registration-copy {
+  font-size: 25rpx;
+  line-height: 1.6;
+}
+
+.reminder-status {
+  padding: 20rpx 24rpx;
+  border-left: 8rpx solid #147a5b;
+  background: #e9f5f0;
+  color: #0d654a;
+  font-size: 26rpx;
+}
+
+.registration-textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 180rpx;
+  padding: 22rpx 24rpx;
+  border: 2rpx solid #cbd3cf;
+  border-radius: 8rpx;
+  background: #ffffff;
+  font-size: 27rpx;
+  line-height: 1.6;
+}

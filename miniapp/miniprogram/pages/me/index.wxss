@@ -70,6 +70,18 @@
   line-height: 1.6;
 }
 
+.prompt-button {
+  min-height: 72rpx;
+  margin-top: 8rpx;
+  font-size: 26rpx;
+}
+
+.account-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16rpx;
+}
+
 .account-section {
   display: flex;
   flex-direction: column;

@@ -25,6 +25,12 @@
     <view wx:if="{{!user.profileComplete}}" class="profile-prompt">
       <text class="profile-prompt-title">完善社区资料</text>
       <text class="profile-prompt-copy">补充昵称和微信号后，报名活动时会更方便联系。</text>
+      <button class="primary-button prompt-button" bindtap="openProfile">现在完善</button>
+    </view>
+
+    <view class="account-actions">
+      <button class="secondary-button" bindtap="openRegistrations">我的活动</button>
+      <button class="secondary-button" bindtap="openProfile">编辑资料</button>
     </view>
 
     <view class="account-section">
