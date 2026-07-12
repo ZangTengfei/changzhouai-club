@@ -23,6 +23,7 @@ config.toml
 
 # Generated artifacts
 output/
+tmp/
 
 # Local community knowledge base and source files
 files
