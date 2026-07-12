@@ -33,20 +33,34 @@ export async function GET(
   const event = await loadEvent(auth.supabase, slug);
   if (!event) return miniappJson({ error: "not_found" }, 404);
 
-  const { data, error } = await auth.supabase
-    .from("miniapp_event_subscriptions")
-    .select("status, send_at, sent_at")
-    .eq("user_id", auth.session.user_id)
-    .eq("event_id", event.id)
-    .eq("template_id", config.templateId)
-    .maybeSingle();
+  const userId = auth.session.user_id;
+  const [subscriptionResult, registrationResult] = await Promise.all([
+    auth.supabase
+      .from("miniapp_event_subscriptions")
+      .select("status, send_at, sent_at")
+      .eq("user_id", userId)
+      .eq("event_id", event.id)
+      .eq("template_id", config.templateId)
+      .maybeSingle(),
+    auth.supabase
+      .from("event_registrations")
+      .select("status")
+      .eq("user_id", userId)
+      .eq("event_id", event.id)
+      .maybeSingle(),
+  ]);
 
-  if (error) return miniappJson({ error: "subscription_load_failed" }, 500);
+  if (subscriptionResult.error || registrationResult.error) {
+    return miniappJson({ error: "subscription_load_failed" }, 500);
+  }
 
   return miniappJson({
-    available: event.status === "scheduled" && Boolean(event.event_at),
+    available:
+      event.status === "scheduled" &&
+      Boolean(event.event_at) &&
+      registrationResult.data?.status === "registered",
     templateId: config.templateId,
-    subscription: data ?? null,
+    subscription: subscriptionResult.data ?? null,
   });
 }
 
@@ -73,6 +87,19 @@ export async function POST(
   if (!event) return miniappJson({ error: "not_found" }, 404);
   if (event.status !== "scheduled" || !event.event_at) {
     return miniappJson({ error: "reminder_unavailable" }, 409);
+  }
+
+  const { data: registration, error: registrationError } = await auth.supabase
+    .from("event_registrations")
+    .select("status")
+    .eq("user_id", auth.session.user_id)
+    .eq("event_id", event.id)
+    .maybeSingle();
+  if (registrationError) {
+    return miniappJson({ error: "registration_load_failed" }, 500);
+  }
+  if (registration?.status !== "registered") {
+    return miniappJson({ error: "registration_required" }, 409);
   }
 
   const eventAt = new Date(event.event_at).getTime();

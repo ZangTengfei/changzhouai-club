@@ -1,7 +1,7 @@
 import { getApiBaseUrl } from "./config";
 import { getStoredSessionToken } from "./api";
 
-export function uploadAvatar(filePath: string) {
+export function uploadAvatar(filePath: string, policyVersion: string) {
   const token = getStoredSessionToken();
   if (!token) return Promise.reject(new Error("unauthorized"));
 
@@ -10,6 +10,10 @@ export function uploadAvatar(filePath: string) {
       url: `${getApiBaseUrl()}/api/miniapp/profile/avatar`,
       filePath,
       name: "file",
+      formData: {
+        privacyAccepted: "true",
+        policyVersion,
+      },
       header: { Authorization: `Bearer ${token}` },
       success(response) {
         const body = (() => {

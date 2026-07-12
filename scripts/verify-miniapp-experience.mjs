@@ -97,6 +97,8 @@ try {
     "base64",
   );
   avatarForm.append("file", new Blob([png], { type: "image/png" }), "avatar.png");
+  avatarForm.append("privacyAccepted", "true");
+  avatarForm.append("policyVersion", "2026-07-13");
   const avatarUpload = await request("/api/miniapp/profile/avatar", {
     method: "POST",
     headers: authHeaders,
@@ -191,6 +193,46 @@ try {
   assert.equal(registrationDelete.response.status, 200);
   assert.equal(registrationDelete.body?.registration?.status, "cancelled");
   pass("event_registration_cancelled");
+
+  if (reminder.body?.available && reminder.body?.templateId) {
+    const { data: cancelledReminder, error: cancelledReminderError } = await supabase
+      .from("miniapp_event_subscriptions")
+      .select("id, status")
+      .eq("user_id", userId)
+      .eq("event_id", event.id)
+      .eq("template_id", reminder.body.templateId)
+      .maybeSingle();
+    if (cancelledReminderError) throw cancelledReminderError;
+    assert.equal(cancelledReminder?.status, "cancelled");
+    pass("reminder_cancelled_with_registration");
+
+    const subscriptionAfterCancel = await request(
+      `/api/miniapp/events/${encodeURIComponent(event.slug)}/subscription`,
+      {
+        method: "POST",
+        headers: authHeaders,
+        body: JSON.stringify({ status: "rejected" }),
+      },
+    );
+    assert.equal(subscriptionAfterCancel.response.status, 409);
+    assert.equal(subscriptionAfterCancel.body?.error, "registration_required");
+    pass("reminder_requires_active_registration");
+
+    if (process.env.CRON_SECRET && cancelledReminder) {
+      const { error: reactivateReminderError } = await supabase
+        .from("miniapp_event_subscriptions")
+        .update({ status: "accepted", send_at: new Date().toISOString() })
+        .eq("id", cancelledReminder.id);
+      if (reactivateReminderError) throw reactivateReminderError;
+
+      const cron = await request("/api/cron/miniapp-event-reminders", {
+        headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
+      });
+      assert.equal(cron.response.status, 200);
+      assert.ok(cron.body?.cancelled >= 1);
+      pass("cron_skips_inactive_registration");
+    }
+  }
 
   const analytics = await request("/api/miniapp/analytics", {
     method: "POST",

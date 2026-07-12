@@ -2,10 +2,9 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { loadMiniappAccountSnapshot } from "@/lib/miniapp-auth";
 import { miniappJson, requireMiniappSession } from "@/lib/miniapp-api";
+import { MINIAPP_PRIVACY_POLICY_VERSION } from "@/lib/miniapp-profile";
 
 export const runtime = "nodejs";
-
-const PRIVACY_POLICY_VERSION = "2026-07-13";
 
 type ProfilePayload = {
   displayName?: unknown;
@@ -64,7 +63,7 @@ async function loadProfile(
       .from("miniapp_consents")
       .select("policy_version, accepted_at")
       .eq("user_id", userId)
-      .eq("policy_version", PRIVACY_POLICY_VERSION)
+      .eq("policy_version", MINIAPP_PRIVACY_POLICY_VERSION)
       .maybeSingle(),
   ]);
 
@@ -90,7 +89,7 @@ async function loadProfile(
     willingToShare: member?.willing_to_share ?? false,
     willingToJoinProjects: member?.willing_to_join_projects ?? false,
     privacyAccepted: Boolean(consentResult.data),
-    privacyPolicyVersion: PRIVACY_POLICY_VERSION,
+    privacyPolicyVersion: MINIAPP_PRIVACY_POLICY_VERSION,
   };
 }
 
@@ -171,7 +170,7 @@ export async function PUT(request: Request) {
     context.supabase.from("miniapp_consents").upsert(
       {
         user_id: userId,
-        policy_version: PRIVACY_POLICY_VERSION,
+        policy_version: MINIAPP_PRIVACY_POLICY_VERSION,
         accepted_at: now,
       },
       { onConflict: "user_id,policy_version" },

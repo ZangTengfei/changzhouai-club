@@ -1,5 +1,6 @@
 import { loadMiniappAccountSnapshot } from "@/lib/miniapp-auth";
 import { miniappJson, requireMiniappSession } from "@/lib/miniapp-api";
+import { MINIAPP_PRIVACY_POLICY_VERSION } from "@/lib/miniapp-profile";
 import {
   buildMemberAvatarPath,
   MEMBER_AVATARS_BUCKET,
@@ -16,6 +17,14 @@ export async function POST(request: Request) {
 
   const formData = await request.formData().catch(() => null);
   const file = formData?.get("file");
+  const privacyAccepted = formData?.get("privacyAccepted") === "true";
+  const policyVersion = String(formData?.get("policyVersion") ?? "");
+  if (
+    !privacyAccepted ||
+    policyVersion !== MINIAPP_PRIVACY_POLICY_VERSION
+  ) {
+    return miniappJson({ error: "privacy_consent_required" }, 400);
+  }
   if (!(file instanceof File)) {
     return miniappJson({ error: "missing_avatar" }, 400);
   }
@@ -24,6 +33,20 @@ export async function POST(request: Request) {
   }
 
   const userId = auth.session.user_id;
+  const { error: consentError } = await auth.supabase
+    .from("miniapp_consents")
+    .upsert(
+      {
+        user_id: userId,
+        policy_version: MINIAPP_PRIVACY_POLICY_VERSION,
+        accepted_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,policy_version" },
+    );
+  if (consentError) {
+    return miniappJson({ error: "privacy_consent_save_failed" }, 500);
+  }
+
   const path = buildMemberAvatarPath(userId);
   const { error: uploadError } = await auth.supabase.storage
     .from(MEMBER_AVATARS_BUCKET)

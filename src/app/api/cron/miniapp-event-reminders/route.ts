@@ -16,6 +16,7 @@ export const runtime = "nodejs";
 type DueSubscription = {
   id: string;
   user_id: string;
+  event_id: string;
   template_id: string;
   events: {
     slug: string;
@@ -23,6 +24,7 @@ type DueSubscription = {
     event_at: string;
     venue: string | null;
     city: string | null;
+    status: string;
   } | null;
 };
 
@@ -67,7 +69,9 @@ async function run(request: Request) {
   const now = new Date().toISOString();
   const { data, error } = await supabase
     .from("miniapp_event_subscriptions")
-    .select("id, user_id, template_id, events(slug, title, event_at, venue, city)")
+    .select(
+      "id, user_id, event_id, template_id, events(slug, title, event_at, venue, city, status)",
+    )
     .eq("status", "accepted")
     .lte("send_at", now)
     .limit(100);
@@ -82,34 +86,89 @@ async function run(request: Request) {
   }
 
   const userIds = Array.from(new Set(subscriptions.map((item) => item.user_id)));
-  const { data: identities, error: identityError } = await supabase
-    .from("user_identities")
-    .select("user_id, provider_user_id")
-    .eq("provider", "wechat")
-    .eq("provider_app_id", wechatConfig.appId)
-    .eq("provider_channel", "mini_program")
-    .in("user_id", userIds);
+  const eventIds = Array.from(new Set(subscriptions.map((item) => item.event_id)));
+  const [identityResult, registrationResult] = await Promise.all([
+    supabase
+      .from("user_identities")
+      .select("user_id, provider_user_id")
+      .eq("provider", "wechat")
+      .eq("provider_app_id", wechatConfig.appId)
+      .eq("provider_channel", "mini_program")
+      .in("user_id", userIds),
+    supabase
+      .from("event_registrations")
+      .select("user_id, event_id")
+      .eq("status", "registered")
+      .in("user_id", userIds)
+      .in("event_id", eventIds),
+  ]);
 
-  if (identityError) {
-    return NextResponse.json({ error: "identities_load_failed" }, { status: 500 });
+  if (identityResult.error || registrationResult.error) {
+    return NextResponse.json(
+      { error: "reminder_targets_load_failed" },
+      { status: 500 },
+    );
   }
 
   const openids = new Map(
-    (identities ?? []).map((identity) => [
+    (identityResult.data ?? []).map((identity) => [
       identity.user_id as string,
       identity.provider_user_id as string,
     ]),
   );
+  const activeRegistrations = new Set(
+    (registrationResult.data ?? []).map(
+      (registration) => `${registration.user_id}:${registration.event_id}`,
+    ),
+  );
+  const deliverableSubscriptions: DueSubscription[] = [];
+  let cancelled = 0;
+
+  for (const subscription of subscriptions) {
+    const event = subscription.events;
+    const registrationActive = activeRegistrations.has(
+      `${subscription.user_id}:${subscription.event_id}`,
+    );
+
+    if (
+      !event ||
+      event.status !== "scheduled" ||
+      !registrationActive ||
+      new Date(event.event_at).getTime() <= Date.now()
+    ) {
+      await supabase
+        .from("miniapp_event_subscriptions")
+        .update({
+          status: "cancelled",
+          last_error: "reminder_target_inactive",
+        })
+        .eq("id", subscription.id);
+      cancelled += 1;
+      continue;
+    }
+
+    deliverableSubscriptions.push(subscription);
+  }
+
+  if (deliverableSubscriptions.length === 0) {
+    return NextResponse.json({
+      processed: subscriptions.length,
+      sent: 0,
+      failed: 0,
+      cancelled,
+    });
+  }
+
   const accessToken = await getWechatMiniappAccessToken(wechatConfig);
   let sent = 0;
   let failed = 0;
 
-  for (const subscription of subscriptions) {
+  for (const subscription of deliverableSubscriptions) {
     const event = subscription.events;
     const openid = openids.get(subscription.user_id);
 
     try {
-      if (!event || !openid || new Date(event.event_at).getTime() <= Date.now()) {
+      if (!event || !openid) {
         throw new Error("invalid_reminder_target");
       }
 
@@ -145,7 +204,12 @@ async function run(request: Request) {
     }
   }
 
-  return NextResponse.json({ processed: subscriptions.length, sent, failed });
+  return NextResponse.json({
+    processed: subscriptions.length,
+    sent,
+    failed,
+    cancelled,
+  });
 }
 
 export async function GET(request: Request) {

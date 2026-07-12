@@ -28,6 +28,7 @@ Page({
     willingToShare: false,
     willingToJoinProjects: false,
     privacyAccepted: false,
+    privacyPolicyVersion: "",
     avatarUrl: null as string | null,
     avatarUploading: false,
   },
@@ -56,6 +57,7 @@ Page({
         willingToShare: profile.willingToShare,
         willingToJoinProjects: profile.willingToJoinProjects,
         privacyAccepted: profile.privacyAccepted,
+        privacyPolicyVersion: profile.privacyPolicyVersion,
         avatarUrl: profile.avatarUrl,
       });
     } catch {
@@ -84,10 +86,17 @@ Page({
   async chooseAvatar(event: WechatMiniprogram.CustomEvent<{ avatarUrl: string }>) {
     const filePath = event.detail.avatarUrl;
     if (!filePath || this.data.avatarUploading) return;
+    if (!this.data.privacyAccepted) {
+      void wx.showToast({ title: "请先同意隐私说明", icon: "none" });
+      return;
+    }
 
     this.setData({ avatarUploading: true });
     try {
-      const response = await uploadAvatar(filePath);
+      const response = await uploadAvatar(
+        filePath,
+        this.data.privacyPolicyVersion,
+      );
       getApp<IAppOption>().globalData.currentUser = response.user;
       this.setData({ avatarUrl: response.avatarUrl });
       void wx.showToast({ title: "头像已更新", icon: "success" });

@@ -144,16 +144,25 @@ export async function DELETE(
   const event = await loadEvent(auth.supabase, slug);
   if (!event) return miniappJson({ error: "not_found" }, 404);
 
-  const { data, error } = await auth.supabase
-    .from("event_registrations")
-    .update({ status: "cancelled" })
-    .eq("event_id", event.id)
-    .eq("user_id", auth.session.user_id)
-    .neq("status", "cancelled")
-    .select("id, status, note, created_at")
-    .maybeSingle();
+  const userId = auth.session.user_id;
+  const [{ data, error }, { error: subscriptionError }] = await Promise.all([
+    auth.supabase
+      .from("event_registrations")
+      .update({ status: "cancelled" })
+      .eq("event_id", event.id)
+      .eq("user_id", userId)
+      .neq("status", "cancelled")
+      .select("id, status, note, created_at")
+      .maybeSingle(),
+    auth.supabase
+      .from("miniapp_event_subscriptions")
+      .update({ status: "cancelled", last_error: null })
+      .eq("event_id", event.id)
+      .eq("user_id", userId)
+      .in("status", ["accepted", "rejected", "failed"]),
+  ]);
 
-  if (error) {
+  if (error || subscriptionError) {
     return miniappJson({ error: "registration_cancel_failed" }, 500);
   }
 
