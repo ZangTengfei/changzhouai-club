@@ -82,7 +82,7 @@ async function run(request: Request) {
 
   const subscriptions = (data ?? []) as unknown as DueSubscription[];
   if (subscriptions.length === 0) {
-    return NextResponse.json({ processed: 0, sent: 0, failed: 0 });
+    return NextResponse.json({ processed: 0, sent: 0, failed: 0, cancelled: 0 });
   }
 
   const userIds = Array.from(new Set(subscriptions.map((item) => item.user_id)));
