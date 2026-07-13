@@ -4,8 +4,10 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import {
   buildOAuthCallbackUrl,
   buildWechatAuthorizationUrl,
+  buildWechatOfficialAccountAuthorizationUrl,
   createOpaqueToken,
   getWechatOAuthConfig,
+  getWechatOfficialAccountOAuthConfig,
   getWechatStateExpiresAt,
   getWechatProviderName,
   getWechatOAuthScope,
@@ -15,7 +17,11 @@ import {
 
 export const runtime = "nodejs";
 
-function redirectWithError(redirectUri: string, state: string, description: string) {
+function redirectWithError(
+  redirectUri: string,
+  state: string,
+  description: string,
+) {
   return NextResponse.redirect(
     buildOAuthCallbackUrl(redirectUri, {
       error: "server_error",
@@ -29,7 +35,10 @@ export async function GET(request: Request) {
   const config = getWechatOAuthConfig();
 
   if (!config) {
-    return Response.json({ error: "wechat_oauth_not_configured" }, { status: 503 });
+    return Response.json(
+      { error: "wechat_oauth_not_configured" },
+      { status: 503 },
+    );
   }
 
   const requestUrl = new URL(request.url);
@@ -39,24 +48,53 @@ export async function GET(request: Request) {
   const providerState = requestUrl.searchParams.get("state");
   const scope = requestUrl.searchParams.get("scope") ?? getWechatOAuthScope();
   const codeChallenge = requestUrl.searchParams.get("code_challenge");
-  const codeChallengeMethod = requestUrl.searchParams.get("code_challenge_method");
+  const codeChallengeMethod = requestUrl.searchParams.get(
+    "code_challenge_method",
+  );
+  const isWechatBrowser = /MicroMessenger/i.test(
+    request.headers.get("user-agent") ?? "",
+  );
+  const officialAccountConfig = isWechatBrowser
+    ? getWechatOfficialAccountOAuthConfig()
+    : null;
+  const providerChannel = isWechatBrowser ? "official_account" : "website";
 
   if (clientId !== config.appId || responseType !== "code") {
     return Response.json({ error: "invalid_oauth_request" }, { status: 400 });
   }
 
-  if (!redirectUri || !providerState || !isValidSupabaseCallbackUrl(redirectUri)) {
+  if (
+    !redirectUri ||
+    !providerState ||
+    !isValidSupabaseCallbackUrl(redirectUri)
+  ) {
     return Response.json({ error: "invalid_redirect_uri" }, { status: 400 });
   }
 
   if (!scope.split(/\s+/).includes(getWechatOAuthScope())) {
-    return redirectWithError(redirectUri, providerState, "missing_wechat_scope");
+    return redirectWithError(
+      redirectUri,
+      providerState,
+      "missing_wechat_scope",
+    );
+  }
+
+  if (isWechatBrowser && !officialAccountConfig) {
+    return redirectWithError(
+      redirectUri,
+      providerState,
+      "wechat_official_account_oauth_not_configured",
+    );
   }
 
   const supabase = createSupabaseAdminClient();
 
   if (!supabase) {
-    return redirectWithError(redirectUri, providerState, "missing_service_role_key");
+    return redirectWithError(
+      redirectUri,
+      providerState,
+      "missing_service_role_key",
+    );
   }
 
   const state = createOpaqueToken(24);
@@ -66,6 +104,7 @@ export async function GET(request: Request) {
     redirect_uri: redirectUri,
     code_challenge: codeChallenge,
     code_challenge_method: codeChallengeMethod,
+    provider_channel: providerChannel,
     expires_at: getWechatStateExpiresAt(),
   });
 
@@ -77,5 +116,9 @@ export async function GET(request: Request) {
     return redirectWithError(redirectUri, providerState, "state_create_failed");
   }
 
-  return NextResponse.redirect(buildWechatAuthorizationUrl(config, state));
+  return NextResponse.redirect(
+    officialAccountConfig
+      ? buildWechatOfficialAccountAuthorizationUrl(officialAccountConfig, state)
+      : buildWechatAuthorizationUrl(config, state),
+  );
 }

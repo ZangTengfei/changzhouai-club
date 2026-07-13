@@ -3,6 +3,8 @@ import { createHash, randomBytes, timingSafeEqual } from "crypto";
 import { getPublicSiteUrl } from "@/lib/env";
 
 const WECHAT_AUTHORIZATION_URL = "https://open.weixin.qq.com/connect/qrconnect";
+const WECHAT_OFFICIAL_ACCOUNT_AUTHORIZATION_URL =
+  "https://open.weixin.qq.com/connect/oauth2/authorize";
 const WECHAT_TOKEN_URL = "https://api.weixin.qq.com/sns/oauth2/access_token";
 const WECHAT_USERINFO_URL = "https://api.weixin.qq.com/sns/userinfo";
 const WECHAT_SCOPE = "snsapi_login";
@@ -16,6 +18,8 @@ export type WechatOAuthConfig = {
   baseUrl: string;
   callbackUrl: string;
 };
+
+export type WechatOAuthChannel = "website" | "official_account";
 
 export type WechatOAuthClaims = {
   sub: string;
@@ -32,6 +36,7 @@ export type WechatOAuthClaims = {
     province?: string;
     country?: string;
     scope?: string;
+    channel: WechatOAuthChannel;
   };
 };
 
@@ -79,8 +84,33 @@ export function getWechatOAuthConfig() {
   };
 }
 
+export function getWechatOfficialAccountOAuthConfig() {
+  const appId = process.env.WECHAT_OFFICIAL_ACCOUNT_APP_ID?.trim();
+  const appSecret = process.env.WECHAT_OFFICIAL_ACCOUNT_APP_SECRET?.trim();
+  const baseUrl = (
+    process.env.WECHAT_OFFICIAL_ACCOUNT_OAUTH_BASE_URL?.trim() ??
+    getPublicSiteUrl() ??
+    ""
+  ).replace(/\/$/, "");
+
+  if (!appId || !appSecret || !baseUrl) {
+    return null;
+  }
+
+  return {
+    appId,
+    appSecret,
+    baseUrl,
+    callbackUrl: new URL("/api/auth/wechat/callback", baseUrl).toString(),
+  };
+}
+
 export function hasWechatOAuthEnv() {
   return Boolean(getWechatOAuthConfig());
+}
+
+export function hasWechatOfficialAccountOAuthEnv() {
+  return Boolean(getWechatOfficialAccountOAuthConfig());
 }
 
 export function getWechatProviderName() {
@@ -133,7 +163,8 @@ export function safeCompare(left: string, right: string) {
 export function isValidSupabaseCallbackUrl(value: string) {
   try {
     const url = new URL(value);
-    const isLocalhost = url.hostname === "localhost" || url.hostname === "127.0.0.1";
+    const isLocalhost =
+      url.hostname === "localhost" || url.hostname === "127.0.0.1";
 
     if (url.protocol !== "https:" && !isLocalhost) {
       return false;
@@ -145,12 +176,29 @@ export function isValidSupabaseCallbackUrl(value: string) {
   }
 }
 
-export function buildWechatAuthorizationUrl(config: WechatOAuthConfig, state: string) {
+export function buildWechatAuthorizationUrl(
+  config: WechatOAuthConfig,
+  state: string,
+) {
   const url = new URL(WECHAT_AUTHORIZATION_URL);
   url.searchParams.set("appid", config.appId);
   url.searchParams.set("redirect_uri", config.callbackUrl);
   url.searchParams.set("response_type", "code");
   url.searchParams.set("scope", WECHAT_SCOPE);
+  url.searchParams.set("state", state);
+
+  return `${url.toString()}#wechat_redirect`;
+}
+
+export function buildWechatOfficialAccountAuthorizationUrl(
+  config: WechatOAuthConfig,
+  state: string,
+) {
+  const url = new URL(WECHAT_OFFICIAL_ACCOUNT_AUTHORIZATION_URL);
+  url.searchParams.set("appid", config.appId);
+  url.searchParams.set("redirect_uri", config.callbackUrl);
+  url.searchParams.set("response_type", "code");
+  url.searchParams.set("scope", "snsapi_userinfo");
   url.searchParams.set("state", state);
 
   return `${url.toString()}#wechat_redirect`;
@@ -189,7 +237,10 @@ export function createOAuthJsonError(
   );
 }
 
-export async function exchangeWechatCode(config: WechatOAuthConfig, code: string) {
+export async function exchangeWechatCode(
+  config: WechatOAuthConfig,
+  code: string,
+) {
   const url = new URL(WECHAT_TOKEN_URL);
   url.searchParams.set("appid", config.appId);
   url.searchParams.set("secret", config.appSecret);
@@ -239,22 +290,26 @@ export async function fetchWechatUserInfo(token: WechatTokenResponse) {
 export function buildWechatClaims(
   token: WechatTokenResponse,
   userInfo: WechatUserInfoResponse | null,
+  channel: WechatOAuthChannel,
 ) {
   if (!token.openid) {
     throw new Error("missing_wechat_openid");
   }
 
   const unionid = userInfo?.unionid ?? token.unionid;
+  if (!unionid) {
+    throw new Error("missing_wechat_unionid");
+  }
   const nickname = userInfo?.nickname?.trim() || "微信用户";
   const avatarUrl = userInfo?.headimgurl?.trim() || undefined;
 
   return {
-    sub: token.openid,
+    sub: unionid,
     name: nickname,
     nickname,
     picture: avatarUrl,
     avatar_url: avatarUrl,
-    provider_id: token.openid,
+    provider_id: unionid,
     full_name: nickname,
     custom_claims: {
       openid: token.openid,
@@ -263,6 +318,7 @@ export function buildWechatClaims(
       province: userInfo?.province,
       country: userInfo?.country,
       scope: token.scope,
+      channel,
     },
   } satisfies WechatOAuthClaims;
 }
@@ -275,9 +331,10 @@ export function getBasicAuthCredentials(request: Request) {
   }
 
   try {
-    const decoded = Buffer.from(header.slice("Basic ".length), "base64").toString(
-      "utf8",
-    );
+    const decoded = Buffer.from(
+      header.slice("Basic ".length),
+      "base64",
+    ).toString("utf8");
     const separatorIndex = decoded.indexOf(":");
 
     if (separatorIndex < 0) {

@@ -6,15 +6,18 @@ import {
 } from "@/lib/miniapp-auth";
 import {
   getWechatOAuthConfig,
+  getWechatOfficialAccountOAuthConfig,
   getWechatProviderName,
+  type WechatOAuthChannel,
 } from "@/lib/wechat-oauth";
 
 type WechatClaims = {
   openid?: unknown;
   unionid?: unknown;
+  channel?: unknown;
 };
 
-function getWebsiteWechatClaims(user: User) {
+function getWechatOAuthClaims(user: User) {
   const identity = user.identities?.find(
     (candidate) => candidate.provider === getWechatProviderName(),
   );
@@ -23,6 +26,8 @@ function getWebsiteWechatClaims(user: User) {
   const openid = typeof claims?.openid === "string" ? claims.openid.trim() : "";
   const unionid =
     typeof claims?.unionid === "string" ? claims.unionid.trim() : "";
+  const channel: WechatOAuthChannel =
+    claims?.channel === "official_account" ? "official_account" : "website";
 
   if (!identity) {
     return null;
@@ -32,19 +37,22 @@ function getWebsiteWechatClaims(user: User) {
     throw new MiniappAuthError("wechat_unionid_missing");
   }
 
-  return { openid, unionid };
+  return { openid, unionid, channel };
 }
 
-export async function syncWebsiteWechatAccount(
+export async function syncWechatOAuthAccount(
   supabase: SupabaseClient,
   user: User,
 ) {
-  const claims = getWebsiteWechatClaims(user);
+  const claims = getWechatOAuthClaims(user);
   if (!claims) {
     return false;
   }
 
-  const config = getWechatOAuthConfig();
+  const config =
+    claims.channel === "official_account"
+      ? getWechatOfficialAccountOAuthConfig()
+      : getWechatOAuthConfig();
   if (!config) {
     throw new MiniappAuthError("wechat_oauth_config_missing");
   }
@@ -88,7 +96,7 @@ export async function syncWebsiteWechatAccount(
     appId: config.appId,
     openid: claims.openid,
     unionid: claims.unionid,
-    channel: "website",
+    channel: claims.channel,
   });
 
   return true;

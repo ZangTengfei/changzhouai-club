@@ -11,6 +11,7 @@ import styles from "./login-panel.module.css";
 type LoginPanelProps = {
   enabled: boolean;
   wechatEnabled: boolean;
+  officialAccountEnabled: boolean;
   nextPath?: string;
   error?: string;
 };
@@ -29,6 +30,7 @@ type AuthMethod = "email" | "google" | "wechat";
 export function LoginPanel({
   enabled,
   wechatEnabled,
+  officialAccountEnabled,
   nextPath = "/account",
   error,
 }: LoginPanelProps) {
@@ -151,6 +153,7 @@ export function LoginPanel({
           <div className={styles.activePane}>
             <WechatQrLogin
               enabled={enabled && wechatEnabled}
+              officialAccountEnabled={officialAccountEnabled}
               nextPath={nextPath}
             />
           </div>

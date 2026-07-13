@@ -9,6 +9,8 @@ import {
   fetchWechatUserInfo,
   getWechatCodeExpiresAt,
   getWechatOAuthConfig,
+  getWechatOfficialAccountOAuthConfig,
+  type WechatOAuthChannel,
   sha256Hex,
 } from "@/lib/wechat-oauth";
 
@@ -21,6 +23,7 @@ type WechatOAuthStateRow = {
   code_challenge_method: string | null;
   expires_at: string;
   used_at: string | null;
+  provider_channel: WechatOAuthChannel;
 };
 
 function redirectWithError(row: WechatOAuthStateRow, description: string) {
@@ -34,11 +37,13 @@ function redirectWithError(row: WechatOAuthStateRow, description: string) {
 }
 
 export async function GET(request: Request) {
-  const config = getWechatOAuthConfig();
   const supabase = createSupabaseAdminClient();
 
-  if (!config || !supabase) {
-    return Response.json({ error: "wechat_oauth_not_configured" }, { status: 503 });
+  if (!supabase) {
+    return Response.json(
+      { error: "wechat_oauth_not_configured" },
+      { status: 503 },
+    );
   }
 
   const requestUrl = new URL(request.url);
@@ -46,12 +51,17 @@ export async function GET(request: Request) {
   const state = requestUrl.searchParams.get("state");
 
   if (!code || !state) {
-    return Response.json({ error: "missing_wechat_callback_params" }, { status: 400 });
+    return Response.json(
+      { error: "missing_wechat_callback_params" },
+      { status: 400 },
+    );
   }
 
   const { data: row, error: stateError } = await supabase
     .from("wechat_oauth_states")
-    .select("provider_state, redirect_uri, code_challenge, code_challenge_method, expires_at, used_at")
+    .select(
+      "provider_state, redirect_uri, code_challenge, code_challenge_method, expires_at, used_at, provider_channel",
+    )
     .eq("state_hash", sha256Hex(state))
     .maybeSingle<WechatOAuthStateRow>();
 
@@ -78,19 +88,30 @@ export async function GET(request: Request) {
   }
 
   try {
+    const config =
+      row.provider_channel === "official_account"
+        ? getWechatOfficialAccountOAuthConfig()
+        : getWechatOAuthConfig();
+
+    if (!config) {
+      return redirectWithError(row, "wechat_oauth_not_configured");
+    }
+
     const token = await exchangeWechatCode(config, code);
     const userInfo = await fetchWechatUserInfo(token);
-    const claims = buildWechatClaims(token, userInfo);
+    const claims = buildWechatClaims(token, userInfo, row.provider_channel);
     const authCode = createOpaqueToken(32);
 
-    const { error: codeCreateError } = await supabase.from("wechat_oauth_codes").insert({
-      auth_code_hash: sha256Hex(authCode),
-      claims,
-      redirect_uri: row.redirect_uri,
-      code_challenge: row.code_challenge,
-      code_challenge_method: row.code_challenge_method,
-      code_expires_at: getWechatCodeExpiresAt(),
-    });
+    const { error: codeCreateError } = await supabase
+      .from("wechat_oauth_codes")
+      .insert({
+        auth_code_hash: sha256Hex(authCode),
+        claims,
+        redirect_uri: row.redirect_uri,
+        code_challenge: row.code_challenge,
+        code_challenge_method: row.code_challenge_method,
+        code_expires_at: getWechatCodeExpiresAt(),
+      });
 
     if (codeCreateError) {
       console.error("Failed to create WeChat OAuth code.", { codeCreateError });

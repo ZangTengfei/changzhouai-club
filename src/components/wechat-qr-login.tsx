@@ -10,6 +10,7 @@ import styles from "./wechat-qr-login.module.css";
 
 type WechatQrLoginProps = {
   enabled: boolean;
+  officialAccountEnabled: boolean;
   nextPath?: string;
 };
 
@@ -18,7 +19,7 @@ type EmbeddedUrlResponse = {
   error?: string;
 };
 
-type QrEnvironment = "checking" | "supported" | "unsupported";
+type LoginEnvironment = "checking" | "desktop" | "wechat" | "mobile";
 
 function getSafeNextPath(nextPath: string) {
   if (!nextPath.startsWith("/") || nextPath.startsWith("//")) {
@@ -29,7 +30,10 @@ function getSafeNextPath(nextPath: string) {
 }
 
 function getSiteOrigin() {
-  return getPublicSiteUrl() ?? (typeof window === "undefined" ? "" : window.location.origin);
+  return (
+    getPublicSiteUrl() ??
+    (typeof window === "undefined" ? "" : window.location.origin)
+  );
 }
 
 function getAuthCallbackUrl(nextPath: string) {
@@ -44,9 +48,9 @@ function getAuthCallbackUrl(nextPath: string) {
   return callbackUrl.toString();
 }
 
-function canShowWechatQrLogin() {
+function getWechatLoginEnvironment(): LoginEnvironment {
   if (typeof window === "undefined") {
-    return false;
+    return "checking";
   }
 
   const userAgent = navigator.userAgent;
@@ -54,7 +58,11 @@ function canShowWechatQrLogin() {
   const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent);
   const isNarrowViewport = window.matchMedia("(max-width: 720px)").matches;
 
-  return !isWechatBrowser && !isMobileDevice && !isNarrowViewport;
+  if (isWechatBrowser) {
+    return "wechat";
+  }
+
+  return isMobileDevice || isNarrowViewport ? "mobile" : "desktop";
 }
 
 function getEmbeddedFrameUrl(value: string) {
@@ -69,19 +77,23 @@ function getEmbeddedFrameUrl(value: string) {
 
 export function WechatQrLogin({
   enabled,
+  officialAccountEnabled,
   nextPath = "/account",
 }: WechatQrLoginProps) {
   const [frameUrl, setFrameUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [qrEnvironment, setQrEnvironment] =
-    useState<QrEnvironment>("checking");
+  const [loginEnvironment, setLoginEnvironment] =
+    useState<LoginEnvironment>("checking");
   const safeNextPath = getSafeNextPath(nextPath);
-  const redirectTo = useMemo(() => getAuthCallbackUrl(safeNextPath), [safeNextPath]);
+  const redirectTo = useMemo(
+    () => getAuthCallbackUrl(safeNextPath),
+    [safeNextPath],
+  );
 
   useEffect(() => {
     function updateQrEnvironment() {
-      setQrEnvironment(canShowWechatQrLogin() ? "supported" : "unsupported");
+      setLoginEnvironment(getWechatLoginEnvironment());
     }
 
     updateQrEnvironment();
@@ -95,7 +107,7 @@ export function WechatQrLogin({
   }, []);
 
   useEffect(() => {
-    if (!enabled || !redirectTo || qrEnvironment !== "supported") {
+    if (!enabled || !redirectTo || loginEnvironment !== "desktop") {
       setFrameUrl(null);
       setError(null);
       setLoading(false);
@@ -120,7 +132,9 @@ export function WechatQrLogin({
         });
 
         if (authError || !data?.url) {
-          throw new Error(authError?.message || "wechat_authorize_url_unavailable");
+          throw new Error(
+            authError?.message || "wechat_authorize_url_unavailable",
+          );
         }
 
         const response = await fetch("/api/auth/wechat/embedded-url", {
@@ -154,17 +168,37 @@ export function WechatQrLogin({
     return () => {
       cancelled = true;
     };
-  }, [enabled, redirectTo, qrEnvironment]);
+  }, [enabled, redirectTo, loginEnvironment]);
 
-  if (qrEnvironment !== "supported") {
+  if (loginEnvironment === "wechat") {
+    return (
+      <div className={styles.stack}>
+        <div className={styles.mobileNotice}>
+          <strong>微信内快捷登录</strong>
+          <span>确认授权后会自动回到社区账号页。</span>
+        </div>
+        <WechatAuthButton
+          enabled={enabled && officialAccountEnabled}
+          mode="sign-in"
+          nextPath={safeNextPath}
+          className="button button-secondary auth-button"
+        />
+        {!officialAccountEnabled ? (
+          <p className="note-strip">服务号登录暂未启用，请稍后再试。</p>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (loginEnvironment !== "desktop") {
     return (
       <div className={styles.mobileNotice}>
         <strong>
-          {qrEnvironment === "checking" ? "正在判断当前设备..." : "手机端暂不显示扫码登录"}
+          {loginEnvironment === "checking"
+            ? "正在判断当前设备..."
+            : "请在微信内打开官网"}
         </strong>
-        <span>
-          微信扫码登录更适合电脑浏览器。手机上请先使用邮箱登录已有账号；第一次加入可稍后在电脑端完成微信确认。
-        </span>
+        <span>也可以返回邮箱方式登录。</span>
       </div>
     );
   }

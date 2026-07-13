@@ -3,7 +3,10 @@ import type { Metadata } from "next";
 import { LoginPanel } from "@/components/login-panel";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { hasSupabaseEnv } from "@/lib/env";
-import { hasWechatOAuthEnv } from "@/lib/wechat-oauth";
+import {
+  hasWechatOAuthEnv,
+  hasWechatOfficialAccountOAuthEnv,
+} from "@/lib/wechat-oauth";
 
 import styles from "./login-page.module.css";
 
@@ -19,6 +22,7 @@ export default async function LoginPage({
 }) {
   const enabled = hasSupabaseEnv();
   const wechatEnabled = hasWechatOAuthEnv();
+  const officialAccountEnabled = hasWechatOfficialAccountOAuthEnv();
   const params = await searchParams;
 
   return (
@@ -38,6 +42,7 @@ export default async function LoginPage({
         <LoginPanel
           enabled={enabled}
           wechatEnabled={wechatEnabled}
+          officialAccountEnabled={officialAccountEnabled}
           nextPath={params.next ?? "/account"}
           error={params.error}
         />

@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getPublicSiteUrl, hasSupabaseEnv } from "@/lib/env";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { syncWebsiteWechatAccount } from "@/lib/wechat-account-linking";
+import { syncWechatOAuthAccount } from "@/lib/wechat-account-linking";
 
 function getSafeNextPath(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) {
@@ -42,7 +42,7 @@ export async function GET(request: Request) {
 
     try {
       if (data.user && admin) {
-        await syncWebsiteWechatAccount(admin, data.user);
+        await syncWechatOAuthAccount(admin, data.user);
       } else if (
         data.user?.identities?.some(
           (identity) => identity.provider === "custom:wechat",
