@@ -391,15 +391,56 @@ export async function loadMiniappAccountSnapshot(
   supabase: SupabaseClient,
   userId: string,
 ) {
-  const [profileResult, memberResult, identityResult] = await Promise.all([
+  type FootprintEvent = {
+    id: string;
+    slug: string;
+    title: string;
+    event_at: string | null;
+    venue: string | null;
+    city: string | null;
+    cover_image_url: string | null;
+    status: string;
+  };
+  type RelatedEvent = FootprintEvent | FootprintEvent[] | null;
+  type RegistrationRow = {
+    id: string;
+    event_id: string;
+    status: string;
+    created_at: string;
+    events: RelatedEvent;
+  };
+  type AttendanceRow = {
+    id: string;
+    event_id: string;
+    status: string;
+    checked_in_at: string | null;
+    created_at: string;
+    events: RelatedEvent;
+  };
+  type BadgeAwardRow = {
+    badge_code: string;
+    label: string;
+    description: string | null;
+    source: string;
+    awarded_at: string;
+  };
+
+  const [
+    profileResult,
+    memberResult,
+    identityResult,
+    registrationResult,
+    attendanceResult,
+    badgeResult,
+  ] = await Promise.all([
     supabase
       .from("profiles")
-      .select("display_name, avatar_url, city, wechat")
+      .select("display_name, avatar_url, city, wechat, role_label, organization")
       .eq("id", userId)
       .maybeSingle(),
     supabase
       .from("members")
-      .select("status")
+      .select("status, joined_at, is_co_builder")
       .eq("id", userId)
       .maybeSingle(),
     supabase
@@ -407,15 +448,48 @@ export async function loadMiniappAccountSnapshot(
       .select("provider_channel, last_seen_at")
       .eq("user_id", userId)
       .eq("provider", WECHAT_PROVIDER),
+    supabase
+      .from("event_registrations")
+      .select(
+        "id, event_id, status, created_at, events(id, slug, title, event_at, venue, city, cover_image_url, status)",
+      )
+      .in("status", ["registered", "waitlisted"])
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(20),
+    supabase
+      .from("event_attendance")
+      .select(
+        "id, event_id, status, checked_in_at, created_at, events(id, slug, title, event_at, venue, city, cover_image_url, status)",
+      )
+      .in("status", ["attended", "late", "speaker"])
+      .eq("user_id", userId)
+      .order("checked_in_at", { ascending: false, nullsFirst: false })
+      .limit(20),
+    supabase
+      .from("member_badge_awards")
+      .select("badge_code, label, description, source, awarded_at")
+      .eq("user_id", userId)
+      .order("awarded_at", { ascending: false }),
   ]);
 
-  if (profileResult.error || memberResult.error || identityResult.error) {
+  if (
+    profileResult.error ||
+    memberResult.error ||
+    identityResult.error ||
+    registrationResult.error ||
+    attendanceResult.error ||
+    badgeResult.error
+  ) {
     throw new MiniappAuthError("account_snapshot_failed");
   }
 
   const profile = profileResult.data;
   const member = memberResult.data;
   const identities = identityResult.data;
+  const registrations = (registrationResult.data ?? []) as RegistrationRow[];
+  const attendances = (attendanceResult.data ?? []) as AttendanceRow[];
+  const badgeAwards = (badgeResult.data ?? []) as BadgeAwardRow[];
 
   const channels = Array.from(
     new Set(
@@ -425,16 +499,142 @@ export async function loadMiniappAccountSnapshot(
     ),
   );
   const displayName = profile?.display_name?.trim() || "微信用户";
+  const identityLabel =
+    member?.status === "admin" || member?.status === "organizer"
+      ? "社区主理人"
+      : member?.is_co_builder
+        ? "共建伙伴"
+        : member?.status === "pending"
+          ? "待确认成员"
+          : member?.status === "paused"
+            ? "暂停参与"
+            : "社区成员";
+  const attendanceCount = attendances.length;
+  const hasSpeakerAttendance = attendances.some(
+    (attendance) => attendance.status === "speaker",
+  );
+  const automaticBadges = [
+    ...(member?.is_co_builder
+      ? [
+          {
+            code: "co_builder",
+            label: "共建伙伴",
+            description: "持续参与社区建设与协作",
+            source: "system",
+            awardedAt: member.joined_at,
+          },
+        ]
+      : []),
+    ...(attendanceCount >= 1
+      ? [
+          {
+            code: "first_meetup",
+            label: "初见同行",
+            description: "完成第一次线下活动签到",
+            source: "system",
+            awardedAt:
+              attendances.at(-1)?.checked_in_at ?? member?.joined_at ?? null,
+          },
+        ]
+      : []),
+    ...(attendanceCount >= 3
+      ? [
+          {
+            code: "frequent_participant",
+            label: "常来常往",
+            description: "已参加至少三场社区活动",
+            source: "system",
+            awardedAt:
+              attendances[0]?.checked_in_at ?? member?.joined_at ?? null,
+          },
+        ]
+      : []),
+    ...(hasSpeakerAttendance
+      ? [
+          {
+            code: "speaker",
+            label: "分享嘉宾",
+            description: "在社区活动中贡献过主题分享",
+            source: "system",
+            awardedAt:
+              attendances.find((attendance) => attendance.status === "speaker")
+                ?.checked_in_at ?? member?.joined_at ?? null,
+          },
+        ]
+      : []),
+  ];
+  const badges = new Map(
+    automaticBadges.map((badge) => [badge.code, badge]),
+  );
+  badgeAwards.forEach((badge) => {
+    badges.set(badge.badge_code, {
+      code: badge.badge_code,
+      label: badge.label,
+      description: badge.description ?? "社区授予的成员徽章",
+      source: badge.source,
+      awardedAt: badge.awarded_at,
+    });
+  });
+
+  function readRelatedEvent(value: RelatedEvent) {
+    return Array.isArray(value) ? (value[0] ?? null) : value;
+  }
+
+  const footprints = new Map<
+    string,
+    FootprintEvent & {
+      participationLabel: string;
+      participationAt: string;
+    }
+  >();
+  attendances.forEach((attendance) => {
+    const event = readRelatedEvent(attendance.events);
+    if (!event) return;
+    footprints.set(event.id, {
+      ...event,
+      participationLabel:
+        attendance.status === "speaker" ? "分享嘉宾" : "已参加",
+      participationAt:
+        attendance.checked_in_at ?? attendance.created_at ?? event.event_at ?? "",
+    });
+  });
+  registrations.forEach((registration) => {
+    const event = readRelatedEvent(registration.events);
+    if (!event || footprints.has(event.id)) return;
+    footprints.set(event.id, {
+      ...event,
+      participationLabel:
+        registration.status === "waitlisted" ? "候补中" : "已报名",
+      participationAt: registration.created_at ?? event.event_at ?? "",
+    });
+  });
+  const recentFootprints = Array.from(footprints.values())
+    .sort((left, right) =>
+      right.participationAt.localeCompare(left.participationAt),
+    )
+    .slice(0, 6);
 
   return {
     id: userId,
     displayName,
     avatarUrl: profile?.avatar_url ?? null,
     city: profile?.city?.trim() || "常州",
+    roleLabel: profile?.role_label?.trim() || null,
+    organization: profile?.organization?.trim() || null,
     memberStatus: member?.status ?? "active",
+    identityLabel,
+    joinedAt: member?.joined_at ?? null,
+    isCoBuilder: Boolean(member?.is_co_builder),
     profileComplete: Boolean(
       profile?.display_name?.trim() && profile?.wechat?.trim(),
     ),
     channels,
+    stats: {
+      registrationCount: registrations.length,
+      attendanceCount,
+      badgeCount: badges.size,
+    },
+    badges: Array.from(badges.values()),
+    footprints: recentFootprints,
   };
 }

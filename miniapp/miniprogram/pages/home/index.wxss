@@ -52,7 +52,7 @@
 }
 
 .focus-title {
-  font-size: 36rpx;
+  font-size: 34rpx;
   font-weight: 680;
   line-height: 1.45;
 }

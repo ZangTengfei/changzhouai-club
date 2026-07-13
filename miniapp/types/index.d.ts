@@ -3,9 +3,38 @@ interface MiniappUser {
   displayName: string;
   avatarUrl: string | null;
   city: string;
+  roleLabel: string | null;
+  organization: string | null;
   memberStatus: string;
+  identityLabel: string;
+  joinedAt: string | null;
+  isCoBuilder: boolean;
   profileComplete: boolean;
   channels: string[];
+  stats: {
+    registrationCount: number;
+    attendanceCount: number;
+    badgeCount: number;
+  };
+  badges: Array<{
+    code: string;
+    label: string;
+    description: string;
+    source: string;
+    awardedAt: string | null;
+  }>;
+  footprints: Array<{
+    id: string;
+    slug: string;
+    title: string;
+    event_at: string | null;
+    venue: string | null;
+    city: string | null;
+    cover_image_url: string | null;
+    status: string;
+    participationLabel: string;
+    participationAt: string;
+  }>;
 }
 
 interface MiniappProfile {

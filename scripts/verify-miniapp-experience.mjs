@@ -147,6 +147,27 @@ try {
     .insert({ event_id: event.id, user_id: userId, status: "registered" });
   if (seedRegistrationError) throw seedRegistrationError;
 
+  const { error: attendanceError } = await supabase
+    .from("event_attendance")
+    .insert({
+      event_id: event.id,
+      user_id: userId,
+      status: "speaker",
+      checked_in_at: new Date().toISOString(),
+    });
+  if (attendanceError) throw attendanceError;
+
+  const { error: badgeError } = await supabase
+    .from("member_badge_awards")
+    .insert({
+      user_id: userId,
+      badge_code: "verification_badge",
+      label: "验收徽章",
+      description: "仅用于自动化验收",
+      source: "admin",
+    });
+  if (badgeError) throw badgeError;
+
   const registrationPut = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
     {
@@ -158,6 +179,31 @@ try {
   assert.equal(registrationPut.response.status, 200);
   assert.equal(registrationPut.body?.registration?.status, "registered");
   pass("event_registered_idempotently");
+
+  const accountSnapshot = await request("/api/miniapp/auth/me", {
+    headers: authHeaders,
+  });
+  assert.equal(accountSnapshot.response.status, 200);
+  assert.ok(accountSnapshot.body?.user?.stats?.registrationCount >= 1);
+  assert.equal(accountSnapshot.body?.user?.stats?.attendanceCount, 1);
+  assert.ok(
+    accountSnapshot.body?.user?.badges?.some(
+      (badge) => badge.code === "speaker",
+    ),
+  );
+  assert.ok(
+    accountSnapshot.body?.user?.badges?.some(
+      (badge) => badge.code === "verification_badge",
+    ),
+  );
+  assert.ok(
+    accountSnapshot.body?.user?.footprints?.some(
+      (footprint) =>
+        footprint.id === event.id &&
+        footprint.participationLabel === "分享嘉宾",
+    ),
+  );
+  pass("member_growth_snapshot_loaded");
 
   const registrations = await request("/api/miniapp/registrations", {
     headers: authHeaders,

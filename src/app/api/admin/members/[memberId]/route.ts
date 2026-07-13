@@ -36,9 +36,19 @@ export async function GET(
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
+  const { data: badgeAwards, error: badgeError } = await staffContext.supabase
+    .from("member_badge_awards")
+    .select("id, badge_code, label, description, source, awarded_at")
+    .eq("user_id", memberId)
+    .order("awarded_at", { ascending: false });
+
   return NextResponse.json({
     member,
-    queryErrors: data.queryErrors,
+    badgeAwards: badgeAwards ?? [],
+    queryErrors: [
+      ...data.queryErrors,
+      ...(badgeError ? [`member_badge_awards: ${badgeError.message}`] : []),
+    ],
   });
 }
 

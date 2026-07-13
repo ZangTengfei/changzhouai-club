@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Award, Trash2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTransition } from "react";
 import { toast } from "sonner";
@@ -34,6 +35,14 @@ import type { AdminMember } from "@/lib/admin/members";
 
 type AdminMemberDetailData = {
   member: AdminMember;
+  badgeAwards: Array<{
+    id: string;
+    badge_code: string;
+    label: string;
+    description: string | null;
+    source: string;
+    awarded_at: string;
+  }>;
   queryErrors: string[];
 };
 
@@ -131,6 +140,44 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
         reload();
       } catch (requestError) {
         toast.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
+      }
+    });
+  }
+
+  function handleBadgeSubmit(formData: FormData) {
+    startTransition(async () => {
+      try {
+        const response = await fetch(`/api/admin/members/${memberId}/badges`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            label: String(formData.get("badge_label") ?? ""),
+            description: String(formData.get("badge_description") ?? ""),
+          }),
+        });
+        await readApiResult(response);
+        toast.success("成员徽章已授予。");
+        reload();
+      } catch (requestError) {
+        toast.error(requestError instanceof Error ? requestError.message : "徽章授予失败。");
+      }
+    });
+  }
+
+  function handleBadgeRemove(awardId: string, label: string) {
+    if (!window.confirm(`确认移除“${label}”徽章吗？`)) return;
+    startTransition(async () => {
+      try {
+        const response = await fetch(`/api/admin/members/${memberId}/badges`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ awardId }),
+        });
+        await readApiResult(response);
+        toast.success("成员徽章已移除。");
+        reload();
+      } catch (requestError) {
+        toast.error(requestError instanceof Error ? requestError.message : "徽章移除失败。");
       }
     });
   }
@@ -238,6 +285,59 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
               </AdminPanelBody>
             </AdminPanel>
           ) : null}
+
+          <AdminPanel>
+            <AdminPanelHeader eyebrow="Member Badges" title="公开徽章" />
+            <AdminPanelBody className="space-y-4">
+              {data?.badgeAwards.length ? (
+                <div className="divide-y divide-border/70 border-y border-border/70">
+                  {data.badgeAwards.map((badge) => (
+                    <div key={badge.id} className="flex items-center gap-3 py-3">
+                      <Award className="size-4 shrink-0 text-primary" aria-hidden="true" />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium text-foreground">{badge.label}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {badge.description ?? "社区授予的成员徽章"} · {formatDate(badge.awarded_at)}
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        title={`移除${badge.label}`}
+                        aria-label={`移除${badge.label}`}
+                        disabled={isPending}
+                        onClick={() => handleBadgeRemove(badge.id, badge.label)}
+                      >
+                        <Trash2 className="size-4" aria-hidden="true" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <AdminNotice>尚未人工授予徽章。基于签到和共建身份的自动徽章不在这里重复显示。</AdminNotice>
+              )}
+
+              <form
+                className="grid gap-4 md:grid-cols-[minmax(0,0.5fr)_minmax(0,1fr)_auto] md:items-end"
+                onSubmit={(formEvent) => {
+                  formEvent.preventDefault();
+                  handleBadgeSubmit(new FormData(formEvent.currentTarget));
+                }}
+              >
+                <AdminField label="徽章名称">
+                  <Input name="badge_label" minLength={2} maxLength={20} required placeholder="例如：社区引路人" />
+                </AdminField>
+                <AdminField label="授予说明">
+                  <Input name="badge_description" maxLength={100} placeholder="说明这枚徽章对应的贡献" />
+                </AdminField>
+                <Button type="submit" disabled={isPending}>
+                  <Award className="size-4" aria-hidden="true" />
+                  {isPending ? "处理中..." : "授予徽章"}
+                </Button>
+              </form>
+            </AdminPanelBody>
+          </AdminPanel>
 
           <AdminPanel>
             <AdminPanelHeader eyebrow="Profile" title="成员概览" />

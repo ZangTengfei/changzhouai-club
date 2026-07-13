@@ -5,12 +5,18 @@
   gap: 28rpx;
 }
 
+.member-band {
+  margin: -8rpx -28rpx 0;
+  padding: 32rpx 28rpx 0;
+  background: #17211d;
+  color: #ffffff;
+}
+
 .profile-header {
   display: flex;
   align-items: center;
   gap: 24rpx;
-  padding: 24rpx 0 36rpx;
-  border-bottom: 2rpx solid #dce2df;
+  padding: 12rpx 0 32rpx;
 }
 
 .avatar {
@@ -34,7 +40,17 @@
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 10rpx;
+  gap: 8rpx;
+}
+
+.identity-label {
+  width: fit-content;
+  padding: 5rpx 12rpx;
+  border: 2rpx solid rgba(168, 216, 199, 0.5);
+  border-radius: 6rpx;
+  color: #a8d8c7;
+  font-size: 22rpx;
+  line-height: 1.3;
 }
 
 .profile-name {
@@ -46,8 +62,45 @@
 }
 
 .profile-meta {
-  color: #68716d;
+  overflow: hidden;
+  color: #c2cbc7;
   font-size: 25rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.joined-label {
+  color: #8fa099;
+  font-size: 23rpx;
+}
+
+.member-stats {
+  display: grid;
+  height: 124rpx;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 2rpx solid rgba(255, 255, 255, 0.13);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.stat-item + .stat-item {
+  border-left: 2rpx solid rgba(255, 255, 255, 0.13);
+}
+
+.stat-value {
+  font-size: 36rpx;
+  font-weight: 740;
+}
+
+.stat-label {
+  color: #9eaaa5;
+  font-size: 22rpx;
 }
 
 .profile-prompt {
@@ -85,21 +138,165 @@
 .account-section {
   display: flex;
   flex-direction: column;
-  gap: 24rpx;
-  margin-top: 16rpx;
+  gap: 20rpx;
+  margin-top: 12rpx;
 }
 
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.section-note {
+  color: #7d8883;
+  font-size: 22rpx;
+}
+
+.text-action {
+  margin: 0;
+  padding: 8rpx 0 8rpx 20rpx;
+  background: transparent;
+  color: #147a5b;
+  font-size: 24rpx;
+  line-height: 1;
+}
+
+.text-action::after {
+  border: 0;
+}
+
+.badge-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
+}
+
+.badge-item {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 14rpx;
+  padding: 18rpx;
+  border: 2rpx solid #dce2df;
+  border-radius: 8rpx;
+  background: #ffffff;
+}
+
+.badge-mark {
+  display: flex;
+  width: 52rpx;
+  height: 52rpx;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #fff0e8;
+  color: #a5482d;
+  font-size: 22rpx;
+  font-weight: 720;
+}
+
+.badge-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.badge-name {
+  font-size: 25rpx;
+  font-weight: 680;
+}
+
+.badge-description {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #68716d;
+  font-size: 20rpx;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.footprint-list,
 .channel-list {
   border-top: 2rpx solid #dce2df;
 }
 
+.footprint-row {
+  display: flex;
+  min-height: 124rpx;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx 0;
+  border-bottom: 2rpx solid #dce2df;
+}
+
+.footprint-marker {
+  width: 16rpx;
+  height: 16rpx;
+  flex: 0 0 auto;
+  border: 4rpx solid #bce2d5;
+  border-radius: 50%;
+  background: #147a5b;
+}
+
+.footprint-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.footprint-meta {
+  display: flex;
+  justify-content: space-between;
+  color: #147a5b;
+  font-size: 21rpx;
+}
+
+.footprint-title {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 27rpx;
+  font-weight: 680;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.footprint-location {
+  overflow: hidden;
+  color: #68716d;
+  font-size: 22rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.row-arrow {
+  color: #9aa39f;
+  font-size: 38rpx;
+}
+
+.compact-empty {
+  padding: 24rpx 0;
+  border-top: 2rpx solid #dce2df;
+  border-bottom: 2rpx solid #dce2df;
+  color: #68716d;
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+
 .channel-row {
   display: flex;
+  min-height: 84rpx;
   align-items: center;
   justify-content: space-between;
-  min-height: 92rpx;
   border-bottom: 2rpx solid #dce2df;
-  font-size: 28rpx;
+  font-size: 27rpx;
 }
 
 .secondary-channel {
@@ -108,9 +305,9 @@
 
 .channel-status {
   color: #147a5b;
-  font-size: 24rpx;
+  font-size: 23rpx;
 }
 
 .logout-button {
-  margin-top: 32rpx;
+  margin-top: 24rpx;
 }

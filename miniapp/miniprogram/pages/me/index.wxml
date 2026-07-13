@@ -13,12 +13,22 @@
   </view>
 
   <view wx:elif="{{user}}" class="account-content">
-    <view class="profile-header">
-      <image wx:if="{{user.avatarUrl}}" class="avatar" src="{{user.avatarUrl}}" mode="aspectFill" />
-      <view wx:else class="avatar avatar-placeholder">{{avatarInitial}}</view>
-      <view class="profile-copy">
-        <text class="profile-name">{{user.displayName}}</text>
-        <text class="profile-meta">{{user.city}} · {{user.memberStatus}}</text>
+    <view class="member-band">
+      <view class="profile-header">
+        <image wx:if="{{user.avatarUrl}}" class="avatar" src="{{user.avatarUrl}}" mode="aspectFill" />
+        <view wx:else class="avatar avatar-placeholder">{{avatarInitial}}</view>
+        <view class="profile-copy">
+          <text class="identity-label">{{user.identityLabel}}</text>
+          <text class="profile-name">{{user.displayName}}</text>
+          <text class="profile-meta">{{user.roleLabel || user.city}}{{user.organization ? ' · ' + user.organization : ''}}</text>
+          <text class="joined-label">{{joinedLabel}}</text>
+        </view>
+      </view>
+
+      <view class="member-stats">
+        <view class="stat-item"><text class="stat-value">{{user.stats.registrationCount}}</text><text class="stat-label">活动报名</text></view>
+        <view class="stat-item"><text class="stat-value">{{user.stats.attendanceCount}}</text><text class="stat-label">实际到场</text></view>
+        <view class="stat-item"><text class="stat-value">{{user.stats.badgeCount}}</text><text class="stat-label">社区徽章</text></view>
       </view>
     </view>
 
@@ -34,7 +44,40 @@
     </view>
 
     <view class="account-section">
-      <text class="section-title">账号连接</text>
+      <view class="section-heading">
+        <text class="section-title">社区徽章</text>
+        <text class="section-note">来自真实参与和社区授予</text>
+      </view>
+      <view wx:if="{{user.badges.length}}" class="badge-list">
+        <view wx:for="{{user.badges}}" wx:key="code" class="badge-item">
+          <text class="badge-mark">章</text>
+          <view class="badge-copy"><text class="badge-name">{{item.label}}</text><text class="badge-description">{{item.description}}</text></view>
+        </view>
+      </view>
+      <view wx:else class="compact-empty">参加活动或参与共建后，徽章会出现在这里。</view>
+    </view>
+
+    <view class="account-section">
+      <view class="section-heading">
+        <text class="section-title">社区足迹</text>
+        <button class="text-action" bindtap="openRegistrations">全部报名</button>
+      </view>
+      <view wx:if="{{footprints.length}}" class="footprint-list">
+        <view wx:for="{{footprints}}" wx:key="id" class="footprint-row" data-slug="{{item.slug}}" bindtap="openEvent">
+          <view class="footprint-marker"></view>
+          <view class="footprint-copy">
+            <view class="footprint-meta"><text>{{item.participationLabel}}</text><text>{{item.dateLabel}}</text></view>
+            <text class="footprint-title">{{item.title}}</text>
+            <text class="footprint-location">{{item.locationLabel}}</text>
+          </view>
+          <text class="row-arrow">›</text>
+        </view>
+      </view>
+      <view wx:else class="compact-empty">还没有活动足迹，先去看看社区活动。</view>
+    </view>
+
+    <view class="account-section">
+      <view class="section-heading"><text class="section-title">账号连接</text></view>
       <view class="channel-list">
         <view class="channel-row">
           <text>微信小程序</text>

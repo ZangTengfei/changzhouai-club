@@ -9,7 +9,7 @@
 
   <view class="focus-band">
     <text class="focus-label">社区正在发生</text>
-    <text class="focus-title">见面、分享、协作，把想法推进到真实项目</text>
+    <text class="focus-title">见面、分享、协作，把想法做成真实项目</text>
   </view>
 
   <view class="section-heading">
