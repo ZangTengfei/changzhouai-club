@@ -1,32 +1,34 @@
 "use client";
 
 import { useState } from "react";
-import {
-  AtSign,
-  Mail,
-} from "lucide-react";
+import { AtSign, Mail, MessageCircle } from "lucide-react";
 
 import { EmailAuthForm } from "@/components/email-auth-form";
+import { WechatQrLogin } from "@/components/wechat-qr-login";
 
 import styles from "./login-panel.module.css";
 
 type LoginPanelProps = {
   enabled: boolean;
+  wechatEnabled: boolean;
   nextPath?: string;
   error?: string;
 };
 
 const errorMap: Record<string, string> = {
   oauth_callback: "登录回调失败，请稍后重试，或改用邮箱。",
+  wechat_account_link: "微信账号归并失败，请稍后重试，或改用邮箱。",
   recovery_link: "密码重设链接不完整，请重新发送找回密码邮件。",
-  recovery_link_expired: "这封邮件里的链接已失效或已经使用过，请重新发送找回密码邮件，或输入邮件里的 6 位验证码。",
+  recovery_link_expired:
+    "这封邮件里的链接已失效或已经使用过，请重新发送找回密码邮件，或输入邮件里的 6 位验证码。",
 };
 
 type AuthIntent = "sign-in" | "sign-up";
-type AuthMethod = "email" | "google";
+type AuthMethod = "email" | "google" | "wechat";
 
 export function LoginPanel({
   enabled,
+  wechatEnabled,
   nextPath = "/account",
   error,
 }: LoginPanelProps) {
@@ -38,6 +40,7 @@ export function LoginPanel({
   const isSignIn = authIntent === "sign-in";
   const isEmailMethod = authMethod === "email";
   const isGoogleMethod = authMethod === "google";
+  const isWechatMethod = authMethod === "wechat";
 
   function chooseIntent(nextIntent: AuthIntent) {
     setAuthIntent(nextIntent);
@@ -86,15 +89,28 @@ export function LoginPanel({
           </button>
 
           {isSignIn ? (
-            <button
-              type="button"
-              className={`${styles.methodTab} ${isGoogleMethod ? styles.methodTabActive : ""}`}
-              onClick={() => setAuthMethod("google")}
-              aria-pressed={isGoogleMethod}
-            >
-              <AtSign aria-hidden="true" strokeWidth={1.9} />
-              <span>Google</span>
-            </button>
+            <>
+              <button
+                type="button"
+                className={`${styles.methodTab} ${isGoogleMethod ? styles.methodTabActive : ""}`}
+                onClick={() => setAuthMethod("google")}
+                aria-pressed={isGoogleMethod}
+              >
+                <AtSign aria-hidden="true" strokeWidth={1.9} />
+                <span>Google</span>
+              </button>
+              {wechatEnabled ? (
+                <button
+                  type="button"
+                  className={`${styles.methodTab} ${isWechatMethod ? styles.methodTabActive : ""}`}
+                  onClick={() => setAuthMethod("wechat")}
+                  aria-pressed={isWechatMethod}
+                >
+                  <MessageCircle aria-hidden="true" strokeWidth={1.9} />
+                  <span>微信</span>
+                </button>
+              ) : null}
+            </>
           ) : null}
         </div>
 
@@ -130,12 +146,19 @@ export function LoginPanel({
             />
           </div>
         ) : null}
+
+        {isSignIn && isWechatMethod ? (
+          <div className={styles.activePane}>
+            <WechatQrLogin
+              enabled={enabled && wechatEnabled}
+              nextPath={nextPath}
+            />
+          </div>
+        ) : null}
       </section>
 
       {!enabled ? (
-        <p className={styles.hint}>
-          当前登录服务暂未启用，请稍后再试。
-        </p>
+        <p className={styles.hint}>当前登录服务暂未启用，请稍后再试。</p>
       ) : null}
     </div>
   );
