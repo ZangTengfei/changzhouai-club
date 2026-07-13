@@ -109,53 +109,28 @@ try {
   avatarPath = `${userId}/avatar`;
   pass("avatar_uploaded");
 
-  const { data: existingEvent, error: eventError } = await supabase
+  const slug = `miniapp-verify-${randomUUID()}`;
+  const { data: event, error: createEventError } = await supabase
     .from("events")
+    .insert({
+      slug,
+      title: "小程序体验版自动验收活动",
+      summary: "仅用于自动化验收，完成后自动删除。",
+      status: "scheduled",
+      event_type: "community",
+      event_at: new Date(Date.now() + 48 * 60 * 60 * 1_000).toISOString(),
+      city: "常州",
+      venue: "自动化测试场地",
+    })
     .select("id, slug")
-    .eq("status", "scheduled")
-    .neq("event_type", "external")
-    .is("registration_url", null)
-    .order("event_at", { ascending: true })
-    .limit(1)
-    .maybeSingle();
-  if (eventError) throw eventError;
-
-  let event = existingEvent;
-  if (!event) {
-    const slug = `miniapp-verify-${randomUUID()}`;
-    const { data: createdEvent, error: createEventError } = await supabase
-      .from("events")
-      .insert({
-        slug,
-        title: "小程序体验版自动验收活动",
-        summary: "仅用于自动化验收，完成后自动删除。",
-        status: "scheduled",
-        event_type: "community",
-        event_at: new Date(Date.now() + 48 * 60 * 60 * 1_000).toISOString(),
-        city: "常州",
-        venue: "自动化测试场地",
-      })
-      .select("id, slug")
-      .single();
-    if (createEventError) throw createEventError;
-    event = createdEvent;
-    temporaryEventId = createdEvent.id;
-  }
+    .single();
+  if (createEventError) throw createEventError;
+  temporaryEventId = event.id;
 
   const { error: seedRegistrationError } = await supabase
     .from("event_registrations")
     .insert({ event_id: event.id, user_id: userId, status: "registered" });
   if (seedRegistrationError) throw seedRegistrationError;
-
-  const { error: attendanceError } = await supabase
-    .from("event_attendance")
-    .insert({
-      event_id: event.id,
-      user_id: userId,
-      status: "speaker",
-      checked_in_at: new Date().toISOString(),
-    });
-  if (attendanceError) throw attendanceError;
 
   const { error: badgeError } = await supabase
     .from("member_badge_awards")
@@ -180,17 +155,46 @@ try {
   assert.equal(registrationPut.body?.registration?.status, "registered");
   pass("event_registered_idempotently");
 
+  const checkinToken = randomBytes(32).toString("base64url");
+  const { error: checkinTokenError } = await supabase
+    .from("event_checkin_tokens")
+    .insert({
+      event_id: event.id,
+      token_hash: createHash("sha256").update(checkinToken).digest("hex"),
+      expires_at: new Date(Date.now() + 60 * 60 * 1_000).toISOString(),
+    });
+  if (checkinTokenError) throw checkinTokenError;
+
+  const checkin = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}/checkin`,
+    {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({ token: checkinToken }),
+    },
+  );
+  assert.equal(checkin.response.status, 200);
+  assert.equal(checkin.body?.attendance?.status, "attended");
+  assert.equal(checkin.body?.alreadyCheckedIn, false);
+  const repeatedCheckin = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}/checkin`,
+    {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({ token: checkinToken }),
+    },
+  );
+  assert.equal(repeatedCheckin.response.status, 200);
+  assert.equal(repeatedCheckin.body?.alreadyCheckedIn, true);
+  pass("event_checkin_completed_idempotently");
+
   const accountSnapshot = await request("/api/miniapp/auth/me", {
     headers: authHeaders,
   });
   assert.equal(accountSnapshot.response.status, 200);
   assert.ok(accountSnapshot.body?.user?.stats?.registrationCount >= 1);
   assert.equal(accountSnapshot.body?.user?.stats?.attendanceCount, 1);
-  assert.ok(
-    accountSnapshot.body?.user?.badges?.some(
-      (badge) => badge.code === "speaker",
-    ),
-  );
+  assert.ok(accountSnapshot.body?.user?.badges?.some((badge) => badge.code === "first_meetup"));
   assert.ok(
     accountSnapshot.body?.user?.badges?.some(
       (badge) => badge.code === "verification_badge",
@@ -200,7 +204,7 @@ try {
     accountSnapshot.body?.user?.footprints?.some(
       (footprint) =>
         footprint.id === event.id &&
-        footprint.participationLabel === "分享嘉宾",
+        footprint.participationLabel === "已参加",
     ),
   );
   pass("member_growth_snapshot_loaded");
@@ -279,6 +283,31 @@ try {
       pass("cron_skips_inactive_registration");
     }
   }
+
+  const { error: completeEventError } = await supabase
+    .from("events")
+    .update({ status: "completed" })
+    .eq("id", event.id);
+  if (completeEventError) throw completeEventError;
+
+  const feedbackPut = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}/feedback`,
+    {
+      method: "PUT",
+      headers: authHeaders,
+      body: JSON.stringify({ rating: 5, comment: "自动化验收反馈" }),
+    },
+  );
+  assert.equal(feedbackPut.response.status, 200);
+  assert.equal(feedbackPut.body?.feedback?.rating, 5);
+  const feedbackGet = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}/feedback`,
+    { headers: authHeaders },
+  );
+  assert.equal(feedbackGet.response.status, 200);
+  assert.equal(feedbackGet.body?.attendance?.status, "attended");
+  assert.equal(feedbackGet.body?.feedback?.comment, "自动化验收反馈");
+  pass("event_feedback_saved_and_loaded");
 
   const analytics = await request("/api/miniapp/analytics", {
     method: "POST",

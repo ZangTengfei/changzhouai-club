@@ -41,6 +41,23 @@ export type AdminRegistrationRow = {
   event_id: string;
 };
 
+export type AdminAttendanceRow = {
+  id: string;
+  status: string;
+  checked_in_at: string | null;
+  user_id: string;
+  event_id: string;
+};
+
+export type AdminEventFeedbackRow = {
+  id: string;
+  event_id: string;
+  user_id: string;
+  rating: number;
+  comment: string | null;
+  submitted_at: string;
+};
+
 export type AdminEventPhotoRow = {
   id: string;
   event_id: string;
@@ -58,11 +75,17 @@ export type AdminProfileRow = {
 
 export type AdminRegistration = AdminRegistrationRow & {
   profile: AdminProfileRow | null;
+  attendance: AdminAttendanceRow | null;
+};
+
+export type AdminEventFeedback = AdminEventFeedbackRow & {
+  profile: AdminProfileRow | null;
 };
 
 export type AdminEvent = AdminEventRow & {
   photos: AdminEventPhotoRow[];
   registrations: AdminRegistration[];
+  feedback: AdminEventFeedback[];
 };
 
 export type AdminDebugSnapshot = {
@@ -72,6 +95,8 @@ export type AdminDebugSnapshot = {
   eventsCount: number;
   photosCount: number;
   registrationsCount: number;
+  attendanceCount: number;
+  feedbackCount: number;
   profilesCount: number;
   queryErrors: string[];
 };
@@ -104,6 +129,8 @@ export async function loadAdminEventsData(
     { data: eventsData, error: eventsError },
     { data: photosData, error: photosError },
     { data: registrationsData, error: registrationsError },
+    { data: feedbackData, error: feedbackError },
+    { data: attendanceData, error: attendanceError },
     { data: profilesData, error: profilesError },
   ] = await Promise.all([
     supabase
@@ -123,6 +150,17 @@ export async function loadAdminEventsData(
           .order("created_at", { ascending: false })
       : Promise.resolve({ data: [], error: null }),
     canReadRegistrations
+      ? supabase
+          .from("event_feedback")
+          .select("id, event_id, user_id, rating, comment, submitted_at")
+          .order("submitted_at", { ascending: false })
+      : Promise.resolve({ data: [], error: null }),
+    canReadRegistrations
+      ? supabase
+          .from("event_attendance")
+          .select("id, event_id, user_id, status, checked_in_at")
+      : Promise.resolve({ data: [], error: null }),
+    canReadRegistrations
       ? supabase.from("profiles").select("id, display_name, email, city")
       : Promise.resolve({ data: [], error: null }),
   ]);
@@ -130,17 +168,37 @@ export async function loadAdminEventsData(
   const events = (eventsData ?? []) as AdminEventRow[];
   const photos = (photosData ?? []) as AdminEventPhotoRow[];
   const registrations = (registrationsData ?? []) as AdminRegistrationRow[];
+  const attendance = (attendanceData ?? []) as AdminAttendanceRow[];
+  const feedback = (feedbackData ?? []) as AdminEventFeedbackRow[];
   const profiles = (profilesData ?? []) as AdminProfileRow[];
   const queryErrors = [
     eventsError?.message,
     photosError?.message,
     registrationsError?.message,
+    attendanceError?.message,
+    feedbackError?.message,
     profilesError?.message,
   ].filter(Boolean) as string[];
 
   const profilesByUserId = new Map(profiles.map((profile) => [profile.id, profile]));
   const photosByEventId = new Map<string, AdminEventPhotoRow[]>();
   const registrationsByEventId = new Map<string, AdminRegistration[]>();
+  const attendanceByEventAndUser = new Map(
+    attendance.map((record) => [
+      `${record.event_id}:${record.user_id}`,
+      record,
+    ]),
+  );
+  const feedbackByEventId = new Map<string, AdminEventFeedback[]>();
+
+  feedback.forEach((item) => {
+    const eventFeedback = feedbackByEventId.get(item.event_id) ?? [];
+    eventFeedback.push({
+      ...item,
+      profile: profilesByUserId.get(item.user_id) ?? null,
+    });
+    feedbackByEventId.set(item.event_id, eventFeedback);
+  });
 
   photos.forEach((photo) => {
     const eventPhotos = photosByEventId.get(photo.event_id) ?? [];
@@ -161,6 +219,10 @@ export async function loadAdminEventsData(
             email: canReadRegistrationContact ? profile.email : redactSensitiveValue(profile.email),
           }
         : null,
+      attendance:
+        attendanceByEventAndUser.get(
+          `${registration.event_id}:${registration.user_id}`,
+        ) ?? null,
     });
     registrationsByEventId.set(registration.event_id, eventRegistrations);
   });
@@ -170,6 +232,7 @@ export async function loadAdminEventsData(
       ...event,
       photos: sortPhotos(photosByEventId.get(event.id) ?? []),
       registrations: registrationsByEventId.get(event.id) ?? [],
+      feedback: feedbackByEventId.get(event.id) ?? [],
     })),
     queryErrors,
     debugSnapshot: {
@@ -179,6 +242,8 @@ export async function loadAdminEventsData(
       eventsCount: events.length,
       photosCount: photos.length,
       registrationsCount: registrations.length,
+      attendanceCount: attendance.length,
+      feedbackCount: feedback.length,
       profilesCount: profiles.length,
       queryErrors,
     },

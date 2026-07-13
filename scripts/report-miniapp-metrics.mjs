@@ -24,6 +24,8 @@ const eventNames = [
   "reminder_accepted",
   "reminder_rejected",
   "share_event",
+  "checkin_success",
+  "feedback_saved",
 ];
 
 const counts = {};
@@ -56,6 +58,14 @@ console.log(
         registrationToReminderAcceptance: ratio(
           counts.reminder_accepted,
           counts.registration_created,
+        ),
+        registrationToCheckin: ratio(
+          counts.checkin_success,
+          counts.registration_created,
+        ),
+        checkinToFeedback: ratio(
+          counts.feedback_saved,
+          counts.checkin_success,
         ),
       },
     },

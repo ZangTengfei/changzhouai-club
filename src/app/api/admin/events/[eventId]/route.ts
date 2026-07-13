@@ -51,6 +51,10 @@ export async function GET(
     debugSnapshot: data.debugSnapshot,
     permissions: {
       canExportRegistrations: canAdmin(staffContext, "events.export_registrations"),
+      canManageCheckin: canAdmin(
+        staffContext,
+        "events.update_registration_status",
+      ),
     },
   });
 }

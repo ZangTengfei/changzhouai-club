@@ -78,6 +78,7 @@
           <text class="muted registration-copy">活动开始前可以在“我的活动”中再次查看。</text>
           <button wx:if="{{reminder && reminder.available && (!reminder.subscription || reminder.subscription.status !== 'accepted')}}" class="primary-button" loading="{{reminderSubmitting}}" disabled="{{reminderSubmitting}}" bindtap="enableReminder">开启活动提醒</button>
           <view wx:elif="{{reminder && reminder.subscription && reminder.subscription.status === 'accepted'}}" class="reminder-status">活动提醒已开启</view>
+          <button class="secondary-button" loading="{{checkinSubmitting}}" disabled="{{checkinSubmitting}}" bindtap="scanCheckinCode">{{attendance ? '已签到' : '扫码签到'}}</button>
           <button class="secondary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="cancelRegistration">取消报名</button>
         </block>
         <block wx:elif="{{!user || !user.profileComplete}}">
@@ -92,7 +93,21 @@
         </block>
       </view>
 
-      <view wx:elif="{{event.status === 'completed'}}" class="completed-note">本场活动已结束，现场记录会持续补充。</view>
+      <view wx:elif="{{event.status === 'completed'}}" class="completed-panel">
+        <view class="completed-note">本场活动已结束，现场记录会持续补充。</view>
+        <view wx:if="{{attendance}}" class="feedback-panel">
+          <view class="feedback-heading">
+            <text class="registration-title">活动反馈</text>
+            <text class="feedback-status">{{feedback ? '已提交，可继续修改' : '仅实际到场成员可填写'}}</text>
+          </view>
+          <view class="rating-switch">
+            <view wx:for="{{ratingOptions}}" wx:key="*this" class="rating-option {{feedbackRating === item ? 'rating-option-active' : ''}}" data-rating="{{item}}" bindtap="selectFeedbackRating">{{item}}</view>
+          </view>
+          <view class="rating-caption"><text>需要改进</text><text>非常满意</text></view>
+          <textarea class="registration-textarea" maxlength="500" value="{{feedbackComment}}" bindinput="handleFeedbackInput" placeholder="可选：留下一条建议" />
+          <button class="primary-button" loading="{{feedbackSubmitting}}" disabled="{{feedbackSubmitting || !feedbackRating}}" bindtap="submitFeedback">保存反馈</button>
+        </view>
+      </view>
     </view>
   </block>
 </view>
