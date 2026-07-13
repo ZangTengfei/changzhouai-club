@@ -1,30 +1,37 @@
 <view class="page-shell events-page">
   <view class="page-heading">
-    <text class="section-title">近期活动</text>
-    <text class="page-summary">线下见面，分享真实实践，也一起寻找可以继续推进的协作。</text>
+    <text class="section-title">社区活动</text>
+    <text class="page-summary">查看近期安排，也可以回顾社区已经发生的每一场活动。</text>
+  </view>
+
+  <view class="mode-switch" aria-label="活动范围">
+    <view class="mode-option {{activeMode === 'upcoming' ? 'mode-option-active' : ''}}" data-mode="upcoming" bindtap="switchMode">
+      <text>即将开始</text><text class="mode-count">{{counts.upcoming}}</text>
+    </view>
+    <view class="mode-option {{activeMode === 'history' ? 'mode-option-active' : ''}}" data-mode="history" bindtap="switchMode">
+      <text>往期回顾</text><text class="mode-count">{{counts.history}}</text>
+    </view>
   </view>
 
   <view wx:if="{{loading}}" class="empty-state">正在加载活动</view>
   <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">活动加载失败，轻触重试</view>
-  <view wx:elif="{{events.length === 0}}" class="empty-state">暂时没有开放报名的活动</view>
-  <view wx:else class="event-grid">
+  <view wx:elif="{{visibleEvents.length === 0}}" class="empty-state">{{activeMode === 'upcoming' ? '暂时没有即将开始的活动' : '暂时没有往期活动'}}</view>
+  <view wx:else class="event-list">
     <view
-      wx:for="{{events}}"
+      wx:for="{{visibleEvents}}"
       wx:key="id"
-      class="event-item"
+      class="event-row"
       data-slug="{{item.slug}}"
       bindtap="openEvent"
     >
       <image wx:if="{{item.cover_image_url}}" class="event-image" src="{{item.cover_image_url}}" mode="aspectFill" />
+      <view wx:else class="event-image event-image-placeholder">AI</view>
       <view class="event-content">
-        <text class="event-type">{{item.eventTypeLabel}}</text>
+        <text class="event-type">{{item.statusLabel}} · {{item.eventTypeLabel}} · {{item.dateLabel}}</text>
         <text class="event-name">{{item.title}}</text>
-        <text wx:if="{{item.summary}}" class="event-summary">{{item.summary}}</text>
-        <view class="event-facts">
-          <text>{{item.dateLabel}}</text>
-          <text>{{item.locationLabel}}</text>
-        </view>
+        <text class="event-location">{{item.locationLabel}}</text>
       </view>
+      <text class="event-arrow">›</text>
     </view>
   </view>
 </view>

@@ -27,6 +27,7 @@ Page({
     submitting: false,
     reminder: null as ReminderConfig | null,
     reminderSubmitting: false,
+    galleryUrls: [] as string[],
   },
 
   onLoad(options: Record<string, string | undefined>) {
@@ -45,7 +46,11 @@ Page({
 
     try {
       const event = await loadEventDetail(slug);
-      this.setData({ event, loading: false });
+      this.setData({
+        event,
+        galleryUrls: event.gallery.map((item) => item.imageUrl),
+        loading: false,
+      });
       void wx.setNavigationBarTitle({ title: event.title });
       trackEvent("event_detail_view", "/pages/events/detail/index", { slug });
       void this.loadRegistration(slug);
@@ -90,6 +95,19 @@ Page({
     if (url) {
       void wx.setClipboardData({ data: url });
     }
+  },
+
+  copyDocsLink() {
+    const url = this.data.event?.docsUrl;
+    if (url) {
+      void wx.setClipboardData({ data: url });
+    }
+  },
+
+  previewGalleryImage(event: WechatMiniprogram.TouchEvent) {
+    const current = String(event.currentTarget.dataset.url ?? "");
+    if (!current) return;
+    void wx.previewImage({ current, urls: this.data.galleryUrls });
   },
 
   async submitRegistration() {

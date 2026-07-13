@@ -9,7 +9,19 @@ export type EventSummary = {
   venue: string | null;
   city: string | null;
   cover_image_url: string | null;
+  event_type: string;
   eventTypeLabel: string;
+  status: "scheduled" | "completed";
+  statusLabel: string;
+};
+
+export type EventCatalog = {
+  upcoming: EventSummary[];
+  history: EventSummary[];
+  counts: {
+    upcoming: number;
+    history: number;
+  };
 };
 
 export type EventDetail = {
@@ -29,13 +41,24 @@ export type EventDetail = {
   registrationUrl: string | null;
   status: string;
   eventType: string;
+  recapParagraphs: string[];
+  docsUrl: string | null;
+  video: {
+    url: string;
+    title: string | null;
+    coverUrl: string | null;
+  } | null;
+  gallery: Array<{
+    id: string;
+    imageUrl: string;
+    caption: string | null;
+  }>;
 };
 
 export async function loadEvents() {
-  const response = await apiRequest<{ events: EventSummary[] }>({
+  return apiRequest<EventCatalog>({
     path: "/api/miniapp/events",
   });
-  return response.events;
 }
 
 export async function loadEventDetail(slug: string) {

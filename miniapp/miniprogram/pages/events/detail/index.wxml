@@ -15,6 +15,34 @@
         <view class="fact-row"><text class="fact-label">地点</text><text>{{event.locationLabel}}</text></view>
       </view>
 
+      <view wx:if="{{event.recapParagraphs.length}}" class="detail-section recap-section">
+        <text class="section-title">活动回顾</text>
+        <text wx:for="{{event.recapParagraphs}}" wx:key="*this" class="paragraph">{{item}}</text>
+      </view>
+
+      <view wx:if="{{event.video}}" class="detail-section">
+        <text class="section-title">现场视频</text>
+        <video class="event-video" src="{{event.video.url}}" poster="{{event.video.coverUrl}}" title="{{event.video.title || event.title}}" controls></video>
+      </view>
+
+      <view wx:if="{{event.gallery.length}}" class="detail-section">
+        <view class="detail-section-heading">
+          <text class="section-title">现场记录</text>
+          <text class="section-count">{{event.gallery.length}} 张</text>
+        </view>
+        <view class="gallery-grid">
+          <image
+            wx:for="{{event.gallery}}"
+            wx:key="id"
+            class="gallery-image"
+            src="{{item.imageUrl}}"
+            mode="aspectFill"
+            data-url="{{item.imageUrl}}"
+            bindtap="previewGalleryImage"
+          />
+        </view>
+      </view>
+
       <view wx:if="{{event.descriptionParagraphs.length}}" class="detail-section">
         <text class="section-title">活动介绍</text>
         <text wx:for="{{event.descriptionParagraphs}}" wx:key="*this" class="paragraph">{{item}}</text>
@@ -29,6 +57,8 @@
       </view>
 
       <view wx:if="{{event.registrationNote}}" class="registration-note">{{event.registrationNote}}</view>
+
+      <button wx:if="{{event.docsUrl}}" class="secondary-button resource-button" bindtap="copyDocsLink">复制活动资料链接</button>
 
       <view class="share-row">
         <button class="secondary-button share-button" open-type="share">分享活动</button>
@@ -61,6 +91,8 @@
           <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitRegistration">确认报名</button>
         </block>
       </view>
+
+      <view wx:elif="{{event.status === 'completed'}}" class="completed-note">本场活动已结束，现场记录会持续补充。</view>
     </view>
   </block>
 </view>

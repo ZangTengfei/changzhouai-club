@@ -73,6 +73,21 @@ export type PublicScheduledEvent = {
   eventTypeLabel: string;
 };
 
+export type PublicEventSummary = {
+  id: string;
+  slug: string;
+  title: string;
+  summary: string | null;
+  event_at: string | null;
+  venue: string | null;
+  city: string | null;
+  cover_image_url: string | null;
+  event_type: string;
+  eventTypeLabel: string;
+  status: "scheduled" | "completed";
+  statusLabel: string;
+};
+
 export type PublicGalleryImage = {
   id: string;
   imageUrl: string;
@@ -374,6 +389,14 @@ export async function getScheduledEvents() {
   return getCachedScheduledEvents();
 }
 
+export async function getPublishedEventSummaries() {
+  if (!hasSupabaseEnv()) {
+    return [] as PublicEventSummary[];
+  }
+
+  return getCachedPublishedEventSummaries();
+}
+
 export async function getHomeScheduledEvents() {
   if (!hasSupabaseEnv()) {
     return [] as PublicScheduledEvent[];
@@ -480,6 +503,29 @@ const getCachedScheduledEvents = unstable_cache(
     );
   },
   ["public-scheduled-events"],
+  { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
+);
+
+const getCachedPublishedEventSummaries = unstable_cache(
+  async () => {
+    const supabase = createPublicServerClient();
+    const { data } = await supabase
+      .from("events")
+      .select(
+        "id, slug, title, summary, event_at, venue, city, cover_image_url, event_type, status",
+      )
+      .in("status", ["scheduled", "completed"])
+      .order("event_at", { ascending: false, nullsFirst: false });
+
+    return ((data ?? []) as Array<Omit<PublicEventSummary, "eventTypeLabel" | "statusLabel">>).map(
+      (event) => ({
+        ...event,
+        eventTypeLabel: formatEventType(event.event_type),
+        statusLabel: formatPublicEventStatus(event.status),
+      }),
+    );
+  },
+  ["public-published-event-summaries"],
   { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
 );
 

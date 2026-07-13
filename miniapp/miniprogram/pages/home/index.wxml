@@ -13,13 +13,13 @@
   </view>
 
   <view class="section-heading">
-    <text class="section-title">近期活动</text>
-    <button class="text-action" bindtap="openEvents">查看全部</button>
+    <text class="section-title">{{eventSectionTitle}}</text>
+    <button class="text-action" bindtap="openEvents">{{eventSectionHint}}</button>
   </view>
 
   <view wx:if="{{loading}}" class="empty-state">正在加载活动</view>
   <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">活动加载失败，轻触重试</view>
-  <view wx:elif="{{events.length === 0}}" class="empty-state">暂时没有开放报名的活动</view>
+  <view wx:elif="{{events.length === 0}}" class="empty-state">暂时没有可查看的活动</view>
   <view wx:else class="event-list">
     <view
       wx:for="{{events}}"
@@ -30,7 +30,7 @@
     >
       <image wx:if="{{item.cover_image_url}}" class="event-cover" src="{{item.cover_image_url}}" mode="aspectFill" />
       <view class="event-body">
-        <text class="event-meta">{{item.eventTypeLabel}} · {{item.dateLabel}}</text>
+        <text class="event-meta">{{item.statusLabel}} · {{item.eventTypeLabel}} · {{item.dateLabel}}</text>
         <text class="event-title">{{item.title}}</text>
         <text class="event-location">{{item.locationLabel}}</text>
       </view>

@@ -7,9 +7,15 @@ type EventListItem = EventSummary & {
   locationLabel: string;
 };
 
+type EventMode = "upcoming" | "history";
+
 Page({
   data: {
-    events: [] as EventListItem[],
+    upcoming: [] as EventListItem[],
+    history: [] as EventListItem[],
+    visibleEvents: [] as EventListItem[],
+    activeMode: "history" as EventMode,
+    counts: { upcoming: 0, history: 0 },
     loading: true,
     loadFailed: false,
   },
@@ -29,18 +35,35 @@ Page({
     this.setData({ loading: true, loadFailed: false });
 
     try {
-      const events = await loadEvents();
+      const catalog = await loadEvents();
+      const mapEvent = (event: EventSummary): EventListItem => ({
+        ...event,
+        dateLabel: formatEventDate(event.event_at),
+        locationLabel: event.venue || event.city || "常州",
+      });
+      const upcoming = catalog.upcoming.map(mapEvent);
+      const history = catalog.history.map(mapEvent);
+      const activeMode: EventMode = upcoming.length > 0 ? "upcoming" : "history";
       this.setData({
-        events: events.map((event) => ({
-          ...event,
-          dateLabel: formatEventDate(event.event_at),
-          locationLabel: event.venue || event.city || "常州",
-        })),
+        upcoming,
+        history,
+        visibleEvents: activeMode === "upcoming" ? upcoming : history,
+        activeMode,
+        counts: catalog.counts,
         loading: false,
       });
     } catch {
       this.setData({ loading: false, loadFailed: true });
     }
+  },
+
+  switchMode(event: WechatMiniprogram.TouchEvent) {
+    const mode = String(event.currentTarget.dataset.mode ?? "") as EventMode;
+    if (mode !== "upcoming" && mode !== "history") return;
+    this.setData({
+      activeMode: mode,
+      visibleEvents: mode === "upcoming" ? this.data.upcoming : this.data.history,
+    });
   },
 
   openEvent(event: WechatMiniprogram.TouchEvent) {

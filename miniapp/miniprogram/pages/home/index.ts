@@ -10,6 +10,8 @@ type HomeEvent = EventSummary & {
 Page({
   data: {
     events: [] as HomeEvent[],
+    eventSectionTitle: "近期活动",
+    eventSectionHint: "查看全部活动",
     loading: true,
     loadFailed: false,
   },
@@ -29,13 +31,19 @@ Page({
     this.setData({ loading: true, loadFailed: false });
 
     try {
-      const events = await loadEvents();
+      const catalog = await loadEvents();
+      const showingHistory = catalog.upcoming.length === 0;
+      const events = showingHistory ? catalog.history : catalog.upcoming;
       this.setData({
         events: events.slice(0, 3).map((event) => ({
           ...event,
           dateLabel: formatEventDate(event.event_at),
           locationLabel: event.venue || event.city || "常州",
         })),
+        eventSectionTitle: showingHistory ? "最近回顾" : "近期活动",
+        eventSectionHint: showingHistory
+          ? `查看全部 ${catalog.counts.history} 场`
+          : "查看全部活动",
         loading: false,
       });
     } catch {

@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 14rpx;
-  margin-bottom: 36rpx;
+  margin-bottom: 28rpx;
 }
 
 .page-summary {
@@ -11,31 +11,75 @@
   line-height: 1.6;
 }
 
-.event-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 24rpx;
-}
-
-.event-item {
-  overflow: hidden;
+.mode-switch {
+  display: grid;
+  height: 76rpx;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 24rpx;
+  padding: 6rpx;
   border: 2rpx solid #dce2df;
   border-radius: 8rpx;
+  background: #edf1ef;
+}
+
+.mode-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  border-radius: 6rpx;
+  color: #59635f;
+  font-size: 26rpx;
+  font-weight: 650;
+}
+
+.mode-option-active {
   background: #ffffff;
+  color: #17211d;
+  box-shadow: 0 2rpx 8rpx rgba(23, 33, 29, 0.08);
+}
+
+.mode-count {
+  color: #147a5b;
+  font-size: 22rpx;
+}
+
+.event-list {
+  border-top: 2rpx solid #dce2df;
+}
+
+.event-row {
+  display: flex;
+  min-height: 154rpx;
+  align-items: center;
+  gap: 22rpx;
+  padding: 24rpx 0;
+  border-bottom: 2rpx solid #dce2df;
 }
 
 .event-image {
-  display: block;
-  width: 100%;
-  height: 320rpx;
+  display: flex;
+  width: 176rpx;
+  height: 124rpx;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6rpx;
   background: #e5eae7;
+}
+
+.event-image-placeholder {
+  color: #7d8883;
+  font-size: 28rpx;
+  font-weight: 700;
 }
 
 .event-content {
   display: flex;
+  min-width: 0;
+  flex: 1;
   flex-direction: column;
-  gap: 14rpx;
-  padding: 28rpx;
+  gap: 10rpx;
 }
 
 .event-type {
@@ -45,26 +89,26 @@
 }
 
 .event-name {
-  font-size: 34rpx;
-  font-weight: 700;
-  line-height: 1.4;
-}
-
-.event-summary {
   display: -webkit-box;
   overflow: hidden;
-  color: #59635f;
-  font-size: 26rpx;
-  line-height: 1.6;
+  font-size: 30rpx;
+  font-weight: 700;
+  line-height: 1.35;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
-.event-facts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12rpx 24rpx;
-  padding-top: 8rpx;
+.event-location {
+  overflow: hidden;
   color: #68716d;
-  font-size: 24rpx;
+  font-size: 23rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-arrow {
+  flex: 0 0 auto;
+  color: #9aa39f;
+  font-size: 42rpx;
+  font-weight: 300;
 }
