@@ -10,6 +10,7 @@
     "project:publish": "node scripts/publish-project-opportunity.mjs",
     "db:migrate:selfhost": "node scripts/run-selfhost-migrations.mjs",
     "miniapp:audit-accounts": "node --env-file=.env.local scripts/audit-miniapp-accounts.mjs",
+    "miniapp:verify-account-link": "node --env-file=.env.local scripts/verify-wechat-account-unification.mjs",
     "miniapp:verify-api": "node --env-file=.env.local scripts/verify-miniapp-experience.mjs",
     "miniapp:metrics": "node --env-file=.env.local scripts/report-miniapp-metrics.mjs",
     "news:radar": "node scripts/ai-news-radar.mjs",

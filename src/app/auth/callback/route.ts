@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 
 import { getPublicSiteUrl, hasSupabaseEnv } from "@/lib/env";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { syncWebsiteWechatAccount } from "@/lib/wechat-account-linking";
 
 function getSafeNextPath(value: string | null) {
   if (!value || !value.startsWith("/") || value.startsWith("//")) {
@@ -30,11 +32,33 @@ export async function GET(request: Request) {
 
   if (code) {
     const supabase = await createClient();
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
-    if (!error) {
-      return redirectToSite(requestUrl, next);
+    if (error) {
+      return redirectToSite(requestUrl, "/login?error=oauth_callback");
     }
+
+    const admin = createSupabaseAdminClient();
+
+    try {
+      if (data.user && admin) {
+        await syncWebsiteWechatAccount(admin, data.user);
+      } else if (
+        data.user?.identities?.some(
+          (identity) => identity.provider === "custom:wechat",
+        )
+      ) {
+        throw new Error("Supabase admin configuration is missing.");
+      }
+    } catch (linkError) {
+      console.error("Failed to link website WeChat account.", {
+        userId: data.user?.id,
+        error: linkError instanceof Error ? linkError.message : "unknown_error",
+      });
+      return redirectToSite(requestUrl, "/login?error=wechat_account_link");
+    }
+
+    return redirectToSite(requestUrl, next);
   }
 
   return redirectToSite(requestUrl, "/login?error=oauth_callback");

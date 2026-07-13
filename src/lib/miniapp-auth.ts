@@ -175,6 +175,20 @@ async function saveWechatIdentity(
   }
 }
 
+export async function linkWechatIdentityToCommunityUser(
+  supabase: SupabaseClient,
+  userId: string,
+  input: {
+    appId: string;
+    openid: string;
+    unionid: string;
+    channel: WechatChannel;
+  },
+) {
+  await claimUnionAccount(supabase, input.unionid, userId);
+  await saveWechatIdentity(supabase, { ...input, userId });
+}
+
 async function createWechatAccountAnchor(supabase: SupabaseClient) {
   const internalEmail = `wechat-${randomUUID()}@users.invalid`;
   const { data, error } = await supabase.auth.admin.createUser({
