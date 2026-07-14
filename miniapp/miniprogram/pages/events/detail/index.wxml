@@ -2,32 +2,32 @@
   <view wx:if="{{loading}}" class="page-shell"><view class="empty-state">正在加载活动</view></view>
   <view wx:elif="{{loadFailed}}" class="page-shell"><view class="empty-state">暂时无法打开这个活动</view></view>
   <block wx:elif="{{event}}">
-    <image wx:if="{{event.imageUrl}}" class="detail-cover" src="{{event.imageUrl}}" mode="aspectFill" />
+    <image wx:if="{{event.imageUrl}}" class="detail-cover" src="{{event.imageUrl}}" mode="{{coverMode}}" />
     <view class="page-shell detail-content">
       <view class="detail-header">
-        <text class="detail-type">{{event.eventTypeLabel}} · {{event.statusLabel}}</text>
+        <text class="status-tag">{{event.eventTypeLabel}} · {{event.statusLabel}}</text>
         <text class="detail-title">{{event.title}}</text>
         <text class="detail-summary">{{event.summary}}</text>
       </view>
 
       <view class="fact-band">
-        <view class="fact-row"><text class="fact-label">时间</text><text>{{event.dateTimeLabel}}</text></view>
-        <view class="fact-row"><text class="fact-label">地点</text><text>{{event.locationLabel}}</text></view>
+        <view class="fact-row"><text class="fact-label">DATE / TIME</text><text class="fact-value">{{event.dateTimeLabel}}</text></view>
+        <view class="fact-row"><text class="fact-label">LOCATION</text><text class="fact-value">{{event.locationLabel}}</text></view>
       </view>
 
       <view wx:if="{{event.recapParagraphs.length}}" class="detail-section recap-section">
-        <text class="section-title">活动回顾</text>
+        <view class="record-heading"><text class="record-number">01</text><text class="section-title">活动回顾</text></view>
         <text wx:for="{{event.recapParagraphs}}" wx:key="*this" class="paragraph">{{item}}</text>
       </view>
 
       <view wx:if="{{event.video}}" class="detail-section">
-        <text class="section-title">现场视频</text>
+        <view class="record-heading"><text class="record-number record-number-blue">02</text><text class="section-title">现场视频</text></view>
         <video class="event-video" src="{{event.video.url}}" poster="{{event.video.coverUrl}}" title="{{event.video.title || event.title}}" controls></video>
       </view>
 
       <view wx:if="{{event.gallery.length}}" class="detail-section">
         <view class="detail-section-heading">
-          <text class="section-title">现场记录</text>
+          <view class="record-heading"><text class="record-number record-number-orange">03</text><text class="section-title">现场记录</text></view>
           <text class="section-count">{{event.gallery.length}} 张</text>
         </view>
         <view class="gallery-grid">
@@ -44,12 +44,12 @@
       </view>
 
       <view wx:if="{{event.descriptionParagraphs.length}}" class="detail-section">
-        <text class="section-title">活动介绍</text>
+        <view class="record-heading"><text class="record-number record-number-blue">04</text><text class="section-title">活动介绍</text></view>
         <text wx:for="{{event.descriptionParagraphs}}" wx:key="*this" class="paragraph">{{item}}</text>
       </view>
 
       <view wx:if="{{event.agendaItems.length}}" class="detail-section">
-        <text class="section-title">活动流程</text>
+        <view class="record-heading"><text class="record-number record-number-orange">05</text><text class="section-title">活动流程</text></view>
         <view wx:for="{{event.agendaItems}}" wx:key="*this" class="list-row">
           <text class="list-index">{{index + 1}}</text>
           <text class="list-text">{{item}}</text>

@@ -1,26 +1,49 @@
 <view class="page-shell home-page">
   <view class="brand-band">
-    <image class="brand-mark" src="https://changzhouai.club/logo-mark.webp" mode="aspectFit" />
+    <image class="brand-mark" src="/assets/logo-mark.webp" mode="aspectFit" />
     <view class="brand-copy">
       <text class="brand-title">常州 AI Club</text>
       <text class="brand-subtitle">在常州，和认真做事的人一起把 AI 用起来</text>
     </view>
   </view>
 
-  <view class="focus-band">
-    <text class="focus-label">社区正在发生</text>
-    <text class="focus-title">见面、分享、协作，把想法做成真实项目</text>
+  <view class="brief-heading">
+    <view class="brief-heading-copy">
+      <text class="brief-title">现场简报</text>
+      <text class="brief-caption">COMMUNITY FIELD NOTES</text>
+    </view>
+    <text class="brief-date">{{briefDate}}</text>
   </view>
 
-  <view class="section-heading">
-    <text class="section-title">{{eventSectionTitle}}</text>
-    <button class="text-action" bindtap="openEvents">{{eventSectionHint}}</button>
+  <view wx:if="{{loading}}" class="empty-state">正在整理社区现场记录</view>
+  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">现场记录加载失败，轻触重试</view>
+  <view wx:elif="{{!featuredEvent}}" class="empty-state">暂时没有可查看的活动记录</view>
+  <view wx:else class="feature-record" data-slug="{{featuredEvent.slug}}" bindtap="openEvent">
+    <image wx:if="{{featuredEvent.cover_image_url}}" class="feature-cover" src="{{featuredEvent.cover_image_url}}" mode="{{featuredEvent.coverMode}}" />
+    <view wx:else class="feature-cover feature-cover-placeholder"><image src="/assets/logo-mark.webp" mode="aspectFit" /></view>
+    <view class="feature-meta">
+      <text class="status-tag">{{featuredEvent.statusLabel}}</text>
+      <text>{{featuredEvent.eventTypeLabel}}</text>
+      <text>{{featuredEvent.dateLabel}}</text>
+    </view>
+    <view class="feature-copy">
+      <text class="feature-index">{{featuredEvent.indexLabel}}</text>
+      <view class="feature-body">
+        <text class="feature-title">{{featuredEvent.title}}</text>
+        <text class="feature-location">{{featuredEvent.locationLabel}}</text>
+        <text class="feature-summary">{{featuredEvent.summary || '看看这场活动留下了哪些现场记录。'}}</text>
+      </view>
+    </view>
+    <button class="brief-action" data-slug="{{featuredEvent.slug}}" catchtap="openEvent">查看简报</button>
   </view>
 
-  <view wx:if="{{loading}}" class="empty-state">正在加载活动</view>
-  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">活动加载失败，轻触重试</view>
-  <view wx:elif="{{events.length === 0}}" class="empty-state">暂时没有可查看的活动</view>
-  <view wx:else class="event-list">
+  <block wx:if="{{!loading && !loadFailed && featuredEvent}}">
+    <view class="section-heading">
+      <text class="section-title">{{eventSectionTitle}}</text>
+      <button class="text-action" bindtap="openEvents">{{eventSectionHint}}</button>
+    </view>
+
+    <view class="event-list">
     <view
       wx:for="{{events}}"
       wx:key="id"
@@ -28,12 +51,21 @@
       data-slug="{{item.slug}}"
       bindtap="openEvent"
     >
-      <image wx:if="{{item.cover_image_url}}" class="event-cover" src="{{item.cover_image_url}}" mode="aspectFill" />
+      <text class="event-index">{{item.indexLabel}}</text>
+      <image wx:if="{{item.cover_image_url}}" class="event-cover" src="{{item.cover_image_url}}" mode="{{item.coverMode}}" />
+      <image wx:else class="event-cover event-cover-placeholder" src="/assets/logo-mark.webp" mode="aspectFit" />
       <view class="event-body">
         <text class="event-meta">{{item.statusLabel}} · {{item.eventTypeLabel}} · {{item.dateLabel}}</text>
         <text class="event-title">{{item.title}}</text>
         <text class="event-location">{{item.locationLabel}}</text>
       </view>
+      <image class="event-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
     </view>
-  </view>
+    </view>
+
+    <view class="archive-note" bindtap="openEvents">
+      <text>社区已发生</text><text class="archive-count">{{eventSectionHint}}</text>
+      <image src="/assets/icons/chevron-right.png" mode="aspectFit" />
+    </view>
+  </block>
 </view>

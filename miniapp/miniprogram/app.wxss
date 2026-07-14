@@ -1,12 +1,33 @@
 page {
+  --color-canvas: #f3f5f2;
+  --color-surface: #ffffff;
+  --color-ink: #17211d;
+  --color-muted: #59635f;
+  --color-subtle: #68716d;
+  --color-line: #dce2df;
+  --color-green: #0f7a6a;
+  --color-green-dark: #0d5f53;
+  --color-green-soft: #e6f2ed;
+  --color-orange: #ec8e44;
+  --color-orange-soft: #fff2e7;
+  --color-blue: #2f82ed;
+  --color-blue-soft: #eaf2fd;
+  --color-yellow: #f4be4b;
   min-height: 100%;
-  background: #f5f7f6;
-  color: #17211d;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: "Avenir Next", -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif;
   font-size: 30rpx;
 }
 
 button {
+  letter-spacing: 0;
+}
+
+text,
+view,
+input,
+textarea {
   letter-spacing: 0;
 }
 
@@ -18,8 +39,8 @@ button {
 
 .section-title {
   margin: 0;
-  font-size: 38rpx;
-  font-weight: 700;
+  font-size: 36rpx;
+  font-weight: 760;
   line-height: 1.3;
 }
 
@@ -34,7 +55,7 @@ button {
   min-height: 88rpx;
   margin: 0;
   border-radius: 8rpx;
-  background: #147a5b;
+  background: var(--color-green);
   color: #ffffff;
   font-size: 30rpx;
   font-weight: 650;
@@ -52,7 +73,7 @@ button {
   margin: 0;
   border: 2rpx solid #cbd3cf;
   border-radius: 8rpx;
-  background: #ffffff;
+  background: var(--color-surface);
   color: #27332e;
   font-size: 28rpx;
 }
@@ -62,9 +83,31 @@ button {
 }
 
 .empty-state {
-  padding: 64rpx 32rpx;
-  border: 2rpx dashed #cbd3cf;
-  border-radius: 8rpx;
-  color: #68716d;
-  text-align: center;
+  padding: 48rpx 28rpx;
+  border-top: 6rpx solid var(--color-orange);
+  border-bottom: 2rpx solid var(--color-line);
+  background: var(--color-surface);
+  color: var(--color-subtle);
+  font-size: 26rpx;
+  line-height: 1.6;
+  text-align: left;
+}
+
+.status-tag {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  min-height: 38rpx;
+  padding: 2rpx 10rpx;
+  border-radius: 6rpx;
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
+  font-size: 21rpx;
+  font-weight: 680;
+  line-height: 1.4;
+}
+
+.status-tag-blue {
+  background: var(--color-blue-soft);
+  color: var(--color-blue);
 }

@@ -1,5 +1,5 @@
 <view class="page-shell account-page">
-  <view wx:if="{{loading}}" class="empty-state">正在进入社区账号</view>
+  <view wx:if="{{loading}}" class="empty-state">正在进入社区通行证</view>
 
   <view wx:elif="{{loggedOut}}" class="account-error">
     <text class="section-title">已退出当前账号</text>
@@ -13,7 +13,13 @@
   </view>
 
   <view wx:elif="{{user}}" class="account-content">
+    <view class="account-brand">
+      <image src="/assets/logo-mark.webp" mode="aspectFit" />
+      <view><text>常州 AI Club</text><text>在常州，和认真做事的人一起把 AI 用起来</text></view>
+    </view>
+
     <view class="member-band">
+      <view class="passport-kicker"><text>社区通行证</text><text>CAIC MEMBER</text></view>
       <view class="profile-header">
         <image wx:if="{{user.avatarUrl}}" class="avatar" src="{{user.avatarUrl}}" mode="aspectFill" />
         <view wx:else class="avatar avatar-placeholder">{{avatarInitial}}</view>
@@ -23,12 +29,29 @@
           <text class="profile-meta">{{user.roleLabel || user.city}}{{user.organization ? ' · ' + user.organization : ''}}</text>
           <text class="joined-label">{{joinedLabel}}</text>
         </view>
+        <image class="level-badge" src="{{currentLevelAsset}}" mode="aspectFit" />
       </view>
 
-      <view class="member-stats">
-        <view class="stat-item"><text class="stat-value">{{user.stats.registrationCount}}</text><text class="stat-label">活动报名</text></view>
-        <view class="stat-item"><text class="stat-value">{{user.stats.attendanceCount}}</text><text class="stat-label">实际到场</text></view>
-        <view class="stat-item"><text class="stat-value">{{user.stats.badgeCount}}</text><text class="stat-label">社区徽章</text></view>
+      <view class="next-action" bindtap="handleNextAction">
+        <view class="next-action-index"><text>下一步</text><text>01</text></view>
+        <view class="next-action-copy"><text class="next-action-title">{{nextActionTitle}}</text><text class="next-action-description">{{nextActionCopy}}</text></view>
+        <image src="/assets/icons/chevron-right-active.png" mode="aspectFit" />
+      </view>
+    </view>
+
+    <view class="member-stats">
+      <view class="stat-item"><text class="stat-value">{{user.stats.registrationCount}}</text><text class="stat-label">活动报名</text></view>
+      <view class="stat-item"><text class="stat-value">{{user.stats.attendanceCount}}</text><text class="stat-label">实际到场</text></view>
+      <view class="stat-item"><text class="stat-value stat-value-warm">{{user.stats.badgeCount}}</text><text class="stat-label">社区徽章</text></view>
+    </view>
+
+    <view class="growth-section">
+      <view class="growth-heading">
+        <view><text class="section-title">成员成长</text><text class="growth-note">当前 {{currentLevelLabel}} · 下一阶段 {{nextLevelLabel}}</text></view>
+        <image src="{{currentLevelAsset}}" mode="aspectFit" />
+      </view>
+      <view class="growth-steps">
+        <view wx:for="{{growthSteps}}" wx:key="label" class="growth-step {{item.stateClass}}">{{item.label}}</view>
       </view>
     </view>
 
@@ -46,11 +69,11 @@
     <view class="account-section">
       <view class="section-heading">
         <text class="section-title">社区徽章</text>
-        <text class="section-note">来自真实参与和社区授予</text>
+        <text class="section-note">真实参与和社区授予</text>
       </view>
       <view wx:if="{{user.badges.length}}" class="badge-list">
         <view wx:for="{{user.badges}}" wx:key="code" class="badge-item">
-          <text class="badge-mark">章</text>
+          <image class="badge-mark" src="/assets/logo-mark.webp" mode="aspectFit" />
           <view class="badge-copy"><text class="badge-name">{{item.label}}</text><text class="badge-description">{{item.description}}</text></view>
         </view>
       </view>
@@ -64,13 +87,9 @@
       </view>
       <view wx:if="{{footprints.length}}" class="footprint-list">
         <view wx:for="{{footprints}}" wx:key="id" class="footprint-row" data-slug="{{item.slug}}" bindtap="openEvent">
-          <view class="footprint-marker"></view>
-          <view class="footprint-copy">
-            <view class="footprint-meta"><text>{{item.participationLabel}}</text><text>{{item.dateLabel}}</text></view>
-            <text class="footprint-title">{{item.title}}</text>
-            <text class="footprint-location">{{item.locationLabel}}</text>
-          </view>
-          <text class="row-arrow">›</text>
+          <view class="footprint-date"><text>{{item.dateLabel}}</text><text>{{item.participationLabel}}</text></view>
+          <view class="footprint-copy"><text class="footprint-title">{{item.title}}</text><text class="footprint-location">{{item.locationLabel}}</text></view>
+          <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
         </view>
       </view>
       <view wx:else class="compact-empty">还没有活动足迹，先去看看社区活动。</view>
@@ -79,14 +98,8 @@
     <view class="account-section">
       <view class="section-heading"><text class="section-title">账号连接</text></view>
       <view class="channel-list">
-        <view class="channel-row">
-          <text>微信小程序</text>
-          <text class="channel-status">已连接</text>
-        </view>
-        <view wx:for="{{linkedChannels}}" wx:key="*this" class="channel-row secondary-channel">
-          <text>{{item}}</text>
-          <text class="channel-status">已连接</text>
-        </view>
+        <view class="channel-row"><text>微信小程序</text><text class="channel-status">已连接</text></view>
+        <view wx:for="{{linkedChannels}}" wx:key="*this" class="channel-row secondary-channel"><text>{{item}}</text><text class="channel-status">已连接</text></view>
       </view>
     </view>
 

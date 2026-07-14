@@ -9,7 +9,7 @@
     "pages/privacy/index"
   ],
   "window": {
-    "backgroundColor": "#f5f7f6",
+    "backgroundColor": "#f3f5f2",
     "backgroundTextStyle": "dark",
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",
@@ -17,21 +17,27 @@
   },
   "tabBar": {
     "color": "#68716d",
-    "selectedColor": "#147a5b",
+    "selectedColor": "#0f7a6a",
     "backgroundColor": "#ffffff",
     "borderStyle": "black",
     "list": [
       {
         "pagePath": "pages/home/index",
-        "text": "首页"
+        "text": "首页",
+        "iconPath": "assets/icons/home.png",
+        "selectedIconPath": "assets/icons/home-active.png"
       },
       {
         "pagePath": "pages/events/index",
-        "text": "活动"
+        "text": "活动",
+        "iconPath": "assets/icons/events.png",
+        "selectedIconPath": "assets/icons/events-active.png"
       },
       {
         "pagePath": "pages/me/index",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "assets/icons/me.png",
+        "selectedIconPath": "assets/icons/me-active.png"
       }
     ]
   },

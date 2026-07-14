@@ -1,6 +1,6 @@
 .privacy-page, .privacy-section { display: flex; flex-direction: column; }
-.privacy-page { gap: 36rpx; }
+.privacy-page { gap: 36rpx; padding-top: 28rpx; border-top: 6rpx solid var(--color-orange); }
 .privacy-section { gap: 12rpx; }
 .privacy-title { font-size: 30rpx; font-weight: 700; }
 .privacy-copy { color: #35413b; font-size: 27rpx; line-height: 1.8; }
-.privacy-version { padding-top: 28rpx; border-top: 2rpx solid #dce2df; color: #68716d; font-size: 24rpx; }
+.privacy-version { padding-top: 28rpx; border-top: 2rpx solid var(--color-line); color: var(--color-subtle); font-size: 24rpx; }

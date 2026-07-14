@@ -24,6 +24,7 @@ import {
 Page({
   data: {
     event: null as EventDetail | null,
+    coverMode: "aspectFill" as "aspectFill" | "aspectFit",
     loading: true,
     loadFailed: false,
     slug: "",
@@ -60,8 +61,14 @@ Page({
 
     try {
       const event = await loadEventDetail(slug);
+      const coverMode = /(?:poster|layout|challenge|registration)/i.test(
+        event.imageUrl ?? "",
+      )
+        ? "aspectFit"
+        : "aspectFill";
       this.setData({
         event,
+        coverMode,
         galleryUrls: event.gallery.map((item) => item.imageUrl),
         loading: false,
       });

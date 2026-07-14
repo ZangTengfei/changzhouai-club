@@ -1,12 +1,12 @@
-.page-heading { display: flex; flex-direction: column; gap: 12rpx; margin-bottom: 32rpx; }
+.page-heading { display: flex; flex-direction: column; gap: 12rpx; margin-bottom: 32rpx; padding-top: 24rpx; border-top: 6rpx solid var(--color-blue); }
 .page-summary { font-size: 26rpx; }
-.registration-list { border-top: 2rpx solid #dce2df; }
+.registration-list { border-top: 2rpx solid var(--color-ink); }
 
 .registration-row {
   display: flex;
   gap: 22rpx;
   padding: 28rpx 0;
-  border-bottom: 2rpx solid #dce2df;
+  border-bottom: 2rpx solid var(--color-line);
 }
 
 .registration-cover { width: 176rpx; height: 132rpx; flex: 0 0 auto; border-radius: 6rpx; background: #e5eae7; }
@@ -14,5 +14,5 @@
 .registration-meta { display: flex; align-items: center; justify-content: space-between; color: #68716d; font-size: 23rpx; }
 .registration-title { font-size: 30rpx; font-weight: 700; line-height: 1.4; }
 .registration-location, .status { font-size: 23rpx; }
-.status-registered { color: #147a5b; }
+.status-registered { color: var(--color-green); }
 .status-cancelled { color: #8a4b3b; }
