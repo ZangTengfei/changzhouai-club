@@ -1,9 +1,5 @@
+<custom-navigation />
 <view class="page-shell events-page">
-  <view class="index-brand">
-    <image src="/assets/logo-mark.webp" mode="aspectFit" />
-    <text>常州 AI Club</text>
-  </view>
-
   <view class="page-heading">
     <view class="page-title-row">
       <text class="page-title">活动索引</text>

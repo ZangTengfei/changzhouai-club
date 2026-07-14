@@ -1,12 +1,5 @@
+<custom-navigation />
 <view class="page-shell home-page">
-  <view class="brand-band">
-    <image class="brand-mark" src="/assets/logo-mark.webp" mode="aspectFit" />
-    <view class="brand-copy">
-      <text class="brand-title">常州 AI Club</text>
-      <text class="brand-subtitle">在常州，和认真做事的人一起把 AI 用起来</text>
-    </view>
-  </view>
-
   <view class="brief-heading">
     <view class="brief-heading-copy">
       <text class="brief-title">现场简报</text>

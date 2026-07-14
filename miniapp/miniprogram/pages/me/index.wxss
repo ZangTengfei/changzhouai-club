@@ -5,40 +5,8 @@
   gap: 28rpx;
 }
 
-.account-brand {
-  display: flex;
-  align-items: center;
-  gap: 16rpx;
-  margin-bottom: -28rpx;
-  padding: 8rpx 0 2rpx;
-}
-
-.account-brand image {
-  width: 76rpx;
-  height: 76rpx;
-  flex: 0 0 auto;
-}
-
-.account-brand view {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 3rpx;
-}
-
-.account-brand text:first-child {
-  font-size: 37rpx;
-  font-weight: 800;
-}
-
-.account-brand text:last-child {
-  color: var(--color-muted);
-  font-size: 21rpx;
-  line-height: 1.4;
-}
-
 .member-band {
-  margin: 0 -28rpx;
+  margin: -8rpx -28rpx 0;
   padding: 28rpx 28rpx 0;
   background: var(--color-ink);
   color: #ffffff;

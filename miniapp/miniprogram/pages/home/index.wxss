@@ -2,21 +2,6 @@
   padding-top: 20rpx;
 }
 
-.brand-band {
-  display: flex;
-  align-items: center;
-  gap: 18rpx;
-  padding: 20rpx 0 30rpx;
-  border-bottom: 2rpx solid var(--color-line);
-}
-
-.brand-mark {
-  width: 82rpx;
-  height: 82rpx;
-  flex: 0 0 auto;
-}
-
-.brand-copy,
 .brief-heading-copy,
 .feature-body,
 .event-body {
@@ -25,28 +10,12 @@
   flex-direction: column;
 }
 
-.brand-copy {
-  gap: 4rpx;
-}
-
-.brand-title {
-  font-size: 42rpx;
-  font-weight: 800;
-  line-height: 1.2;
-}
-
-.brand-subtitle {
-  color: var(--color-muted);
-  font-size: 23rpx;
-  line-height: 1.45;
-}
-
 .brief-heading {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
   gap: 20rpx;
-  margin-top: 28rpx;
+  margin-top: 0;
   padding: 30rpx 0 24rpx;
   border-top: 6rpx solid var(--color-orange);
 }

@@ -1,3 +1,4 @@
+<custom-navigation />
 <view class="page-shell account-page">
   <view wx:if="{{loading}}" class="empty-state">正在进入社区通行证</view>
 
@@ -13,11 +14,6 @@
   </view>
 
   <view wx:elif="{{user}}" class="account-content">
-    <view class="account-brand">
-      <image src="/assets/logo-mark.webp" mode="aspectFit" />
-      <view><text>常州 AI Club</text><text>在常州，和认真做事的人一起把 AI 用起来</text></view>
-    </view>
-
     <view class="member-band">
       <view class="passport-kicker"><text>社区通行证</text><text>CAIC MEMBER</text></view>
       <view class="profile-header">

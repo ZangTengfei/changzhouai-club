@@ -2,29 +2,11 @@
   padding-top: 20rpx;
 }
 
-.index-brand {
-  display: flex;
-  align-items: center;
-  gap: 14rpx;
-  padding: 14rpx 0 28rpx;
-}
-
-.index-brand image {
-  width: 62rpx;
-  height: 62rpx;
-}
-
-.index-brand text {
-  font-size: 34rpx;
-  font-weight: 800;
-}
-
 .page-heading {
   display: flex;
   flex-direction: column;
   gap: 12rpx;
-  padding: 26rpx 0 28rpx;
-  border-top: 2rpx solid var(--color-line);
+  padding: 6rpx 0 28rpx;
   border-bottom: 2rpx solid var(--color-line);
 }
 

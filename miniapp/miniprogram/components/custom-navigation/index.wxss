@@ -1,0 +1,38 @@
+.custom-navigation {
+  width: 100%;
+}
+
+.custom-navigation-fixed {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  left: 0;
+  box-sizing: border-box;
+  border-bottom: 1px solid #dce2df;
+  background: #f3f5f2;
+}
+
+.custom-navigation-bar {
+  display: flex;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 8px;
+  padding-left: 14px;
+}
+
+.custom-navigation-mark {
+  width: 32px;
+  height: 32px;
+  flex: 0 0 auto;
+}
+
+.custom-navigation-title {
+  overflow: hidden;
+  color: #17211d;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

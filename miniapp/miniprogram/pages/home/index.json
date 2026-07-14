@@ -1,4 +1,7 @@
 {
-  "navigationBarTitleText": "常州 AI Club",
+  "navigationStyle": "custom",
+  "usingComponents": {
+    "custom-navigation": "/components/custom-navigation/index"
+  },
   "enablePullDownRefresh": true
 }
