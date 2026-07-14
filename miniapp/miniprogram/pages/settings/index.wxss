@@ -1,0 +1,103 @@
+.settings-page {
+  display: flex;
+  flex-direction: column;
+  gap: 38rpx;
+}
+
+.settings-identity {
+  display: flex;
+  flex-direction: column;
+  gap: 6rpx;
+  padding: 20rpx 0 28rpx;
+  border-top: 6rpx solid var(--color-orange);
+  border-bottom: 2rpx solid var(--color-line);
+}
+
+.settings-name {
+  font-size: 40rpx;
+  font-weight: 800;
+}
+
+.settings-caption,
+.settings-count {
+  color: var(--color-subtle);
+  font-size: 22rpx;
+}
+
+.settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.settings-group-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settings-group-title {
+  font-size: 24rpx;
+  font-weight: 760;
+}
+
+.settings-list {
+  border-top: 2rpx solid var(--color-ink);
+}
+
+.settings-row {
+  display: grid;
+  min-height: 96rpx;
+  grid-template-columns: 44rpx minmax(0, 1fr) 28rpx;
+  align-items: center;
+  gap: 18rpx;
+  border-bottom: 2rpx solid var(--color-line);
+}
+
+.settings-icon {
+  width: 44rpx;
+  height: 44rpx;
+}
+
+.settings-label {
+  font-size: 27rpx;
+  font-weight: 650;
+}
+
+.settings-arrow {
+  width: 28rpx;
+  height: 28rpx;
+}
+
+.connection-row {
+  grid-template-columns: 44rpx minmax(0, 1fr) auto;
+}
+
+.connection-status {
+  color: var(--color-green);
+  font-size: 23rpx;
+}
+
+.logout-button {
+  display: flex;
+  min-height: 88rpx;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  margin: 8rpx 0 0;
+  border: 2rpx solid var(--color-line);
+  border-radius: 8rpx;
+  background: var(--color-surface);
+  color: #7d3d2d;
+  font-size: 27rpx;
+  font-weight: 650;
+}
+
+.logout-button::after {
+  border: 0;
+}
+
+.logout-button image {
+  width: 38rpx;
+  height: 38rpx;
+}

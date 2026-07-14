@@ -6,6 +6,7 @@
     "pages/events/detail/index",
     "pages/profile/edit/index",
     "pages/registrations/index",
+    "pages/settings/index",
     "pages/privacy/index"
   ],
   "window": {

@@ -1,4 +1,4 @@
-import { ensureSession, logout } from "../../services/auth";
+import { ensureSession } from "../../services/auth";
 import { formatEventDate } from "../../services/events";
 
 type FootprintItem = MiniappUser["footprints"][number] & {
@@ -19,6 +19,12 @@ const membershipLevels = [
   { label: "核心共建", asset: "/assets/badges/level-3-core-builder-128.png" },
   { label: "荣誉共建", asset: "/assets/badges/level-4-honor-builder-128.png" },
 ] as const;
+
+const membershipBadgeCodes = new Set([
+  "co_builder",
+  "core_builder",
+  "honor_builder",
+]);
 
 function getMembershipLevel(user: MiniappUser) {
   const badgeCodes = new Set(user.badges.map((badge) => badge.code));
@@ -80,7 +86,7 @@ Page({
   data: {
     user: null as MiniappUser | null,
     avatarInitial: "微",
-    linkedChannels: [] as string[],
+    honorBadges: [] as MiniappUser["badges"],
     joinedLabel: "",
     footprints: [] as FootprintItem[],
     currentLevelAsset: membershipLevels[0].asset as string,
@@ -93,9 +99,24 @@ Page({
     loading: true,
     loginFailed: false,
     loggedOut: false,
+    suppressAutoLogin: false,
+  },
+
+  onLoad(options: Record<string, string | undefined>) {
+    if (options.loggedOut === "1") {
+      this.setData({
+        loading: false,
+        loggedOut: true,
+        suppressAutoLogin: true,
+      });
+    }
   },
 
   onShow() {
+    if (this.data.suppressAutoLogin) {
+      this.setData({ suppressAutoLogin: false });
+      return;
+    }
     void this.loadAccount();
   },
 
@@ -110,17 +131,11 @@ Page({
       this.setData({
         user,
         avatarInitial: user.displayName.slice(0, 1) || "微",
-        linkedChannels: user.channels
-          .filter((channel) => channel !== "mini_program")
-          .map((channel) =>
-            channel === "website"
-              ? "网站微信登录"
-              : channel === "official_account"
-                ? "服务号网页登录"
-                : channel,
-          ),
+        honorBadges: user.badges.filter(
+          (badge) => !membershipBadgeCodes.has(badge.code),
+        ),
         joinedLabel: formatJoinedAt(user.joinedAt),
-        footprints: user.footprints.map((footprint) => ({
+        footprints: user.footprints.slice(0, 2).map((footprint) => ({
           ...footprint,
           dateLabel: formatEventDate(footprint.event_at),
           locationLabel: footprint.venue || footprint.city || "常州",
@@ -139,33 +154,16 @@ Page({
     }
   },
 
-  async handleLogout() {
-    await logout();
-    getApp<IAppOption>().globalData.currentUser = null;
-    this.setData({
-      user: null,
-      avatarInitial: "微",
-      linkedChannels: [],
-      joinedLabel: "",
-      footprints: [],
-      currentLevelAsset: membershipLevels[0].asset,
-      currentLevelLabel: membershipLevels[0].label,
-      nextLevelLabel: membershipLevels[1].label,
-      growthSteps: getGrowthSteps(0),
-      nextActionTitle: "",
-      nextActionCopy: "",
-      nextActionType: "events",
-      loginFailed: false,
-      loggedOut: true,
-    });
-  },
-
   openProfile() {
     void wx.navigateTo({ url: "/pages/profile/edit/index" });
   },
 
   openRegistrations() {
     void wx.navigateTo({ url: "/pages/registrations/index" });
+  },
+
+  openSettings() {
+    void wx.navigateTo({ url: "/pages/settings/index" });
   },
 
   openEvents() {
