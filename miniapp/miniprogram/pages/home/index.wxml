@@ -12,7 +12,7 @@
   <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">现场记录加载失败，轻触重试</view>
   <view wx:elif="{{!featuredEvent}}" class="empty-state">暂时没有可查看的活动记录</view>
   <view wx:else class="feature-record" data-slug="{{featuredEvent.slug}}" bindtap="openEvent">
-    <image wx:if="{{featuredEvent.cover_image_url}}" class="feature-cover" src="{{featuredEvent.cover_image_url}}" mode="{{featuredEvent.coverMode}}" />
+    <image wx:if="{{featuredEvent.cover_image_url}}" class="feature-cover" src="{{featuredEvent.cover_image_url}}" mode="aspectFill" />
     <view wx:else class="feature-cover feature-cover-placeholder"><image src="/assets/logo-mark.webp" mode="aspectFit" /></view>
     <view class="feature-meta">
       <text class="status-tag">{{featuredEvent.statusLabel}}</text>
