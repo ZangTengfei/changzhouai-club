@@ -603,6 +603,22 @@ function LocalGroupDailyView({
 
         {canViewFullReport ? (
           <>
+            {stats?.top_speakers?.length ? (
+              <section className={styles.groupPosterSection}>
+                <span>TOP CONTRIBUTORS</span>
+                <h3>今日活跃成员 TOP {stats.top_speakers.length}</h3>
+                <ol className={styles.groupSpeakerRanking}>
+                  {stats.top_speakers.map(([speaker, messageCount], index) => (
+                    <li key={`${speaker}-${index}`}>
+                      <span>{index + 1}</span>
+                      <strong title={speaker}>{speaker}</strong>
+                      <small>{formatCompactNumber(messageCount)} 条消息</small>
+                    </li>
+                  ))}
+                </ol>
+              </section>
+            ) : null}
+
             {report.parsed.quote ? <blockquote className={styles.groupPosterQuote}>{report.parsed.quote}</blockquote> : null}
 
             {report.parsed.overview ? (

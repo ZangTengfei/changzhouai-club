@@ -1230,6 +1230,56 @@
   overflow-wrap: anywhere;
 }
 
+.groupSpeakerRanking {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.groupSpeakerRanking li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(146, 101, 58, 0.12);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.groupSpeakerRanking li > span {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-pill);
+  background: rgba(188, 109, 42, 0.1);
+  color: #a95c1e;
+  font-family: var(--font-latin-rounded);
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+.groupSpeakerRanking strong {
+  overflow: hidden;
+  color: #1f2524;
+  font-size: 0.88rem;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.groupSpeakerRanking small {
+  color: rgba(72, 57, 41, 0.58);
+  font-size: 0.76rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
 .groupOverview,
 .groupVibe {
   margin: 0;
@@ -1705,7 +1755,8 @@
   }
 
   .groupStatGrid,
-  .groupHighlightGrid {
+  .groupHighlightGrid,
+  .groupSpeakerRanking {
     grid-template-columns: 1fr;
   }
 
