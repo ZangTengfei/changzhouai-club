@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import nextra from "nextra";
+import { randomUUID } from "node:crypto";
 
 type RemotePattern = NonNullable<
   NonNullable<NextConfig["images"]>["remotePatterns"]
@@ -17,6 +18,9 @@ const SUPABASE_STORAGE_PATHS = [
   "/storage/v1/object/public/**",
   "/storage/v1/render/image/public/**",
 ] as const;
+
+const deploymentId =
+  process.env.NEXT_DEPLOYMENT_ID?.trim() || randomUUID().replaceAll("-", "");
 
 function getSupabaseImagePatterns() {
   const patterns: RemotePattern[] = SUPABASE_STORAGE_PATHS.map((pathname) => ({
@@ -54,6 +58,7 @@ function getSupabaseImagePatterns() {
 }
 
 const nextConfig: NextConfig = {
+  deploymentId,
   output: "standalone",
   async redirects() {
     return [
