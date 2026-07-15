@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Download, LoaderCircle, ShieldCheck, X } from "lucide-react";
+import { Check, Copy, Download, LoaderCircle, ShieldCheck, X } from "lucide-react";
 import QRCode from "qrcode";
 
 import { AdminNotice, AdminStatusBadge } from "@/components/admin-ui";
@@ -19,6 +19,7 @@ import {
 
 const MAX_TOPIC_CARDS = 6;
 const PREVIEW_SCALE = 0.34;
+const TOPIC_EMOJIS = ["💡", "🔍", "🧰", "🚀", "🧠", "✨"];
 
 type SourceTopic = {
   id: string;
@@ -51,6 +52,8 @@ export function AdminWeDailyShareCardsClient({
     sourceTopics.filter((item) => item.label === "今日要点").slice(0, 4),
   );
   const [privacyReviewed, setPrivacyReviewed] = useState(false);
+  const [socialTitle, setSocialTitle] = useState(() => formatDailyReportTitle(report.date));
+  const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
   const [exporting, setExporting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -75,6 +78,10 @@ export function AdminWeDailyShareCardsClient({
       cancelled = true;
     };
   }, [reportUrl]);
+
+  useEffect(() => {
+    setCopyState("idle");
+  }, [selectedCards, socialTitle]);
 
   function toggleTopic(topic: SourceTopic) {
     const selected = selectedCards.some((item) => item.id === topic.id);
@@ -149,7 +156,23 @@ export function AdminWeDailyShareCardsClient({
     }
   }
 
+  async function copySocialText() {
+    try {
+      await navigator.clipboard.writeText(socialCopyText);
+      setCopyState("copied");
+    } catch {
+      setCopyState("error");
+    }
+  }
+
   const selectedIds = new Set(selectedCards.map((item) => item.id));
+  const socialTopicLines = selectedCards.map(
+    (card, index) => `${TOPIC_EMOJIS[index % TOPIC_EMOJIS.length]} ${card.title}`,
+  );
+  const socialCopyText = [
+    ...(socialTitle.trim() ? [socialTitle.trim(), ""] : []),
+    ...socialTopicLines,
+  ].join("\n");
   const cardExports: CardExport[] = [
     {
       id: "cover",
@@ -199,6 +222,56 @@ export function AdminWeDailyShareCardsClient({
       </header>
 
       {message ? <AdminNotice>{message}</AdminNotice> : null}
+
+      <section className="grid gap-4 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4 lg:grid-cols-[minmax(260px,0.72fr)_minmax(360px,1.28fr)]">
+        <div className="grid content-start gap-3">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Social Copy
+            </p>
+            <h3 className="text-base font-semibold text-foreground">配套发布文案</h3>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
+              标题统一使用日期日报；所选话题会自动生成一行一条的 emoji 清单。
+            </p>
+          </div>
+          <label className="grid gap-1.5">
+            <span className="text-xs font-medium text-muted-foreground">发布标题</span>
+            <Input
+              data-testid="daily-share-social-title"
+              value={socialTitle}
+              onChange={(event) => setSocialTitle(event.target.value)}
+              maxLength={24}
+            />
+          </label>
+        </div>
+
+        <div className="grid gap-2">
+          <label className="grid gap-1.5">
+            <span className="text-xs font-medium text-muted-foreground">复制内容</span>
+            <Textarea
+              data-testid="daily-share-social-copy"
+              value={socialCopyText}
+              readOnly
+              className="min-h-36 resize-y font-mono text-sm leading-6"
+            />
+          </label>
+          <div className="flex items-center justify-between gap-3">
+            <span className="text-xs text-muted-foreground">
+              {copyState === "error" ? "复制失败，请手动选择上方文字。" : `${socialTopicLines.length} 个精华话题`}
+            </span>
+            <Button
+              type="button"
+              variant="secondary"
+              data-testid="daily-share-copy-text"
+              disabled={!socialTopicLines.length}
+              onClick={() => void copySocialText()}
+            >
+              {copyState === "copied" ? <Check /> : <Copy />}
+              {copyState === "copied" ? "已复制" : "复制标题与话题"}
+            </Button>
+          </div>
+        </div>
+      </section>
 
       <div className="grid min-w-0 gap-4 xl:grid-cols-[300px_minmax(360px,0.9fr)_minmax(420px,1fr)]">
         <aside className="grid content-start gap-3 self-start xl:sticky xl:top-4">
@@ -416,6 +489,11 @@ function buildSourceTopics(parsed: ParsedWeDailyMarkdown): SourceTopic[] {
       summary: item.body.replace(/https?:\/\/\S+/g, "").trim(),
     })),
   ].filter((item) => item.title && item.summary);
+}
+
+function formatDailyReportTitle(date: string) {
+  const [, month = "", day = ""] = date.split("-");
+  return `${Number(month)}月${Number(day)}日群聊日报`;
 }
 
 function CardPreviewFrame({
