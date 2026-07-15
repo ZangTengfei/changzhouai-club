@@ -38,7 +38,9 @@ export function LoginPanel({
   const [authIntent, setAuthIntent] = useState<AuthIntent>(
     isOnboardingFlow ? "sign-up" : "sign-in",
   );
-  const [authMethod, setAuthMethod] = useState<AuthMethod>("email");
+  const [authMethod, setAuthMethod] = useState<AuthMethod>(
+    isOnboardingFlow || !wechatEnabled ? "email" : "wechat",
+  );
   const isSignIn = authIntent === "sign-in";
   const isEmailMethod = authMethod === "email";
   const isGoogleMethod = authMethod === "google";
@@ -47,9 +49,9 @@ export function LoginPanel({
   function chooseIntent(nextIntent: AuthIntent) {
     setAuthIntent(nextIntent);
 
-    if (nextIntent === "sign-up") {
-      setAuthMethod("email");
-    }
+    setAuthMethod(
+      nextIntent === "sign-in" && wechatEnabled ? "wechat" : "email",
+    );
   }
 
   return (
@@ -80,6 +82,17 @@ export function LoginPanel({
           role="group"
           aria-label={isSignIn ? "选择登录方式" : "选择注册方式"}
         >
+          {isSignIn && wechatEnabled ? (
+            <button
+              type="button"
+              className={`${styles.methodTab} ${isWechatMethod ? styles.methodTabActive : ""}`}
+              onClick={() => setAuthMethod("wechat")}
+              aria-pressed={isWechatMethod}
+            >
+              <MessageCircle aria-hidden="true" strokeWidth={1.9} />
+              <span>微信</span>
+            </button>
+          ) : null}
           <button
             type="button"
             className={`${styles.methodTab} ${isEmailMethod ? styles.methodTabActive : ""}`}
@@ -89,30 +102,16 @@ export function LoginPanel({
             <Mail aria-hidden="true" strokeWidth={1.9} />
             <span>邮箱</span>
           </button>
-
           {isSignIn ? (
-            <>
-              <button
-                type="button"
-                className={`${styles.methodTab} ${isGoogleMethod ? styles.methodTabActive : ""}`}
-                onClick={() => setAuthMethod("google")}
-                aria-pressed={isGoogleMethod}
-              >
-                <AtSign aria-hidden="true" strokeWidth={1.9} />
-                <span>Google</span>
-              </button>
-              {wechatEnabled ? (
-                <button
-                  type="button"
-                  className={`${styles.methodTab} ${isWechatMethod ? styles.methodTabActive : ""}`}
-                  onClick={() => setAuthMethod("wechat")}
-                  aria-pressed={isWechatMethod}
-                >
-                  <MessageCircle aria-hidden="true" strokeWidth={1.9} />
-                  <span>微信</span>
-                </button>
-              ) : null}
-            </>
+            <button
+              type="button"
+              className={`${styles.methodTab} ${isGoogleMethod ? styles.methodTabActive : ""}`}
+              onClick={() => setAuthMethod("google")}
+              aria-pressed={isGoogleMethod}
+            >
+              <AtSign aria-hidden="true" strokeWidth={1.9} />
+              <span>Google</span>
+            </button>
           ) : null}
         </div>
 
