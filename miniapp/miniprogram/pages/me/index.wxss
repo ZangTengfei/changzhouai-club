@@ -8,7 +8,6 @@
 .identity-band {
   margin: -8rpx -28rpx 0;
   padding: 22rpx 28rpx 0;
-  border-top: 6rpx solid var(--color-orange);
   border-bottom: 2rpx solid var(--color-line);
   background: var(--color-surface);
 }
