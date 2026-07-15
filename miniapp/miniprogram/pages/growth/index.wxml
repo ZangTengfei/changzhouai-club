@@ -1,0 +1,49 @@
+<view class="page-shell growth-page">
+  <view wx:if="{{loading}}" class="empty-state">正在加载成长档案</view>
+  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadGrowth">成长档案加载失败，轻触重试</view>
+
+  <block wx:elif="{{user}}">
+    <view class="growth-identity">
+      <image class="level-badge" src="{{currentLevelAsset}}" mode="aspectFit" />
+      <view class="growth-identity-copy">
+        <text class="growth-kicker">成员身份</text>
+        <text class="growth-level">{{user.identityLabel}}</text>
+        <text class="growth-member">成长等级 {{currentLevelLabel}} · {{joinedLabel}}</text>
+      </view>
+    </view>
+
+    <view class="growth-stats">
+      <view class="stat-item"><text class="stat-value">{{user.stats.registrationCount}}</text><text class="stat-label">活动报名</text></view>
+      <view class="stat-item"><text class="stat-value">{{user.stats.attendanceCount}}</text><text class="stat-label">实际到场</text></view>
+      <view class="stat-item"><text class="stat-value">{{honorBadges.length}}</text><text class="stat-label">社区荣誉</text></view>
+    </view>
+
+    <view class="growth-section">
+      <view class="section-heading">
+        <text class="section-title">身份成长</text>
+        <text class="section-note">当前 {{currentLevelLabel}} · 下一阶段 {{nextLevelLabel}}</text>
+      </view>
+      <view class="growth-path">
+        <view wx:for="{{growthSteps}}" wx:key="label" class="growth-step {{item.stateClass}}">
+          <view class="growth-step-index">{{index + 1}}</view>
+          <view class="growth-step-copy"><text class="growth-step-label">{{item.label}}</text><text class="growth-step-description">{{item.description}}</text></view>
+          <text class="growth-step-state">{{item.stateLabel}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="growth-section">
+      <view class="section-heading">
+        <text class="section-title">社区荣誉</text>
+        <text class="section-note">真实参与与社区授予</text>
+      </view>
+      <view wx:if="{{honorBadges.length}}" class="honor-list">
+        <view wx:for="{{honorBadges}}" wx:key="code" class="honor-row">
+          <image src="/assets/logo-mark.webp" mode="aspectFit" />
+          <view class="honor-copy"><text class="honor-name">{{item.label}}</text><text class="honor-description">{{item.description}}</text></view>
+        </view>
+      </view>
+      <view wx:else class="honor-empty">社区荣誉会根据真实参与和贡献逐步记录。</view>
+    </view>
+  </block>
+</view>

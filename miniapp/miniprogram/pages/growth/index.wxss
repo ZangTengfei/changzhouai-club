@@ -1,0 +1,184 @@
+.growth-page {
+  display: flex;
+  flex-direction: column;
+  gap: 38rpx;
+}
+
+.growth-identity {
+  display: grid;
+  grid-template-columns: 132rpx minmax(0, 1fr);
+  align-items: center;
+  gap: 24rpx;
+  padding: 28rpx 0 32rpx;
+  border-top: 6rpx solid var(--color-orange);
+  border-bottom: 2rpx solid var(--color-line);
+}
+
+.level-badge {
+  width: 132rpx;
+  height: 132rpx;
+}
+
+.growth-identity-copy,
+.growth-step-copy,
+.honor-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.growth-identity-copy {
+  gap: 6rpx;
+}
+
+.growth-kicker {
+  color: var(--color-green);
+  font-size: 22rpx;
+  font-weight: 760;
+}
+
+.growth-level {
+  font-size: 42rpx;
+  font-weight: 800;
+}
+
+.growth-member,
+.section-note,
+.growth-step-description,
+.honor-description {
+  color: var(--color-subtle);
+  font-size: 22rpx;
+}
+
+.growth-stats {
+  display: grid;
+  height: 116rpx;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 2rpx solid var(--color-ink);
+  border-bottom: 2rpx solid var(--color-line);
+  background: var(--color-surface);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4rpx;
+}
+
+.stat-item + .stat-item {
+  border-left: 2rpx solid var(--color-line);
+}
+
+.stat-value {
+  color: var(--color-green);
+  font-size: 36rpx;
+  font-weight: 800;
+}
+
+.stat-label {
+  color: var(--color-subtle);
+  font-size: 21rpx;
+}
+
+.growth-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.growth-path,
+.honor-list {
+  border-top: 2rpx solid var(--color-ink);
+}
+
+.growth-step {
+  display: grid;
+  min-height: 96rpx;
+  grid-template-columns: 46rpx minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14rpx;
+  border-bottom: 2rpx solid var(--color-line);
+}
+
+.growth-step-index {
+  display: flex;
+  width: 40rpx;
+  height: 40rpx;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #e7ece9;
+  color: var(--color-subtle);
+  font-size: 21rpx;
+  font-weight: 760;
+}
+
+.growth-step-copy {
+  gap: 4rpx;
+}
+
+.growth-step-label,
+.honor-name {
+  font-size: 25rpx;
+  font-weight: 700;
+}
+
+.growth-step-state {
+  color: var(--color-subtle);
+  font-size: 21rpx;
+}
+
+.growth-step-complete .growth-step-index,
+.growth-step-current .growth-step-index {
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
+}
+
+.growth-step-current .growth-step-label,
+.growth-step-current .growth-step-state {
+  color: var(--color-green);
+}
+
+.growth-step-current .growth-step-state {
+  font-weight: 760;
+}
+
+.honor-row {
+  display: grid;
+  min-height: 104rpx;
+  grid-template-columns: 52rpx minmax(0, 1fr);
+  align-items: center;
+  gap: 16rpx;
+  border-bottom: 2rpx solid var(--color-line);
+}
+
+.honor-row image {
+  width: 52rpx;
+  height: 52rpx;
+}
+
+.honor-copy {
+  gap: 4rpx;
+}
+
+.honor-description {
+  line-height: 1.45;
+}
+
+.honor-empty {
+  padding: 24rpx 0;
+  border-top: 2rpx solid var(--color-ink);
+  border-bottom: 2rpx solid var(--color-line);
+  color: var(--color-subtle);
+  font-size: 23rpx;
+  line-height: 1.6;
+}
