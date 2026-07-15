@@ -212,6 +212,20 @@
 .admin-main-inner {
   position: relative;
 }
+
+.admin-app-shell:has([data-admin-editor-fullscreen]) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.admin-app-shell:has([data-admin-editor-fullscreen]) .admin-desktop-sidebar,
+.admin-app-shell:has([data-admin-editor-fullscreen]) .admin-mobile-topbar,
+.admin-app-shell:has([data-admin-editor-fullscreen]) .admin-mobile-nav {
+  display: none;
+}
+
+.admin-main-inner:has([data-admin-editor-fullscreen]) {
+  max-width: none;
+}
 .admin-mobile-topbar {
   position: sticky;
   top: 0;

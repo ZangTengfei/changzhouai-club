@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { FileText, Plus } from "lucide-react";
 
 import {
   deleteAdminWechatQrCode,
@@ -21,7 +23,6 @@ import { StorageImageUrlField } from "@/components/storage-image-url-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { WechatArticleComposer } from "@/components/wechat-article-composer";
 import {
   getAdminErrorMessage,
   getAdminSavedMessage,
@@ -29,8 +30,8 @@ import {
 import { loadAdminSocialData } from "@/lib/admin/social";
 
 export const metadata: Metadata = {
-  title: "社媒发布工具",
-  description: "管理社区公众号排版、外部平台入口和官方微信二维码。",
+  title: "社媒素材",
+  description: "管理社区社媒底稿、公众号排版和官方微信二维码。",
 };
 
 type AdminSocialPageProps = {
@@ -91,7 +92,7 @@ export default async function AdminSocialPage({
   searchParams,
 }: AdminSocialPageProps) {
   const params = await searchParams;
-  const { qrCodes, currentQrCode, queryErrors } = await loadAdminSocialData();
+  const { materials, qrCodes, currentQrCode, queryErrors } = await loadAdminSocialData();
   const startsAt = new Date();
   const expiresAt = new Date(startsAt);
   expiresAt.setFullYear(expiresAt.getFullYear() + 10);
@@ -106,11 +107,16 @@ export default async function AdminSocialPage({
       <AdminPanel>
         <AdminPanelHeader
           eyebrow="Social"
-          title="社媒发布工具"
+          title="社媒素材"
           actions={
             <>
-              <AdminMetric label="二维码" value={qrCodes.length} />
-              <AdminMetric label="当前状态" value={currentQrCode ? "可添加" : "需更新"} />
+              <AdminMetric label="公众号底稿" value={materials.length} />
+              <Button asChild>
+                <Link href="/admin/social/wechat">
+                  <Plus className="size-4" />
+                  新建公众号底稿
+                </Link>
+              </Button>
             </>
           }
         />
@@ -123,26 +129,61 @@ export default async function AdminSocialPage({
       <AdminPanel>
         <AdminPanelHeader
           eyebrow="Wechat"
-          title="公众号排版复制"
+          title="公众号素材"
           actions={
             <>
-              <AdminMetric label="模板" value="3" />
-              <AdminMetric label="格式" value="富文本" />
+              <AdminMetric label="平台" value="公众号" />
+              <AdminMetric label="底稿" value={materials.length} />
             </>
           }
         />
-        <AdminPanelBody>
-          <WechatArticleComposer />
+        <AdminPanelBody className="space-y-2">
+          {materials.length > 0 ? (
+            materials.map((material) => (
+              <article
+                key={material.id}
+                className="flex flex-col gap-3 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-3 sm:flex-row sm:items-center"
+              >
+                <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-muted text-muted-foreground">
+                  <FileText className="size-5" />
+                </span>
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="truncate text-base font-semibold text-foreground">
+                      {material.title}
+                    </h2>
+                    <AdminStatusBadge tone="completed">公众号</AdminStatusBadge>
+                  </div>
+                  <p className="line-clamp-1 text-sm text-muted-foreground">
+                    {material.contentMarkdown.replace(/[#>*_`\[\]()!-]/g, " ").trim() || "空白底稿"}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    最后保存于 {formatDateTime(material.updatedAt)}
+                  </p>
+                </div>
+                <Button asChild variant="outline" size="sm">
+                  <Link href={`/admin/social/wechat?draft=${material.id}`}>继续编辑</Link>
+                </Button>
+              </article>
+            ))
+          ) : (
+            <AdminNotice>
+              还没有公众号底稿。新建后会保存在这里，后续可继续编辑或复制到其他平台。
+            </AdminNotice>
+          )}
         </AdminPanelBody>
       </AdminPanel>
 
       <AdminPanel>
         <AdminPanelHeader
           eyebrow="History"
-          title="二维码历史"
+          title="官方微信二维码"
           actions={
-            <AdminModal title="发布新的官方微信二维码" triggerLabel="上传二维码">
-              <form action={saveAdminWechatQrCode} className="grid gap-4">
+            <>
+              <AdminMetric label="二维码" value={qrCodes.length} />
+              <AdminMetric label="当前状态" value={currentQrCode ? "可添加" : "需更新"} />
+              <AdminModal title="发布新的官方微信二维码" triggerLabel="上传二维码">
+                <form action={saveAdminWechatQrCode} className="grid gap-4">
                 <div className="grid gap-4 md:grid-cols-2">
                   <AdminField label="标题">
                     <Input
@@ -219,8 +260,9 @@ export default async function AdminSocialPage({
                   <Button type="submit">保存并发布二维码</Button>
                   <span className="text-sm text-muted-foreground">默认长期有效，可在高级设置里调整。</span>
                 </div>
-              </form>
-            </AdminModal>
+                </form>
+              </AdminModal>
+            </>
           }
         />
         <AdminPanelBody className="space-y-2">

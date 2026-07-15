@@ -1,9 +1,20 @@
 "use client";
 
-import { Clipboard, ClipboardCheck, ImagePlus, RotateCcw } from "lucide-react";
+import {
+  Clipboard,
+  ClipboardCheck,
+  ImagePlus,
+  LoaderCircle,
+  Palette,
+  PanelBottom,
+  RotateCcw,
+  Save,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
 
 import { AdminNotice } from "@/components/admin-ui";
+import { AdminModal } from "@/components/admin-modal";
 import { ImageUploadField } from "@/components/image-upload-field";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +28,13 @@ import {
   type WechatArticleFooterLink,
   type WechatArticleTemplateId,
 } from "@/lib/wechat-article-template";
+import {
+  defaultWechatMaterialSettings,
+  getWechatFooterTemplatePreset,
+  wechatFooterTemplatePresets,
+  type WechatSocialMaterial,
+  type WechatSocialMaterialInput,
+} from "@/lib/social-material";
 
 const sampleMarkdown = `# 从 Codex 到真实项目：一次常州 AI Club 的实战交流
 
@@ -43,11 +61,7 @@ const sampleMarkdown = `# 从 Codex 到真实项目：一次常州 AI Club 的�
 
 如果你也在常州，正在做 AI 相关产品、项目或工具探索，欢迎加入常州 AI Club。`;
 
-const defaultVideoTitle = "看现场片段与活动花絮";
-const defaultVideoDescription = "短视频、直播回放和活动花絮会优先沉淀到视频号。";
-const defaultVideoActionLabel = "搜索：常州 AI Club";
-const defaultRelatedLinksText = `查看更多社区动态 | https://changzhouai.club/updates | 活动复盘、成员实践与项目进展
-浏览近期活动与报名 | https://changzhouai.club/events | 线下活动、沙龙和共创报名`;
+const sampleTitle = "从 Codex 到真实项目：一次常州 AI Club 的实战交流";
 
 function getImageMarkdown(url: string, alt: string) {
   const safeAlt = (alt || "图片").replace(/[\[\]\r\n]/g, " ").trim() || "图片";
@@ -90,23 +104,48 @@ function getSeparatedInsertion(before: string, after: string, value: string) {
   };
 }
 
-export function WechatArticleComposer() {
-  const [templateId, setTemplateId] = useState<WechatArticleTemplateId>("community");
-  const [markdown, setMarkdown] = useState(sampleMarkdown);
+export function WechatArticleComposer({
+  initialMaterial = null,
+}: {
+  initialMaterial?: WechatSocialMaterial | null;
+}) {
+  const router = useRouter();
+  const initialSettings = initialMaterial?.settings ?? defaultWechatMaterialSettings;
+  const initialMarkdown = initialMaterial?.contentMarkdown ?? sampleMarkdown;
+  const [materialId, setMaterialId] = useState(initialMaterial?.id ?? null);
+  const [title, setTitle] = useState(initialMaterial?.title ?? sampleTitle);
+  const [templateId, setTemplateId] = useState<WechatArticleTemplateId>(
+    initialSettings.templateId,
+  );
+  const [footerTemplateId, setFooterTemplateId] = useState<WechatArticleTemplateId>(
+    initialSettings.footerTemplateId,
+  );
+  const [markdown, setMarkdown] = useState(initialMarkdown);
+  const [imageModalOpen, setImageModalOpen] = useState(false);
   const [imageAlt, setImageAlt] = useState("文章配图");
   const [imageUrl, setImageUrl] = useState("");
-  const [videoTitle, setVideoTitle] = useState(defaultVideoTitle);
-  const [videoDescription, setVideoDescription] = useState(defaultVideoDescription);
-  const [videoActionLabel, setVideoActionLabel] = useState(defaultVideoActionLabel);
-  const [videoUrl, setVideoUrl] = useState("");
-  const [relatedLinksText, setRelatedLinksText] = useState(defaultRelatedLinksText);
+  const [videoTitle, setVideoTitle] = useState(initialSettings.videoTitle);
+  const [videoDescription, setVideoDescription] = useState(initialSettings.videoDescription);
+  const [videoActionLabel, setVideoActionLabel] = useState(initialSettings.videoActionLabel);
+  const [videoUrl, setVideoUrl] = useState(initialSettings.videoUrl);
+  const [relatedLinksText, setRelatedLinksText] = useState(initialSettings.relatedLinksText);
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">(
+    "idle",
+  );
+  const [savedAt, setSavedAt] = useState(initialMaterial?.updatedAt ?? null);
   const [copyState, setCopyState] = useState<"idle" | "copied" | "fallback" | "error">(
     "idle",
   );
   const markdownTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const markdownSelectionRef = useRef({
+    start: initialMarkdown.length,
+    end: initialMarkdown.length,
+  });
   const previewRef = useRef<HTMLDivElement>(null);
   const template = getWechatArticleTemplate(templateId);
+  const footerTemplate = getWechatArticleTemplate(footerTemplateId);
+  const footerPreset = getWechatFooterTemplatePreset(footerTemplateId);
   const relatedLinks = useMemo(
     () => parseFooterLinksText(relatedLinksText),
     [relatedLinksText],
@@ -123,12 +162,25 @@ export function WechatArticleComposer() {
   const html = useMemo(
     () =>
       renderWechatArticleHtml(markdown, template, {
+        footerTemplate,
         relatedLinks,
         videoChannel,
       }),
-    [markdown, relatedLinks, template, videoChannel],
+    [footerTemplate, markdown, relatedLinks, template, videoChannel],
   );
   const plainText = useMemo(() => toWechatArticlePlainText(markdown), [markdown]);
+
+  function markChanged() {
+    setCopyState("idle");
+    setSaveState("idle");
+  }
+
+  function rememberMarkdownSelection(textarea: HTMLTextAreaElement) {
+    markdownSelectionRef.current = {
+      start: textarea.selectionStart,
+      end: textarea.selectionEnd,
+    };
+  }
 
   function insertImageMarkdown(url = imageUrl, alt = imageAlt) {
     const trimmedUrl = url.trim();
@@ -139,8 +191,9 @@ export function WechatArticleComposer() {
     }
 
     const textarea = markdownTextareaRef.current;
-    const start = textarea?.selectionStart ?? markdown.length;
-    const end = textarea?.selectionEnd ?? markdown.length;
+    const start = textarea ? markdownSelectionRef.current.start : markdown.length;
+    const end = textarea ? markdownSelectionRef.current.end : markdown.length;
+    const previousScrollTop = textarea?.scrollTop ?? 0;
     const before = markdown.slice(0, start);
     const after = markdown.slice(end);
     const imageMarkdown = getImageMarkdown(trimmedUrl, alt);
@@ -148,14 +201,86 @@ export function WechatArticleComposer() {
     const nextMarkdown = `${before}${insertion.text}${after}`;
 
     setMarkdown(nextMarkdown);
-    setCopyState("idle");
+    markChanged();
     setImageUploadError(null);
+    setImageUrl("");
+    setImageModalOpen(false);
 
     requestAnimationFrame(() => {
       const nextCursor = start + insertion.cursorOffset;
-      markdownTextareaRef.current?.focus();
-      markdownTextareaRef.current?.setSelectionRange(nextCursor, nextCursor);
+      const currentTextarea = markdownTextareaRef.current;
+      currentTextarea?.focus({ preventScroll: true });
+      currentTextarea?.setSelectionRange(nextCursor, nextCursor);
+      if (currentTextarea) {
+        currentTextarea.scrollTop = previousScrollTop;
+        currentTextarea.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+      markdownSelectionRef.current = { start: nextCursor, end: nextCursor };
     });
+  }
+
+  function applyFooterTemplate(nextId: WechatArticleTemplateId) {
+    const preset = getWechatFooterTemplatePreset(nextId);
+
+    setFooterTemplateId(nextId);
+    setVideoTitle(preset.videoTitle);
+    setVideoDescription(preset.videoDescription);
+    setVideoActionLabel(preset.videoActionLabel);
+    setVideoUrl(preset.videoUrl);
+    setRelatedLinksText(preset.relatedLinksText);
+    markChanged();
+  }
+
+  async function saveMaterial() {
+    const trimmedTitle = title.trim();
+    if (!trimmedTitle) {
+      setSaveState("error");
+      return;
+    }
+
+    const payload: WechatSocialMaterialInput = {
+      title: trimmedTitle,
+      contentMarkdown: markdown,
+      settings: {
+        templateId,
+        footerTemplateId,
+        videoTitle,
+        videoDescription,
+        videoActionLabel,
+        videoUrl,
+        relatedLinksText,
+      },
+    };
+    const endpoint = materialId
+      ? `/api/admin/social-materials/${materialId}`
+      : "/api/admin/social-materials";
+
+    setSaveState("saving");
+
+    try {
+      const response = await fetch(endpoint, {
+        method: materialId ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const result = await response.json();
+
+      if (!response.ok || !result.material?.id) {
+        throw new Error(result.error ?? "save_failed");
+      }
+
+      setMaterialId(result.material.id);
+      setTitle(trimmedTitle);
+      setSavedAt(result.material.updatedAt);
+      setSaveState("saved");
+      if (!materialId) {
+        router.replace(`/admin/social/wechat?draft=${result.material.id}`, {
+          scroll: false,
+        });
+      }
+    } catch {
+      setSaveState("error");
+    }
   }
 
   async function copyRichText() {
@@ -188,195 +313,108 @@ export function WechatArticleComposer() {
   }
 
   return (
-    <div className="grid gap-4">
-      <section className="grid gap-4 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background/70 p-3">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="grid gap-1">
-            <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              辅助设置
+    <div className="grid gap-3">
+      <section className="sticky top-2 z-20 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background/95 p-2 shadow-[0_12px_30px_rgba(15,23,42,0.08)] backdrop-blur">
+        <div className="flex flex-wrap items-end gap-2">
+          <label className="grid min-w-[220px] flex-1 gap-1 sm:max-w-[360px]">
+            <span className="px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              底稿标题
             </span>
-            <p className="text-sm leading-6 text-muted-foreground">
-              模板、图片插入和底部模块统一在这里设置，正文区只保留 Markdown。
-            </p>
-          </div>
-          <label className="grid min-w-[220px] gap-2">
-            <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              模板
+            <Input
+              value={title}
+              onChange={(event) => {
+                setTitle(event.target.value);
+                setSaveState("idle");
+              }}
+              placeholder="给底稿起一个便于查找的标题"
+            />
+          </label>
+
+          <Button
+            type="button"
+            variant={imageModalOpen ? "secondary" : "outline"}
+            onClick={() => setImageModalOpen(true)}
+          >
+            <ImagePlus className="size-4" />
+            插入图片
+          </Button>
+
+          <label className="grid min-w-[150px] gap-1">
+            <span className="flex items-center gap-1 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              <Palette className="size-3" />
+              整体风格
             </span>
             <NativeSelect
               value={templateId}
               onChange={(event) => {
                 setTemplateId(event.target.value as WechatArticleTemplateId);
-                setCopyState("idle");
+                markChanged();
               }}
             >
               {wechatArticleTemplates.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.name}
-                </option>
+                <option key={item.id} value={item.id}>{item.name}</option>
               ))}
             </NativeSelect>
           </label>
-        </div>
 
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-          <div className="grid gap-3 rounded-[calc(var(--radius)-3px)] border border-border/60 bg-muted/20 p-3">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="grid gap-1">
-                <span className="text-sm font-semibold text-foreground">图片插入</span>
-                <span className="text-xs leading-5 text-muted-foreground">{template.description}</span>
-              </div>
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => insertImageMarkdown()}
-                disabled={!imageUrl.trim()}
-              >
-                <ImagePlus className="size-4" />
-                插入图片
-              </Button>
-            </div>
-
-            <div className="grid gap-3 md:grid-cols-[minmax(0,0.62fr)_minmax(0,1fr)]">
-              <label className="grid gap-2">
-                <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                  图片说明
-                </span>
-                <Input
-                  value={imageAlt}
-                  onChange={(event) => setImageAlt(event.target.value)}
-                  placeholder="例如：活动现场照片"
-                />
-              </label>
-              <ImageUploadField
-                name="wechat_article_image_url"
-                value={imageUrl}
-                onValueChange={(value) => {
-                  setImageUrl(value);
-                  setImageUploadError(null);
-                  setCopyState("idle");
-                }}
-                uploadTarget={{
-                  kind: "storage",
-                  scope: "wechat-article",
-                  eventSlug: "wechat-article",
-                }}
-                panelTitle="图片链接"
-                placeholder="上传后自动生成，也可粘贴公开 HTTPS 图片地址"
-                uploadLabel="上传公众号图片"
-                clearLabel="清空链接"
-                filledStatusText="图片链接已准备好"
-                emptyStatusText="当前未设置图片"
-              />
-            </div>
-
-            {imageUploadError ? <AdminNotice>{imageUploadError}</AdminNotice> : null}
-          </div>
-
-          <div className="grid gap-3 rounded-[calc(var(--radius)-3px)] border border-border/60 bg-muted/20 p-3">
-            <div className="grid gap-1">
-              <span className="text-sm font-semibold text-foreground">底部模块</span>
-              <span className="text-xs leading-5 text-muted-foreground">
-                视频号和延伸阅读会进入右侧预览，不写入左侧 Markdown。
-              </span>
-            </div>
-
-            <div className="grid gap-3 md:grid-cols-2">
-              <label className="grid gap-2">
-                <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                  视频号标题
-                </span>
-                <Input
-                  value={videoTitle}
-                  onChange={(event) => {
-                    setVideoTitle(event.target.value);
-                    setCopyState("idle");
-                  }}
-                  placeholder="看现场片段与活动花絮"
-                />
-              </label>
-              <label className="grid gap-2">
-                <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                  视频号说明
-                </span>
-                <Input
-                  value={videoDescription}
-                  onChange={(event) => {
-                    setVideoDescription(event.target.value);
-                    setCopyState("idle");
-                  }}
-                  placeholder="短视频、直播回放和活动花絮会优先沉淀到视频号。"
-                />
-              </label>
-            </div>
-
-            <div className="grid gap-3 md:grid-cols-2">
-              <label className="grid gap-2">
-                <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                  视频号动作
-                </span>
-                <Input
-                  value={videoActionLabel}
-                  onChange={(event) => {
-                    setVideoActionLabel(event.target.value);
-                    setCopyState("idle");
-                  }}
-                  placeholder="搜索：常州 AI Club"
-                />
-              </label>
-              <label className="grid gap-2">
-                <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                  视频号链接
-                </span>
-                <Input
-                  value={videoUrl}
-                  onChange={(event) => {
-                    setVideoUrl(event.target.value);
-                    setCopyState("idle");
-                  }}
-                  placeholder="可留空，复制后把视频号卡片插在标题下方"
-                />
-              </label>
-            </div>
-
-            <label className="grid gap-2">
-              <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                延伸阅读
-              </span>
-              <Textarea
-                value={relatedLinksText}
-                onChange={(event) => {
-                  setRelatedLinksText(event.target.value);
-                  setCopyState("idle");
-                }}
-                className="min-h-[72px] resize-y font-mono text-[13px] leading-6"
-                placeholder="标题 | https://example.com | 可选说明"
-                spellCheck={false}
-              />
-            </label>
-          </div>
-        </div>
-      </section>
-
-      <div className="grid gap-4 xl:grid-cols-[minmax(0,0.96fr)_minmax(360px,0.84fr)]">
-        <section className="grid content-start gap-4">
-          <label className="grid gap-2">
-            <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              Markdown 原稿
+          <label className="grid min-w-[160px] gap-1">
+            <span className="flex items-center gap-1 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              <PanelBottom className="size-3" />
+              底部模块
             </span>
-            <Textarea
-              ref={markdownTextareaRef}
-              value={markdown}
-              onChange={(event) => {
-                setMarkdown(event.target.value);
-                setCopyState("idle");
-              }}
-              className="min-h-[620px] resize-y font-mono text-[13px] leading-6"
-              spellCheck={false}
-            />
+            <NativeSelect
+              value={footerTemplateId}
+              onChange={(event) => applyFooterTemplate(
+                event.target.value as WechatArticleTemplateId,
+              )}
+            >
+              {wechatFooterTemplatePresets.map((item) => (
+                <option key={item.id} value={item.id}>{item.name}</option>
+              ))}
+            </NativeSelect>
           </label>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            title="恢复示例"
+            aria-label="恢复示例"
+            onClick={() => {
+              setMarkdown(sampleMarkdown);
+              setTitle(sampleTitle);
+              setTemplateId(defaultWechatMaterialSettings.templateId);
+              applyFooterTemplate(defaultWechatMaterialSettings.footerTemplateId);
+              setImageModalOpen(false);
+              markChanged();
+            }}
+          >
+            <RotateCcw className="size-4" />
+          </Button>
+
+          <div className="ml-auto flex flex-wrap items-center gap-2">
+            <span className="max-w-[180px] text-right text-[11px] leading-4 text-muted-foreground">
+              {saveState === "saved" && savedAt
+                ? `已保存 ${new Date(savedAt).toLocaleString("zh-CN")}`
+                : saveState === "error"
+                  ? "保存失败，请稍后重试"
+                  : materialId
+                    ? "修改后记得保存"
+                    : "尚未保存"}
+            </span>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={saveMaterial}
+              disabled={saveState === "saving"}
+            >
+              {saveState === "saving" ? (
+                <LoaderCircle className="size-4 animate-spin" />
+              ) : (
+                <Save className="size-4" />
+              )}
+              {saveState === "saving" ? "保存中" : "保存底稿"}
+            </Button>
             <Button type="button" onClick={copyRichText}>
               {copyState === "copied" ? (
                 <ClipboardCheck className="size-4" />
@@ -384,45 +422,102 @@ export function WechatArticleComposer() {
                 <Clipboard className="size-4" />
               )}
               {copyState === "copied"
-                ? "已复制富文本"
+                ? "已复制"
                 : copyState === "fallback"
                   ? "已复制纯文本"
                   : "复制到公众号"}
             </Button>
+          </div>
+        </div>
+
+        {copyState === "error" ? (
+          <p className="mt-2 text-xs text-destructive">浏览器没有开放剪贴板权限。</p>
+        ) : null}
+      </section>
+
+      <AdminModal
+        title="插入图片到当前光标"
+        open={imageModalOpen}
+        onOpenChange={setImageModalOpen}
+      >
+        <div className="grid gap-4">
+          <p className="text-sm text-muted-foreground">
+            上传或粘贴图片地址，插入后会自动回到原来的编辑位置。
+          </p>
+          <label className="grid gap-1.5">
+            <span className="text-xs font-medium text-muted-foreground">图片说明</span>
+            <Input
+              value={imageAlt}
+              onChange={(event) => setImageAlt(event.target.value)}
+              placeholder="例如：活动现场照片"
+            />
+          </label>
+          <ImageUploadField
+            name="wechat_article_image_url"
+            value={imageUrl}
+            onValueChange={(value) => {
+              setImageUrl(value);
+              setImageUploadError(null);
+            }}
+            uploadTarget={{
+              kind: "storage",
+              scope: "wechat-article",
+              eventSlug: "wechat-article",
+            }}
+            placeholder="上传后自动生成，也可粘贴公开 HTTPS 图片地址"
+            uploadLabel="上传图片"
+            clearLabel="清空"
+            filledStatusText="图片已准备好"
+            emptyStatusText="等待上传或填写链接"
+          />
+          {imageUploadError ? <AdminNotice>{imageUploadError}</AdminNotice> : null}
+          <div className="flex justify-end">
             <Button
               type="button"
-              variant="outline"
-              onClick={() => {
-                setMarkdown(sampleMarkdown);
-                setVideoTitle(defaultVideoTitle);
-                setVideoDescription(defaultVideoDescription);
-                setVideoActionLabel(defaultVideoActionLabel);
-                setVideoUrl("");
-                setRelatedLinksText(defaultRelatedLinksText);
-                setCopyState("idle");
-              }}
+              onClick={() => insertImageMarkdown()}
+              disabled={!imageUrl.trim()}
             >
-              <RotateCcw className="size-4" />
-              恢复示例
+              <ImagePlus className="size-4" />
+              插入到光标
             </Button>
-            {copyState === "error" ? (
-              <span className="text-sm text-destructive">浏览器没有开放剪贴板权限。</span>
-            ) : null}
           </div>
+        </div>
+      </AdminModal>
 
-          <AdminNotice>
-            图片建议使用官网、公众号素材库或其他公开 HTTPS 地址；本地文件路径复制到公众号后通常无法显示。
-          </AdminNotice>
+      <div className="grid min-h-0 gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(440px,0.9fr)]">
+        <section className="min-w-0 overflow-hidden rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background">
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 bg-muted/30 px-3 py-2">
+            <div>
+              <p className="text-sm font-semibold text-foreground">Markdown 原稿</p>
+              <p className="text-xs text-muted-foreground">{template.description}</p>
+            </div>
+            <span className="text-xs text-muted-foreground">{markdown.length} 字符</span>
+          </div>
+          <Textarea
+            ref={markdownTextareaRef}
+            value={markdown}
+            onChange={(event) => {
+              setMarkdown(event.target.value);
+              rememberMarkdownSelection(event.currentTarget);
+              markChanged();
+            }}
+            onSelect={(event) => rememberMarkdownSelection(event.currentTarget)}
+            className="min-h-[calc(100vh-230px)] resize-none rounded-none border-0 bg-background px-4 py-4 font-mono text-[14px] leading-7 shadow-none focus-visible:ring-0"
+            spellCheck={false}
+          />
         </section>
 
-        <section className="min-w-0 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-[#f5f2eb] p-3">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-              公众号预览
-            </span>
-            <span className="text-xs text-muted-foreground">宽度按公众号正文区域模拟</span>
+        <section className="min-w-0 self-start rounded-[calc(var(--radius)-2px)] border border-border/70 bg-[#f5f2eb] p-3 xl:sticky xl:top-[92px]">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-sm font-semibold text-foreground">公众号预览</p>
+              <p className="text-xs text-muted-foreground">
+                {footerPreset.name} · {footerPreset.description}
+              </p>
+            </div>
+            <span className="text-xs text-muted-foreground">实时更新</span>
           </div>
-          <div className="max-h-[760px] overflow-auto rounded-[calc(var(--radius)-4px)] bg-white shadow-sm">
+          <div className="max-h-[calc(100vh-170px)] overflow-auto rounded-[calc(var(--radius)-4px)] bg-white shadow-sm">
             <div
               ref={previewRef}
               className="mx-auto w-full max-w-[677px]"

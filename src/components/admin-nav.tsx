@@ -63,7 +63,7 @@ const adminNavGroups: AdminNavGroup[] = [
       },
       {
         href: "/admin/social",
-        label: "社交入口",
+        label: "社媒素材",
         icon: Share2,
         permissions: ["social.write"],
       },

@@ -44,6 +44,7 @@ type MarkdownBlock =
 
 type RenderWechatArticleOptions = {
   title?: string | null;
+  footerTemplate?: WechatArticleTemplate;
   relatedLinks?: WechatArticleFooterLink[];
   videoChannel?: WechatArticleVideoChannel | null;
 };
@@ -563,6 +564,6 @@ export function renderWechatArticleHtml(
   <section style="padding:8px 20px 18px;">
     ${bodyHtml}
   </section>
-  ${renderFooter(template, options)}
+  ${renderFooter(options.footerTemplate ?? template, options)}
 </section>`;
 }

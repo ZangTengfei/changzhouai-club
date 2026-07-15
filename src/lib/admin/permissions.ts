@@ -31,7 +31,7 @@ export const ADMIN_PERMISSION_DEFINITIONS = [
   { key: "updates.publish", label: "发布社区动态", module: "updates", sensitivity: "L1" },
   { key: "updates.pin", label: "置顶和精选动态", module: "updates", sensitivity: "L1" },
   { key: "updates.delete", label: "删除社区动态", module: "updates", sensitivity: "L3" },
-  { key: "social.write", label: "管理社交入口", module: "social", sensitivity: "L1" },
+  { key: "social.write", label: "管理社媒素材", module: "social", sensitivity: "L1" },
 
   { key: "members.read", label: "查看成员", module: "members", sensitivity: "L1" },
   { key: "members.read_contact", label: "查看成员联系方式", module: "members", sensitivity: "L2" },
