@@ -4,10 +4,44 @@ After every successful code change, automatically stage and commit the changes u
 
 Rules:
 - Commit after verification when feasible.
-- Use a concise commit message describing the change.
+- Use a concise commit message describing the change and follow the convention below.
 - Do not wait for the user to ask for a commit.
 - If there are unrelated user changes in the worktree, avoid committing them unless they are part of the requested task.
 - If a commit would be risky or ambiguous, ask once before committing.
+
+## Commit Message Convention
+
+Use `type(scope): 中文摘要` for new commits. The type describes what changed; the scope identifies the affected product or system area.
+
+Allowed types:
+- `feat`: new user-facing capability.
+- `fix`: bug or incorrect behavior fix.
+- `docs`: documentation-only change.
+- `refactor`: code restructuring without intended behavior change.
+- `perf`: performance improvement.
+- `test`: test-only change.
+- `build`: dependency or build-system change.
+- `ci`: continuous-integration change.
+- `chore`: repository maintenance that does not fit the types above.
+- `revert`: revert an earlier commit.
+
+Preferred scopes:
+- `web`: Next.js website pages, components, and browser behavior.
+- `miniapp`: WeChat mini-program code and experience.
+- `api`: shared server APIs and backend application logic.
+- `db`: Supabase migrations, schema, and data scripts.
+- `shared`: logic or assets shared by the website and mini program.
+- `content`: tracked publishable website content.
+- `ops`: deployment, infrastructure, and runtime configuration.
+- `repo`: repository-level tooling, conventions, or maintenance.
+
+Examples:
+- `feat(web): 优先展示微信登录`
+- `fix(miniapp): 修复成员卡分隔线重复显示`
+- `docs(web): 补充网页登录配置说明`
+- `chore(ops): 更新生产部署脚本`
+
+Use the dominant scope for a focused change. Use `shared` when one change intentionally affects both the website and mini program. Do not rewrite existing history solely to apply this convention.
 
 # Local Knowledge Workspace
 
