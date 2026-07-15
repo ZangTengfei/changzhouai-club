@@ -1,7 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Download, RefreshCcw, Save } from "lucide-react";
+import { Download, Images, RefreshCcw, Save } from "lucide-react";
 
 import { AdminNotice, AdminStatusBadge } from "@/components/admin-ui";
 import { Button } from "@/components/ui/button";
@@ -249,6 +250,12 @@ export function AdminWeDailyReportsClient({
               </div>
 
               <div className="flex flex-wrap gap-2">
+                <Button asChild variant="secondary">
+                  <Link href={`/admin/reports/${selectedReport.id}/share`}>
+                    <Images className="size-4" />
+                    制作精华贴图
+                  </Link>
+                </Button>
                 <Button
                   type="button"
                   onClick={saveMarkdown}
