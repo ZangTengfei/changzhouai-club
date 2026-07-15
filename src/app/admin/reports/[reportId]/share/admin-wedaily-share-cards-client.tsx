@@ -19,7 +19,10 @@ import {
 
 const MAX_TOPIC_CARDS = 6;
 const PREVIEW_SCALE = 0.34;
-const TOPIC_EMOJIS = ["💡", "🔍", "🧰", "🚀", "🧠", "✨"];
+const TOPIC_EMOJIS = [
+  "💡", "🔍", "🧰", "🚀", "🧠", "✨",
+  "🤖", "🏭", "📣", "🎯", "🧭", "🔧",
+];
 
 type SourceTopic = {
   id: string;
@@ -44,6 +47,10 @@ export function AdminWeDailyShareCardsClient({
   parsed: ParsedWeDailyMarkdown;
 }) {
   const sourceTopics = useMemo(() => buildSourceTopics(parsed), [parsed]);
+  const importantTopics = useMemo(() => {
+    const highlights = sourceTopics.filter((item) => item.label === "今日要点");
+    return highlights.length ? highlights : sourceTopics;
+  }, [sourceTopics]);
   const [coverTitle, setCoverTitle] = useState("常州 AI Club 群聊精华");
   const [coverSummary, setCoverSummary] = useState(
     parsed.overview || "从一天的群聊中，选出值得继续讨论的本地 AI 观察与实践线索。",
@@ -166,8 +173,11 @@ export function AdminWeDailyShareCardsClient({
   }
 
   const selectedIds = new Set(selectedCards.map((item) => item.id));
-  const socialTopicLines = selectedCards.map(
-    (card, index) => `${TOPIC_EMOJIS[index % TOPIC_EMOJIS.length]} ${card.title}`,
+  const selectedCardById = new Map(selectedCards.map((item) => [item.id, item]));
+  const socialTopicLines = importantTopics.map(
+    (topic, index) => (
+      `${TOPIC_EMOJIS[index % TOPIC_EMOJIS.length]} ${selectedCardById.get(topic.id)?.title ?? topic.title}`
+    ),
   );
   const socialCopyText = [
     ...(socialTitle.trim() ? [socialTitle.trim(), ""] : []),
@@ -231,7 +241,7 @@ export function AdminWeDailyShareCardsClient({
             </p>
             <h3 className="text-base font-semibold text-foreground">配套发布文案</h3>
             <p className="mt-1 text-xs leading-5 text-muted-foreground">
-              标题统一使用日期日报；所选话题会自动生成一行一条的 emoji 清单。
+              标题统一使用日期日报；全部“今日要点”会生成一行一条的 emoji 清单，与贴图选择数量互不影响。
             </p>
           </div>
           <label className="grid gap-1.5">
@@ -252,12 +262,15 @@ export function AdminWeDailyShareCardsClient({
               data-testid="daily-share-social-copy"
               value={socialCopyText}
               readOnly
+              rows={Math.min(20, Math.max(6, socialTopicLines.length + 2))}
               className="min-h-36 resize-y font-mono text-sm leading-6"
             />
           </label>
           <div className="flex items-center justify-between gap-3">
             <span className="text-xs text-muted-foreground">
-              {copyState === "error" ? "复制失败，请手动选择上方文字。" : `${socialTopicLines.length} 个精华话题`}
+              {copyState === "error"
+                ? "复制失败，请手动选择上方文字。"
+                : `全部 ${socialTopicLines.length} 个今日要点`}
             </span>
             <Button
               type="button"
