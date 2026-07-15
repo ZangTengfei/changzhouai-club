@@ -5,6 +5,7 @@ import {
   type WechatSocialMaterial,
   type WechatSocialMaterialInput,
 } from "@/lib/social-material";
+import { getWechatArticleTemplate } from "@/lib/wechat-article-template";
 
 export type AdminWechatQrCodeRow = {
   id: string;
@@ -40,14 +41,45 @@ export function normalizeWechatMaterialSettings(value: unknown): WechatMaterialS
   const settings = value && typeof value === "object" ? value as Record<string, unknown> : {};
   const templateId = String(settings.templateId ?? "");
   const footerTemplateId = String(settings.footerTemplateId ?? templateId);
+  const footerModules = settings.footerModules && typeof settings.footerModules === "object"
+    ? settings.footerModules as Record<string, unknown>
+    : {};
+  const normalizedTemplateId = WECHAT_TEMPLATE_IDS.has(templateId)
+    ? templateId as WechatMaterialSettings["templateId"]
+    : defaultWechatMaterialSettings.templateId;
+  const normalizedFooterTemplateId = WECHAT_TEMPLATE_IDS.has(footerTemplateId)
+    ? footerTemplateId as WechatMaterialSettings["footerTemplateId"]
+    : defaultWechatMaterialSettings.footerTemplateId;
+  const footerTemplate = getWechatArticleTemplate(normalizedFooterTemplateId);
+  const officialAccount = settings.officialAccount
+    && typeof settings.officialAccount === "object"
+    ? settings.officialAccount as Record<string, unknown>
+    : {};
 
   return {
-    templateId: WECHAT_TEMPLATE_IDS.has(templateId)
-      ? templateId as WechatMaterialSettings["templateId"]
-      : defaultWechatMaterialSettings.templateId,
-    footerTemplateId: WECHAT_TEMPLATE_IDS.has(footerTemplateId)
-      ? footerTemplateId as WechatMaterialSettings["footerTemplateId"]
-      : defaultWechatMaterialSettings.footerTemplateId,
+    templateId: normalizedTemplateId,
+    footerTemplateId: normalizedFooterTemplateId,
+    footerModules: {
+      relatedLinks: typeof footerModules.relatedLinks === "boolean"
+        ? footerModules.relatedLinks
+        : true,
+      videoChannel: typeof footerModules.videoChannel === "boolean"
+        ? footerModules.videoChannel
+        : true,
+      officialAccount: typeof footerModules.officialAccount === "boolean"
+        ? footerModules.officialAccount
+        : true,
+    },
+    officialAccount: {
+      footerText: String(officialAccount.footerText ?? footerTemplate.footer),
+      qrImageUrl: String(officialAccount.qrImageUrl ?? footerTemplate.qrImageUrl),
+      qrTitle: String(officialAccount.qrTitle ?? footerTemplate.qrTitle),
+      qrDescription: String(
+        officialAccount.qrDescription ?? footerTemplate.qrDescription,
+      ),
+      linkLabel: String(officialAccount.linkLabel ?? footerTemplate.footerLinkLabel),
+      linkUrl: String(officialAccount.linkUrl ?? footerTemplate.footerLinkUrl),
+    },
     videoTitle: String(settings.videoTitle ?? defaultWechatMaterialSettings.videoTitle),
     videoDescription: String(
       settings.videoDescription ?? defaultWechatMaterialSettings.videoDescription,

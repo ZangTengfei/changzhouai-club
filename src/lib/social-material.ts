@@ -1,8 +1,14 @@
-import type { WechatArticleTemplateId } from "@/lib/wechat-article-template";
+import type {
+  WechatArticleFooterModules,
+  WechatArticleOfficialAccount,
+  WechatArticleTemplateId,
+} from "@/lib/wechat-article-template";
 
 export type WechatMaterialSettings = {
   templateId: WechatArticleTemplateId;
   footerTemplateId: WechatArticleTemplateId;
+  footerModules: WechatArticleFooterModules;
+  officialAccount: WechatArticleOfficialAccount;
   videoTitle: string;
   videoDescription: string;
   videoActionLabel: string;
@@ -66,6 +72,19 @@ export function getWechatFooterTemplatePreset(id: WechatArticleTemplateId) {
 export const defaultWechatMaterialSettings: WechatMaterialSettings = {
   templateId: "community",
   footerTemplateId: "community",
+  footerModules: {
+    relatedLinks: true,
+    videoChannel: true,
+    officialAccount: true,
+  },
+  officialAccount: {
+    footerText: "常州 AI Club｜连接、分享、共创",
+    qrImageUrl: "https://changzhouai.club/wechat-official-account-qr.jpg",
+    qrTitle: "扫码关注公众号",
+    qrDescription: "不错过下一场线下活动",
+    linkLabel: "changzhouai.club",
+    linkUrl: "https://changzhouai.club",
+  },
   videoTitle: wechatFooterTemplatePresets[0].videoTitle,
   videoDescription: wechatFooterTemplatePresets[0].videoDescription,
   videoActionLabel: wechatFooterTemplatePresets[0].videoActionLabel,

@@ -7,8 +7,10 @@ import {
   LoaderCircle,
   Palette,
   PanelBottom,
+  Plus,
   RotateCcw,
   Save,
+  Trash2,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useRef, useState } from "react";
@@ -26,6 +28,7 @@ import {
   toWechatArticlePlainText,
   wechatArticleTemplates,
   type WechatArticleFooterLink,
+  type WechatArticleFooterModules,
   type WechatArticleTemplateId,
 } from "@/lib/wechat-article-template";
 import {
@@ -69,7 +72,7 @@ function getImageMarkdown(url: string, alt: string) {
   return `![${safeAlt}](${url})`;
 }
 
-function parseFooterLinksText(value: string): WechatArticleFooterLink[] {
+function parseFooterLinksDraft(value: string): WechatArticleFooterLink[] {
   return value
     .split("\n")
     .map((line) => {
@@ -79,7 +82,15 @@ function parseFooterLinksText(value: string): WechatArticleFooterLink[] {
 
       return { title, url, description };
     })
-    .filter((link) => link.title && link.url);
+    .filter((link) => link.title || link.url || link.description);
+}
+
+function serializeFooterLinks(links: WechatArticleFooterLink[]) {
+  return links
+    .map((link) => [link.title, link.url, link.description ?? ""]
+      .map((part) => part.replace(/\|/g, "｜").trim())
+      .join(" | "))
+    .join("\n");
 }
 
 function getSeparatedInsertion(before: string, after: string, value: string) {
@@ -122,13 +133,18 @@ export function WechatArticleComposer({
   );
   const [markdown, setMarkdown] = useState(initialMarkdown);
   const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [footerModalOpen, setFooterModalOpen] = useState(false);
+  const [footerModules, setFooterModules] = useState(initialSettings.footerModules);
   const [imageAlt, setImageAlt] = useState("文章配图");
   const [imageUrl, setImageUrl] = useState("");
   const [videoTitle, setVideoTitle] = useState(initialSettings.videoTitle);
   const [videoDescription, setVideoDescription] = useState(initialSettings.videoDescription);
   const [videoActionLabel, setVideoActionLabel] = useState(initialSettings.videoActionLabel);
   const [videoUrl, setVideoUrl] = useState(initialSettings.videoUrl);
-  const [relatedLinksText, setRelatedLinksText] = useState(initialSettings.relatedLinksText);
+  const [relatedLinksDraft, setRelatedLinksDraft] = useState(() =>
+    parseFooterLinksDraft(initialSettings.relatedLinksText),
+  );
+  const [officialAccount, setOfficialAccount] = useState(initialSettings.officialAccount);
   const [imageUploadError, setImageUploadError] = useState<string | null>(null);
   const [saveState, setSaveState] = useState<"idle" | "saving" | "saved" | "error">(
     "idle",
@@ -147,8 +163,8 @@ export function WechatArticleComposer({
   const footerTemplate = getWechatArticleTemplate(footerTemplateId);
   const footerPreset = getWechatFooterTemplatePreset(footerTemplateId);
   const relatedLinks = useMemo(
-    () => parseFooterLinksText(relatedLinksText),
-    [relatedLinksText],
+    () => relatedLinksDraft.filter((link) => link.title.trim() && link.url.trim()),
+    [relatedLinksDraft],
   );
   const videoChannel = useMemo(
     () => ({
@@ -163,16 +179,46 @@ export function WechatArticleComposer({
     () =>
       renderWechatArticleHtml(markdown, template, {
         footerTemplate,
+        footerModules,
         relatedLinks,
         videoChannel,
+        officialAccount,
       }),
-    [footerTemplate, markdown, relatedLinks, template, videoChannel],
+    [
+      footerModules,
+      footerTemplate,
+      markdown,
+      officialAccount,
+      relatedLinks,
+      template,
+      videoChannel,
+    ],
   );
   const plainText = useMemo(() => toWechatArticlePlainText(markdown), [markdown]);
+  const enabledFooterModuleCount = Object.values(footerModules).filter(Boolean).length;
 
   function markChanged() {
     setCopyState("idle");
     setSaveState("idle");
+  }
+
+  function setFooterModuleEnabled(
+    key: keyof WechatArticleFooterModules,
+    enabled: boolean,
+  ) {
+    setFooterModules((current) => ({ ...current, [key]: enabled }));
+    markChanged();
+  }
+
+  function updateRelatedLink(
+    index: number,
+    key: keyof WechatArticleFooterLink,
+    value: string,
+  ) {
+    setRelatedLinksDraft((current) => current.map((link, linkIndex) =>
+      linkIndex === index ? { ...link, [key]: value } : link
+    ));
+    markChanged();
   }
 
   function rememberMarkdownSelection(textarea: HTMLTextAreaElement) {
@@ -221,13 +267,27 @@ export function WechatArticleComposer({
 
   function applyFooterTemplate(nextId: WechatArticleTemplateId) {
     const preset = getWechatFooterTemplatePreset(nextId);
+    const nextFooterTemplate = getWechatArticleTemplate(nextId);
 
     setFooterTemplateId(nextId);
+    setFooterModules({
+      relatedLinks: true,
+      videoChannel: true,
+      officialAccount: true,
+    });
     setVideoTitle(preset.videoTitle);
     setVideoDescription(preset.videoDescription);
     setVideoActionLabel(preset.videoActionLabel);
     setVideoUrl(preset.videoUrl);
-    setRelatedLinksText(preset.relatedLinksText);
+    setRelatedLinksDraft(parseFooterLinksDraft(preset.relatedLinksText));
+    setOfficialAccount({
+      footerText: nextFooterTemplate.footer,
+      qrImageUrl: nextFooterTemplate.qrImageUrl,
+      qrTitle: nextFooterTemplate.qrTitle,
+      qrDescription: nextFooterTemplate.qrDescription,
+      linkLabel: nextFooterTemplate.footerLinkLabel,
+      linkUrl: nextFooterTemplate.footerLinkUrl,
+    });
     markChanged();
   }
 
@@ -244,11 +304,13 @@ export function WechatArticleComposer({
       settings: {
         templateId,
         footerTemplateId,
+        footerModules,
+        officialAccount,
         videoTitle,
         videoDescription,
         videoActionLabel,
         videoUrl,
-        relatedLinksText,
+        relatedLinksText: serializeFooterLinks(relatedLinksDraft),
       },
     };
     const endpoint = materialId
@@ -357,22 +419,23 @@ export function WechatArticleComposer({
             </NativeSelect>
           </label>
 
-          <label className="grid min-w-[160px] gap-1">
+          <div className="grid min-w-[180px] gap-1">
             <span className="flex items-center gap-1 px-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
               <PanelBottom className="size-3" />
               底部模块
             </span>
-            <NativeSelect
-              value={footerTemplateId}
-              onChange={(event) => applyFooterTemplate(
-                event.target.value as WechatArticleTemplateId,
-              )}
+            <Button
+              type="button"
+              variant={footerModalOpen ? "secondary" : "outline"}
+              className="justify-start"
+              onClick={() => setFooterModalOpen(true)}
             >
-              {wechatFooterTemplatePresets.map((item) => (
-                <option key={item.id} value={item.id}>{item.name}</option>
-              ))}
-            </NativeSelect>
-          </label>
+              <PanelBottom className="size-4" />
+              {enabledFooterModuleCount === 0
+                ? "无底部"
+                : `${footerPreset.name} · ${enabledFooterModuleCount} 项`}
+            </Button>
+          </div>
 
           <Button
             type="button"
@@ -484,6 +547,351 @@ export function WechatArticleComposer({
         </div>
       </AdminModal>
 
+      <AdminModal
+        title="底部模块"
+        open={footerModalOpen}
+        onOpenChange={setFooterModalOpen}
+      >
+        <div className="grid gap-4">
+          <p className="text-sm text-muted-foreground">
+            选择预设后仍可单独关闭某个模块，修改会实时显示在右侧预览中。
+          </p>
+          <label className="grid gap-1.5">
+            <span className="text-xs font-medium text-muted-foreground">底部预设</span>
+            <NativeSelect
+              value={enabledFooterModuleCount === 0 ? "none" : footerTemplateId}
+              onChange={(event) => {
+                if (event.target.value === "none") {
+                  setFooterModules({
+                    relatedLinks: false,
+                    videoChannel: false,
+                    officialAccount: false,
+                  });
+                  markChanged();
+                  return;
+                }
+
+                applyFooterTemplate(event.target.value as WechatArticleTemplateId);
+              }}
+            >
+              <option value="none">无底部</option>
+              {wechatFooterTemplatePresets.map((item) => (
+                <option key={item.id} value={item.id}>{item.name}</option>
+              ))}
+            </NativeSelect>
+          </label>
+          <section className="overflow-hidden rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/20">
+            <label className="flex cursor-pointer items-start gap-3 p-3">
+              <input
+                type="checkbox"
+                checked={footerModules.relatedLinks}
+                onChange={(event) => setFooterModuleEnabled(
+                  "relatedLinks",
+                  event.target.checked,
+                )}
+                className="mt-0.5 size-4 accent-primary"
+              />
+              <span className="grid gap-0.5">
+                <strong className="text-sm font-semibold text-foreground">
+                  延伸阅读
+                </strong>
+                <span className="text-xs leading-5 text-muted-foreground">
+                  展示活动、项目或社区内容的推荐链接。
+                </span>
+              </span>
+            </label>
+            {footerModules.relatedLinks ? (
+              <div className="grid gap-3 border-t border-border/70 bg-background p-3">
+                {relatedLinksDraft.map((link, index) => (
+                  <div
+                    key={index}
+                    className="grid gap-3 rounded-[calc(var(--radius)-5px)] border border-border/60 p-3"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="text-xs font-semibold text-foreground">
+                        推荐文章 {index + 1}
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        aria-label={`删除推荐文章 ${index + 1}`}
+                        onClick={() => {
+                          setRelatedLinksDraft((current) => current.filter(
+                            (_, linkIndex) => linkIndex !== index,
+                          ));
+                          markChanged();
+                        }}
+                      >
+                        <Trash2 className="size-4" />
+                      </Button>
+                    </div>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <label className="grid gap-1.5">
+                        <span className="text-xs font-medium text-muted-foreground">
+                          标题
+                        </span>
+                        <Input
+                          value={link.title}
+                          onChange={(event) => updateRelatedLink(
+                            index,
+                            "title",
+                            event.target.value,
+                          )}
+                          placeholder="文章标题"
+                        />
+                      </label>
+                      <label className="grid gap-1.5">
+                        <span className="text-xs font-medium text-muted-foreground">
+                          文章链接
+                        </span>
+                        <Input
+                          type="url"
+                          value={link.url}
+                          onChange={(event) => updateRelatedLink(
+                            index,
+                            "url",
+                            event.target.value,
+                          )}
+                          placeholder="https://example.com/article"
+                        />
+                      </label>
+                    </div>
+                    <label className="grid gap-1.5">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        描述
+                      </span>
+                      <Textarea
+                        value={link.description ?? ""}
+                        onChange={(event) => updateRelatedLink(
+                          index,
+                          "description",
+                          event.target.value,
+                        )}
+                        className="min-h-20 resize-y"
+                        placeholder="简短说明这篇文章为什么值得继续阅读"
+                      />
+                    </label>
+                  </div>
+                ))}
+                {relatedLinksDraft.length < 3 ? (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => {
+                      setRelatedLinksDraft((current) => [
+                        ...current,
+                        { title: "", url: "", description: "" },
+                      ]);
+                      markChanged();
+                    }}
+                  >
+                    <Plus className="size-4" />
+                    添加推荐文章
+                  </Button>
+                ) : null}
+              </div>
+            ) : null}
+          </section>
+
+          <section className="overflow-hidden rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/20">
+            <label className="flex cursor-pointer items-start gap-3 p-3">
+              <input
+                type="checkbox"
+                checked={footerModules.videoChannel}
+                onChange={(event) => setFooterModuleEnabled(
+                  "videoChannel",
+                  event.target.checked,
+                )}
+                className="mt-0.5 size-4 accent-primary"
+              />
+              <span className="grid gap-0.5">
+                <strong className="text-sm font-semibold text-foreground">视频号</strong>
+                <span className="text-xs leading-5 text-muted-foreground">
+                  展示视频号名称、说明和引导文字。
+                </span>
+              </span>
+            </label>
+            {footerModules.videoChannel ? (
+              <div className="grid gap-3 border-t border-border/70 bg-background p-3 sm:grid-cols-2">
+                <label className="grid gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">标题</span>
+                  <Input
+                    value={videoTitle}
+                    onChange={(event) => {
+                      setVideoTitle(event.target.value);
+                      markChanged();
+                    }}
+                    placeholder="看现场片段与活动花絮"
+                  />
+                </label>
+                <label className="grid gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">引导文字</span>
+                  <Input
+                    value={videoActionLabel}
+                    onChange={(event) => {
+                      setVideoActionLabel(event.target.value);
+                      markChanged();
+                    }}
+                    placeholder="搜索：常州 AI Club"
+                  />
+                </label>
+                <label className="grid gap-1.5 sm:col-span-2">
+                  <span className="text-xs font-medium text-muted-foreground">说明</span>
+                  <Textarea
+                    value={videoDescription}
+                    onChange={(event) => {
+                      setVideoDescription(event.target.value);
+                      markChanged();
+                    }}
+                    className="min-h-20 resize-y"
+                    placeholder="短视频、直播回放和活动花絮会优先沉淀到视频号。"
+                  />
+                </label>
+                <label className="grid gap-1.5 sm:col-span-2">
+                  <span className="text-xs font-medium text-muted-foreground">链接</span>
+                  <Input
+                    type="url"
+                    value={videoUrl}
+                    onChange={(event) => {
+                      setVideoUrl(event.target.value);
+                      markChanged();
+                    }}
+                    placeholder="可留空，复制后在公众号中手动插入视频号卡片"
+                  />
+                </label>
+              </div>
+            ) : null}
+          </section>
+
+          <section className="overflow-hidden rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/20">
+            <label className="flex cursor-pointer items-start gap-3 p-3">
+              <input
+                type="checkbox"
+                checked={footerModules.officialAccount}
+                onChange={(event) => setFooterModuleEnabled(
+                  "officialAccount",
+                  event.target.checked,
+                )}
+                className="mt-0.5 size-4 accent-primary"
+              />
+              <span className="grid gap-0.5">
+                <strong className="text-sm font-semibold text-foreground">
+                  公众号关注
+                </strong>
+                <span className="text-xs leading-5 text-muted-foreground">
+                  展示公众号二维码、关注提示和官网入口。
+                </span>
+              </span>
+            </label>
+            {footerModules.officialAccount ? (
+              <div className="grid gap-3 border-t border-border/70 bg-background p-3 sm:grid-cols-2">
+                <label className="grid gap-1.5 sm:col-span-2">
+                  <span className="text-xs font-medium text-muted-foreground">收尾文案</span>
+                  <Textarea
+                    value={officialAccount.footerText}
+                    onChange={(event) => {
+                      setOfficialAccount((current) => ({
+                        ...current,
+                        footerText: event.target.value,
+                      }));
+                      markChanged();
+                    }}
+                    className="min-h-20 resize-y"
+                    placeholder="常州 AI Club｜连接、分享、共创"
+                  />
+                </label>
+                <label className="grid gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">二维码标题</span>
+                  <Input
+                    value={officialAccount.qrTitle}
+                    onChange={(event) => {
+                      setOfficialAccount((current) => ({
+                        ...current,
+                        qrTitle: event.target.value,
+                      }));
+                      markChanged();
+                    }}
+                    placeholder="扫码关注公众号"
+                  />
+                </label>
+                <label className="grid gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">二维码说明</span>
+                  <Input
+                    value={officialAccount.qrDescription}
+                    onChange={(event) => {
+                      setOfficialAccount((current) => ({
+                        ...current,
+                        qrDescription: event.target.value,
+                      }));
+                      markChanged();
+                    }}
+                    placeholder="不错过下一场线下活动"
+                  />
+                </label>
+                <div className="sm:col-span-2">
+                  <ImageUploadField
+                    name="wechat_official_account_qr_url"
+                    value={officialAccount.qrImageUrl}
+                    onValueChange={(value) => {
+                      setOfficialAccount((current) => ({
+                        ...current,
+                        qrImageUrl: value,
+                      }));
+                      markChanged();
+                    }}
+                    uploadTarget={{
+                      kind: "storage",
+                      scope: "wechat-article",
+                      eventSlug: "wechat-article",
+                    }}
+                    placeholder="公众号二维码图片地址"
+                    uploadLabel="上传二维码"
+                    clearLabel="清空"
+                    filledStatusText="二维码已准备好"
+                    emptyStatusText="等待上传或填写链接"
+                  />
+                </div>
+                <label className="grid gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">官网名称</span>
+                  <Input
+                    value={officialAccount.linkLabel}
+                    onChange={(event) => {
+                      setOfficialAccount((current) => ({
+                        ...current,
+                        linkLabel: event.target.value,
+                      }));
+                      markChanged();
+                    }}
+                    placeholder="changzhouai.club"
+                  />
+                </label>
+                <label className="grid gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">官网链接</span>
+                  <Input
+                    type="url"
+                    value={officialAccount.linkUrl}
+                    onChange={(event) => {
+                      setOfficialAccount((current) => ({
+                        ...current,
+                        linkUrl: event.target.value,
+                      }));
+                      markChanged();
+                    }}
+                    placeholder="https://changzhouai.club"
+                  />
+                </label>
+              </div>
+            ) : null}
+          </section>
+          <div className="flex justify-end">
+            <Button type="button" onClick={() => setFooterModalOpen(false)}>
+              完成
+            </Button>
+          </div>
+        </div>
+      </AdminModal>
+
       <div className="grid min-h-0 gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(440px,0.9fr)]">
         <section className="min-w-0 overflow-hidden rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/70 bg-muted/30 px-3 py-2">
@@ -512,7 +920,9 @@ export function WechatArticleComposer({
             <div>
               <p className="text-sm font-semibold text-foreground">公众号预览</p>
               <p className="text-xs text-muted-foreground">
-                {footerPreset.name} · {footerPreset.description}
+                {enabledFooterModuleCount === 0
+                  ? "未启用底部模块"
+                  : `${footerPreset.name} · 已启用 ${enabledFooterModuleCount} 项`}
               </p>
             </div>
             <span className="text-xs text-muted-foreground">实时更新</span>

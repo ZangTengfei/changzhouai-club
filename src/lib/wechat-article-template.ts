@@ -34,6 +34,21 @@ export type WechatArticleVideoChannel = {
   url?: string;
 };
 
+export type WechatArticleFooterModules = {
+  relatedLinks: boolean;
+  videoChannel: boolean;
+  officialAccount: boolean;
+};
+
+export type WechatArticleOfficialAccount = {
+  footerText: string;
+  qrImageUrl: string;
+  qrTitle: string;
+  qrDescription: string;
+  linkLabel: string;
+  linkUrl: string;
+};
+
 type MarkdownBlock =
   | { type: "heading"; depth: 1 | 2 | 3; text: string }
   | { type: "paragraph"; lines: string[] }
@@ -45,8 +60,10 @@ type MarkdownBlock =
 type RenderWechatArticleOptions = {
   title?: string | null;
   footerTemplate?: WechatArticleTemplate;
+  footerModules?: WechatArticleFooterModules;
   relatedLinks?: WechatArticleFooterLink[];
   videoChannel?: WechatArticleVideoChannel | null;
+  officialAccount?: WechatArticleOfficialAccount | null;
 };
 
 const officialAccountQrUrl = "https://changzhouai.club/wechat-official-account-qr.jpg";
@@ -264,38 +281,70 @@ function renderVideoChannel(
 }
 
 function renderFooter(template: WechatArticleTemplate, options: RenderWechatArticleOptions) {
-  const qrImage = template.qrImageUrl.trim()
+  const modules = options.footerModules ?? {
+    relatedLinks: true,
+    videoChannel: true,
+    officialAccount: true,
+  };
+  const officialAccount = options.officialAccount ?? {
+    footerText: template.footer,
+    qrImageUrl: template.qrImageUrl,
+    qrTitle: template.qrTitle,
+    qrDescription: template.qrDescription,
+    linkLabel: template.footerLinkLabel,
+    linkUrl: template.footerLinkUrl,
+  };
+  const qrImage = isPublicUrl(officialAccount.qrImageUrl)
     ? `<img src="${escapeAttribute(
-        template.qrImageUrl,
+        officialAccount.qrImageUrl,
       )}" alt="${escapeAttribute(
-        template.qrTitle,
+        officialAccount.qrTitle,
       )}" style="display:block;width:92px;height:92px;margin:0 auto;border-radius:8px;"/>`
     : `<section style="width:92px;height:92px;margin:0 auto;border:1px dashed ${template.accent};border-radius:8px;background:#ffffff;"></section>`;
+  const officialLink = isPublicUrl(officialAccount.linkUrl)
+    ? `<a href="${escapeAttribute(
+      officialAccount.linkUrl,
+    )}" style="display:inline-block;white-space:nowrap;word-break:keep-all;color:${template.accent};font-size:12px;font-weight:800;text-decoration:none;border-bottom:1px solid ${template.accent};">${escapeHtml(
+      officialAccount.linkLabel,
+    )}</a>`
+    : `<span style="display:inline-block;color:${template.accent};font-size:12px;font-weight:800;">${escapeHtml(
+      officialAccount.linkLabel,
+    )}</span>`;
 
-  return `<section style="margin:6px 20px 0;padding:18px 0 28px;border-top:1px solid #ece4d8;">
-    ${renderRelatedLinks(template, options.relatedLinks)}
-    ${renderVideoChannel(template, options.videoChannel)}
-    <section style="margin:0 0 14px;color:${template.muted};font-size:13px;line-height:1.7;text-align:center;">${escapeHtml(
-      template.footer,
+  const relatedLinks = modules.relatedLinks
+    ? renderRelatedLinks(template, options.relatedLinks)
+    : "";
+  const videoChannel = modules.videoChannel
+    ? renderVideoChannel(template, options.videoChannel)
+    : "";
+  const officialAccountHtml = modules.officialAccount
+    ? `<section style="margin:0 0 14px;color:${template.muted};font-size:13px;line-height:1.7;text-align:center;">${escapeHtml(
+      officialAccount.footerText,
     )}</section>
     <section style="max-width:230px;margin:0 auto;padding:14px 14px 13px;border:1px solid ${template.accentSoft};border-radius:14px;background:${template.accentSoft};text-align:center;">
       <section style="display:inline-block;padding:9px;border-radius:12px;background:#ffffff;">
         ${qrImage}
       </section>
       <strong style="display:block;margin:7px 0 0;color:${template.text};font-size:12px;line-height:1.5;font-weight:800;">${escapeHtml(
-        template.qrTitle,
+        officialAccount.qrTitle,
       )}</strong>
       <span style="display:block;color:${template.muted};font-size:11px;line-height:1.45;">${escapeHtml(
-        template.qrDescription,
+        officialAccount.qrDescription,
       )}</span>
     </section>
     <section style="margin:12px 0 0;color:${template.muted};font-size:12px;line-height:1.7;text-align:center;">
-      <span style="display:inline-block;">官网：</span><a href="${escapeAttribute(
-        template.footerLinkUrl,
-      )}" style="display:inline-block;white-space:nowrap;word-break:keep-all;color:${template.accent};font-size:12px;font-weight:800;text-decoration:none;border-bottom:1px solid ${template.accent};">${escapeHtml(
-        template.footerLinkLabel,
-      )}</a>
-    </section>
+      <span style="display:inline-block;">官网：</span>${officialLink}
+    </section>`
+    : "";
+
+  if (!relatedLinks && !videoChannel && !officialAccountHtml) {
+    return "";
+  }
+
+  return `<section style="margin:6px 20px 0;padding:18px 0 28px;border-top:1px solid #ece4d8;">
+    ${relatedLinks}
+    ${videoChannel}
+    ${officialAccountHtml}
   </section>`;
 }
 
