@@ -33,7 +33,7 @@
   <block wx:if="{{!loading && !loadFailed && featuredEvent}}">
     <view class="section-heading">
       <text class="section-title">{{eventSectionTitle}}</text>
-      <button class="text-action" bindtap="openEvents">{{eventSectionHint}}</button>
+      <view class="text-action" bindtap="openEvents" role="button" aria-label="{{eventSectionHint}}">{{eventSectionHint}}</view>
     </view>
 
     <view class="event-list">

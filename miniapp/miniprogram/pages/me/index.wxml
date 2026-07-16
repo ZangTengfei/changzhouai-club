@@ -46,7 +46,7 @@
           <text class="section-title">我的活动</text>
           <text class="activity-summary">{{activitySummary}}</text>
         </view>
-        <button class="text-action" bindtap="openRegistrations">查看全部</button>
+        <view class="text-action" bindtap="openRegistrations" role="button" aria-label="查看全部活动">查看全部</view>
       </view>
       <view wx:if="{{latestFootprint}}" class="footprint-row" data-slug="{{latestFootprint.slug}}" bindtap="openEvent">
         <view class="footprint-date"><text>{{latestFootprint.dateLabel}}</text><text>{{latestFootprint.participationLabel}}</text></view>

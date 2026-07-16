@@ -138,27 +138,32 @@
   line-height: 1;
 }
 
-.brief-action::after,
-.text-action::after {
+.brief-action::after {
   border: 0;
 }
 
 .section-heading {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
+  column-gap: 20rpx;
   margin-top: 34rpx;
   padding-bottom: 20rpx;
 }
 
 .text-action {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  min-height: 64rpx;
   margin: 0;
-  padding: 12rpx 0 12rpx 20rpx;
+  padding: 0 0 0 20rpx;
   background: transparent;
   color: var(--color-green);
   font-size: 24rpx;
   font-weight: 650;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .event-list {
