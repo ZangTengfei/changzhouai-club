@@ -39,7 +39,7 @@
       </view>
       <view wx:if="{{honorBadges.length}}" class="honor-list">
         <view wx:for="{{honorBadges}}" wx:key="code" class="honor-row">
-          <image src="/assets/logo-mark.webp" mode="aspectFit" />
+          <image src="/assets/logo-mark.png" mode="aspectFit" />
           <view class="honor-copy"><text class="honor-name">{{item.label}}</text><text class="honor-description">{{item.description}}</text></view>
         </view>
       </view>

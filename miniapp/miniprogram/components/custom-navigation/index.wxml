@@ -1,7 +1,7 @@
 <view class="custom-navigation" style="height: {{statusBarHeight + navigationBarHeight}}px;">
   <view class="custom-navigation-fixed" style="padding-top: {{statusBarHeight}}px;">
     <view class="custom-navigation-bar" style="height: {{navigationBarHeight}}px; padding-right: {{rightInset}}px;">
-      <image class="custom-navigation-mark" src="/assets/logo-mark.webp" mode="aspectFit" />
+      <image class="custom-navigation-mark" src="/assets/logo-mark.png" mode="aspectFit" />
       <text class="custom-navigation-title">常州 AI Club</text>
     </view>
   </view>

@@ -41,7 +41,7 @@
             <text class="status-tag">{{event.statusLabel}}</text>
           </view>
           <image wx:if="{{event.cover_image_url}}" class="event-image" src="{{event.cover_image_url}}" mode="{{event.coverMode}}" />
-          <image wx:else class="event-image event-image-placeholder" src="/assets/logo-mark.webp" mode="aspectFit" />
+          <image wx:else class="event-image event-image-placeholder" src="/assets/logo-mark.png" mode="aspectFit" />
           <view class="event-content">
             <text class="event-type {{event.typeClass}}">{{event.eventTypeLabel}}</text>
             <text class="event-name">{{event.title}}</text>
