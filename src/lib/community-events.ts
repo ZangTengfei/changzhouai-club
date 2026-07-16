@@ -7,6 +7,7 @@ import {
   normalizeEventType,
   type EventType,
 } from "@/lib/event-type";
+import { getEventImageUrl } from "@/lib/public-image-url";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 type EventPhotoRow = {
@@ -91,6 +92,7 @@ export type PublicEventSummary = {
 export type PublicGalleryImage = {
   id: string;
   imageUrl: string;
+  thumbnailUrl: string;
   caption: string | null;
 };
 
@@ -131,6 +133,7 @@ export type PublicEventDetail = {
   venue: string | null;
   locationLabel: string;
   imageUrl: string | null;
+  imageThumbnailUrl: string | null;
   descriptionParagraphs: string[];
   agendaItems: string[];
   speakerItems: string[];
@@ -209,6 +212,8 @@ function buildEventGallery(row: EventRow) {
     .map((photo) => ({
       id: photo.id,
       imageUrl: photo.image_url,
+      thumbnailUrl:
+        getEventImageUrl(photo.image_url, "miniapp-gallery") ?? photo.image_url,
       caption: photo.caption,
     }));
 
@@ -217,6 +222,9 @@ function buildEventGallery(row: EventRow) {
         {
           id: `${row.id}-cover`,
           imageUrl: row.cover_image_url,
+          thumbnailUrl:
+            getEventImageUrl(row.cover_image_url, "miniapp-gallery") ??
+            row.cover_image_url,
           caption: row.title,
         },
       ]
@@ -290,6 +298,9 @@ function mapCompletedEventPreview(row: CompletedEventPreviewRow): PublicEventRec
         {
           id: `${row.id}-cover`,
           imageUrl: row.cover_image_url,
+          thumbnailUrl:
+            getEventImageUrl(row.cover_image_url, "miniapp-gallery") ??
+            row.cover_image_url,
           caption: row.title,
         },
       ]
@@ -317,6 +328,7 @@ function mapCompletedEventPreview(row: CompletedEventPreviewRow): PublicEventRec
 function mapPublicEventDetail(row: EventRow): PublicEventDetail {
   const gallery = buildEventGallery(row);
   const video = buildEventVideo(row);
+  const imageUrl = row.cover_image_url ?? gallery[0]?.imageUrl ?? null;
 
   return {
     id: row.id,
@@ -336,7 +348,8 @@ function mapPublicEventDetail(row: EventRow): PublicEventDetail {
     city: row.city,
     venue: row.venue,
     locationLabel: buildLocationLabel(row.city, row.venue),
-    imageUrl: row.cover_image_url ?? gallery[0]?.imageUrl ?? null,
+    imageUrl,
+    imageThumbnailUrl: getEventImageUrl(imageUrl, "miniapp-detail-cover"),
     descriptionParagraphs: parseParagraphs(row.description),
     agendaItems: parseLineList(row.agenda),
     speakerItems: parseLineList(row.speaker_lineup),

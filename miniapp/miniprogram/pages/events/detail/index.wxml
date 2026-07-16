@@ -2,7 +2,7 @@
   <view wx:if="{{loading}}" class="page-shell"><view class="empty-state">正在加载活动</view></view>
   <view wx:elif="{{loadFailed}}" class="page-shell"><view class="empty-state">暂时无法打开这个活动</view></view>
   <block wx:elif="{{event}}">
-    <image wx:if="{{event.imageUrl}}" class="detail-cover" src="{{event.imageUrl}}" mode="{{coverMode}}" />
+    <image wx:if="{{event.imageUrl}}" class="detail-cover" src="{{event.imageThumbnailUrl || event.imageUrl}}" mode="{{coverMode}}" />
     <view class="page-shell detail-content">
       <view class="detail-header">
         <text class="status-tag">{{event.eventTypeLabel}} · {{event.statusLabel}}</text>
@@ -35,8 +35,9 @@
             wx:for="{{event.gallery}}"
             wx:key="id"
             class="gallery-image"
-            src="{{item.imageUrl}}"
+            src="{{item.thumbnailUrl || item.imageUrl}}"
             mode="aspectFill"
+            lazy-load="{{true}}"
             data-url="{{item.imageUrl}}"
             bindtap="previewGalleryImage"
           />

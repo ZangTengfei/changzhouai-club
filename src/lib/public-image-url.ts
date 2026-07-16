@@ -11,6 +11,8 @@ type EventImageVariant =
   | "review-card"
   | "event-feature"
   | "event-detail-hero"
+  | "miniapp-detail-cover"
+  | "miniapp-gallery"
   | "gallery"
   | "archive";
 
@@ -54,6 +56,14 @@ const eventImageVariantMap: Record<EventImageVariant, PublicImageTransformOption
     height: 900,
     quality: 82,
     resize: "cover",
+  },
+  "miniapp-detail-cover": {
+    width: 900,
+    quality: 80,
+  },
+  "miniapp-gallery": {
+    width: 480,
+    quality: 75,
   },
   gallery: {
     width: 1280,

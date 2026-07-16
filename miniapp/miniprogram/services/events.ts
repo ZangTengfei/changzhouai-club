@@ -34,6 +34,7 @@ export type EventDetail = {
   eventTypeLabel: string;
   locationLabel: string;
   imageUrl: string | null;
+  imageThumbnailUrl: string | null;
   descriptionParagraphs: string[];
   agendaItems: string[];
   speakerItems: string[];
@@ -51,6 +52,7 @@ export type EventDetail = {
   gallery: Array<{
     id: string;
     imageUrl: string;
+    thumbnailUrl: string;
     caption: string | null;
   }>;
 };
