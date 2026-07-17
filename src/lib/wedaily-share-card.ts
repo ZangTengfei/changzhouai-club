@@ -136,6 +136,112 @@ export const DAILY_SHARE_CARD_CSS = `
   font-weight: 610;
   line-height: 1.55;
 }
+.daily-share-card[data-template="neural-glass"] {
+  padding: 60px 66px 52px;
+  color: #0b2f67;
+}
+.daily-share-card[data-template="neural-glass"] .daily-share-card__meta {
+  padding: 0 10px 24px;
+  border-bottom: 2px solid rgba(28, 92, 180, 0.24);
+  color: #175fc5;
+}
+.daily-share-card[data-template="neural-glass"] .daily-share-card__brand { color: #1261d5; }
+.daily-share-card[data-template="neural-glass"] .daily-share-card__eyebrow {
+  padding: 13px 24px;
+  border: 2px solid rgba(255, 255, 255, 0.78);
+  border-radius: 999px;
+  color: #ffffff;
+  background: #2676f4;
+  box-shadow: 0 10px 28px rgba(40, 119, 237, 0.2);
+}
+.daily-share-card[data-template="neural-glass"] h2 { color: #0a2e65; font-size: 104px; line-height: 1.08; }
+.daily-share-card[data-template="neural-glass"] .daily-share-card__cover-summary { color: rgba(11, 47, 103, 0.76); }
+.daily-share-card[data-template="neural-glass"] .daily-share-card__stat {
+  border-color: rgba(255, 255, 255, 0.78);
+  border-radius: 28px;
+  background: rgba(244, 250, 255, 0.76);
+  box-shadow: 0 20px 48px rgba(45, 103, 179, 0.12);
+}
+.daily-share-card[data-template="neural-glass"] .daily-share-card__stat strong { color: #1767d1; }
+.daily-share-card--topic[data-template="neural-glass"] h2 { max-width: 890px; font-size: 116px; }
+.daily-share-card[data-template="neural-glass"] .daily-share-card__topic-number {
+  color: rgba(46, 111, 202, 0.2);
+  font-size: 118px;
+}
+.daily-share-card[data-template="neural-glass"] .daily-share-card__topic-summary {
+  min-height: 390px;
+  padding: 48px 50px;
+  border: 2px solid rgba(255, 255, 255, 0.82);
+  border-left: 5px solid #76baff;
+  border-radius: 36px;
+  color: rgba(11, 47, 103, 0.88);
+  background: rgba(244, 250, 255, 0.78);
+  box-shadow: 0 24px 56px rgba(45, 103, 179, 0.14);
+  font-size: 47px;
+}
+.daily-share-card[data-template="neural-glass"] .daily-share-card__footer {
+  border-top: 2px solid rgba(28, 92, 180, 0.26);
+  color: #2262ad;
+}
+.daily-share-card[data-template="neural-glass"] .daily-share-card__end-main p { color: rgba(11, 47, 103, 0.72); }
+.daily-share-card[data-template="neural-glass"] .daily-share-card__qr {
+  border: 3px solid rgba(79, 145, 226, 0.6);
+  border-radius: 28px;
+  box-shadow: 0 22px 52px rgba(45, 103, 179, 0.16);
+}
+.daily-share-card[data-template="holographic-orbit"] {
+  padding: 58px 68px 52px;
+  color: #082861;
+}
+.daily-share-card[data-template="holographic-orbit"] .daily-share-card__meta {
+  padding: 0 10px 24px;
+  border-bottom: 2px solid rgba(74, 116, 210, 0.28);
+  color: #2459b8;
+}
+.daily-share-card[data-template="holographic-orbit"] .daily-share-card__brand { color: #1b5bc6; }
+.daily-share-card[data-template="holographic-orbit"] .daily-share-card__eyebrow {
+  padding: 13px 24px;
+  border: 2px solid rgba(255, 255, 255, 0.86);
+  border-radius: 999px;
+  color: #1a5cc2;
+  background: rgba(231, 241, 255, 0.84);
+  box-shadow: 0 12px 32px rgba(72, 103, 189, 0.14);
+}
+.daily-share-card[data-template="holographic-orbit"] h2 { color: #082861; font-size: 106px; line-height: 1.08; }
+.daily-share-card[data-template="holographic-orbit"] .daily-share-card__cover-summary { color: rgba(8, 40, 97, 0.74); }
+.daily-share-card[data-template="holographic-orbit"] .daily-share-card__stat {
+  border-color: rgba(255, 255, 255, 0.84);
+  border-radius: 24px;
+  background: rgba(247, 250, 255, 0.78);
+  box-shadow: 0 22px 50px rgba(65, 89, 163, 0.12);
+}
+.daily-share-card[data-template="holographic-orbit"] .daily-share-card__stat strong { color: #356bd4; }
+.daily-share-card--topic[data-template="holographic-orbit"] h2 { max-width: 900px; font-size: 118px; }
+.daily-share-card[data-template="holographic-orbit"] .daily-share-card__topic-number {
+  color: rgba(87, 116, 206, 0.22);
+  font-size: 116px;
+}
+.daily-share-card[data-template="holographic-orbit"] .daily-share-card__topic-summary {
+  min-height: 350px;
+  padding: 46px 50px;
+  border: 2px solid rgba(255, 255, 255, 0.86);
+  border-left: 7px solid #6d8fff;
+  border-radius: 32px;
+  color: rgba(8, 40, 97, 0.88);
+  background: rgba(247, 250, 255, 0.8);
+  box-shadow: 0 24px 56px rgba(65, 89, 163, 0.14);
+  font-size: 46px;
+}
+.daily-share-card[data-template="holographic-orbit"] .daily-share-card__footer {
+  border-top: 2px solid rgba(74, 116, 210, 0.3);
+  color: #2a5eb7;
+}
+.daily-share-card[data-template="holographic-orbit"] .daily-share-card__end-main p { color: rgba(8, 40, 97, 0.72); }
+.daily-share-card[data-template="holographic-orbit"] .daily-share-card__qr {
+  border: 3px solid rgba(95, 127, 221, 0.64);
+  border-radius: 24px;
+  box-shadow: 0 22px 54px rgba(65, 89, 163, 0.16);
+}
 .daily-share-card[data-copy-density="compact"] h2 { font-size: 92px; }
 .daily-share-card[data-copy-density="compact"] .daily-share-card__cover-summary { font-size: 37px; }
 .daily-share-card[data-copy-density="compact"] .daily-share-card__stat { min-height: 190px; }

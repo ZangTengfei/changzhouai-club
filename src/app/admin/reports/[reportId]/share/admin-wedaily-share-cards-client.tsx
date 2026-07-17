@@ -19,7 +19,26 @@ import {
 
 const MAX_TOPIC_CARDS = 6;
 const PREVIEW_SCALE = 0.34;
-const DAILY_SHARE_CARD_BACKGROUND = "/share-cards/wedaily-intelligent-grid.png";
+const DAILY_SHARE_TEMPLATES = [
+  {
+    id: "neural-glass",
+    name: "神经玻璃",
+    description: "轻盈蓝白光感与神经网络",
+    background: "/share-cards/wedaily-neural-glass.png",
+  },
+  {
+    id: "intelligent-grid",
+    name: "智能网格",
+    description: "理性技术纸张与大字排版",
+    background: "/share-cards/wedaily-intelligent-grid.png",
+  },
+  {
+    id: "holographic-orbit",
+    name: "全息光场",
+    description: "柔和环形光带与空间层次",
+    background: "/share-cards/wedaily-holographic-orbit.png",
+  },
+] as const;
 const TOPIC_EMOJIS = [
   "💡", "🔍", "🧰", "🚀", "🧠", "✨",
   "🤖", "🏭", "📣", "🎯", "🧭", "🔧",
@@ -33,6 +52,8 @@ type SourceTopic = {
 };
 
 type ShareTopicCard = SourceTopic;
+
+type DailyShareTemplateId = (typeof DAILY_SHARE_TEMPLATES)[number]["id"];
 
 type CardExport = {
   fileName: string;
@@ -60,6 +81,7 @@ export function AdminWeDailyShareCardsClient({
     sourceTopics.filter((item) => item.label === "今日要点").slice(0, 4),
   );
   const [privacyReviewed, setPrivacyReviewed] = useState(false);
+  const [templateId, setTemplateId] = useState<DailyShareTemplateId>("intelligent-grid");
   const [socialTitle, setSocialTitle] = useState(() => formatDailyReportTitle(report.date));
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
@@ -233,6 +255,53 @@ export function AdminWeDailyShareCardsClient({
       </header>
 
       {message ? <AdminNotice>{message}</AdminNotice> : null}
+
+      <section className="grid gap-3 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Template
+          </p>
+          <h3 className="text-base font-semibold text-foreground">选择贴图模板</h3>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            封面、话题卡、二维码结尾卡和 PNG 导出会同步使用所选模板。
+          </p>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {DAILY_SHARE_TEMPLATES.map((template) => {
+            const selected = template.id === templateId;
+
+            return (
+              <button
+                key={template.id}
+                type="button"
+                data-testid={`daily-share-template-${template.id}`}
+                aria-pressed={selected}
+                className={`grid grid-cols-[72px_minmax(0,1fr)] items-center gap-3 rounded-[calc(var(--radius)-4px)] border p-2.5 text-left transition ${
+                  selected
+                    ? "border-primary bg-primary/10 ring-2 ring-primary/15"
+                    : "border-border/70 bg-muted/20 hover:border-primary/40 hover:bg-muted/50"
+                }`}
+                onClick={() => setTemplateId(template.id)}
+              >
+                <span className="h-16 overflow-hidden rounded-sm border border-border/60 bg-white">
+                  <img
+                    src={template.background}
+                    alt=""
+                    aria-hidden="true"
+                    className="h-full w-full object-cover"
+                  />
+                </span>
+                <span className="min-w-0">
+                  <strong className="block text-sm font-semibold text-foreground">{template.name}</strong>
+                  <span className="mt-1 block text-xs leading-5 text-muted-foreground">
+                    {template.description}
+                  </span>
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
       <section className="grid gap-4 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4 lg:grid-cols-[minmax(260px,0.72fr)_minmax(360px,1.28fr)]">
         <div className="grid content-start gap-3">
@@ -438,6 +507,7 @@ export function AdminWeDailyShareCardsClient({
               <DailyShareCoverCard
                 cardRef={bindCardRef("cover")}
                 date={report.date}
+                templateId={templateId}
                 title={coverTitle}
                 summary={coverSummary}
                 messageCount={report.stats?.message_count ?? 0}
@@ -458,6 +528,7 @@ export function AdminWeDailyShareCardsClient({
                   card={card}
                   date={report.date}
                   index={index + 1}
+                  templateId={templateId}
                   total={selectedCards.length}
                 />
               </CardPreviewFrame>
@@ -473,6 +544,7 @@ export function AdminWeDailyShareCardsClient({
                 date={report.date}
                 qrCodeDataUrl={qrCodeDataUrl}
                 reportUrl={reportUrl}
+                templateId={templateId}
               />
             </CardPreviewFrame>
           </div>
@@ -556,6 +628,7 @@ function DailyShareCoverCard({
   summary,
   messageCount,
   speakerCount,
+  templateId,
   topicCount,
 }: {
   cardRef: (node: HTMLElement | null) => void;
@@ -564,6 +637,7 @@ function DailyShareCoverCard({
   summary: string;
   messageCount: number;
   speakerCount: number;
+  templateId: DailyShareTemplateId;
   topicCount: number;
 }) {
   return (
@@ -571,9 +645,10 @@ function DailyShareCoverCard({
       className="daily-share-card"
       data-copy-density={getCardCopyDensity(title, summary)}
       data-share-card="cover"
+      data-template={templateId}
       ref={cardRef}
     >
-      <CardBackground />
+      <CardBackground templateId={templateId} />
       <CardMeta date={date} />
       <main className="daily-share-card__cover-main">
         <p className="daily-share-card__eyebrow">LOCAL AI COMMUNITY · DAILY NOTES</p>
@@ -595,12 +670,14 @@ function DailyShareTopicCard({
   card,
   date,
   index,
+  templateId,
   total,
 }: {
   cardRef: (node: HTMLElement | null) => void;
   card: ShareTopicCard;
   date: string;
   index: number;
+  templateId: DailyShareTemplateId;
   total: number;
 }) {
   return (
@@ -608,9 +685,10 @@ function DailyShareTopicCard({
       className="daily-share-card daily-share-card--topic"
       data-copy-density={getCardCopyDensity(card.title, card.summary)}
       data-share-card={`topic-${index}`}
+      data-template={templateId}
       ref={cardRef}
     >
-      <CardBackground />
+      <CardBackground templateId={templateId} />
       <CardMeta date={date} />
       <main className="daily-share-card__topic-main">
         <p className="daily-share-card__eyebrow">{card.label || "精华话题"}</p>
@@ -628,15 +706,22 @@ function DailyShareEndCard({
   date,
   qrCodeDataUrl,
   reportUrl,
+  templateId,
 }: {
   cardRef: (node: HTMLElement | null) => void;
   date: string;
   qrCodeDataUrl: string;
   reportUrl: string;
+  templateId: DailyShareTemplateId;
 }) {
   return (
-    <article className="daily-share-card daily-share-card--end" data-share-card="end" ref={cardRef}>
-      <CardBackground />
+    <article
+      className="daily-share-card daily-share-card--end"
+      data-share-card="end"
+      data-template={templateId}
+      ref={cardRef}
+    >
+      <CardBackground templateId={templateId} />
       <CardMeta date={date} />
       <main className="daily-share-card__end-main">
         <p className="daily-share-card__eyebrow">READ THE FULL REPORT</p>
@@ -653,11 +738,14 @@ function DailyShareEndCard({
   );
 }
 
-function CardBackground() {
+function CardBackground({ templateId }: { templateId: DailyShareTemplateId }) {
+  const template = DAILY_SHARE_TEMPLATES.find((item) => item.id === templateId)
+    ?? DAILY_SHARE_TEMPLATES[1];
+
   return (
     <img
       className="daily-share-card__background"
-      src={DAILY_SHARE_CARD_BACKGROUND}
+      src={template.background}
       alt=""
       aria-hidden="true"
       data-export-background

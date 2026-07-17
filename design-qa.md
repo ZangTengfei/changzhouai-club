@@ -37,6 +37,49 @@ final result: passed
 
 ---
 
+# 群聊日报三模板选择 Design QA
+
+- Source visual truth:
+  - `/Users/nobugai/.codex/generated_images/019f6e02-ffee-7973-b13e-fc2ab4d32d67/exec-3996f442-9705-4eee-8d3d-f5228c597216.png`
+  - `/Users/nobugai/.codex/generated_images/019f6e02-ffee-7973-b13e-fc2ab4d32d67/exec-122aadc7-f748-4a83-8dc9-61f1782d68fd.png`
+  - `/Users/nobugai/.codex/generated_images/019f6e02-ffee-7973-b13e-fc2ab4d32d67/exec-4b76fb1f-ee2f-490d-9fdd-7fe1e4cc45fe.png`
+- Implementation screenshots:
+  - `/Users/nobugai/develop/changzhouai-club/output/playwright/wedaily-template-neural-glass.jpg`
+  - `/Users/nobugai/develop/changzhouai-club/output/playwright/wedaily-template-intelligent-grid.jpg`
+  - `/Users/nobugai/develop/changzhouai-club/output/playwright/wedaily-template-holographic-orbit.jpg`
+- Viewport: `1080 × 1440`
+- State: 同一话题卡、默认文案密度、2026-07-17、话题 1 / 4
+- Three-way comparison: `/Users/nobugai/develop/changzhouai-club/output/playwright/wedaily-template-three-way-comparison.png`
+
+## Findings
+
+- No actionable P0/P1/P2 differences remain.
+- 三套模板保留各自独立的视觉语言：神经玻璃使用轻盈网络光点，智能网格使用理性技术纸张，全息光场使用柔和环形光带。
+- 三套模板共用标题、摘要、统计、二维码、页脚及文案密度逻辑；切换模板不会丢失后台已编辑内容。
+- 模板状态同时驱动封面、话题卡、结束卡与 PNG 导出，预览和下载结果保持一致。
+- 两套新增背景均为 `1080 × 1440` 实际位图资产，没有使用 CSS 图形近似。
+- 三套话题卡均未出现文字溢出、遮挡或异常留白，浏览器控制台无警告和错误。
+
+## Comparison History
+
+1. First pass: three templates rendered at the same viewport and content state with distinct hierarchy and complete content.
+   - No P0/P1/P2 visual fixes were required.
+2. Selector integration: reviewed shared template state, card propagation, selected-state styling, and export background lookup.
+   - TypeScript, production build, and diff checks form the implementation gate.
+
+## Implementation Checklist
+
+- [x] 后台提供三套带缩略图的可选模板。
+- [x] 默认继续使用用户已选择的智能网格模板。
+- [x] 封面、话题卡、结束卡同步切换。
+- [x] PNG 导出使用当前模板背景。
+- [x] 长文案继续使用现有紧凑与密集排版保护。
+- [x] 完成三模板同状态视觉对比。
+
+final result: passed
+
+---
+
 # 群聊日报智能网格模板 Design QA
 
 - Source visual truth: `/Users/nobugai/.codex/generated_images/019f6e02-ffee-7973-b13e-fc2ab4d32d67/exec-122aadc7-f748-4a83-8dc9-61f1782d68fd.png`
