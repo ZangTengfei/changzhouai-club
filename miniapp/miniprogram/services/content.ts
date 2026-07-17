@@ -12,7 +12,11 @@ export async function loadNews({
   mode?: MiniappNewsMode;
   page?: number;
 } = {}) {
-  const params = new URLSearchParams({ category, mode, page: String(page) });
+  const params = [
+    `category=${encodeURIComponent(category)}`,
+    `mode=${encodeURIComponent(mode)}`,
+    `page=${encodeURIComponent(String(page))}`,
+  ].join("&");
   return apiRequest<{
     categories: MiniappNewsCategory[];
     error: string | null;
@@ -20,7 +24,7 @@ export async function loadNews({
     items: MiniappNewsItem[];
     pagination: { hasNext: boolean; page: number; pageSize: number };
   }>({
-    path: `/api/miniapp/news?${params.toString()}`,
+    path: `/api/miniapp/news?${params}`,
     authenticated: true,
   });
 }
