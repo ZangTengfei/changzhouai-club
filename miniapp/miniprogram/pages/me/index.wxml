@@ -1,4 +1,4 @@
-<custom-navigation />
+<custom-navigation title="我的" />
 <view class="page-shell account-page">
   <view wx:if="{{loading}}" class="empty-state">正在加载成员档案</view>
 

@@ -15,7 +15,7 @@ Component({
   properties: {
     showMark: {
       type: Boolean,
-      value: true,
+      value: false,
     },
     title: {
       type: String,

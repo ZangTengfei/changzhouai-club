@@ -1,4 +1,4 @@
-<custom-navigation />
+<custom-navigation title="活动" />
 <view class="page-shell events-page">
   <view class="page-heading">
     <view class="page-title-row">

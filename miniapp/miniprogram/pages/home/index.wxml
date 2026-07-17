@@ -1,4 +1,4 @@
-<custom-navigation />
+<custom-navigation show-mark="{{true}}" />
 <view class="page-shell home-page">
   <view class="brief-heading">
     <view class="brief-heading-copy">
