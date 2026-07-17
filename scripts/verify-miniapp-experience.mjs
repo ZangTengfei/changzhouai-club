@@ -426,6 +426,25 @@ try {
   );
   pass("content_interactions_saved_and_loaded");
 
+  const news = await request("/api/miniapp/news", { headers: authHeaders });
+  assert.equal(news.response.status, 200);
+  assert.ok(Array.isArray(news.body?.categories));
+  assert.ok(Array.isArray(news.body?.items));
+  pass("news_feed_loaded_with_fallback_contract");
+
+  const dailyBrief = await request("/api/miniapp/news/daily", {
+    headers: authHeaders,
+  });
+  assert.equal(dailyBrief.response.status, 200);
+  pass("daily_brief_loaded_with_fallback_contract");
+
+  const groupDigests = await request("/api/miniapp/group-digests", {
+    headers: authHeaders,
+  });
+  assert.equal(groupDigests.response.status, 200);
+  assert.ok(Array.isArray(groupDigests.body?.items));
+  pass("published_group_digests_loaded");
+
   console.log(JSON.stringify({ ok: true, checks }, null, 2));
 } finally {
   if (avatarPath) {
