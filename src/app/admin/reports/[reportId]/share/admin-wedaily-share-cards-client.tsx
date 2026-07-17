@@ -566,7 +566,12 @@ function DailyShareCoverCard({
   topicCount: number;
 }) {
   return (
-    <article className="daily-share-card" data-share-card="cover" ref={cardRef}>
+    <article
+      className="daily-share-card"
+      data-copy-density={getCardCopyDensity(title, summary)}
+      data-share-card="cover"
+      ref={cardRef}
+    >
       <CardMeta date={date} />
       <main className="daily-share-card__cover-main">
         <p className="daily-share-card__eyebrow">LOCAL AI COMMUNITY · DAILY NOTES</p>
@@ -597,7 +602,12 @@ function DailyShareTopicCard({
   total: number;
 }) {
   return (
-    <article className="daily-share-card daily-share-card--topic" data-share-card={`topic-${index}`} ref={cardRef}>
+    <article
+      className="daily-share-card daily-share-card--topic"
+      data-copy-density={getCardCopyDensity(card.title, card.summary)}
+      data-share-card={`topic-${index}`}
+      ref={cardRef}
+    >
       <CardMeta date={date} />
       <main className="daily-share-card__topic-main">
         <p className="daily-share-card__eyebrow">{card.label || "精华话题"}</p>
@@ -664,4 +674,12 @@ function CardFooter({ text }: { text: string }) {
       <span>连接 · 分享 · 共创</span>
     </footer>
   );
+}
+
+function getCardCopyDensity(title: string, summary: string) {
+  const copyWeight = title.trim().length * 2 + summary.trim().length;
+
+  if (copyWeight > 160) return "dense";
+  if (copyWeight > 100) return "compact";
+  return "default";
 }
