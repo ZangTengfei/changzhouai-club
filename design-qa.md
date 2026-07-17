@@ -34,3 +34,53 @@
 - `npm run miniapp:verify-api`：既有签到验收夹具在 check-in 步骤返回 409；本次未修改后端签到逻辑，单列为后续测试维护项。
 
 final result: passed
+
+---
+
+# 群聊日报智能网格模板 Design QA
+
+- Source visual truth: `/Users/nobugai/.codex/generated_images/019f6e02-ffee-7973-b13e-fc2ab4d32d67/exec-122aadc7-f748-4a83-8dc9-61f1782d68fd.png`
+- Implementation screenshot: `/Users/nobugai/develop/changzhouai-club/output/playwright/wedaily-card-intelligent-grid-final.png`
+- Viewport: `1080 × 1440`
+- State: 话题卡默认文案密度，2026-07-17，话题 1 / 4
+- Full-view comparison: `/Users/nobugai/develop/changzhouai-club/output/playwright/wedaily-card-intelligent-grid-final-comparison.png`
+- Focused title comparison: `/Users/nobugai/develop/changzhouai-club/output/playwright/wedaily-card-intelligent-grid-title-comparison.png`
+- Supporting cover capture: `/Users/nobugai/develop/changzhouai-club/output/playwright/wedaily-card-intelligent-grid-cover.jpg`
+- Supporting end-card capture: `/Users/nobugai/develop/changzhouai-club/output/playwright/wedaily-card-intelligent-grid-end.jpg`
+
+## Findings
+
+- No actionable P0/P1/P2 differences remain.
+- Fonts and typography: implementation preserves the selected concept's extra-bold navy headline, compact metadata, blue topic label, and medium-weight summary. Exact line breaks remain content- and system-font-dependent by design because the title is editable.
+- Spacing and layout rhythm: title, summary block, metadata, index, and footer occupy comparable regions to the source; the earlier excessive middle gap has been removed.
+- Colors and visual tokens: white, powder blue, cobalt, and deep navy match the selected direction. Website green, orange, and beige are absent.
+- Image quality and asset fidelity: the technical grid and right-edge blue band use a generated 1080 × 1440 raster asset rather than a CSS approximation. The asset remains sharp at export resolution.
+- Copy and content: all existing editable title, summary, metadata, statistics, QR code, and footer content remain present.
+- Browser console: no warning or error entries during topic, cover, and end-card checks.
+
+## Comparison History
+
+1. Initial implementation: headline expanded across three wide lines and left a large unused middle region.
+   - Fix: narrowed the topic headline measure and increased its type scale.
+   - Evidence: `wedaily-card-intelligent-grid-comparison.png`.
+2. Second pass: headline hierarchy improved but remained shorter than the selected reference.
+   - Fix: set the default topic title to `144px` with a `700px` measure while preserving compact and dense fallbacks.
+   - Post-fix evidence: `wedaily-card-intelligent-grid-final-comparison.png` and `wedaily-card-intelligent-grid-title-comparison.png`.
+
+## Open Questions
+
+- None blocking. Editable copy can naturally produce different line breaks from the fixed mockup; the existing density modes protect longer content.
+
+## Implementation Checklist
+
+- [x] Use the selected blue technical-grid visual system.
+- [x] Apply the system to cover, topic, and QR end cards.
+- [x] Preserve editable copy and density fallbacks.
+- [x] Preserve PNG export with background and QR layers.
+- [x] Check topic, cover, and end-card browser rendering.
+
+## Follow-up Polish
+
+- P3: If a future bundled display font is introduced, recheck Chinese glyph width and topic wrapping across macOS and Windows.
+
+final result: passed

@@ -19,6 +19,7 @@ import {
 
 const MAX_TOPIC_CARDS = 6;
 const PREVIEW_SCALE = 0.34;
+const DAILY_SHARE_CARD_BACKGROUND = "/share-cards/wedaily-intelligent-grid.png";
 const TOPIC_EMOJIS = [
   "💡", "🔍", "🧰", "🚀", "🧠", "✨",
   "🤖", "🏭", "📣", "🎯", "🧭", "🔧",
@@ -71,7 +72,7 @@ export function AdminWeDailyShareCardsClient({
     let cancelled = false;
 
     QRCode.toDataURL(reportUrl, {
-      color: { dark: "#173d33", light: "#ffffff" },
+      color: { dark: "#061747", light: "#ffffff" },
       errorCorrectionLevel: "M",
       margin: 1,
       width: 266,
@@ -572,6 +573,7 @@ function DailyShareCoverCard({
       data-share-card="cover"
       ref={cardRef}
     >
+      <CardBackground />
       <CardMeta date={date} />
       <main className="daily-share-card__cover-main">
         <p className="daily-share-card__eyebrow">LOCAL AI COMMUNITY · DAILY NOTES</p>
@@ -608,6 +610,7 @@ function DailyShareTopicCard({
       data-share-card={`topic-${index}`}
       ref={cardRef}
     >
+      <CardBackground />
       <CardMeta date={date} />
       <main className="daily-share-card__topic-main">
         <p className="daily-share-card__eyebrow">{card.label || "精华话题"}</p>
@@ -633,6 +636,7 @@ function DailyShareEndCard({
 }) {
   return (
     <article className="daily-share-card daily-share-card--end" data-share-card="end" ref={cardRef}>
+      <CardBackground />
       <CardMeta date={date} />
       <main className="daily-share-card__end-main">
         <p className="daily-share-card__eyebrow">READ THE FULL REPORT</p>
@@ -646,6 +650,18 @@ function DailyShareEndCard({
       </main>
       <CardFooter text={reportUrl} />
     </article>
+  );
+}
+
+function CardBackground() {
+  return (
+    <img
+      className="daily-share-card__background"
+      src={DAILY_SHARE_CARD_BACKGROUND}
+      alt=""
+      aria-hidden="true"
+      data-export-background
+    />
   );
 }
 
