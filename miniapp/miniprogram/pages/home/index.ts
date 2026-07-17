@@ -3,6 +3,7 @@ import {
   loadEvents,
   type EventSummary,
 } from "../../services/events";
+import { loadGroupDigests, loadNews } from "../../services/content";
 import { trackEvent } from "../../services/analytics";
 import { ensureSession } from "../../services/auth";
 
@@ -11,6 +12,15 @@ type HomeEvent = EventSummary & {
   dateLabel: string;
   indexLabel: string;
   locationLabel: string;
+};
+
+type HomeNews = MiniappNewsItem & {
+  metaLabel: string;
+};
+
+type HomeDigest = MiniappGroupDigest & {
+  dateLabel: string;
+  summaryLabel: string;
 };
 
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
@@ -33,6 +43,8 @@ Page({
     briefDate: formatBriefDate(),
     eventSectionTitle: "最近记录",
     eventSectionHint: "查看全部活动",
+    featuredNews: null as HomeNews | null,
+    latestDigest: null as HomeDigest | null,
     profileCompletion: null as MiniappProfileCompletion | null,
     loading: true,
     loadFailed: false,
@@ -76,6 +88,7 @@ Page({
           : "查看全部活动",
         loading: false,
       });
+      void this.loadContentHighlights();
     } catch {
       this.setData({
         featuredEvent: null,
@@ -83,6 +96,37 @@ Page({
         loading: false,
         loadFailed: true,
       });
+    }
+  },
+
+  async loadContentHighlights() {
+    try {
+      await ensureSession();
+      const [news, digests] = await Promise.all([
+        loadNews({ mode: "selected" }),
+        loadGroupDigests(),
+      ]);
+      const firstNews = news.items[0] ?? null;
+      const firstDigest = digests.items[0] ?? null;
+      this.setData({
+        featuredNews: firstNews
+          ? {
+              ...firstNews,
+              metaLabel: `${firstNews.sourceName} · ${firstNews.categoryLabel}`,
+            }
+          : null,
+        latestDigest: firstDigest
+          ? {
+              ...firstDigest,
+              dateLabel: firstDigest.date.replace(/-/g, "."),
+              summaryLabel:
+                firstDigest.overview ||
+                `整理了 ${firstDigest.highlightCount} 个讨论要点。`,
+            }
+          : null,
+      });
+    } catch {
+      this.setData({ featuredNews: null, latestDigest: null });
     }
   },
 
@@ -111,5 +155,25 @@ Page({
 
   openEvents() {
     void wx.switchTab({ url: "/pages/events/index" });
+  },
+
+  openNewsTab() {
+    void wx.switchTab({ url: "/pages/news/index" });
+  },
+
+  openNews(event: WechatMiniprogram.TouchEvent) {
+    const id = String(event.currentTarget.dataset.id ?? "");
+    if (!id) return;
+    void wx.navigateTo({
+      url: `/pages/news/detail/index?kind=news&id=${encodeURIComponent(id)}`,
+    });
+  },
+
+  openDigest(event: WechatMiniprogram.TouchEvent) {
+    const id = String(event.currentTarget.dataset.id ?? "");
+    if (!id) return;
+    void wx.navigateTo({
+      url: `/pages/news/detail/index?kind=digest&id=${encodeURIComponent(id)}`,
+    });
   },
 });

@@ -70,4 +70,20 @@
       <image src="/assets/icons/chevron-right.png" mode="aspectFit" />
     </view>
   </block>
+
+  <view wx:if="{{featuredNews || latestDigest}}" class="content-heading">
+    <text class="section-title">今日情报</text>
+    <view class="text-action" bindtap="openNewsTab" role="button">查看资讯</view>
+  </view>
+  <view wx:if="{{featuredNews}}" class="content-highlight" data-id="{{featuredNews.id}}" bindtap="openNews">
+    <view class="content-highlight-meta"><text>AI HOT</text><text>{{featuredNews.metaLabel}}</text></view>
+    <text class="content-highlight-title">{{featuredNews.title}}</text>
+    <text wx:if="{{featuredNews.summary}}" class="content-highlight-summary">{{featuredNews.summary}}</text>
+  </view>
+  <view wx:if="{{latestDigest}}" class="digest-highlight" data-id="{{latestDigest.id}}" bindtap="openDigest">
+    <text class="digest-highlight-label">群聊精华 · {{latestDigest.dateLabel}}</text>
+    <text class="digest-highlight-title">{{latestDigest.title}}</text>
+    <text class="digest-highlight-copy">{{latestDigest.summaryLabel}}</text>
+    <image src="/assets/icons/chevron-right.png" mode="aspectFit" />
+  </view>
 </view>

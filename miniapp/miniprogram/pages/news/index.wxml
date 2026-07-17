@@ -1,0 +1,53 @@
+<custom-navigation />
+<view class="page-shell news-page">
+  <view class="page-heading">
+    <view class="page-title-row"><text class="page-title">今日情报</text><text class="page-count">AI · 社区 · 连接</text></view>
+    <text class="page-summary">值得继续阅读、讨论和带回群里的内容。</text>
+  </view>
+
+  <view class="mode-tabs" aria-label="内容类型">
+    <view class="mode-tab {{activeSection === 'selected' ? 'mode-tab-active' : ''}}" data-section="selected" bindtap="switchSection">精选</view>
+    <view class="mode-tab {{activeSection === 'all' ? 'mode-tab-active' : ''}}" data-section="all" bindtap="switchSection">AI 快讯</view>
+    <view class="mode-tab {{activeSection === 'digest' ? 'mode-tab-active' : ''}}" data-section="digest" bindtap="switchSection">群聊精华</view>
+  </view>
+
+  <scroll-view wx:if="{{activeSection !== 'digest'}}" class="category-tabs" scroll-x="true" enable-flex="true" aria-label="资讯分类">
+    <view class="category-tabs-inner">
+      <view wx:for="{{categories}}" wx:key="id" class="category-tab {{activeCategory === item.id ? 'category-tab-active' : ''}}" data-category="{{item.id}}" bindtap="switchCategory">{{item.label}}</view>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{isStale && !loading}}" class="stale-note">外部内容源暂时波动，正在展示最近一次整理结果。</view>
+  <view wx:if="{{loading}}" class="empty-state">正在整理今日内容</view>
+  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadContent">内容加载失败，轻触重试</view>
+
+  <block wx:elif="{{activeSection !== 'digest'}}">
+    <view wx:if="{{items.length === 0}}" class="empty-state">这一类内容还在整理中</view>
+    <view wx:else class="news-list">
+      <view wx:for="{{items}}" wx:key="id" class="news-row" data-id="{{item.id}}" bindtap="openNews">
+        <view class="news-rail"><text>{{item.dateLabel}}</text><view></view></view>
+        <view class="news-copy">
+          <view class="news-meta"><text>{{item.metaLabel}}</text><text wx:if="{{item.isFavorited}}">已收藏</text></view>
+          <text class="news-title">{{item.title}}</text>
+          <text wx:if="{{item.summary}}" class="news-summary">{{item.summary}}</text>
+          <text wx:if="{{item.recommendationReason}}" class="news-reason">推荐 · {{item.recommendationReason}}</text>
+        </view>
+        <image class="news-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+      </view>
+    </view>
+    <view wx:if="{{loadingMore}}" class="loading-more">正在继续加载</view>
+    <view wx:elif="{{hasNext}}" class="loading-more">继续下滑查看更多</view>
+  </block>
+
+  <block wx:else>
+    <view wx:if="{{digests.length === 0}}" class="empty-state">还没有经运营确认可展示的群聊精华</view>
+    <view wx:else class="digest-list">
+      <view wx:for="{{digests}}" wx:key="id" class="digest-row" data-id="{{item.id}}" bindtap="openDigest">
+        <view class="digest-heading"><text class="digest-date">{{item.dateLabel}}</text><text wx:if="{{item.isFavorited}}" class="digest-favorite">已收藏</text></view>
+        <text class="digest-title">{{item.title}}</text>
+        <text class="digest-summary">{{item.summaryLabel}}</text>
+        <view class="digest-footer"><text>{{item.highlightCount}} 个讨论要点</text><text>{{item.resourceCount}} 条资源线索</text><image src="/assets/icons/chevron-right.png" mode="aspectFit" /></view>
+      </view>
+    </view>
+  </block>
+</view>

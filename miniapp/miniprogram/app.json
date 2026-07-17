@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/home/index",
+    "pages/news/index",
     "pages/events/index",
     "pages/me/index",
     "pages/events/detail/index",
@@ -28,6 +29,12 @@
         "text": "首页",
         "iconPath": "assets/icons/home.png",
         "selectedIconPath": "assets/icons/home-active.png"
+      },
+      {
+        "pagePath": "pages/news/index",
+        "text": "资讯",
+        "iconPath": "assets/icons/news.png",
+        "selectedIconPath": "assets/icons/news-active.png"
       },
       {
         "pagePath": "pages/events/index",

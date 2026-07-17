@@ -96,6 +96,67 @@ interface MiniappProfileUpdate {
   privacyAccepted: boolean;
 }
 
+type MiniappNewsMode = "selected" | "all";
+
+interface MiniappNewsCategory {
+  id: string;
+  label: string;
+}
+
+interface MiniappContentInteraction {
+  isFavorited: boolean;
+  lastReadAt: string | null;
+}
+
+interface MiniappNewsItem extends MiniappContentInteraction {
+  id: string;
+  title: string;
+  summary: string | null;
+  recommendationReason: string | null;
+  sourceName: string;
+  sourceUrl: string;
+  category: string;
+  categoryLabel: string;
+  publishedAt: string | null;
+}
+
+interface MiniappGroupDigest extends MiniappContentInteraction {
+  id: string;
+  date: string;
+  title: string;
+  overview: string | null;
+  highlightCount: number;
+  resourceCount: number;
+  tags: string[];
+}
+
+interface MiniappGroupDigestDetail extends MiniappGroupDigest {
+  highlights: Array<{ title: string; summary: string }>;
+  discussions: Array<{ title: string; conclusion: string }>;
+  resources: Array<{ title: string; body: string; url: string | null }>;
+}
+
+interface MiniappDailyBrief {
+  date: string;
+  generatedAt: string;
+  lead: { title: string; leadParagraph: string } | null;
+  sections: Array<{
+    label: string;
+    items: Array<{
+      sourceName: string;
+      sourceUrl: string;
+      summary: string;
+      title: string;
+    }>;
+  }>;
+  flashes: Array<{
+    publishedAt: string | null;
+    sourceName: string;
+    sourceUrl: string;
+    title: string;
+  }>;
+}
+
 interface MiniappRegistrationEvent {
   id: string;
   slug: string;

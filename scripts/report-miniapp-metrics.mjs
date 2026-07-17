@@ -17,6 +17,12 @@ const eventNames = [
   "login_success",
   "login_failed",
   "home_view",
+  "news_list_view",
+  "news_item_view",
+  "group_digest_view",
+  "content_favorited",
+  "content_unfavorited",
+  "content_shared",
   "event_list_view",
   "event_detail_view",
   "profile_started",
@@ -63,6 +69,10 @@ console.log(
         profileStartToCompletion: ratio(
           counts.profile_completed,
           counts.profile_started,
+        ),
+        contentReadToFavorite: ratio(
+          counts.content_favorited,
+          counts.news_item_view + counts.group_digest_view,
         ),
         registrationToReminderAcceptance: ratio(
           counts.reminder_accepted,

@@ -5,6 +5,12 @@ export const runtime = "nodejs";
 const ALLOWED_EVENTS = new Set([
   "login_success",
   "home_view",
+  "news_list_view",
+  "news_item_view",
+  "group_digest_view",
+  "content_favorited",
+  "content_unfavorited",
+  "content_shared",
   "event_list_view",
   "event_detail_view",
   "profile_started",

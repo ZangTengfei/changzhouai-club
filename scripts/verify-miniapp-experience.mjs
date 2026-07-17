@@ -164,7 +164,7 @@ try {
     "avatar.png",
   );
   avatarForm.append("privacyAccepted", "true");
-  avatarForm.append("policyVersion", "2026-07-17");
+  avatarForm.append("policyVersion", "2026-07-18");
   const avatarUpload = await request("/api/miniapp/profile/avatar", {
     method: "POST",
     headers: authHeaders,
@@ -390,6 +390,41 @@ try {
   });
   assert.equal(analytics.response.status, 200);
   pass("analytics_tracked");
+
+  const contentRead = await request("/api/miniapp/content-interactions", {
+    method: "POST",
+    headers: authHeaders,
+    body: JSON.stringify({
+      action: "read",
+      contentType: "news",
+      contentId: "verification-news-item",
+    }),
+  });
+  assert.equal(contentRead.response.status, 200);
+  assert.ok(contentRead.body?.interaction?.lastReadAt);
+
+  const contentFavorite = await request("/api/miniapp/content-interactions", {
+    method: "POST",
+    headers: authHeaders,
+    body: JSON.stringify({
+      action: "favorite",
+      contentType: "news",
+      contentId: "verification-news-item",
+    }),
+  });
+  assert.equal(contentFavorite.response.status, 200);
+  assert.equal(contentFavorite.body?.interaction?.isFavorited, true);
+
+  const contentInteractions = await request(
+    "/api/miniapp/content-interactions?contentType=news&contentIds=verification-news-item",
+    { headers: authHeaders },
+  );
+  assert.equal(contentInteractions.response.status, 200);
+  assert.equal(
+    contentInteractions.body?.interactions?.["verification-news-item"]?.isFavorited,
+    true,
+  );
+  pass("content_interactions_saved_and_loaded");
 
   console.log(JSON.stringify({ ok: true, checks }, null, 2));
 } finally {

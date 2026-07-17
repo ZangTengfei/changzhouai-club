@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Download, Images, RefreshCcw, Save } from "lucide-react";
+import { Download, EyeOff, Images, RefreshCcw, Save, Send } from "lucide-react";
 
 import { AdminNotice, AdminStatusBadge } from "@/components/admin-ui";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,8 @@ export function AdminWeDailyReportsClient({
   const [previewTemplate, setPreviewTemplate] = useState<AdminWeDailyReportExportTemplate | null>(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [message, setMessage] = useState(initialError);
+  const [miniappPublished, setMiniappPublished] = useState(false);
+  const [miniappPublicationLoading, setMiniappPublicationLoading] = useState(false);
 
   const selectedReport = useMemo(
     () => reports.find((report) => report.id === selectedReportId) ?? reports[0] ?? null,
@@ -83,6 +85,36 @@ export function AdminWeDailyReportsClient({
       window.clearTimeout(timer);
     };
   }, [selectedReport?.id, markdown]);
+
+  useEffect(() => {
+    if (!selectedReport) {
+      setMiniappPublished(false);
+      return;
+    }
+
+    let cancelled = false;
+    setMiniappPublicationLoading(true);
+
+    void fetch(`/api/admin/wedaily/reports/${selectedReport.id}/miniapp-publication`, {
+      cache: "no-store",
+    }).then(async (response) => {
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; published?: boolean }
+        | null;
+      if (!response.ok) throw new Error(payload?.error || "读取小程序发布状态失败");
+      if (!cancelled) setMiniappPublished(Boolean(payload?.published));
+    }).catch((error) => {
+      if (!cancelled) {
+        setMessage(error instanceof Error ? error.message : "读取小程序发布状态失败");
+      }
+    }).finally(() => {
+      if (!cancelled) setMiniappPublicationLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedReport?.id]);
 
   async function reloadReports() {
     setLoadState("loading");
@@ -179,6 +211,34 @@ export function AdminWeDailyReportsClient({
     }
   }
 
+  async function toggleMiniappPublication() {
+    if (!selectedReport || miniappPublicationLoading) return;
+
+    setMiniappPublicationLoading(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch(
+        `/api/admin/wedaily/reports/${selectedReport.id}/miniapp-publication`,
+        {
+          method: "PATCH",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ published: !miniappPublished }),
+        },
+      );
+      const payload = (await response.json().catch(() => null)) as
+        | { error?: string; published?: boolean }
+        | null;
+      if (!response.ok) throw new Error(payload?.error || "更新小程序发布状态失败");
+      setMiniappPublished(Boolean(payload?.published));
+      setMessage(payload?.published ? "已发布到小程序群聊精华。" : "已从小程序群聊精华撤回。");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "更新小程序发布状态失败");
+    } finally {
+      setMiniappPublicationLoading(false);
+    }
+  }
+
   function upsertReport(report: AdminWeDailyReport) {
     setReports((current) =>
       current.map((item) => (item.id === report.id ? report : item)),
@@ -237,6 +297,9 @@ export function AdminWeDailyReportsClient({
                   <AdminStatusBadge tone={isDirty ? "pending" : "active"}>
                     {isDirty ? "未保存" : "已同步"}
                   </AdminStatusBadge>
+                  <AdminStatusBadge tone={miniappPublished ? "active" : "pending"}>
+                    {miniappPublished ? "小程序已发布" : "小程序未发布"}
+                  </AdminStatusBadge>
                   <span className="text-xs text-muted-foreground">
                     {selectedReport.generated_by || "WeDaily"}
                   </span>
@@ -255,6 +318,15 @@ export function AdminWeDailyReportsClient({
                     <Images className="size-4" />
                     制作精华贴图
                   </Link>
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={toggleMiniappPublication}
+                  disabled={miniappPublicationLoading || isDirty}
+                >
+                  {miniappPublished ? <EyeOff className="size-4" /> : <Send className="size-4" />}
+                  {miniappPublished ? "撤回小程序" : "发布到小程序"}
                 </Button>
                 <Button
                   type="button"

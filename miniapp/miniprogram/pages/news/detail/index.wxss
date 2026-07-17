@@ -1,0 +1,22 @@
+.detail-page { display: flex; flex-direction: column; gap: 28rpx; padding-top: 42rpx; }
+.detail-eyebrow { display: flex; gap: 16rpx; color: var(--color-green); font-size: 22rpx; font-weight: 740; }
+.detail-title { font-size: 50rpx; font-weight: 820; line-height: 1.3; }
+.detail-lead { color: var(--color-muted); font-size: 28rpx; line-height: 1.78; }
+.reason-panel { display: flex; flex-direction: column; gap: 10rpx; padding: 22rpx 24rpx; border-left: 6rpx solid var(--color-orange); background: var(--color-orange-soft); color: #6d4a27; font-size: 25rpx; line-height: 1.65; }
+.reason-panel text:first-child, .detail-section-label { font-size: 20rpx; font-weight: 760; }
+.detail-actions { display: flex; flex-wrap: wrap; gap: 16rpx; padding-top: 4rpx; }
+.action-button { display: flex; width: auto; min-width: 154rpx; min-height: 68rpx; align-items: center; justify-content: center; margin: 0; padding: 0 22rpx; border: 2rpx solid var(--color-green); border-radius: 6rpx; background: transparent; color: var(--color-green); font-size: 24rpx; font-weight: 700; line-height: 1; }
+.action-button::after { border: 0; }
+.action-button-active { background: var(--color-green); color: #ffffff; }
+.source-note { display: flex; flex-direction: column; gap: 8rpx; padding-top: 22rpx; border-top: 2rpx solid var(--color-line); color: var(--color-subtle); font-size: 23rpx; line-height: 1.55; }
+.source-note text:first-child { color: var(--color-ink); font-size: 25rpx; font-weight: 700; }
+.detail-section { display: flex; flex-direction: column; gap: 12rpx; padding-top: 28rpx; border-top: 2rpx solid var(--color-line); }
+.detail-section-label { color: var(--color-green); }
+.detail-section-title { font-size: 34rpx; font-weight: 780; }
+.detail-list { border-top: 2rpx solid var(--color-line); }
+.detail-item { display: flex; flex-direction: column; gap: 8rpx; padding: 22rpx 0; border-bottom: 2rpx solid var(--color-line); }
+.detail-item-title { font-size: 28rpx; font-weight: 740; line-height: 1.45; }
+.detail-item-copy { color: var(--color-muted); font-size: 24rpx; line-height: 1.65; }
+.detail-link { width: fit-content; padding-top: 4rpx; color: var(--color-green); font-size: 23rpx; font-weight: 700; }
+.tag-list { display: flex; flex-wrap: wrap; gap: 12rpx; color: var(--color-green-dark); font-size: 22rpx; }
+.privacy-note { padding-top: 24rpx; border-top: 2rpx solid var(--color-line); color: var(--color-subtle); font-size: 22rpx; line-height: 1.65; }

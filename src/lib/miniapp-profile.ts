@@ -1,6 +1,6 @@
 import { memberTags } from "@/lib/site-data";
 
-export const MINIAPP_PRIVACY_POLICY_VERSION = "2026-07-17";
+export const MINIAPP_PRIVACY_POLICY_VERSION = "2026-07-18";
 
 export const MINIAPP_INDUSTRY_OPTIONS = [
   "制造业",
