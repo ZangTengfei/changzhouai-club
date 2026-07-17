@@ -82,7 +82,7 @@
           <button class="secondary-button" loading="{{checkinSubmitting}}" disabled="{{checkinSubmitting}}" bindtap="scanCheckinCode">{{attendance ? '已签到' : '扫码签到'}}</button>
           <button class="secondary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="cancelRegistration">取消报名</button>
         </block>
-        <block wx:elif="{{!user || !user.profileComplete}}">
+        <block wx:elif="{{!user || !user.registrationReady}}">
           <text class="registration-title">完善资料后报名</text>
           <text class="muted registration-copy">昵称和微信号用于活动联系，只需填写一次。</text>
           <button class="primary-button" bindtap="openProfile">完善社区资料</button>

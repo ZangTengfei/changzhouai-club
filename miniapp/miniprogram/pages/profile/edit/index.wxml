@@ -4,36 +4,106 @@
 
   <view wx:else class="profile-form">
     <view class="form-heading">
-      <text class="section-title">社区资料</text>
-      <text class="muted form-summary">昵称和微信号用于活动报名联系，其他信息可以帮助社区找到更合适的连接。</text>
+      <view>
+        <text class="section-title">能力档案</text>
+        <text class="completion-label">{{completion ? completion.percent : 0}}% 已完成</text>
+      </view>
+      <text class="muted form-summary">资料越清晰，社区越容易为你找到合适的活动、伙伴和协作机会。</text>
+      <view class="completion-track"><view class="completion-value" style="width: {{completion ? completion.percent : 0}}%;"></view></view>
     </view>
 
-    <button class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="chooseAvatar" loading="{{avatarUploading}}">
-      <image wx:if="{{avatarUrl}}" class="avatar-preview" src="{{avatarUrl}}" mode="aspectFill" />
-      <view wx:else class="avatar-preview avatar-empty">选择头像</view>
-      <text class="avatar-action">更换头像</text>
-    </button>
-
-    <label class="form-field"><text class="field-label">昵称 *</text><input class="field-input" maxlength="60" value="{{displayName}}" data-field="displayName" bindinput="handleInput" /></label>
-    <label class="form-field"><text class="field-label">微信号 *</text><input class="field-input" maxlength="80" value="{{wechat}}" data-field="wechat" bindinput="handleInput" /></label>
-    <label class="form-field"><text class="field-label">所在城市</text><input class="field-input" maxlength="40" value="{{city}}" data-field="city" bindinput="handleInput" /></label>
-    <label class="form-field"><text class="field-label">职业方向</text><input class="field-input" maxlength="80" value="{{roleLabel}}" data-field="roleLabel" bindinput="handleInput" placeholder="例如：产品经理、开发者" /></label>
-    <label class="form-field"><text class="field-label">组织或公司</text><input class="field-input" maxlength="120" value="{{organization}}" data-field="organization" bindinput="handleInput" /></label>
-    <label class="form-field"><text class="field-label">每月可投入时间</text><input class="field-input" maxlength="80" value="{{monthlyTime}}" data-field="monthlyTime" bindinput="handleInput" placeholder="例如：每月 4 小时" /></label>
-    <label class="form-field"><text class="field-label">技能标签</text><input class="field-input" value="{{skillsText}}" data-field="skillsText" bindinput="handleInput" placeholder="多个标签用逗号分隔" /></label>
-    <label class="form-field"><text class="field-label">感兴趣的方向</text><input class="field-input" value="{{interestsText}}" data-field="interestsText" bindinput="handleInput" placeholder="多个方向用逗号分隔" /></label>
-    <label class="form-field"><text class="field-label">个人介绍</text><textarea class="field-textarea" maxlength="500" value="{{bio}}" data-field="bio" bindinput="handleInput" placeholder="简单介绍你正在做的事情" /></label>
-
-    <view class="preference-list">
-      <view class="preference-row"><text>愿意参加社区活动</text><switch checked="{{willingToAttend}}" data-field="willingToAttend" bindchange="handleSwitch" color="#147a5b" /></view>
-      <view class="preference-row"><text>愿意分享实践经验</text><switch checked="{{willingToShare}}" data-field="willingToShare" bindchange="handleSwitch" color="#147a5b" /></view>
-      <view class="preference-row"><text>愿意参与共创项目</text><switch checked="{{willingToJoinProjects}}" data-field="willingToJoinProjects" bindchange="handleSwitch" color="#147a5b" /></view>
+    <view class="stepper" aria-label="资料填写进度">
+      <view wx:for="{{steps}}" wx:key="index" class="step-item {{item.index === currentStep ? 'step-item-active' : ''}} {{item.index < currentStep ? 'step-item-complete' : ''}}">
+        <text class="step-number">{{item.index + 1}}</text>
+        <text class="step-label">{{item.label}}</text>
+      </view>
     </view>
 
-    <checkbox-group bindchange="handlePrivacyChange">
-      <label class="privacy-row"><checkbox value="accepted" checked="{{privacyAccepted}}" color="#147a5b" /><text>我已阅读并同意</text><text class="privacy-link" catchtap="openPrivacy">隐私说明</text></label>
-    </checkbox-group>
+    <view class="step-heading">
+      <text class="step-title">{{currentStepTitle}}</text>
+      <text class="step-hint">{{currentStepHint}}</text>
+    </view>
 
-    <button class="primary-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveProfile">保存资料</button>
+    <view wx:if="{{currentStep === 0}}" class="step-content">
+      <button class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="chooseAvatar" loading="{{avatarUploading}}">
+        <image wx:if="{{avatarUrl}}" class="avatar-preview" src="{{avatarUrl}}" mode="aspectFill" />
+        <view wx:else class="avatar-preview avatar-empty">选择头像</view>
+        <view class="avatar-copy"><text class="avatar-title">成员头像</text><text class="avatar-action">点击更换</text></view>
+      </button>
+
+      <label class="form-field"><text class="field-label">昵称 *</text><input class="field-input" maxlength="60" value="{{displayName}}" data-field="displayName" bindinput="handleInput" placeholder="你希望大家如何称呼你" /></label>
+      <label class="form-field"><text class="field-label">微信号 *</text><input class="field-input" maxlength="80" value="{{wechat}}" data-field="wechat" bindinput="handleInput" placeholder="仅用于社区联系，不公开展示" /></label>
+      <label class="form-field"><text class="field-label">所在城市 / 辖区 *</text><input class="field-input" maxlength="40" value="{{city}}" data-field="city" bindinput="handleInput" placeholder="例如：常州新北区" /></label>
+      <label class="form-field"><text class="field-label">当前身份 *</text><input class="field-input" maxlength="80" value="{{roleLabel}}" data-field="roleLabel" bindinput="handleInput" placeholder="例如：产品经理、开发者、创业者" /></label>
+      <label class="form-field"><text class="field-label">组织或公司</text><input class="field-input" maxlength="120" value="{{organization}}" data-field="organization" bindinput="handleInput" placeholder="选填" /></label>
+
+      <checkbox-group bindchange="handlePrivacyChange">
+        <label class="privacy-row"><checkbox value="accepted" checked="{{privacyAccepted}}" color="#147a5b" /><text>我已阅读并同意</text><text class="privacy-link" catchtap="openPrivacy">隐私说明</text></label>
+      </checkbox-group>
+    </view>
+
+    <view wx:elif="{{currentStep === 1}}" class="step-content">
+      <view class="tag-field">
+        <view class="field-heading"><text class="field-label">所在行业 *</text><text class="field-count">已选 {{industryTags.length}} / 8</text></view>
+        <view class="tag-options">
+          <view wx:for="{{industryOptionItems}}" wx:key="label" class="tag-option {{item.selected ? 'tag-option-selected' : ''}}" data-field="industryTags" data-value="{{item.label}}" bindtap="toggleTag" role="button">{{item.label}}</view>
+        </view>
+        <view class="custom-tag-row">
+          <input class="field-input custom-tag-input" maxlength="40" value="{{customIndustry}}" data-field="customIndustry" bindinput="handleInput" placeholder="补充其他行业" />
+          <button class="tag-add-button" bindtap="addCustomIndustry">添加</button>
+        </view>
+      </view>
+
+      <view class="tag-field">
+        <view class="field-heading"><text class="field-label">擅长方向 *</text><text class="field-count">已选 {{skills.length}}</text></view>
+        <text class="field-help">选择你能实际交流、分享或参与协作的方向。</text>
+        <view class="tag-options">
+          <view wx:for="{{skillOptionItems}}" wx:key="label" class="tag-option {{item.selected ? 'tag-option-selected' : ''}}" data-field="skills" data-value="{{item.label}}" bindtap="toggleTag" role="button">{{item.label}}</view>
+        </view>
+        <view class="custom-tag-row">
+          <input class="field-input custom-tag-input" maxlength="80" value="{{customSkill}}" data-field="customSkill" bindinput="handleInput" placeholder="补充技能，多个用逗号分隔" />
+          <button class="tag-add-button" bindtap="addCustomSkill">添加</button>
+        </view>
+      </view>
+    </view>
+
+    <view wx:elif="{{currentStep === 2}}" class="step-content">
+      <label class="form-field"><text class="field-label">我能提供什么</text><textarea class="field-textarea" maxlength="300" value="{{capabilitySummary}}" data-field="capabilitySummary" bindinput="handleInput" placeholder="例如：可以交流企业知识库落地，也愿意帮忙评审产品原型" /></label>
+      <label class="form-field"><text class="field-label">我现在需要什么</text><textarea class="field-textarea" maxlength="300" value="{{seekingSummary}}" data-field="seekingSummary" bindinput="handleInput" placeholder="例如：正在寻找制造业 AI 场景和懂销售的合作伙伴" /></label>
+      <text class="connection-note">以上两项至少填写一项，内容应尽量具体。</text>
+      <label class="form-field"><text class="field-label">感兴趣的方向</text><input class="field-input" value="{{interestsText}}" data-field="interestsText" bindinput="handleInput" placeholder="多个方向用逗号分隔" /></label>
+      <label class="form-field"><text class="field-label">每月可投入时间</text><input class="field-input" maxlength="80" value="{{monthlyTime}}" data-field="monthlyTime" bindinput="handleInput" placeholder="例如：每月 4 小时" /></label>
+      <label class="form-field"><text class="field-label">个人介绍</text><textarea class="field-textarea" maxlength="500" value="{{bio}}" data-field="bio" bindinput="handleInput" placeholder="简单介绍你正在做的事情" /></label>
+
+      <view class="preference-list">
+        <view class="preference-row"><text>愿意参加社区活动</text><switch checked="{{willingToAttend}}" data-field="willingToAttend" bindchange="handleSwitch" color="#147a5b" /></view>
+        <view class="preference-row"><text>愿意分享实践经验</text><switch checked="{{willingToShare}}" data-field="willingToShare" bindchange="handleSwitch" color="#147a5b" /></view>
+        <view class="preference-row"><text>愿意参与共创项目</text><switch checked="{{willingToJoinProjects}}" data-field="willingToJoinProjects" bindchange="handleSwitch" color="#147a5b" /></view>
+      </view>
+    </view>
+
+    <view wx:else class="step-content">
+      <view class="profile-preview">
+        <view class="preview-header">
+          <image wx:if="{{avatarUrl}}" class="preview-avatar" src="{{avatarUrl}}" mode="aspectFill" />
+          <view wx:else class="preview-avatar preview-avatar-empty">{{avatarInitial}}</view>
+          <view class="preview-title"><text>{{displayName || '社区成员'}}</text><text>{{roleLabel || '当前身份待补充'}}{{organization ? ' · ' + organization : ''}}</text></view>
+        </view>
+        <view class="preview-section"><text class="preview-label">行业</text><view class="preview-tags"><text wx:for="{{industryTags}}" wx:key="*this">{{item}}</text></view></view>
+        <view class="preview-section"><text class="preview-label">擅长方向</text><view class="preview-tags"><text wx:for="{{skills}}" wx:key="*this">{{item}}</text></view></view>
+        <view wx:if="{{capabilitySummary}}" class="preview-section"><text class="preview-label">可以提供</text><text class="preview-copy">{{capabilitySummary}}</text></view>
+        <view wx:if="{{seekingSummary}}" class="preview-section"><text class="preview-label">正在寻找</text><text class="preview-copy">{{seekingSummary}}</text></view>
+      </view>
+
+      <view class="visibility-row">
+        <view><text class="field-label">公开成员档案</text><text class="visibility-help">开启后，以上资料可在社区成员页面展示；微信号不会公开。</text></view>
+        <switch checked="{{isPubliclyVisible}}" data-field="isPubliclyVisible" bindchange="handleSwitch" color="#147a5b" />
+      </view>
+    </view>
+
+    <view class="form-actions">
+      <button wx:if="{{currentStep > 0}}" class="secondary-button back-button" disabled="{{saving}}" bindtap="goPrevious">上一步</button>
+      <button class="primary-button next-button" loading="{{saving}}" disabled="{{saving}}" bindtap="handlePrimaryAction">{{currentStep === 3 ? '保存能力档案' : '保存并继续'}}</button>
+    </view>
   </view>
 </view>

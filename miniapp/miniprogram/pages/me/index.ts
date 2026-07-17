@@ -81,6 +81,10 @@ Page({
     void wx.navigateTo({ url: "/pages/growth/index" });
   },
 
+  openProfile() {
+    void wx.navigateTo({ url: "/pages/profile/edit/index" });
+  },
+
   openEvent(event: WechatMiniprogram.TouchEvent) {
     const slug = String(event.currentTarget.dataset.slug ?? "");
     if (!slug) return;

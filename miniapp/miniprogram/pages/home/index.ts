@@ -1,4 +1,8 @@
-import { formatEventDate, loadEvents, type EventSummary } from "../../services/events";
+import {
+  formatEventDate,
+  loadEvents,
+  type EventSummary,
+} from "../../services/events";
 import { trackEvent } from "../../services/analytics";
 import { ensureSession } from "../../services/auth";
 
@@ -29,15 +33,20 @@ Page({
     briefDate: formatBriefDate(),
     eventSectionTitle: "最近记录",
     eventSectionHint: "查看全部活动",
+    profileCompletion: null as MiniappProfileCompletion | null,
     loading: true,
     loadFailed: false,
   },
 
   onLoad() {
-    void ensureSession().then(() =>
-      trackEvent("home_view", "/pages/home/index"),
-    ).catch(() => undefined);
+    void ensureSession()
+      .then(() => trackEvent("home_view", "/pages/home/index"))
+      .catch(() => undefined);
     void this.loadPage();
+  },
+
+  onShow() {
+    void this.loadProfileProgress();
   },
 
   onPullDownRefresh() {
@@ -68,14 +77,35 @@ Page({
         loading: false,
       });
     } catch {
-      this.setData({ featuredEvent: null, events: [], loading: false, loadFailed: true });
+      this.setData({
+        featuredEvent: null,
+        events: [],
+        loading: false,
+        loadFailed: true,
+      });
     }
+  },
+
+  async loadProfileProgress() {
+    try {
+      const user = await ensureSession();
+      getApp<IAppOption>().globalData.currentUser = user;
+      this.setData({ profileCompletion: user.profileCompletion });
+    } catch {
+      this.setData({ profileCompletion: null });
+    }
+  },
+
+  openProfile() {
+    void wx.navigateTo({ url: "/pages/profile/edit/index" });
   },
 
   openEvent(event: WechatMiniprogram.TouchEvent) {
     const slug = String(event.currentTarget.dataset.slug ?? "");
     if (slug) {
-      void wx.navigateTo({ url: `/pages/events/detail/index?slug=${encodeURIComponent(slug)}` });
+      void wx.navigateTo({
+        url: `/pages/events/detail/index?slug=${encodeURIComponent(slug)}`,
+      });
     }
   },
 

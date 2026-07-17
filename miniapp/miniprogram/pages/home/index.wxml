@@ -8,6 +8,15 @@
     <text class="brief-date">{{briefDate}}</text>
   </view>
 
+  <view wx:if="{{profileCompletion && !profileCompletion.completed}}" class="profile-progress" bindtap="openProfile" role="button" aria-label="继续完善能力档案">
+    <view class="profile-progress-copy">
+      <text class="profile-progress-kicker">能力档案 {{profileCompletion.percent}}%</text>
+      <text class="profile-progress-title">再补充 {{profileCompletion.missingItems[0]}}，让社区更懂你</text>
+    </view>
+    <view class="profile-progress-action">继续完善</view>
+    <view class="profile-progress-track"><view style="width: {{profileCompletion.percent}}%;"></view></view>
+  </view>
+
   <view wx:if="{{loading}}" class="empty-state">正在整理社区现场记录</view>
   <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">现场记录加载失败，轻触重试</view>
   <view wx:elif="{{!featuredEvent}}" class="empty-state">暂时没有可查看的活动记录</view>

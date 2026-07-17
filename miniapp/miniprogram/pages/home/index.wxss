@@ -43,6 +43,58 @@
   white-space: nowrap;
 }
 
+.profile-progress {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10rpx 20rpx;
+  margin-bottom: 28rpx;
+  padding: 22rpx 24rpx;
+  border: 2rpx solid #c9d9d3;
+  border-radius: 8rpx;
+  background: var(--color-green-soft);
+}
+
+.profile-progress-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6rpx;
+}
+
+.profile-progress-kicker,
+.profile-progress-action {
+  color: var(--color-green-dark);
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
+.profile-progress-title {
+  overflow: hidden;
+  font-size: 25rpx;
+  font-weight: 680;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-progress-action {
+  align-self: center;
+  white-space: nowrap;
+}
+
+.profile-progress-track {
+  grid-column: 1 / -1;
+  overflow: hidden;
+  height: 6rpx;
+  border-radius: 3rpx;
+  background: rgba(15, 122, 106, 0.16);
+}
+
+.profile-progress-track view {
+  height: 100%;
+  border-radius: 3rpx;
+  background: var(--color-green);
+}
+
 .feature-record {
   padding-bottom: 32rpx;
   border-bottom: 2rpx solid var(--color-green);

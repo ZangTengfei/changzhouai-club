@@ -34,6 +34,14 @@
           </view>
         </view>
       </view>
+      <view wx:if="{{!user.capabilityProfileComplete}}" class="profile-completion-entry" catchtap="openProfile" role="button" aria-label="继续完善能力档案">
+        <view class="profile-completion-copy">
+          <text>能力档案 {{user.profileCompletion.percent}}%</text>
+          <text>待补充：{{user.profileCompletion.missingItems[0]}}</text>
+        </view>
+        <view class="profile-completion-action">继续完善</view>
+        <view class="profile-completion-track"><view style="width: {{user.profileCompletion.percent}}%;"></view></view>
+      </view>
       <view class="growth-entry">
         <text>查看成长档案</text>
         <image src="/assets/icons/chevron-right.png" mode="aspectFit" />

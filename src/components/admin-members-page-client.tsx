@@ -52,7 +52,10 @@ function normalizeSearchText(value: string) {
   return value.trim().toLocaleLowerCase("zh-CN");
 }
 
-function matchesKeyword(fields: Array<string | null | undefined | string[]>, keyword: string) {
+function matchesKeyword(
+  fields: Array<string | null | undefined | string[]>,
+  keyword: string,
+) {
   if (!keyword) {
     return true;
   }
@@ -70,6 +73,8 @@ function buildMembersFilterHref(
   status: string,
   visibility: string,
   intent: string,
+  completion: string,
+  industry: string,
   memberQuery: string,
   memberPage = 1,
 ) {
@@ -85,6 +90,14 @@ function buildMembersFilterHref(
 
   if (intent !== "all") {
     params.set("intent", intent);
+  }
+
+  if (completion !== "all") {
+    params.set("completion", completion);
+  }
+
+  if (industry !== "all") {
+    params.set("industry", industry);
   }
 
   if (memberQuery.trim()) {
@@ -116,12 +129,15 @@ function buildDetailHref(basePath: string, currentPath: string) {
 }
 
 async function readApiResult(response: Response) {
-  const payload = (await response.json().catch(() => null)) as
-    | { error?: string; saved?: string }
-    | null;
+  const payload = (await response.json().catch(() => null)) as {
+    error?: string;
+    saved?: string;
+  } | null;
 
   if (!response.ok) {
-    throw new Error(getAdminErrorMessage(payload?.error) ?? "提交失败，请稍后再试。");
+    throw new Error(
+      getAdminErrorMessage(payload?.error) ?? "提交失败，请稍后再试。",
+    );
   }
 
   return payload;
@@ -132,12 +148,18 @@ export function AdminMembersPageClient() {
   const { data, error, isLoading, reload } =
     useAdminResource<AdminMembersData>("/api/admin/members");
   const publishingMemberIdsRef = useRef(new Set<string>());
-  const [publishingMemberIds, setPublishingMemberIds] = useState<Set<string>>(() => new Set());
-  const [publishedMemberIds, setPublishedMemberIds] = useState<Set<string>>(() => new Set());
+  const [publishingMemberIds, setPublishingMemberIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [publishedMemberIds, setPublishedMemberIds] = useState<Set<string>>(
+    () => new Set(),
+  );
 
   const statusFilter = searchParams.get("status") ?? "all";
   const visibilityFilter = searchParams.get("visibility") ?? "all";
   const intentFilter = searchParams.get("intent") ?? "all";
+  const completionFilter = searchParams.get("completion") ?? "all";
+  const industryFilter = searchParams.get("industry") ?? "all";
   const memberQueryInput = (searchParams.get("member_query") ?? "").trim();
   const requestedMemberPage = parsePage(searchParams.get("member_page"));
   const memberKeyword = normalizeSearchText(memberQueryInput);
@@ -170,6 +192,27 @@ export function AdminMembersPageClient() {
         return false;
       }
 
+      if (
+        completionFilter === "complete" &&
+        !member.profileCompletion.completed
+      ) {
+        return false;
+      }
+
+      if (
+        completionFilter === "incomplete" &&
+        member.profileCompletion.completed
+      ) {
+        return false;
+      }
+
+      if (
+        industryFilter !== "all" &&
+        !member.industryTags.includes(industryFilter)
+      ) {
+        return false;
+      }
+
       return matchesKeyword(
         [
           member.displayName,
@@ -178,14 +221,20 @@ export function AdminMembersPageClient() {
           member.city,
           member.monthlyTime,
           member.bio,
+          member.industryTags,
           member.skills,
           member.interests,
+          member.capabilitySummary,
+          member.seekingSummary,
         ],
         memberKeyword,
       );
     }) ?? [];
 
-  const totalMemberPages = Math.max(1, Math.ceil(filteredMembers.length / MEMBERS_PER_PAGE));
+  const totalMemberPages = Math.max(
+    1,
+    Math.ceil(filteredMembers.length / MEMBERS_PER_PAGE),
+  );
   const currentMemberPage = Math.min(requestedMemberPage, totalMemberPages);
   const memberPageStartIndex = (currentMemberPage - 1) * MEMBERS_PER_PAGE;
   const paginatedMembers = filteredMembers.slice(
@@ -196,6 +245,8 @@ export function AdminMembersPageClient() {
     statusFilter,
     visibilityFilter,
     intentFilter,
+    completionFilter,
+    industryFilter,
     memberQueryInput,
     currentMemberPage,
   );
@@ -218,15 +269,18 @@ export function AdminMembersPageClient() {
     setMemberPublishing(memberId, true);
 
     try {
-      const response = await fetch(`/api/admin/members/${memberId}/visibility`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `/api/admin/members/${memberId}/visibility`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            is_publicly_visible: true,
+          }),
         },
-        body: JSON.stringify({
-          is_publicly_visible: true,
-        }),
-      });
+      );
       const result = await readApiResult(response);
 
       setPublishedMemberIds((current) => new Set(current).add(memberId));
@@ -236,7 +290,11 @@ export function AdminMembersPageClient() {
       );
       reload();
     } catch (requestError) {
-      toast.error(requestError instanceof Error ? requestError.message : "公开失败，请稍后再试。");
+      toast.error(
+        requestError instanceof Error
+          ? requestError.message
+          : "公开失败，请稍后再试。",
+      );
     } finally {
       setMemberPublishing(memberId, false);
     }
@@ -255,12 +313,25 @@ export function AdminMembersPageClient() {
           title="成员列表"
           actions={
             <>
-              <AdminMetric label="成员总数" value={data?.stats.totalMembers ?? "..."} />
-              <AdminMetric label="共建成员" value={data?.stats.coBuilders ?? "..."} />
-              <AdminMetric label="愿意分享" value={data?.stats.willingToShare ?? "..."} />
+              <AdminMetric
+                label="成员总数"
+                value={data?.stats.totalMembers ?? "..."}
+              />
+              <AdminMetric
+                label="共建成员"
+                value={data?.stats.coBuilders ?? "..."}
+              />
+              <AdminMetric
+                label="愿意分享"
+                value={data?.stats.willingToShare ?? "..."}
+              />
               <AdminMetric
                 label="愿意共建"
                 value={data?.stats.willingToJoinProjects ?? "..."}
+              />
+              <AdminMetric
+                label="能力档案完成"
+                value={data?.stats.completedProfiles ?? "..."}
               />
             </>
           }
@@ -269,7 +340,9 @@ export function AdminMembersPageClient() {
 
       {error ? <AdminNotice>后台数据读取出现问题：{error}</AdminNotice> : null}
       {data && data.queryErrors.length > 0 ? (
-        <AdminNotice>后台数据读取出现问题：{data.queryErrors.join(" | ")}</AdminNotice>
+        <AdminNotice>
+          后台数据读取出现问题：{data.queryErrors.join(" | ")}
+        </AdminNotice>
       ) : null}
 
       <AdminPanel>
@@ -277,7 +350,7 @@ export function AdminMembersPageClient() {
         <AdminPanelBody>
           <form
             action="/admin/members"
-            className="grid gap-3 lg:grid-cols-[1.1fr_0.8fr_0.8fr_0.8fr_auto]"
+            className="grid gap-3 lg:grid-cols-3 xl:grid-cols-[1.1fr_0.8fr_0.8fr_0.8fr_0.9fr_0.9fr_auto]"
           >
             <AdminField label="成员搜索">
               <Input
@@ -316,6 +389,25 @@ export function AdminMembersPageClient() {
               </NativeSelect>
             </AdminField>
 
+            <AdminField label="档案完成度">
+              <NativeSelect name="completion" defaultValue={completionFilter}>
+                <option value="all">全部</option>
+                <option value="complete">已完成</option>
+                <option value="incomplete">待完善</option>
+              </NativeSelect>
+            </AdminField>
+
+            <AdminField label="行业方向">
+              <NativeSelect name="industry" defaultValue={industryFilter}>
+                <option value="all">全部行业</option>
+                {(data?.industryOptions ?? []).map((industry) => (
+                  <option key={industry} value={industry}>
+                    {industry}
+                  </option>
+                ))}
+              </NativeSelect>
+            </AdminField>
+
             <div className="flex flex-wrap items-end gap-2">
               <Button type="submit" variant="secondary">
                 筛选
@@ -323,7 +415,9 @@ export function AdminMembersPageClient() {
               {memberQueryInput ||
               statusFilter !== "all" ||
               visibilityFilter !== "all" ||
-              intentFilter !== "all" ? (
+              intentFilter !== "all" ||
+              completionFilter !== "all" ||
+              industryFilter !== "all" ? (
                 <Button asChild variant="outline">
                   <Link href="/admin/members">重置</Link>
                 </Button>
@@ -339,7 +433,8 @@ export function AdminMembersPageClient() {
           title="成员结果"
           actions={
             <span className="text-sm text-muted-foreground">
-              共 {filteredMembers.length} 位 · 第 {currentMemberPage} / {totalMemberPages} 页
+              共 {filteredMembers.length} 位 · 第 {currentMemberPage} /{" "}
+              {totalMemberPages} 页
             </span>
           }
         />
@@ -356,6 +451,7 @@ export function AdminMembersPageClient() {
                     <TableHead className="min-w-[220px]">成员</TableHead>
                     <TableHead>状态</TableHead>
                     <TableHead>公开</TableHead>
+                    <TableHead>资料</TableHead>
                     <TableHead>加入时间</TableHead>
                     <TableHead>活动</TableHead>
                     <TableHead>身份 / 意愿</TableHead>
@@ -366,7 +462,8 @@ export function AdminMembersPageClient() {
                   {paginatedMembers.map((member) => {
                     const isPublishing = publishingMemberIds.has(member.id);
                     const isPubliclyVisible =
-                      member.isPubliclyVisible || publishedMemberIds.has(member.id);
+                      member.isPubliclyVisible ||
+                      publishedMemberIds.has(member.id);
 
                     return (
                       <TableRow key={member.id}>
@@ -384,12 +481,18 @@ export function AdminMembersPageClient() {
                             <span className="text-sm text-muted-foreground">
                               {member.email ?? "未提供邮箱"}
                             </span>
-                            <span className="text-xs text-muted-foreground">{member.city}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {member.city}
+                            </span>
                           </div>
                         </TableCell>
                         <TableCell>
                           <AdminStatusBadge
-                            tone={getAdminMemberStatusTone(member.status) as AdminTone}
+                            tone={
+                              getAdminMemberStatusTone(
+                                member.status,
+                              ) as AdminTone
+                            }
                           >
                             {formatAdminMemberStatus(member.status)}
                           </AdminStatusBadge>
@@ -400,6 +503,9 @@ export function AdminMembersPageClient() {
                               ? "公开 / 首页"
                               : "公开"
                             : "未公开"}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {member.profileCompletion.percent}%
                         </TableCell>
                         <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
                           {formatDate(member.joinedAt)}
@@ -426,11 +532,17 @@ export function AdminMembersPageClient() {
                                 disabled={isPublishing}
                                 aria-label={`公开展示 ${member.displayName}`}
                                 onClick={() => {
-                                  void handlePublishMember(member.id, member.displayName);
+                                  void handlePublishMember(
+                                    member.id,
+                                    member.displayName,
+                                  );
                                 }}
                               >
                                 {isPublishing ? (
-                                  <LoaderCircle aria-hidden="true" className="animate-spin" />
+                                  <LoaderCircle
+                                    aria-hidden="true"
+                                    className="animate-spin"
+                                  />
                                 ) : (
                                   <Eye aria-hidden="true" />
                                 )}
@@ -466,6 +578,8 @@ export function AdminMembersPageClient() {
                         statusFilter,
                         visibilityFilter,
                         intentFilter,
+                        completionFilter,
+                        industryFilter,
                         memberQueryInput,
                         1,
                       )}
@@ -479,6 +593,8 @@ export function AdminMembersPageClient() {
                         statusFilter,
                         visibilityFilter,
                         intentFilter,
+                        completionFilter,
+                        industryFilter,
                         memberQueryInput,
                         Math.max(1, currentMemberPage - 1),
                       )}
@@ -492,6 +608,8 @@ export function AdminMembersPageClient() {
                         statusFilter,
                         visibilityFilter,
                         intentFilter,
+                        completionFilter,
+                        industryFilter,
                         memberQueryInput,
                         Math.min(totalMemberPages, currentMemberPage + 1),
                       )}
@@ -505,6 +623,8 @@ export function AdminMembersPageClient() {
                         statusFilter,
                         visibilityFilter,
                         intentFilter,
+                        completionFilter,
+                        industryFilter,
                         memberQueryInput,
                         totalMemberPages,
                       )}

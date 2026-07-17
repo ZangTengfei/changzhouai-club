@@ -9,7 +9,10 @@ interface MiniappUser {
   identityLabel: string;
   joinedAt: string | null;
   isCoBuilder: boolean;
+  registrationReady: boolean;
   profileComplete: boolean;
+  capabilityProfileComplete: boolean;
+  profileCompletion: MiniappProfileCompletion;
   channels: string[];
   stats: {
     registrationCount: number;
@@ -37,6 +40,19 @@ interface MiniappUser {
   }>;
 }
 
+interface MiniappProfileCompletion {
+  completed: boolean;
+  percent: number;
+  completedCount: number;
+  totalCount: number;
+  missingItems: string[];
+}
+
+interface MiniappProfileOptions {
+  industries: string[];
+  skills: string[];
+}
+
 interface MiniappProfile {
   displayName: string;
   avatarUrl: string | null;
@@ -46,13 +62,18 @@ interface MiniappProfile {
   organization: string;
   monthlyTime: string;
   bio: string;
+  industryTags: string[];
   skills: string[];
   interests: string[];
+  capabilitySummary: string;
+  seekingSummary: string;
   willingToAttend: boolean;
   willingToShare: boolean;
   willingToJoinProjects: boolean;
+  isPubliclyVisible: boolean;
   privacyAccepted: boolean;
   privacyPolicyVersion: string;
+  completion: MiniappProfileCompletion;
 }
 
 interface MiniappProfileUpdate {
@@ -63,11 +84,15 @@ interface MiniappProfileUpdate {
   organization: string;
   monthlyTime: string;
   bio: string;
+  industryTags: string[];
   skills: string[];
   interests: string[];
+  capabilitySummary: string;
+  seekingSummary: string;
   willingToAttend: boolean;
   willingToShare: boolean;
   willingToJoinProjects: boolean;
+  isPubliclyVisible: boolean;
   privacyAccepted: boolean;
 }
 

@@ -1,15 +1,21 @@
 import { apiRequest } from "./api";
 
 export async function loadProfile() {
-  const response = await apiRequest<{ profile: MiniappProfile }>({
+  return apiRequest<{
+    profile: MiniappProfile;
+    options: MiniappProfileOptions;
+  }>({
     path: "/api/miniapp/profile",
     authenticated: true,
   });
-  return response.profile;
 }
 
 export async function updateProfile(profile: MiniappProfileUpdate) {
-  return apiRequest<{ profile: MiniappProfile; user: MiniappUser }>({
+  return apiRequest<{
+    profile: MiniappProfile;
+    user: MiniappUser;
+    options: MiniappProfileOptions;
+  }>({
     path: "/api/miniapp/profile",
     method: "PUT",
     authenticated: true,

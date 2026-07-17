@@ -2,6 +2,11 @@ import { createHash, randomBytes, randomUUID } from "crypto";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import {
+  getMiniappProfileCompletion,
+  isMiniappRegistrationReady,
+} from "@/lib/miniapp-profile";
+
 const MINIAPP_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1_000;
 const WECHAT_PROVIDER = "wechat";
 
@@ -114,7 +119,11 @@ async function saveWechatIdentity(
   },
 ) {
   const now = new Date().toISOString();
-  const existingUserId = await loadExactIdentity(supabase, input.appId, input.openid);
+  const existingUserId = await loadExactIdentity(
+    supabase,
+    input.appId,
+    input.openid,
+  );
 
   if (existingUserId) {
     if (existingUserId !== input.userId) {
@@ -169,7 +178,11 @@ async function saveWechatIdentity(
     throw new MiniappAuthError("identity_save_failed");
   }
 
-  const racedUserId = await loadExactIdentity(supabase, input.appId, input.openid);
+  const racedUserId = await loadExactIdentity(
+    supabase,
+    input.appId,
+    input.openid,
+  );
   if (racedUserId !== input.userId) {
     throw new MiniappAuthError("wechat_identity_conflict");
   }
@@ -230,7 +243,10 @@ async function createWechatAccountAnchor(supabase: SupabaseClient) {
   return userId;
 }
 
-async function deleteWechatAccountAnchor(supabase: SupabaseClient, userId: string) {
+async function deleteWechatAccountAnchor(
+  supabase: SupabaseClient,
+  userId: string,
+) {
   const { error } = await supabase.auth.admin.deleteUser(userId);
 
   if (error) {
@@ -249,7 +265,11 @@ export async function resolveOrCreateWechatCommunityUser(
     channel: WechatChannel;
   },
 ) {
-  const exactUserId = await loadExactIdentity(supabase, input.appId, input.openid);
+  const exactUserId = await loadExactIdentity(
+    supabase,
+    input.appId,
+    input.openid,
+  );
 
   if (exactUserId) {
     if (input.unionid) {
@@ -435,7 +455,9 @@ export async function loadMiniappAccountSnapshot(
   ] = await Promise.all([
     supabase
       .from("profiles")
-      .select("display_name, avatar_url, city, wechat, role_label, organization")
+      .select(
+        "display_name, avatar_url, city, wechat, role_label, organization, industry_tags, skills, capability_summary, seeking_summary",
+      )
       .eq("id", userId)
       .maybeSingle(),
     supabase
@@ -499,6 +521,20 @@ export async function loadMiniappAccountSnapshot(
     ),
   );
   const displayName = profile?.display_name?.trim() || "微信用户";
+  const profileCompletion = getMiniappProfileCompletion({
+    displayName: profile?.display_name,
+    wechat: profile?.wechat,
+    city: profile?.city,
+    roleLabel: profile?.role_label,
+    industryTags: profile?.industry_tags,
+    skills: profile?.skills,
+    capabilitySummary: profile?.capability_summary,
+    seekingSummary: profile?.seeking_summary,
+  });
+  const registrationReady = isMiniappRegistrationReady({
+    displayName: profile?.display_name,
+    wechat: profile?.wechat,
+  });
   const identityLabel =
     member?.status === "admin" || member?.status === "organizer"
       ? "社区主理人"
@@ -558,14 +594,14 @@ export async function loadMiniappAccountSnapshot(
             source: "system",
             awardedAt:
               attendances.find((attendance) => attendance.status === "speaker")
-                ?.checked_in_at ?? member?.joined_at ?? null,
+                ?.checked_in_at ??
+              member?.joined_at ??
+              null,
           },
         ]
       : []),
   ];
-  const badges = new Map(
-    automaticBadges.map((badge) => [badge.code, badge]),
-  );
+  const badges = new Map(automaticBadges.map((badge) => [badge.code, badge]));
   badgeAwards.forEach((badge) => {
     badges.set(badge.badge_code, {
       code: badge.badge_code,
@@ -595,7 +631,10 @@ export async function loadMiniappAccountSnapshot(
       participationLabel:
         attendance.status === "speaker" ? "分享嘉宾" : "已参加",
       participationAt:
-        attendance.checked_in_at ?? attendance.created_at ?? event.event_at ?? "",
+        attendance.checked_in_at ??
+        attendance.created_at ??
+        event.event_at ??
+        "",
     });
   });
   registrations.forEach((registration) => {
@@ -625,9 +664,10 @@ export async function loadMiniappAccountSnapshot(
     identityLabel,
     joinedAt: member?.joined_at ?? null,
     isCoBuilder: Boolean(member?.is_co_builder),
-    profileComplete: Boolean(
-      profile?.display_name?.trim() && profile?.wechat?.trim(),
-    ),
+    registrationReady,
+    profileComplete: registrationReady,
+    capabilityProfileComplete: profileCompletion.completed,
+    profileCompletion,
     channels,
     stats: {
       registrationCount: registrations.length,

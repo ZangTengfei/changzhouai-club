@@ -63,22 +63,29 @@ function getBackHref(from?: string | null) {
 }
 
 async function readApiResult(response: Response) {
-  const payload = (await response.json().catch(() => null)) as
-    | { error?: string; saved?: string }
-    | null;
+  const payload = (await response.json().catch(() => null)) as {
+    error?: string;
+    saved?: string;
+  } | null;
 
   if (!response.ok) {
-    throw new Error(getAdminErrorMessage(payload?.error) ?? "提交失败，请检查表单内容后重试。");
+    throw new Error(
+      getAdminErrorMessage(payload?.error) ??
+        "提交失败，请检查表单内容后重试。",
+    );
   }
 
   return payload;
 }
 
-export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) {
+export function AdminMemberDetailPageClient({
+  memberId,
+}: {
+  memberId: string;
+}) {
   const searchParams = useSearchParams();
-  const { data, error, isLoading, reload } = useAdminResource<AdminMemberDetailData>(
-    `/api/admin/members/${memberId}`,
-  );
+  const { data, error, isLoading, reload } =
+    useAdminResource<AdminMemberDetailData>(`/api/admin/members/${memberId}`);
   const [isPending, startTransition] = useTransition();
   const member = data?.member;
   const querySaved = searchParams.get("saved") ?? undefined;
@@ -101,23 +108,36 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
             role_label: String(formData.get("role_label") ?? ""),
             organization: String(formData.get("organization") ?? ""),
             monthly_time: String(formData.get("monthly_time") ?? ""),
+            industry_tags: String(formData.get("industry_tags") ?? ""),
             skills: String(formData.get("skills") ?? ""),
             interests: String(formData.get("interests") ?? ""),
+            capability_summary: String(
+              formData.get("capability_summary") ?? "",
+            ),
+            seeking_summary: String(formData.get("seeking_summary") ?? ""),
             bio: String(formData.get("bio") ?? ""),
             status: String(formData.get("status") ?? "pending"),
             willing_to_attend: formData.get("willing_to_attend") === "on",
             willing_to_share: formData.get("willing_to_share") === "on",
-            willing_to_join_projects: formData.get("willing_to_join_projects") === "on",
+            willing_to_join_projects:
+              formData.get("willing_to_join_projects") === "on",
             is_co_builder: formData.get("is_co_builder") === "on",
             is_publicly_visible: formData.get("is_publicly_visible") === "on",
             is_featured_on_home: formData.get("is_featured_on_home") === "on",
           }),
         });
         const result = await readApiResult(response);
-        toast.success(getAdminSavedMessage(result?.saved ?? "member_profile") ?? "后台内容已更新。");
+        toast.success(
+          getAdminSavedMessage(result?.saved ?? "member_profile") ??
+            "后台内容已更新。",
+        );
         reload();
       } catch (requestError) {
-        toast.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
+        toast.error(
+          requestError instanceof Error
+            ? requestError.message
+            : "保存失败，请稍后再试。",
+        );
       }
     });
   }
@@ -131,15 +151,24 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            role_ids: formData.getAll("role_id").map((roleId) => String(roleId)),
+            role_ids: formData
+              .getAll("role_id")
+              .map((roleId) => String(roleId)),
             note: String(formData.get("note") ?? ""),
           }),
         });
         const result = await readApiResult(response);
-        toast.success(getAdminSavedMessage(result?.saved ?? "member_roles") ?? "后台角色已更新。");
+        toast.success(
+          getAdminSavedMessage(result?.saved ?? "member_roles") ??
+            "后台角色已更新。",
+        );
         reload();
       } catch (requestError) {
-        toast.error(requestError instanceof Error ? requestError.message : "保存失败，请稍后再试。");
+        toast.error(
+          requestError instanceof Error
+            ? requestError.message
+            : "保存失败，请稍后再试。",
+        );
       }
     });
   }
@@ -159,7 +188,11 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
         toast.success("成员徽章已授予。");
         reload();
       } catch (requestError) {
-        toast.error(requestError instanceof Error ? requestError.message : "徽章授予失败。");
+        toast.error(
+          requestError instanceof Error
+            ? requestError.message
+            : "徽章授予失败。",
+        );
       }
     });
   }
@@ -177,7 +210,11 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
         toast.success("成员徽章已移除。");
         reload();
       } catch (requestError) {
-        toast.error(requestError instanceof Error ? requestError.message : "徽章移除失败。");
+        toast.error(
+          requestError instanceof Error
+            ? requestError.message
+            : "徽章移除失败。",
+        );
       }
     });
   }
@@ -206,7 +243,9 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
             }
           />
           <AdminPanelBody className="flex flex-wrap gap-2">
-            <AdminStatusBadge tone={getAdminMemberStatusTone(member.status) as AdminTone}>
+            <AdminStatusBadge
+              tone={getAdminMemberStatusTone(member.status) as AdminTone}
+            >
               {formatAdminMemberStatus(member.status)}
             </AdminStatusBadge>
             {member.isCoBuilder ? (
@@ -227,7 +266,9 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
 
       {error ? <AdminNotice>后台数据读取出现问题：{error}</AdminNotice> : null}
       {data && data.queryErrors.length > 0 ? (
-        <AdminNotice>后台数据读取出现问题：{data.queryErrors.join(" | ")}</AdminNotice>
+        <AdminNotice>
+          后台数据读取出现问题：{data.queryErrors.join(" | ")}
+        </AdminNotice>
       ) : null}
       {isLoading ? <AdminNotice>正在加载成员详情...</AdminNotice> : null}
 
@@ -292,12 +333,21 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
               {data?.badgeAwards.length ? (
                 <div className="divide-y divide-border/70 border-y border-border/70">
                   {data.badgeAwards.map((badge) => (
-                    <div key={badge.id} className="flex items-center gap-3 py-3">
-                      <Award className="size-4 shrink-0 text-primary" aria-hidden="true" />
+                    <div
+                      key={badge.id}
+                      className="flex items-center gap-3 py-3"
+                    >
+                      <Award
+                        className="size-4 shrink-0 text-primary"
+                        aria-hidden="true"
+                      />
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-foreground">{badge.label}</p>
+                        <p className="text-sm font-medium text-foreground">
+                          {badge.label}
+                        </p>
                         <p className="text-xs text-muted-foreground">
-                          {badge.description ?? "社区授予的成员徽章"} · {formatDate(badge.awarded_at)}
+                          {badge.description ?? "社区授予的成员徽章"} ·{" "}
+                          {formatDate(badge.awarded_at)}
                         </p>
                       </div>
                       <Button
@@ -315,7 +365,9 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                   ))}
                 </div>
               ) : (
-                <AdminNotice>尚未人工授予徽章。基于签到和共建身份的自动徽章不在这里重复显示。</AdminNotice>
+                <AdminNotice>
+                  尚未人工授予徽章。基于签到和共建身份的自动徽章不在这里重复显示。
+                </AdminNotice>
               )}
 
               <form
@@ -326,10 +378,20 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                 }}
               >
                 <AdminField label="徽章名称">
-                  <Input name="badge_label" minLength={2} maxLength={20} required placeholder="例如：社区引路人" />
+                  <Input
+                    name="badge_label"
+                    minLength={2}
+                    maxLength={20}
+                    required
+                    placeholder="例如：社区引路人"
+                  />
                 </AdminField>
                 <AdminField label="授予说明">
-                  <Input name="badge_description" maxLength={100} placeholder="说明这枚徽章对应的贡献" />
+                  <Input
+                    name="badge_description"
+                    maxLength={100}
+                    placeholder="说明这枚徽章对应的贡献"
+                  />
                 </AdminField>
                 <Button type="submit" disabled={isPending}>
                   <Award className="size-4" aria-hidden="true" />
@@ -345,19 +407,36 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
               <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
                 <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/20 p-4">
                   <div className="flex items-start gap-3">
-                    <MemberAvatar name={member.displayName} avatarUrl={member.avatarUrl} size="sm" />
+                    <MemberAvatar
+                      name={member.displayName}
+                      avatarUrl={member.avatarUrl}
+                      size="sm"
+                    />
                     <div className="grid gap-1">
-                      <h3 className="text-base font-semibold text-foreground">{member.displayName}</h3>
-                      <p className="text-sm text-muted-foreground">{member.email ?? "未提供邮箱"}</p>
-                      <p className="text-sm text-muted-foreground">{member.wechat ?? "未填写微信号"}</p>
+                      <h3 className="text-base font-semibold text-foreground">
+                        {member.displayName}
+                      </h3>
                       <p className="text-sm text-muted-foreground">
-                        主页链接：{member.publicSlug ? `/members/${member.publicSlug}` : "未设置"}
+                        {member.email ?? "未提供邮箱"}
                       </p>
-                      <p className="text-sm text-muted-foreground">{member.roleLabel ?? "未填写身份"}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {member.wechat ?? "未填写微信号"}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        主页链接：
+                        {member.publicSlug
+                          ? `/members/${member.publicSlug}`
+                          : "未设置"}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {member.roleLabel ?? "未填写身份"}
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         {member.organization ?? "未填写公司 / 学校 / 团队"}
                       </p>
-                      <p className="text-sm text-muted-foreground">{member.city}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {member.city}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -372,6 +451,12 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                       <p>最近活跃：{formatDate(member.lastActiveAt)}</p>
                       <p>活动报名：{member.registrationCount} 次</p>
                       <p>每月可投入时间：{member.monthlyTime ?? "未填写"}</p>
+                      <p>
+                        能力档案：{member.profileCompletion.percent}%
+                        {member.profileCompletion.completed
+                          ? "（已完成）"
+                          : `（待补充 ${member.profileCompletion.missingItems.join("、")}）`}
+                      </p>
                     </div>
                   </div>
 
@@ -381,7 +466,9 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <AdminStatusBadge tone="neutral">
-                        {member.willingToAttend ? "愿意参加线下活动" : "暂不参加线下活动"}
+                        {member.willingToAttend
+                          ? "愿意参加线下活动"
+                          : "暂不参加线下活动"}
                       </AdminStatusBadge>
                       <AdminStatusBadge tone="neutral">
                         {member.willingToShare ? "愿意分享" : "暂不分享"}
@@ -396,7 +483,9 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                         {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
                       </AdminStatusBadge>
                       <AdminStatusBadge tone="scheduled">
-                        {member.isFeaturedOnHome ? "首页展示中" : "未在首页展示"}
+                        {member.isFeaturedOnHome
+                          ? "首页展示中"
+                          : "未在首页展示"}
                       </AdminStatusBadge>
                     </div>
                   </div>
@@ -422,6 +511,43 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                 <AdminNotice>这位成员尚未补充技能标签。</AdminNotice>
               )}
 
+              {member.industryTags.length > 0 ? (
+                <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                    行业方向
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {member.industryTags.map((industry) => (
+                      <ToneBadge
+                        key={`${member.id}-${industry}`}
+                        label={industry}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+              {member.capabilitySummary || member.seekingSummary ? (
+                <div className="grid gap-3 md:grid-cols-2">
+                  <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                      可提供能力
+                    </p>
+                    <p className="mt-3 text-sm text-muted-foreground">
+                      {member.capabilitySummary ?? "未填写"}
+                    </p>
+                  </div>
+                  <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                      当前需要
+                    </p>
+                    <p className="mt-3 text-sm text-muted-foreground">
+                      {member.seekingSummary ?? "未填写"}
+                    </p>
+                  </div>
+                </div>
+              ) : null}
+
               {member.interests.length > 0 ? (
                 <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
                   <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
@@ -429,7 +555,10 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                   </p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {member.interests.map((interest) => (
-                      <ToneBadge key={`${member.id}-${interest}`} label={interest} />
+                      <ToneBadge
+                        key={`${member.id}-${interest}`}
+                        label={interest}
+                      />
                     ))}
                   </div>
                 </div>
@@ -451,7 +580,11 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                   <AdminField label="显示名">
                     <Input
                       name="display_name"
-                      defaultValue={member.displayName === "未填写显示名" ? "" : member.displayName}
+                      defaultValue={
+                        member.displayName === "未填写显示名"
+                          ? ""
+                          : member.displayName
+                      }
                       placeholder="比如：张三"
                     />
                   </AdminField>
@@ -473,7 +606,11 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                   </AdminField>
 
                   <AdminField label="城市">
-                    <Input name="city" defaultValue={member.city} placeholder="常州" />
+                    <Input
+                      name="city"
+                      defaultValue={member.city}
+                      placeholder="常州"
+                    />
                   </AdminField>
 
                   <AdminField label="身份 / 角色">
@@ -545,6 +682,32 @@ export function AdminMemberDetailPageClient({ memberId }: { memberId: string }) 
                       name="skills"
                       defaultValue={member.skills.join("，")}
                       placeholder="例如：Agent，RAG，前端工程，自动化工作流"
+                    />
+                  </AdminField>
+
+                  <AdminField label="行业方向" className="md:col-span-2">
+                    <Input
+                      name="industry_tags"
+                      defaultValue={member.industryTags.join("，")}
+                      placeholder="例如：制造业，软件与信息服务，企业服务"
+                    />
+                  </AdminField>
+
+                  <AdminField label="可提供能力" className="md:col-span-2">
+                    <Textarea
+                      name="capability_summary"
+                      defaultValue={member.capabilitySummary ?? ""}
+                      rows={3}
+                      placeholder="成员可以分享、咨询、开发或连接的具体能力"
+                    />
+                  </AdminField>
+
+                  <AdminField label="当前需要" className="md:col-span-2">
+                    <Textarea
+                      name="seeking_summary"
+                      defaultValue={member.seekingSummary ?? ""}
+                      rows={3}
+                      placeholder="成员当前希望获得的场景、资源或合作方向"
                     />
                   </AdminField>
 

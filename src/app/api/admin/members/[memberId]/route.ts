@@ -25,7 +25,8 @@ export async function GET(
   _request: Request,
   context: { params: Promise<{ memberId: string }> },
 ) {
-  const { context: staffContext, response } = await requireAdminApiPermission("members.read");
+  const { context: staffContext, response } =
+    await requireAdminApiPermission("members.read");
   if (response) return response;
 
   const { memberId } = await context.params;
@@ -56,12 +57,16 @@ export async function PATCH(
   request: Request,
   context: { params: Promise<{ memberId: string }> },
 ) {
-  const { context: staffContext, response } =
-    await requireAdminApiPermission("members.write_profile");
+  const { context: staffContext, response } = await requireAdminApiPermission(
+    "members.write_profile",
+  );
   if (response) return response;
 
   const { memberId } = await context.params;
-  const payload = (await request.json().catch(() => null)) as Record<string, unknown> | null;
+  const payload = (await request.json().catch(() => null)) as Record<
+    string,
+    unknown
+  > | null;
 
   if (!payload || !memberId) {
     return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
@@ -70,7 +75,10 @@ export async function PATCH(
   const status = String(payload.status ?? "").trim();
 
   if (!status) {
-    return NextResponse.json({ error: "missing_required_fields" }, { status: 400 });
+    return NextResponse.json(
+      { error: "missing_required_fields" },
+      { status: 400 },
+    );
   }
 
   const willingToAttend = Boolean(payload.willing_to_attend);
@@ -78,36 +86,47 @@ export async function PATCH(
   const willingToJoinProjects = Boolean(payload.willing_to_join_projects);
   const isCoBuilder = Boolean(payload.is_co_builder);
   const isPubliclyVisible = Boolean(payload.is_publicly_visible);
-  const isFeaturedOnHome = isPubliclyVisible && Boolean(payload.is_featured_on_home);
-  const publicSlug = normalizeMemberPublicSlug(String(payload.public_slug ?? ""));
+  const isFeaturedOnHome =
+    isPubliclyVisible && Boolean(payload.is_featured_on_home);
+  const publicSlug = normalizeMemberPublicSlug(
+    String(payload.public_slug ?? ""),
+  );
 
   if (publicSlug && !isValidMemberPublicSlug(publicSlug)) {
     return NextResponse.json({ error: "invalid_public_slug" }, { status: 400 });
   }
 
-  const [{ data: existingProfile }, { data: existingMember, error: memberLookupError }] =
-    await Promise.all([
-      staffContext.supabase
-        .from("profiles")
-        .select("public_slug")
-        .eq("id", memberId)
-        .maybeSingle(),
-      staffContext.supabase
-        .from("members")
-        .select("status, is_co_builder")
-        .eq("id", memberId)
-        .maybeSingle(),
-    ]);
+  const [
+    { data: existingProfile },
+    { data: existingMember, error: memberLookupError },
+  ] = await Promise.all([
+    staffContext.supabase
+      .from("profiles")
+      .select("public_slug")
+      .eq("id", memberId)
+      .maybeSingle(),
+    staffContext.supabase
+      .from("members")
+      .select("status, is_co_builder")
+      .eq("id", memberId)
+      .maybeSingle(),
+  ]);
 
   if (memberLookupError) {
-    return NextResponse.json({ error: "database_write_failed" }, { status: 400 });
+    return NextResponse.json(
+      { error: "database_write_failed" },
+      { status: 400 },
+    );
   }
 
   if (!existingMember) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
-  if (status !== existingMember.status && !canAdmin(staffContext, "members.manage_status")) {
+  if (
+    status !== existingMember.status &&
+    !canAdmin(staffContext, "members.manage_status")
+  ) {
     return NextResponse.json(
       { error: "forbidden", permission: "members.manage_status" },
       { status: 403 },
@@ -132,8 +151,11 @@ export async function PATCH(
     organization: getOptionalValue(payload, "organization"),
     monthly_time: getOptionalValue(payload, "monthly_time"),
     bio: getOptionalValue(payload, "bio"),
+    industry_tags: normalizeSkills(String(payload.industry_tags ?? "")),
     skills: normalizeSkills(String(payload.skills ?? "")),
     interests: normalizeSkills(String(payload.interests ?? "")),
+    capability_summary: getOptionalValue(payload, "capability_summary"),
+    seeking_summary: getOptionalValue(payload, "seeking_summary"),
   };
 
   if (canAdmin(staffContext, "members.read_contact")) {
@@ -164,7 +186,10 @@ export async function PATCH(
       return NextResponse.json({ error: "public_slug_taken" }, { status: 400 });
     }
 
-    return NextResponse.json({ error: "database_write_failed" }, { status: 400 });
+    return NextResponse.json(
+      { error: "database_write_failed" },
+      { status: 400 },
+    );
   }
 
   revalidateAdminMemberPaths(memberId);

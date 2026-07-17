@@ -2,6 +2,10 @@ import { notFound } from "next/navigation";
 
 import { redactSensitiveValue } from "@/lib/admin/permissions";
 import {
+  getMiniappProfileCompletion,
+  MINIAPP_INDUSTRY_OPTIONS,
+} from "@/lib/miniapp-profile";
+import {
   canAdmin,
   getAdminContextResult,
   requireAdminPermission,
@@ -19,8 +23,11 @@ type AdminProfileRow = {
   organization: string | null;
   monthly_time: string | null;
   bio: string | null;
+  industry_tags: string[] | null;
   skills: string[] | null;
   interests: string[] | null;
+  capability_summary: string | null;
+  seeking_summary: string | null;
 };
 
 type AdminMemberRow = {
@@ -79,8 +86,12 @@ export type AdminMember = {
   organization: string | null;
   monthlyTime: string | null;
   bio: string | null;
+  industryTags: string[];
   skills: string[];
   interests: string[];
+  capabilitySummary: string | null;
+  seekingSummary: string | null;
+  profileCompletion: ReturnType<typeof getMiniappProfileCompletion>;
   willingToAttend: boolean;
   status: string;
   willingToShare: boolean;
@@ -153,8 +164,10 @@ export type AdminMembersData = {
     coBuilders: number;
     willingToShare: number;
     willingToJoinProjects: number;
+    completedProfiles: number;
     joinRequests: number;
   };
+  industryOptions: string[];
   queryErrors: string[];
 };
 
@@ -208,7 +221,8 @@ function getJoinRequestSortWeight(status: string) {
 export async function loadAdminMembersData(
   context?: AdminContext,
 ): Promise<AdminMembersData> {
-  const adminContext = context ?? (await requireAdminPermission("members.read"));
+  const adminContext =
+    context ?? (await requireAdminPermission("members.read"));
   const { supabase } = adminContext;
   const canReadContact = canAdmin(adminContext, "members.read_contact");
   const canManageRoles = canAdmin(adminContext, "system.manage_roles");
@@ -224,7 +238,7 @@ export async function loadAdminMembersData(
     supabase
       .from("profiles")
       .select(
-        "id, email, display_name, public_slug, avatar_url, wechat, city, role_label, organization, monthly_time, bio, skills, interests",
+        "id, email, display_name, public_slug, avatar_url, wechat, city, role_label, organization, monthly_time, bio, industry_tags, skills, interests, capability_summary, seeking_summary",
       ),
     supabase
       .from("members")
@@ -239,10 +253,15 @@ export async function loadAdminMembersData(
       )
       .order("created_at", { ascending: false }),
     canManageRoles
-      ? supabase.from("admin_roles").select("id, role_key, name, description").order("sort_order")
+      ? supabase
+          .from("admin_roles")
+          .select("id, role_key, name, description")
+          .order("sort_order")
       : Promise.resolve({ data: [], error: null }),
     canManageRoles
-      ? supabase.from("member_admin_roles").select("member_id, role_id, expires_at, note")
+      ? supabase
+          .from("member_admin_roles")
+          .select("member_id, role_id, expires_at, note")
       : Promise.resolve({ data: [], error: null }),
   ]);
 
@@ -259,7 +278,9 @@ export async function loadAdminMembersData(
     memberRolesError?.message,
   ].filter(Boolean) as string[];
 
-  const profilesById = new Map(profiles.map((profile) => [profile.id, profile]));
+  const profilesById = new Map(
+    profiles.map((profile) => [profile.id, profile]),
+  );
   const roles = (rolesData ?? []) as AdminRoleRow[];
   const memberRoles = (memberRolesData ?? []) as MemberAdminRoleRow[];
   const rolesById = new Map(roles.map((role) => [role.id, role]));
@@ -302,20 +323,39 @@ export async function loadAdminMembersData(
     .map((member) => {
       const profile = profilesById.get(member.id);
 
+      const profileCompletion = getMiniappProfileCompletion({
+        displayName: profile?.display_name,
+        wechat: profile?.wechat,
+        city: profile?.city,
+        roleLabel: profile?.role_label,
+        industryTags: profile?.industry_tags,
+        skills: profile?.skills,
+        capabilitySummary: profile?.capability_summary,
+        seekingSummary: profile?.seeking_summary,
+      });
+
       return {
         id: member.id,
-        email: canReadContact ? profile?.email ?? null : redactSensitiveValue(profile?.email),
+        email: canReadContact
+          ? (profile?.email ?? null)
+          : redactSensitiveValue(profile?.email),
         displayName: profile?.display_name?.trim() || "未填写显示名",
         publicSlug: profile?.public_slug?.trim() || null,
         avatarUrl: profile?.avatar_url ?? null,
-        wechat: canReadContact ? profile?.wechat?.trim() || null : redactSensitiveValue(profile?.wechat),
+        wechat: canReadContact
+          ? profile?.wechat?.trim() || null
+          : redactSensitiveValue(profile?.wechat),
         city: profile?.city?.trim() || "常州",
         roleLabel: profile?.role_label?.trim() || null,
         organization: profile?.organization?.trim() || null,
         monthlyTime: profile?.monthly_time?.trim() || null,
         bio: profile?.bio ?? null,
+        industryTags: profile?.industry_tags ?? [],
         skills: profile?.skills ?? [],
         interests: profile?.interests ?? [],
+        capabilitySummary: profile?.capability_summary?.trim() || null,
+        seekingSummary: profile?.seeking_summary?.trim() || null,
+        profileCompletion,
         willingToAttend: member.willing_to_attend,
         status: member.status,
         willingToShare: member.willing_to_share,
@@ -331,13 +371,15 @@ export async function loadAdminMembersData(
       };
     })
     .sort((a, b) => {
-      const joinedAtDiff = new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime();
+      const joinedAtDiff =
+        new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime();
 
       if (joinedAtDiff !== 0) {
         return joinedAtDiff;
       }
 
-      const weightDiff = getMemberSortWeight(a.status) - getMemberSortWeight(b.status);
+      const weightDiff =
+        getMemberSortWeight(a.status) - getMemberSortWeight(b.status);
 
       if (weightDiff !== 0) {
         return weightDiff;
@@ -345,13 +387,17 @@ export async function loadAdminMembersData(
 
       return a.displayName.localeCompare(b.displayName, "zh-CN");
     });
-  const memberNamesById = new Map(mergedMembers.map((member) => [member.id, member.displayName]));
+  const memberNamesById = new Map(
+    mergedMembers.map((member) => [member.id, member.displayName]),
+  );
 
   const mappedJoinRequests = joinRequests
     .map((request) => ({
       id: request.id,
       displayName: request.display_name,
-      wechat: canReadContact ? request.wechat : redactSensitiveValue(request.wechat) ?? "",
+      wechat: canReadContact
+        ? request.wechat
+        : (redactSensitiveValue(request.wechat) ?? ""),
       city: request.city?.trim() || "常州",
       roleLabel: request.role_label,
       organization: request.organization,
@@ -363,7 +409,9 @@ export async function loadAdminMembersData(
       willingToShare: request.willing_to_share,
       willingToJoinProjects: request.willing_to_join_projects,
       status: request.status,
-      adminNote: canReadContact ? request.admin_note : redactSensitiveValue(request.admin_note),
+      adminNote: canReadContact
+        ? request.admin_note
+        : redactSensitiveValue(request.admin_note),
       contactedAt: request.contacted_at,
       approvedAt: request.approved_at,
       invitedToRegisterAt: request.invited_to_register_at,
@@ -372,12 +420,13 @@ export async function loadAdminMembersData(
       convertedToMemberAt: request.converted_to_member_at,
       convertedMemberId: request.converted_member_id,
       convertedMemberDisplayName: request.converted_member_id
-        ? memberNamesById.get(request.converted_member_id) ?? null
+        ? (memberNamesById.get(request.converted_member_id) ?? null)
         : null,
       createdAt: request.created_at,
     }))
     .sort((a, b) => {
-      const weightDiff = getJoinRequestSortWeight(a.status) - getJoinRequestSortWeight(b.status);
+      const weightDiff =
+        getJoinRequestSortWeight(a.status) - getJoinRequestSortWeight(b.status);
 
       if (weightDiff !== 0) {
         return weightDiff;
@@ -395,14 +444,25 @@ export async function loadAdminMembersData(
         ["active", "organizer", "admin"].includes(member.status),
       ).length,
       coBuilders: mergedMembers.filter(
-        (member) => !["organizer", "admin"].includes(member.status) && member.isCoBuilder,
+        (member) =>
+          !["organizer", "admin"].includes(member.status) && member.isCoBuilder,
       ).length,
-      willingToShare: mergedMembers.filter((member) => member.willingToShare).length,
+      willingToShare: mergedMembers.filter((member) => member.willingToShare)
+        .length,
       willingToJoinProjects: mergedMembers.filter(
         (member) => member.willingToJoinProjects,
       ).length,
+      completedProfiles: mergedMembers.filter(
+        (member) => member.profileCompletion.completed,
+      ).length,
       joinRequests: mappedJoinRequests.length,
     },
+    industryOptions: Array.from(
+      new Set([
+        ...MINIAPP_INDUSTRY_OPTIONS,
+        ...mergedMembers.flatMap((member) => member.industryTags),
+      ]),
+    ),
     queryErrors,
   };
 }

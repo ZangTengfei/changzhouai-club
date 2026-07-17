@@ -91,7 +91,11 @@ Page({
         void this.loadReminder(slug);
       }
     } catch {
-      this.setData({ user: null, registration: null, registrationLoading: false });
+      this.setData({
+        user: null,
+        registration: null,
+        registrationLoading: false,
+      });
     }
   },
 
@@ -148,7 +152,7 @@ Page({
 
   async submitRegistration() {
     if (this.data.submitting || !this.data.event) return;
-    if (!this.data.user?.profileComplete) {
+    if (!this.data.user?.registrationReady) {
       this.openProfile();
       return;
     }
@@ -166,7 +170,10 @@ Page({
       void this.loadReminder(this.data.slug);
       void wx.showToast({ title: "报名成功", icon: "success" });
     } catch (error) {
-      if (error instanceof ApiError && error.errorCode === "profile_incomplete") {
+      if (
+        error instanceof ApiError &&
+        error.errorCode === "profile_incomplete"
+      ) {
         this.openProfile();
       } else {
         void wx.showToast({ title: "报名失败，请重试", icon: "none" });

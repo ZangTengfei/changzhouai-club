@@ -19,6 +19,10 @@ const eventNames = [
   "home_view",
   "event_list_view",
   "event_detail_view",
+  "profile_started",
+  "profile_step_completed",
+  "profile_completed",
+  "profile_updated",
   "profile_saved",
   "registration_created",
   "registration_cancelled",
@@ -56,6 +60,10 @@ console.log(
           counts.registration_created,
           counts.event_detail_view,
         ),
+        profileStartToCompletion: ratio(
+          counts.profile_completed,
+          counts.profile_started,
+        ),
         registrationToReminderAcceptance: ratio(
           counts.reminder_accepted,
           counts.registration_created,
@@ -64,10 +72,7 @@ console.log(
           counts.checkin_success,
           counts.registration_created,
         ),
-        checkinToFeedback: ratio(
-          counts.feedback_saved,
-          counts.checkin_success,
-        ),
+        checkinToFeedback: ratio(counts.feedback_saved, counts.checkin_success),
       },
     },
     null,
