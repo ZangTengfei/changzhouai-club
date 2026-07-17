@@ -11,16 +11,14 @@ export async function GET(request: Request) {
   const { data: publications, error: publicationError } = await auth.supabase
     .from("miniapp_group_digest_publications")
     .select("report_id")
-    .eq("is_published", true)
-    .order("published_at", { ascending: false });
+    .eq("is_published", false);
   if (publicationError) return miniappJson({ error: "group_digest_publication_load_failed" }, 500);
 
-  const publishedIds = (publications ?? []).map((item) => String(item.report_id));
+  const hiddenIds = new Set((publications ?? []).map((item) => String(item.report_id)));
   const source = await loadMiniappGroupDigests();
-  const reportById = new Map(source.reports.map((report) => [String(report.id), report]));
-  const digests = publishedIds
-    .map((id) => reportById.get(id))
-    .filter((report): report is NonNullable<typeof report> => Boolean(report))
+  const digests = source.reports
+    .filter((report) => !hiddenIds.has(String(report.id)))
+    .slice(0, 20)
     .map(toMiniappGroupDigest)
     .map(({ discussions, highlights, resources, ...digest }) => digest);
   const interactions = await getMiniappContentInteractions(

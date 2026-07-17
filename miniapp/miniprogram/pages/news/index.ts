@@ -17,6 +17,10 @@ type DigestListItem = MiniappGroupDigest & {
   summaryLabel: string;
 };
 
+type HotTopicListItem = MiniappHotTopic & {
+  latestLabel: string;
+};
+
 function formatDate(value: string | null) {
   if (!value) return "最新整理";
   const date = new Date(value);
@@ -42,6 +46,23 @@ function mapDigest(item: MiniappGroupDigest): DigestListItem {
   };
 }
 
+function mapHotTopic(item: MiniappHotTopic): HotTopicListItem {
+  return {
+    ...item,
+    latestLabel: formatDate(item.latestAt),
+  };
+}
+
+function openDetail(kind: "news" | "digest", id: string) {
+  void wx.navigateTo({
+    url: `/pages/news/detail/index?kind=${kind}&id=${encodeURIComponent(id)}`,
+    fail(error) {
+      console.error("Failed to open news detail", { error, id, kind });
+      void wx.showToast({ title: "页面暂时无法打开", icon: "none" });
+    },
+  });
+}
+
 Page({
   data: {
     activeCategory: "all",
@@ -49,6 +70,7 @@ Page({
     categories: [] as MiniappNewsCategory[],
     digests: [] as DigestListItem[],
     hasNext: false,
+    hotTopics: [] as HotTopicListItem[],
     isStale: false,
     items: [] as NewsListItem[],
     loadFailed: false,
@@ -105,6 +127,7 @@ Page({
       this.setData({
         categories: response.categories,
         hasNext: response.pagination.hasNext,
+        hotTopics: append ? this.data.hotTopics : response.hotTopics.map(mapHotTopic),
         isStale: response.isStale,
         items: append
           ? [...this.data.items, ...response.items.map(mapNews)]
@@ -147,7 +170,7 @@ Page({
     if (section !== "selected" && section !== "all" && section !== "digest") return;
     if (section === this.data.activeSection) return;
 
-    this.setData({ activeSection: section, hasNext: false, items: [], page: 1 });
+    this.setData({ activeSection: section, hasNext: false, hotTopics: [], items: [], page: 1 });
     void this.loadContent();
   },
 
@@ -155,23 +178,19 @@ Page({
     const category = String(event.currentTarget.dataset.category ?? "all");
     if (category === this.data.activeCategory) return;
 
-    this.setData({ activeCategory: category, hasNext: false, items: [], page: 1 });
+    this.setData({ activeCategory: category, hasNext: false, hotTopics: [], items: [], page: 1 });
     void this.loadNewsPage(1, false);
   },
 
   openNews(event: WechatMiniprogram.TouchEvent) {
     const id = String(event.currentTarget.dataset.id ?? "");
     if (!id) return;
-    void wx.navigateTo({
-      url: `/pages/news/detail/index?kind=news&id=${encodeURIComponent(id)}`,
-    });
+    openDetail("news", id);
   },
 
   openDigest(event: WechatMiniprogram.TouchEvent) {
     const id = String(event.currentTarget.dataset.id ?? "");
     if (!id) return;
-    void wx.navigateTo({
-      url: `/pages/news/detail/index?kind=digest&id=${encodeURIComponent(id)}`,
-    });
+    openDetail("digest", id);
   },
 });

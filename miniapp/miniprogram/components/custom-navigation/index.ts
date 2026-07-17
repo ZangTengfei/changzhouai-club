@@ -12,5 +12,15 @@ function getNavigationLayout() {
 }
 
 Component({
+  properties: {
+    showMark: {
+      type: Boolean,
+      value: true,
+    },
+    title: {
+      type: String,
+      value: "常州 AI Club",
+    },
+  },
   data: getNavigationLayout(),
 });

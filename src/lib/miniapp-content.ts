@@ -2,10 +2,12 @@ import {
   aiHotCategories,
   getAiHotDailyReport,
   getAiHotFeed,
+  getAiHotTopics,
   getAiHotCategoryShortLabel,
   isAiHotCategory,
   type AiHotFeedCategory,
   type AiHotMode,
+  type AiHotTopic,
   type AiNewsItem,
 } from "@/lib/aihot";
 import { getWeDailyReports, type WeDailyReport } from "@/lib/wedaily";
@@ -25,6 +27,16 @@ export type MiniappNewsItem = {
   category: string;
   categoryLabel: string;
   publishedAt: string | null;
+};
+
+export type MiniappHotTopic = {
+  id: string;
+  title: string;
+  sourceName: string;
+  sourceCount: number;
+  sourceNames: string[];
+  sourceUrl: string;
+  latestAt: string | null;
 };
 
 export type MiniappGroupDigest = {
@@ -49,6 +61,7 @@ type CachedValue<T> = {
 };
 
 const newsCache = new Map<string, CachedValue<AiNewsItem[]>>();
+let hotTopicCache: CachedValue<AiHotTopic[]> | null = null;
 let groupDigestCache: CachedValue<WeDailyReport[]> | null = null;
 
 export function getMiniappNewsMode(value: unknown): MiniappNewsMode {
@@ -135,6 +148,33 @@ export async function loadMiniappDailyBrief() {
   };
 }
 
+export async function loadMiniappHotTopics() {
+  const now = Date.now();
+  const cached = hotTopicCache;
+
+  if (cached && now - cached.cachedAt < CONTENT_CACHE_TTL_MS) {
+    return { error: null, isStale: false, topics: cached.value };
+  }
+
+  const result = await getAiHotTopics();
+
+  if (result.topics.length > 0) {
+    hotTopicCache = { cachedAt: now, value: result.topics };
+    return { error: result.error, isStale: false, topics: result.topics };
+  }
+
+  if (!result.error) {
+    hotTopicCache = { cachedAt: now, value: [] };
+    return { error: null, isStale: false, topics: [] };
+  }
+
+  if (cached && now - cached.cachedAt < CONTENT_CACHE_STALE_MS) {
+    return { error: result.error || "hot_topics_unavailable", isStale: true, topics: cached.value };
+  }
+
+  return { error: result.error || "hot_topics_unavailable", isStale: false, topics: [] };
+}
+
 export async function loadMiniappGroupDigests() {
   const now = Date.now();
   const cached = groupDigestCache;
@@ -205,6 +245,37 @@ export function toMiniappNewsItem(item: AiNewsItem): MiniappNewsItem {
     category: item.category || "other",
     categoryLabel: getAiHotCategoryShortLabel(item.category),
     publishedAt: item.publishedAt,
+  };
+}
+
+export function toMiniappHotTopic(topic: AiHotTopic): MiniappHotTopic {
+  return {
+    id: `aihot-${topic.id}`,
+    title: cleanText(topic.title, 120) || "AI 热点",
+    sourceName: cleanText(topic.source, 48) || "AI HOT",
+    sourceCount: Math.max(1, Number(topic.sourceCount) || 1),
+    sourceNames: (Array.isArray(topic.sourceNames) ? topic.sourceNames : [])
+      .slice(0, 20)
+      .map((name) => cleanText(name, 60))
+      .filter(Boolean),
+    sourceUrl: safeUrl(topic.url),
+    latestAt: topic.latestAt ?? null,
+  };
+}
+
+export function hotTopicToMiniappNewsItem(topic: AiHotTopic): MiniappNewsItem {
+  const normalized = toMiniappHotTopic(topic);
+
+  return {
+    id: normalized.id,
+    title: normalized.title,
+    summary: `该话题正在被 ${normalized.sourceCount} 个独立信源共同关注。`,
+    recommendationReason: "多源信息持续聚合，适合优先了解事件全貌。",
+    sourceName: normalized.sourceName,
+    sourceUrl: normalized.sourceUrl,
+    category: "other",
+    categoryLabel: "当前热点",
+    publishedAt: normalized.latestAt,
   };
 }
 

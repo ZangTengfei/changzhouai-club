@@ -1,6 +1,6 @@
 const AIHOT_BASE_URL = "https://aihot.virxact.com";
 const AIHOT_USER_AGENT =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
+  "changzhouai-club/1.0 (+https://changzhouai.club)";
 const AIHOT_REQUEST_TIMEOUT_MS = 8_000;
 
 export const aiHotCategories = [
@@ -53,6 +53,23 @@ type AiHotItemList = {
   hasNext: boolean;
   nextCursor: string | null;
   items: AiHotItem[];
+};
+
+export type AiHotTopic = {
+  id: string;
+  title: string;
+  url: string;
+  permalink: string;
+  source: string;
+  sourceCount: number;
+  signalCount: number;
+  sourceNames: string[];
+  latestAt: string | null;
+};
+
+type AiHotTopicList = {
+  count: number;
+  items: AiHotTopic[];
 };
 
 export type AiHotDailyItem = {
@@ -215,6 +232,18 @@ export async function getAiHotDailyReport(): Promise<{
   return {
     dailyReport: result.data,
     error: result.error,
+  };
+}
+
+export async function getAiHotTopics(): Promise<{
+  error: string | null;
+  topics: AiHotTopic[];
+}> {
+  const result = await fetchAiHotJson<AiHotTopicList>("/api/public/hot-topics", 120);
+
+  return {
+    error: result.error,
+    topics: result.data?.items ?? [],
   };
 }
 

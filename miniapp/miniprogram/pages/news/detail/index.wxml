@@ -24,6 +24,6 @@
     <view wx:if="{{digest.discussions.length}}" class="detail-section"><text class="detail-section-label">KEY DISCUSSIONS</text><text class="detail-section-title">重点讨论</text><view class="detail-list"><view wx:for="{{digest.discussions}}" wx:key="title" class="detail-item"><text class="detail-item-title">{{item.title}}</text><text class="detail-item-copy">{{item.conclusion}}</text></view></view></view>
     <view wx:if="{{digest.resources.length}}" class="detail-section"><text class="detail-section-label">RESOURCES</text><text class="detail-section-title">资源线索</text><view class="detail-list"><view wx:for="{{digest.resources}}" wx:key="title" class="detail-item"><text class="detail-item-title">{{item.title}}</text><text class="detail-item-copy">{{item.body}}</text><text wx:if="{{item.url}}" class="detail-link" data-url="{{item.url}}" bindtap="copySource">复制资源链接</text></view></view></view>
     <view wx:if="{{digest.tags.length}}" class="tag-list"><text wx:for="{{digest.tags}}" wx:key="*this"># {{item}}</text></view>
-    <text class="privacy-note">本页仅展示经运营确认且已脱敏的群聊总结，不包含原始聊天记录、成员列表或联系方式。</text>
+    <text class="privacy-note">本页内容由网站群聊日报同步并经过脱敏，不包含原始聊天记录、成员列表或联系方式。</text>
   </block>
 </view>

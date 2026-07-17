@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { Download, EyeOff, Images, RefreshCcw, Save, Send } from "lucide-react";
+import { Download, Eye, EyeOff, Images, RefreshCcw, Save } from "lucide-react";
 
 import { AdminNotice, AdminStatusBadge } from "@/components/admin-ui";
 import { Button } from "@/components/ui/button";
@@ -231,7 +231,7 @@ export function AdminWeDailyReportsClient({
         | null;
       if (!response.ok) throw new Error(payload?.error || "更新小程序发布状态失败");
       setMiniappPublished(Boolean(payload?.published));
-      setMessage(payload?.published ? "已发布到小程序群聊精华。" : "已从小程序群聊精华撤回。");
+      setMessage(payload?.published ? "已恢复在小程序展示。" : "已从小程序群聊精华隐藏。");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "更新小程序发布状态失败");
     } finally {
@@ -298,7 +298,7 @@ export function AdminWeDailyReportsClient({
                     {isDirty ? "未保存" : "已同步"}
                   </AdminStatusBadge>
                   <AdminStatusBadge tone={miniappPublished ? "active" : "pending"}>
-                    {miniappPublished ? "小程序已发布" : "小程序未发布"}
+                    {miniappPublished ? "小程序已同步" : "小程序已隐藏"}
                   </AdminStatusBadge>
                   <span className="text-xs text-muted-foreground">
                     {selectedReport.generated_by || "WeDaily"}
@@ -325,8 +325,8 @@ export function AdminWeDailyReportsClient({
                   onClick={toggleMiniappPublication}
                   disabled={miniappPublicationLoading || isDirty}
                 >
-                  {miniappPublished ? <EyeOff className="size-4" /> : <Send className="size-4" />}
-                  {miniappPublished ? "撤回小程序" : "发布到小程序"}
+                  {miniappPublished ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                  {miniappPublished ? "从小程序隐藏" : "恢复小程序展示"}
                 </Button>
                 <Button
                   type="button"

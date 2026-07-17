@@ -227,6 +227,7 @@ try {
     .insert({
       event_id: event.id,
       token_hash: createHash("sha256").update(checkinToken).digest("hex"),
+      starts_at: new Date(Date.now() - 60 * 1_000).toISOString(),
       expires_at: new Date(Date.now() + 60 * 60 * 1_000).toISOString(),
     });
   if (checkinTokenError) throw checkinTokenError;
@@ -429,7 +430,12 @@ try {
   const news = await request("/api/miniapp/news", { headers: authHeaders });
   assert.equal(news.response.status, 200);
   assert.ok(Array.isArray(news.body?.categories));
+  assert.ok(Array.isArray(news.body?.hotTopics));
   assert.ok(Array.isArray(news.body?.items));
+  if (news.body.hotTopics.length > 0) {
+    assert.ok(news.body.hotTopics[0]?.id);
+    assert.ok(news.body.hotTopics[0]?.sourceCount >= 1);
+  }
   pass("news_feed_loaded_with_fallback_contract");
 
   const dailyBrief = await request("/api/miniapp/news/daily", {
@@ -443,7 +449,16 @@ try {
   });
   assert.equal(groupDigests.response.status, 200);
   assert.ok(Array.isArray(groupDigests.body?.items));
-  pass("published_group_digests_loaded");
+  if (groupDigests.body.items.length > 0) {
+    const digestDetail = await request(
+      `/api/miniapp/group-digests/${encodeURIComponent(groupDigests.body.items[0].id)}`,
+      { headers: authHeaders },
+    );
+    assert.equal(digestDetail.response.status, 200);
+    assert.equal(digestDetail.body?.digest?.id, groupDigests.body.items[0].id);
+    assert.ok(Array.isArray(digestDetail.body?.digest?.highlights));
+  }
+  pass("synced_group_digests_loaded");
 
   console.log(JSON.stringify({ ok: true, checks }, null, 2));
 } finally {

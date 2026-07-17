@@ -20,6 +20,7 @@ export async function loadNews({
   return apiRequest<{
     categories: MiniappNewsCategory[];
     error: string | null;
+    hotTopics: MiniappHotTopic[];
     isStale: boolean;
     items: MiniappNewsItem[];
     pagination: { hasNext: boolean; page: number; pageSize: number };

@@ -120,6 +120,16 @@ interface MiniappNewsItem extends MiniappContentInteraction {
   publishedAt: string | null;
 }
 
+interface MiniappHotTopic {
+  id: string;
+  title: string;
+  sourceName: string;
+  sourceCount: number;
+  sourceNames: string[];
+  sourceUrl: string;
+  latestAt: string | null;
+}
+
 interface MiniappGroupDigest extends MiniappContentInteraction {
   id: string;
   date: string;

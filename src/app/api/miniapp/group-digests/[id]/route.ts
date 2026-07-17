@@ -17,12 +17,11 @@ export async function GET(
 
   const { data: publication, error: publicationError } = await auth.supabase
     .from("miniapp_group_digest_publications")
-    .select("report_id")
+    .select("is_published")
     .eq("report_id", reportId)
-    .eq("is_published", true)
     .maybeSingle();
   if (publicationError) return miniappJson({ error: "group_digest_publication_load_failed" }, 500);
-  if (!publication) return miniappJson({ error: "not_found" }, 404);
+  if (publication?.is_published === false) return miniappJson({ error: "not_found" }, 404);
 
   const source = await loadMiniappGroupDigests();
   const report = source.reports.find((item) => item.id === reportId);

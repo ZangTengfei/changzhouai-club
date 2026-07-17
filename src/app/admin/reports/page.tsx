@@ -52,8 +52,8 @@ export default async function AdminReportsPage({
         <AdminPanelBody className="space-y-4">
           <AdminNotice>
             这里编辑的是 WeDaily 远端日报 Markdown。保存后会刷新前台资讯页缓存；
-            导出图片会调用 WeDaily 的长图渲染接口，保持和日报源站一致。确认不含成员隐私后，
-            才可发布到小程序的群聊精华。
+            导出图片会调用 WeDaily 的长图渲染接口，保持和日报源站一致。日报默认以脱敏摘要同步到
+            小程序群聊精华；如有敏感内容，可单独隐藏该期日报。
           </AdminNotice>
           <AdminWeDailyReportsClient
             initialError={error}

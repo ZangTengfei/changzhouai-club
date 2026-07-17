@@ -25,7 +25,7 @@ export async function GET(
     .maybeSingle();
   if (error) return NextResponse.json({ error: "publication_load_failed" }, { status: 500 });
 
-  return NextResponse.json({ published: data?.is_published ?? false });
+  return NextResponse.json({ published: data?.is_published ?? true });
 }
 
 export async function PATCH(
