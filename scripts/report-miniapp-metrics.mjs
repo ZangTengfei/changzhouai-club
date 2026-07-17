@@ -15,6 +15,7 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
 const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1_000).toISOString();
 const eventNames = [
   "login_success",
+  "login_failed",
   "home_view",
   "event_list_view",
   "event_detail_view",
