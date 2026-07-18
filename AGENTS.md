@@ -11,6 +11,8 @@ Rules:
 
 ## Commit Message Convention
 
+This convention is local to the `changzhouai-club` repository. Do not apply its `web`, `miniapp`, or other scope labels to commits in unrelated repositories.
+
 Use `type(scope): 中文摘要` for new commits. The type describes what changed; the scope identifies the affected product or system area.
 
 Allowed types:
