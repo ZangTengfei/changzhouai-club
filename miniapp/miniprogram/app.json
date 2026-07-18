@@ -13,17 +13,17 @@
     "pages/privacy/index"
   ],
   "window": {
-    "backgroundColor": "#f3f5f2",
+    "backgroundColor": "#ffffff",
     "backgroundTextStyle": "dark",
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "常州 AI Club"
   },
   "tabBar": {
-    "color": "#68716d",
-    "selectedColor": "#0f7a6a",
+    "color": "#66706c",
+    "selectedColor": "#12a566",
     "backgroundColor": "#ffffff",
-    "borderStyle": "black",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/home/index",

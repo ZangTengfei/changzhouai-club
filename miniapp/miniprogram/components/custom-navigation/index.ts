@@ -13,7 +13,19 @@ function getNavigationLayout() {
 
 Component({
   properties: {
+    avatarInitial: {
+      type: String,
+      value: "微",
+    },
+    avatarUrl: {
+      type: String,
+      value: "",
+    },
     showMark: {
+      type: Boolean,
+      value: false,
+    },
+    showAvatar: {
       type: Boolean,
       value: false,
     },

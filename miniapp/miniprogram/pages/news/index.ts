@@ -80,6 +80,17 @@ Page({
   },
 
   onShow() {
+    const requestedSection = wx.getStorageSync("miniapp:news-section");
+    if (requestedSection === "selected" || requestedSection === "all" || requestedSection === "digest") {
+      wx.removeStorageSync("miniapp:news-section");
+      this.setData({
+        activeSection: requestedSection,
+        hasNext: false,
+        hotTopics: [],
+        items: [],
+        page: 1,
+      });
+    }
     void ensureSession()
       .then(() => trackEvent("news_list_view", "/pages/news/index"))
       .catch(() => undefined);

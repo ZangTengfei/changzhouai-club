@@ -1,19 +1,20 @@
 <view class="page-shell registrations-page">
-  <view class="page-heading">
-    <text class="section-title">我的活动</text>
-    <text class="muted page-summary">查看报名状态，也可以重新打开活动详情。</text>
+  <view class="page-intro">
+    <text class="page-intro-title">我的活动</text>
+    <text class="page-intro-copy">查看报名状态，也可以重新打开活动详情。</text>
   </view>
 
   <view wx:if="{{loading}}" class="empty-state">正在加载报名记录</view>
   <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">报名记录加载失败，轻触重试</view>
   <view wx:elif="{{registrations.length === 0}}" class="empty-state">你还没有报名活动</view>
   <view wx:else class="registration-list">
-    <view wx:for="{{registrations}}" wx:key="id" class="registration-row" data-slug="{{item.events.slug}}" bindtap="openEvent">
+    <view wx:for="{{registrations}}" wx:key="id" class="registration-card surface-card" data-slug="{{item.events.slug}}" bindtap="openEvent">
       <image wx:if="{{item.events.cover_image_url}}" class="registration-cover" src="{{item.events.cover_image_url}}" mode="aspectFill" />
+      <view wx:else class="registration-cover registration-placeholder"><image src="/assets/logo-mark.png" mode="aspectFit" /></view>
       <view class="registration-content">
         <view class="registration-meta"><text>{{item.dateLabel}}</text><text class="status status-{{item.status}}">{{item.statusLabel}}</text></view>
         <text class="registration-title">{{item.events.title}}</text>
-        <text class="muted registration-location">{{item.locationLabel}}</text>
+        <view class="registration-footer"><text class="registration-location">{{item.locationLabel}}</text><image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" /></view>
       </view>
     </view>
   </view>

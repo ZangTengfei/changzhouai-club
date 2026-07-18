@@ -37,6 +37,53 @@ final result: passed
 
 ---
 
+# 小程序白底多彩卡片全量改版 Design QA
+
+- 日期：2026-07-19
+- Source visual truth：
+  - `output/design-mockups/2026-07-19-miniapp-home-v2.png`
+  - `output/design-mockups/2026-07-19-miniapp-news-v2.png`
+  - `output/design-mockups/2026-07-19-miniapp-events-v2.png`
+  - `output/design-mockups/2026-07-19-miniapp-me-v2.png`
+- Implementation screenshots：`output/design-qa/miniapp-v2/`
+- Viewport：微信开发者工具 `390 × 762` 逻辑像素，截图为 2 倍图
+- State：本地真实 API、开发者工具登录态；当前数据为近期活动 0、往期活动 21、档案完成度 29%
+- Full-view comparisons：`output/design-qa/miniapp-v2/comparisons/home.png`、`news.png`、`events.png`、`me.png`
+- Focused comparisons：`output/design-qa/miniapp-v2/comparisons/home-focus.png`、`news-focus.png`、`events-focus.png`、`me-focus.png`
+
+## Findings
+
+- No actionable P0/P1/P2 differences remain.
+- 首页、情报、活动、我的四个主页面保持了参考图的白色画布、黑色高对比标题、柔和多彩功能卡、32rpx 大圆角和轻阴影语言。
+- 首页只保留品牌标识；其余页面使用明确页面标题，符合小程序导航层级。动态头像、成员身份、活动统计和内容数量来自真实登录状态与接口，不用占位数据伪造完成状态。
+- 首页的活动主卡、活动列表和活动详情使用真实活动图片；图片裁切、圆角、标题换行、时间地点信息均未出现重叠或越界。
+- 情报页保留精选、AI 快讯、群聊精华三种真实内容入口；当前热点、资讯列表和详情页在长中文标题下仍保持清晰层级。
+- 活动页因真实数据没有未来活动，默认展示往期回顾；该状态与 mock 中的即将开始状态差异属于数据状态，不是视觉实现偏差。
+- 我的、成长档案、能力档案、我的活动、设置、隐私说明均沿用同一套颜色、圆角、留白和卡片语法，长页面首屏与滚动内容不存在断层。
+- 活动详情保留报名、取消、提醒、签到、反馈、相册、资料与外部报名等既有业务能力；本次只重构表现层，没有缩减流程。
+- 微信开发者工具运行日志无 exception；移除了开发者工具判定无效的详情页分享 JSON 字段，分享回调继续由页面逻辑提供。
+
+## Comparison History
+
+1. 第一轮：四个核心页完成真实数据渲染并与对应效果图并排检查。
+   - 调整结果：统一页面留白、卡片圆角、文字层级、柔和彩色模块和真实图片优先级。
+2. 第二轮：补齐活动详情、内容详情、成长档案、能力档案、我的活动、设置和隐私说明页面。
+   - 调整结果：统一二级页标题、表单控件、信息块和空状态；保留所有原交互入口。
+3. 最终轮：开发者工具预览编译与 11 个路由截图复核。
+   - 结果：无 P0/P1/P2 视觉问题，无运行时异常。
+
+## Verification
+
+- `npm run typecheck`（`miniapp/`）：通过
+- `npm run miniapp:verify-api`：18 项体验链路全部通过
+- 微信开发者工具预览编译：通过，主包 `348.4 KB`
+- 微信开发者工具路由截图：11 个页面通过
+- `git diff --check`：通过
+
+final result: passed
+
+---
+
 # 群聊日报三模板选择 Design QA
 
 - Source visual truth:

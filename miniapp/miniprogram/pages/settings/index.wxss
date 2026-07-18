@@ -1,96 +1,129 @@
 .settings-page {
-  display: flex;
-  flex-direction: column;
-  gap: 38rpx;
+  padding-top: 26rpx;
 }
 
 .settings-identity {
   display: flex;
   flex-direction: column;
-  gap: 6rpx;
-  padding: 20rpx 0 28rpx;
-  border-top: 6rpx solid var(--color-orange);
-  border-bottom: 2rpx solid var(--color-line);
+  gap: 8rpx;
+  padding: 30rpx;
+  border: 2rpx solid #dcefe5;
+  border-radius: var(--radius-card);
+  background: var(--color-green-soft);
+}
+
+.settings-caption {
+  color: var(--color-green-dark);
+  font-size: 22rpx;
+  font-weight: 720;
 }
 
 .settings-name {
   font-size: 40rpx;
-  font-weight: 800;
+  font-weight: 830;
 }
 
-.settings-caption,
-.settings-count {
+.settings-summary {
   color: var(--color-subtle);
-  font-size: 22rpx;
+  font-size: 23rpx;
+  line-height: 1.5;
 }
 
 .settings-group {
-  display: flex;
-  flex-direction: column;
-  gap: 16rpx;
+  margin-top: 30rpx;
 }
 
 .settings-group-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16rpx;
 }
 
 .settings-group-title {
-  font-size: 24rpx;
-  font-weight: 760;
+  display: block;
+  margin-bottom: 16rpx;
+  font-size: 27rpx;
+  font-weight: 790;
+}
+
+.settings-count {
+  margin-bottom: 16rpx;
+  color: var(--color-subtle);
+  font-size: 22rpx;
 }
 
 .settings-list {
-  border-top: 2rpx solid var(--color-ink);
+  overflow: hidden;
+  border: 2rpx solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: #ffffff;
+  box-shadow: var(--shadow-card);
 }
 
 .settings-row {
-  display: grid;
-  min-height: 96rpx;
-  grid-template-columns: 44rpx minmax(0, 1fr) 28rpx;
+  display: flex;
+  min-height: 106rpx;
   align-items: center;
   gap: 18rpx;
+  padding: 0 24rpx;
   border-bottom: 2rpx solid var(--color-line);
 }
 
+.settings-row:last-child {
+  border-bottom: 0;
+}
+
 .settings-icon {
-  width: 44rpx;
-  height: 44rpx;
+  box-sizing: border-box;
+  width: 64rpx;
+  height: 64rpx;
+  flex: 0 0 auto;
+  padding: 14rpx;
+  border-radius: 20rpx;
+  background: var(--color-blue-soft);
+}
+
+.connection-row .settings-icon {
+  background: var(--color-purple-soft);
 }
 
 .settings-label {
+  min-width: 0;
+  flex: 1;
   font-size: 27rpx;
-  font-weight: 650;
+  font-weight: 680;
 }
 
 .settings-arrow {
   width: 28rpx;
   height: 28rpx;
-}
-
-.connection-row {
-  grid-template-columns: 44rpx minmax(0, 1fr) auto;
+  opacity: 0.7;
 }
 
 .connection-status {
-  color: var(--color-green);
-  font-size: 23rpx;
+  padding: 5rpx 13rpx;
+  border-radius: 18rpx;
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
+  font-size: 21rpx;
+  font-weight: 700;
 }
 
 .logout-button {
   display: flex;
-  min-height: 88rpx;
+  width: 100%;
+  min-height: 92rpx;
   align-items: center;
   justify-content: center;
   gap: 12rpx;
-  margin: 8rpx 0 0;
-  border: 2rpx solid var(--color-line);
-  border-radius: 8rpx;
-  background: var(--color-surface);
-  color: #7d3d2d;
+  margin-top: 42rpx;
+  border: 2rpx solid #ffd9d2;
+  border-radius: 46rpx;
+  background: #fff3f0;
+  color: #bf3e2e;
   font-size: 27rpx;
-  font-weight: 650;
+  font-weight: 700;
 }
 
 .logout-button::after {
@@ -98,6 +131,6 @@
 }
 
 .logout-button image {
-  width: 38rpx;
-  height: 38rpx;
+  width: 34rpx;
+  height: 34rpx;
 }

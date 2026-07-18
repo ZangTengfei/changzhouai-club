@@ -1,8 +1,14 @@
 <view class="page-shell privacy-page">
-  <text class="section-title">隐私说明</text>
-  <view class="privacy-section"><text class="privacy-title">我们收集什么</text><text class="privacy-copy">当你完善能力档案时，我们会保存昵称、微信号、城市，以及你主动填写的身份、行业、技能、可提供能力、当前需要和参与意愿。微信登录标识仅用于识别账号。</text></view>
-  <view class="privacy-section"><text class="privacy-title">如何使用</text><text class="privacy-copy">这些信息用于活动报名联系、社区成员服务、能力匹配和你主动参与的项目协作。微信号不会在公开成员页面展示；只有你主动开启“公开成员档案”后，公开资料才会进入社区展示范围。</text></view>
-  <view class="privacy-section"><text class="privacy-title">群聊精华</text><text class="privacy-copy">群聊精华展示网站群聊日报同步并脱敏后的总结、要点与资源线索，不展示原始聊天记录、成员列表或联系方式。你的阅读、收藏和分享操作仅用于改善内容服务与运营统计。</text></view>
-  <view class="privacy-section"><text class="privacy-title">保存与退出</text><text class="privacy-copy">数据保存在常州 AI Club 的社区账号系统中。你可以随时修改资料；如需删除账号和相关数据，可通过社区官方联系方式提出申请。</text></view>
+  <view class="privacy-hero">
+    <view class="icon-tile"><image src="/assets/icons/privacy.png" mode="aspectFit" /></view>
+    <text class="privacy-kicker">隐私与数据</text>
+    <text class="privacy-hero-title">清楚说明，我们如何使用你的社区资料</text>
+    <text class="privacy-hero-copy">只收集提供社区服务所需要的信息，微信号不会公开展示。</text>
+  </view>
+
+  <view class="privacy-section privacy-section-green"><text class="privacy-index">01</text><text class="privacy-title">我们收集什么</text><text class="privacy-copy">当你完善能力档案时，我们会保存昵称、微信号、城市，以及你主动填写的身份、行业、技能、可提供能力、当前需要和参与意愿。微信登录标识仅用于识别账号。</text></view>
+  <view class="privacy-section privacy-section-blue"><text class="privacy-index">02</text><text class="privacy-title">如何使用</text><text class="privacy-copy">这些信息用于活动报名联系、社区成员服务、能力匹配和你主动参与的项目协作。微信号不会在公开成员页面展示；只有你主动开启“公开成员档案”后，公开资料才会进入社区展示范围。</text></view>
+  <view class="privacy-section privacy-section-purple"><text class="privacy-index">03</text><text class="privacy-title">群聊精华</text><text class="privacy-copy">群聊精华展示网站群聊日报同步并脱敏后的总结、要点与资源线索，不展示原始聊天记录、成员列表或联系方式。你的阅读、收藏和分享操作仅用于改善内容服务与运营统计。</text></view>
+  <view class="privacy-section privacy-section-orange"><text class="privacy-index">04</text><text class="privacy-title">保存与退出</text><text class="privacy-copy">数据保存在常州 AI Club 的社区账号系统中。你可以随时修改资料；如需删除账号和相关数据，可通过社区官方联系方式提出申请。</text></view>
   <text class="privacy-version">版本：2026-07-18</text>
 </view>

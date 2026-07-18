@@ -3,7 +3,7 @@
   <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadSettings">设置加载失败，轻触重试</view>
 
   <block wx:else>
-    <view class="settings-identity"><text class="settings-name">{{displayName}}</text><text class="settings-caption">社区账号</text></view>
+    <view class="settings-identity"><text class="settings-caption">社区账号</text><text class="settings-name">{{displayName}}</text><text class="settings-summary">管理资料、账号连接与隐私选项。</text></view>
 
     <view class="settings-group">
       <text class="settings-group-title">个人信息</text>

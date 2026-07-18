@@ -1,55 +1,57 @@
 <custom-navigation title="活动" />
+
 <view class="page-shell events-page">
-  <view class="page-heading">
-    <view class="page-title-row">
-      <text class="page-title">活动索引</text>
-      <text class="record-count">{{counts.upcoming + counts.history}} 场记录</text>
-    </view>
-    <text class="page-summary">按时间查看社区现场，也可以区分社区活动与外部活动。</text>
+  <view class="page-intro">
+    <text class="page-intro-title">一起见面，做点新东西</text>
+    <text class="page-intro-copy">发现社区现场，也记录每一次真实连接。</text>
   </view>
 
-  <view class="mode-tabs" aria-label="活动范围">
-    <view class="mode-tab {{activeMode === 'upcoming' ? 'mode-tab-active' : ''}}" data-mode="upcoming" bindtap="switchMode">
-      <text>即将开始</text><text>{{counts.upcoming}}</text>
-    </view>
-    <view class="mode-tab {{activeMode === 'history' ? 'mode-tab-active' : ''}}" data-mode="history" bindtap="switchMode">
-      <text>往期回顾</text><text>{{counts.history}}</text>
-    </view>
+  <view class="segmented-control" aria-label="活动范围">
+    <view class="segmented-item {{activeMode === 'upcoming' ? 'segmented-item-active' : ''}}" data-mode="upcoming" bindtap="switchMode">即将开始 {{counts.upcoming}}</view>
+    <view class="segmented-item {{activeMode === 'history' ? 'segmented-item-active' : ''}}" data-mode="history" bindtap="switchMode">往期回顾 {{counts.history}}</view>
   </view>
 
-  <view class="category-tabs" aria-label="活动类型">
-    <view class="category-tab {{activeFilter === 'all' ? 'category-tab-active' : ''}}" data-filter="all" bindtap="switchFilter">全部 {{categoryCounts.all}}</view>
-    <view class="category-tab {{activeFilter === 'community' ? 'category-tab-active' : ''}}" data-filter="community" bindtap="switchFilter">社区活动 {{categoryCounts.community}}</view>
-    <view class="category-tab category-tab-external {{activeFilter === 'external' ? 'category-tab-active category-tab-external-active' : ''}}" data-filter="external" bindtap="switchFilter">外部活动 {{categoryCounts.external}}</view>
+  <view class="chip-row" aria-label="活动类型">
+    <view class="filter-chip {{activeFilter === 'all' ? 'filter-chip-active' : ''}}" data-filter="all" bindtap="switchFilter">全部</view>
+    <view class="filter-chip {{activeFilter === 'community' ? 'filter-chip-active' : ''}}" data-filter="community" bindtap="switchFilter">社区活动</view>
+    <view class="filter-chip {{activeFilter === 'external' ? 'filter-chip-active' : ''}}" data-filter="external" bindtap="switchFilter">外部活动</view>
   </view>
 
-  <view wx:if="{{loading}}" class="empty-state">正在整理活动索引</view>
-  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">活动索引加载失败，轻触重试</view>
-  <view wx:elif="{{visibleEvents.length === 0}}" class="empty-state">当前范围暂时没有活动记录</view>
+  <view wx:if="{{loading}}" class="empty-state">正在整理活动</view>
+  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">活动加载失败，轻触重试</view>
+  <view wx:elif="{{visibleEvents.length === 0}}" class="empty-state">当前范围暂时没有活动</view>
+
   <view wx:else class="event-index">
     <view wx:for="{{eventGroups}}" wx:key="key" wx:for-item="group" class="month-group">
-      <view class="month-heading">
+      <view class="section-heading-row month-heading">
         <view class="month-copy"><text class="month-label">{{group.monthLabel}}</text><text class="year-label">{{group.yearLabel}}</text></view>
         <text class="month-count">{{group.countLabel}}</text>
       </view>
 
       <view class="month-events">
-        <view wx:for="{{group.events}}" wx:key="id" wx:for-item="event" class="event-row" data-slug="{{event.slug}}" bindtap="openEvent">
-          <view class="event-date">
-            <text class="event-day">{{event.dateDayLabel}}</text>
-            <text class="event-time">{{event.dateTimeLabel}}</text>
-            <text class="status-tag">{{event.statusLabel}}</text>
+        <view wx:for="{{group.events}}" wx:key="id" wx:for-item="event" class="event-card surface-card" data-slug="{{event.slug}}" bindtap="openEvent">
+          <view class="event-media">
+            <image wx:if="{{event.cover_image_url}}" class="event-image" src="{{event.cover_image_url}}" mode="{{event.coverMode}}" />
+            <view wx:else class="event-image event-image-placeholder"><image src="/assets/logo-mark.png" mode="aspectFit" /></view>
+            <view class="event-date-tile"><text>{{event.dateDayLabel}}</text><text>{{event.dateTimeLabel}}</text></view>
           </view>
-          <image wx:if="{{event.cover_image_url}}" class="event-image" src="{{event.cover_image_url}}" mode="{{event.coverMode}}" />
-          <image wx:else class="event-image event-image-placeholder" src="/assets/logo-mark.png" mode="aspectFit" />
           <view class="event-content">
             <text class="event-type {{event.typeClass}}">{{event.eventTypeLabel}}</text>
             <text class="event-name">{{event.title}}</text>
-            <text class="event-location">{{event.locationLabel}}</text>
+            <view class="event-footer">
+              <text class="event-location">{{event.locationLabel}}</text>
+              <text class="event-status">{{event.statusLabel}}</text>
+              <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+            </view>
           </view>
-          <image class="event-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
         </view>
       </view>
     </view>
+  </view>
+
+  <view wx:if="{{counts.history}}" class="history-teaser" data-mode="history" bindtap="switchMode" role="button">
+    <view class="icon-tile"><image src="/assets/icons/events.png" mode="aspectFit" /></view>
+    <view class="history-copy"><text>看看我们一起做过的事</text><text>{{counts.history}} 场活动记录</text></view>
+    <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
   </view>
 </view>

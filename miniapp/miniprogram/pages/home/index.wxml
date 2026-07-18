@@ -1,89 +1,121 @@
-<custom-navigation show-mark="{{true}}" />
+<custom-navigation
+  show-mark="{{true}}"
+  show-avatar="{{true}}"
+  avatar-url="{{avatarUrl}}"
+  avatar-initial="{{avatarInitial}}"
+/>
+
 <view class="page-shell home-page">
-  <view class="brief-heading">
-    <view class="brief-heading-copy">
-      <text class="brief-title">现场简报</text>
-      <text class="brief-caption">COMMUNITY FIELD NOTES</text>
-    </view>
-    <text class="brief-date">{{briefDate}}</text>
+  <view class="welcome-block">
+    <text class="welcome-title">{{greeting}}，{{greetingName}}</text>
+    <text class="welcome-copy">今天，和有趣的人一起做点新东西。</text>
   </view>
 
-  <view wx:if="{{profileCompletion && !profileCompletion.completed}}" class="profile-progress" bindtap="openProfile" role="button" aria-label="继续完善能力档案">
-    <view class="profile-progress-copy">
-      <text class="profile-progress-kicker">能力档案 {{profileCompletion.percent}}%</text>
-      <text class="profile-progress-title">再补充 {{profileCompletion.missingItems[0]}}，让社区更懂你</text>
+  <view class="quick-grid">
+    <view class="quick-card quick-card-blue" bindtap="openNewsTab" role="button" aria-label="查看社区动态">
+      <view class="icon-tile"><image src="/assets/icons/news.png" mode="aspectFit" /></view>
+      <text class="quick-title">社区动态</text>
+      <text class="quick-copy">看看大家在关注什么</text>
+      <image class="quick-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
     </view>
-    <view class="profile-progress-action">继续完善</view>
-    <view class="profile-progress-track"><view style="width: {{profileCompletion.percent}}%;"></view></view>
+    <view class="quick-card quick-card-orange" bindtap="openEvents" role="button" aria-label="查看近期活动">
+      <view class="icon-tile"><image src="/assets/icons/events.png" mode="aspectFit" /></view>
+      <text class="quick-title">近期活动</text>
+      <text class="quick-copy">{{upcomingCount}} 场活动即将开始</text>
+      <image class="quick-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+    </view>
+    <view class="quick-card quick-card-green" bindtap="openDigestList" role="button" aria-label="查看群聊精华">
+      <view class="icon-tile"><image src="/assets/icons/account-link.png" mode="aspectFit" /></view>
+      <text class="quick-title">群聊精华</text>
+      <text class="quick-copy">把讨论沉淀成线索</text>
+      <image class="quick-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+    </view>
+    <view class="quick-card quick-card-purple" bindtap="openGrowth" role="button" aria-label="查看成员成长">
+      <view class="icon-tile"><image src="/assets/icons/me.png" mode="aspectFit" /></view>
+      <text class="quick-title">成员成长</text>
+      <text class="quick-copy">查看身份与社区荣誉</text>
+      <image class="quick-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+    </view>
   </view>
 
-  <view wx:if="{{loading}}" class="empty-state">正在整理社区现场记录</view>
-  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">现场记录加载失败，轻触重试</view>
-  <view wx:elif="{{!featuredEvent}}" class="empty-state">暂时没有可查看的活动记录</view>
-  <view wx:else class="feature-record" data-slug="{{featuredEvent.slug}}" bindtap="openEvent">
-    <image wx:if="{{featuredEvent.cover_image_url}}" class="feature-cover" src="{{featuredEvent.cover_image_url}}" mode="aspectFill" />
-    <view wx:else class="feature-cover feature-cover-placeholder"><image src="/assets/logo-mark.png" mode="aspectFit" /></view>
-    <view class="feature-meta">
-      <text class="status-tag">{{featuredEvent.statusLabel}}</text>
-      <text>{{featuredEvent.eventTypeLabel}}</text>
-      <text>{{featuredEvent.dateLabel}}</text>
-    </view>
-    <view class="feature-copy">
-      <text class="feature-index">{{featuredEvent.indexLabel}}</text>
-      <view class="feature-body">
-        <text class="feature-title">{{featuredEvent.title}}</text>
-        <text class="feature-location">{{featuredEvent.locationLabel}}</text>
-        <text class="feature-summary">{{featuredEvent.summary || '看看这场活动留下了哪些现场记录。'}}</text>
+  <view class="section-heading-row">
+    <text class="section-title">本周精选</text>
+    <view class="section-action" bindtap="openEvents" role="button">查看全部</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty-state">正在整理社区现场</view>
+  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">现场内容加载失败，轻触重试</view>
+  <view wx:elif="{{!featuredEvent}}" class="empty-state">新的社区活动正在准备中</view>
+  <view wx:else class="featured-card surface-card" data-slug="{{featuredEvent.slug}}" bindtap="openEvent">
+    <image wx:if="{{featuredEvent.cover_image_url}}" class="featured-cover" src="{{featuredEvent.cover_image_url}}" mode="aspectFill" />
+    <view wx:else class="featured-cover featured-placeholder"><image src="/assets/logo-mark.png" mode="aspectFit" /></view>
+    <view class="featured-content">
+      <view class="featured-meta">
+        <text class="status-tag">{{featuredEvent.statusLabel}}</text>
+        <text>{{featuredEvent.eventTypeLabel}}</text>
+      </view>
+      <text class="featured-title">{{featuredEvent.title}}</text>
+      <text class="featured-detail">{{featuredEvent.dateLabel}} · {{featuredEvent.locationLabel}}</text>
+      <text wx:if="{{featuredEvent.summary}}" class="featured-summary">{{featuredEvent.summary}}</text>
+      <view class="featured-footer">
+        <text>社区现场</text>
+        <button class="featured-action" data-slug="{{featuredEvent.slug}}" catchtap="openEvent">查看活动</button>
       </view>
     </view>
-    <button class="brief-action" data-slug="{{featuredEvent.slug}}" catchtap="openEvent">查看简报</button>
   </view>
 
-  <block wx:if="{{!loading && !loadFailed && featuredEvent}}">
-    <view class="section-heading">
-      <text class="section-title">{{eventSectionTitle}}</text>
-      <view class="text-action" bindtap="openEvents" role="button" aria-label="{{eventSectionHint}}">{{eventSectionHint}}</view>
-    </view>
-
-    <view class="event-list">
-    <view
-      wx:for="{{events}}"
-      wx:key="id"
-      class="event-row"
-      data-slug="{{item.slug}}"
-      bindtap="openEvent"
-    >
-      <text class="event-index">{{item.indexLabel}}</text>
-      <image wx:if="{{item.cover_image_url}}" class="event-cover" src="{{item.cover_image_url}}" mode="{{item.coverMode}}" />
-      <image wx:else class="event-cover event-cover-placeholder" src="/assets/logo-mark.png" mode="aspectFit" />
-      <view class="event-body">
-        <text class="event-meta">{{item.statusLabel}} · {{item.eventTypeLabel}} · {{item.dateLabel}}</text>
-        <text class="event-title">{{item.title}}</text>
-        <text class="event-location">{{item.locationLabel}}</text>
+  <view wx:if="{{events.length}}" class="compact-events">
+    <view wx:for="{{events}}" wx:key="id" class="compact-event" data-slug="{{item.slug}}" bindtap="openEvent">
+      <image wx:if="{{item.cover_image_url}}" class="compact-event-cover" src="{{item.cover_image_url}}" mode="{{item.coverMode}}" />
+      <image wx:else class="compact-event-cover compact-event-placeholder" src="/assets/logo-mark.png" mode="aspectFit" />
+      <view class="compact-event-copy">
+        <text class="compact-event-meta">{{item.dateLabel}} · {{item.statusLabel}}</text>
+        <text class="compact-event-title">{{item.title}}</text>
+        <text class="compact-event-location">{{item.locationLabel}}</text>
       </view>
-      <image class="event-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+      <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
     </view>
-    </view>
+  </view>
 
-    <view class="archive-note" bindtap="openEvents">
-      <text>社区已发生</text><text class="archive-count">{{eventSectionHint}}</text>
-      <image src="/assets/icons/chevron-right.png" mode="aspectFit" />
-    </view>
-  </block>
-
-  <view wx:if="{{featuredNews || latestDigest}}" class="content-heading">
+  <view wx:if="{{featuredNews || latestDigest}}" class="section-heading-row content-heading">
     <text class="section-title">今日情报</text>
-    <view class="text-action" bindtap="openNewsTab" role="button">查看资讯</view>
+    <view class="section-action" bindtap="openNewsTab" role="button">查看资讯</view>
   </view>
-  <view wx:if="{{featuredNews}}" class="content-highlight" data-id="{{featuredNews.id}}" bindtap="openNews">
-    <view class="content-highlight-meta"><text>AI HOT</text><text>{{featuredNews.metaLabel}}</text></view>
-    <text class="content-highlight-title">{{featuredNews.title}}</text>
-    <text wx:if="{{featuredNews.summary}}" class="content-highlight-summary">{{featuredNews.summary}}</text>
+
+  <view wx:if="{{featuredNews}}" class="content-card content-card-blue" data-id="{{featuredNews.id}}" bindtap="openNews">
+    <view class="content-card-icon"><image src="/assets/icons/news.png" mode="aspectFit" /></view>
+    <view class="content-card-copy">
+      <text class="content-card-label">AI 精选 · {{featuredNews.metaLabel}}</text>
+      <text class="content-card-title">{{featuredNews.title}}</text>
+      <text wx:if="{{featuredNews.summary}}" class="content-card-summary">{{featuredNews.summary}}</text>
+    </view>
+    <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
   </view>
-  <view wx:if="{{latestDigest}}" class="digest-highlight" data-id="{{latestDigest.id}}" bindtap="openDigest">
-    <text class="digest-highlight-label">群聊精华 · {{latestDigest.dateLabel}}</text>
-    <text class="digest-highlight-title">{{latestDigest.title}}</text>
-    <text class="digest-highlight-copy">{{latestDigest.summaryLabel}}</text>
-    <image src="/assets/icons/chevron-right.png" mode="aspectFit" />
+
+  <view wx:if="{{latestDigest}}" class="content-card content-card-purple" data-id="{{latestDigest.id}}" bindtap="openDigest">
+    <view class="content-card-icon"><image src="/assets/icons/account-link.png" mode="aspectFit" /></view>
+    <view class="content-card-copy">
+      <text class="content-card-label">群聊精华 · {{latestDigest.dateLabel}}</text>
+      <text class="content-card-title">{{latestDigest.title}}</text>
+      <text class="content-card-summary">{{latestDigest.summaryLabel}}</text>
+    </view>
+    <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+  </view>
+
+  <view wx:if="{{profileCompletion && !profileCompletion.completed}}" class="member-strip surface-card" bindtap="openProfile" role="button">
+    <image class="member-strip-badge" src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
+    <view class="member-strip-copy">
+      <text class="member-strip-title">能力档案 {{profileCompletion.percent}}%</text>
+      <text class="member-strip-meta">继续完善，让伙伴更了解你</text>
+    </view>
+    <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+  </view>
+  <view wx:else class="member-strip surface-card" bindtap="openGrowth" role="button">
+    <image class="member-strip-badge" src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
+    <view class="member-strip-copy">
+      <text class="member-strip-title">{{memberIdentity}}</text>
+      <text class="member-strip-meta">{{attendanceSummary}}</text>
+    </view>
+    <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
   </view>
 </view>

@@ -1,8 +1,14 @@
 <view class="custom-navigation" style="height: {{statusBarHeight + navigationBarHeight}}px;">
   <view class="custom-navigation-fixed" style="padding-top: {{statusBarHeight}}px;">
     <view class="custom-navigation-bar" style="height: {{navigationBarHeight}}px; padding-right: {{rightInset}}px;">
-      <image wx:if="{{showMark}}" class="custom-navigation-mark" src="/assets/logo-mark.png" mode="aspectFit" />
-      <text class="custom-navigation-title">{{title}}</text>
+      <view class="custom-navigation-brand">
+        <image wx:if="{{showMark}}" class="custom-navigation-mark" src="/assets/logo-mark.png" mode="aspectFit" />
+        <text class="custom-navigation-title">{{title}}</text>
+      </view>
+      <view wx:if="{{showAvatar}}" class="custom-navigation-avatar">
+        <image wx:if="{{avatarUrl}}" src="{{avatarUrl}}" mode="aspectFill" />
+        <text wx:else>{{avatarInitial}}</text>
+      </view>
     </view>
   </view>
 </view>

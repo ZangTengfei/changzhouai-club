@@ -1,114 +1,100 @@
 <view class="detail-page">
   <view wx:if="{{loading}}" class="page-shell"><view class="empty-state">正在加载活动</view></view>
   <view wx:elif="{{loadFailed}}" class="page-shell"><view class="empty-state">暂时无法打开这个活动</view></view>
-  <block wx:elif="{{event}}">
-    <image wx:if="{{event.imageUrl}}" class="detail-cover" src="{{event.imageThumbnailUrl || event.imageUrl}}" mode="{{coverMode}}" />
-    <view class="page-shell detail-content">
+
+  <view wx:elif="{{event}}" class="page-shell detail-content">
+    <view class="detail-hero surface-card">
+      <image wx:if="{{event.imageUrl}}" class="detail-cover" src="{{event.imageThumbnailUrl || event.imageUrl}}" mode="{{coverMode}}" />
+      <view wx:else class="detail-cover detail-cover-placeholder"><image src="/assets/logo-mark.png" mode="aspectFit" /></view>
       <view class="detail-header">
         <text class="status-tag">{{event.eventTypeLabel}} · {{event.statusLabel}}</text>
         <text class="detail-title">{{event.title}}</text>
-        <text class="detail-summary">{{event.summary}}</text>
-      </view>
-
-      <view class="fact-band">
-        <view class="fact-row"><text class="fact-label">DATE / TIME</text><text class="fact-value">{{event.dateTimeLabel}}</text></view>
-        <view class="fact-row"><text class="fact-label">LOCATION</text><text class="fact-value">{{event.locationLabel}}</text></view>
-      </view>
-
-      <view wx:if="{{event.recapParagraphs.length}}" class="detail-section recap-section">
-        <view class="record-heading"><text class="record-number">01</text><text class="section-title">活动回顾</text></view>
-        <text wx:for="{{event.recapParagraphs}}" wx:key="*this" class="paragraph">{{item}}</text>
-      </view>
-
-      <view wx:if="{{event.video}}" class="detail-section">
-        <view class="record-heading"><text class="record-number record-number-blue">02</text><text class="section-title">现场视频</text></view>
-        <video class="event-video" src="{{event.video.url}}" poster="{{event.video.coverUrl}}" title="{{event.video.title || event.title}}" controls></video>
-      </view>
-
-      <view wx:if="{{event.gallery.length}}" class="detail-section">
-        <view class="detail-section-heading">
-          <view class="record-heading"><text class="record-number record-number-orange">03</text><text class="section-title">现场记录</text></view>
-          <text class="section-count">{{event.gallery.length}} 张</text>
-        </view>
-        <view class="gallery-grid">
-          <image
-            wx:for="{{event.gallery}}"
-            wx:key="id"
-            class="gallery-image"
-            src="{{item.thumbnailUrl || item.imageUrl}}"
-            mode="aspectFill"
-            lazy-load="{{true}}"
-            data-url="{{item.imageUrl}}"
-            bindtap="previewGalleryImage"
-          />
-        </view>
-      </view>
-
-      <view wx:if="{{event.descriptionParagraphs.length}}" class="detail-section">
-        <view class="record-heading"><text class="record-number record-number-blue">04</text><text class="section-title">活动介绍</text></view>
-        <text wx:for="{{event.descriptionParagraphs}}" wx:key="*this" class="paragraph">{{item}}</text>
-      </view>
-
-      <view wx:if="{{event.agendaItems.length}}" class="detail-section">
-        <view class="record-heading"><text class="record-number record-number-orange">05</text><text class="section-title">活动流程</text></view>
-        <view wx:for="{{event.agendaItems}}" wx:key="*this" class="list-row">
-          <text class="list-index">{{index + 1}}</text>
-          <text class="list-text">{{item}}</text>
-        </view>
-      </view>
-
-      <view wx:if="{{event.registrationNote}}" class="registration-note">{{event.registrationNote}}</view>
-
-      <button wx:if="{{event.docsUrl}}" class="secondary-button resource-button" bindtap="copyDocsLink">复制活动资料链接</button>
-
-      <view class="share-row">
-        <button class="secondary-button share-button" open-type="share">分享活动</button>
-      </view>
-
-      <view wx:if="{{event.status === 'scheduled'}}" class="registration-panel">
-        <block wx:if="{{event.registrationUrl}}">
-          <text class="registration-title">外部活动报名</text>
-          <text class="muted registration-copy">该活动使用外部报名入口，复制链接后在浏览器打开。</text>
-          <button class="primary-button" bindtap="copyExternalLink">复制报名链接</button>
-        </block>
-        <block wx:elif="{{registrationLoading}}">
-          <text class="muted">正在检查报名状态</text>
-        </block>
-        <block wx:elif="{{registration && registration.status === 'registered'}}">
-          <text class="registration-title">你已报名</text>
-          <text class="muted registration-copy">活动开始前可以在“我的活动”中再次查看。</text>
-          <button wx:if="{{reminder && reminder.available && (!reminder.subscription || reminder.subscription.status !== 'accepted')}}" class="primary-button" loading="{{reminderSubmitting}}" disabled="{{reminderSubmitting}}" bindtap="enableReminder">开启活动提醒</button>
-          <view wx:elif="{{reminder && reminder.subscription && reminder.subscription.status === 'accepted'}}" class="reminder-status">活动提醒已开启</view>
-          <button class="secondary-button" loading="{{checkinSubmitting}}" disabled="{{checkinSubmitting}}" bindtap="scanCheckinCode">{{attendance ? '已签到' : '扫码签到'}}</button>
-          <button class="secondary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="cancelRegistration">取消报名</button>
-        </block>
-        <block wx:elif="{{!user || !user.registrationReady}}">
-          <text class="registration-title">完善资料后报名</text>
-          <text class="muted registration-copy">昵称和微信号用于活动联系，只需填写一次。</text>
-          <button class="primary-button" bindtap="openProfile">完善社区资料</button>
-        </block>
-        <block wx:else>
-          <text class="registration-title">报名这场活动</text>
-          <textarea class="registration-textarea" maxlength="500" value="{{registrationNote}}" bindinput="handleNoteInput" placeholder="可选：写下你特别想交流的话题" />
-          <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitRegistration">确认报名</button>
-        </block>
-      </view>
-
-      <view wx:elif="{{event.status === 'completed'}}" class="completed-panel">
-        <view class="completed-note">本场活动已结束，现场记录会持续补充。</view>
-        <view wx:if="{{attendance}}" class="feedback-panel">
-          <view class="feedback-heading">
-            <text class="registration-title">活动反馈</text>
-            <text class="feedback-status">{{feedback ? '已提交，可继续修改' : '仅实际到场成员可填写'}}</text>
-          </view>
-          <view class="rating-switch">
-            <view wx:for="{{ratingOptions}}" wx:key="*this" class="rating-option {{feedbackRating === item ? 'rating-option-active' : ''}}" data-rating="{{item}}" bindtap="selectFeedbackRating">{{item}}</view>
-          </view>
-          <view class="rating-caption"><text>需要改进</text><text>非常满意</text></view>
-          <textarea class="registration-textarea" maxlength="500" value="{{feedbackComment}}" bindinput="handleFeedbackInput" placeholder="可选：留下一条建议" />
-          <button class="primary-button" loading="{{feedbackSubmitting}}" disabled="{{feedbackSubmitting || !feedbackRating}}" bindtap="submitFeedback">保存反馈</button>
-        </view>
+        <text wx:if="{{event.summary}}" class="detail-summary">{{event.summary}}</text>
       </view>
     </view>
-  </block>
+
+    <view class="fact-band">
+      <view class="fact-row fact-row-orange"><view class="icon-tile"><image src="/assets/icons/events.png" mode="aspectFit" /></view><view class="fact-copy"><text class="fact-label">时间</text><text class="fact-value">{{event.dateTimeLabel}}</text></view></view>
+      <view class="fact-row fact-row-blue"><view class="icon-tile"><image src="/assets/icons/account-link.png" mode="aspectFit" /></view><view class="fact-copy"><text class="fact-label">地点</text><text class="fact-value">{{event.locationLabel}}</text></view></view>
+    </view>
+
+    <view wx:if="{{event.recapParagraphs.length}}" class="detail-section detail-section-green">
+      <view class="record-heading"><text class="record-number">01</text><text class="section-title">活动回顾</text></view>
+      <text wx:for="{{event.recapParagraphs}}" wx:key="*this" class="paragraph">{{item}}</text>
+    </view>
+
+    <view wx:if="{{event.video}}" class="detail-section detail-section-blue">
+      <view class="record-heading"><text class="record-number">02</text><text class="section-title">现场视频</text></view>
+      <video class="event-video" src="{{event.video.url}}" poster="{{event.video.coverUrl}}" title="{{event.video.title || event.title}}" controls></video>
+    </view>
+
+    <view wx:if="{{event.gallery.length}}" class="detail-section detail-section-orange">
+      <view class="detail-section-heading">
+        <view class="record-heading"><text class="record-number">03</text><text class="section-title">现场记录</text></view>
+        <text class="section-count">{{event.gallery.length}} 张</text>
+      </view>
+      <view class="gallery-grid">
+        <image wx:for="{{event.gallery}}" wx:key="id" class="gallery-image" src="{{item.thumbnailUrl || item.imageUrl}}" mode="aspectFill" lazy-load="{{true}}" data-url="{{item.imageUrl}}" bindtap="previewGalleryImage" />
+      </view>
+    </view>
+
+    <view wx:if="{{event.descriptionParagraphs.length}}" class="detail-section detail-section-purple">
+      <view class="record-heading"><text class="record-number">04</text><text class="section-title">活动介绍</text></view>
+      <text wx:for="{{event.descriptionParagraphs}}" wx:key="*this" class="paragraph">{{item}}</text>
+    </view>
+
+    <view wx:if="{{event.agendaItems.length}}" class="detail-section detail-section-blue">
+      <view class="record-heading"><text class="record-number">05</text><text class="section-title">活动流程</text></view>
+      <view wx:for="{{event.agendaItems}}" wx:key="*this" class="list-row"><text class="list-index">{{index + 1}}</text><text class="list-text">{{item}}</text></view>
+    </view>
+
+    <view wx:if="{{event.registrationNote}}" class="registration-note">{{event.registrationNote}}</view>
+
+    <view class="resource-actions">
+      <button wx:if="{{event.docsUrl}}" class="secondary-button resource-button" bindtap="copyDocsLink">复制活动资料链接</button>
+      <button class="secondary-button share-button" open-type="share">分享活动</button>
+    </view>
+
+    <view wx:if="{{event.status === 'scheduled'}}" class="registration-panel">
+      <block wx:if="{{event.registrationUrl}}">
+        <text class="registration-kicker">活动报名</text>
+        <text class="registration-title">外部活动报名</text>
+        <text class="registration-copy">该活动使用外部报名入口，复制链接后在浏览器打开。</text>
+        <button class="primary-button" bindtap="copyExternalLink">复制报名链接</button>
+      </block>
+      <block wx:elif="{{registrationLoading}}"><text class="registration-copy">正在检查报名状态</text></block>
+      <block wx:elif="{{registration && registration.status === 'registered'}}">
+        <text class="registration-kicker">报名状态</text>
+        <text class="registration-title">你已报名</text>
+        <text class="registration-copy">活动开始前可以在“我的活动”中再次查看。</text>
+        <button wx:if="{{reminder && reminder.available && (!reminder.subscription || reminder.subscription.status !== 'accepted')}}" class="primary-button" loading="{{reminderSubmitting}}" disabled="{{reminderSubmitting}}" bindtap="enableReminder">开启活动提醒</button>
+        <view wx:elif="{{reminder && reminder.subscription && reminder.subscription.status === 'accepted'}}" class="reminder-status">活动提醒已开启</view>
+        <button class="secondary-button" loading="{{checkinSubmitting}}" disabled="{{checkinSubmitting}}" bindtap="scanCheckinCode">{{attendance ? '已签到' : '扫码签到'}}</button>
+        <button class="secondary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="cancelRegistration">取消报名</button>
+      </block>
+      <block wx:elif="{{!user || !user.registrationReady}}">
+        <text class="registration-kicker">活动报名</text>
+        <text class="registration-title">完善资料后报名</text>
+        <text class="registration-copy">昵称和微信号用于活动联系，只需填写一次。</text>
+        <button class="primary-button" bindtap="openProfile">完善社区资料</button>
+      </block>
+      <block wx:else>
+        <text class="registration-kicker">活动报名</text>
+        <text class="registration-title">报名这场活动</text>
+        <textarea class="registration-textarea" maxlength="500" value="{{registrationNote}}" bindinput="handleNoteInput" placeholder="可选：写下你特别想交流的话题" />
+        <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitRegistration">确认报名</button>
+      </block>
+    </view>
+
+    <view wx:elif="{{event.status === 'completed'}}" class="completed-panel">
+      <view class="completed-note">本场活动已结束，现场记录会持续补充。</view>
+      <view wx:if="{{attendance}}" class="feedback-panel">
+        <view class="feedback-heading"><text class="registration-title">活动反馈</text><text class="feedback-status">{{feedback ? '已提交，可继续修改' : '仅实际到场成员可填写'}}</text></view>
+        <view class="rating-switch"><view wx:for="{{ratingOptions}}" wx:key="*this" class="rating-option {{feedbackRating === item ? 'rating-option-active' : ''}}" data-rating="{{item}}" bindtap="selectFeedbackRating">{{item}}</view></view>
+        <view class="rating-caption"><text>需要改进</text><text>非常满意</text></view>
+        <textarea class="registration-textarea" maxlength="500" value="{{feedbackComment}}" bindinput="handleFeedbackInput" placeholder="可选：留下一条建议" />
+        <button class="primary-button" loading="{{feedbackSubmitting}}" disabled="{{feedbackSubmitting || !feedbackRating}}" bindtap="submitFeedback">保存反馈</button>
+      </view>
+    </view>
+  </view>
 </view>

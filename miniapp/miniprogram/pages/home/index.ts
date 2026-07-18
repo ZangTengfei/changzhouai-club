@@ -30,6 +30,14 @@ function formatBriefDate() {
   return `${now.getMonth() + 1}月${now.getDate()}日 ${weekdayLabels[now.getDay()]}`;
 }
 
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 11) return "早上好";
+  if (hour < 14) return "中午好";
+  if (hour < 18) return "下午好";
+  return "晚上好";
+}
+
 function getCoverMode(url: string | null): "aspectFill" | "aspectFit" {
   return url && /poster|layout|challenge|registration/i.test(url)
     ? "aspectFit"
@@ -38,6 +46,13 @@ function getCoverMode(url: string | null): "aspectFill" | "aspectFit" {
 
 Page({
   data: {
+    greeting: getGreeting(),
+    greetingName: "朋友",
+    avatarUrl: "",
+    avatarInitial: "微",
+    memberIdentity: "社区成员",
+    attendanceSummary: "参与记录会在这里更新",
+    upcomingCount: 0,
     featuredEvent: null as HomeEvent | null,
     events: [] as HomeEvent[],
     briefDate: formatBriefDate(),
@@ -80,6 +95,7 @@ Page({
         locationLabel: event.venue || event.city || "常州",
       }));
       this.setData({
+        upcomingCount: catalog.counts.upcoming,
         featuredEvent: mappedEvents[0] ?? null,
         events: mappedEvents.slice(1),
         eventSectionTitle: showingHistory ? "最近回顾" : "接下来发生",
@@ -91,6 +107,7 @@ Page({
       void this.loadContentHighlights();
     } catch {
       this.setData({
+        upcomingCount: 0,
         featuredEvent: null,
         events: [],
         loading: false,
@@ -134,7 +151,16 @@ Page({
     try {
       const user = await ensureSession();
       getApp<IAppOption>().globalData.currentUser = user;
-      this.setData({ profileCompletion: user.profileCompletion });
+      this.setData({
+        profileCompletion: user.profileCompletion,
+        greetingName: user.displayName || "朋友",
+        avatarUrl: user.avatarUrl || "",
+        avatarInitial: user.displayName.slice(0, 1) || "微",
+        memberIdentity: user.identityLabel || "社区成员",
+        attendanceSummary: user.stats.attendanceCount
+          ? `已真实到场 ${user.stats.attendanceCount} 次`
+          : "完成第一次真实参与",
+      });
     } catch {
       this.setData({ profileCompletion: null });
     }
@@ -159,6 +185,15 @@ Page({
 
   openNewsTab() {
     void wx.switchTab({ url: "/pages/news/index" });
+  },
+
+  openDigestList() {
+    wx.setStorageSync("miniapp:news-section", "digest");
+    void wx.switchTab({ url: "/pages/news/index" });
+  },
+
+  openGrowth() {
+    void wx.navigateTo({ url: "/pages/growth/index" });
   },
 
   openNews(event: WechatMiniprogram.TouchEvent) {

@@ -3,6 +3,7 @@
   <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadGrowth">成长档案加载失败，轻触重试</view>
 
   <block wx:elif="{{user}}">
+    <view class="growth-intro"><text>每一次真实参与，都会成为你的社区足迹。</text></view>
     <view class="growth-identity">
       <image class="level-badge" src="{{currentLevelAsset}}" mode="aspectFit" />
       <view class="growth-identity-copy">

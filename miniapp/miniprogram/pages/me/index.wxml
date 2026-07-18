@@ -1,9 +1,11 @@
 <custom-navigation title="我的" />
+
 <view class="page-shell account-page">
   <view wx:if="{{loading}}" class="empty-state">正在加载成员档案</view>
 
   <view wx:elif="{{loggedOut}}" class="account-error">
     <text class="section-title">已退出当前账号</text>
+    <text class="muted">重新进入后，可以继续使用微信登录。</text>
     <button class="primary-button" bindtap="loadAccount">重新登录</button>
   </view>
 
@@ -14,56 +16,78 @@
   </view>
 
   <view wx:elif="{{user}}" class="account-content">
-    <view class="identity-band" bindtap="openGrowth" role="button" aria-label="查看成长档案">
-      <view class="identity-toolbar">
-        <text class="identity-kicker">成员档案</text>
-        <view class="settings-button" catchtap="openSettings" role="button" aria-label="打开设置">
-          <image src="/assets/icons/settings.png" mode="aspectFit" />
-          <text>设置</text>
-        </view>
-      </view>
-      <view class="profile-header">
+    <view class="settings-entry" bindtap="openSettings" role="button" aria-label="打开设置">
+      <image src="/assets/icons/settings.png" mode="aspectFit" />
+      <text>设置</text>
+    </view>
+
+    <view class="identity-hero">
+      <view class="identity-main" bindtap="openGrowth" role="button" aria-label="查看成长档案">
         <image wx:if="{{user.avatarUrl}}" class="avatar" src="{{user.avatarUrl}}" mode="aspectFill" />
         <view wx:else class="avatar avatar-placeholder">{{avatarInitial}}</view>
-        <view class="profile-copy">
+        <view class="identity-copy">
           <text class="profile-name">{{user.displayName}}</text>
           <text class="profile-meta">{{user.roleLabel || user.city}}{{user.organization ? ' · ' + user.organization : ''}}</text>
-          <view class="identity-tags">
-            <text class="identity-label">{{user.identityLabel}}</text>
-            <text wx:for="{{honorTags}}" wx:key="code" class="honor-tag">{{item.label}}</text>
-          </view>
+          <view class="identity-pill"><image src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" /><text>{{user.identityLabel}}</text></view>
+          <text class="joined-label">{{joinedLabel}}</text>
         </view>
       </view>
-      <view wx:if="{{!user.capabilityProfileComplete}}" class="profile-completion-entry" catchtap="openProfile" role="button" aria-label="继续完善能力档案">
-        <view class="profile-completion-copy">
-          <text>能力档案 {{user.profileCompletion.percent}}%</text>
-          <text>待补充：{{user.profileCompletion.missingItems[0]}}</text>
-        </view>
-        <view class="profile-completion-action">继续完善</view>
+
+      <view class="profile-completion" bindtap="openProfile" role="button" aria-label="继续完善能力档案">
+        <view class="profile-completion-heading"><text>能力档案 {{user.profileCompletion.percent}}%</text><text>继续完善</text></view>
+        <text class="profile-completion-copy">{{user.profileCompletion.completed ? '档案已完善，可以随时更新' : '再补充 ' + user.profileCompletion.missingItems.length + ' 项，让更多伙伴了解你'}}</text>
         <view class="profile-completion-track"><view style="width: {{user.profileCompletion.percent}}%;"></view></view>
-      </view>
-      <view class="growth-entry">
-        <text>查看成长档案</text>
-        <image src="/assets/icons/chevron-right.png" mode="aspectFit" />
       </view>
     </view>
 
-    <view class="account-section activity-section">
-      <view class="section-heading">
-        <view class="section-copy">
-          <text class="section-title">我的活动</text>
-          <text class="activity-summary">{{activitySummary}}</text>
-        </view>
-        <view class="text-action" bindtap="openRegistrations" role="button" aria-label="查看全部活动">查看全部</view>
+    <view class="stats-card surface-card">
+      <view class="stat-item"><text>{{user.stats.registrationCount}}</text><text>活动报名</text></view>
+      <view class="stat-item"><text>{{user.stats.attendanceCount}}</text><text>实际到场</text></view>
+      <view class="stat-item"><text>{{user.stats.badgeCount}}</text><text>社区荣誉</text></view>
+    </view>
+
+    <view class="section-heading-row"><text class="section-title">我的空间</text></view>
+    <view class="space-grid">
+      <view class="space-card space-green" bindtap="openGrowth" role="button">
+        <view class="icon-tile"><image src="/assets/icons/me.png" mode="aspectFit" /></view>
+        <text class="space-title">成长档案</text><text class="space-copy">查看身份路径</text>
+        <image class="space-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
       </view>
-      <view wx:if="{{latestFootprint}}" class="footprint-row" data-slug="{{latestFootprint.slug}}" bindtap="openEvent">
-        <view class="footprint-date"><text>{{latestFootprint.dateLabel}}</text><text>{{latestFootprint.participationLabel}}</text></view>
-        <view class="footprint-copy"><text class="footprint-title">{{latestFootprint.title}}</text><text class="footprint-location">{{latestFootprint.locationLabel}}</text></view>
-        <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+      <view class="space-card space-orange" bindtap="openRegistrations" role="button">
+        <view class="icon-tile"><image src="/assets/icons/events.png" mode="aspectFit" /></view>
+        <text class="space-title">我的活动</text><text class="space-copy">{{user.stats.registrationCount}} 场记录</text>
+        <image class="space-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
       </view>
-      <view wx:else class="compact-empty" bindtap="openEvents" role="button">
-        <text>还没有活动记录，去看看社区活动</text>
-        <image src="/assets/icons/chevron-right.png" mode="aspectFit" />
+      <view class="space-card space-blue" bindtap="openProfile" role="button">
+        <view class="icon-tile"><image src="/assets/icons/edit-profile.png" mode="aspectFit" /></view>
+        <text class="space-title">能力档案</text><text class="space-copy">技能与方向</text>
+        <image class="space-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+      </view>
+      <view class="space-card space-purple" bindtap="openSettings" role="button">
+        <view class="icon-tile"><image src="/assets/icons/settings.png" mode="aspectFit" /></view>
+        <text class="space-title">账号设置</text><text class="space-copy">隐私与绑定</text>
+        <image class="space-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+      </view>
+    </view>
+
+    <view class="section-heading-row">
+      <text class="section-title">最近参与</text>
+      <view class="section-action" bindtap="openRegistrations" role="button">查看全部</view>
+    </view>
+    <view wx:if="{{latestFootprint}}" class="recent-event surface-card" data-slug="{{latestFootprint.slug}}" bindtap="openEvent">
+      <image wx:if="{{latestFootprint.cover_image_url}}" class="recent-cover" src="{{latestFootprint.cover_image_url}}" mode="aspectFill" />
+      <image wx:else class="recent-cover recent-placeholder" src="/assets/logo-mark.png" mode="aspectFit" />
+      <view class="recent-copy"><text class="recent-title">{{latestFootprint.title}}</text><text>{{latestFootprint.dateLabel}} · {{latestFootprint.locationLabel}}</text></view>
+      <text class="recent-status">{{latestFootprint.participationLabel}}</text>
+      <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+    </view>
+    <view wx:else class="empty-state" bindtap="openEvents" role="button">还没有活动记录，去看看社区活动</view>
+
+    <view class="honor-strip">
+      <text class="honor-heading">社区荣誉</text>
+      <view class="honor-items">
+        <view class="honor-item"><image src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" /><text>{{user.identityLabel}}</text></view>
+        <view wx:for="{{honorTags}}" wx:key="code" class="honor-item"><image src="/assets/logo-mark.png" mode="aspectFit" /><text>{{item.label}}</text></view>
       </view>
     </view>
   </view>
