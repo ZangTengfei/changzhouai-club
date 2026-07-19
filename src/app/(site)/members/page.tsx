@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ExternalLink } from "lucide-react";
 
 import { MemberDirectoryCard } from "@/components/member-directory-card";
 import { ToneBadge } from "@/components/tone-badge";
@@ -117,6 +117,15 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
             <Link href="/join" prefetch={false} className="button home-ghost-button">
               申请加入
             </Link>
+            <a
+              href="http://ecs.abbs.fun:15173/"
+              className="button home-ghost-button"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <ExternalLink aria-hidden="true" strokeWidth={2} />
+              查看成员星图
+            </a>
           </div>
         </div>
 
