@@ -26,11 +26,11 @@
           <view wx:else class="avatar avatar-placeholder">{{avatarInitial}}</view>
           <view class="identity-copy">
             <text class="profile-name">{{user.displayName}}</text>
+            <view class="identity-pill" catchtap="openGrowth" role="button" aria-label="查看成长档案">
+              <image src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
+              <text>{{user.identityLabel}}</text>
+            </view>
           </view>
-        </view>
-        <view class="identity-pill" catchtap="openGrowth" role="button" aria-label="查看成长档案">
-          <image src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
-          <text>{{user.identityLabel}}</text>
         </view>
       </view>
 
