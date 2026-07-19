@@ -37,6 +37,48 @@ final result: passed
 
 ---
 
+# “我的”页设置入口收敛 Design QA
+
+- 日期：2026-07-19
+- Source visual truth：用户确认的布局原则——设置归入账号身份卡、移除独立占行和重复入口；改动前截图 `output/design-qa/miniapp-v2/me.png`
+- Implementation screenshot：`output/design-audit/2026-07-19-me-settings-placement.png`
+- Viewport：微信开发者工具 `390 × 762` 逻辑像素，截图为 2 倍图
+- State：本地真实 API、开发者工具登录态，资料完成度 29%
+- Full-view comparison：`output/design-qa/miniapp-v2/comparisons/me-settings-placement.png`
+- Focused comparison：设置图标、身份信息和成长档案首屏区域在并排图中清晰可读；无需额外裁切。
+
+## Findings
+
+- No actionable P0/P1/P2 differences remain.
+- [Resolved P1] 设置入口原先在标题和身份卡之间单独占行，切断了页面开头的信息流，并与“我的空间”的账号设置卡重复。
+  - Fix：将其移动到身份卡右上角，使用 72rpx 白色半透明图标按钮和“打开账号设置”无障碍标签；删除独立行与重复的账号设置卡。
+  - Evidence：改后标题下直接进入成员身份卡，设置操作与账号信息合并；“我的空间”以全宽成长档案加两个并列核心动作完成均衡布局。
+- 设置按钮位于身份卡而非小程序顶部导航，避免和微信胶囊右侧安全区冲突。
+
+## Required Fidelity Surfaces
+
+- Fonts and typography：未改动原有标题、身份、统计和卡片文案的字重或字号；设置改为图标形式，不额外占用文字行。
+- Spacing and layout rhythm：删除 72rpx 孤立行后，标题、身份卡、统计和我的空间的纵向节奏连续；身份卡右上动作与 30rpx 内边距保持一致。
+- Colors and visual tokens：设置图标使用既有紫色，按钮采用白色半透明底与轻阴影，和绿色身份卡形成明确但不过度抢眼的对比。
+- Image quality and asset fidelity：继续使用现有 Solar 导出的透明 PNG 设置图标，边缘清晰，没有新增近似图形。
+- Copy and content：未修改成员身份、活动统计、能力档案或账号设置的业务内容。
+
+## Comparison History
+
+1. 初始状态：设置作为独立右对齐行，且在“我的空间”重复出现。
+2. 修复：身份卡内的图标按钮承接设置；移除重复入口，并将成长档案设为全宽主卡。
+3. 复核：开发者工具同一登录态截图对照，首屏无元素重叠、文本截断或布局空洞。
+
+## Verification
+
+- `cd miniapp && npm run typecheck`：通过
+- 微信开发者工具重新编译并截图：通过
+- `git diff --check`：通过
+
+final result: passed
+
+---
+
 # 小程序图标系统校准 Design QA
 
 - 日期：2026-07-19

@@ -14,22 +14,8 @@
   padding-top: 80rpx;
 }
 
-.settings-entry {
-  display: flex;
-  min-height: 72rpx;
-  align-items: center;
-  align-self: flex-end;
-  gap: 10rpx;
-  color: var(--color-muted);
-  font-size: 25rpx;
-}
-
-.settings-entry image {
-  width: 36rpx;
-  height: 36rpx;
-}
-
 .identity-hero {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 24rpx;
@@ -37,6 +23,28 @@
   border: 2rpx solid #def0e6;
   border-radius: 36rpx;
   background: #f1fbf5;
+}
+
+.account-settings-button {
+  position: absolute;
+  z-index: 1;
+  top: 20rpx;
+  right: 20rpx;
+  display: flex;
+  box-sizing: border-box;
+  width: 72rpx;
+  height: 72rpx;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid rgba(115, 87, 232, 0.14);
+  border-radius: 24rpx;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 8rpx 18rpx rgba(94, 75, 170, 0.08);
+}
+
+.account-settings-button image {
+  width: 40rpx;
+  height: 40rpx;
 }
 
 .identity-main {
@@ -70,6 +78,7 @@
   flex: 1;
   flex-direction: column;
   gap: 8rpx;
+  padding-right: 76rpx;
 }
 
 .profile-name {
@@ -199,6 +208,15 @@
   padding: 22rpx;
   border: 2rpx solid rgba(17, 23, 21, 0.03);
   border-radius: 28rpx;
+}
+
+.space-card-featured {
+  grid-column: span 2;
+  min-height: 178rpx;
+}
+
+.space-card-featured .space-title {
+  font-size: 32rpx;
 }
 
 .space-green {
