@@ -10,6 +10,7 @@ import {
 
 import { toggleCommunityUpdateLike } from "@/app/(site)/updates/actions";
 import { MemberAvatar } from "@/components/member-avatar";
+import { RevealHtmlImages } from "@/components/reveal-image";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import { getViewerCommunityUpdateLike } from "@/lib/community-update-interactions";
 import {
@@ -173,9 +174,9 @@ export default async function UpdateDetailPage({
           </div>
         </header>
 
-        <div
+        <RevealHtmlImages
           className={styles.updateWechatArticle}
-          dangerouslySetInnerHTML={{ __html: articleHtml }}
+          html={articleHtml}
         />
 
         {update.tags.length > 0 ? (

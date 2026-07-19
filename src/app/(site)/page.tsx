@@ -8,6 +8,8 @@ import {
   UsersRound,
 } from "lucide-react";
 
+import { RevealImage, RevealNextImage } from "@/components/reveal-image";
+
 import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { HeroPhotoCarousel } from "@/components/hero-photo-carousel";
 import { SiteSponsors } from "@/components/site-sponsors";
@@ -296,10 +298,11 @@ export default async function HomePage() {
             <div className={cx("home-avatar-stack")} aria-hidden="true">
               {memberAvatars.length > 0 ? (
                 memberAvatars.map((avatarUrl, index) => (
-                  <img
+                  <RevealImage
                     key={`${avatarUrl}-${index}`}
                     src={avatarUrl}
                     alt=""
+                    loading="eager"
                     style={{ zIndex: memberAvatars.length - index }}
                     referrerPolicy="no-referrer"
                   />
@@ -463,7 +466,7 @@ export default async function HomePage() {
                 <div className={cx("home-member-story-head")}>
                   <div className={cx("home-member-story-avatar")} aria-hidden="true">
                     {"avatarUrl" in item && item.avatarUrl ? (
-                      <img
+                      <RevealImage
                         src={item.avatarUrl}
                         alt=""
                         referrerPolicy="no-referrer"
@@ -516,7 +519,7 @@ export default async function HomePage() {
                   <div className={cx("home-community-update-head")}>
                     <div className={cx("home-community-update-avatar")} aria-hidden="true">
                       {update.author.avatarUrl ? (
-                        <img
+                        <RevealImage
                           src={update.author.avatarUrl}
                           alt=""
                           referrerPolicy="no-referrer"
@@ -540,7 +543,7 @@ export default async function HomePage() {
 
                   {coverImage ? (
                     <div className={cx("home-community-update-media")}>
-                      <img
+                      <RevealImage
                         src={coverImage.imageUrl}
                         alt={coverImage.alt ?? update.title ?? update.typeLabel}
                         loading="lazy"
@@ -586,7 +589,7 @@ export default async function HomePage() {
               >
                 <div className={cx("home-event-review-media")}>
                   {item.imageUrl ? (
-                    <Image
+                    <RevealNextImage
                       src={getEventImageUrl(item.imageUrl, "review-card") ?? item.imageUrl}
                       alt={item.title}
                       width={640}
@@ -654,7 +657,7 @@ export default async function HomePage() {
             <strong>常州 AI Club 共创社区</strong>
           </div>
           <div className={cx("home-join-official-qr")}>
-            <img
+            <RevealImage
               src={officialCommunityChannels[0].qrImageUrl}
               alt="常州 AI Club 共创社区公众号二维码"
               width={196}

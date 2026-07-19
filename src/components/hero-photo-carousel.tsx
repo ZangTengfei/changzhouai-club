@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, CirclePlay, Heart, Smile } from "lucide-react";
 
 import { DoodleSparkles } from "@/components/home-visual-assets";
+import { RevealNextImage } from "@/components/reveal-image";
 import { cssModuleCx } from "@/lib/utils";
 
 import styles from "@/app/(site)/home-page.module.css";
@@ -155,7 +155,7 @@ export function HeroPhotoCarousel({
             className={cx("home-photo-main-link")}
             aria-label={`查看${activeLabel}详情`}
           >
-            <Image
+            <RevealNextImage
               key={activeImageSrc}
               src={activeImageSrc}
               alt={activeLabel}
@@ -193,7 +193,7 @@ export function HeroPhotoCarousel({
                 onClick={() => setActiveIndex(index)}
               >
                 <span className={cx("home-photo-thumb-wrap")}>
-                  <Image
+                  <RevealNextImage
                     src={image.thumbSrc}
                     alt=""
                     width={220}

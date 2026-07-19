@@ -175,6 +175,17 @@
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
+.updateWechatArticle img {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.updateWechatArticle img[data-loaded="true"] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 160ms ease-out;
+}
+
 .updateTags span {
   display: inline-flex;
   align-items: center;

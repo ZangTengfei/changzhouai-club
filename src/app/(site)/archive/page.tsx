@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PageHero } from "@/components/page-hero";
+import { RevealImage } from "@/components/reveal-image";
 import galleryStyles from "@/components/content-gallery.module.css";
 import { getCompletedEventRecaps } from "@/lib/community-events";
 import { getEventImageUrl } from "@/lib/public-image-url";
@@ -47,10 +48,9 @@ export default async function ArchivePage() {
           {galleryItems.map((item) => (
             <article className={galleryStyles["gallery-card"]} key={item.id}>
               <div className={galleryStyles["gallery-media"]}>
-                <img
+                <RevealImage
                   src={getEventImageUrl(item.imageUrl, "archive") ?? item.imageUrl}
                   alt={item.caption ?? item.eventTitle}
-                  loading="lazy"
                 />
               </div>
               <div className={galleryStyles["gallery-copy"]}>

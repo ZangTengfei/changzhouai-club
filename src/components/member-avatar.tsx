@@ -1,4 +1,5 @@
 import styles from "./member-avatar.module.css";
+import { RevealImage } from "./reveal-image";
 
 type MemberAvatarProps = {
   name: string;
@@ -46,7 +47,7 @@ export function MemberAvatar({
   if (avatarUrl) {
     return (
       <span className={className}>
-        <img
+        <RevealImage
           src={avatarUrl}
           alt={name}
           className={imageClassName}

@@ -15,6 +15,9 @@ import {
   UsersRound,
 } from "lucide-react";
 
+import { RevealImage } from "@/components/reveal-image";
+import { getProjectCoverImageUrl } from "@/lib/public-image-url";
+
 import { submitProjectApplication } from "@/app/(site)/projects/actions";
 import { MarkdownContent } from "@/components/markdown-content";
 import { getVisibleProjectOpportunityBySlug } from "@/lib/community-projects";
@@ -258,7 +261,15 @@ export default async function ProjectDetailPage({
         <aside className={styles.projectHeroBoard} aria-label="项目关键信息">
           {opportunity.coverImageUrl ? (
             <div className={styles.projectCover}>
-              <img src={opportunity.coverImageUrl} alt="" loading="eager" />
+              <RevealImage
+                src={
+                  getProjectCoverImageUrl(opportunity.coverImageUrl, "detail") ??
+                  opportunity.coverImageUrl
+                }
+                alt=""
+                loading="eager"
+                fetchPriority="high"
+              />
             </div>
           ) : null}
 

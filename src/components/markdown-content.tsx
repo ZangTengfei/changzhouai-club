@@ -4,6 +4,7 @@ import ReactMarkdown, { type Components } from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
+import { RevealImage } from "@/components/reveal-image";
 import { cn } from "@/lib/utils";
 
 import styles from "./markdown-content.module.css";
@@ -63,7 +64,7 @@ function MarkdownImage({
     return null;
   }
 
-  return <img {...props} src={src} alt={alt ?? ""} loading="lazy" />;
+  return <RevealImage {...props} src={src} alt={alt ?? ""} />;
 }
 
 const markdownComponents = {

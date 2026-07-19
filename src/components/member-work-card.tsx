@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { MemberAvatar } from "@/components/member-avatar";
+import { RevealImage } from "@/components/reveal-image";
 import { WorkQrCodePreview } from "@/components/work-qr-code-preview";
 import type {
   PublicExternalCaseCard,
@@ -33,7 +34,7 @@ export function MemberWorkCard({ work, compact = false }: MemberWorkCardProps) {
     <article className={cn(styles.workCard, compact ? styles.workCardCompact : null)}>
       <div className={styles.workCover}>
         {work.coverImageUrl ? (
-          <img src={work.coverImageUrl} alt="" loading="lazy" />
+          <RevealImage src={work.coverImageUrl} alt="" />
         ) : (
           <span>{getWorkInitial(work.title)}</span>
         )}
@@ -114,7 +115,7 @@ export function ExternalCaseCard({ card }: { card: PublicExternalCaseCard }) {
     >
       <div className={styles.workCover} aria-hidden="true">
         {card.coverImageUrl ? (
-          <img src={card.coverImageUrl} alt="" loading="lazy" />
+          <RevealImage src={card.coverImageUrl} alt="" />
         ) : (
           <span>{getWorkInitial(card.title)}</span>
         )}

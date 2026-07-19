@@ -66,8 +66,8 @@ const eventImageVariantMap: Record<EventImageVariant, PublicImageTransformOption
     quality: 75,
   },
   gallery: {
-    width: 1280,
-    quality: 76,
+    width: 960,
+    quality: 74,
   },
   archive: {
     width: 720,
@@ -198,6 +198,18 @@ export function getCommunityUpdateImageUrl(imageUrl: string | null | undefined) 
   });
 }
 
+export function getProjectCoverImageUrl(
+  imageUrl: string | null | undefined,
+  variant: "card" | "detail" = "card",
+) {
+  return getPublicImageUrl(imageUrl, {
+    width: variant === "detail" ? 1200 : 720,
+    height: variant === "detail" ? 675 : 405,
+    quality: variant === "detail" ? 78 : 74,
+    resize: "cover",
+  });
+}
+
 export function getSponsorLogoImageUrl(imageUrl: string | null | undefined) {
   return getPublicImageUrl(imageUrl, {
     width: 320,
@@ -216,7 +228,7 @@ export function getSponsorImageUrl(imageUrl: string | null | undefined) {
 
 export function getWechatQrCodeImageUrl(imageUrl: string | null | undefined) {
   return getPublicImageUrl(imageUrl, {
-    width: 720,
+    width: 480,
     quality: 78,
   });
 }

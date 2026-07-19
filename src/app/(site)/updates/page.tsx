@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { MemberAvatar } from "@/components/member-avatar";
+import { RevealImage } from "@/components/reveal-image";
 import { formatChangzhouDateTime, formatChangzhouIsoDate } from "@/lib/changzhou-time";
 import {
   communityUpdateTypeLabels,
@@ -140,7 +141,7 @@ function TimelineUpdate({ update }: { update: PublicCommunityUpdate }) {
         >
           {previewImages.map((image) => (
             <span key={image.id}>
-              <img
+              <RevealImage
                 src={image.imageUrl}
                 alt={image.alt ?? update.title ?? update.typeLabel}
               />

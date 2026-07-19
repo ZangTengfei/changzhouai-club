@@ -9,6 +9,7 @@ import {
   UsersRound,
 } from "lucide-react";
 
+import { RevealImage } from "@/components/reveal-image";
 import { getVisibleProjectOpportunities } from "@/lib/community-projects";
 
 import styles from "./projects-page.module.css";
@@ -55,7 +56,7 @@ export default async function ProjectsPage() {
               <article className={styles.projectsOpportunityCard} key={opportunity.id}>
                 {opportunity.coverImageUrl ? (
                   <div className={styles.projectsOpportunityCover}>
-                    <img src={opportunity.coverImageUrl} alt="" loading="lazy" />
+                    <RevealImage src={opportunity.coverImageUrl} alt="" />
                   </div>
                 ) : null}
 

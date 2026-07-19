@@ -2,6 +2,7 @@ import { unstable_cache } from "next/cache";
 
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import { hasSupabaseEnv } from "@/lib/env";
+import { getProjectCoverImageUrl } from "@/lib/public-image-url";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 export const projectOpportunityTypeLabels = {
@@ -163,7 +164,7 @@ function mapProjectOpportunity(row: PublicProjectOpportunityRow): PublicProjectO
     href: `/projects/${row.slug}`,
     title: row.title.trim(),
     summary: row.summary.trim(),
-    coverImageUrl: row.cover_image_url,
+    coverImageUrl: getProjectCoverImageUrl(row.cover_image_url),
     description: row.description,
     type: row.opportunity_type,
     typeLabel: projectOpportunityTypeLabels[row.opportunity_type] ?? row.opportunity_type,

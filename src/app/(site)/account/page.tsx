@@ -18,6 +18,9 @@ import {
   Ticket,
 } from "lucide-react";
 
+import { RevealImage } from "@/components/reveal-image";
+import { getWorkCoverImageUrl } from "@/lib/public-image-url";
+
 import {
   cancelRegistration,
   deleteAccountMemberWork,
@@ -621,7 +624,10 @@ export default async function AccountPage({
                     </p>
                   </div>
                   {work.cover_image_url ? (
-                    <img src={work.cover_image_url} alt="" loading="lazy" />
+                    <RevealImage
+                      src={getWorkCoverImageUrl(work.cover_image_url) ?? work.cover_image_url}
+                      alt=""
+                    />
                   ) : (
                     <Boxes aria-hidden="true" strokeWidth={1.8} />
                   )}

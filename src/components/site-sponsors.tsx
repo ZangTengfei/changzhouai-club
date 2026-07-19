@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { RevealImage } from "@/components/reveal-image";
 import { getPublicSponsors } from "@/lib/sponsors";
 import { cssModuleCx } from "@/lib/utils";
 import styles from "./site-sponsors.module.css";
@@ -37,7 +38,7 @@ export async function SiteSponsors() {
                   </div>
                   {sponsor.logoUrl ? (
                     <div className={cx("home-sponsor-logo-mark")} aria-label={`${sponsor.name} Logo`}>
-                      <img src={sponsor.logoUrl} alt={`${sponsor.name} Logo`} loading="lazy" />
+                      <RevealImage src={sponsor.logoUrl} alt={`${sponsor.name} Logo`} />
                     </div>
                   ) : <span className={cx("home-sponsor-logo-fallback")}>{sponsor.name}</span>}
                 </div>
@@ -59,7 +60,7 @@ export async function SiteSponsors() {
               >
                 <div className={cx("home-sponsor-compact-logo")}>
                   {sponsor.logoUrl ? (
-                    <img src={sponsor.logoUrl} alt={`${sponsor.name} Logo`} loading="lazy" />
+                    <RevealImage src={sponsor.logoUrl} alt={`${sponsor.name} Logo`} />
                   ) : (
                     <span>{sponsor.name}</span>
                   )}

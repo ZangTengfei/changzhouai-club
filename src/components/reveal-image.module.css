@@ -1,0 +1,16 @@
+.image {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loaded {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 160ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loaded {
+    transition: none;
+  }
+}

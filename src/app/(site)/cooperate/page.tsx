@@ -7,6 +7,8 @@ import {
   Lightbulb,
 } from "lucide-react";
 
+import { RevealImage } from "@/components/reveal-image";
+
 import { submitCooperationLead } from "@/app/(site)/cooperate/actions";
 import { ToneBadge } from "@/components/tone-badge";
 import { getCurrentWechatQrCode } from "@/lib/community-social";
@@ -226,7 +228,7 @@ export default async function CooperatePage({
         <div className={styles.joinBannerSide}>
           <div className={styles.joinBannerQr}>
             {wechatQrCode ? (
-              <img
+              <RevealImage
                 src={wechatQrCode.imageUrl}
                 alt={wechatQrCode.title}
                 width={180}

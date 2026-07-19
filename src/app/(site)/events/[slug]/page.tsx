@@ -16,6 +16,8 @@ import {
   Ticket,
 } from "lucide-react";
 
+import { RevealImage } from "@/components/reveal-image";
+
 import { EventDetailRegistrationPanel } from "@/components/event-detail-registration-panel";
 import { getPublicEventBySlug } from "@/lib/community-events";
 import { getPublicCommunityUpdatesForEvent } from "@/lib/community-updates";
@@ -183,7 +185,7 @@ export default async function EventDetailPage({
         <div className={styles.eventHeroVisual}>
           <div className={styles.eventHeroMedia}>
             {event.imageUrl ? (
-              <img
+              <RevealImage
                 src={getEventImageUrl(event.imageUrl, "event-detail-hero") ?? event.imageUrl}
                 alt={event.title}
                 loading="eager"
@@ -476,7 +478,7 @@ export default async function EventDetailPage({
                 >
                   {coverImage ? (
                     <span className={styles.eventRelatedUpdateMedia}>
-                      <img
+                      <RevealImage
                         src={coverImage.imageUrl}
                         alt={coverImage.alt ?? update.title ?? update.typeLabel}
                         loading="lazy"
@@ -516,7 +518,7 @@ export default async function EventDetailPage({
             {event.gallery.map((image) => (
               <article className={styles.eventGalleryCard} key={image.id}>
                 <div className={styles.eventGalleryMedia}>
-                  <img
+                  <RevealImage
                     src={getEventImageUrl(image.imageUrl, "gallery") ?? image.imageUrl}
                     alt={image.caption ?? event.title}
                     loading="lazy"

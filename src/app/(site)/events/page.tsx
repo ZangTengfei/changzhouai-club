@@ -11,6 +11,8 @@ import {
   UsersRound,
 } from "lucide-react";
 
+import { RevealImage } from "@/components/reveal-image";
+
 import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { EventsRegistrationGrid } from "@/components/events-registration-grid";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
@@ -193,7 +195,7 @@ export default async function EventsPage({
         <div className={styles.heroVisual}>
           <div className={styles.heroPhoto}>
             {heroImageUrl ? (
-              <img
+              <RevealImage
                 src={heroImageUrl}
                 alt={latestCompletedEvent?.title ?? "常州 AI Club 活动现场"}
                 loading="eager"
@@ -328,11 +330,9 @@ export default async function EventsPage({
                 </Link>
                 <div className={styles.recapImage}>
                   {item.imageUrl ? (
-                    <img
+                    <RevealImage
                       src={getEventImageUrl(item.imageUrl, "event-feature") ?? item.imageUrl}
                       alt={item.title}
-                      loading={index === 0 ? "eager" : "lazy"}
-                      fetchPriority={index === 0 ? "high" : "auto"}
                     />
                   ) : (
                     <div className={styles.recapImageFallback}>活动图片待补充</div>

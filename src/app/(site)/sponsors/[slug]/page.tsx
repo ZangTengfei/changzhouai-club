@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import galleryStyles from "@/components/content-gallery.module.css";
+import { RevealImage } from "@/components/reveal-image";
 import { getPublicSponsorBySlug } from "@/lib/sponsors";
 import { cn } from "@/lib/utils";
 
@@ -78,7 +79,7 @@ export default async function SponsorDetailPage({
 
         <div className={styles["sponsor-logo-panel"]}>
           {sponsor.logoUrl ? (
-            <img
+            <RevealImage
               src={sponsor.logoUrl}
               alt={`${sponsor.name} Logo`}
               loading="eager"
@@ -136,7 +137,7 @@ export default async function SponsorDetailPage({
             {sponsor.images.map((image) => (
               <article className={galleryStyles["gallery-card"]} key={image.id}>
                 <div className={galleryStyles["gallery-media"]}>
-                  <img src={image.imageUrl} alt={image.caption ?? sponsor.name} loading="lazy" />
+                  <RevealImage src={image.imageUrl} alt={image.caption ?? sponsor.name} />
                 </div>
                 <div className={galleryStyles["gallery-copy"]}>
                   <h3>{sponsor.name}</h3>

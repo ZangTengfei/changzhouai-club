@@ -198,7 +198,7 @@
   color: #fffaf2;
   background:
     linear-gradient(rgba(12, 34, 33, 0.82), rgba(12, 34, 33, 0.9)),
-    url("https://sb.occcc.cc/storage/v1/object/public/event-assets/events/historical/event-05-20260321.jpeg")
+    url("https://sb.occcc.cc/storage/v1/render/image/public/event-assets/events/historical/event-05-20260321.jpeg?width=1600&height=900&quality=74&resize=cover")
       center / cover,
     #102b2a;
 }
