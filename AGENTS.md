@@ -45,6 +45,13 @@ Examples:
 
 Use the dominant scope for a focused change. Use `shared` when one change intentionally affects both the website and mini program. Do not rewrite existing history solely to apply this convention.
 
+# Browser Debugging Cleanup
+
+Before ending any Codex page-debugging or Playwright browser-automation task:
+- Close every page, browser context, browser instance, and Playwright daemon session created for the task.
+- Check the process list for residual Playwright/Chrome debugging processes and clean up only the disposable sessions identified by debugging arguments or temporary `playwright_chromiumdev_profile-*` profiles.
+- Do not leave headed or headless Chrome icons/processes running, and do not terminate the user's normal Chrome session.
+
 # Local Knowledge Workspace
 
 This repository also contains local-only community knowledge directories that are intentionally ignored by Git:
