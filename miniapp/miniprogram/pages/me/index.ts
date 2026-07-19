@@ -7,20 +7,12 @@ type FootprintItem = MiniappUser["footprints"][number] & {
   locationLabel: string;
 };
 
-function formatJoinedAt(value: string | null) {
-  if (!value) return "加入时间待补充";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "加入时间待补充";
-  return `${date.getFullYear()}年${date.getMonth() + 1}月加入社区`;
-}
-
 Page({
   data: {
     user: null as MiniappUser | null,
     avatarInitial: "微",
     honorTags: [] as MiniappUser["badges"],
     latestFootprint: null as FootprintItem | null,
-    joinedLabel: "",
     activitySummary: "",
     loading: true,
     loginFailed: false,
@@ -57,7 +49,6 @@ Page({
         user,
         avatarInitial: user.displayName.slice(0, 1) || "微",
         honorTags: getHonorBadges(user).slice(0, 2),
-        joinedLabel: formatJoinedAt(user.joinedAt),
         latestFootprint: latestFootprint
           ? {
               ...latestFootprint,

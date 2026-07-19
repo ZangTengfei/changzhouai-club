@@ -53,6 +53,14 @@
   gap: 24rpx;
 }
 
+.identity-profile-trigger {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 24rpx;
+}
+
 .avatar {
   display: flex;
   width: 146rpx;
@@ -78,7 +86,6 @@
   flex: 1;
   flex-direction: column;
   gap: 8rpx;
-  padding-right: 76rpx;
 }
 
 .profile-name {
@@ -87,18 +94,10 @@
   line-height: 1.25;
 }
 
-.profile-meta,
-.joined-label {
-  overflow: hidden;
-  color: var(--color-subtle);
-  font-size: 24rpx;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .identity-pill {
   display: flex;
-  width: fit-content;
+  width: 156rpx;
+  flex: 0 0 auto;
   min-height: 48rpx;
   align-items: center;
   gap: 8rpx;
