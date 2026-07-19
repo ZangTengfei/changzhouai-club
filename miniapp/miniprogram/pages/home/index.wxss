@@ -61,6 +61,15 @@
   position: absolute;
   top: 20rpx;
   left: 20rpx;
+  width: 62rpx;
+  height: 62rpx;
+  border-radius: 0;
+  background: transparent;
+}
+
+.quick-card .icon-tile image {
+  width: 54rpx;
+  height: 54rpx;
 }
 
 .quick-title {
@@ -84,10 +93,29 @@
 .quick-arrow {
   position: absolute;
   right: 20rpx;
-  bottom: 44rpx;
-  width: 28rpx;
-  height: 28rpx;
-  opacity: 0.65;
+  bottom: 34rpx;
+  box-sizing: border-box;
+  width: 48rpx;
+  height: 48rpx;
+  padding: 11rpx;
+  border-radius: 50%;
+  opacity: 1;
+}
+
+.quick-arrow-blue {
+  background: #d9eaff;
+}
+
+.quick-arrow-orange {
+  background: #ffe0bd;
+}
+
+.quick-arrow-green {
+  background: #ccf2dd;
+}
+
+.quick-arrow-purple {
+  background: #e4dcff;
 }
 
 .featured-card {

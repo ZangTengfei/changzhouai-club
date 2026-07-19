@@ -37,6 +37,50 @@ final result: passed
 
 ---
 
+# 小程序图标系统校准 Design QA
+
+- 日期：2026-07-19
+- Source visual truth：`output/design-mockups/2026-07-19-miniapp-home-v2.png`、`news-v2.png`、`events-v2.png`、`me-v2.png`
+- Implementation screenshots：`output/design-qa/miniapp-v2/home.png`、`news.png`、`events.png`、`me.png`、`event-detail.png`、`settings.png`
+- Viewport：微信开发者工具 `390 × 762` 逻辑像素，截图为 2 倍图
+- State：本地真实 API、开发者工具登录态；当前没有即将开始的活动
+- Full-view comparison：`output/design-qa/miniapp-v2/comparisons/home.png`、`news.png`、`events.png`、`me.png`
+- Focused comparison：`output/design-qa/miniapp-v2/comparisons/home-focus.png`、`news-focus.png`、`events-focus.png`、`me-focus.png`；首页功能卡与“我的空间”卡片中的图标、箭头与色彩可在全图中清晰判读，无需额外裁切。
+
+## Findings
+
+- No actionable P0/P1/P2 differences remain.
+- [Resolved P1] 首页和“我的空间”原先复用灰色细线图标，并附着统一的白色方形底，和参考图的蓝、橙、绿、紫功能图标及同色圆形箭头差异明显。
+  - Fix：使用 Solar 线性图标集生成小程序本地 PNG；首页、情报、活动、成员、设置、隐私和活动详情分别使用语义化彩色资源，TabBar 同时更新为圆润线性样式。
+  - Evidence：更新后的首页左上功能图标为蓝色文档、右上为橙色日历、左下为绿色成员、右下为紫色荣誉；四个方向箭头均具有对应浅色圆形底。
+- 图标与文字、图片、圆角容器之间没有重叠或截断；详情页的时间和地点图标、设置页的资料/隐私/连接图标也已使用相同视觉语言。
+- 微信开发者工具运行日志只有懒加载提示，没有 exception 或页面配置警告。
+
+## Required Fidelity Surfaces
+
+- Fonts and typography：未改动字体、字重、换行或内容密度；新图标不挤占标题和摘要的可用宽度。
+- Spacing and layout rhythm：功能卡图标保持顶部 20rpx 对齐；方向箭头调整为 48rpx/42rpx 圆形触觉提示，和效果图的视觉重心一致。
+- Colors and visual tokens：蓝 `#2F80ED`、橙 `#F47B20`、绿 `#12A566`、紫 `#7357E8` 与既有卡片软色背景一一对应。
+- Image quality and asset fidelity：图标来自 Solar 开源图标集并导出为 96px 透明 PNG，未使用 CSS 图形、文字符号或内联 SVG 近似；在 2 倍模拟器截图中边缘清晰。
+- Copy and content：未修改任何业务文案、真实活动数据或内容数据。
+
+## Comparison History
+
+1. 初始实现：灰色通用 Lucide 图标在彩色卡片中的辨识度和目标图标语言不一致。
+2. 修复：替换为圆润线性本地图标，按模块使用语义色，并增加彩色圆形箭头底。
+3. 复核：清理微信开发者工具编译缓存后重新抓取核心页、详情页和设置页；未发现 P0/P1/P2 问题。
+
+## Verification
+
+- `cd miniapp && npm run typecheck`：通过
+- 微信开发者工具重新编译、核心路由截图：通过
+- 运行日志：无 exception
+- `git diff --check`：通过
+
+final result: passed
+
+---
+
 # 小程序白底多彩卡片全量改版 Design QA
 
 - 日期：2026-07-19

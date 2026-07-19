@@ -41,7 +41,7 @@
             <view class="event-footer">
               <text class="event-location">{{event.locationLabel}}</text>
               <text class="event-status">{{event.statusLabel}}</text>
-              <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+              <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
             </view>
           </view>
         </view>
@@ -50,8 +50,8 @@
   </view>
 
   <view wx:if="{{counts.history}}" class="history-teaser" data-mode="history" bindtap="switchMode" role="button">
-    <view class="icon-tile"><image src="/assets/icons/events.png" mode="aspectFit" /></view>
+    <view class="icon-tile"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view>
     <view class="history-copy"><text>看看我们一起做过的事</text><text>{{counts.history}} 场活动记录</text></view>
-    <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+    <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
   </view>
 </view>

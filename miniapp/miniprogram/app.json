@@ -28,26 +28,26 @@
       {
         "pagePath": "pages/home/index",
         "text": "首页",
-        "iconPath": "assets/icons/home.png",
-        "selectedIconPath": "assets/icons/home-active.png"
+        "iconPath": "assets/icons/home-tab-v2.png",
+        "selectedIconPath": "assets/icons/home-tab-active-v2.png"
       },
       {
         "pagePath": "pages/news/index",
         "text": "资讯",
-        "iconPath": "assets/icons/news.png",
-        "selectedIconPath": "assets/icons/news-active.png"
+        "iconPath": "assets/icons/news-tab-v2.png",
+        "selectedIconPath": "assets/icons/news-tab-active-v2.png"
       },
       {
         "pagePath": "pages/events/index",
         "text": "活动",
-        "iconPath": "assets/icons/events.png",
-        "selectedIconPath": "assets/icons/events-active.png"
+        "iconPath": "assets/icons/events-tab-v2.png",
+        "selectedIconPath": "assets/icons/events-tab-active-v2.png"
       },
       {
         "pagePath": "pages/me/index",
         "text": "我的",
-        "iconPath": "assets/icons/me.png",
-        "selectedIconPath": "assets/icons/me-active.png"
+        "iconPath": "assets/icons/me-tab-v2.png",
+        "selectedIconPath": "assets/icons/me-tab-active-v2.png"
       }
     ]
   },

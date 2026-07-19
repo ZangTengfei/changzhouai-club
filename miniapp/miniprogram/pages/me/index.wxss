@@ -221,13 +221,15 @@
   position: absolute;
   top: 18rpx;
   left: 18rpx;
-  width: 64rpx;
-  height: 64rpx;
+  width: 58rpx;
+  height: 58rpx;
+  border-radius: 0;
+  background: transparent;
 }
 
 .space-card .icon-tile image {
-  width: 36rpx;
-  height: 36rpx;
+  width: 50rpx;
+  height: 50rpx;
 }
 
 .space-title {
@@ -245,10 +247,29 @@
 .space-arrow {
   position: absolute;
   right: 18rpx;
-  bottom: 38rpx;
-  width: 26rpx;
-  height: 26rpx;
-  opacity: 0.65;
+  bottom: 28rpx;
+  box-sizing: border-box;
+  width: 42rpx;
+  height: 42rpx;
+  padding: 10rpx;
+  border-radius: 50%;
+  opacity: 1;
+}
+
+.space-green .space-arrow {
+  background: #ccf2dd;
+}
+
+.space-orange .space-arrow {
+  background: #ffe0bd;
+}
+
+.space-blue .space-arrow {
+  background: #d9eaff;
+}
+
+.space-purple .space-arrow {
+  background: #e4dcff;
 }
 
 .recent-event {

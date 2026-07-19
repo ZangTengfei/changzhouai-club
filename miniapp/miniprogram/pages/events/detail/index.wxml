@@ -14,8 +14,8 @@
     </view>
 
     <view class="fact-band">
-      <view class="fact-row fact-row-orange"><view class="icon-tile"><image src="/assets/icons/events.png" mode="aspectFit" /></view><view class="fact-copy"><text class="fact-label">时间</text><text class="fact-value">{{event.dateTimeLabel}}</text></view></view>
-      <view class="fact-row fact-row-blue"><view class="icon-tile"><image src="/assets/icons/account-link.png" mode="aspectFit" /></view><view class="fact-copy"><text class="fact-label">地点</text><text class="fact-value">{{event.locationLabel}}</text></view></view>
+      <view class="fact-row fact-row-orange"><view class="icon-tile"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view><view class="fact-copy"><text class="fact-label">时间</text><text class="fact-value">{{event.dateTimeLabel}}</text></view></view>
+      <view class="fact-row fact-row-blue"><view class="icon-tile"><image src="/assets/icons/location-blue-v2.png" mode="aspectFit" /></view><view class="fact-copy"><text class="fact-label">地点</text><text class="fact-value">{{event.locationLabel}}</text></view></view>
     </view>
 
     <view wx:if="{{event.recapParagraphs.length}}" class="detail-section detail-section-green">

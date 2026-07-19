@@ -17,7 +17,7 @@
 
   <view wx:elif="{{user}}" class="account-content">
     <view class="settings-entry" bindtap="openSettings" role="button" aria-label="打开设置">
-      <image src="/assets/icons/settings.png" mode="aspectFit" />
+      <image src="/assets/icons/settings-purple-v2.png" mode="aspectFit" />
       <text>设置</text>
     </view>
 
@@ -49,24 +49,24 @@
     <view class="section-heading-row"><text class="section-title">我的空间</text></view>
     <view class="space-grid">
       <view class="space-card space-green" bindtap="openGrowth" role="button">
-        <view class="icon-tile"><image src="/assets/icons/me.png" mode="aspectFit" /></view>
+        <view class="icon-tile"><image src="/assets/icons/growth-purple-v2.png" mode="aspectFit" /></view>
         <text class="space-title">成长档案</text><text class="space-copy">查看身份路径</text>
-        <image class="space-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+        <image class="space-arrow" src="/assets/icons/chevron-green-v2.png" mode="aspectFit" />
       </view>
       <view class="space-card space-orange" bindtap="openRegistrations" role="button">
-        <view class="icon-tile"><image src="/assets/icons/events.png" mode="aspectFit" /></view>
+        <view class="icon-tile"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view>
         <text class="space-title">我的活动</text><text class="space-copy">{{user.stats.registrationCount}} 场记录</text>
-        <image class="space-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+        <image class="space-arrow" src="/assets/icons/chevron-orange-v2.png" mode="aspectFit" />
       </view>
       <view class="space-card space-blue" bindtap="openProfile" role="button">
-        <view class="icon-tile"><image src="/assets/icons/edit-profile.png" mode="aspectFit" /></view>
+        <view class="icon-tile"><image src="/assets/icons/profile-blue-v2.png" mode="aspectFit" /></view>
         <text class="space-title">能力档案</text><text class="space-copy">技能与方向</text>
-        <image class="space-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+        <image class="space-arrow" src="/assets/icons/chevron-blue-v2.png" mode="aspectFit" />
       </view>
       <view class="space-card space-purple" bindtap="openSettings" role="button">
-        <view class="icon-tile"><image src="/assets/icons/settings.png" mode="aspectFit" /></view>
+        <view class="icon-tile"><image src="/assets/icons/settings-purple-v2.png" mode="aspectFit" /></view>
         <text class="space-title">账号设置</text><text class="space-copy">隐私与绑定</text>
-        <image class="space-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+        <image class="space-arrow" src="/assets/icons/chevron-purple-v2.png" mode="aspectFit" />
       </view>
     </view>
 
@@ -79,7 +79,7 @@
       <image wx:else class="recent-cover recent-placeholder" src="/assets/logo-mark.png" mode="aspectFit" />
       <view class="recent-copy"><text class="recent-title">{{latestFootprint.title}}</text><text>{{latestFootprint.dateLabel}} · {{latestFootprint.locationLabel}}</text></view>
       <text class="recent-status">{{latestFootprint.participationLabel}}</text>
-      <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+      <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
     </view>
     <view wx:else class="empty-state" bindtap="openEvents" role="button">还没有活动记录，去看看社区活动</view>
 

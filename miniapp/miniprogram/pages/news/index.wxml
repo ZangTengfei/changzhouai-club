@@ -34,7 +34,7 @@
           <text class="hot-topic-meta">{{item.sourceName}} · {{item.latestLabel}}</text>
           <text class="hot-topic-action">查看解读</text>
         </view>
-        <view class="hot-topic-visual"><image src="/assets/icons/news-active.png" mode="aspectFit" /></view>
+        <view class="hot-topic-visual"><image src="/assets/icons/news-blue-v2.png" mode="aspectFit" /></view>
       </view>
     </view>
 
@@ -46,14 +46,14 @@
     <view wx:if="{{items.length === 0}}" class="empty-state">这一类内容还在整理中</view>
     <view wx:else class="news-list">
       <view wx:for="{{items}}" wx:key="id" class="news-card" data-id="{{item.id}}" bindtap="openNews">
-        <view class="news-card-icon"><image src="/assets/icons/news.png" mode="aspectFit" /></view>
+        <view class="news-card-icon"><image src="/assets/icons/news-blue-v2.png" mode="aspectFit" /></view>
         <view class="news-card-copy">
           <view class="news-card-meta"><text>{{item.categoryLabel}}</text><text>{{item.dateLabel}}</text><text wx:if="{{item.isFavorited}}">已收藏</text></view>
           <text class="news-card-title">{{item.title}}</text>
           <text wx:if="{{item.summary}}" class="news-card-summary">{{item.summary}}</text>
           <text wx:if="{{item.recommendationReason}}" class="news-card-reason">推荐 · {{item.recommendationReason}}</text>
         </view>
-        <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+        <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
       </view>
     </view>
     <view wx:if="{{loadingMore}}" class="loading-more">正在继续加载</view>
@@ -68,7 +68,7 @@
         <view class="digest-card-top"><text class="digest-date">{{item.dateLabel}}</text><text wx:if="{{item.isFavorited}}" class="digest-favorite">已收藏</text></view>
         <text class="digest-title">{{item.title}}</text>
         <text class="digest-summary">{{item.summaryLabel}}</text>
-        <view class="digest-footer"><text>{{item.highlightCount}} 个讨论要点</text><text>{{item.resourceCount}} 条资源线索</text><image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" /></view>
+        <view class="digest-footer"><text>{{item.highlightCount}} 个讨论要点</text><text>{{item.resourceCount}} 条资源线索</text><image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" /></view>
       </view>
     </view>
   </block>

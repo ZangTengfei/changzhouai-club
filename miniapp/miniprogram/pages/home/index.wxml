@@ -13,28 +13,28 @@
 
   <view class="quick-grid">
     <view class="quick-card quick-card-blue" bindtap="openNewsTab" role="button" aria-label="查看社区动态">
-      <view class="icon-tile"><image src="/assets/icons/news.png" mode="aspectFit" /></view>
+      <view class="icon-tile"><image src="/assets/icons/news-blue-v2.png" mode="aspectFit" /></view>
       <text class="quick-title">社区动态</text>
       <text class="quick-copy">看看大家在关注什么</text>
-      <image class="quick-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+      <image class="quick-arrow quick-arrow-blue" src="/assets/icons/chevron-blue-v2.png" mode="aspectFit" />
     </view>
     <view class="quick-card quick-card-orange" bindtap="openEvents" role="button" aria-label="查看近期活动">
-      <view class="icon-tile"><image src="/assets/icons/events.png" mode="aspectFit" /></view>
+      <view class="icon-tile"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view>
       <text class="quick-title">近期活动</text>
       <text class="quick-copy">{{upcomingCount}} 场活动即将开始</text>
-      <image class="quick-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+      <image class="quick-arrow quick-arrow-orange" src="/assets/icons/chevron-orange-v2.png" mode="aspectFit" />
     </view>
     <view class="quick-card quick-card-green" bindtap="openDigestList" role="button" aria-label="查看群聊精华">
-      <view class="icon-tile"><image src="/assets/icons/account-link.png" mode="aspectFit" /></view>
+      <view class="icon-tile"><image src="/assets/icons/cocreate-green-v2.png" mode="aspectFit" /></view>
       <text class="quick-title">群聊精华</text>
       <text class="quick-copy">把讨论沉淀成线索</text>
-      <image class="quick-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+      <image class="quick-arrow quick-arrow-green" src="/assets/icons/chevron-green-v2.png" mode="aspectFit" />
     </view>
     <view class="quick-card quick-card-purple" bindtap="openGrowth" role="button" aria-label="查看成员成长">
-      <view class="icon-tile"><image src="/assets/icons/me.png" mode="aspectFit" /></view>
+      <view class="icon-tile"><image src="/assets/icons/growth-purple-v2.png" mode="aspectFit" /></view>
       <text class="quick-title">成员成长</text>
       <text class="quick-copy">查看身份与社区荣誉</text>
-      <image class="quick-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+      <image class="quick-arrow quick-arrow-purple" src="/assets/icons/chevron-purple-v2.png" mode="aspectFit" />
     </view>
   </view>
 
@@ -73,7 +73,7 @@
         <text class="compact-event-title">{{item.title}}</text>
         <text class="compact-event-location">{{item.locationLabel}}</text>
       </view>
-      <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+      <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
     </view>
   </view>
 
@@ -83,23 +83,23 @@
   </view>
 
   <view wx:if="{{featuredNews}}" class="content-card content-card-blue" data-id="{{featuredNews.id}}" bindtap="openNews">
-    <view class="content-card-icon"><image src="/assets/icons/news.png" mode="aspectFit" /></view>
+    <view class="content-card-icon"><image src="/assets/icons/news-blue-v2.png" mode="aspectFit" /></view>
     <view class="content-card-copy">
       <text class="content-card-label">AI 精选 · {{featuredNews.metaLabel}}</text>
       <text class="content-card-title">{{featuredNews.title}}</text>
       <text wx:if="{{featuredNews.summary}}" class="content-card-summary">{{featuredNews.summary}}</text>
     </view>
-    <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+    <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
   </view>
 
   <view wx:if="{{latestDigest}}" class="content-card content-card-purple" data-id="{{latestDigest.id}}" bindtap="openDigest">
-    <view class="content-card-icon"><image src="/assets/icons/account-link.png" mode="aspectFit" /></view>
+    <view class="content-card-icon"><image src="/assets/icons/link-purple-v2.png" mode="aspectFit" /></view>
     <view class="content-card-copy">
       <text class="content-card-label">群聊精华 · {{latestDigest.dateLabel}}</text>
       <text class="content-card-title">{{latestDigest.title}}</text>
       <text class="content-card-summary">{{latestDigest.summaryLabel}}</text>
     </view>
-    <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+    <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
   </view>
 
   <view wx:if="{{profileCompletion && !profileCompletion.completed}}" class="member-strip surface-card" bindtap="openProfile" role="button">
@@ -108,7 +108,7 @@
       <text class="member-strip-title">能力档案 {{profileCompletion.percent}}%</text>
       <text class="member-strip-meta">继续完善，让伙伴更了解你</text>
     </view>
-    <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+    <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
   </view>
   <view wx:else class="member-strip surface-card" bindtap="openGrowth" role="button">
     <image class="member-strip-badge" src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
@@ -116,6 +116,6 @@
       <text class="member-strip-title">{{memberIdentity}}</text>
       <text class="member-strip-meta">{{attendanceSummary}}</text>
     </view>
-    <image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" />
+    <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
   </view>
 </view>

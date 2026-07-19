@@ -14,7 +14,7 @@
       <view class="registration-content">
         <view class="registration-meta"><text>{{item.dateLabel}}</text><text class="status status-{{item.status}}">{{item.statusLabel}}</text></view>
         <text class="registration-title">{{item.events.title}}</text>
-        <view class="registration-footer"><text class="registration-location">{{item.locationLabel}}</text><image class="row-arrow" src="/assets/icons/chevron-right.png" mode="aspectFit" /></view>
+        <view class="registration-footer"><text class="registration-location">{{item.locationLabel}}</text><image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" /></view>
       </view>
     </view>
   </view>
