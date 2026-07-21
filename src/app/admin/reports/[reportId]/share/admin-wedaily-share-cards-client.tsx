@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Copy, Download, LoaderCircle, ShieldCheck, X } from "lucide-react";
-import QRCode from "qrcode";
 
 import { AdminNotice, AdminStatusBadge } from "@/components/admin-ui";
 import { Button } from "@/components/ui/button";
@@ -19,6 +18,7 @@ import {
 
 const MAX_TOPIC_CARDS = 6;
 const PREVIEW_SCALE = 0.34;
+const COMMUNITY_WECHAT_QR_IMAGE_PATH = "/community-wechat-qr.png";
 const DAILY_SHARE_TEMPLATES = [
   {
     id: "neural-glass",
@@ -84,30 +84,9 @@ export function AdminWeDailyShareCardsClient({
   const [templateId, setTemplateId] = useState<DailyShareTemplateId>("intelligent-grid");
   const [socialTitle, setSocialTitle] = useState(() => formatDailyReportTitle(report.date));
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
-  const [qrCodeDataUrl, setQrCodeDataUrl] = useState("");
   const [exporting, setExporting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const cardRefs = useRef(new Map<string, HTMLElement>());
-  const reportUrl = `https://changzhouai.club/news?view=local&date=${encodeURIComponent(report.date)}`;
-
-  useEffect(() => {
-    let cancelled = false;
-
-    QRCode.toDataURL(reportUrl, {
-      color: { dark: "#061747", light: "#ffffff" },
-      errorCorrectionLevel: "M",
-      margin: 1,
-      width: 266,
-    }).then((value) => {
-      if (!cancelled) setQrCodeDataUrl(value);
-    }).catch(() => {
-      if (!cancelled) setMessage("二维码生成失败，暂时无法导出结尾卡。");
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [reportUrl]);
 
   useEffect(() => {
     setCopyState("idle");
@@ -145,7 +124,7 @@ export function AdminWeDailyShareCardsClient({
   }
 
   async function exportCards() {
-    if (!privacyReviewed || !qrCodeDataUrl || exporting) return;
+    if (!privacyReviewed || exporting) return;
 
     setExporting(true);
     setMessage(null);
@@ -165,7 +144,7 @@ export function AdminWeDailyShareCardsClient({
   }
 
   async function exportSingleCard(card: CardExport) {
-    if (!privacyReviewed || exporting || (card.id === "end" && !qrCodeDataUrl)) return;
+    if (!privacyReviewed || exporting) return;
 
     const element = cardRefs.current.get(card.id);
     if (!element) {
@@ -219,8 +198,8 @@ export function AdminWeDailyShareCardsClient({
     })),
     {
       id: "end",
-      label: "二维码结尾卡",
-      fileName: `${String(selectedCards.length + 2).padStart(2, "0")}-${report.date}-查看完整日报.png`,
+      label: "社区微信结尾卡",
+      fileName: `${String(selectedCards.length + 2).padStart(2, "0")}-${report.date}-添加社区微信.png`,
     },
   ];
 
@@ -247,7 +226,7 @@ export function AdminWeDailyShareCardsClient({
           type="button"
           data-testid="daily-share-export"
           onClick={exportCards}
-          disabled={!privacyReviewed || !qrCodeDataUrl || exporting}
+          disabled={!privacyReviewed || exporting}
         >
           {exporting ? <LoaderCircle className="animate-spin" /> : <Download />}
           {exporting ? "导出中" : "批量导出 PNG"}
@@ -263,7 +242,7 @@ export function AdminWeDailyShareCardsClient({
           </p>
           <h3 className="text-base font-semibold text-foreground">选择贴图模板</h3>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">
-            封面、话题卡、二维码结尾卡和 PNG 导出会同步使用所选模板。
+            封面、话题卡、社区微信结尾卡和 PNG 导出会同步使用所选模板。
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-3">
@@ -535,15 +514,14 @@ export function AdminWeDailyShareCardsClient({
             ))}
 
             <CardPreviewFrame
-              actionLabel="单独导出二维码结尾卡"
-              disabled={!privacyReviewed || !qrCodeDataUrl || exporting}
+              actionLabel="单独导出社区微信结尾卡"
+              disabled={!privacyReviewed || exporting}
               onExport={() => void exportSingleCard(cardExports[cardExports.length - 1])}
             >
               <DailyShareEndCard
                 cardRef={bindCardRef("end")}
                 date={report.date}
-                qrCodeDataUrl={qrCodeDataUrl}
-                reportUrl={reportUrl}
+                qrCodeImageUrl={COMMUNITY_WECHAT_QR_IMAGE_PATH}
                 templateId={templateId}
               />
             </CardPreviewFrame>
@@ -704,14 +682,12 @@ function DailyShareTopicCard({
 function DailyShareEndCard({
   cardRef,
   date,
-  qrCodeDataUrl,
-  reportUrl,
+  qrCodeImageUrl,
   templateId,
 }: {
   cardRef: (node: HTMLElement | null) => void;
   date: string;
-  qrCodeDataUrl: string;
-  reportUrl: string;
+  qrCodeImageUrl: string;
   templateId: DailyShareTemplateId;
 }) {
   return (
@@ -724,16 +700,14 @@ function DailyShareEndCard({
       <CardBackground templateId={templateId} />
       <CardMeta date={date} />
       <main className="daily-share-card__end-main">
-        <p className="daily-share-card__eyebrow">READ THE FULL REPORT</p>
-        <h2>扫码查看完整群聊日报</h2>
-        <p>更多重点讨论、干货资源与行动线索，都整理在当天的完整日报中。</p>
+        <p className="daily-share-card__eyebrow">JOIN THE CLUB</p>
+        <h2>扫码添加社区微信</h2>
+        <p>添加「常州 AI Club 小助手」为好友，了解社区活动、项目合作与最新动态。</p>
         <div className="daily-share-card__qr">
-          {qrCodeDataUrl ? (
-            <img src={qrCodeDataUrl} alt="完整日报二维码" data-export-overlay />
-          ) : null}
+          <img src={qrCodeImageUrl} alt="常州 AI Club 小助手微信二维码" data-export-overlay />
         </div>
       </main>
-      <CardFooter text={reportUrl} />
+      <CardFooter text="常州 AI Club · 社区微信" />
     </article>
   );
 }

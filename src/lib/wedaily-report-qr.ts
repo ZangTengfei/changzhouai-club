@@ -1,37 +1,25 @@
-import QRCode from "qrcode";
-
 import type { AdminWeDailyReportExportTemplate } from "@/lib/admin/wedaily-admin";
 
-const PUBLIC_SITE_ORIGIN = "https://changzhouai.club";
-const REPORT_QR_CODE_SIZE = 176;
+const COMMUNITY_WECHAT_QR_IMAGE_PATH = "/community-wechat-qr.png";
 
 export async function appendWeDailyReportQrCode(
   template: AdminWeDailyReportExportTemplate,
-  { date }: { date: string },
 ) {
   if (template.html.includes("club-report-qr")) {
     return template;
   }
 
-  const reportUrl = buildReportPublicUrl(date);
-  const qrCodeSvg = await QRCode.toString(reportUrl, {
-    color: {
-      dark: "#1f2524",
-      light: "#ffffff",
-    },
-    errorCorrectionLevel: "M",
-    margin: 1,
-    type: "svg",
-    width: REPORT_QR_CODE_SIZE,
-  });
+  const qrCodeDataUrl = await fetchImageAsDataUrl(COMMUNITY_WECHAT_QR_IMAGE_PATH);
   const qrCodeHtml = `
 <section class="club-report-qr">
   <div class="club-report-qr__text">
-    <span>READ ONLINE</span>
-    <strong>扫码查看日报原文</strong>
-    <p>${escapeHtml(reportUrl)}</p>
+    <span>JOIN THE CLUB</span>
+    <strong>扫码添加社区微信</strong>
+    <p>添加「常州 AI Club 小助手」为好友</p>
   </div>
-  <div class="club-report-qr__code" aria-hidden="true">${qrCodeSvg}</div>
+  <div class="club-report-qr__code">
+    <img src="${qrCodeDataUrl}" alt="常州 AI Club 小助手微信二维码" />
+  </div>
 </section>`;
 
   return {
@@ -39,16 +27,6 @@ export async function appendWeDailyReportQrCode(
     css: `${template.css}\n${REPORT_QR_CODE_CSS}`,
     html: insertBeforeDailySheetEnd(template.html, qrCodeHtml),
   };
-}
-
-function buildReportPublicUrl(date: string) {
-  const params = new URLSearchParams({ view: "local" });
-
-  if (date) {
-    params.set("date", date);
-  }
-
-  return `${PUBLIC_SITE_ORIGIN}/news?${params.toString()}`;
 }
 
 function insertBeforeDailySheetEnd(html: string, content: string) {
@@ -61,13 +39,21 @@ function insertBeforeDailySheetEnd(html: string, content: string) {
   return `${html}${content}`;
 }
 
-function escapeHtml(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
+async function fetchImageAsDataUrl(imagePath: string) {
+  const response = await fetch(imagePath);
+
+  if (!response.ok) {
+    throw new Error("community_wechat_qr_load_failed");
+  }
+
+  const blob = await response.blob();
+
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(new Error("community_wechat_qr_read_failed"));
+    reader.readAsDataURL(blob);
+  });
 }
 
 const REPORT_QR_CODE_CSS = `
@@ -126,9 +112,10 @@ const REPORT_QR_CODE_CSS = `
   background: #ffffff;
 }
 
-.club-report-qr__code svg {
+.club-report-qr__code img {
   display: block;
   width: 176px;
   height: 176px;
+  object-fit: contain;
 }
 `;

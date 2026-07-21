@@ -422,7 +422,7 @@ async function fetchCurrentExportTemplate(report: AdminWeDailyReport, markdown: 
     throw new Error(payload?.error || "日报渲染失败");
   }
 
-  return appendWeDailyReportQrCode(payload, { date: report.date });
+  return appendWeDailyReportQrCode(payload);
 }
 
 function buildPreviewDocument(template: AdminWeDailyReportExportTemplate) {

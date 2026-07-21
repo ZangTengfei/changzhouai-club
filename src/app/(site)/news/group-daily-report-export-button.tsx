@@ -35,7 +35,7 @@ export function GroupDailyReportExportButton({ report }: GroupDailyReportExportB
         throw new Error(payload?.error || "导出图片失败");
       }
 
-      const template = await appendWeDailyReportQrCode(payload, { date: report.date });
+      const template = await appendWeDailyReportQrCode(payload);
       await downloadWeDailyReportTemplatePng(template, `changzhou-group-daily-${report.date || "latest"}.png`);
 
       setState("done");
