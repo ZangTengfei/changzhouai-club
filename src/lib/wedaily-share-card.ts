@@ -242,6 +242,98 @@ export const DAILY_SHARE_CARD_CSS = `
   border-radius: 24px;
   box-shadow: 0 22px 54px rgba(65, 89, 163, 0.16);
 }
+.daily-share-card[data-template="topic-list"] {
+  padding: 58px 68px 52px;
+  color: #082861;
+}
+.daily-share-card[data-template="topic-list"] .daily-share-card__meta {
+  padding: 0 10px 24px;
+  border-bottom: 2px solid rgba(31, 101, 237, 0.3);
+}
+.daily-share-card[data-template="topic-list"] .daily-share-card__cover-main {
+  padding: 42px 12px 28px;
+}
+.daily-share-card[data-template="topic-list"] .daily-share-card__eyebrow {
+  flex: none;
+  margin: 0;
+  padding: 12px 22px;
+  border: 0;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #135fd7;
+  box-shadow: 0 10px 26px rgba(19, 95, 215, 0.18);
+  font-size: 25px;
+}
+.daily-share-card__topic-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin: 0 0 28px;
+}
+.daily-share-card[data-template="topic-list"] .daily-share-card__topic-list-heading h2 {
+  margin: 0;
+  color: #0a2e65;
+  font-size: 54px;
+  font-weight: 920;
+  letter-spacing: -0.035em;
+  line-height: 1.08;
+}
+.daily-share-card__topic-list {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+}
+.daily-share-card__topic-list p {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  margin: 0;
+  padding: 8px 4px;
+  color: #0a2e65;
+  font-size: 38px;
+  line-height: 1.36;
+}
+.daily-share-card__topic-list p > span { line-height: 1.38; }
+.daily-share-card__topic-list strong { font-weight: 760; }
+.daily-share-card__topic-list-more {
+  display: block;
+  margin-top: 4px;
+  padding-left: 62px;
+  color: rgba(10, 46, 101, 0.62);
+  font-size: 26px;
+  font-weight: 650;
+}
+.daily-share-card[data-template="topic-list"][data-list-density="compact"] .daily-share-card__topic-list {
+  gap: 11px;
+}
+.daily-share-card[data-template="topic-list"][data-list-density="compact"] .daily-share-card__topic-list p {
+  grid-template-columns: 48px minmax(0, 1fr);
+  padding: 6px 4px;
+  font-size: 34px;
+}
+.daily-share-card[data-template="topic-list"][data-list-density="dense"] .daily-share-card__cover-main {
+  padding-top: 32px;
+}
+.daily-share-card[data-template="topic-list"][data-list-density="dense"] .daily-share-card__eyebrow {
+  padding-block: 10px;
+}
+.daily-share-card[data-template="topic-list"][data-list-density="dense"] .daily-share-card__topic-list-heading {
+  margin-bottom: 20px;
+}
+.daily-share-card[data-template="topic-list"][data-list-density="dense"] .daily-share-card__topic-list {
+  gap: 8px;
+}
+.daily-share-card[data-template="topic-list"][data-list-density="dense"] .daily-share-card__topic-list p {
+  grid-template-columns: 44px minmax(0, 1fr);
+  padding: 4px;
+  font-size: 30px;
+  line-height: 1.32;
+}
+.daily-share-card[data-template="topic-list"] .daily-share-card__footer {
+  border-top: 2px solid rgba(31, 101, 237, 0.3);
+}
 .daily-share-card[data-copy-density="compact"] h2 { font-size: 92px; }
 .daily-share-card[data-copy-density="compact"] .daily-share-card__cover-summary { font-size: 37px; }
 .daily-share-card[data-copy-density="compact"] .daily-share-card__stat { min-height: 190px; }

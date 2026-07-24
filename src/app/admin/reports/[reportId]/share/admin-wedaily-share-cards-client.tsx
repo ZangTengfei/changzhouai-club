@@ -17,6 +17,7 @@ import {
 } from "@/lib/wedaily-share-card";
 
 const MAX_TOPIC_CARDS = 6;
+const MAX_COVER_TOPICS = 12;
 const PREVIEW_SCALE = 0.34;
 const COMMUNITY_WECHAT_QR_IMAGE_PATH = "/community-wechat-qr.png";
 const DAILY_SHARE_TEMPLATES = [
@@ -37,6 +38,12 @@ const DAILY_SHARE_TEMPLATES = [
     name: "全息光场",
     description: "柔和环形光带与空间层次",
     background: "/share-cards/wedaily-holographic-orbit.png",
+  },
+  {
+    id: "topic-list",
+    name: "今日清单",
+    description: "封面直接展示当日全部要点",
+    background: "/share-cards/wedaily-intelligent-grid.png",
   },
 ] as const;
 const TOPIC_EMOJIS = [
@@ -181,6 +188,11 @@ export function AdminWeDailyShareCardsClient({
       `${TOPIC_EMOJIS[index % TOPIC_EMOJIS.length]} ${selectedCardById.get(topic.id)?.title ?? topic.title}`
     ),
   );
+  const coverTopicLines = importantTopics.slice(0, MAX_COVER_TOPICS).map((topic, index) => ({
+    emoji: TOPIC_EMOJIS[index % TOPIC_EMOJIS.length],
+    title: selectedCardById.get(topic.id)?.title ?? topic.title,
+  }));
+  const hiddenCoverTopicCount = Math.max(0, importantTopics.length - coverTopicLines.length);
   const socialCopyText = [
     ...(socialTitle.trim() ? [socialTitle.trim(), ""] : []),
     ...socialTopicLines,
@@ -245,7 +257,7 @@ export function AdminWeDailyShareCardsClient({
             封面、话题卡、社区微信结尾卡和 PNG 导出会同步使用所选模板。
           </p>
         </div>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {DAILY_SHARE_TEMPLATES.map((template) => {
             const selected = template.id === templateId;
 
@@ -383,24 +395,34 @@ export function AdminWeDailyShareCardsClient({
 
           <div className="grid gap-3 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
             <strong className="text-sm font-semibold text-foreground">封面</strong>
-            <label className="grid gap-1.5">
-              <span className="text-xs font-medium text-muted-foreground">标题</span>
-              <Input
-                data-testid="daily-share-cover-title"
-                value={coverTitle}
-                onChange={(event) => setCoverTitle(event.target.value)}
-                maxLength={28}
-              />
-            </label>
-            <label className="grid gap-1.5">
-              <span className="text-xs font-medium text-muted-foreground">一句话概览</span>
-              <Textarea
-                value={coverSummary}
-                onChange={(event) => setCoverSummary(event.target.value)}
-                className="min-h-28 resize-y"
-                maxLength={180}
-              />
-            </label>
+            {templateId === "topic-list" ? (
+              <p className="text-xs leading-5 text-muted-foreground">
+                封面展示前 {coverTopicLines.length} 个“今日要点”
+                {hiddenCoverTopicCount ? `，其余 ${hiddenCoverTopicCount} 个以查看更多提示收起` : ""}；
+                右侧配套发布文案仍保留全部内容。
+              </p>
+            ) : (
+              <>
+                <label className="grid gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">标题</span>
+                  <Input
+                    data-testid="daily-share-cover-title"
+                    value={coverTitle}
+                    onChange={(event) => setCoverTitle(event.target.value)}
+                    maxLength={28}
+                  />
+                </label>
+                <label className="grid gap-1.5">
+                  <span className="text-xs font-medium text-muted-foreground">一句话概览</span>
+                  <Textarea
+                    value={coverSummary}
+                    onChange={(event) => setCoverSummary(event.target.value)}
+                    className="min-h-28 resize-y"
+                    maxLength={180}
+                  />
+                </label>
+              </>
+            )}
           </div>
 
           {selectedCards.map((card, index) => (
@@ -491,7 +513,9 @@ export function AdminWeDailyShareCardsClient({
                 summary={coverSummary}
                 messageCount={report.stats?.message_count ?? 0}
                 speakerCount={report.stats?.speaker_count ?? 0}
+                totalTopicCount={importantTopics.length}
                 topicCount={selectedCards.length}
+                topics={coverTopicLines}
               />
             </CardPreviewFrame>
 
@@ -607,7 +631,9 @@ function DailyShareCoverCard({
   messageCount,
   speakerCount,
   templateId,
+  totalTopicCount,
   topicCount,
+  topics,
 }: {
   cardRef: (node: HTMLElement | null) => void;
   date: string;
@@ -616,12 +642,17 @@ function DailyShareCoverCard({
   messageCount: number;
   speakerCount: number;
   templateId: DailyShareTemplateId;
+  totalTopicCount: number;
   topicCount: number;
+  topics: Array<{ emoji: string; title: string }>;
 }) {
+  const isTopicList = templateId === "topic-list";
+
   return (
     <article
       className="daily-share-card"
       data-copy-density={getCardCopyDensity(title, summary)}
+      data-list-density={getCoverListDensity(topics)}
       data-share-card="cover"
       data-template={templateId}
       ref={cardRef}
@@ -629,14 +660,38 @@ function DailyShareCoverCard({
       <CardBackground templateId={templateId} />
       <CardMeta date={date} />
       <main className="daily-share-card__cover-main">
-        <p className="daily-share-card__eyebrow">LOCAL AI COMMUNITY · DAILY NOTES</p>
-        <h2>{title || "群聊精华"}</h2>
-        <p className="daily-share-card__cover-summary">{summary}</p>
-        <div className="daily-share-card__stats">
-          <CardStat label="今日消息" value={messageCount} />
-          <CardStat label="参与成员" value={speakerCount} />
-          <CardStat label="精选话题" value={topicCount} />
-        </div>
+        {isTopicList ? (
+          <>
+            <div className="daily-share-card__topic-list-heading">
+              <h2>群聊日报精华</h2>
+              <p className="daily-share-card__eyebrow">今日 {totalTopicCount} 个话题</p>
+            </div>
+            <div className="daily-share-card__topic-list">
+              {topics.map((topic, index) => (
+                <p key={`${index}-${topic.title}`}>
+                  <span aria-hidden="true">{topic.emoji}</span>
+                  <strong>{topic.title}</strong>
+                </p>
+              ))}
+              {totalTopicCount > topics.length ? (
+                <div className="daily-share-card__topic-list-more">
+                  另有 {totalTopicCount - topics.length} 条精彩话题，查看完整日报
+                </div>
+              ) : null}
+            </div>
+          </>
+        ) : (
+          <>
+            <p className="daily-share-card__eyebrow">LOCAL AI COMMUNITY · DAILY NOTES</p>
+            <h2>{title || "群聊精华"}</h2>
+            <p className="daily-share-card__cover-summary">{summary}</p>
+            <div className="daily-share-card__stats">
+              <CardStat label="今日消息" value={messageCount} />
+              <CardStat label="参与成员" value={speakerCount} />
+              <CardStat label="精选话题" value={topicCount} />
+            </div>
+          </>
+        )}
       </main>
       <CardFooter text="从群聊中打捞值得继续讨论的真实问题" />
     </article>
@@ -759,5 +814,14 @@ function getCardCopyDensity(title: string, summary: string) {
 
   if (copyWeight > 160) return "dense";
   if (copyWeight > 100) return "compact";
+  return "default";
+}
+
+function getCoverListDensity(topics: Array<{ title: string }>) {
+  const copyWeight = topics.reduce((total, topic) => total + topic.title.trim().length, 0);
+  const longTopicCount = topics.filter((topic) => topic.title.trim().length > 22).length;
+
+  if (copyWeight > 300 || longTopicCount > 5) return "dense";
+  if (copyWeight > 230 || longTopicCount > 2) return "compact";
   return "default";
 }
