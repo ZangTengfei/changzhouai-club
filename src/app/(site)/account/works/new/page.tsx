@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { ArrowLeft, CircleAlert } from "lucide-react";
 
 import { hasSupabaseEnv } from "@/lib/env";
+import { resolveCommunityUserId } from "@/lib/community-user";
 import { createClient } from "@/lib/supabase/server";
 
 import styles from "../../account-page.module.css";
@@ -66,6 +67,8 @@ export default async function NewAccountWorkPage({
     redirect(`/login?next=${encodeURIComponent("/account/works/new")}`);
   }
 
+  const communityUserId = await resolveCommunityUserId(supabase, user.id);
+
   const statusMessage = getWorkErrorMessage(params.error);
 
   return (
@@ -92,7 +95,7 @@ export default async function NewAccountWorkPage({
           </div>
         ) : null}
 
-        <AccountWorkSubmitForm userId={user.id} />
+        <AccountWorkSubmitForm userId={communityUserId} />
       </section>
     </div>
   );

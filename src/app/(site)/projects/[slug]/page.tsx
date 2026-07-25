@@ -22,6 +22,7 @@ import { submitProjectApplication } from "@/app/(site)/projects/actions";
 import { MarkdownContent } from "@/components/markdown-content";
 import { getVisibleProjectOpportunityBySlug } from "@/lib/community-projects";
 import { createClient } from "@/lib/supabase/server";
+import { resolveCommunityUserId } from "@/lib/community-user";
 
 import { ProjectApplicationSubmitButton } from "./project-application-submit-button";
 import { ProjectApplicationToast } from "./project-application-toast";
@@ -98,7 +99,7 @@ async function getSignedInUserId() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  return user?.id ?? null;
+  return user ? resolveCommunityUserId(supabase, user.id) : null;
 }
 
 async function hasSignedInUserApplied(projectId: string, userId: string | null) {

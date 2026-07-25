@@ -1,5 +1,6 @@
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 
+import { resolveCommunityUserId } from "@/lib/community-user";
 import {
   linkWechatIdentityToCommunityUser,
   MiniappAuthError,
@@ -69,6 +70,18 @@ export async function syncWechatOAuthAccount(
 
   const existingUserId = unionAccount?.user_id;
   if (existingUserId && existingUserId !== user.id) {
+    const canonicalUserId = await resolveCommunityUserId(supabase, user.id);
+
+    if (canonicalUserId === existingUserId) {
+      await linkWechatIdentityToCommunityUser(supabase, existingUserId, {
+        appId: config.appId,
+        openid: claims.openid,
+        unionid: claims.unionid,
+        channel: claims.channel,
+      });
+      return true;
+    }
+
     const { data: existingUser, error: existingUserError } =
       await supabase.auth.admin.getUserById(existingUserId);
 

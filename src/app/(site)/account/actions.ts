@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { sendAdminRegistrationNotification } from "@/lib/email";
+import { resolveCommunityUserId } from "@/lib/community-user";
 import {
   getMemberPublicSlugPath,
   isValidMemberPublicSlug,
@@ -138,16 +139,18 @@ export async function updateAccountProfile(formData: FormData) {
     redirect("/login?next=/account");
   }
 
+  const communityUserId = await resolveCommunityUserId(supabase, user.id);
+
   const [{ data: existingProfile }, existingMemberResult] = await Promise.all([
     supabase
       .from("profiles")
       .select("display_name, wechat, email, public_slug")
-      .eq("id", user.id)
+      .eq("id", communityUserId)
       .maybeSingle(),
     supabase
       .from("members")
       .select("onboarding_completed_at, admin_registration_notified_at")
-      .eq("id", user.id)
+      .eq("id", communityUserId)
       .maybeSingle(),
   ]);
   const existingMember = existingMemberResult.data;
@@ -158,7 +161,7 @@ export async function updateAccountProfile(formData: FormData) {
   if (existingMemberResult.error && supportsRegistrationTracking) {
     console.error("Failed to load account member tracking fields.", {
       memberError: existingMemberResult.error,
-      userId: user.id,
+      userId: communityUserId,
     });
   }
 
@@ -221,7 +224,7 @@ export async function updateAccountProfile(formData: FormData) {
         skills,
         interests,
       })
-      .eq("id", user.id),
+      .eq("id", communityUserId),
     supabase
       .from("members")
       .update({
@@ -232,7 +235,7 @@ export async function updateAccountProfile(formData: FormData) {
           ? { onboarding_completed_at: completionTimestamp }
           : {}),
       })
-      .eq("id", user.id),
+      .eq("id", communityUserId),
   ]);
 
   if (profileError || memberError) {
@@ -243,7 +246,7 @@ export async function updateAccountProfile(formData: FormData) {
     console.error("Failed to update account profile.", {
       profileError,
       memberError,
-      userId: user.id,
+      userId: communityUserId,
     });
     redirect("/account?error=save_failed");
   }
@@ -257,13 +260,13 @@ export async function updateAccountProfile(formData: FormData) {
   if (authUpdateError) {
     console.error("Failed to update auth avatar metadata.", {
       authUpdateError,
-      userId: user.id,
+      userId: communityUserId,
     });
   }
 
   if (shouldNotifyAdmin) {
     const notificationSent = await sendAdminRegistrationNotification({
-      userId: user.id,
+      userId: communityUserId,
       email: user.email ?? existingProfile?.email ?? null,
       displayName,
       wechat,
@@ -285,7 +288,7 @@ export async function updateAccountProfile(formData: FormData) {
         .update({
           admin_registration_notified_at: new Date().toISOString(),
         })
-        .eq("id", user.id)
+        .eq("id", communityUserId)
         .is("admin_registration_notified_at", null);
     }
   }
@@ -293,14 +296,14 @@ export async function updateAccountProfile(formData: FormData) {
   revalidatePath("/account");
   revalidatePath("/");
   revalidatePath("/members");
-  revalidatePath(`/members/${user.id}`);
+  revalidatePath(`/members/${communityUserId}`);
 
   if (existingProfile?.public_slug) {
     revalidatePath(`/members/${existingProfile.public_slug}`);
   }
 
   if (publicSlug) {
-    revalidatePath(getMemberPublicSlugPath({ id: user.id, publicSlug }));
+    revalidatePath(getMemberPublicSlugPath({ id: communityUserId, publicSlug }));
   }
 
   redirect("/account?updated=profile");
@@ -316,6 +319,8 @@ export async function saveAccountMemberWork(formData: FormData) {
   if (!user) {
     redirect(`/login?next=${encodeURIComponent(formPath)}`);
   }
+
+  const communityUserId = await resolveCommunityUserId(supabase, user.id);
 
   const workId = String(formData.get("work_id") ?? "").trim();
   const title = String(formData.get("title") ?? "").trim();
@@ -341,7 +346,7 @@ export async function saveAccountMemberWork(formData: FormData) {
   }
 
   const payload = {
-    member_id: user.id,
+    member_id: communityUserId,
     title,
     summary,
     description: String(formData.get("description") ?? "").trim() || null,
@@ -365,26 +370,26 @@ export async function saveAccountMemberWork(formData: FormData) {
       .from("member_works")
       .update(payload)
       .eq("id", workId)
-      .eq("member_id", user.id);
+      .eq("member_id", communityUserId);
 
     if (error) {
       console.error("Failed to update account member work.", {
         error,
         workId,
-        userId: user.id,
+        userId: communityUserId,
       });
       redirectAccountWorkError(formData, "work_save_failed");
     }
   } else {
     const { error } = await supabase.from("member_works").insert({
       ...payload,
-      created_by: user.id,
+      created_by: communityUserId,
     });
 
     if (error) {
       console.error("Failed to submit account member work.", {
         error,
-        userId: user.id,
+        userId: communityUserId,
       });
       redirectAccountWorkError(formData, "work_save_failed");
     }
@@ -392,7 +397,7 @@ export async function saveAccountMemberWork(formData: FormData) {
 
   revalidatePath("/account");
   revalidatePath("/works");
-  revalidatePath(`/members/${user.id}`);
+  revalidatePath(`/members/${communityUserId}`);
   redirect("/account?updated=work#works");
 }
 
@@ -406,6 +411,8 @@ export async function deleteAccountMemberWork(formData: FormData) {
     redirect("/login?next=/account");
   }
 
+  const communityUserId = await resolveCommunityUserId(supabase, user.id);
+
   const workId = String(formData.get("work_id") ?? "").trim();
 
   if (workId) {
@@ -413,14 +420,14 @@ export async function deleteAccountMemberWork(formData: FormData) {
       .from("member_works")
       .delete()
       .eq("id", workId)
-      .eq("member_id", user.id)
+      .eq("member_id", communityUserId)
       .eq("is_public", false);
 
     if (error) {
       console.error("Failed to delete account member work.", {
         error,
         workId,
-        userId: user.id,
+        userId: communityUserId,
       });
       redirect("/account?error=work_save_failed#works");
     }
@@ -428,7 +435,7 @@ export async function deleteAccountMemberWork(formData: FormData) {
 
   revalidatePath("/account");
   revalidatePath("/works");
-  revalidatePath(`/members/${user.id}`);
+  revalidatePath(`/members/${communityUserId}`);
   redirect("/account?updated=work_deleted#works");
 }
 
@@ -442,6 +449,8 @@ export async function cancelRegistration(formData: FormData) {
     redirect("/login?next=/account");
   }
 
+  const communityUserId = await resolveCommunityUserId(supabase, user.id);
+
   const registrationId = String(formData.get("registration_id") ?? "").trim();
 
   if (registrationId) {
@@ -449,7 +458,7 @@ export async function cancelRegistration(formData: FormData) {
       .from("event_registrations")
       .update({ status: "cancelled" })
       .eq("id", registrationId)
-      .eq("user_id", user.id);
+      .eq("user_id", communityUserId);
   }
 
   revalidatePath("/account");

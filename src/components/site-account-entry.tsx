@@ -11,6 +11,7 @@ import {
 import { hasSupabaseEnv } from "@/lib/env";
 import { getAvatarImageUrl } from "@/lib/public-image-url";
 import { createClient } from "@/lib/supabase/client";
+import { resolveCommunityUserId } from "@/lib/community-user";
 import styles from "./site-account-entry.module.css";
 
 type AdminPermissionRow = {
@@ -95,13 +96,19 @@ export function SiteAccountEntry({
         return;
       }
 
+      const communityUserId = await resolveCommunityUserId(supabase, user.id);
+
       const [{ data: profile }, { data: member }, { data: adminPermissions }] = await Promise.all([
         supabase
           .from("profiles")
           .select("display_name, avatar_url")
-          .eq("id", user.id)
+          .eq("id", communityUserId)
           .maybeSingle(),
-        supabase.from("members").select("status").eq("id", user.id).maybeSingle(),
+        supabase
+          .from("members")
+          .select("status")
+          .eq("id", communityUserId)
+          .maybeSingle(),
         supabase.rpc("list_current_admin_permissions"),
       ]);
       const permissionKeys = new Set<string>(

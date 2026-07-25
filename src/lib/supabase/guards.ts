@@ -5,6 +5,7 @@ import {
   hasAdminPermission,
   type AdminPermissionKey,
 } from "@/lib/admin/permissions";
+import { resolveCommunityUserId } from "@/lib/community-user";
 import { createClient } from "@/lib/supabase/server";
 
 type AdminPermissionRow = {
@@ -49,10 +50,11 @@ export async function getAdminContextResult(requiredPermission?: AdminPermission
     };
   }
 
+  const communityUserId = await resolveCommunityUserId(supabase, user.id);
   const { data: member } = await supabase
     .from("members")
     .select("status")
-    .eq("id", user.id)
+    .eq("id", communityUserId)
     .maybeSingle();
   const permissions = await loadCurrentAdminPermissions(supabase, member?.status);
   const isAdmin = hasAdminPermission(permissions, "admin.access");

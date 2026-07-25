@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { sendAdminEventRegistrationNotification } from "@/lib/email";
+import { resolveCommunityUserId } from "@/lib/community-user";
 import { createClient } from "@/lib/supabase/server";
 
 function resolveRedirectPath(raw: string | null, fallback: string) {
@@ -40,6 +41,8 @@ export async function registerForEvent(formData: FormData) {
     redirect(`/login?next=${encodeURIComponent(redirectTo)}`);
   }
 
+  const communityUserId = await resolveCommunityUserId(supabase, user.id);
+
   const eventId = String(formData.get("event_id") ?? "").trim();
   const note = String(formData.get("note") ?? "").trim();
 
@@ -53,7 +56,7 @@ export async function registerForEvent(formData: FormData) {
         .from("event_registrations")
         .select("status")
         .eq("event_id", eventId)
-        .eq("user_id", user.id)
+        .eq("user_id", communityUserId)
         .maybeSingle(),
       supabase
         .from("events")
@@ -63,7 +66,7 @@ export async function registerForEvent(formData: FormData) {
       supabase
         .from("profiles")
         .select("display_name, email, wechat, city")
-        .eq("id", user.id)
+        .eq("id", communityUserId)
         .maybeSingle(),
     ]);
 
@@ -72,7 +75,7 @@ export async function registerForEvent(formData: FormData) {
   await supabase.from("event_registrations").upsert(
     {
       event_id: eventId,
-      user_id: user.id,
+      user_id: communityUserId,
       note: note || null,
       status: "registered",
     },
@@ -101,7 +104,7 @@ export async function registerForEvent(formData: FormData) {
       console.error("Failed to send event registration notification.", {
         notificationError,
         eventId,
-        userId: user.id,
+        userId: communityUserId,
       });
     }
   }

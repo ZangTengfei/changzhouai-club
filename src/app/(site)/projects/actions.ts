@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { resolveCommunityUserId } from "@/lib/community-user";
 
 function getOptionalValue(formData: FormData, key: string) {
   const value = String(formData.get(key) ?? "").trim();
@@ -160,7 +161,9 @@ export async function submitProjectApplication(formData: FormData) {
     redirect(`/login?next=${encodeURIComponent(`/projects/${project.slug}#application-form`)}`);
   }
 
-  const applicantUserId = user?.id ?? null;
+  const applicantUserId = user
+    ? await resolveCommunityUserId(supabase, user.id)
+    : null;
   const hasExistingApplication = await hasExistingProjectApplication({
     projectId,
     applicantUserId,

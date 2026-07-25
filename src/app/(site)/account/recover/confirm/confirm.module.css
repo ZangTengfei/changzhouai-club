@@ -1,0 +1,65 @@
+.accountGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.accountGrid article {
+  display: grid;
+  gap: 7px;
+  padding: 18px;
+  border: 1px solid rgba(208, 214, 207, 0.8);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.58);
+}
+
+.accountGrid span,
+.accountGrid small {
+  color: var(--muted);
+}
+
+.accountGrid strong {
+  font-size: 1.08rem;
+}
+
+.form {
+  display: grid;
+  gap: 18px;
+  max-width: 680px;
+}
+
+.form > :global(.button) {
+  justify-self: start;
+}
+
+.choiceGroup {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid rgba(208, 214, 207, 0.8);
+  border-radius: var(--radius-md);
+}
+
+.choiceGroup legend {
+  padding: 0 6px;
+  font-weight: 650;
+}
+
+.choiceGroup label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.choiceGroup img {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+@media (max-width: 720px) {
+  .accountGrid {
+    grid-template-columns: 1fr;
+  }
+}

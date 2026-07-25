@@ -34,6 +34,7 @@ import { MemberAvatar } from "@/components/member-avatar";
 import { SignOutButton } from "@/components/sign-out-button";
 import { WechatAuthButton } from "@/components/wechat-auth-button";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
+import { resolveCommunityUserId } from "@/lib/community-user";
 import {
   workReviewStatusLabels,
   workStatusLabels,
@@ -172,6 +173,14 @@ function getStatusMessage(error?: string) {
     return "社区动态保存失败，请稍后再试。";
   }
 
+  if (error === "account_recovery_invalid") {
+    return "账号找回链接无效或已经过期，请重新发起找回。";
+  }
+
+  if (error === "account_recovery_failed") {
+    return "账号资料合并失败，原账号资料没有被删除，请稍后重试。";
+  }
+
   return "资料保存失败，请稍后再试。";
 }
 
@@ -296,10 +305,7 @@ export default async function AccountPage({
   }
 
   const supabase = await createClient();
-  const [{ data: userData }, { data: identityData }] = await Promise.all([
-    supabase.auth.getUser(),
-    supabase.auth.getUserIdentities(),
-  ]);
+  const { data: userData } = await supabase.auth.getUser();
 
   const user = userData.user;
 
@@ -316,49 +322,72 @@ export default async function AccountPage({
     redirect("/account/works/new");
   }
 
+  const communityUserId = await resolveCommunityUserId(supabase, user.id);
+
   const [
+    { data: identityData },
+    { data: communityWechatIdentities },
     { data: profile },
     { data: member },
     { data: registrations },
     { data: works },
   ] = await Promise.all([
+      supabase.auth.getUserIdentities(),
+      supabase
+        .from("user_identities")
+        .select("identity_data")
+        .eq("user_id", communityUserId)
+        .eq("provider", "wechat"),
       supabase
         .from("profiles")
         .select(
-          "display_name, public_slug, avatar_url, wechat, city, role_label, organization, monthly_time, bio, skills, interests",
+          "email, display_name, public_slug, avatar_url, wechat, city, role_label, organization, monthly_time, bio, skills, interests",
         )
-        .eq("id", user.id)
+        .eq("id", communityUserId)
         .maybeSingle(),
       supabase
         .from("members")
         .select(
           "status, willing_to_attend, willing_to_share, willing_to_join_projects, is_publicly_visible, is_featured_on_home",
         )
-        .eq("id", user.id)
+        .eq("id", communityUserId)
         .maybeSingle(),
       supabase
         .from("event_registrations")
         .select(
           "id, status, note, created_at, events(title, event_at, city, venue, slug, status)",
         )
-        .eq("user_id", user.id)
+        .eq("user_id", communityUserId)
         .order("created_at", { ascending: false }),
       supabase
         .from("member_works")
         .select(
           "id, title, summary, description, work_type, status, review_status, role_label, cover_image_url, qr_code_image_url, website_url, repo_url, demo_url, tags, is_public, is_featured, updated_at",
         )
-        .eq("member_id", user.id)
+        .eq("member_id", communityUserId)
         .order("updated_at", { ascending: false }),
     ]);
 
   const identities = identityData?.identities ?? [];
-  const providers = identities.map((item) => item.provider);
+  const providers = Array.from(
+    new Set([
+      ...identities.map((item) => item.provider),
+      ...(communityWechatIdentities?.length ? [getWechatProviderName()] : []),
+      ...(profile?.email && !identities.some((item) => item.provider === "google")
+        ? ["email"]
+        : []),
+    ]),
+  );
   const wechatIdentity = identities.find(
     (item) => item.provider === getWechatProviderName(),
   );
   const wechatEnabled = hasWechatOAuthEnv();
-  const wechatLinked = providers.includes(getWechatProviderName());
+  const wechatLinked = Boolean(
+    providers.includes(getWechatProviderName()) || communityWechatIdentities?.length,
+  );
+  const canRecoverOldAccount =
+    communityUserId === user.id &&
+    identities.some((identity) => identity.provider === getWechatProviderName());
   const wechatProfile = wechatLinked
     ? getWechatProfile(
         wechatIdentity?.identity_data as IdentityData | null | undefined,
@@ -372,7 +401,7 @@ export default async function AccountPage({
   );
   const publicProfilePath = member?.is_publicly_visible
     ? getMemberPublicSlugPath({
-        id: user.id,
+        id: communityUserId,
         publicSlug: profile?.public_slug ?? null,
       })
     : null;
@@ -408,7 +437,7 @@ export default async function AccountPage({
     {
       label: "登录方式",
       value: formatProviderList(providers),
-      detail: user.email ?? "未提供邮箱",
+      detail: profile?.email ?? user.email ?? "未提供邮箱",
       icon: ShieldCheck,
     },
   ];
@@ -459,7 +488,7 @@ export default async function AccountPage({
             >
               <AccountProfileForm
                 className={styles.accountProfileForm}
-                userId={user.id}
+                userId={communityUserId}
                 profile={profile}
                 member={member}
               />
@@ -521,6 +550,15 @@ export default async function AccountPage({
               <KeyRound aria-hidden="true" strokeWidth={2} />
               设置密码
             </Link>
+            {canRecoverOldAccount ? (
+              <Link
+                href="/account/recover"
+                className={`button button-secondary ${styles.accountSecurityAction}`}
+              >
+                <ShieldCheck aria-hidden="true" strokeWidth={2} />
+                找回旧账号
+              </Link>
+            ) : null}
             <SignOutButton enabled />
           </div>
         </div>
@@ -560,6 +598,8 @@ export default async function AccountPage({
                 ? "邮箱登录密码已更新。"
               : params.updated === "wechat_identity"
                 ? "微信已绑定。"
+              : params.updated === "account_merged"
+                ? "旧账号已找回，微信登录和原账号资料已合并。"
               : params.updated === "work"
                 ? "作品已提交，等待管理员审核。"
                 : params.updated === "work_deleted"
@@ -699,7 +739,7 @@ export default async function AccountPage({
                       />
                     </label>
                     <WorkImageField
-                      userId={user.id}
+                      userId={communityUserId}
                       name="cover_image_url"
                       label="封面 / 产品图片"
                       defaultValue={work.cover_image_url ?? ""}
@@ -711,7 +751,7 @@ export default async function AccountPage({
                       emptyStatusText="当前未设置图片"
                     />
                     <WorkImageField
-                      userId={user.id}
+                      userId={communityUserId}
                       name="qr_code_image_url"
                       label="小程序码 / 二维码"
                       defaultValue={work.qr_code_image_url ?? ""}
