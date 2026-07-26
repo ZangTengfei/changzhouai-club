@@ -11,6 +11,8 @@ export type WechatArticleTemplate = {
   muted: string;
   background: string;
   label: string;
+  headerTitle: string;
+  headerDescription: string;
   footer: string;
   footerTitle: string;
   footerDescription: string;
@@ -54,11 +56,22 @@ type MarkdownBlock =
   | { type: "paragraph"; lines: string[] }
   | { type: "quote"; lines: string[] }
   | { type: "list"; ordered: boolean; items: string[]; start?: number }
-  | { type: "image"; alt: string; src: string }
+  | { type: "image"; alt: string; src: string; width: ImageDisplayWidth }
+  | { type: "imageGroup"; images: ArticleImage[] }
+  | { type: "imageSlider"; images: ArticleImage[] }
   | { type: "hr" };
+
+type ImageDisplayWidth = 100 | 80 | 60 | 50;
+
+type ArticleImage = {
+  alt: string;
+  src: string;
+  width: ImageDisplayWidth;
+};
 
 type RenderWechatArticleOptions = {
   title?: string | null;
+  showTitle?: boolean;
   footerTemplate?: WechatArticleTemplate;
   footerModules?: WechatArticleFooterModules;
   relatedLinks?: WechatArticleFooterLink[];
@@ -73,13 +86,15 @@ export const wechatArticleTemplates: WechatArticleTemplate[] = [
     id: "community",
     name: "社区复盘版",
     description: "适合活动回顾、社区公众号、轻松但不松散的口吻。",
-    accent: "#15935f",
-    accentSoft: "#e8f7ef",
-    accentWarm: "#ffc83d",
-    text: "#24352d",
-    muted: "#6b7a70",
-    background: "#fffdf8",
+    accent: "#0d8259",
+    accentSoft: "#dceee5",
+    accentWarm: "#e6a900",
+    text: "#262626",
+    muted: "#6b6b6b",
+    background: "#ffffff",
     label: "Changzhou AI Club",
+    headerTitle: "社区实践 · 真实记录",
+    headerDescription: "记录本地 AI 行动、协作与成长",
     footer: "常州 AI Club｜连接、分享、共创",
     footerTitle: "继续和常州 AI Club 一起共创",
     footerDescription: "关注公众号，获取活动回顾、项目机会和本地 AI 实践者故事。",
@@ -94,12 +109,14 @@ export const wechatArticleTemplates: WechatArticleTemplate[] = [
     name: "官方通稿版",
     description: "适合园区、合作方公众号发布，表达更稳、更正式。",
     accent: "#147f6c",
-    accentSoft: "#eef7f5",
+    accentSoft: "#e2efec",
     accentWarm: "#2f80ed",
-    text: "#1f2f2b",
-    muted: "#63746f",
+    text: "#242424",
+    muted: "#6b6f6e",
     background: "#ffffff",
     label: "常州 AI Club",
+    headerTitle: "社区动态 · 实践记录",
+    headerDescription: "分享本地 AI 实践、活动与共建进展",
     footer: "共同推动 AI 创客交流与场景落地",
     footerTitle: "常州 AI Club",
     footerDescription: "连接本地 AI 创客、产业场景与真实项目，持续推动交流与落地。",
@@ -114,12 +131,14 @@ export const wechatArticleTemplates: WechatArticleTemplate[] = [
     name: "项目招募版",
     description: "适合揭榜、项目报名、合作机会发布。",
     accent: "#1662c4",
-    accentSoft: "#edf5ff",
+    accentSoft: "#e3ecf8",
     accentWarm: "#18a36b",
-    text: "#1d2d44",
-    muted: "#607086",
-    background: "#fbfdff",
+    text: "#25282d",
+    muted: "#68707a",
+    background: "#ffffff",
     label: "项目合作机会",
+    headerTitle: "真实需求 · 共建招募",
+    headerDescription: "让合适的能力与真实项目更快相遇",
     footer: "欢迎带着真实问题、真实能力和真实项目一起共创",
     footerTitle: "带着能力进入真实项目",
     footerDescription: "关注社区后续项目发布、揭榜报名和小范围需求澄清信息。",
@@ -348,6 +367,20 @@ function renderFooter(template: WechatArticleTemplate, options: RenderWechatArti
   </section>`;
 }
 
+function parseImageLine(line: string): ArticleImage | null {
+  const match = line.match(/^!\[([^\]]*)\]\(([^)]+)\)(?:\{width=(100|80|60|50)\})?$/);
+
+  if (!match) {
+    return null;
+  }
+
+  return {
+    alt: match[1].trim(),
+    src: match[2].trim(),
+    width: match[3] ? (Number.parseInt(match[3], 10) as ImageDisplayWidth) : 100,
+  };
+}
+
 function parseMarkdown(markdown: string) {
   const blocks: MarkdownBlock[] = [];
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
@@ -389,7 +422,8 @@ function parseMarkdown(markdown: string) {
     flushQuote();
   };
 
-  for (const rawLine of lines) {
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
+    const rawLine = lines[lineIndex];
     const line = rawLine.trim();
 
     if (!line) {
@@ -410,13 +444,38 @@ function parseMarkdown(markdown: string) {
       continue;
     }
 
-    const imageMatch = line.match(/^!\[([^\]]*)\]\(([^)]+)\)$/);
-    if (imageMatch) {
+    if (line === ":::gallery" || line === ":::slider") {
+      flushAll();
+      const isSlider = line === ":::slider";
+      const images: ArticleImage[] = [];
+
+      for (lineIndex += 1; lineIndex < lines.length; lineIndex += 1) {
+        const galleryLine = lines[lineIndex].trim();
+
+        if (galleryLine === ":::") {
+          break;
+        }
+
+        const galleryImage = parseImageLine(galleryLine);
+        if (galleryImage) {
+          images.push({ ...galleryImage, width: 100 });
+        }
+      }
+
+      if (images.length > 0) {
+        blocks.push(images.length === 1
+          ? { type: "image", ...images[0] }
+          : { type: isSlider ? "imageSlider" : "imageGroup", images });
+      }
+      continue;
+    }
+
+    const image = parseImageLine(line);
+    if (image) {
       flushAll();
       blocks.push({
         type: "image",
-        alt: imageMatch[1].trim(),
-        src: imageMatch[2].trim(),
+        ...image,
       });
       continue;
     }
@@ -477,13 +536,38 @@ function parseMarkdown(markdown: string) {
 
 export function toWechatArticlePlainText(markdown: string) {
   return markdown
+    .replace(/^#\s+.*(?:\n+|$)/, "")
+    .replace(/^:::(?:gallery|slider)\s*$/gm, "")
+    .replace(/^:::\s*$/gm, "")
     .replace(/^#{1,6}\s+/gm, "")
-    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, "$1")
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)(?:\{width=(?:100|80|60|50)\})?/g, "$1")
     .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1 $2")
     .replace(/\*\*([^*]+)\*\*/g, "$1")
     .replace(/`([^`]+)`/g, "$1")
     .replace(/^>\s?/gm, "")
     .trim();
+}
+
+function renderImageContent(
+  image: ArticleImage,
+  template: WechatArticleTemplate,
+  fallbackLabel: string,
+) {
+  if (!isPublicUrl(image.src)) {
+    return `<section style="padding:16px;border:1px dashed ${template.accent};border-radius:10px;background:${template.accentSoft};color:${template.muted};font-size:14px;line-height:1.7;">图片待替换：${escapeHtml(
+      image.alt || fallbackLabel,
+    )}<br/>${escapeHtml(image.src)}</section>`;
+  }
+
+  const caption = image.alt
+    ? `<p style="margin:8px 0 0;color:${template.muted};font-size:13px;line-height:1.6;text-align:center;">${escapeHtml(
+        image.alt,
+      )}</p>`
+    : "";
+
+  return `<img src="${escapeAttribute(image.src)}" alt="${escapeAttribute(
+    image.alt,
+  )}" style="display:block;width:100%;height:auto;border-radius:10px;"/>${caption}`;
 }
 
 export function renderWechatArticleHtml(
@@ -497,6 +581,7 @@ export function renderWechatArticleHtml(
       block.type === "heading" && block.depth === 1,
   );
   const title = options.title?.trim() || firstHeading?.text || "公众号推文标题";
+  const showTitle = options.showTitle ?? true;
   const bodyBlocks = firstHeading
     ? blocks.filter((block) => block !== firstHeading)
     : blocks;
@@ -524,8 +609,7 @@ export function renderWechatArticleHtml(
       }
 
       if (block.type === "quote") {
-        return `<section style="margin:20px 0;padding:16px 17px 16px;border:1px solid ${template.accentSoft};border-radius:12px;background:${template.accentSoft};">
-          <section style="width:38px;height:3px;margin:0 0 12px;border-radius:999px;background:${template.accentWarm};"></section>
+        return `<section style="margin:20px 0;padding:16px 17px 16px;border:1px solid ${template.accentSoft};border-radius:12px;background:${template.background};">
           <section style="display:table;width:100%;border-collapse:collapse;">
             <section style="display:table-cell;width:26px;vertical-align:top;color:${template.accent};font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1;font-weight:700;">“</section>
             <section style="display:table-cell;vertical-align:top;">
@@ -576,31 +660,70 @@ export function renderWechatArticleHtml(
       }
 
       if (block.type === "image") {
-        if (!isPublicUrl(block.src)) {
-          return `<section style="margin:20px 0;padding:16px;border:1px dashed ${template.accent};border-radius:10px;background:${template.accentSoft};color:${template.muted};font-size:14px;line-height:1.7;">图片待替换：${escapeHtml(
-            block.alt || `第 ${index + 1} 张图片`,
-          )}<br/>${escapeHtml(block.src)}</section>`;
-        }
+        return `<section style="width:${block.width}%;margin:22px auto;">${renderImageContent(
+          block,
+          template,
+          `第 ${index + 1} 张图片`,
+        )}</section>`;
+      }
 
-        const caption = block.alt
-          ? `<p style="margin:8px 0 0;color:${template.muted};font-size:13px;line-height:1.6;text-align:center;">${escapeHtml(
-              block.alt,
-            )}</p>`
-          : "";
+      if (block.type === "imageGroup") {
+        const rows = Array.from(
+          { length: Math.ceil(block.images.length / 2) },
+          (_, rowIndex) => block.images.slice(rowIndex * 2, rowIndex * 2 + 2),
+        )
+          .map((images, rowIndex) => {
+            const cells = images
+              .map((image, cellIndex) => {
+                const isLeft = cellIndex === 0;
 
-        return `<section style="margin:22px 0;"><img src="${escapeAttribute(
-          block.src,
-        )}" alt="${escapeAttribute(
-          block.alt,
-        )}" style="display:block;width:100%;height:auto;border-radius:10px;"/>${caption}</section>`;
+                return `<td style="width:50%;padding:0 ${isLeft ? "5px" : "0"} 10px ${isLeft ? "0" : "5px"};vertical-align:top;">${renderImageContent(
+                  image,
+                  template,
+                  `第 ${rowIndex * 2 + cellIndex + 1} 张图片`,
+                )}</td>`;
+              })
+              .join("");
+            const filler = images.length === 1
+              ? '<td style="width:50%;padding:0 0 10px 5px;"></td>'
+              : "";
+
+            return `<tr>${cells}${filler}</tr>`;
+          })
+          .join("");
+
+        return `<section style="margin:22px 0 12px;"><table role="presentation" style="width:100%;table-layout:fixed;border-collapse:collapse;border-spacing:0;"><tbody>${rows}</tbody></table></section>`;
+      }
+
+      if (block.type === "imageSlider") {
+        const slides = block.images
+          .map((image, imageIndex) => `<section data-svg-blockname="滑动组：" data-svg-role="block" data-svg-op="copy,delete" style="display:inline-block;vertical-align:top;white-space:normal;width:100%;word-wrap:break-word;scroll-snap-align:center;max-width:100% !important;box-sizing:border-box;">
+            <section style="font-size:0 !important;line-height:0 !important;margin:0 !important;padding:0 !important;text-align:center;box-sizing:border-box;">${renderImageContent(
+              image,
+              template,
+              `第 ${imageIndex + 1} 张图片`,
+            )}</section>
+          </section>`)
+          .join("");
+
+        return `<section data-role="animate" style="margin:22px 0 12px;">
+          <section style="font-size:0;line-height:0;margin:0;padding:0;box-sizing:border-box;transform:scale(1);-webkit-transform:scale(1);">
+            <section style="margin:0 auto;white-space:normal;text-align:center;padding:0;overflow:hidden;box-sizing:border-box;">
+              <section style="line-height:0;overflow-x:scroll;overflow-y:hidden;width:100%;margin:0;white-space:nowrap;-webkit-overflow-scrolling:touch;pointer-events:all;scroll-snap-type:x mandatory;max-width:100% !important;box-sizing:border-box;">${slides}</section>
+            </section>
+          </section>
+          <section data-svg-blockname="滑动文案：" data-svg-role="block">
+            <p style="margin:4px 0 15px;color:${template.muted};font-size:12px;line-height:30px;letter-spacing:0.5px;text-align:center;">&gt; 左右滑动查看更多</p>
+          </section>
+        </section>`;
       }
 
       return `<section style="height:1px;margin:26px 0;background:#e6e0d7;"></section>`;
     })
     .join("");
 
-  return `<section style="max-width:677px;margin:0 auto;padding:0;background:${template.background};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',Arial,sans-serif;">
-  <section style="padding:26px 20px 8px;">
+  const headerHtml = showTitle
+    ? `<section style="padding:26px 20px 8px;">
     <section style="display:inline-block;margin:0 0 14px;padding:5px 10px;border-radius:999px;background:${template.accentSoft};color:${template.accent};font-size:12px;font-weight:700;letter-spacing:0.08em;">${escapeHtml(
       template.label,
     )}</section>
@@ -609,7 +732,23 @@ export function renderWechatArticleHtml(
       template,
     )}</h1>
     <section style="width:42px;height:4px;margin:18px 0 0;border-radius:999px;background:${template.accentWarm};"></section>
-  </section>
+  </section>`
+    : `<section style="padding:22px 20px 8px;">
+    <section style="padding:15px 16px;border:1px solid ${template.accentSoft};border-radius:14px;background:${template.background};">
+      <section style="display:inline-block;padding:3px 9px;border:1px solid ${template.accent};border-radius:999px;background:${template.background};color:${template.accent};font-size:11px;line-height:1.5;font-weight:800;letter-spacing:0.08em;">${escapeHtml(
+        template.label,
+      )}</section>
+      <strong style="display:block;margin:10px 0 0;color:${template.text};font-size:17px;line-height:1.5;font-weight:800;">${escapeHtml(
+        template.headerTitle,
+      )}</strong>
+      <span style="display:block;margin:3px 0 0;color:${template.muted};font-size:13px;line-height:1.7;">${escapeHtml(
+        template.headerDescription,
+      )}</span>
+    </section>
+  </section>`;
+
+  return `<section style="max-width:677px;margin:0 auto;padding:0;background:${template.background};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',Arial,sans-serif;">
+  ${headerHtml}
   <section style="padding:8px 20px 18px;">
     ${bodyHtml}
   </section>

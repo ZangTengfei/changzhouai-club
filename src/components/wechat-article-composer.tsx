@@ -66,10 +66,26 @@ const sampleMarkdown = `# 从 Codex 到真实项目：一次常州 AI Club 的�
 
 const sampleTitle = "从 Codex 到真实项目：一次常州 AI Club 的实战交流";
 
-function getImageMarkdown(url: string, alt: string) {
-  const safeAlt = (alt || "图片").replace(/[\[\]\r\n]/g, " ").trim() || "图片";
+type ImageInsertMode = "single" | "gallery" | "slider";
+type ImageDisplayWidth = "100" | "80" | "60" | "50";
+type GalleryImageDraft = { url: string; alt: string };
 
-  return `![${safeAlt}](${url})`;
+function getImageMarkdown(url: string, alt: string, width: ImageDisplayWidth = "100") {
+  const safeAlt = (alt || "图片").replace(/[\[\]\r\n]/g, " ").trim() || "图片";
+  const widthOption = width === "100" ? "" : `{width=${width}}`;
+
+  return `![${safeAlt}](${url})${widthOption}`;
+}
+
+function getGalleryMarkdown(
+  images: GalleryImageDraft[],
+  mode: Exclude<ImageInsertMode, "single">,
+) {
+  return [
+    mode === "slider" ? ":::slider" : ":::gallery",
+    ...images.map((image) => getImageMarkdown(image.url, image.alt)),
+    ":::",
+  ].join("\n");
 }
 
 function parseFooterLinksDraft(value: string): WechatArticleFooterLink[] {
@@ -137,6 +153,9 @@ export function WechatArticleComposer({
   const [footerModules, setFooterModules] = useState(initialSettings.footerModules);
   const [imageAlt, setImageAlt] = useState("文章配图");
   const [imageUrl, setImageUrl] = useState("");
+  const [imageInsertMode, setImageInsertMode] = useState<ImageInsertMode>("single");
+  const [imageDisplayWidth, setImageDisplayWidth] = useState<ImageDisplayWidth>("100");
+  const [galleryImages, setGalleryImages] = useState<GalleryImageDraft[]>([]);
   const [videoTitle, setVideoTitle] = useState(initialSettings.videoTitle);
   const [videoDescription, setVideoDescription] = useState(initialSettings.videoDescription);
   const [videoActionLabel, setVideoActionLabel] = useState(initialSettings.videoActionLabel);
@@ -178,6 +197,7 @@ export function WechatArticleComposer({
   const html = useMemo(
     () =>
       renderWechatArticleHtml(markdown, template, {
+        showTitle: false,
         footerTemplate,
         footerModules,
         relatedLinks,
@@ -228,22 +248,14 @@ export function WechatArticleComposer({
     };
   }
 
-  function insertImageMarkdown(url = imageUrl, alt = imageAlt) {
-    const trimmedUrl = url.trim();
-
-    if (!trimmedUrl) {
-      setImageUploadError("请先上传图片或填写图片链接。");
-      return;
-    }
-
+  function insertMarkdownAtSelection(value: string) {
     const textarea = markdownTextareaRef.current;
     const start = textarea ? markdownSelectionRef.current.start : markdown.length;
     const end = textarea ? markdownSelectionRef.current.end : markdown.length;
     const previousScrollTop = textarea?.scrollTop ?? 0;
     const before = markdown.slice(0, start);
     const after = markdown.slice(end);
-    const imageMarkdown = getImageMarkdown(trimmedUrl, alt);
-    const insertion = getSeparatedInsertion(before, after, imageMarkdown);
+    const insertion = getSeparatedInsertion(before, after, value);
     const nextMarkdown = `${before}${insertion.text}${after}`;
 
     setMarkdown(nextMarkdown);
@@ -263,6 +275,43 @@ export function WechatArticleComposer({
       }
       markdownSelectionRef.current = { start: nextCursor, end: nextCursor };
     });
+  }
+
+  function insertImageMarkdown() {
+    const trimmedUrl = imageUrl.trim();
+
+    if (!trimmedUrl) {
+      setImageUploadError("请先上传图片或填写图片链接。");
+      return;
+    }
+
+    insertMarkdownAtSelection(getImageMarkdown(trimmedUrl, imageAlt, imageDisplayWidth));
+  }
+
+  function addImageToGallery() {
+    const trimmedUrl = imageUrl.trim();
+
+    if (!trimmedUrl) {
+      setImageUploadError("请先上传图片或填写图片链接。");
+      return;
+    }
+
+    setGalleryImages((current) => [...current, { url: trimmedUrl, alt: imageAlt }]);
+    setImageUrl("");
+    setImageUploadError(null);
+  }
+
+  function insertGalleryMarkdown() {
+    if (galleryImages.length < 2) {
+      setImageUploadError("图片组至少需要两张图片。");
+      return;
+    }
+
+    insertMarkdownAtSelection(getGalleryMarkdown(
+      galleryImages,
+      imageInsertMode === "slider" ? "slider" : "gallery",
+    ));
+    setGalleryImages([]);
   }
 
   function applyFooterTemplate(nextId: WechatArticleTemplateId) {
@@ -499,14 +548,54 @@ export function WechatArticleComposer({
       </section>
 
       <AdminModal
-        title="插入图片到当前光标"
+        title="插入图片"
         open={imageModalOpen}
         onOpenChange={setImageModalOpen}
       >
         <div className="grid gap-4">
           <p className="text-sm text-muted-foreground">
-            上传或粘贴图片地址，插入后会自动回到原来的编辑位置。
+            单图可调整显示宽度；多图可选择双列并排或左右滑动。
           </p>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="grid gap-1.5">
+              <span className="text-xs font-medium text-muted-foreground">图片形式</span>
+              <NativeSelect
+                value={imageInsertMode}
+                onChange={(event) => {
+                  setImageInsertMode(event.target.value as ImageInsertMode);
+                  setImageUploadError(null);
+                }}
+              >
+                <option value="single">单张图片</option>
+                <option value="gallery">多图并排</option>
+                <option value="slider">横向滑动</option>
+              </NativeSelect>
+            </label>
+            {imageInsertMode === "single" ? (
+              <label className="grid gap-1.5">
+                <span className="text-xs font-medium text-muted-foreground">
+                  图片显示比例
+                </span>
+                <NativeSelect
+                  value={imageDisplayWidth}
+                  onChange={(event) => setImageDisplayWidth(
+                    event.target.value as ImageDisplayWidth,
+                  )}
+                >
+                  <option value="100">100% · 满宽</option>
+                  <option value="80">80% · 较宽</option>
+                  <option value="60">60% · 居中</option>
+                  <option value="50">50% · 半宽</option>
+                </NativeSelect>
+              </label>
+            ) : (
+              <div className="rounded-[calc(var(--radius)-5px)] border border-border/70 bg-muted/30 px-3 py-2 text-xs leading-5 text-muted-foreground">
+                {imageInsertMode === "slider"
+                  ? "每次展示一张，读者可左右滑动切换；使用公众号支持的纯 HTML/CSS，无需脚本。"
+                  : "复制到公众号后会稳定显示为每行两张。"}
+              </div>
+            )}
+          </div>
           <label className="grid gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">图片说明</span>
             <Input
@@ -533,16 +622,69 @@ export function WechatArticleComposer({
             filledStatusText="图片已准备好"
             emptyStatusText="等待上传或填写链接"
           />
+          {imageInsertMode !== "single" && galleryImages.length > 0 ? (
+            <section className="grid gap-2 rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/20 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <strong className="text-sm font-semibold text-foreground">
+                  已加入 {galleryImages.length} 张
+                </strong>
+                <span className="text-xs text-muted-foreground">按加入顺序排列</span>
+              </div>
+              {galleryImages.map((image, index) => (
+                <div
+                  key={`${image.url}-${index}`}
+                  className="flex items-center justify-between gap-3 rounded-[calc(var(--radius)-6px)] bg-background px-3 py-2"
+                >
+                  <span className="min-w-0 truncate text-sm text-foreground">
+                    {index + 1}. {image.alt || "图片"}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label={`移除第 ${index + 1} 张图片`}
+                    onClick={() => setGalleryImages((current) => current.filter(
+                      (_, imageIndex) => imageIndex !== index,
+                    ))}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+              ))}
+            </section>
+          ) : null}
           {imageUploadError ? <AdminNotice>{imageUploadError}</AdminNotice> : null}
-          <div className="flex justify-end">
-            <Button
-              type="button"
-              onClick={() => insertImageMarkdown()}
-              disabled={!imageUrl.trim()}
-            >
-              <ImagePlus className="size-4" />
-              插入到光标
-            </Button>
+          <div className="flex flex-wrap justify-end gap-2">
+            {imageInsertMode !== "single" ? (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addImageToGallery}
+                  disabled={!imageUrl.trim()}
+                >
+                  <Plus className="size-4" />
+                  加入图片组
+                </Button>
+                <Button
+                  type="button"
+                  onClick={insertGalleryMarkdown}
+                  disabled={galleryImages.length < 2}
+                >
+                  <ImagePlus className="size-4" />
+                  插入 {galleryImages.length} 张图片
+                </Button>
+              </>
+            ) : (
+              <Button
+                type="button"
+                onClick={insertImageMarkdown}
+                disabled={!imageUrl.trim()}
+              >
+                <ImagePlus className="size-4" />
+                插入到光标
+              </Button>
+            )}
           </div>
         </div>
       </AdminModal>
