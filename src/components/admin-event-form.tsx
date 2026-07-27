@@ -157,7 +157,7 @@ export function AdminEventForm({
               className="input"
               name="docs_url"
               defaultValue={event?.docs_url ?? ""}
-              placeholder="/docs/events/2026-04-25-ai-salon 或飞书文档链接"
+              placeholder="https://... 飞书文档链接"
             />
           </label>
 

@@ -9,7 +9,6 @@ export const navItems = [
   { href: "/works", label: "案例库" },
   { href: "/projects", label: "项目协作" },
   { href: "/cooperate", label: "合作联系" },
-  { href: "/docs", label: "社区文档" },
 ];
 
 export const siteRepositoryUrl = "https://github.com/ZangTengfei/changzhouai-club";
@@ -84,7 +83,7 @@ export const activityMoments = [
   {
     title: "官网沉淀上下文",
     description:
-      "活动回顾、案例库和社区文档会持续记录过程，帮助后来的项目少走弯路。",
+      "活动回顾、社区动态和案例库会持续记录过程，帮助后来的项目少走弯路。",
   },
 ];
 
@@ -193,7 +192,7 @@ export const faqItems = [
   {
     question: "AI Club 和普通技术交流群有什么不同？",
     answer:
-      "我们不只讨论工具和资讯，更关注真实问题如何被验证、原型如何被做出来、项目如何进入场景试点，以及经验如何沉淀成案例和文档。",
+      "我们不只讨论工具和资讯，更关注真实问题如何被验证、原型如何被做出来、项目如何进入场景试点，以及经验如何沉淀成案例和活动回顾。",
   },
   {
     question: "企业可以把真实场景带到社区吗？",

@@ -64,7 +64,7 @@ values
     '2026-03-21 14:00:00+08',
     '常州',
     'https://assets.changzhouai.club/event-assets/events/historical/event-05-20260321.jpeg',
-    '/docs/events/2026-03-21-ai-salon',
+    null,
     'completed'
   ),
   (

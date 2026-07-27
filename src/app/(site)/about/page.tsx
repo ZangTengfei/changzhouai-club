@@ -47,7 +47,7 @@ const longTermDirections = [
   },
   {
     title: "让试点经验变成资产",
-    summary: "从一次交流延伸到 PoC、案例复盘、交付模板和可复用社区文档。",
+    summary: "从一次交流延伸到 PoC、案例复盘、交付模板和可复用实践资产。",
   },
 ] as const;
 

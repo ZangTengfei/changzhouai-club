@@ -2,28 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  BarChart3,
-  BookOpenText,
-  ChevronDown,
-  FileText,
-  Info,
-} from "lucide-react";
-import {
-  type FocusEvent,
-  type MouseEvent,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { MobileMenuToggle } from "@/components/mobile-menu-toggle";
 import { SiteAccountEntry } from "@/components/site-account-entry";
 import { SiteLogoMark } from "@/components/site-logo-mark";
-import { SocialPlatformIcon } from "@/components/social-platform-icon";
 import { hasSupabaseEnv } from "@/lib/env";
-import { navItems, siteNameEn, siteRepositoryUrl } from "@/lib/site-data";
+import { navItems, siteNameEn } from "@/lib/site-data";
 import { cssModuleCx } from "@/lib/utils";
 import styles from "./site-header.module.css";
 
@@ -38,10 +23,7 @@ export function SiteHeader() {
   const [authReady, setAuthReady] = useState(!hasSupabaseEnv());
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [docsMenuOpen, setDocsMenuOpen] = useState(false);
   const [pendingNavHref, setPendingNavHref] = useState<string | null>(null);
-  const docsDropdownRef = useRef<HTMLDivElement>(null);
-  const docsTriggerRef = useRef<HTMLAnchorElement>(null);
   const shouldShowJoinButton = authReady && !isAuthenticated;
   const handleAuthStateChange = useCallback((nextIsAuthenticated: boolean) => {
     setIsAuthenticated(nextIsAuthenticated);
@@ -49,7 +31,6 @@ export function SiteHeader() {
   }, []);
   const closeAllMenus = useCallback(() => {
     setMobileMenuOpen(false);
-    setDocsMenuOpen(false);
   }, []);
   const handleNavLinkClick = useCallback((href: string) => {
     if (isMobileNavigationMode()) {
@@ -61,32 +42,7 @@ export function SiteHeader() {
     }
   }, [closeAllMenus, pathname]);
   const handleMobileMenuToggle = useCallback(() => {
-    setMobileMenuOpen((current) => {
-      const nextOpen = !current;
-
-      if (!nextOpen) {
-        setDocsMenuOpen(false);
-      }
-
-      return nextOpen;
-    });
-  }, []);
-  const handleDocsTriggerClick = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
-    if (!isMobileNavigationMode()) {
-      return;
-    }
-
-    event.preventDefault();
-    setDocsMenuOpen((current) => !current);
-  }, []);
-  const handleDocsMenuBlur = useCallback((event: FocusEvent<HTMLDivElement>) => {
-    const nextFocused = event.relatedTarget as Node | null;
-
-    if (nextFocused && event.currentTarget.contains(nextFocused)) {
-      return;
-    }
-
-    setDocsMenuOpen(false);
+    setMobileMenuOpen((current) => !current);
   }, []);
 
   useEffect(() => {
@@ -109,20 +65,13 @@ export function SiteHeader() {
   }, [pendingNavHref]);
 
   useEffect(() => {
-    if (!mobileMenuOpen && !docsMenuOpen) {
+    if (!mobileMenuOpen) {
       return;
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        const shouldFocusDocsTrigger = docsMenuOpen;
-
-        setDocsMenuOpen(false);
         setMobileMenuOpen(false);
-
-        if (shouldFocusDocsTrigger) {
-          docsTriggerRef.current?.focus();
-        }
       }
     };
 
@@ -131,7 +80,7 @@ export function SiteHeader() {
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
     };
-  }, [docsMenuOpen, mobileMenuOpen]);
+  }, [mobileMenuOpen]);
 
   return (
     <header className={cx("site-header")}>
@@ -153,124 +102,9 @@ export function SiteHeader() {
         <nav id="site-navigation" className={cx("nav-links")} aria-label="主导航">
           {navItems.map((item) => {
             const isActive =
-              item.href === "/docs"
-                ? pathname === "/docs" ||
-                  pathname.startsWith("/docs/") ||
-                  pathname === "/about"
-                : item.href === "/"
+              item.href === "/"
                 ? pathname === "/"
                 : pathname === item.href || pathname.startsWith(`${item.href}/`);
-
-            if (item.href === "/docs") {
-              return (
-                <div
-                  key={item.href}
-                  className={cx("nav-dropdown", docsMenuOpen && "nav-dropdown-open")}
-                  ref={docsDropdownRef}
-                  onMouseEnter={() => {
-                    if (isMobileNavigationMode()) {
-                      return;
-                    }
-
-                    setDocsMenuOpen(true);
-                  }}
-                  onMouseLeave={() => {
-                    if (!isMobileNavigationMode()) {
-                      setDocsMenuOpen(false);
-                    }
-                  }}
-                  onBlur={handleDocsMenuBlur}
-                >
-                  <Link
-                    href="/docs"
-                    prefetch={false}
-                    ref={docsTriggerRef}
-                    className={cx(
-                      "nav-dropdown-trigger",
-                      isActive && "nav-link-active",
-                    )}
-                    aria-haspopup="true"
-                    aria-expanded={docsMenuOpen}
-                    aria-controls="docs-navigation-menu"
-                    onClick={handleDocsTriggerClick}
-                    onFocus={() => {
-                      if (isMobileNavigationMode()) {
-                        return;
-                      }
-
-                      setDocsMenuOpen(true);
-                    }}
-                  >
-                    <span>{item.label}</span>
-                    <ChevronDown aria-hidden="true" className={cx("nav-dropdown-chevron")} />
-                  </Link>
-                  <div
-                    id="docs-navigation-menu"
-                    className={cx("nav-dropdown-menu")}
-                    aria-label="社区文档相关链接"
-                  >
-                    <Link
-                      href="/docs"
-                      prefetch={false}
-                      className={cx("nav-dropdown-item mobile-dropdown-item")}
-                      aria-current={pathname === "/docs" ? "page" : undefined}
-                      onClick={() => handleNavLinkClick("/docs")}
-                    >
-                      <FileText aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
-                      <span>文档首页</span>
-                    </Link>
-                    <Link
-                      href="/docs/guides/co-builder-rules"
-                      prefetch={false}
-                      className={cx("nav-dropdown-item")}
-                      aria-current={
-                        pathname === "/docs/guides/co-builder-rules" ? "page" : undefined
-                      }
-                      onClick={() => handleNavLinkClick("/docs/guides/co-builder-rules")}
-                    >
-                      <BookOpenText
-                        aria-hidden="true"
-                        className={cx("nav-dropdown-item-icon")}
-                      />
-                      <span>共建规则</span>
-                    </Link>
-                    <Link
-                      href="/reports"
-                      prefetch={false}
-                      className={cx("nav-dropdown-item")}
-                      aria-current={pathname === "/reports" ? "page" : undefined}
-                      onClick={() => handleNavLinkClick("/reports")}
-                    >
-                      <BarChart3 aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
-                      <span>研究与报告</span>
-                    </Link>
-                    <Link
-                      href="/about"
-                      prefetch={false}
-                      className={cx("nav-dropdown-item")}
-                      aria-current={pathname === "/about" ? "page" : undefined}
-                      onClick={() => handleNavLinkClick("/about")}
-                    >
-                      <Info aria-hidden="true" className={cx("nav-dropdown-item-icon")} />
-                      <span>关于我们</span>
-                    </Link>
-                    <Link
-                      href={siteRepositoryUrl}
-                      className={cx("nav-dropdown-item")}
-                      target="_blank"
-                      rel="noreferrer"
-                      onClick={closeAllMenus}
-                    >
-                      <SocialPlatformIcon
-                        tone="github"
-                        className={cx("nav-dropdown-item-icon")}
-                      />
-                      <span>开源仓库</span>
-                    </Link>
-                  </div>
-                </div>
-              );
-            }
 
             return (
               <Link

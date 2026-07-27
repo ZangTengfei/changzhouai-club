@@ -1,18 +1,9 @@
 import type { NextConfig } from "next";
-import nextra from "nextra";
 import { randomUUID } from "node:crypto";
 
 type RemotePattern = NonNullable<
   NonNullable<NextConfig["images"]>["remotePatterns"]
 >[number];
-
-const withNextra = nextra({
-  contentDirBasePath: "/docs",
-  defaultShowCopyCode: true,
-  search: {
-    codeblocks: false,
-  },
-});
 
 const SUPABASE_STORAGE_PATHS = [
   "/storage/v1/object/public/**",
@@ -105,4 +96,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withNextra(nextConfig);
+export default nextConfig;

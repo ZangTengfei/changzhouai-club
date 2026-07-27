@@ -20,16 +20,6 @@ const routes = [
   "/reports/opc-package-survey",
   "/reports/training-demand-survey",
   "/faq",
-  "/docs",
-  "/docs/getting-started",
-  "/docs/agents/install-guide",
-  "/docs/agents/codex-guide",
-  "/docs/events/2026-03-21-ai-salon",
-  "/docs/events/2026-04-11-gov-ai-salon",
-  "/docs/events/2026-04-25-ai-salon",
-  "/docs/events/2026-05-23-jintan-opc-salon",
-  "/docs/guides/co-build-workflow",
-  "/docs/contributing",
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {

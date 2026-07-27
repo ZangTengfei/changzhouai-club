@@ -4,7 +4,6 @@ import Link from "next/link";
 import {
   ArrowRight,
   BadgeCheck,
-  BookOpenText,
   CheckCircle2,
   Clock3,
   IdCard,
@@ -26,7 +25,6 @@ export const metadata: Metadata = {
 };
 
 const onboardingPath = "/account?onboarding=1";
-const coBuilderRulesPath = "/docs/guides/co-builder-rules";
 
 const requiredFields = [
   {
@@ -54,9 +52,9 @@ const optionalFields = [
 
 const coBuilderSignals = [
   {
-    title: "先读规则",
-    summary: "了解共建者能做什么、不能代表社区承诺什么，以及贡献如何被看见。",
-    icon: BookOpenText,
+    title: "说明参与方向",
+    summary: "在个人资料中说明你愿意参与的工作，以及目前可以投入的时间。",
+    icon: MessageCircle,
   },
   {
     title: "表达意向",
@@ -222,15 +220,11 @@ export default async function JoinPage() {
           <h2 id="co-builder-title">想参与社区共建？</h2>
           <p>
             如果你愿意参与活动组织、内容输出、项目协作、资料整理或社群运营，
-            可以先阅读共建者协作规则，再在个人资料里补充你的方向和可投入时间。
+            可以在个人资料里补充你的方向和可投入时间，从一件具体的小任务开始。
           </p>
 
           <div className={styles.coBuilderActions}>
-            <Link href={coBuilderRulesPath} prefetch={false} className="button home-primary-button">
-              阅读共建规则
-              <BookOpenText aria-hidden="true" strokeWidth={2} />
-            </Link>
-            <Link href={primaryHref} prefetch={false} className="button home-ghost-button">
+            <Link href={primaryHref} prefetch={false} className="button home-primary-button">
               报名参与共建
               <ArrowRight aria-hidden="true" strokeWidth={2} />
             </Link>

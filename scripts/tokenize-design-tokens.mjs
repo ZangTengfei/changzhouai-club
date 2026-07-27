@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // 设计令牌批量替换(DS-03 圆角 / DS-04 阴影 / DS-07 断点)
 // 仅处理前台 site 范围(src/app/(site)、src/components、src/app/globals.css),
-// 排除 admin/docs(它们有独立 --admin-* / --docs-* 子主题)。
+// 排除 admin（它有独立 --admin-* 子主题）。
 // 用法: node scripts/tokenize-design-tokens.mjs [radius|breakpoints|shadow|all]
 // 幂等:已令牌化的声明不会被再次匹配。
 

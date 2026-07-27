@@ -92,8 +92,7 @@ export default async function EventDetailPage({
   const hasRecap = event.recapParagraphs.length > 0;
   const hasRelatedUpdates = relatedUpdates.length > 0;
   const statusTone = statusToneMap[event.status] ?? "green";
-  const eventDocsHref = event.docsUrl;
-  const isExternalDocsHref = eventDocsHref?.startsWith("http") ?? false;
+  const eventDocsHref = event.docsUrl?.startsWith("http") ? event.docsUrl : null;
   const videoPosterUrl = event.video?.coverUrl
     ? getEventImageUrl(event.video.coverUrl, "event-detail-hero") ?? event.video.coverUrl
     : undefined;
@@ -377,8 +376,8 @@ export default async function EventDetailPage({
               {eventDocsHref ? (
                 <li>
                   <FileText aria-hidden="true" strokeWidth={1.8} />
-                  <span>完整纪要</span>
-                  <strong>已整理到文档</strong>
+                  <span>活动资料</span>
+                  <strong>已发布</strong>
                 </li>
               ) : null}
               {event.video ? (
@@ -407,22 +406,15 @@ export default async function EventDetailPage({
                 返回活动列表
               </Link>
               {eventDocsHref ? (
-                isExternalDocsHref ? (
-                  <a
-                    href={eventDocsHref}
-                    className="button home-primary-button"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    阅读完整纪要
-                    <ArrowRight aria-hidden="true" strokeWidth={2} />
-                  </a>
-                ) : (
-                  <Link href={eventDocsHref} className="button home-primary-button">
-                    阅读完整纪要
-                    <ArrowRight aria-hidden="true" strokeWidth={2} />
-                  </Link>
-                )
+                <a
+                  href={eventDocsHref}
+                  className="button home-primary-button"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  查看活动资料
+                  <ArrowRight aria-hidden="true" strokeWidth={2} />
+                </a>
               ) : null}
               {event.status === "completed" ? (
                 <Link href="/archive" className="button home-ghost-button">

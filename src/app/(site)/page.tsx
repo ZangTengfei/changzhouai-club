@@ -30,7 +30,6 @@ import styles from "./home-page.module.css";
 
 const cx = cssModuleCx.bind(null, styles);
 const HERO_CAROUSEL_IMAGE_LIMIT = 3;
-const CO_BUILDER_RULES_PATH = "/docs/guides/co-builder-rules";
 
 function formatMetricDate(isoDate: string | null) {
   if (!isoDate) {
@@ -634,10 +633,6 @@ export default async function HomePage() {
               <span>位成员已加入我们</span>
             </div>
           </div>
-          <Link href={CO_BUILDER_RULES_PATH} prefetch={false} className={cx("home-join-banner-rule-link")}>
-            想参与社区共建？查看协作规则
-            <ArrowRight aria-hidden="true" strokeWidth={2} />
-          </Link>
         </div>
 
         <div className={cx("home-join-banner-illustration")} aria-hidden="true">

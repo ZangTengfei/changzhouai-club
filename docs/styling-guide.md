@@ -43,7 +43,6 @@ Tailwind 的 `rounded-*` 与设计的 `--radius-*` **有意保持两套不同值
 | 子主题 | 位置 | 处理原则 |
 |---|---|---|
 | admin | `src/app/admin/admin-layout.module.css`(`--admin-*`) | token 尽量引用全局(已收敛 `--admin-border`/`--admin-radius-sm`);保留后台特有的紧凑圆角 `--admin-radius-lg: 22px` |
-| docs | `src/app/docs/`(`--docs-*` + nextra) | **独立体系,勿收敛**——docs 用 nextra 的中性灰蓝调,与品牌暖绿正交 |
 | deck | `reports/opc-community-funding/`(`--deck-*`) | `--deck-green`/`--deck-orange` 已引用全局 `--accent`/`--accent-warm`;`--deck-blue` 是演示稿独有色,保留 |
 
 ## 四、新增样式决策树
