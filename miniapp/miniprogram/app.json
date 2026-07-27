@@ -1,10 +1,8 @@
 {
   "pages": [
     "pages/home/index",
-    "pages/news/index",
     "pages/events/index",
     "pages/me/index",
-    "pages/news/detail/index",
     "pages/events/detail/index",
     "pages/profile/edit/index",
     "pages/registrations/index",
@@ -30,12 +28,6 @@
         "text": "首页",
         "iconPath": "assets/icons/home-tab-v2.png",
         "selectedIconPath": "assets/icons/home-tab-active-v2.png"
-      },
-      {
-        "pagePath": "pages/news/index",
-        "text": "资讯",
-        "iconPath": "assets/icons/news-tab-v2.png",
-        "selectedIconPath": "assets/icons/news-tab-active-v2.png"
       },
       {
         "pagePath": "pages/events/index",

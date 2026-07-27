@@ -49,10 +49,6 @@
   background: var(--color-blue-soft);
 }
 
-.privacy-section-purple {
-  background: var(--color-purple-soft);
-}
-
 .privacy-section-orange {
   background: var(--color-orange-soft);
 }
