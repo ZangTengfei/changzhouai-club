@@ -13,6 +13,7 @@ const adminLandingCandidates = [
   { href: "/admin/leads", permission: "leads.read" },
   { href: "/admin/sponsors", permission: "sponsors.read" },
   { href: "/admin/social", permission: "social.write" },
+  { href: "/admin/settings", permission: "system.manage_settings" },
 ] as const;
 
 export default async function AdminPage() {

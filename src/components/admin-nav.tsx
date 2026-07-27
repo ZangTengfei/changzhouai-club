@@ -11,6 +11,7 @@ import {
   Handshake,
   MessagesSquare,
   Newspaper,
+  Settings2,
   Share2,
   Users,
 } from "lucide-react";
@@ -108,6 +109,18 @@ const adminNavGroups: AdminNavGroup[] = [
         label: "赞助者",
         icon: BadgeCheck,
         permissions: ["sponsors.read"],
+      },
+    ],
+  },
+  {
+    id: "system",
+    label: "系统",
+    items: [
+      {
+        href: "/admin/settings",
+        label: "站点设置",
+        icon: Settings2,
+        permissions: ["system.manage_settings"],
       },
     ],
   },

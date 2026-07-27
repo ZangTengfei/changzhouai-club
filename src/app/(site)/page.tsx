@@ -20,6 +20,10 @@ import {
   getHomeCompletedEventsCount,
   getHomeScheduledEvents,
 } from "@/lib/community-events";
+import {
+  formatCommunityMemberCount,
+  getCommunityMemberCount,
+} from "@/lib/community-metrics";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import { getHomeCommunityUpdates } from "@/lib/community-updates";
 import { getEventImageUrl } from "@/lib/public-image-url";
@@ -146,13 +150,18 @@ export default async function HomePage() {
     recentCommunityUpdates,
     completedEventsCount,
     directory,
+    communityMemberCount,
   ] = await Promise.all([
     getHomeScheduledEvents(),
     getHomeCompletedEventRecaps(),
     getHomeCommunityUpdates(),
     getHomeCompletedEventsCount(),
     getPublicMembersDirectory(),
+    getCommunityMemberCount(),
   ]);
+  const communityMemberCountLabel = formatCommunityMemberCount(
+    communityMemberCount,
+  );
   const primaryScheduledEvent = scheduledEvents[0];
   const hasUpcomingEvent = Boolean(primaryScheduledEvent);
   const latestCompletedEvent = recentCompletedEvents[0];
@@ -189,7 +198,7 @@ export default async function HomePage() {
     .slice(0, 6);
   const communityStats = [
     {
-      value: "300+",
+      value: communityMemberCountLabel,
       label: "全网成员",
       detail: "本地 AI 从业者与爱好者",
       icon: "people",
@@ -316,7 +325,7 @@ export default async function HomePage() {
             </div>
             <div className={cx("home-member-proof-copy")}>
               <span className={cx("home-member-proof-line")}>
-                <strong>300+</strong>
+                <strong>{communityMemberCountLabel}</strong>
                 <span>位成员已加入我们</span>
               </span>
               <small>期待你的加入！</small>
@@ -629,7 +638,7 @@ export default async function HomePage() {
               <span aria-hidden="true">→</span>
             </Link>
             <div className={cx("home-join-banner-proof")}>
-              <strong>300+</strong>
+              <strong>{communityMemberCountLabel}</strong>
               <span>位成员已加入我们</span>
             </div>
           </div>

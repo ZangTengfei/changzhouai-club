@@ -1,9 +1,14 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { recordAdminAuditLog } from "@/lib/admin/audit";
 import { normalizeAdminEventDateTime } from "@/lib/admin/event-datetime";
+import {
+  COMMUNITY_MEMBER_COUNT_KEY,
+  COMMUNITY_METRICS_CACHE_TAG,
+} from "@/lib/community-metrics";
 import { normalizeEventType } from "@/lib/event-type";
 import { canAdmin, requireAdminPermission } from "@/lib/supabase/guards";
 
@@ -11,6 +16,7 @@ const ADMIN_EVENTS_PATH = "/admin/events";
 const ADMIN_LEADS_PATH = "/admin/leads";
 const ADMIN_MEMBERS_PATH = "/admin/members";
 const ADMIN_PROJECTS_PATH = "/admin/projects";
+const ADMIN_SETTINGS_PATH = "/admin/settings";
 const ADMIN_SOCIAL_PATH = "/admin/social";
 const ADMIN_UPDATES_PATH = "/admin/updates";
 const ADMIN_WORKS_PATH = "/admin/works";
@@ -286,6 +292,54 @@ function revalidateWorkPaths(memberId?: string) {
   if (memberId) {
     revalidatePath(`/members/${memberId}`);
   }
+}
+
+export async function saveAdminCommunityMemberCount(formData: FormData) {
+  const { supabase, user } = await requireAdminPermission(
+    "system.manage_settings",
+  );
+  const rawMemberCount = String(formData.get("member_count") ?? "").trim();
+  const memberCount = Number(rawMemberCount);
+
+  if (
+    !Number.isInteger(memberCount) ||
+    memberCount < 0 ||
+    memberCount > 1_000_000
+  ) {
+    redirect(`${ADMIN_SETTINGS_PATH}?error=invalid_member_count`);
+  }
+
+  const { data: beforeMetric } = await supabase
+    .from("community_metrics")
+    .select("numeric_value")
+    .eq("metric_key", COMMUNITY_MEMBER_COUNT_KEY)
+    .maybeSingle();
+  const { error } = await supabase.from("community_metrics").upsert(
+    {
+      metric_key: COMMUNITY_MEMBER_COUNT_KEY,
+      numeric_value: memberCount,
+      updated_by: user.id,
+    },
+    { onConflict: "metric_key" },
+  );
+
+  if (error) {
+    redirect(`${ADMIN_SETTINGS_PATH}?error=database_write_failed`);
+  }
+
+  await recordAdminAuditLog(supabase, {
+    actorId: user.id,
+    action: "community_metric.update",
+    resourceType: "community_metric",
+    resourceId: COMMUNITY_MEMBER_COUNT_KEY,
+    beforeSnapshot: beforeMetric ?? null,
+    afterSnapshot: { numeric_value: memberCount },
+  });
+
+  updateTag(COMMUNITY_METRICS_CACHE_TAG);
+  revalidatePath("/");
+  revalidatePath("/cooperate");
+  redirect(`${ADMIN_SETTINGS_PATH}?saved=member_count`);
 }
 
 export async function saveAdminEvent(formData: FormData) {

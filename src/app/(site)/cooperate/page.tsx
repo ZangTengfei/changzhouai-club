@@ -11,6 +11,10 @@ import { RevealImage } from "@/components/reveal-image";
 
 import { submitCooperationLead } from "@/app/(site)/cooperate/actions";
 import { ToneBadge } from "@/components/tone-badge";
+import {
+  formatCommunityMemberCount,
+  getCommunityMemberCount,
+} from "@/lib/community-metrics";
 import { getCurrentWechatQrCode } from "@/lib/community-social";
 import { cooperationAreas } from "@/lib/site-data";
 
@@ -62,10 +66,14 @@ export default async function CooperatePage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const [params, wechatQrCode] = await Promise.all([
+  const [params, wechatQrCode, communityMemberCount] = await Promise.all([
     searchParams,
     getCurrentWechatQrCode(),
+    getCommunityMemberCount(),
   ]);
+  const communityMemberCountLabel = formatCommunityMemberCount(
+    communityMemberCount,
+  );
   const errorMessage = getStatusMessage(params.error);
 
   return (
@@ -232,7 +240,7 @@ export default async function CooperatePage({
           <div className={styles.joinBannerInfo}>
             <span>社区官方微信</span>
             <strong>{wechatQrCode?.title ?? "常州 AI Club 官方微信"}</strong>
-            <small>300+ 位成员</small>
+            <small>{communityMemberCountLabel} 位成员</small>
             <p>添加好友・备注来意・邀请进群</p>
           </div>
         </div>
