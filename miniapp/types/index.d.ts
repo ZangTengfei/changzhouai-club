@@ -14,6 +14,7 @@ interface MiniappUser {
   capabilityProfileComplete: boolean;
   profileCompletion: MiniappProfileCompletion;
   channels: string[];
+  accountRecoveryAvailable: boolean;
   stats: {
     registrationCount: number;
     attendanceCount: number;
@@ -94,6 +95,20 @@ interface MiniappProfileUpdate {
   willingToJoinProjects: boolean;
   isPubliclyVisible: boolean;
   privacyAccepted: boolean;
+}
+
+interface MiniappAccountRecoveryAccount {
+  avatarUrl: string | null;
+  displayName: string | null;
+  registrationCount: number;
+  wechat: string | null;
+  workCount: number;
+}
+
+interface MiniappAccountRecoveryPreview {
+  targetEmail: string;
+  currentAccount: MiniappAccountRecoveryAccount;
+  oldAccount: MiniappAccountRecoveryAccount;
 }
 
 type MiniappNewsMode = "selected" | "all";

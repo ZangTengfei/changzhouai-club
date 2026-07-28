@@ -13,6 +13,7 @@ Page({
     loading: true,
     loadFailed: false,
     submitting: false,
+    accountRecoveryAvailable: false,
   },
 
   onShow() {
@@ -29,6 +30,7 @@ Page({
         linkedChannels: user.channels.map(
           (channel) => channelLabels[channel] ?? channel,
         ),
+        accountRecoveryAvailable: user.accountRecoveryAvailable,
         loading: false,
       });
     } catch {
@@ -42,6 +44,10 @@ Page({
 
   openPrivacy() {
     void wx.navigateTo({ url: "/pages/privacy/index" });
+  },
+
+  openAccountRecovery() {
+    void wx.navigateTo({ url: "/pages/account-recovery/index" });
   },
 
   handleLogout() {

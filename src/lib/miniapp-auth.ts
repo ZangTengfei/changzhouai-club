@@ -2,6 +2,7 @@ import { createHash, randomBytes, randomUUID } from "crypto";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { isMiniappAccountRecoveryAvailable } from "@/lib/account-recovery";
 import {
   getMiniappProfileCompletion,
   isMiniappRegistrationReady,
@@ -452,6 +453,7 @@ export async function loadMiniappAccountSnapshot(
     registrationResult,
     attendanceResult,
     badgeResult,
+    accountRecoveryAvailable,
   ] = await Promise.all([
     supabase
       .from("profiles")
@@ -493,6 +495,7 @@ export async function loadMiniappAccountSnapshot(
       .select("badge_code, label, description, source, awarded_at")
       .eq("user_id", userId)
       .order("awarded_at", { ascending: false }),
+    isMiniappAccountRecoveryAvailable(supabase, userId).catch(() => false),
   ]);
 
   if (
@@ -669,6 +672,7 @@ export async function loadMiniappAccountSnapshot(
     capabilityProfileComplete: profileCompletion.completed,
     profileCompletion,
     channels,
+    accountRecoveryAvailable,
     stats: {
       registrationCount: registrations.length,
       attendanceCount,

@@ -1,0 +1,95 @@
+<view class="page-shell recovery-page">
+  <view class="recovery-hero">
+    <text class="recovery-kicker">账号连接</text>
+    <text class="recovery-title">找回旧账号</text>
+    <text class="recovery-copy">验证以前使用的 Google 或邮箱账号。合并后，旧账号保留为主账号，微信成为新的登录方式。</text>
+    <view class="step-list" aria-label="账号找回进度">
+      <text class="step-item active">1 邮箱</text>
+      <text class="step-line {{step !== 'email' ? 'active' : ''}}"></text>
+      <text class="step-item {{step !== 'email' ? 'active' : ''}}">2 验证</text>
+      <text class="step-line {{step === 'preview' ? 'active' : ''}}"></text>
+      <text class="step-item {{step === 'preview' ? 'active' : ''}}">3 合并</text>
+    </view>
+  </view>
+
+  <view wx:if="{{step === 'email'}}" class="recovery-card">
+    <text class="card-title">输入原账号邮箱</text>
+    <text class="card-copy">用于证明旧账号属于你。发送前不会展示这个邮箱是否存在。</text>
+    <input class="recovery-input" type="text" value="{{email}}" placeholder="name@example.com" confirm-type="done" bindinput="handleEmailInput" bindconfirm="submitEmail" aria-label="原账号邮箱" />
+    <button class="primary-button" loading="{{pending}}" disabled="{{pending}}" bindtap="submitEmail">发送验证邮件</button>
+  </view>
+
+  <view wx:elif="{{step === 'code'}}" class="recovery-card">
+    <text class="card-title">输入 6 位验证码</text>
+    <text class="card-copy">验证邮件已发送至 {{email}}。请返回小程序输入邮件里的数字验证码。</text>
+    <input class="recovery-input code-input" type="number" value="{{code}}" maxlength="6" placeholder="000000" confirm-type="done" bindinput="handleCodeInput" bindconfirm="submitCode" aria-label="六位验证码" />
+    <button class="primary-button" loading="{{pending}}" disabled="{{pending}}" bindtap="submitCode">验证并查看合并预览</button>
+    <button class="text-button" disabled="{{pending}}" bindtap="backToEmail">更换邮箱或重新发送</button>
+  </view>
+
+  <block wx:elif="{{step === 'preview' && preview}}">
+    <view class="account-preview-grid">
+      <view class="account-preview old-account">
+        <text class="account-label">原账号 · 合并后保留</text>
+        <view class="account-identity">
+          <image wx:if="{{preview.oldAccount.avatarUrl}}" class="account-avatar" src="{{preview.oldAccount.avatarUrl}}" mode="aspectFill" />
+          <view wx:else class="account-avatar account-avatar-empty">{{oldInitial}}</view>
+          <text class="account-name">{{preview.oldAccount.displayName || '原账号用户'}}</text>
+        </view>
+        <text class="account-meta">{{preview.oldAccount.registrationCount}} 条报名 · {{preview.oldAccount.workCount}} 个作品</text>
+        <text class="verified-email">已验证 {{preview.targetEmail}}</text>
+      </view>
+      <view class="account-preview current-account">
+        <text class="account-label">当前微信账号 · 资料并入</text>
+        <view class="account-identity">
+          <image wx:if="{{preview.currentAccount.avatarUrl}}" class="account-avatar" src="{{preview.currentAccount.avatarUrl}}" mode="aspectFill" />
+          <view wx:else class="account-avatar account-avatar-empty">{{currentInitial}}</view>
+          <text class="account-name">{{preview.currentAccount.displayName || '微信用户'}}</text>
+        </view>
+        <text class="account-meta">{{preview.currentAccount.registrationCount}} 条报名 · {{preview.currentAccount.workCount}} 个作品</text>
+      </view>
+    </view>
+
+    <view wx:if="{{displayNameConflict || avatarConflict || wechatConflict}}" class="recovery-card choice-card">
+      <text class="card-title">选择保留的资料</text>
+      <text class="card-copy">默认保留原账号信息，你也可以选择当前微信账号的内容。</text>
+
+      <view wx:if="{{displayNameConflict}}" class="choice-group">
+        <text class="choice-label">昵称</text>
+        <view class="choice-option {{choices.displayName === 'target' ? 'selected' : ''}}" data-field="displayName" data-value="target" bindtap="chooseValue" role="button" aria-label="保留原账号昵称">
+          <text>原账号</text><text>{{preview.oldAccount.displayName}}</text>
+        </view>
+        <view class="choice-option {{choices.displayName === 'source' ? 'selected' : ''}}" data-field="displayName" data-value="source" bindtap="chooseValue" role="button" aria-label="使用当前微信账号昵称">
+          <text>当前微信</text><text>{{preview.currentAccount.displayName}}</text>
+        </view>
+      </view>
+
+      <view wx:if="{{avatarConflict}}" class="choice-group">
+        <text class="choice-label">头像</text>
+        <view class="avatar-choice-row">
+          <view class="avatar-choice {{choices.avatarUrl === 'target' ? 'selected' : ''}}" data-field="avatarUrl" data-value="target" bindtap="chooseValue" role="button" aria-label="保留原账号头像"><image src="{{preview.oldAccount.avatarUrl}}" mode="aspectFill" /><text>原账号</text></view>
+          <view class="avatar-choice {{choices.avatarUrl === 'source' ? 'selected' : ''}}" data-field="avatarUrl" data-value="source" bindtap="chooseValue" role="button" aria-label="使用当前微信账号头像"><image src="{{preview.currentAccount.avatarUrl}}" mode="aspectFill" /><text>当前微信</text></view>
+        </view>
+      </view>
+
+      <view wx:if="{{wechatConflict}}" class="choice-group">
+        <text class="choice-label">微信号</text>
+        <view class="choice-option {{choices.wechat === 'target' ? 'selected' : ''}}" data-field="wechat" data-value="target" bindtap="chooseValue" role="button" aria-label="保留原账号微信号">
+          <text>原账号</text><text>{{preview.oldAccount.wechat}}</text>
+        </view>
+        <view class="choice-option {{choices.wechat === 'source' ? 'selected' : ''}}" data-field="wechat" data-value="source" bindtap="chooseValue" role="button" aria-label="使用当前微信账号微信号">
+          <text>当前微信</text><text>{{preview.currentAccount.wechat}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="merge-note">
+      <text>活动记录、作品、能力档案会合并；技能和兴趣会自动去重。</text>
+      <text>这是账号归并操作，完成后不能在小程序内自行拆分。</text>
+    </view>
+    <button class="primary-button merge-button" loading="{{pending}}" disabled="{{pending}}" bindtap="confirmMerge">确认合并账号</button>
+  </block>
+
+  <view wx:if="{{message}}" class="feedback-message">{{message}}</view>
+  <view wx:if="{{error}}" class="feedback-message feedback-error">{{error}}</view>
+</view>

@@ -65,6 +65,19 @@ try {
   if (sessionError) throw sessionError;
   const authHeaders = { Authorization: `Bearer ${token}` };
 
+  const { error: identityError } = await supabase
+    .from("user_identities")
+    .insert({
+      user_id: userId,
+      provider: "wechat",
+      provider_app_id: "miniapp-experience-verifier",
+      provider_user_id: randomUUID(),
+      provider_channel: "mini_program",
+      identity_data: {},
+      last_seen_at: new Date().toISOString(),
+    });
+  if (identityError) throw identityError;
+
   const unauthorized = await request("/api/miniapp/profile");
   assert.equal(unauthorized.response.status, 401);
   pass("unauthorized_session_rejected");
@@ -277,7 +290,65 @@ try {
         footprint.id === event.id && footprint.participationLabel === "已参加",
     ),
   );
+  assert.equal(accountSnapshot.body?.user?.accountRecoveryAvailable, true);
   pass("member_growth_snapshot_loaded");
+
+  const invalidRecoveryStart = await request(
+    "/api/miniapp/account-recovery/start",
+    {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({ email: "invalid-email" }),
+    },
+  );
+  assert.equal(invalidRecoveryStart.response.status, 400);
+  assert.equal(invalidRecoveryStart.body?.error, "invalid_email");
+
+  const recoveryToken = randomBytes(32).toString("base64url");
+  const { error: recoveryIntentError } = await supabase
+    .from("account_recovery_intents")
+    .insert({
+      token_hash: createHash("sha256").update(recoveryToken).digest("hex"),
+      source_user_id: userId,
+      target_email_hash: createHash("sha256")
+        .update(email.toLowerCase())
+        .digest("hex"),
+      expires_at: new Date(Date.now() + 15 * 60 * 1_000).toISOString(),
+    });
+  if (recoveryIntentError) throw recoveryIntentError;
+
+  const invalidRecoveryCode = await request(
+    "/api/miniapp/account-recovery/verify",
+    {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({
+        code: "000000",
+        email,
+        recoveryToken,
+      }),
+    },
+  );
+  assert.equal(invalidRecoveryCode.response.status, 400);
+  assert.equal(
+    invalidRecoveryCode.body?.error,
+    "invalid_verification_code",
+  );
+
+  const unverifiedRecoveryConfirm = await request(
+    "/api/miniapp/account-recovery/confirm",
+    {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({ recoveryToken, choices: {} }),
+    },
+  );
+  assert.equal(unverifiedRecoveryConfirm.response.status, 409);
+  assert.equal(
+    unverifiedRecoveryConfirm.body?.error,
+    "account_merge_failed",
+  );
+  pass("account_recovery_guards_enforced");
 
   const registrations = await request("/api/miniapp/registrations", {
     headers: authHeaders,

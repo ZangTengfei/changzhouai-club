@@ -1,0 +1,261 @@
+.recovery-page {
+  padding-top: 26rpx;
+}
+
+.recovery-hero {
+  display: flex;
+  flex-direction: column;
+  gap: 10rpx;
+  padding: 30rpx;
+  border: 2rpx solid #dcefe5;
+  border-radius: var(--radius-card);
+  background: var(--color-green-soft);
+}
+
+.recovery-kicker {
+  color: var(--color-green-dark);
+  font-size: 22rpx;
+  font-weight: 760;
+}
+
+.recovery-title {
+  font-size: 42rpx;
+  font-weight: 830;
+}
+
+.recovery-copy,
+.card-copy {
+  color: var(--color-subtle);
+  font-size: 24rpx;
+  line-height: 1.6;
+}
+
+.step-list {
+  display: flex;
+  align-items: center;
+  margin-top: 18rpx;
+}
+
+.step-item {
+  color: var(--color-subtle);
+  font-size: 20rpx;
+  font-weight: 720;
+}
+
+.step-item.active {
+  color: var(--color-green-dark);
+}
+
+.step-line {
+  height: 4rpx;
+  flex: 1;
+  margin: 0 12rpx;
+  border-radius: 2rpx;
+  background: #cfe4d8;
+}
+
+.step-line.active {
+  background: var(--color-green);
+}
+
+.recovery-card {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  margin-top: 24rpx;
+  padding: 28rpx;
+  border: 2rpx solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: #ffffff;
+  box-shadow: var(--shadow-card);
+}
+
+.card-title {
+  font-size: 30rpx;
+  font-weight: 790;
+}
+
+.recovery-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 92rpx;
+  padding: 0 24rpx;
+  border: 2rpx solid var(--color-line);
+  border-radius: var(--radius-control);
+  background: #f8faf9;
+  font-size: 28rpx;
+}
+
+.code-input {
+  letter-spacing: 14rpx;
+  text-align: center;
+}
+
+.text-button {
+  min-height: 72rpx;
+  margin: 0;
+  background: transparent;
+  color: var(--color-green-dark);
+  font-size: 24rpx;
+}
+
+.text-button::after {
+  border: 0;
+}
+
+.account-preview-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  margin-top: 24rpx;
+}
+
+.account-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  padding: 26rpx;
+  border: 2rpx solid #dcefe5;
+  border-radius: 28rpx;
+  background: var(--color-green-soft);
+}
+
+.current-account {
+  border-color: #e3ddff;
+  background: var(--color-purple-soft);
+}
+
+.account-label {
+  color: var(--color-green-dark);
+  font-size: 21rpx;
+  font-weight: 760;
+}
+
+.current-account .account-label {
+  color: var(--color-purple);
+}
+
+.account-identity {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.account-avatar {
+  display: flex;
+  width: 72rpx;
+  height: 72rpx;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 3rpx solid #ffffff;
+  border-radius: 50%;
+  background: #ffffff;
+}
+
+.account-avatar-empty {
+  color: var(--color-green-dark);
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.account-name {
+  font-size: 30rpx;
+  font-weight: 790;
+}
+
+.account-meta,
+.verified-email {
+  color: var(--color-subtle);
+  font-size: 22rpx;
+}
+
+.verified-email {
+  color: var(--color-green-dark);
+  font-weight: 680;
+}
+
+.choice-card {
+  box-shadow: none;
+}
+
+.choice-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12rpx;
+  padding-top: 18rpx;
+  border-top: 2rpx solid var(--color-line);
+}
+
+.choice-label {
+  font-size: 24rpx;
+  font-weight: 760;
+}
+
+.choice-option {
+  display: flex;
+  min-height: 76rpx;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+  padding: 0 20rpx;
+  border: 2rpx solid var(--color-line);
+  border-radius: 22rpx;
+  color: var(--color-subtle);
+  font-size: 23rpx;
+}
+
+.choice-option.selected,
+.avatar-choice.selected {
+  border-color: var(--color-green);
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
+}
+
+.avatar-choice-row {
+  display: flex;
+  gap: 14rpx;
+}
+
+.avatar-choice {
+  display: flex;
+  min-height: 124rpx;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  border: 2rpx solid var(--color-line);
+  border-radius: 22rpx;
+  color: var(--color-subtle);
+  font-size: 21rpx;
+}
+
+.avatar-choice image {
+  width: 62rpx;
+  height: 62rpx;
+  border-radius: 50%;
+}
+
+.merge-note,
+.feedback-message {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  margin-top: 22rpx;
+  padding: 22rpx;
+  border-radius: 24rpx;
+  background: var(--color-yellow-soft);
+  color: var(--color-muted);
+  font-size: 22rpx;
+  line-height: 1.6;
+}
+
+.feedback-error {
+  background: #fff1ee;
+  color: #a73b2f;
+}
+
+.merge-button {
+  margin-top: 22rpx;
+}

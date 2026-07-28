@@ -38,6 +38,10 @@ export type AccountRecoveryPreview = {
   };
 };
 
+type RecoveryPreviewOptions = {
+  expectedSourceUserId?: string;
+};
+
 export function normalizeRecoveryEmail(value: string) {
   return value.trim().toLowerCase();
 }
@@ -70,6 +74,37 @@ export function maskEmail(email: string) {
   return `${visible}${"*".repeat(Math.max(2, localPart.length - visible.length))}@${domain}`;
 }
 
+export async function isMiniappAccountRecoveryAvailable(
+  admin: SupabaseClient,
+  userId: string,
+) {
+  const [canonicalUserId, identityResult, mergeAuditResult] =
+    await Promise.all([
+      resolveCommunityUserId(admin, userId),
+      admin
+        .from("user_identities")
+        .select("user_id")
+        .eq("user_id", userId)
+        .eq("provider", "wechat")
+        .limit(1)
+        .maybeSingle(),
+      admin
+        .from("account_merge_audits")
+        .select("id", { count: "exact", head: true })
+        .or(`source_user_id.eq.${userId},target_user_id.eq.${userId}`),
+    ]);
+
+  if (identityResult.error || mergeAuditResult.error) {
+    throw new Error("recovery_availability_failed");
+  }
+
+  return Boolean(
+    canonicalUserId === userId &&
+      identityResult.data &&
+      (mergeAuditResult.count ?? 0) === 0,
+  );
+}
+
 async function loadRecoveryIntent(
   admin: SupabaseClient,
   recoveryToken: string,
@@ -99,6 +134,19 @@ async function loadRecoveryIntent(
   }
 
   return data;
+}
+
+export async function assertAccountRecoveryIntentSource(
+  admin: SupabaseClient,
+  recoveryToken: string,
+  sourceUserId: string,
+) {
+  const intent = await loadRecoveryIntent(admin, recoveryToken);
+  if (intent.source_user_id !== sourceUserId) {
+    throw new Error("recovery_source_mismatch");
+  }
+
+  return intent;
 }
 
 async function loadProfile(admin: SupabaseClient, userId: string) {
@@ -141,11 +189,14 @@ export async function loadAccountRecoveryPreview(
   admin: SupabaseClient,
   recoveryToken: string,
   targetUser: User,
+  options: RecoveryPreviewOptions = {},
 ): Promise<AccountRecoveryPreview> {
   const intent = await loadRecoveryIntent(admin, recoveryToken);
   const targetEmail = normalizeRecoveryEmail(targetUser.email ?? "");
 
   if (
+    (options.expectedSourceUserId &&
+      intent.source_user_id !== options.expectedSourceUserId) ||
     !targetEmail ||
     !targetUser.email_confirmed_at ||
     sha256Hex(targetEmail) !== intent.target_email_hash ||
@@ -154,16 +205,26 @@ export async function loadAccountRecoveryPreview(
     throw new Error("recovery_target_mismatch");
   }
 
-  const [canonicalTargetId, sourceUserResult] = await Promise.all([
-    resolveCommunityUserId(admin, targetUser.id),
-    admin.auth.admin.getUserById(intent.source_user_id),
-  ]);
+  const [canonicalTargetId, sourceUserResult, miniappIdentityResult] =
+    await Promise.all([
+      resolveCommunityUserId(admin, targetUser.id),
+      admin.auth.admin.getUserById(intent.source_user_id),
+      admin
+        .from("user_identities")
+        .select("user_id")
+        .eq("user_id", intent.source_user_id)
+        .eq("provider", "wechat")
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
   if (
     canonicalTargetId !== targetUser.id ||
     sourceUserResult.error ||
     !sourceUserResult.data.user ||
-    !isWechatAuthUser(sourceUserResult.data.user)
+    miniappIdentityResult.error ||
+    (!isWechatAuthUser(sourceUserResult.data.user) &&
+      !miniappIdentityResult.data)
   ) {
     throw new Error("recovery_accounts_not_mergeable");
   }
@@ -192,11 +253,13 @@ export async function bindRecoveryIntentTarget(
   admin: SupabaseClient,
   recoveryToken: string,
   targetUser: User,
+  options: RecoveryPreviewOptions = {},
 ) {
   const preview = await loadAccountRecoveryPreview(
     admin,
     recoveryToken,
     targetUser,
+    options,
   );
   const { error } = await admin
     .from("account_recovery_intents")
@@ -209,4 +272,52 @@ export async function bindRecoveryIntentTarget(
   }
 
   return preview;
+}
+
+export async function loadBoundAccountRecoveryPreview(
+  admin: SupabaseClient,
+  recoveryToken: string,
+  sourceUserId: string,
+) {
+  const intent = await loadRecoveryIntent(admin, recoveryToken);
+  if (intent.source_user_id !== sourceUserId || !intent.target_user_id) {
+    throw new Error("recovery_target_mismatch");
+  }
+
+  const { data, error } = await admin.auth.admin.getUserById(
+    intent.target_user_id,
+  );
+  if (error || !data.user) {
+    throw new Error("recovery_target_not_found");
+  }
+
+  return loadAccountRecoveryPreview(admin, recoveryToken, data.user, {
+    expectedSourceUserId: sourceUserId,
+  });
+}
+
+export async function loadCompletedAccountRecoveryTarget(
+  admin: SupabaseClient,
+  recoveryToken: string,
+  currentUserId: string,
+) {
+  if (!/^[A-Za-z0-9_-]{32,128}$/.test(recoveryToken)) {
+    return null;
+  }
+
+  const { data, error } = await admin
+    .from("account_recovery_intents")
+    .select("target_user_id, consumed_at")
+    .eq("token_hash", sha256Hex(recoveryToken))
+    .maybeSingle<Pick<RecoveryIntentRow, "target_user_id" | "consumed_at">>();
+
+  if (
+    error ||
+    !data?.consumed_at ||
+    data.target_user_id !== currentUserId
+  ) {
+    return null;
+  }
+
+  return currentUserId;
 }

@@ -84,7 +84,8 @@
   background: var(--color-blue-soft);
 }
 
-.connection-row .settings-icon {
+.connection-row .settings-icon,
+.recovery-row .settings-icon {
   background: var(--color-purple-soft);
 }
 
@@ -93,6 +94,23 @@
   flex: 1;
   font-size: 27rpx;
   font-weight: 680;
+}
+
+.settings-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 5rpx;
+}
+
+.settings-description {
+  color: var(--color-subtle);
+  font-size: 21rpx;
+}
+
+.settings-copy .settings-label {
+  flex: 0 0 auto;
 }
 
 .settings-arrow {

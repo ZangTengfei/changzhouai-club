@@ -8,6 +8,7 @@
     "pages/profile/edit/index",
     "pages/registrations/index",
     "pages/settings/index",
+    "pages/account-recovery/index",
     "pages/growth/index",
     "pages/privacy/index"
   ],
