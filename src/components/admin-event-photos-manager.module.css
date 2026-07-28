@@ -27,7 +27,7 @@
   gap: 14px;
   padding: 12px;
   border-radius: var(--radius-md);
-  background: rgba(var(--surface-muted-rgb), 0.6);
+  background: #f9fafb;
 }
 
 .admin-photo-body > * {
@@ -43,7 +43,7 @@
   gap: 8px;
   padding: 12px;
   border-radius: var(--radius-md);
-  background: rgba(var(--surface-rgb), 0.94);
+  background: #ffffff;
 }
 
 .admin-image-preview img {

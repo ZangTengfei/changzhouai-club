@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { Spin } from "antd";
 
 import {
   AdminField,
-  AdminMetric,
   AdminNotice,
   AdminPageStack,
   AdminPanel,
@@ -44,12 +44,17 @@ function normalizeSearchText(value: string) {
   return value.trim().toLocaleLowerCase("zh-CN");
 }
 
-function matchesKeyword(fields: Array<string | null | undefined>, keyword: string) {
+function matchesKeyword(
+  fields: Array<string | null | undefined>,
+  keyword: string,
+) {
   if (!keyword) {
     return true;
   }
 
-  return fields.some((field) => normalizeSearchText(field ?? "").includes(keyword));
+  return fields.some((field) =>
+    normalizeSearchText(field ?? "").includes(keyword),
+  );
 }
 
 function parsePage(value: string | null) {
@@ -92,9 +97,8 @@ function buildEventsFilterHref(
 
 export function AdminEventsPageClient() {
   const searchParams = useSearchParams();
-  const { data, error, isLoading, reload } = useAdminResource<AdminEventsData>(
-    "/api/admin/events",
-  );
+  const { data, error, isLoading, reload } =
+    useAdminResource<AdminEventsData>("/api/admin/events");
 
   const statusFilter = searchParams.get("status") ?? "all";
   const timingFilter = searchParams.get("timing") ?? "all";
@@ -112,7 +116,9 @@ export function AdminEventsPageClient() {
         return false;
       }
 
-      const eventTime = event.event_at ? new Date(event.event_at).getTime() : null;
+      const eventTime = event.event_at
+        ? new Date(event.event_at).getTime()
+        : null;
 
       if (timingFilter === "upcoming" && (!eventTime || eventTime < now)) {
         return false;
@@ -139,7 +145,10 @@ export function AdminEventsPageClient() {
       );
     }) ?? [];
 
-  const totalEventPages = Math.max(1, Math.ceil(filteredEvents.length / EVENTS_PER_PAGE));
+  const totalEventPages = Math.max(
+    1,
+    Math.ceil(filteredEvents.length / EVENTS_PER_PAGE),
+  );
   const currentEventPage = Math.min(requestedEventPage, totalEventPages);
   const eventPageStartIndex = (currentEventPage - 1) * EVENTS_PER_PAGE;
   const paginatedEvents = filteredEvents.slice(
@@ -154,37 +163,48 @@ export function AdminEventsPageClient() {
         error={queryError ? getAdminErrorMessage(queryError) : null}
       />
 
-      <AdminPanel>
-        <AdminPanelHeader
-          eyebrow="Events"
-          title="活动列表"
-          actions={
-            <>
-              <AdminMetric label="活动总数" value={data?.events.length ?? "..."} />
-              <AdminEventEditorModal triggerLabel="新建活动" onChanged={reload} />
-            </>
-          }
-        />
-      </AdminPanel>
-
       {error ? <AdminNotice>后台数据读取出现问题：{error}</AdminNotice> : null}
       {data && data.queryErrors.length > 0 ? (
-        <AdminNotice>后台数据读取出现问题：{data.queryErrors.join(" | ")}</AdminNotice>
+        <AdminNotice>
+          后台数据读取出现问题：{data.queryErrors.join(" | ")}
+        </AdminNotice>
+      ) : null}
+
+      {showDebug && data ? (
+        <AdminPanel>
+          <AdminPanelHeader eyebrow="Diagnostics" title="数据诊断信息" />
+          <AdminPanelBody>
+            <pre className="overflow-x-auto rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 p-3 text-xs text-muted-foreground">
+              {JSON.stringify(data.debugSnapshot, null, 2)}
+            </pre>
+          </AdminPanelBody>
+        </AdminPanel>
       ) : null}
 
       <AdminPanel>
-        <AdminPanelHeader eyebrow="Filters" title="活动筛选" />
-        <AdminPanelBody>
+        <AdminPanelBody className="border-b border-border/70">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 className="text-xl font-semibold text-foreground">
+                活动管理
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                共 {filteredEvents.length} 场活动
+              </p>
+            </div>
+            <AdminEventEditorModal triggerLabel="新建活动" onChanged={reload} />
+          </div>
+
           <form
             action="/admin/events"
-            className="grid gap-3 lg:grid-cols-[1.2fr_0.8fr_0.8fr_auto]"
+            className="grid gap-3 lg:grid-cols-[minmax(220px,1.4fr)_minmax(140px,0.7fr)_minmax(140px,0.7fr)_auto]"
           >
             <AdminField label="活动搜索">
               <Input
                 type="search"
                 name="event_query"
                 defaultValue={eventQueryInput}
-                placeholder="搜索标题、链接、城市、地点"
+                placeholder="搜索标题、城市或地点"
               />
             </AdminField>
 
@@ -211,7 +231,9 @@ export function AdminEventsPageClient() {
               <Button type="submit" variant="secondary">
                 筛选
               </Button>
-              {eventQueryInput || statusFilter !== "all" || timingFilter !== "all" ? (
+              {eventQueryInput ||
+              statusFilter !== "all" ||
+              timingFilter !== "all" ? (
                 <Button asChild variant="outline">
                   <Link href="/admin/events">重置</Link>
                 </Button>
@@ -219,40 +241,22 @@ export function AdminEventsPageClient() {
             </div>
           </form>
         </AdminPanelBody>
-      </AdminPanel>
-
-      {showDebug && data ? (
-        <AdminPanel>
-          <AdminPanelHeader eyebrow="Diagnostics" title="数据诊断信息" />
-          <AdminPanelBody>
-            <pre className="overflow-x-auto rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 p-3 text-xs text-muted-foreground">
-              {JSON.stringify(data.debugSnapshot, null, 2)}
-            </pre>
-          </AdminPanelBody>
-        </AdminPanel>
-      ) : null}
-
-      <AdminPanel>
-        <AdminPanelHeader
-          eyebrow="List"
-          title="活动结果"
-          actions={
-            <span className="text-sm text-muted-foreground">
-              共 {filteredEvents.length} 场 · 第 {currentEventPage} / {totalEventPages} 页
-            </span>
-          }
-        />
         <AdminPanelBody className="p-0">
           {isLoading ? (
-            <div className="p-4">
-              <AdminNotice>正在加载活动列表...</AdminNotice>
+            <div
+              className="grid min-h-48 place-items-center content-center gap-3 text-sm text-muted-foreground"
+              role="status"
+              aria-live="polite"
+            >
+              <Spin size="large" />
+              <span>正在加载活动数据</span>
             </div>
           ) : paginatedEvents.length > 0 ? (
             <>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="min-w-[220px]">活动</TableHead>
+                    <TableHead className="min-w-[220px]">活动标题</TableHead>
                     <TableHead>状态</TableHead>
                     <TableHead>时间</TableHead>
                     <TableHead>地点</TableHead>
@@ -264,24 +268,18 @@ export function AdminEventsPageClient() {
                   {paginatedEvents.map((event) => (
                     <TableRow key={event.id}>
                       <TableCell>
-                        <div className="grid gap-1">
-                          <Link
-                            href={`/admin/events/${event.id}`}
-                            className="font-semibold text-foreground transition-colors hover:text-primary"
-                          >
-                            {event.title}
-                          </Link>
-                          <span className="text-xs text-muted-foreground">{event.slug}</span>
-                          <div>
-                            <AdminStatusBadge tone="neutral">
-                              {formatAdminEventType(event.event_type)}
-                            </AdminStatusBadge>
-                          </div>
-                        </div>
+                        <Link
+                          href={`/admin/events/${event.id}`}
+                          className="font-semibold text-foreground transition-colors hover:text-primary"
+                        >
+                          {event.title}
+                        </Link>
                       </TableCell>
                       <TableCell>
                         <AdminStatusBadge
-                          tone={getAdminEventStatusTone(event.status) as AdminTone}
+                          tone={
+                            getAdminEventStatusTone(event.status) as AdminTone
+                          }
                         >
                           {formatAdminEventStatus(event.status)}
                         </AdminStatusBadge>
@@ -321,7 +319,12 @@ export function AdminEventsPageClient() {
                 <div className="flex flex-wrap items-center gap-2">
                   <Button asChild size="sm" variant="outline">
                     <Link
-                      href={buildEventsFilterHref(statusFilter, timingFilter, eventQueryInput, 1)}
+                      href={buildEventsFilterHref(
+                        statusFilter,
+                        timingFilter,
+                        eventQueryInput,
+                        1,
+                      )}
                     >
                       首页
                     </Link>
@@ -373,7 +376,10 @@ export function AdminEventsPageClient() {
                   : "创建活动后，即可继续补充详情、相册和报名信息。"}
               </AdminNotice>
               {data && data.events.length > 0 ? null : (
-                <AdminEventEditorModal triggerLabel="去创建活动" onChanged={reload} />
+                <AdminEventEditorModal
+                  triggerLabel="去创建活动"
+                  onChanged={reload}
+                />
               )}
             </div>
           )}

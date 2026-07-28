@@ -27,13 +27,6 @@
   animation: route-progress-slide 1.3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-.route-progress-bar-admin {
-  background: linear-gradient(90deg, #175cd3, #4f8df6, #175cd3);
-  box-shadow:
-    0 0 22px rgba(23, 92, 211, 0.34),
-    0 0 8px rgba(79, 141, 246, 0.28);
-}
-
 .route-progress-center {
   position: fixed;
   top: 50%;
@@ -59,16 +52,6 @@
   transform: translate(-50%, -50%);
 }
 
-.route-progress-center-admin {
-  border-color: rgba(23, 92, 211, 0.14);
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.97),
-    rgba(248, 250, 252, 0.93)
-  );
-  color: #16202b;
-}
-
 .route-progress-brand-mark {
   display: grid;
   place-items: center;
@@ -87,12 +70,6 @@
       rgba(var(--surface-rgb), 0.85)
     );
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
-}
-
-.route-progress-center-admin .route-progress-brand-mark {
-  background:
-    radial-gradient(circle at 30% 20%, rgba(23, 92, 211, 0.1), transparent 45%),
-    linear-gradient(180deg, rgba(243, 246, 250, 0.96), rgba(255, 255, 255, 0.9));
 }
 
 .route-progress-brand-icon {
@@ -151,37 +128,12 @@
   animation: route-progress-dot-bounce 1.05s ease-in-out infinite;
 }
 
-.route-progress-center-admin .route-progress-brand-pulse span {
-  background: #175cd3;
-  box-shadow: 0 0 12px rgba(23, 92, 211, 0.24);
-}
-
 .route-progress-brand-pulse span:nth-child(2) {
   animation-delay: 0.14s;
 }
 
 .route-progress-brand-pulse span:nth-child(3) {
   animation-delay: 0.28s;
-}
-
-.route-skeleton-shimmer {
-  position: relative;
-  overflow: hidden;
-  background: rgba(var(--ink-rgb), 0.06);
-}
-
-.route-skeleton-shimmer::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.5),
-    transparent
-  );
-  animation: route-skeleton-sweep 1.2s linear infinite;
 }
 
 .site-route-loading {
@@ -213,6 +165,21 @@
   background: var(--accent);
   box-shadow: 0 0 0 5px rgba(var(--accent-rgb), 0.1);
   animation: route-loading-pulse 1.2s ease-in-out infinite;
+}
+
+.admin-region-loading {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  min-height: 240px;
+  padding: 32px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #6b7280;
+  font-size: 14px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 @keyframes route-loading-pulse {
@@ -249,11 +216,5 @@
   40% {
     opacity: 1;
     transform: translateY(-4px) scale(1);
-  }
-}
-
-@keyframes route-skeleton-sweep {
-  100% {
-    transform: translateX(100%);
   }
 }

@@ -472,11 +472,11 @@ export function AdminWeDailyShareCardsClient({
             </div>
           ))}
 
-          <label className="flex cursor-pointer items-start gap-3 rounded-[calc(var(--radius)-2px)] border border-amber-300/70 bg-amber-50 p-4 text-amber-950">
+          <label className="flex cursor-pointer items-start gap-3 rounded-[calc(var(--radius)-2px)] border border-blue-200 bg-blue-50 p-4 text-slate-900">
             <input
               type="checkbox"
               data-testid="daily-share-privacy"
-              className="mt-1 size-4 accent-amber-700"
+              className="mt-1 size-4 accent-blue-600"
               checked={privacyReviewed}
               onChange={(event) => setPrivacyReviewed(event.target.checked)}
             />
@@ -485,7 +485,7 @@ export function AdminWeDailyShareCardsClient({
                 <ShieldCheck className="size-4" />
                 已完成公开发布检查
               </strong>
-              <span className="text-xs leading-5 text-amber-900/80">
+              <span className="text-xs leading-5 text-slate-600">
                 确认卡片不包含成员姓名、联系方式、群聊原话或不适合公开的信息。
               </span>
             </span>
@@ -499,7 +499,7 @@ export function AdminWeDailyShareCardsClient({
             </p>
             <h3 className="text-base font-semibold text-foreground">卡片预览</h3>
           </div>
-          <div className="grid max-h-[82vh] gap-3 overflow-auto rounded-[calc(var(--radius)-2px)] border border-border/70 bg-[#ddd7cc] p-3">
+          <div className="grid max-h-[82vh] gap-3 overflow-auto rounded-[calc(var(--radius)-2px)] border border-border/70 bg-slate-100 p-3">
             <CardPreviewFrame
               actionLabel="导出封面"
               disabled={!privacyReviewed || exporting}

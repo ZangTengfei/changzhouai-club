@@ -1,10 +1,44 @@
 .admin-app-shell {
+  --surface-rgb: 255, 255, 255;
+  --surface-soft-rgb: 255, 255, 255;
+  --surface-muted-rgb: 249, 250, 251;
+  --surface-alt-rgb: 249, 250, 251;
+  --ink-rgb: 31, 41, 55;
+  --accent-rgb: 22, 119, 255;
+  --accent-strong-rgb: 9, 88, 217;
+  --surface: #ffffff;
+  --surface-strong: #ffffff;
+  --background: #f5f5f5;
+  --foreground: #1f2937;
+  --card: #ffffff;
+  --card-foreground: #1f2937;
+  --secondary: #ffffff;
+  --secondary-foreground: #374151;
+  --muted-surface: #f9fafb;
+  --muted-foreground: #6b7280;
+  --border: #e5e7eb;
+  --input: #d1d5db;
+  --primary: #1677ff;
+  --primary-foreground: #ffffff;
+  --accent: #1677ff;
+  --accent-strong: #0958d9;
+  --admin-panel: #ffffff;
+  --admin-panel-alt: #f9fafb;
+  --admin-border: #e5e7eb;
+  --admin-border-strong: #d1d5db;
+  --admin-text: #1f2937;
+  --admin-text-muted: #6b7280;
+  --admin-radius-sm: 6px;
+  --admin-radius-md: 8px;
+  --admin-radius-lg: 8px;
+  --admin-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
   min-height: 100vh;
   background: #f5f5f5;
   color: #1f2937;
-  font-family: "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  font-family:
+    "SF Pro Text", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
 .admin-desktop-sidebar {

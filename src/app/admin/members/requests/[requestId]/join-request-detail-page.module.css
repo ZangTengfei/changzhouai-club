@@ -117,7 +117,7 @@
   padding: 12px 14px;
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius-sm);
-  background: rgba(255, 252, 247, 0.82);
+  background: #f9fafb;
 }
 
 .admin-note-panel .admin-member-bio {
@@ -136,7 +136,7 @@
   padding: 12px 14px;
   border: 1px dashed rgba(var(--ink-rgb), 0.16);
   border-radius: var(--admin-radius-sm);
-  background: rgba(255, 250, 242, 0.72);
+  background: #f9fafb;
 }
 
 .admin-progress-item strong,
