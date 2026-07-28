@@ -1,6 +1,13 @@
 <view class="detail-page">
   <view wx:if="{{loading}}" class="page-shell"><view class="empty-state">正在加载活动</view></view>
-  <view wx:elif="{{loadFailed}}" class="page-shell"><view class="empty-state">暂时无法打开这个活动</view></view>
+  <view wx:elif="{{loadFailed}}" class="page-shell">
+    <view class="empty-state retry-state">
+      <text class="retry-icon">↻</text>
+      <text class="retry-title">暂时无法打开这个活动</text>
+      <text class="retry-copy">网络可能开了个小差，请重新加载</text>
+      <button class="retry-button" bindtap="retryLoad" aria-label="重新加载活动详情">重新加载</button>
+    </view>
+  </view>
 
   <view wx:elif="{{event}}" class="page-shell detail-content">
     <view class="detail-hero surface-card">

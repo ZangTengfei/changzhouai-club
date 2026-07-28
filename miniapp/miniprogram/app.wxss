@@ -101,6 +101,54 @@ textarea {
   text-align: left;
 }
 
+.retry-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14rpx;
+  text-align: center;
+}
+
+.retry-icon {
+  display: flex;
+  width: 72rpx;
+  height: 72rpx;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--color-green-dark);
+  font-size: 46rpx;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.retry-title {
+  color: var(--color-ink);
+  font-weight: 760;
+}
+
+.retry-copy {
+  font-size: 23rpx;
+}
+
+.retry-button {
+  min-width: 210rpx;
+  min-height: 72rpx;
+  margin: 4rpx 0 0;
+  padding: 0 30rpx;
+  border-radius: 36rpx;
+  background: var(--color-green);
+  color: #ffffff;
+  font-size: 25rpx;
+  font-weight: 720;
+  line-height: 72rpx;
+}
+
+.retry-button::after {
+  border: 0;
+}
+
 .status-tag {
   display: inline-flex;
   width: fit-content;

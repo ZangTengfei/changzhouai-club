@@ -32,7 +32,12 @@
   </view>
 
   <view wx:if="{{loading}}" class="empty-state">正在整理社区现场</view>
-  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">现场内容加载失败，轻触重试</view>
+  <view wx:elif="{{loadFailed}}" class="empty-state retry-state">
+    <text class="retry-icon">↻</text>
+    <text class="retry-title">活动加载失败</text>
+    <text class="retry-copy">网络可能开了个小差，请重新加载</text>
+    <button class="retry-button" bindtap="loadPage" aria-label="重新加载首页活动">重新加载</button>
+  </view>
   <view wx:elif="{{!featuredEvent}}" class="empty-state">新的社区活动正在准备中</view>
   <view wx:else class="featured-card surface-card" data-slug="{{featuredEvent.slug}}" bindtap="openEvent">
     <image wx:if="{{featuredEvent.cover_image_url}}" class="featured-cover" src="{{featuredEvent.cover_image_url}}" mode="aspectFill" />

@@ -80,6 +80,12 @@ Page({
     }
   },
 
+  retryLoad() {
+    if (this.data.slug) {
+      void this.loadPage(this.data.slug);
+    }
+  },
+
   async loadRegistration(slug: string) {
     this.setData({ registrationLoading: true });
     try {
