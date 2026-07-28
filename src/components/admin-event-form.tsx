@@ -256,7 +256,7 @@ export function AdminEventForm({
               name="cover_image_url"
               defaultValue={event?.cover_image_url ?? ""}
               eventSlug={event?.slug ?? ""}
-              placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
+              placeholder="https://assets.changzhouai.club/event-assets/..."
               uploadLabel="上传封面"
             />
           </label>

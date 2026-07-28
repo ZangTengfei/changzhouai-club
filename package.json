@@ -19,7 +19,8 @@
     "news:poster": "node scripts/render-ai-daily-wechat-poster.mjs",
     "db:copy": "node scripts/copy-supabase-database.mjs",
     "storage:copy": "node scripts/copy-supabase-storage.mjs",
-    "storage:verify:cos": "node --env-file=.env.local scripts/verify-cos-storage.mjs"
+    "storage:verify:cos": "node --env-file=.env.local scripts/verify-cos-storage.mjs",
+    "storage:migrate:cos": "node --env-file=.env.local scripts/migrate-supabase-images-to-cos.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",

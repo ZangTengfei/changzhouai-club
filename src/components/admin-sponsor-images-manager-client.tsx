@@ -160,7 +160,7 @@ export function AdminSponsorImagesManagerClient({
                           defaultValue={image.image_url}
                           eventSlug={sponsorSlug}
                           uploadScope="sponsor"
-                          placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
+                          placeholder="https://assets.changzhouai.club/event-assets/..."
                           uploadLabel="替换图片"
                           required
                         />
@@ -219,7 +219,7 @@ export function AdminSponsorImagesManagerClient({
                   name="image_url"
                   eventSlug={sponsorSlug}
                   uploadScope="sponsor"
-                  placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
+                  placeholder="https://assets.changzhouai.club/event-assets/..."
                   uploadLabel="上传新图片"
                   required
                 />

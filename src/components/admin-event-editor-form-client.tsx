@@ -353,7 +353,7 @@ export function AdminEventEditorFormClient({
                   defaultValue={event?.cover_image_url ?? ""}
                   eventSlug={event?.slug ?? ""}
                   mode="upload-only"
-                  placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
+                  placeholder="https://assets.changzhouai.club/event-assets/..."
                   uploadLabel="上传封面"
                   clearLabel="移除封面"
                   filledStatusText="已设置封面"

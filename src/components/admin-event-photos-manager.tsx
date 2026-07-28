@@ -85,7 +85,7 @@ export function AdminEventPhotosManager({
                           name="image_url"
                           defaultValue={photo.image_url}
                           eventSlug={eventSlug}
-                          placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
+                          placeholder="https://assets.changzhouai.club/event-assets/..."
                           uploadLabel="替换图片"
                           required
                         />
@@ -168,7 +168,7 @@ export function AdminEventPhotosManager({
               <StorageImageUrlField
                 name="image_url"
                 eventSlug={eventSlug}
-                placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
+                placeholder="https://assets.changzhouai.club/event-assets/..."
                 uploadLabel="上传新图片"
                 required
               />

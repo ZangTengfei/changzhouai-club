@@ -19,7 +19,7 @@ values
     '线下自由交流，启动期成员彼此认识，社区节奏开始形成。',
     '2026-01-24 14:00:00+08',
     '常州',
-    'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-01-20260124.jpg',
+    'https://assets.changzhouai.club/event-assets/events/historical/event-01-20260124.jpg',
     null,
     'completed'
   ),
@@ -30,7 +30,7 @@ values
     '成员持续回流，AI 应用讨论逐步升温，社区氛围继续变强。',
     '2026-02-08 14:00:00+08',
     '常州',
-    'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-02-20260208.jpg',
+    'https://assets.changzhouai.club/event-assets/events/historical/event-02-20260208.jpg',
     null,
     'completed'
   ),
@@ -41,7 +41,7 @@ values
     '固定节奏形成，主题交流开始出现，成员参与度继续提升。',
     '2026-03-08 14:00:00+08',
     '常州',
-    'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-03-20260308.jpg',
+    'https://assets.changzhouai.club/event-assets/events/historical/event-03-20260308.jpg',
     null,
     'completed'
   ),
@@ -52,7 +52,7 @@ values
     '讨论更偏实践导向，围绕工具、路线和落地问题展开。',
     '2026-03-14 14:00:00+08',
     '常州',
-    'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-04-20260314.jpeg',
+    'https://assets.changzhouai.club/event-assets/events/historical/event-04-20260314.jpeg',
     null,
     'completed'
   ),
@@ -63,7 +63,7 @@ values
     '成员自研分享开始出现，活动从交流走向轻量展示与反馈。',
     '2026-03-21 14:00:00+08',
     '常州',
-    'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-05-20260321.jpeg',
+    'https://assets.changzhouai.club/event-assets/events/historical/event-05-20260321.jpeg',
     '/docs/events/2026-03-21-ai-salon',
     'completed'
   ),
@@ -74,7 +74,7 @@ values
     '高频活动节奏已经稳定，也为后续运营沉淀打下基础。',
     '2026-03-28 14:00:00+08',
     '常州',
-    'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-06-20260328.jpg',
+    'https://assets.changzhouai.club/event-assets/events/historical/event-06-20260328.jpg',
     null,
     'completed'
   )
@@ -109,27 +109,27 @@ insert into public.event_photos (
   caption,
   sort_order
 )
-select id, 'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-01-20260124.jpg', '第 1 场线下交流', 0
+select id, 'https://assets.changzhouai.club/event-assets/events/historical/event-01-20260124.jpg', '第 1 场线下交流', 0
 from public.events
 where slug = 'event-01-20260124'
 union all
-select id, 'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-02-20260208.jpg', '第 2 场线下交流', 0
+select id, 'https://assets.changzhouai.club/event-assets/events/historical/event-02-20260208.jpg', '第 2 场线下交流', 0
 from public.events
 where slug = 'event-02-20260208'
 union all
-select id, 'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-03-20260308.jpg', '第 3 场线下交流', 0
+select id, 'https://assets.changzhouai.club/event-assets/events/historical/event-03-20260308.jpg', '第 3 场线下交流', 0
 from public.events
 where slug = 'event-03-20260308'
 union all
-select id, 'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-04-20260314.jpeg', '第 4 场线下交流', 0
+select id, 'https://assets.changzhouai.club/event-assets/events/historical/event-04-20260314.jpeg', '第 4 场线下交流', 0
 from public.events
 where slug = 'event-04-20260314'
 union all
-select id, 'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-05-20260321.jpeg', '第 5 场线下交流', 0
+select id, 'https://assets.changzhouai.club/event-assets/events/historical/event-05-20260321.jpeg', '第 5 场线下交流', 0
 from public.events
 where slug = 'event-05-20260321'
 union all
-select id, 'https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/events/historical/event-06-20260328.jpg', '第 6 场线下交流', 0
+select id, 'https://assets.changzhouai.club/event-assets/events/historical/event-06-20260328.jpg', '第 6 场线下交流', 0
 from public.events
 where slug = 'event-06-20260328';
 

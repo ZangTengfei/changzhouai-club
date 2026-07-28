@@ -213,7 +213,7 @@ export function AdminEventPhotosManagerClient({
                               defaultValue={photo.image_url}
                               eventSlug={eventSlug}
                               mode="upload-only"
-                              placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
+                              placeholder="https://assets.changzhouai.club/event-assets/..."
                               uploadLabel="替换图片"
                               clearLabel="清空图片"
                               filledStatusText="已设置图片"
@@ -291,7 +291,7 @@ export function AdminEventPhotosManagerClient({
                   name="image_url"
                   eventSlug={eventSlug}
                   mode="upload-only"
-                  placeholder="https://mahvssiotvstqlenurvh.supabase.co/storage/v1/object/public/event-assets/..."
+                  placeholder="https://assets.changzhouai.club/event-assets/..."
                   uploadLabel="上传新图片"
                   clearLabel="清空图片"
                   filledStatusText="已设置图片"
