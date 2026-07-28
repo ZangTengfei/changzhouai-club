@@ -1,6 +1,7 @@
 export type GrowthStep = {
   label: string;
   description: string;
+  asset: string;
   stateClass: string;
   stateLabel: string;
 };
@@ -46,14 +47,19 @@ export function getGrowthSteps(currentLevel: number): GrowthStep[] {
   return membershipLevels.map((level, index) => ({
     label: level.label,
     description: level.description,
+    asset: level.asset,
     stateClass:
       index === currentLevel
         ? "growth-step-current"
         : index < currentLevel
           ? "growth-step-complete"
-          : "",
+          : "growth-step-locked",
     stateLabel:
-      index === currentLevel ? "当前" : index < currentLevel ? "已达成" : "未解锁",
+      index === currentLevel
+        ? "✓ 已解锁 · 当前"
+        : index < currentLevel
+          ? "✓ 已解锁"
+          : "锁定 · 未解锁",
   }));
 }
 

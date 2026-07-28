@@ -26,9 +26,14 @@
       </view>
       <view class="growth-path">
         <view wx:for="{{growthSteps}}" wx:key="label" class="growth-step {{item.stateClass}}">
-          <view class="growth-step-index">{{index + 1}}</view>
-          <view class="growth-step-copy"><text class="growth-step-label">{{item.label}}</text><text class="growth-step-description">{{item.description}}</text></view>
-          <text class="growth-step-state">{{item.stateLabel}}</text>
+          <image class="growth-step-badge-background" src="{{item.asset}}" mode="aspectFit" />
+          <view class="growth-step-content">
+            <view class="growth-step-meta">
+              <text class="growth-step-index">身份 {{index + 1}}</text>
+              <text class="growth-step-state">{{item.stateLabel}}</text>
+            </view>
+            <view class="growth-step-copy"><text class="growth-step-label">{{item.label}}</text><text class="growth-step-description">{{item.description}}</text></view>
+          </view>
         </view>
       </view>
     </view>
