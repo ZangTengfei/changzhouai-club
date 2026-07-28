@@ -89,6 +89,9 @@ try {
   });
   assert.equal(profileGet.response.status, 200);
   assert.ok(profileGet.body?.options?.industries?.length > 0);
+  assert.ok(profileGet.body?.options?.cities?.length > 0);
+  assert.ok(profileGet.body?.options?.roles?.length > 0);
+  assert.ok(profileGet.body?.options?.monthlyTimes?.length > 0);
   assert.equal(profileGet.body?.profile?.isPubliclyVisible, true);
   pass("profile_loaded");
   pass("new_profile_visibility_defaults_on");

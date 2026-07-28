@@ -102,6 +102,11 @@ Page({
     roleLabel: "",
     organization: "",
     monthlyTime: "",
+    cityOptions: [] as string[],
+    roleOptions: [] as string[],
+    monthlyTimeOptions: [] as string[],
+    customCity: "",
+    customRoleLabel: "",
     bio: "",
     industryTags: [] as string[],
     skills: [] as string[],
@@ -148,6 +153,17 @@ Page({
         roleLabel: profile.roleLabel,
         organization: profile.organization,
         monthlyTime: profile.monthlyTime,
+        cityOptions: Array.from(
+          new Set([...options.cities, profile.city].filter(Boolean)),
+        ),
+        roleOptions: Array.from(
+          new Set([...options.roles, profile.roleLabel].filter(Boolean)),
+        ),
+        monthlyTimeOptions: Array.from(
+          new Set(
+            [...options.monthlyTimes, profile.monthlyTime].filter(Boolean),
+          ),
+        ),
         bio: profile.bio,
         industryTags: profile.industryTags,
         skills: profile.skills,
@@ -201,6 +217,35 @@ Page({
   handleSwitch(event: WechatMiniprogram.SwitchChange) {
     const field = String(event.currentTarget.dataset.field ?? "");
     if (field) this.setData({ [field]: event.detail.value });
+  },
+
+  selectProfileOption(event: WechatMiniprogram.TouchEvent) {
+    const field = String(event.currentTarget.dataset.field ?? "");
+    const value = String(event.currentTarget.dataset.value ?? "").trim();
+    if (!value || !["city", "roleLabel", "monthlyTime"].includes(field)) {
+      return;
+    }
+    this.setData({ [field]: value });
+  },
+
+  addCustomCity() {
+    const value = this.data.customCity.trim();
+    if (!value) return;
+    this.setData({
+      city: value,
+      cityOptions: Array.from(new Set([...this.data.cityOptions, value])),
+      customCity: "",
+    });
+  },
+
+  addCustomRoleLabel() {
+    const value = this.data.customRoleLabel.trim();
+    if (!value) return;
+    this.setData({
+      roleLabel: value,
+      roleOptions: Array.from(new Set([...this.data.roleOptions, value])),
+      customRoleLabel: "",
+    });
   },
 
   handlePrivacyChange(event: WechatMiniprogram.CheckboxGroupChange) {

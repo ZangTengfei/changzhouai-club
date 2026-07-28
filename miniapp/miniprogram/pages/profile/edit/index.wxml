@@ -33,8 +33,26 @@
 
       <label class="form-field"><text class="field-label">昵称 *</text><input class="field-input" maxlength="60" value="{{displayName}}" data-field="displayName" bindinput="handleInput" placeholder="你希望大家如何称呼你" /></label>
       <label class="form-field"><text class="field-label">微信号 *</text><input class="field-input" maxlength="80" value="{{wechat}}" data-field="wechat" bindinput="handleInput" placeholder="仅用于社区联系，不公开展示" /></label>
-      <label class="form-field"><text class="field-label">所在城市 / 辖区 *</text><input class="field-input" maxlength="40" value="{{city}}" data-field="city" bindinput="handleInput" placeholder="例如：常州新北区" /></label>
-      <label class="form-field"><text class="field-label">当前身份 *</text><input class="field-input" maxlength="80" value="{{roleLabel}}" data-field="roleLabel" bindinput="handleInput" placeholder="例如：产品经理、开发者、创业者" /></label>
+      <view class="tag-field">
+        <view class="field-heading"><text class="field-label">所在城市 / 辖区 *</text><text class="field-count">选择一项</text></view>
+        <view class="tag-options">
+          <view wx:for="{{cityOptions}}" wx:key="*this" class="tag-option {{city === item ? 'tag-option-selected' : ''}}" data-field="city" data-value="{{item}}" bindtap="selectProfileOption" role="button">{{item}}</view>
+        </view>
+        <view class="custom-tag-row">
+          <input class="field-input custom-tag-input" maxlength="40" value="{{customCity}}" data-field="customCity" bindinput="handleInput" placeholder="其他城市或地区" />
+          <button class="tag-add-button" bindtap="addCustomCity">添加</button>
+        </view>
+      </view>
+      <view class="tag-field">
+        <view class="field-heading"><text class="field-label">当前身份 *</text><text class="field-count">选择一项</text></view>
+        <view class="tag-options">
+          <view wx:for="{{roleOptions}}" wx:key="*this" class="tag-option {{roleLabel === item ? 'tag-option-selected' : ''}}" data-field="roleLabel" data-value="{{item}}" bindtap="selectProfileOption" role="button">{{item}}</view>
+        </view>
+        <view class="custom-tag-row">
+          <input class="field-input custom-tag-input" maxlength="80" value="{{customRoleLabel}}" data-field="customRoleLabel" bindinput="handleInput" placeholder="补充其他身份" />
+          <button class="tag-add-button" bindtap="addCustomRoleLabel">添加</button>
+        </view>
+      </view>
       <label class="form-field"><text class="field-label">组织或公司</text><input class="field-input" maxlength="120" value="{{organization}}" data-field="organization" bindinput="handleInput" placeholder="选填" /></label>
 
       <checkbox-group bindchange="handlePrivacyChange">
@@ -71,7 +89,12 @@
       <label class="form-field"><text class="field-label">我能提供什么</text><textarea class="field-textarea" maxlength="300" value="{{capabilitySummary}}" data-field="capabilitySummary" bindinput="handleInput" placeholder="例如：可以交流企业知识库落地，也愿意帮忙评审产品原型" /></label>
       <label class="form-field"><text class="field-label">我现在需要什么</text><textarea class="field-textarea" maxlength="300" value="{{seekingSummary}}" data-field="seekingSummary" bindinput="handleInput" placeholder="例如：正在寻找制造业 AI 场景和懂销售的合作伙伴" /></label>
       <text class="connection-note">以上两项至少填写一项，内容应尽量具体。</text>
-      <label class="form-field"><text class="field-label">每月可投入时间</text><input class="field-input" maxlength="80" value="{{monthlyTime}}" data-field="monthlyTime" bindinput="handleInput" placeholder="例如：每月 4 小时" /></label>
+      <view class="tag-field">
+        <view class="field-heading"><text class="field-label">每月可投入时间</text><text class="field-count">选择大概范围</text></view>
+        <view class="tag-options">
+          <view wx:for="{{monthlyTimeOptions}}" wx:key="*this" class="tag-option {{monthlyTime === item ? 'tag-option-selected' : ''}}" data-field="monthlyTime" data-value="{{item}}" bindtap="selectProfileOption" role="button">{{item}}</view>
+        </view>
+      </view>
       <label class="form-field"><text class="field-label">个人介绍</text><textarea class="field-textarea" maxlength="500" value="{{bio}}" data-field="bio" bindinput="handleInput" placeholder="简单介绍你正在做的事情" /></label>
 
       <view class="preference-list">

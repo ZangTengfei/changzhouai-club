@@ -3,9 +3,12 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { loadMiniappAccountSnapshot } from "@/lib/miniapp-auth";
 import { miniappJson, requireMiniappSession } from "@/lib/miniapp-api";
 import {
+  MINIAPP_CITY_OPTIONS,
   getMiniappProfileCompletion,
   MINIAPP_INDUSTRY_OPTIONS,
+  MINIAPP_MONTHLY_TIME_OPTIONS,
   MINIAPP_PRIVACY_POLICY_VERSION,
+  MINIAPP_ROLE_OPTIONS,
   MINIAPP_SKILL_OPTIONS,
 } from "@/lib/miniapp-profile";
 
@@ -119,6 +122,9 @@ async function loadProfile(supabase: SupabaseClient, userId: string) {
 
 function getProfileOptions() {
   return {
+    cities: MINIAPP_CITY_OPTIONS,
+    roles: MINIAPP_ROLE_OPTIONS,
+    monthlyTimes: MINIAPP_MONTHLY_TIME_OPTIONS,
     industries: MINIAPP_INDUSTRY_OPTIONS,
     skills: MINIAPP_SKILL_OPTIONS,
   };

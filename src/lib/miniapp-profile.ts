@@ -2,6 +2,37 @@ import { memberTags } from "@/lib/site-data";
 
 export const MINIAPP_PRIVACY_POLICY_VERSION = "2026-07-18";
 
+export const MINIAPP_CITY_OPTIONS = [
+  "常州",
+  "常州·天宁区",
+  "常州·钟楼区",
+  "常州·新北区",
+  "常州·武进区",
+  "常州·金坛区",
+  "常州·溧阳市",
+  "常州以外",
+] as const;
+
+export const MINIAPP_ROLE_OPTIONS = [
+  "产品经理",
+  "开发者/工程师",
+  "设计师",
+  "创业者",
+  "企业管理者",
+  "市场/销售",
+  "教育/研究",
+  "学生",
+  "自由职业者",
+] as const;
+
+export const MINIAPP_MONTHLY_TIME_OPTIONS = [
+  "每月 1–2 小时",
+  "每月 3–5 小时",
+  "每月 6–10 小时",
+  "每月 10 小时以上",
+  "暂不确定",
+] as const;
+
 export const MINIAPP_INDUSTRY_OPTIONS = [
   "制造业",
   "软件与信息服务",

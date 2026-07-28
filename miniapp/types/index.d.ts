@@ -50,6 +50,9 @@ interface MiniappProfileCompletion {
 }
 
 interface MiniappProfileOptions {
+  cities: string[];
+  roles: string[];
+  monthlyTimes: string[];
   industries: string[];
   skills: string[];
 }
