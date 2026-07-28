@@ -173,14 +173,7 @@
   z-index: 1;
   min-width: 0;
   flex-direction: column;
-  gap: 18rpx;
-}
-
-.growth-step-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12rpx;
+  gap: 14rpx;
 }
 
 .growth-step-index {
@@ -195,6 +188,13 @@
   min-width: 0;
   flex-direction: column;
   gap: 5rpx;
+}
+
+.growth-step-title-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12rpx;
 }
 
 .growth-step-label {

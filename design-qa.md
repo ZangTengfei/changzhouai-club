@@ -37,6 +37,39 @@ final result: passed
 
 ---
 
+# 身份成长状态标签位置 Design QA
+
+- 日期：2026-07-29
+- Source visual truth：`output/design-qa/growth-status-source.png`
+- Implementation screenshot：`output/design-qa/growth-status-after.png`
+- Focused comparison：`output/design-qa/growth-status-comparison.png`
+- Viewport：微信开发者工具 iPhone 模拟器，约 `390 × 753` 逻辑像素，截图为 2 倍图
+- State：社区成员为当前身份，其余三级未解锁
+
+## Findings
+
+- No actionable P0/P1/P2 differences remain.
+- 状态标签已从卡片上方元信息行移动到身份名称右侧，四张卡片保持一致对齐。
+- 当前状态标签、未解锁标签和右侧放大徽章之间没有重叠；社区成员、共建伙伴、核心共建、荣誉共建均保持清晰可读。
+
+## Required Fidelity Surfaces
+
+- Fonts and typography：沿用原有小程序字体、字号和字重，状态标签保持身份名称的次要层级。
+- Spacing and layout rhythm：身份名称与状态标签使用统一间距，卡片内边距、圆角和纵向间距未改变。
+- Colors and visual tokens：当前绿色和锁定灰色状态色未改变。
+- Image quality and asset fidelity：四个现有徽章 PNG 的缩放、透明度和右侧背景位置未改变。
+- Copy and content：身份名称、说明和状态文字均未改变。
+
+## Comparison History
+
+1. 初始状态：状态标签位于上方元信息行，与身份名称视觉关系较弱。
+2. 修复：将标签移动到身份名称之后，并保持四级身份相同结构。
+3. 复核：开发者工具实际页面截图显示标签位置自然，无文字截断或徽章遮挡。
+
+final result: passed
+
+---
+
 # “我的”页设置入口收敛 Design QA
 
 - 日期：2026-07-19
