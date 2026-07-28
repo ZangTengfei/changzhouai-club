@@ -87,9 +87,18 @@ export async function createProfileShareCard(
   context.fillStyle = "#f4fbf7";
   context.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
+  let brandTextX = 48;
+  try {
+    const logo = await loadImage(canvas, "/assets/logo-mark.png");
+    context.drawImage(logo, 48, 21, 46, 34);
+    brandTextX = 110;
+  } catch {
+    brandTextX = 48;
+  }
+
   context.fillStyle = "#08794a";
   context.font = "700 24px sans-serif";
-  context.fillText("CHANGZHOU AI CLUB · MEMBER", 48, 54);
+  context.fillText("常州 AI Club · 社区成员名片", brandTextX, 51);
 
   roundedRect(context, 36, 84, 678, 208, 30);
   context.fillStyle = "#e3f7eb";
