@@ -1,5 +1,38 @@
 @import "../index.wxss";
 
+.shared-profile-brand {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+  padding-bottom: 22rpx;
+  border-bottom: 2rpx solid rgba(20, 122, 91, 0.12);
+}
+
+.shared-profile-brand image {
+  width: 54rpx;
+  height: 54rpx;
+  flex: 0 0 auto;
+}
+
+.shared-profile-brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2rpx;
+}
+
+.shared-profile-brand-name {
+  color: var(--color-green-dark);
+  font-size: 24rpx;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.shared-profile-brand-caption {
+  color: var(--color-muted);
+  font-size: 20rpx;
+  line-height: 1.25;
+}
+
 .shared-profile-notice {
   margin-bottom: 12rpx;
 }

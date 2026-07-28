@@ -9,6 +9,13 @@
 
   <block wx:elif="{{profile}}">
     <view class="profile-view-hero">
+      <view class="shared-profile-brand">
+        <image src="/assets/logo-mark.png" mode="aspectFit" />
+        <view class="shared-profile-brand-copy">
+          <text class="shared-profile-brand-name">常州 AI Club</text>
+          <text class="shared-profile-brand-caption">社区成员名片</text>
+        </view>
+      </view>
       <view class="profile-view-identity">
         <image wx:if="{{profile.avatarUrl}}" class="profile-view-avatar" src="{{profile.avatarUrl}}" mode="aspectFill" />
         <view wx:else class="profile-view-avatar profile-view-avatar-empty">{{avatarInitial}}</view>
