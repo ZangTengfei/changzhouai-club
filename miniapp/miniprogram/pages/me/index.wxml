@@ -69,9 +69,9 @@
 
     <view class="section-heading-row"><text class="section-title">我的空间</text></view>
     <view class="space-grid">
-      <view class="space-card space-green space-card-featured" bindtap="openGrowth" role="button">
+      <view class="space-card space-green space-card-featured" bindtap="openGrowth" role="button" aria-label="查看成长档案">
         <view class="icon-tile"><image src="/assets/icons/growth-purple-v2.png" mode="aspectFit" /></view>
-        <text class="space-title">成长档案</text><text class="space-copy">查看身份路径</text>
+        <text class="space-title">成长档案</text><text class="space-copy">查看身份路径与社区荣誉</text>
         <image class="space-arrow" src="/assets/icons/chevron-green-v2.png" mode="aspectFit" />
       </view>
       <view class="space-card space-orange" bindtap="openRegistrations" role="button">

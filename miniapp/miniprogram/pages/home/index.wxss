@@ -45,8 +45,8 @@
   background: var(--color-orange-soft);
 }
 
-.quick-card-purple {
-  background: var(--color-purple-soft);
+.quick-card-green {
+  background: var(--color-green-soft);
 }
 
 .quick-card .icon-tile {
@@ -98,8 +98,8 @@
   background: #ffe0bd;
 }
 
-.quick-arrow-purple {
-  background: #e4dcff;
+.quick-arrow-green {
+  background: #ccf2dd;
 }
 
 .featured-card {

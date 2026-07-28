@@ -19,11 +19,11 @@
       <text class="quick-copy">{{upcomingCount}} 场活动即将开始</text>
       <image class="quick-arrow quick-arrow-orange" src="/assets/icons/chevron-orange-v2.png" mode="aspectFit" />
     </view>
-    <view class="quick-card quick-card-purple" bindtap="openGrowth" role="button" aria-label="查看成员成长">
+    <view class="quick-card quick-card-green" bindtap="openGrowth" role="button" aria-label="查看成长档案">
       <view class="icon-tile"><image src="/assets/icons/growth-purple-v2.png" mode="aspectFit" /></view>
-      <text class="quick-title">成员成长</text>
-      <text class="quick-copy">查看身份与社区荣誉</text>
-      <image class="quick-arrow quick-arrow-purple" src="/assets/icons/chevron-purple-v2.png" mode="aspectFit" />
+      <text class="quick-title">成长档案</text>
+      <text class="quick-copy">查看身份路径与社区荣誉</text>
+      <image class="quick-arrow quick-arrow-green" src="/assets/icons/chevron-green-v2.png" mode="aspectFit" />
     </view>
   </view>
 
