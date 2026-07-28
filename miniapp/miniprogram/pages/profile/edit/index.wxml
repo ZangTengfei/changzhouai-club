@@ -71,7 +71,6 @@
       <label class="form-field"><text class="field-label">我能提供什么</text><textarea class="field-textarea" maxlength="300" value="{{capabilitySummary}}" data-field="capabilitySummary" bindinput="handleInput" placeholder="例如：可以交流企业知识库落地，也愿意帮忙评审产品原型" /></label>
       <label class="form-field"><text class="field-label">我现在需要什么</text><textarea class="field-textarea" maxlength="300" value="{{seekingSummary}}" data-field="seekingSummary" bindinput="handleInput" placeholder="例如：正在寻找制造业 AI 场景和懂销售的合作伙伴" /></label>
       <text class="connection-note">以上两项至少填写一项，内容应尽量具体。</text>
-      <label class="form-field"><text class="field-label">感兴趣的方向</text><input class="field-input" value="{{interestsText}}" data-field="interestsText" bindinput="handleInput" placeholder="多个方向用逗号分隔" /></label>
       <label class="form-field"><text class="field-label">每月可投入时间</text><input class="field-input" maxlength="80" value="{{monthlyTime}}" data-field="monthlyTime" bindinput="handleInput" placeholder="例如：每月 4 小时" /></label>
       <label class="form-field"><text class="field-label">个人介绍</text><textarea class="field-textarea" maxlength="500" value="{{bio}}" data-field="bio" bindinput="handleInput" placeholder="简单介绍你正在做的事情" /></label>
 

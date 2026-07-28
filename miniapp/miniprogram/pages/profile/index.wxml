@@ -48,9 +48,8 @@
       <view wx:if="{{profile.seekingSummary}}" class="profile-view-field"><text class="profile-view-label">我正在寻找</text><text class="profile-view-copy">{{profile.seekingSummary}}</text></view>
     </view>
 
-    <view wx:if="{{profile.interests.length || preferenceLabels.length || profile.monthlyTime}}" class="profile-view-section profile-view-section-purple">
+    <view wx:if="{{preferenceLabels.length || profile.monthlyTime}}" class="profile-view-section profile-view-section-purple">
       <view class="profile-view-section-heading"><text class="profile-view-index">03</text><text class="section-title">参与方式</text></view>
-      <view wx:if="{{profile.interests.length}}" class="profile-view-field"><text class="profile-view-label">感兴趣的方向</text><view class="profile-view-tags profile-view-tags-purple"><text wx:for="{{profile.interests}}" wx:key="*this">{{item}}</text></view></view>
       <view wx:if="{{preferenceLabels.length}}" class="profile-view-field"><text class="profile-view-label">参与意愿</text><view class="profile-view-tags profile-view-tags-purple"><text wx:for="{{preferenceLabels}}" wx:key="*this">{{item}}</text></view></view>
       <view wx:if="{{profile.monthlyTime}}" class="profile-view-field"><text class="profile-view-label">每月可投入时间</text><text class="profile-view-copy">{{profile.monthlyTime}}</text></view>
     </view>
