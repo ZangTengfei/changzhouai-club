@@ -101,6 +101,29 @@ textarea {
   text-align: left;
 }
 
+.loading-state {
+  display: flex;
+  align-items: center;
+  gap: 18rpx;
+}
+
+.loading-spinner {
+  box-sizing: border-box;
+  width: 34rpx;
+  height: 34rpx;
+  flex: none;
+  border: 4rpx solid rgba(18, 165, 102, 0.2);
+  border-top-color: var(--color-green-dark);
+  border-radius: 50%;
+  animation: loading-spin 0.8s linear infinite;
+}
+
+@keyframes loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .retry-state {
   display: flex;
   flex-direction: column;

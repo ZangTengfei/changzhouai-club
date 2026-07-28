@@ -17,7 +17,7 @@
     <view class="filter-chip {{activeFilter === 'external' ? 'filter-chip-active' : ''}}" data-filter="external" bindtap="switchFilter">外部活动</view>
   </view>
 
-  <view wx:if="{{loading}}" class="empty-state">正在整理活动</view>
+  <view wx:if="{{loading}}" class="empty-state loading-state"><view class="loading-spinner" aria-hidden="true"></view><text>正在整理活动</text></view>
   <view wx:elif="{{loadFailed}}" class="empty-state retry-state">
     <text class="retry-icon">↻</text>
     <text class="retry-title">活动加载失败</text>

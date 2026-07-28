@@ -1,5 +1,5 @@
 <view class="page-shell profile-page">
-  <view wx:if="{{loading}}" class="empty-state">正在加载资料</view>
+  <view wx:if="{{loading}}" class="empty-state loading-state"><view class="loading-spinner" aria-hidden="true"></view><text>正在加载资料</text></view>
   <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">资料加载失败，轻触重试</view>
 
   <view wx:else class="profile-form">

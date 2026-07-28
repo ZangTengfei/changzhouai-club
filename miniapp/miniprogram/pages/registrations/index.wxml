@@ -4,7 +4,7 @@
     <text class="page-intro-copy">查看报名状态，也可以重新打开活动详情。</text>
   </view>
 
-  <view wx:if="{{loading}}" class="empty-state">正在加载报名记录</view>
+  <view wx:if="{{loading}}" class="empty-state loading-state"><view class="loading-spinner" aria-hidden="true"></view><text>正在加载报名记录</text></view>
   <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">报名记录加载失败，轻触重试</view>
   <view wx:elif="{{registrations.length === 0}}" class="empty-state">你还没有报名活动</view>
   <view wx:else class="registration-list">

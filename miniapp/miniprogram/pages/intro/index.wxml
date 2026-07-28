@@ -1,5 +1,5 @@
 <view class="page-shell intro-page">
-  <view wx:if="{{loading}}" class="empty-state">正在加载你的资料</view>
+  <view wx:if="{{loading}}" class="empty-state loading-state"><view class="loading-spinner" aria-hidden="true"></view><text>正在加载你的资料</text></view>
   <view wx:elif="{{loadFailed}}" class="empty-state retry-state">
     <text class="retry-title">资料加载失败</text>
     <text class="retry-copy">请检查网络后重新加载</text>

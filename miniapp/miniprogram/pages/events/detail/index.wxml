@@ -1,5 +1,5 @@
 <view class="detail-page">
-  <view wx:if="{{loading}}" class="page-shell"><view class="empty-state">正在加载活动</view></view>
+  <view wx:if="{{loading}}" class="page-shell"><view class="empty-state loading-state"><view class="loading-spinner" aria-hidden="true"></view><text>正在加载活动</text></view></view>
   <view wx:elif="{{loadFailed}}" class="page-shell">
     <view class="empty-state retry-state">
       <text class="retry-icon">↻</text>
