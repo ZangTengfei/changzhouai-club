@@ -1,6 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { sendAdminEventRegistrationNotification } from "@/lib/email";
+import {
+  EVENT_PORTRAIT_CONSENT_VERSION,
+  EVENT_REGISTRATION_CONSENT_VERSION,
+  eventPortraitConsentKey,
+  eventRegistrationConsentKey,
+} from "@/lib/event-registration-consent";
 import { miniappJson, requireMiniappSession } from "@/lib/miniapp-api";
 
 export const runtime = "nodejs";
@@ -53,11 +59,29 @@ export async function PUT(
   if (auth.response) return auth.response;
 
   const payload = (await request.json().catch(() => null)) as
-    | { note?: unknown }
+    | {
+        note?: unknown;
+        portraitConsentAccepted?: unknown;
+        portraitConsentVersion?: unknown;
+        registrationConsentAccepted?: unknown;
+        registrationConsentVersion?: unknown;
+      }
     | null;
   const note = typeof payload?.note === "string" ? payload.note.trim() : "";
   if (note.length > 500) {
     return miniappJson({ error: "invalid_registration_note" }, 400);
+  }
+  if (payload?.registrationConsentAccepted !== true) {
+    return miniappJson({ error: "registration_consent_required" }, 400);
+  }
+  if (
+    payload.registrationConsentVersion !== EVENT_REGISTRATION_CONSENT_VERSION ||
+    payload.portraitConsentVersion !== EVENT_PORTRAIT_CONSENT_VERSION
+  ) {
+    return miniappJson({ error: "registration_consent_version_mismatch" }, 409);
+  }
+  if (typeof payload.portraitConsentAccepted !== "boolean") {
+    return miniappJson({ error: "invalid_portrait_consent" }, 400);
   }
 
   const { slug } = await context.params;
@@ -87,6 +111,42 @@ export async function PUT(
 
   if (!profile?.display_name?.trim() || !profile.wechat?.trim()) {
     return miniappJson({ error: "profile_incomplete" }, 409);
+  }
+
+  const acceptedAt = new Date().toISOString();
+  const registrationConsent = {
+    user_id: userId,
+    policy_version: eventRegistrationConsentKey(event.id),
+    accepted_at: acceptedAt,
+  };
+  const portraitConsentKey = eventPortraitConsentKey(event.id);
+  const { error: registrationConsentError } = await auth.supabase
+    .from("miniapp_consents")
+    .upsert(
+      payload.portraitConsentAccepted
+        ? [
+            registrationConsent,
+            {
+              user_id: userId,
+              policy_version: portraitConsentKey,
+              accepted_at: acceptedAt,
+            },
+          ]
+        : [registrationConsent],
+      { onConflict: "user_id,policy_version" },
+    );
+  if (registrationConsentError) {
+    return miniappJson({ error: "registration_consent_save_failed" }, 500);
+  }
+  if (!payload.portraitConsentAccepted) {
+    const { error: portraitConsentError } = await auth.supabase
+      .from("miniapp_consents")
+      .delete()
+      .eq("user_id", userId)
+      .eq("policy_version", portraitConsentKey);
+    if (portraitConsentError) {
+      return miniappJson({ error: "registration_consent_save_failed" }, 500);
+    }
   }
 
   const { data: registration, error } = await auth.supabase
@@ -145,7 +205,11 @@ export async function DELETE(
   if (!event) return miniappJson({ error: "not_found" }, 404);
 
   const userId = auth.session.user_id;
-  const [{ data, error }, { error: subscriptionError }] = await Promise.all([
+  const [
+    { data, error },
+    { error: subscriptionError },
+    { error: portraitConsentError },
+  ] = await Promise.all([
     auth.supabase
       .from("event_registrations")
       .update({ status: "cancelled" })
@@ -160,9 +224,14 @@ export async function DELETE(
       .eq("event_id", event.id)
       .eq("user_id", userId)
       .in("status", ["accepted", "rejected", "failed"]),
+    auth.supabase
+      .from("miniapp_consents")
+      .delete()
+      .eq("user_id", userId)
+      .eq("policy_version", eventPortraitConsentKey(event.id)),
   ]);
 
-  if (error || subscriptionError) {
+  if (error || subscriptionError || portraitConsentError) {
     return miniappJson({ error: "registration_cancel_failed" }, 500);
   }
 

@@ -31,6 +31,8 @@ Page({
     user: null as MiniappUser | null,
     registration: null as MiniappRegistration | null,
     registrationNote: "",
+    registrationConsentAccepted: false,
+    portraitConsentAccepted: false,
     registrationLoading: true,
     submitting: false,
     reminder: null as ReminderConfig | null,
@@ -132,6 +134,20 @@ Page({
     this.setData({ registrationNote: event.detail.value });
   },
 
+  handleRegistrationConsentChange(
+    event: WechatMiniprogram.CheckboxGroupChange,
+  ) {
+    this.setData({
+      registrationConsentAccepted:
+        event.detail.value.includes("registration"),
+      portraitConsentAccepted: event.detail.value.includes("portrait"),
+    });
+  },
+
+  openRegistrationConsent() {
+    void wx.navigateTo({ url: "/pages/event-consent/index" });
+  },
+
   openProfile() {
     void wx.navigateTo({ url: "/pages/profile/edit/index" });
   },
@@ -162,12 +178,21 @@ Page({
       this.openProfile();
       return;
     }
+    if (!this.data.registrationConsentAccepted) {
+      void wx.showToast({ title: "请先同意活动报名隐私说明", icon: "none" });
+      return;
+    }
 
     this.setData({ submitting: true });
     try {
       const registration = await registerForEvent(
         this.data.slug,
         this.data.registrationNote,
+        {
+          registrationConsentAccepted:
+            this.data.registrationConsentAccepted,
+          portraitConsentAccepted: this.data.portraitConsentAccepted,
+        },
       );
       this.setData({ registration });
       trackEvent("registration_created", "/pages/events/detail/index", {
@@ -205,7 +230,12 @@ Page({
     this.setData({ submitting: true });
     try {
       const registration = await cancelEventRegistration(this.data.slug);
-      this.setData({ registration, reminder: null });
+      this.setData({
+        registration,
+        reminder: null,
+        registrationConsentAccepted: false,
+        portraitConsentAccepted: false,
+      });
       trackEvent("registration_cancelled", "/pages/events/detail/index", {
         slug: this.data.slug,
       });

@@ -89,6 +89,16 @@
         <text class="registration-kicker">活动报名</text>
         <text class="registration-title">报名这场活动</text>
         <textarea class="registration-textarea" maxlength="500" value="{{registrationNote}}" bindinput="handleNoteInput" placeholder="可选：写下你特别想交流的话题" />
+        <checkbox-group class="registration-consents" bindchange="handleRegistrationConsentChange">
+          <label class="registration-consent-row">
+            <checkbox value="registration" checked="{{registrationConsentAccepted}}" color="#147a5b" />
+            <view class="registration-consent-copy"><text>我已阅读并同意</text><text class="registration-consent-link" catchtap="openRegistrationConsent">《活动报名与影像使用说明》</text><text> *</text></view>
+          </label>
+          <label class="registration-consent-row registration-consent-row-optional">
+            <checkbox value="portrait" checked="{{portraitConsentAccepted}}" color="#147a5b" />
+            <view class="registration-consent-copy"><text>我自愿授权活动现场肖像及影像用于常州 AI 社区非商业活动记录和宣传</text><text class="registration-consent-optional">可选，不影响报名</text></view>
+          </label>
+        </checkbox-group>
         <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitRegistration">确认报名</button>
       </block>
     </view>

@@ -7,6 +7,7 @@ import {
   formatAdminEventType,
   formatAdminRegistrationStatus,
 } from "@/lib/admin/event-feedback";
+import { eventPortraitConsentKey } from "@/lib/event-registration-consent";
 
 type EventRow = {
   id: string;
@@ -36,7 +37,7 @@ type ProfileRow = {
 };
 
 const csvHeaders =
-  "活动标题,活动链接,活动类型,活动状态,活动时间,活动地点,报名状态,成员昵称,账号邮箱,微信,城市,报名备注,报名时间,报名 ID,用户 ID,活动 ID".split(
+  "活动标题,活动链接,活动类型,活动状态,活动时间,活动地点,报名状态,肖像授权,肖像授权时间,成员昵称,账号邮箱,微信,城市,报名备注,报名时间,报名 ID,用户 ID,活动 ID".split(
     ",",
   );
 
@@ -148,6 +149,22 @@ export async function GET(request: Request) {
   const profilesByUserId = new Map(
     ((profilesData ?? []) as ProfileRow[]).map((profile) => [profile.id, profile]),
   );
+  const { data: portraitConsentsData, error: portraitConsentsError } =
+    userIds.length > 0
+      ? await context.supabase
+          .from("miniapp_consents")
+          .select("user_id, accepted_at")
+          .in("user_id", userIds)
+          .eq("policy_version", eventPortraitConsentKey(eventId))
+      : { data: [], error: null };
+
+  if (portraitConsentsError) {
+    return NextResponse.json({ error: "database_read_failed" }, { status: 400 });
+  }
+
+  const portraitConsentsByUserId = new Map(
+    (portraitConsentsData ?? []).map((consent) => [consent.user_id, consent.accepted_at]),
+  );
 
   await recordAdminAuditLog(context.supabase, {
     actorId: context.user.id,
@@ -162,6 +179,9 @@ export async function GET(request: Request) {
 
   const rows = registrations.map((registration) => {
     const profile = profilesByUserId.get(registration.user_id);
+    const portraitConsentAcceptedAt = portraitConsentsByUserId.get(
+      registration.user_id,
+    );
 
     return [
       eventRow.title,
@@ -171,6 +191,8 @@ export async function GET(request: Request) {
       formatCsvDateTime(eventRow.event_at),
       buildLocationLabel(eventRow),
       formatAdminRegistrationStatus(registration.status),
+      portraitConsentAcceptedAt ? "已授权" : "未授权",
+      formatCsvDateTime(portraitConsentAcceptedAt ?? null),
       profile?.display_name ?? "",
       profile?.email ?? "",
       profile?.wechat ?? "",

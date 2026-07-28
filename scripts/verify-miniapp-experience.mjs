@@ -9,6 +9,8 @@ const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
 const serviceRoleKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY;
+const eventRegistrationConsentVersion = "2026-07-28";
+const eventPortraitConsentVersion = "2026-07-28";
 
 if (!supabaseUrl || !serviceRoleKey) {
   throw new Error("Missing Supabase server configuration.");
@@ -222,17 +224,51 @@ try {
     });
   if (badgeError) throw badgeError;
 
+  const registrationWithoutConsent = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
+    {
+      method: "PUT",
+      headers: authHeaders,
+      body: JSON.stringify({ note: "未同意协议" }),
+    },
+  );
+  assert.equal(registrationWithoutConsent.response.status, 400);
+  assert.equal(
+    registrationWithoutConsent.body?.error,
+    "registration_consent_required",
+  );
+  pass("event_registration_requires_consent");
+
   const registrationPut = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
     {
       method: "PUT",
       headers: authHeaders,
-      body: JSON.stringify({ note: "自动化验收" }),
+      body: JSON.stringify({
+        note: "自动化验收",
+        registrationConsentAccepted: true,
+        portraitConsentAccepted: true,
+        registrationConsentVersion: eventRegistrationConsentVersion,
+        portraitConsentVersion: eventPortraitConsentVersion,
+      }),
     },
   );
   assert.equal(registrationPut.response.status, 200);
   assert.equal(registrationPut.body?.registration?.status, "registered");
   pass("event_registered_idempotently");
+
+  const { data: eventConsents, error: eventConsentsError } = await supabase
+    .from("miniapp_consents")
+    .select("policy_version, accepted_at")
+    .eq("user_id", userId)
+    .in("policy_version", [
+      `event-registration:${eventRegistrationConsentVersion}:${event.id}`,
+      `event-portrait:${eventPortraitConsentVersion}:${event.id}`,
+    ]);
+  if (eventConsentsError) throw eventConsentsError;
+  assert.equal(eventConsents?.length, 2);
+  assert.ok(eventConsents?.every((consent) => consent.accepted_at));
+  pass("event_registration_consents_recorded");
 
   const checkinToken = randomBytes(32).toString("base64url");
   const { error: checkinTokenError } = await supabase
@@ -384,6 +420,20 @@ try {
   assert.equal(registrationDelete.response.status, 200);
   assert.equal(registrationDelete.body?.registration?.status, "cancelled");
   pass("event_registration_cancelled");
+
+  const { data: portraitConsentAfterCancel, error: portraitConsentLoadError } =
+    await supabase
+      .from("miniapp_consents")
+      .select("policy_version")
+      .eq("user_id", userId)
+      .eq(
+        "policy_version",
+        `event-portrait:${eventPortraitConsentVersion}:${event.id}`,
+      )
+      .maybeSingle();
+  if (portraitConsentLoadError) throw portraitConsentLoadError;
+  assert.equal(portraitConsentAfterCancel, null);
+  pass("event_portrait_consent_withdrawn_on_cancel");
 
   if (reminder.body?.available && reminder.body?.templateId) {
     const { data: cancelledReminder, error: cancelledReminderError } =

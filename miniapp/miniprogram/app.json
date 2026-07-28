@@ -4,6 +4,7 @@
     "pages/events/index",
     "pages/me/index",
     "pages/events/detail/index",
+    "pages/event-consent/index",
     "pages/intro/index",
     "pages/profile/index",
     "pages/profile/edit/index",

@@ -181,6 +181,7 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
                       <TableHead>成员</TableHead>
                       <TableHead>联系信息</TableHead>
                       <TableHead>状态</TableHead>
+                      <TableHead>肖像授权</TableHead>
                       <TableHead>签到</TableHead>
                       <TableHead>报名时间</TableHead>
                       <TableHead>备注</TableHead>
@@ -213,6 +214,20 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
                           >
                             {formatAdminRegistrationStatus(registration.status)}
                           </AdminStatusBadge>
+                        </TableCell>
+                        <TableCell>
+                          <AdminStatusBadge
+                            tone={registration.portraitConsentAccepted ? "active" : "neutral"}
+                          >
+                            {registration.portraitConsentAccepted ? "已授权" : "未授权"}
+                          </AdminStatusBadge>
+                          {registration.portraitConsentAcceptedAt ? (
+                            <div className="mt-1 text-xs text-muted-foreground">
+                              {new Date(
+                                registration.portraitConsentAcceptedAt,
+                              ).toLocaleString("zh-CN")}
+                            </div>
+                          ) : null}
                         </TableCell>
                         <TableCell>
                           <NativeSelect

@@ -276,6 +276,54 @@
   line-height: 1.55;
 }
 
+.registration-consents {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.registration-consent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10rpx;
+  padding: 18rpx;
+  border: 2rpx solid #d8e9e0;
+  border-radius: 20rpx;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.registration-consent-row checkbox {
+  flex: 0 0 auto;
+}
+
+.registration-consent-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 2rpx 6rpx;
+  color: var(--color-muted);
+  font-size: 22rpx;
+  line-height: 1.6;
+}
+
+.registration-consent-link {
+  color: var(--color-green-dark);
+  font-weight: 720;
+}
+
+.registration-consent-row-optional {
+  border-color: #e6e0f8;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.registration-consent-optional {
+  width: 100%;
+  color: var(--color-purple);
+  font-size: 20rpx;
+  font-weight: 700;
+}
+
 .reminder-status,
 .completed-note {
   padding: 20rpx 22rpx;

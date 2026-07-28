@@ -2,6 +2,10 @@ import { notFound } from "next/navigation";
 
 import { redactSensitiveValue } from "@/lib/admin/permissions";
 import {
+  EVENT_PORTRAIT_CONSENT_VERSION,
+  eventPortraitConsentKey,
+} from "@/lib/event-registration-consent";
+import {
   canAdmin,
   getAdminContextResult,
   requireAdminPermission,
@@ -76,6 +80,14 @@ export type AdminProfileRow = {
 export type AdminRegistration = AdminRegistrationRow & {
   profile: AdminProfileRow | null;
   attendance: AdminAttendanceRow | null;
+  portraitConsentAccepted: boolean;
+  portraitConsentAcceptedAt: string | null;
+};
+
+type AdminConsentRow = {
+  user_id: string;
+  policy_version: string;
+  accepted_at: string;
 };
 
 export type AdminEventFeedback = AdminEventFeedbackRow & {
@@ -132,6 +144,7 @@ export async function loadAdminEventsData(
     { data: feedbackData, error: feedbackError },
     { data: attendanceData, error: attendanceError },
     { data: profilesData, error: profilesError },
+    { data: portraitConsentsData, error: portraitConsentsError },
   ] = await Promise.all([
     supabase
       .from("events")
@@ -163,6 +176,15 @@ export async function loadAdminEventsData(
     canReadRegistrations
       ? supabase.from("profiles").select("id, display_name, email, city")
       : Promise.resolve({ data: [], error: null }),
+    canReadRegistrations
+      ? supabase
+          .from("miniapp_consents")
+          .select("user_id, policy_version, accepted_at")
+          .like(
+            "policy_version",
+            `event-portrait:${EVENT_PORTRAIT_CONSENT_VERSION}:%`,
+          )
+      : Promise.resolve({ data: [], error: null }),
   ]);
 
   const events = (eventsData ?? []) as AdminEventRow[];
@@ -171,6 +193,7 @@ export async function loadAdminEventsData(
   const attendance = (attendanceData ?? []) as AdminAttendanceRow[];
   const feedback = (feedbackData ?? []) as AdminEventFeedbackRow[];
   const profiles = (profilesData ?? []) as AdminProfileRow[];
+  const portraitConsents = (portraitConsentsData ?? []) as AdminConsentRow[];
   const queryErrors = [
     eventsError?.message,
     photosError?.message,
@@ -178,6 +201,7 @@ export async function loadAdminEventsData(
     attendanceError?.message,
     feedbackError?.message,
     profilesError?.message,
+    portraitConsentsError?.message,
   ].filter(Boolean) as string[];
 
   const profilesByUserId = new Map(profiles.map((profile) => [profile.id, profile]));
@@ -190,6 +214,12 @@ export async function loadAdminEventsData(
     ]),
   );
   const feedbackByEventId = new Map<string, AdminEventFeedback[]>();
+  const portraitConsentByUserAndPolicy = new Map(
+    portraitConsents.map((consent) => [
+      `${consent.user_id}:${consent.policy_version}`,
+      consent,
+    ]),
+  );
 
   feedback.forEach((item) => {
     const eventFeedback = feedbackByEventId.get(item.event_id) ?? [];
@@ -209,6 +239,9 @@ export async function loadAdminEventsData(
   registrations.forEach((registration) => {
     const eventRegistrations = registrationsByEventId.get(registration.event_id) ?? [];
     const profile = profilesByUserId.get(registration.user_id) ?? null;
+    const portraitConsent = portraitConsentByUserAndPolicy.get(
+      `${registration.user_id}:${eventPortraitConsentKey(registration.event_id)}`,
+    );
 
     eventRegistrations.push({
       ...registration,
@@ -223,6 +256,8 @@ export async function loadAdminEventsData(
         attendanceByEventAndUser.get(
           `${registration.event_id}:${registration.user_id}`,
         ) ?? null,
+      portraitConsentAccepted: Boolean(portraitConsent),
+      portraitConsentAcceptedAt: portraitConsent?.accepted_at ?? null,
     });
     registrationsByEventId.set(registration.event_id, eventRegistrations);
   });
