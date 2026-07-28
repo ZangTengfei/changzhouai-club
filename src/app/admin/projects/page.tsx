@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import {
   deleteAdminProjectApplication,
@@ -8,6 +7,7 @@ import {
   updateAdminProjectApplication,
 } from "@/app/admin/actions";
 import { AdminModal } from "@/components/admin-modal";
+import { AdminProjectsTable } from "@/components/admin-projects-table";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
 import {
@@ -79,26 +79,6 @@ function toDatetimeLocal(value: string | null) {
   return localDate.toISOString().slice(0, 16);
 }
 
-function getProjectStatusTone(status: string): AdminTone {
-  switch (status) {
-    case "draft":
-      return "draft";
-    case "recruiting":
-      return "scheduled";
-    case "matching":
-      return "registered";
-    case "in_progress":
-      return "completed";
-    case "filled":
-      return "qualified";
-    case "closed":
-    case "archived":
-      return "cancelled";
-    default:
-      return "neutral";
-  }
-}
-
 function getApplicationStatusTone(status: string): AdminTone {
   switch (status) {
     case "new":
@@ -133,7 +113,11 @@ function ProjectOpportunityForm({
 
       <div className="grid gap-4 md:grid-cols-2">
         <AdminField label="项目标题">
-          <Input name="title" defaultValue={opportunity?.title ?? ""} required />
+          <Input
+            name="title"
+            defaultValue={opportunity?.title ?? ""}
+            required
+          />
         </AdminField>
 
         <AdminField label="链接 slug">
@@ -149,31 +133,43 @@ function ProjectOpportunityForm({
             name="opportunity_type"
             defaultValue={opportunity?.opportunity_type ?? "project"}
           >
-            {Object.entries(projectOpportunityTypeLabels).map(([value, label]) => (
-              <option value={value} key={value}>
-                {label}
-              </option>
-            ))}
+            {Object.entries(projectOpportunityTypeLabels).map(
+              ([value, label]) => (
+                <option value={value} key={value}>
+                  {label}
+                </option>
+              ),
+            )}
           </NativeSelect>
         </AdminField>
 
         <AdminField label="状态">
-          <NativeSelect name="status" defaultValue={opportunity?.status ?? "draft"}>
-            {Object.entries(projectOpportunityStatusLabels).map(([value, label]) => (
-              <option value={value} key={value}>
-                {label}
-              </option>
-            ))}
+          <NativeSelect
+            name="status"
+            defaultValue={opportunity?.status ?? "draft"}
+          >
+            {Object.entries(projectOpportunityStatusLabels).map(
+              ([value, label]) => (
+                <option value={value} key={value}>
+                  {label}
+                </option>
+              ),
+            )}
           </NativeSelect>
         </AdminField>
 
         <AdminField label="可见性">
-          <NativeSelect name="visibility" defaultValue={opportunity?.visibility ?? "public"}>
-            {Object.entries(projectOpportunityVisibilityLabels).map(([value, label]) => (
-              <option value={value} key={value}>
-                {label}
-              </option>
-            ))}
+          <NativeSelect
+            name="visibility"
+            defaultValue={opportunity?.visibility ?? "public"}
+          >
+            {Object.entries(projectOpportunityVisibilityLabels).map(
+              ([value, label]) => (
+                <option value={value} key={value}>
+                  {label}
+                </option>
+              ),
+            )}
           </NativeSelect>
         </AdminField>
 
@@ -186,7 +182,12 @@ function ProjectOpportunityForm({
         </AdminField>
 
         <AdminField label="一句话摘要" className="md:col-span-2">
-          <Textarea name="summary" rows={2} defaultValue={opportunity?.summary ?? ""} required />
+          <Textarea
+            name="summary"
+            rows={2}
+            defaultValue={opportunity?.summary ?? ""}
+            required
+          />
         </AdminField>
 
         <AdminField label="封面图" className="md:col-span-2">
@@ -332,11 +333,14 @@ function ProjectApplicationCard({
           </h3>
           <p className="text-sm text-muted-foreground">
             账号：{application.applicantDisplayName}
-            {application.applicantEmail ? ` · ${application.applicantEmail}` : ""}
+            {application.applicantEmail
+              ? ` · ${application.applicantEmail}`
+              : ""}
           </p>
           <p className="text-sm text-muted-foreground">
             微信 {application.contact_wechat ?? "未填"} · 电话{" "}
-            {application.contact_phone ?? "未填"} · 邮箱 {application.contact_email ?? "未填"}
+            {application.contact_phone ?? "未填"} · 邮箱{" "}
+            {application.contact_email ?? "未填"}
           </p>
         </div>
 
@@ -360,21 +364,28 @@ function ProjectApplicationCard({
       ) : null}
 
       {application.note ? (
-        <p className="mt-2 text-sm text-muted-foreground">备注：{application.note}</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          备注：{application.note}
+        </p>
       ) : null}
 
-      <form action={updateAdminProjectApplication} className="mt-4 grid gap-4 md:grid-cols-2">
+      <form
+        action={updateAdminProjectApplication}
+        className="mt-4 grid gap-4 md:grid-cols-2"
+      >
         <input type="hidden" name="application_id" value={application.id} />
         <input type="hidden" name="project_id" value={opportunity.id} />
         <input type="hidden" name="project_slug" value={opportunity.slug} />
 
         <AdminField label="申请状态">
           <NativeSelect name="status" defaultValue={application.status}>
-            {Object.entries(projectApplicationStatusLabels).map(([value, label]) => (
-              <option value={value} key={value}>
-                {label}
-              </option>
-            ))}
+            {Object.entries(projectApplicationStatusLabels).map(
+              ([value, label]) => (
+                <option value={value} key={value}>
+                  {label}
+                </option>
+              ),
+            )}
           </NativeSelect>
         </AdminField>
 
@@ -436,132 +447,71 @@ export default async function AdminProjectsPage({
       </AdminPanel>
 
       {queryErrors.length > 0 ? (
-        <AdminNotice>后台数据读取出现问题：{queryErrors.join(" | ")}</AdminNotice>
+        <AdminNotice>
+          后台数据读取出现问题：{queryErrors.join(" | ")}
+        </AdminNotice>
       ) : null}
 
       <AdminPanel>
-        <AdminPanelHeader eyebrow="List" title="机会列表" />
-        <AdminPanelBody className="space-y-3">
+        <AdminPanelBody className="p-0">
+          <AdminProjectsTable opportunities={opportunities} />
           {opportunities.length > 0 ? (
-            opportunities.map((opportunity) => (
-              <article
-                key={opportunity.id}
-                className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background"
-              >
-                <div className="grid gap-3 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
-                  <div className="min-w-0 space-y-2">
-                    {opportunity.cover_image_url ? (
-                      <img
-                        src={opportunity.cover_image_url}
-                        alt=""
-                        loading="lazy"
-                        className="mb-3 aspect-[16/9] w-full max-w-80 rounded-[calc(var(--radius)-4px)] border border-border/70 object-cover"
-                      />
-                    ) : null}
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-base font-semibold text-foreground">
-                        {opportunity.title}
-                      </h2>
-                      <AdminStatusBadge tone={getProjectStatusTone(opportunity.status)}>
-                        {projectOpportunityStatusLabels[opportunity.status]}
-                      </AdminStatusBadge>
-                      <AdminStatusBadge tone="neutral">
-                        {projectOpportunityTypeLabels[opportunity.opportunity_type]}
-                      </AdminStatusBadge>
-                      <AdminStatusBadge
-                        tone={opportunity.visibility === "private" ? "draft" : "scheduled"}
-                      >
-                        {projectOpportunityVisibilityLabels[opportunity.visibility]}
-                      </AdminStatusBadge>
-                      {opportunity.is_featured ? (
-                        <AdminStatusBadge tone="registered">精选</AdminStatusBadge>
-                      ) : null}
-                      <AdminStatusBadge
-                        tone={opportunity.application_requires_login ? "pending" : "neutral"}
-                      >
-                        {opportunity.external_application_url
-                          ? "外部表单"
-                          : opportunity.application_requires_login
-                            ? "需登录申请"
-                            : "匿名可申请"}
-                      </AdminStatusBadge>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{opportunity.summary}</p>
-                    <p className="text-xs text-muted-foreground">
-                      /projects/{opportunity.slug} · 申请 {opportunity.applicationCount} 条 · 更新于{" "}
-                      {formatDateTime(opportunity.updated_at)}
-                    </p>
-                    {[...opportunity.role_tags, ...opportunity.topic_tags].length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
-                        {[...opportunity.role_tags, ...opportunity.topic_tags].map((tag) => (
-                          <span
-                            className="rounded-full border border-border/70 bg-muted/30 px-2 py-1 text-xs text-muted-foreground"
-                            key={`${opportunity.id}-${tag}`}
-                          >
-                            {tag}
-                          </span>
-                        ))}
+            <div className="border-t border-border/70 p-4">
+              <p className="mb-3 text-sm font-medium text-foreground">
+                项目编辑与申请管理
+              </p>
+              <div className="grid gap-2">
+                {opportunities.map((opportunity) => (
+                  <details
+                    id={`manage-project-${opportunity.id}`}
+                    key={opportunity.id}
+                    className="rounded-lg border border-border/70 bg-background target:ring-2 target:ring-primary/20"
+                  >
+                    <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-foreground">
+                      {opportunity.title} · {opportunity.applicationCount}{" "}
+                      条申请
+                    </summary>
+                    <div className="grid gap-5 border-t border-border/70 p-4">
+                      <ProjectOpportunityForm opportunity={opportunity} />
+
+                      <div className="grid gap-3">
+                        <h3 className="text-sm font-semibold text-foreground">
+                          申请记录（{opportunity.applicationCount}）
+                        </h3>
+                        {opportunity.applications.length > 0 ? (
+                          opportunity.applications.map((application) => (
+                            <ProjectApplicationCard
+                              key={application.id}
+                              application={application}
+                              opportunity={opportunity}
+                            />
+                          ))
+                        ) : (
+                          <AdminNotice>这个机会还没有收到申请。</AdminNotice>
+                        )}
                       </div>
-                    ) : null}
-                  </div>
 
-                  <div className="flex flex-wrap gap-2 lg:justify-end">
-                    <Button asChild type="button" variant="outline" size="sm">
-                      <a
-                        href={`/api/admin/projects/applications/export?project_id=${encodeURIComponent(opportunity.id)}`}
-                        download
-                        aria-label={`导出 ${opportunity.title} 的申请记录 CSV`}
-                      >
-                        导出申请
-                      </a>
-                    </Button>
-                    {opportunity.visibility !== "private" && opportunity.status !== "draft" ? (
-                      <Button asChild type="button" variant="outline" size="sm">
-                        <Link href={`/projects/${opportunity.slug}`}>前台查看</Link>
-                      </Button>
-                    ) : null}
-                    <form action={deleteAdminProjectOpportunity}>
-                      <input type="hidden" name="opportunity_id" value={opportunity.id} />
-                      <input type="hidden" name="slug" value={opportunity.slug} />
-                      <Button type="submit" variant="outline" size="sm">
-                        删除
-                      </Button>
-                    </form>
-                  </div>
-                </div>
-
-                <details className="border-t border-border/70">
-                  <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-muted-foreground">
-                    展开编辑表单
-                  </summary>
-                  <div className="p-4 pt-1">
-                    <ProjectOpportunityForm opportunity={opportunity} />
-                  </div>
-                </details>
-
-                <details className="border-t border-border/70">
-                  <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-muted-foreground">
-                    查看申请记录（{opportunity.applicationCount}）
-                  </summary>
-                  <div className="grid gap-3 p-4 pt-1">
-                    {opportunity.applications.length > 0 ? (
-                      opportunity.applications.map((application) => (
-                        <ProjectApplicationCard
-                          key={application.id}
-                          application={application}
-                          opportunity={opportunity}
+                      <form action={deleteAdminProjectOpportunity}>
+                        <input
+                          type="hidden"
+                          name="opportunity_id"
+                          value={opportunity.id}
                         />
-                      ))
-                    ) : (
-                      <AdminNotice>这个机会还没有收到申请。</AdminNotice>
-                    )}
-                  </div>
-                </details>
-              </article>
-            ))
-          ) : (
-            <AdminNotice>还没有共建机会。新增后可选择公开、成员可见或仅后台保存。</AdminNotice>
-          )}
+                        <input
+                          type="hidden"
+                          name="slug"
+                          value={opportunity.slug}
+                        />
+                        <Button type="submit" variant="destructive" size="sm">
+                          删除这个项目
+                        </Button>
+                      </form>
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </AdminPanelBody>
       </AdminPanel>
     </AdminPageStack>
