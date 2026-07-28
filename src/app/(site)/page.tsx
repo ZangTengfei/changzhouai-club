@@ -77,7 +77,7 @@ function extractShortBio(value: string | null) {
 
 const heroNotes = [
   {
-    className: "home-sticky-note home-sticky-note-green",
+    className: "home-sticky-note home-sticky-note-orange",
     lines: ["带着问题来", "一起找到", "可验证的方向"],
     icon: "heart",
   },
@@ -215,7 +215,7 @@ export default async function HomePage() {
   const memberStories = storyMembers;
 
   return (
-    <div className={cx("home-page-stack")}>
+    <div className={cx("home-page-stack")} data-home-page>
       <section className={cx("home-hero")} aria-labelledby="home-hero-title">
         <div className={cx("home-hero-copy")}>
           <p className={cx("home-kicker")}>连接・分享・共创 👋</p>
