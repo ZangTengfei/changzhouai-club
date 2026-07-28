@@ -18,7 +18,8 @@
     "news:social": "node scripts/ai-daily-social-materials.mjs",
     "news:poster": "node scripts/render-ai-daily-wechat-poster.mjs",
     "db:copy": "node scripts/copy-supabase-database.mjs",
-    "storage:copy": "node scripts/copy-supabase-storage.mjs"
+    "storage:copy": "node scripts/copy-supabase-storage.mjs",
+    "storage:verify:cos": "node --env-file=.env.local scripts/verify-cos-storage.mjs"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.15",
@@ -30,6 +31,7 @@
     "@vercel/speed-insights": "^2.0.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cos-nodejs-sdk-v5": "^3.0.0",
     "fast-xml-parser": "^5.7.3",
     "lucide-react": "^1.8.0",
     "next": "^16.2.10",
@@ -41,6 +43,7 @@
     "react-markdown": "^10.1.0",
     "remark-breaks": "^4.0.0",
     "remark-gfm": "^4.0.1",
+    "server-only": "^0.0.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0"
   },

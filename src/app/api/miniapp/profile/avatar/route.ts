@@ -1,6 +1,7 @@
 import { loadMiniappAccountSnapshot } from "@/lib/miniapp-auth";
 import { miniappJson, requireMiniappSession } from "@/lib/miniapp-api";
 import { MINIAPP_PRIVACY_POLICY_VERSION } from "@/lib/miniapp-profile";
+import { uploadPublicAsset } from "@/lib/public-asset-storage";
 import {
   buildMemberAvatarPath,
   MEMBER_AVATARS_BUCKET,
@@ -48,22 +49,20 @@ export async function POST(request: Request) {
   }
 
   const path = buildMemberAvatarPath(userId);
-  const { error: uploadError } = await auth.supabase.storage
-    .from(MEMBER_AVATARS_BUCKET)
-    .upload(path, file, {
-      upsert: true,
-      contentType: file.type,
-      cacheControl: "3600",
-    });
+  let publicUrl: string;
 
-  if (uploadError) {
+  try {
+    ({ publicUrl } = await uploadPublicAsset({
+      bucket: MEMBER_AVATARS_BUCKET,
+      path,
+      file,
+    }));
+  } catch (error) {
+    console.error("Failed to upload miniapp avatar to Tencent COS.", error);
     return miniappJson({ error: "avatar_upload_failed" }, 500);
   }
 
-  const { data } = auth.supabase.storage
-    .from(MEMBER_AVATARS_BUCKET)
-    .getPublicUrl(path);
-  const avatarUrl = `${data.publicUrl}?v=${Date.now()}`;
+  const avatarUrl = `${publicUrl}?v=${Date.now()}`;
   const { error: profileError } = await auth.supabase
     .from("profiles")
     .update({ avatar_url: avatarUrl })

@@ -10,13 +10,6 @@ import {
   compressImageFile,
   formatFileSize,
 } from "@/lib/client-image-compression";
-import { createClient } from "@/lib/supabase/client";
-import {
-  buildMemberAvatarPath,
-  buildMemberWorkAssetPath,
-  MEMBER_AVATARS_BUCKET,
-  MEMBER_WORK_ASSETS_BUCKET,
-} from "@/lib/supabase/storage";
 import { cssModuleCx } from "@/lib/utils";
 
 import styles from "./image-upload-field.module.css";
@@ -152,50 +145,35 @@ export function ImageUploadField({
 
       setUploadStage("uploading");
 
-      if (uploadTarget.kind === "member-avatar") {
-        const supabase = createClient();
-        const assetPath = buildMemberAvatarPath(uploadTarget.userId);
-        const { error: uploadError } = await supabase.storage
-          .from(MEMBER_AVATARS_BUCKET)
-          .upload(assetPath, uploadFile, {
-            upsert: true,
-            contentType: uploadFile.type || undefined,
-          });
+      if (
+        uploadTarget.kind === "member-avatar" ||
+        uploadTarget.kind === "member-work-asset"
+      ) {
+        const payload = new FormData();
+        payload.append(
+          "assetType",
+          uploadTarget.kind === "member-avatar" ? "avatar" : "work",
+        );
+        payload.append("file", uploadFile);
 
-        if (uploadError) {
-          throw uploadError;
+        const response = await fetch("/api/account/storage/member-assets", {
+          method: "POST",
+          body: payload,
+        });
+        const result = (await response.json().catch(() => null)) as
+          | { publicUrl?: string; message?: string }
+          | null;
+
+        if (!response.ok || !result?.publicUrl) {
+          throw new Error(result?.message || "图片上传失败，请稍后再试。");
         }
-
-        const { data } = supabase.storage
-          .from(MEMBER_AVATARS_BUCKET)
-          .getPublicUrl(assetPath);
 
         updateValue(
-          uploadTarget.cacheBust === false
-            ? data.publicUrl
-            : `${data.publicUrl}?v=${Date.now()}`,
+          uploadTarget.kind === "member-avatar" &&
+            uploadTarget.cacheBust !== false
+            ? `${result.publicUrl}?v=${Date.now()}`
+            : result.publicUrl,
         );
-      } else if (uploadTarget.kind === "member-work-asset") {
-        const supabase = createClient();
-        const assetPath = buildMemberWorkAssetPath(
-          uploadTarget.userId,
-          uploadFile.name,
-        );
-        const { error: uploadError } = await supabase.storage
-          .from(MEMBER_WORK_ASSETS_BUCKET)
-          .upload(assetPath, uploadFile, {
-            contentType: uploadFile.type || undefined,
-          });
-
-        if (uploadError) {
-          throw uploadError;
-        }
-
-        const { data } = supabase.storage
-          .from(MEMBER_WORK_ASSETS_BUCKET)
-          .getPublicUrl(assetPath);
-
-        updateValue(data.publicUrl);
       } else {
         const payload = new FormData();
         payload.append("eventSlug", uploadTarget.eventSlug);

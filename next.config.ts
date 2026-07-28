@@ -57,6 +57,34 @@ function getSupabaseImagePatterns() {
   return patterns;
 }
 
+function getPublicAssetImagePatterns() {
+  const assetBaseUrl = process.env.NEXT_PUBLIC_IMAGE_CDN_URL?.trim();
+
+  if (!assetBaseUrl) {
+    return [];
+  }
+
+  try {
+    const parsedUrl = new URL(assetBaseUrl);
+    const protocol = parsedUrl.protocol.replace(":", "");
+
+    if (protocol !== "http" && protocol !== "https") {
+      return [];
+    }
+
+    return [
+      {
+        protocol,
+        hostname: parsedUrl.hostname,
+        port: parsedUrl.port,
+        pathname: "/**",
+      } satisfies RemotePattern,
+    ];
+  } catch {
+    return [];
+  }
+}
+
 const nextConfig: NextConfig = {
   deploymentId,
   output: "standalone",
@@ -70,7 +98,10 @@ const nextConfig: NextConfig = {
     ];
   },
   images: {
-    remotePatterns: getSupabaseImagePatterns(),
+    remotePatterns: [
+      ...getSupabaseImagePatterns(),
+      ...getPublicAssetImagePatterns(),
+    ],
   },
 };
 
