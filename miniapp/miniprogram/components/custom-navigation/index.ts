@@ -35,4 +35,9 @@ Component({
     },
   },
   data: getNavigationLayout(),
+  methods: {
+    handleAvatarTap() {
+      this.triggerEvent("avatartap");
+    },
+  },
 });

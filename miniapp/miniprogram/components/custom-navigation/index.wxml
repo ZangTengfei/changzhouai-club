@@ -5,7 +5,7 @@
         <image wx:if="{{showMark}}" class="custom-navigation-mark" src="/assets/logo-mark.png" mode="aspectFit" />
         <text class="custom-navigation-title">{{title}}</text>
       </view>
-      <view wx:if="{{showAvatar}}" class="custom-navigation-avatar">
+      <view wx:if="{{showAvatar}}" class="custom-navigation-avatar" bindtap="handleAvatarTap" role="button" aria-label="查看能力档案">
         <image wx:if="{{avatarUrl}}" src="{{avatarUrl}}" mode="aspectFill" />
         <text wx:else>{{avatarInitial}}</text>
       </view>

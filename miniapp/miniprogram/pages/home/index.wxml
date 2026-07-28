@@ -3,6 +3,7 @@
   show-avatar="{{true}}"
   avatar-url="{{avatarUrl}}"
   avatar-initial="{{avatarInitial}}"
+  bindavatartap="openProfile"
 />
 
 <view class="page-shell home-page">
