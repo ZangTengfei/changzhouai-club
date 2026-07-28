@@ -54,6 +54,9 @@ Page({
   },
 
   onLoad() {
+    void wx.showShareMenu({
+      menus: ["shareAppMessage", "shareTimeline"],
+    });
     void ensureSession()
       .then(() => trackEvent("home_view", "/pages/home/index"))
       .catch(() => undefined);
@@ -143,4 +146,22 @@ Page({
     void wx.navigateTo({ url: "/pages/growth/index" });
   },
 
+  onShareAppMessage() {
+    trackEvent("share_event", "/pages/home/index", {
+      channel: "message",
+    });
+    return {
+      title: "常州 AI Club｜和有趣的人一起做点新东西",
+      path: "/pages/home/index",
+    };
+  },
+
+  onShareTimeline() {
+    trackEvent("share_event", "/pages/home/index", {
+      channel: "timeline",
+    });
+    return {
+      title: "常州 AI Club｜和有趣的人一起做点新东西",
+    };
+  },
 });
