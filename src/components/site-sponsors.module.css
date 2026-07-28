@@ -32,12 +32,8 @@
   padding: 16px;
   border: 0;
   border-radius: var(--radius-md);
-  background: #e9f9f0;
-  box-shadow: 0 10px 24px rgba(var(--ink-rgb), 0.026);
-}
-
-.home-sponsor-featured-card:nth-child(even) {
-  background: #edf5ff;
+  background: #ffffff;
+  box-shadow: 0 10px 28px rgba(var(--ink-rgb), 0.06);
 }
 
 .home-sponsor-featured-card:hover,
@@ -113,10 +109,10 @@
   gap: 10px;
   min-height: 120px;
   padding: 12px;
-  border: 1px solid rgba(205, 213, 209, 0.72);
+  border: 0;
   border-radius: var(--radius-md);
-  background: #f3efff;
-  box-shadow: 0 10px 24px rgba(var(--ink-rgb), 0.024);
+  background: #ffffff;
+  box-shadow: 0 10px 28px rgba(var(--ink-rgb), 0.055);
 }
 
 .home-sponsor-compact-logo {

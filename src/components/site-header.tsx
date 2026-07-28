@@ -83,7 +83,10 @@ export function SiteHeader() {
   }, [mobileMenuOpen]);
 
   return (
-    <header className={cx("site-header")}>
+    <header
+      className={cx("site-header")}
+      data-home-header={pathname === "/" ? "true" : undefined}
+    >
       <div
         className={cx("container header-inner")}
         data-mobile-menu-open={mobileMenuOpen ? "true" : "false"}

@@ -7,6 +7,11 @@
   backdrop-filter: blur(14px);
 }
 
+.site-header[data-home-header="true"] {
+  background: #ffffff;
+  backdrop-filter: none;
+}
+
 .header-inner {
   position: relative;
   display: grid;
@@ -19,6 +24,10 @@
   border-radius: 0;
   background: transparent;
   box-shadow: none;
+}
+
+.site-header[data-home-header="true"] .header-inner {
+  background: #ffffff;
 }
 
 .header-inner::after {

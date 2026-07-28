@@ -174,7 +174,7 @@ export default async function HomePage() {
       : "新活动发布后会同步时间和地点";
   const storyMembers = directory.members
     .filter((member) => member.avatarUrl || member.bio || member.roleLabel)
-    .slice(0, 2)
+    .slice(0, 4)
     .map((member) => {
       const metaParts = [member.roleLabel, member.organization].filter(Boolean);
       const storyTags = member.skills
