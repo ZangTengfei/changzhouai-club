@@ -1,7 +1,27 @@
 <custom-navigation title="我的" />
 
 <view class="page-shell account-page">
-  <view wx:if="{{loading}}" class="empty-state">正在加载成员档案</view>
+  <view wx:if="{{loading}}" class="account-skeleton" aria-hidden="true">
+    <view class="identity-hero skeleton-hero">
+      <view class="skeleton-profile">
+        <view class="skeleton-block skeleton-avatar"></view>
+        <view class="skeleton-profile-copy">
+          <view class="skeleton-block skeleton-name"></view>
+          <view class="skeleton-block skeleton-pill"></view>
+        </view>
+      </view>
+      <view class="skeleton-completion">
+        <view class="skeleton-block skeleton-completion-line"></view>
+        <view class="skeleton-block skeleton-completion-track"></view>
+      </view>
+    </view>
+
+    <view class="stats-card surface-card skeleton-stats">
+      <view class="skeleton-block skeleton-stat"></view>
+      <view class="skeleton-block skeleton-stat"></view>
+      <view class="skeleton-block skeleton-stat"></view>
+    </view>
+  </view>
 
   <view wx:elif="{{loggedOut}}" class="account-error">
     <text class="section-title">已退出当前账号</text>

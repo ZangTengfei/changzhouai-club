@@ -7,6 +7,24 @@ type FootprintItem = MiniappUser["footprints"][number] & {
   locationLabel: string;
 };
 
+function buildAccountViewData(user: MiniappUser) {
+  const latestFootprint = user.footprints[0];
+
+  return {
+    user,
+    avatarInitial: user.displayName.slice(0, 1) || "微",
+    honorTags: getHonorBadges(user).slice(0, 2),
+    latestFootprint: latestFootprint
+      ? {
+          ...latestFootprint,
+          dateLabel: formatEventDate(latestFootprint.event_at),
+          locationLabel: latestFootprint.venue || latestFootprint.city || "常州",
+        }
+      : null,
+    activitySummary: `${user.stats.registrationCount} 次报名 · ${user.stats.attendanceCount} 次到场`,
+  };
+}
+
 Page({
   data: {
     user: null as MiniappUser | null,
@@ -27,6 +45,15 @@ Page({
         loggedOut: true,
         suppressAutoLogin: true,
       });
+      return;
+    }
+
+    const cachedUser = getApp<IAppOption>().globalData.currentUser;
+    if (cachedUser) {
+      this.setData({
+        ...buildAccountViewData(cachedUser),
+        loading: false,
+      });
     }
   },
 
@@ -35,32 +62,40 @@ Page({
       this.setData({ suppressAutoLogin: false });
       return;
     }
+
+    const cachedUser = getApp<IAppOption>().globalData.currentUser;
+    if (cachedUser) {
+      this.setData({
+        ...buildAccountViewData(cachedUser),
+        loading: false,
+      });
+    }
+
     void this.loadAccount();
   },
 
   async loadAccount() {
-    this.setData({ loading: true, loginFailed: false, loggedOut: false });
+    const hasVisibleUser = Boolean(this.data.user);
+    this.setData({
+      loading: !hasVisibleUser,
+      loginFailed: false,
+      loggedOut: false,
+    });
 
     try {
       const user = await ensureSession();
-      const latestFootprint = user.footprints[0];
       getApp<IAppOption>().globalData.currentUser = user;
       this.setData({
-        user,
-        avatarInitial: user.displayName.slice(0, 1) || "微",
-        honorTags: getHonorBadges(user).slice(0, 2),
-        latestFootprint: latestFootprint
-          ? {
-              ...latestFootprint,
-              dateLabel: formatEventDate(latestFootprint.event_at),
-              locationLabel:
-                latestFootprint.venue || latestFootprint.city || "常州",
-            }
-          : null,
-        activitySummary: `${user.stats.registrationCount} 次报名 · ${user.stats.attendanceCount} 次到场`,
+        ...buildAccountViewData(user),
         loading: false,
       });
     } catch {
+      if (hasVisibleUser) {
+        this.setData({ loading: false });
+        void wx.showToast({ title: "刷新失败，已显示上次资料", icon: "none" });
+        return;
+      }
+
       this.setData({ user: null, loading: false, loginFailed: true });
     }
   },
