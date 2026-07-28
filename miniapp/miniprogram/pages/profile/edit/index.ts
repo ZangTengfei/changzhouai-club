@@ -157,6 +157,9 @@ Page({
         completion: profile.completion,
         profileCompleteBefore: profile.completion.completed,
       });
+      void wx.setNavigationBarTitle({
+        title: profile.completion.completed ? "编辑能力档案" : "完善能力档案",
+      });
       trackEvent("profile_started", "/pages/profile/edit/index", {
         completion: profile.completion.percent,
       });

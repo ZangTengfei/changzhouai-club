@@ -82,7 +82,10 @@ Page({
   },
 
   openProfile() {
-    void wx.navigateTo({ url: "/pages/profile/edit/index" });
+    const completed = this.data.user?.profileCompletion.completed ?? false;
+    void wx.navigateTo({
+      url: completed ? "/pages/profile/index" : "/pages/profile/edit/index",
+    });
   },
 
   openEvent(event: WechatMiniprogram.TouchEvent) {

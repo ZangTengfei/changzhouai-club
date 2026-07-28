@@ -21,7 +21,7 @@
         <image src="/assets/icons/settings-purple-v2.png" mode="aspectFit" />
       </view>
       <view class="identity-main">
-        <view class="identity-profile-trigger" bindtap="openProfile" role="button" aria-label="编辑成员资料">
+        <view class="identity-profile-trigger" bindtap="openProfile" role="button" aria-label="查看成员资料">
           <image wx:if="{{user.avatarUrl}}" class="avatar" src="{{user.avatarUrl}}" mode="aspectFill" />
           <view wx:else class="avatar avatar-placeholder">{{avatarInitial}}</view>
           <view class="identity-copy">
@@ -34,9 +34,9 @@
         </view>
       </view>
 
-      <view class="profile-completion" bindtap="openProfile" role="button" aria-label="继续完善能力档案">
-        <view class="profile-completion-heading"><text>能力档案 {{user.profileCompletion.percent}}%</text><text>继续完善</text></view>
-        <text class="profile-completion-copy">{{user.profileCompletion.completed ? '档案已完善，可以随时更新' : '再补充 ' + user.profileCompletion.missingItems.length + ' 项，让更多伙伴了解你'}}</text>
+      <view class="profile-completion" bindtap="openProfile" role="button" aria-label="{{user.profileCompletion.completed ? '查看能力档案' : '继续完善能力档案'}}">
+        <view class="profile-completion-heading"><text>能力档案 {{user.profileCompletion.percent}}%</text><text>{{user.profileCompletion.completed ? '查看档案' : '继续完善'}}</text></view>
+        <text class="profile-completion-copy">{{user.profileCompletion.completed ? '档案已完善，点击查看完整内容' : '再补充 ' + user.profileCompletion.missingItems.length + ' 项，让更多伙伴了解你'}}</text>
         <view class="profile-completion-track"><view style="width: {{user.profileCompletion.percent}}%;"></view></view>
       </view>
     </view>
