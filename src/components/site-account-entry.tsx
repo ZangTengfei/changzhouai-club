@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import {
@@ -59,7 +58,6 @@ export function SiteAccountEntry({
 }: {
   onAuthStateChange?: (isAuthenticated: boolean) => void;
 }) {
-  const pathname = usePathname();
   const [account, setAccount] = useState<AccountState>(defaultState);
   const [menuOpen, setMenuOpen] = useState(false);
   const [pending, setPending] = useState(false);
@@ -74,7 +72,7 @@ export function SiteAccountEntry({
     const supabase = createClient();
     let cancelled = false;
 
-    async function syncAccountState(sessionUser?: {
+    async function syncAccountState(sessionUser: {
       id: string;
       email?: string | null;
       user_metadata?: {
@@ -83,10 +81,7 @@ export function SiteAccountEntry({
         avatar_url?: string;
       };
     } | null) {
-      const user =
-        sessionUser ??
-        (await supabase.auth.getSession()).data.session?.user ??
-        null;
+      const user = sessionUser;
 
       if (!user) {
         if (!cancelled) {
@@ -145,8 +140,6 @@ export function SiteAccountEntry({
       }
     }
 
-    void syncAccountState();
-
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -157,7 +150,7 @@ export function SiteAccountEntry({
       cancelled = true;
       subscription.unsubscribe();
     };
-  }, [onAuthStateChange, pathname]);
+  }, [onAuthStateChange]);
 
   useEffect(() => {
     function handlePointerDown(event: MouseEvent) {
