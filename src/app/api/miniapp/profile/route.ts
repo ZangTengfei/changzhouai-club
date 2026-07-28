@@ -108,7 +108,9 @@ async function loadProfile(supabase: SupabaseClient, userId: string) {
     willingToAttend: member?.willing_to_attend ?? true,
     willingToShare: member?.willing_to_share ?? false,
     willingToJoinProjects: member?.willing_to_join_projects ?? false,
-    isPubliclyVisible: member?.is_publicly_visible ?? false,
+    isPubliclyVisible: completion.completed
+      ? (member?.is_publicly_visible ?? false)
+      : true,
     privacyAccepted: Boolean(consentResult.data),
     privacyPolicyVersion: MINIAPP_PRIVACY_POLICY_VERSION,
     completion,

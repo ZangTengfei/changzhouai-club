@@ -113,7 +113,7 @@ interface MiniappProfileUpdate {
   willingToAttend: boolean;
   willingToShare: boolean;
   willingToJoinProjects: boolean;
-  isPubliclyVisible: boolean;
+  isPubliclyVisible?: boolean;
   privacyAccepted: boolean;
 }
 

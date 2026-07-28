@@ -13,7 +13,7 @@
     </view>
 
     <view class="stepper" aria-label="资料填写进度">
-      <view wx:for="{{steps}}" wx:key="index" class="step-item {{item.index === currentStep ? 'step-item-active' : ''}} {{item.index < currentStep ? 'step-item-complete' : ''}}">
+      <view wx:for="{{steps}}" wx:key="index" class="step-item {{item.index === currentStep ? 'step-item-active' : ''}} {{item.index < currentStep ? 'step-item-complete' : ''}}" data-step="{{item.index}}" bindtap="goToStep" role="button">
         <text class="step-number">{{item.index + 1}}</text>
         <text class="step-label">{{item.label}}</text>
       </view>
@@ -103,7 +103,7 @@
 
     <view class="form-actions">
       <button wx:if="{{currentStep > 0}}" class="secondary-button back-button" disabled="{{saving}}" bindtap="goPrevious">上一步</button>
-      <button class="primary-button next-button" loading="{{saving}}" disabled="{{saving}}" bindtap="handlePrimaryAction">{{currentStep === 3 ? '保存能力档案' : '保存并继续'}}</button>
+      <button class="primary-button next-button" loading="{{saving}}" disabled="{{saving}}" bindtap="handlePrimaryAction">{{currentStep === 3 ? '完成' : '保存并继续'}}</button>
     </view>
   </view>
 </view>

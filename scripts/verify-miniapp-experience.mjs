@@ -89,7 +89,9 @@ try {
   });
   assert.equal(profileGet.response.status, 200);
   assert.ok(profileGet.body?.options?.industries?.length > 0);
+  assert.equal(profileGet.body?.profile?.isPubliclyVisible, true);
   pass("profile_loaded");
+  pass("new_profile_visibility_defaults_on");
 
   const legacyBootstrapPut = await request("/api/miniapp/profile", {
     method: "PUT",
@@ -113,7 +115,15 @@ try {
   assert.equal(legacyBootstrapPut.response.status, 200);
   assert.equal(legacyBootstrapPut.body?.user?.profileComplete, true);
   assert.equal(legacyBootstrapPut.body?.user?.capabilityProfileComplete, false);
+  const { data: bootstrapMember, error: bootstrapMemberError } = await supabase
+    .from("members")
+    .select("is_publicly_visible")
+    .eq("id", userId)
+    .single();
+  if (bootstrapMemberError) throw bootstrapMemberError;
+  assert.equal(bootstrapMember.is_publicly_visible, false);
   pass("legacy_profile_keeps_registration_ready");
+  pass("incomplete_profile_not_published_before_completion");
 
   const profilePut = await request("/api/miniapp/profile", {
     method: "PUT",

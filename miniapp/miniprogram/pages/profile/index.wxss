@@ -74,6 +74,64 @@
   font-weight: 700;
 }
 
+.profile-view-edit-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  margin-top: 20rpx;
+  padding: 20rpx;
+  border: 2rpx solid var(--color-line);
+  border-radius: 26rpx;
+  background: #ffffff;
+}
+
+.profile-view-edit-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.profile-view-edit-heading text:first-child {
+  font-size: 23rpx;
+  font-weight: 760;
+}
+
+.profile-view-edit-heading text:last-child {
+  color: var(--color-subtle);
+  font-size: 20rpx;
+}
+
+.profile-view-edit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8rpx;
+}
+
+.profile-view-edit-step {
+  display: flex;
+  min-height: 72rpx;
+  align-items: center;
+  justify-content: center;
+  gap: 8rpx;
+  border-radius: 20rpx;
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
+  font-size: 21rpx;
+  font-weight: 700;
+}
+
+.profile-view-edit-step text:first-child {
+  display: flex;
+  width: 30rpx;
+  height: 30rpx;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #ffffff;
+  font-size: 18rpx;
+}
+
 .profile-view-intro,
 .profile-view-privacy {
   margin-top: 20rpx;

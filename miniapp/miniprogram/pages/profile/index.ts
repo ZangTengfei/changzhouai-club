@@ -4,9 +4,15 @@ import { loadProfile } from "../../services/profile";
 import { createProfileShareCard } from "../../utils/profile-share-card";
 
 const PAGE_PATH = "/pages/profile/index";
+const profileEditSteps = ["身份", "能力", "连接", "公开"];
+
+function getProfileEditUrl(step: number) {
+  return `/pages/profile/edit/index?step=${step}`;
+}
 
 Page({
   data: {
+    profileEditSteps,
     profile: null as MiniappProfile | null,
     avatarInitial: "微",
     preferenceLabels: [] as string[],
@@ -63,7 +69,13 @@ Page({
   },
 
   editProfile() {
-    void wx.navigateTo({ url: "/pages/profile/edit/index" });
+    void wx.navigateTo({ url: getProfileEditUrl(0) });
+  },
+
+  editProfileStep(event: WechatMiniprogram.TouchEvent) {
+    const step = Number(event.currentTarget.dataset.step);
+    if (!Number.isInteger(step) || !profileEditSteps[step]) return;
+    void wx.navigateTo({ url: getProfileEditUrl(step) });
   },
 
   openVisibilitySettings() {
@@ -73,7 +85,9 @@ Page({
         "分享后，昵称、头像、城市、身份、能力与连接方向会作为公开成员资料展示；微信号不会公开。",
       confirmText: "去设置",
       success: ({ confirm }) => {
-        if (confirm) this.editProfile();
+        if (confirm) {
+          void wx.navigateTo({ url: getProfileEditUrl(3) });
+        }
       },
     });
   },

@@ -72,6 +72,21 @@ function getInitialStep(profile: MiniappProfile) {
   return 0;
 }
 
+function getStepState(currentStep: number) {
+  return {
+    currentStep,
+    currentStepTitle: steps[currentStep].title,
+    currentStepHint: steps[currentStep].hint,
+  };
+}
+
+function readRequestedStep(value: string | undefined) {
+  const step = Number(value);
+  return Number.isInteger(step) && step >= 0 && step < steps.length
+    ? step
+    : undefined;
+}
+
 Page({
   data: {
     steps,
@@ -102,7 +117,7 @@ Page({
     willingToAttend: true,
     willingToShare: false,
     willingToJoinProjects: false,
-    isPubliclyVisible: false,
+    isPubliclyVisible: true,
     privacyAccepted: false,
     privacyPolicyVersion: "",
     avatarUrl: null as string | null,
@@ -112,16 +127,16 @@ Page({
     profileCompleteBefore: false,
   },
 
-  onLoad() {
-    void this.loadPage();
+  onLoad(options: Record<string, string | undefined>) {
+    void this.loadPage(readRequestedStep(options.step));
   },
 
-  async loadPage() {
+  async loadPage(requestedStep?: number) {
     this.setData({ loading: true, loadFailed: false });
     try {
       await ensureSession();
       const { profile, options } = await loadProfile();
-      const currentStep = getInitialStep(profile);
+      const currentStep = requestedStep ?? getInitialStep(profile);
       this.setData({
         loading: false,
         currentStep,
@@ -149,7 +164,9 @@ Page({
         willingToAttend: profile.willingToAttend,
         willingToShare: profile.willingToShare,
         willingToJoinProjects: profile.willingToJoinProjects,
-        isPubliclyVisible: profile.isPubliclyVisible,
+        isPubliclyVisible: profile.completion.completed
+          ? profile.isPubliclyVisible
+          : true,
         privacyAccepted: profile.privacyAccepted,
         privacyPolicyVersion: profile.privacyPolicyVersion,
         avatarUrl: profile.avatarUrl,
@@ -325,7 +342,7 @@ Page({
     return true;
   },
 
-  buildPayload(): MiniappProfileUpdate {
+  buildPayload(includeVisibility = false): MiniappProfileUpdate {
     return {
       displayName: this.data.displayName.trim(),
       wechat: this.data.wechat.trim(),
@@ -342,13 +359,15 @@ Page({
       willingToAttend: this.data.willingToAttend,
       willingToShare: this.data.willingToShare,
       willingToJoinProjects: this.data.willingToJoinProjects,
-      isPubliclyVisible: this.data.isPubliclyVisible,
+      ...(includeVisibility
+        ? { isPubliclyVisible: this.data.isPubliclyVisible }
+        : {}),
       privacyAccepted: true,
     };
   },
 
-  async persistProfile() {
-    const response = await updateProfile(this.buildPayload());
+  async persistProfile(includeVisibility = false) {
+    const response = await updateProfile(this.buildPayload(includeVisibility));
     getApp<IAppOption>().globalData.currentUser = response.user;
     this.setData({ completion: response.profile.completion });
     return response;
@@ -357,11 +376,14 @@ Page({
   goPrevious() {
     if (this.data.saving || this.data.currentStep === 0) return;
     const currentStep = this.data.currentStep - 1;
-    this.setData({
-      currentStep,
-      currentStepTitle: steps[currentStep].title,
-      currentStepHint: steps[currentStep].hint,
-    });
+    this.setData(getStepState(currentStep));
+  },
+
+  goToStep(event: WechatMiniprogram.TouchEvent) {
+    if (this.data.saving) return;
+    const currentStep = Number(event.currentTarget.dataset.step);
+    if (!Number.isInteger(currentStep) || !steps[currentStep]) return;
+    this.setData(getStepState(currentStep));
   },
 
   async handlePrimaryAction() {
@@ -381,11 +403,7 @@ Page({
         completion: response.profile.completion.percent,
       });
       const currentStep = this.data.currentStep + 1;
-      this.setData({
-        currentStep,
-        currentStepTitle: steps[currentStep].title,
-        currentStepHint: steps[currentStep].hint,
-      });
+      this.setData(getStepState(currentStep));
     } catch {
       void wx.showToast({ title: "保存失败，请重试", icon: "none" });
     } finally {
@@ -396,18 +414,14 @@ Page({
   async saveProfile() {
     for (let step = 0; step <= 2; step += 1) {
       if (!this.validateStep(step)) {
-        this.setData({
-          currentStep: step,
-          currentStepTitle: steps[step].title,
-          currentStepHint: steps[step].hint,
-        });
+        this.setData(getStepState(step));
         return;
       }
     }
 
     this.setData({ saving: true });
     try {
-      const response = await this.persistProfile();
+      const response = await this.persistProfile(true);
       trackEvent("profile_saved", "/pages/profile/edit/index", {
         completion: response.profile.completion.percent,
       });
@@ -418,8 +432,11 @@ Page({
         "/pages/profile/edit/index",
         { completion: response.profile.completion.percent },
       );
-      void wx.showToast({ title: "能力档案已保存", icon: "success" });
-      setTimeout(() => void wx.navigateBack(), 500);
+      void wx.showToast({ title: "能力档案已完成", icon: "success" });
+      setTimeout(
+        () => void wx.redirectTo({ url: "/pages/profile/index" }),
+        500,
+      );
     } catch {
       void wx.showToast({ title: "保存失败，请重试", icon: "none" });
     } finally {

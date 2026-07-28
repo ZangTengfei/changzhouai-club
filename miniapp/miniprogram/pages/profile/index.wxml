@@ -24,6 +24,16 @@
       </view>
     </view>
 
+    <view class="profile-view-edit-steps">
+      <view class="profile-view-edit-heading"><text>快速编辑</text><text>点击步骤直接修改</text></view>
+      <view class="profile-view-edit-grid">
+        <view wx:for="{{profileEditSteps}}" wx:key="*this" class="profile-view-edit-step" data-step="{{index}}" bindtap="editProfileStep" role="button">
+          <text>{{index + 1}}</text>
+          <text>{{item}}</text>
+        </view>
+      </view>
+    </view>
+
     <view wx:if="{{profile.bio}}" class="profile-view-intro">{{profile.bio}}</view>
 
     <view class="profile-view-section">
