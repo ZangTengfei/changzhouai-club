@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/site-header";
 
 export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="site-shell">
+    <div className="site-shell" data-public-site>
       <SiteHeader />
       <main className="container site-main">{children}</main>
       <SiteFooter />

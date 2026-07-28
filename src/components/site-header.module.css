@@ -3,8 +3,8 @@
   z-index: 200;
   padding: 0;
   border-bottom: 1px solid rgba(var(--ink-rgb), 0.08);
-  background: rgba(255, 252, 248, 0.75);
-  backdrop-filter: blur(14px);
+  background: #ffffff;
+  backdrop-filter: none;
 }
 
 .site-header[data-white-header="true"] {
@@ -173,7 +173,7 @@
     position: relative;
     padding: 14px 0 0;
     border-bottom: 0;
-    background: transparent;
+    background: #ffffff;
   }
 
   .header-inner {
@@ -181,7 +181,7 @@
     padding: 14px 18px;
     border: 1px solid var(--line);
     border-radius: var(--radius-lg);
-    background: rgba(var(--surface-muted-rgb), 0.88);
+    background: #ffffff;
     box-shadow: var(--shadow-md);
   }
 

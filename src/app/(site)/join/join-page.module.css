@@ -3,6 +3,41 @@
   gap: 28px;
 }
 
+/* Match the restrained white-and-soft-color homepage card hierarchy. */
+.joinHeroProof {
+  border: 0 !important;
+  background: #fff2e5 !important;
+  box-shadow: none !important;
+}
+
+.joinBoard,
+.requiredPanel,
+.optionalPanel {
+  border: 0 !important;
+  background: #ffffff !important;
+  box-shadow: 0 14px 34px rgba(var(--ink-rgb), 0.07) !important;
+}
+
+.joinPassCard {
+  border: 0 !important;
+  background: #e9f9f0 !important;
+  box-shadow: none !important;
+}
+
+.joinPassCard span {
+  color: rgba(var(--ink-rgb), 0.6) !important;
+}
+
+.joinPassCard strong {
+  color: #111b1f !important;
+}
+
+.joinCtaPanel {
+  border: 0 !important;
+  background: #f3efff !important;
+  box-shadow: none !important;
+}
+
 .joinHero {
   display: grid;
   grid-template-columns: minmax(0, 0.88fr) minmax(440px, 1.12fr);
@@ -646,15 +681,15 @@
   .joinHeroActions,
   .coBuilderActions,
   .joinCtaActions {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-wrap: wrap;
     gap: 10px;
   }
 
   .joinHeroActions .button,
   .coBuilderActions .button,
   .joinCtaActions .button {
-    width: 100%;
+    width: auto;
   }
 
   .joinHeroProof {

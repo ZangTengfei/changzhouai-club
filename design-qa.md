@@ -260,3 +260,52 @@ final result: passed
 - P3: If a future bundled display font is introduced, recheck Chinese glyph width and topic wrapping across macOS and Windows.
 
 final result: passed
+
+---
+
+# Public Site Visual Refresh QA
+
+## Comparison setup
+
+- Source visual truth: `output/design-qa/site-refresh/source-home-mobile.png`
+- Initial implementation: `output/design-qa/site-refresh/implementation-members-mobile.png`
+- Final implementation: `output/design-qa/site-refresh/implementation-members-mobile-v2.png`
+- Side-by-side comparison: `output/design-qa/site-refresh/comparison-home-members-mobile-v2.png`
+- Additional evidence: `implementation-join-mobile.png`, `implementation-event-detail-mobile.png`, `implementation-news-mobile.png`, `implementation-members-desktop.png`
+- Mobile viewport and pixels: 390 x 844 CSS px, 390 x 844 image px, density normalized at 1x
+- Desktop viewport and pixels: 1280 x 900 CSS px, 1280 x 900 image px, density normalized at 1x
+- State: signed-out public pages, default scroll position
+
+The homepage is the selected visual-system target rather than a page-for-page content mock. The comparison therefore evaluates the shared header, page background, typography, button sizing, card hierarchy, spacing rhythm, and color tokens at the same viewport. It does not expect the members page to copy the homepage content composition.
+
+## Findings
+
+- No remaining P0, P1, or P2 mismatch was found in the final comparison.
+- Typography: public page headings use the same Avenir/PingFang stack and 700-weight ceiling as the homepage. Body paragraphs use a regular optical weight and retain readable mobile line height.
+- Spacing and layout: the 390 px implementation keeps the homepage page margins and compact vertical rhythm. The 1280 px member layout retains its three-column directory without overflow.
+- Colors and tokens: page and header backgrounds are pure white; rendered main content contains no CSS gradients. Soft green, orange, blue, and purple are limited to summary, state, and guidance cards, while primary content cards stay white with light elevation.
+- Images and assets: existing logos, avatars, event imagery, and icons remain source assets; no replacement artwork or placeholder asset was introduced. Browser checks found no broken loaded images in the sampled routes.
+- Copy and content: existing page copy, ordering, links, and business behavior are preserved. The visual pass did not add duplicate explanatory text.
+- Responsive behavior: sampled listing, detail, form, news, and report routes had no horizontal overflow at 390 px or 1280 px. Public-page CTA buttons return to content width on mobile.
+- Accessibility and interaction: semantic headings, links, buttons, focus rules, and tap-height rules remain intact. No navigation or form behavior was changed by this styling pass.
+
+## Comparison history
+
+1. Initial comparison found a P2 mobile-density mismatch: member and join hero actions still used a one-column, full-width button grid while the homepage used compact content-width actions.
+2. Fixed the mobile action groups to flex-wrap and set public CTA buttons to content width.
+3. The second side-by-side comparison shows the primary and secondary actions sharing a row when space allows, with the third action wrapping naturally. No actionable P0/P1/P2 issue remains.
+
+## Focused region comparison
+
+The mobile above-the-fold comparison is sufficient for the shared design surfaces because it shows the complete header, kicker, H1, explanatory copy, primary/secondary buttons, and first semantic card. Separate mobile captures cover join, event detail, and news content patterns; a desktop capture covers the directory grid and card elevation.
+
+## Routes sampled
+
+- Listings: `/members`, `/works`, `/projects`, `/updates`, `/news`, `/reports`, `/events`, `/about`, `/join`, `/cooperate`, `/faq`, `/archive`
+- Details and forms: `/events/propose`, `/events/2026-07-27-opc-open-day`, `/members/zangtengfei`, `/projects/agentb2b`, `/reports/ai-office-course-survey`, `/sponsors/changzhou-telecom`
+
+## Follow-up polish
+
+- P3: the long-form report pages retain their deliberately dense data layouts. They now share the public visual baseline, but individual chart/table redesigns can be handled separately if a lighter editorial treatment is desired.
+
+final result: passed

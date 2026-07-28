@@ -85,7 +85,7 @@ export function SiteHeader() {
   return (
     <header
       className={cx("site-header")}
-      data-white-header={pathname === "/" || pathname === "/events" ? "true" : undefined}
+      data-white-header="true"
     >
       <div
         className={cx("container header-inner")}

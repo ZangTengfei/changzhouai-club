@@ -145,6 +145,78 @@ img {
   position: relative;
 }
 
+.site-shell[data-public-site] {
+  --surface-rgb: 255, 255, 255;
+  --surface-soft-rgb: 255, 255, 255;
+  --surface-muted-rgb: 255, 255, 255;
+  --surface-alt-rgb: 255, 255, 255;
+  --surface: #ffffff;
+  --surface-strong: #ffffff;
+  --card: #ffffff;
+  --secondary: #ffffff;
+  --muted-surface: #ffffff;
+}
+
+body:has(.site-shell[data-public-site]) {
+  background: #ffffff;
+}
+
+.site-shell[data-public-site]::before {
+  display: none;
+}
+
+.site-shell[data-public-site] .site-main * {
+  background-image: none !important;
+}
+
+.site-shell[data-public-site] .site-main h1,
+.site-shell[data-public-site] .site-main h2,
+.site-shell[data-public-site] .site-main h3 {
+  font-weight: 700 !important;
+}
+
+.site-shell[data-public-site] .site-main p {
+  font-weight: 400 !important;
+}
+
+.site-shell[data-public-site] .site-main .button {
+  border-radius: var(--radius-sm);
+  font-weight: 650;
+}
+
+.site-shell[data-public-site] .site-main .surface,
+.site-shell[data-public-site] .site-main .card,
+.site-shell[data-public-site] .site-main .faq-item,
+.site-shell[data-public-site] .site-main .field-panel {
+  border-color: transparent;
+  background-color: #ffffff;
+  box-shadow: 0 14px 34px rgba(var(--ink-rgb), 0.07);
+}
+
+.site-shell[data-public-site] .site-main .hero-panel,
+.site-shell[data-public-site] .site-main .metric-card,
+.site-shell[data-public-site] .site-main .step-card,
+.site-shell[data-public-site] .site-main .note-strip {
+  border-color: transparent;
+  background-color: #e9f9f0;
+  box-shadow: none;
+}
+
+.site-shell[data-public-site] .site-main .metric-card:nth-child(4n + 2),
+.site-shell[data-public-site] .site-main .step-card:nth-child(4n + 2) {
+  background-color: #fff2e5;
+}
+
+.site-shell[data-public-site] .site-main .metric-card:nth-child(4n + 3),
+.site-shell[data-public-site] .site-main .step-card:nth-child(4n + 3) {
+  background-color: #edf5ff;
+}
+
+.site-shell[data-public-site] .site-main .metric-card:nth-child(4n),
+.site-shell[data-public-site] .site-main .step-card:nth-child(4n) {
+  background-color: #f3efff;
+}
+
 .site-shell::before {
   content: "";
   position: fixed;
@@ -1173,6 +1245,20 @@ img {
 
   .site-main {
     padding: 18px 0 56px;
+  }
+
+  .site-shell[data-public-site] .site-main .cta-row > .button {
+    width: auto;
+  }
+
+  .site-shell[data-public-site] .site-main .button {
+    width: fit-content !important;
+    max-width: 100%;
+  }
+
+  .site-shell[data-public-site] .site-main h1 {
+    font-size: clamp(2.15rem, 10.5vw, 2.8rem) !important;
+    line-height: 1.12 !important;
   }
 
   .page-stack {

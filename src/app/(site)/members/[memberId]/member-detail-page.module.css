@@ -3,6 +3,41 @@
   gap: 22px;
 }
 
+/* Match the restrained white-and-soft-color homepage card hierarchy. */
+.memberHeroSummary {
+  border: 0 !important;
+  background: #e9f9f0 !important;
+}
+
+.memberIdentityPanel,
+.memberSkillsSection,
+.memberSignalsSection,
+.memberWorksSection {
+  border: 0 !important;
+  background: #ffffff !important;
+  box-shadow: 0 14px 34px rgba(var(--ink-rgb), 0.07) !important;
+}
+
+.memberSignalCard {
+  border: 0 !important;
+  background: #edf5ff !important;
+  box-shadow: none !important;
+}
+
+.memberSignalCard:nth-child(2) {
+  background: #fff2e5 !important;
+}
+
+.memberSignalCard:nth-child(3) {
+  background: #f3efff !important;
+}
+
+.memberJoinPanel {
+  border: 0 !important;
+  background: #e9f9f0 !important;
+  box-shadow: none !important;
+}
+
 .memberHero {
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.92fr);
@@ -408,8 +443,8 @@
   }
 
   .memberHeroActions {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .memberHeroActions :global(.button),

@@ -641,8 +641,8 @@
   }
 
   .heroActions {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .heroActions :global(.button) {
