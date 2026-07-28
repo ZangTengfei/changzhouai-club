@@ -14,6 +14,7 @@ type HomeEvent = EventSummary & {
 };
 
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+const homeShareImageUrl = "/assets/share/home-share-v1.png";
 
 function formatBriefDate() {
   const now = new Date();
@@ -153,6 +154,7 @@ Page({
     return {
       title: "常州 AI Club｜和有趣的人一起做点新东西",
       path: "/pages/home/index",
+      imageUrl: homeShareImageUrl,
     };
   },
 
@@ -162,6 +164,7 @@ Page({
     });
     return {
       title: "常州 AI Club｜和有趣的人一起做点新东西",
+      imageUrl: homeShareImageUrl,
     };
   },
 });
