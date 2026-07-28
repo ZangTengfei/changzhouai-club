@@ -88,6 +88,10 @@ Page({
     });
   },
 
+  openIntro() {
+    void wx.navigateTo({ url: "/pages/intro/index" });
+  },
+
   openEvent(event: WechatMiniprogram.TouchEvent) {
     const slug = String(event.currentTarget.dataset.slug ?? "");
     if (!slug) return;

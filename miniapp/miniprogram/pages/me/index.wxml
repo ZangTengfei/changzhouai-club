@@ -64,6 +64,11 @@
         <text class="space-title">能力档案</text><text class="space-copy">技能与方向</text>
         <image class="space-arrow" src="/assets/icons/chevron-blue-v2.png" mode="aspectFit" />
       </view>
+      <view class="space-card space-purple" bindtap="openIntro" role="button">
+        <view class="icon-tile"><image src="/assets/icons/link-purple-v2.png" mode="aspectFit" /></view>
+        <text class="space-title">群内介绍</text><text class="space-copy">填写并复制</text>
+        <image class="space-arrow" src="/assets/icons/chevron-purple-v2.png" mode="aspectFit" />
+      </view>
     </view>
 
     <view class="section-heading-row">
