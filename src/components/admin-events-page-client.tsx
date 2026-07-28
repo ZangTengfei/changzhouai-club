@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Spin } from "antd";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Empty, Table, type TableColumnsType } from "antd";
 
 import {
   AdminField,
@@ -19,16 +19,8 @@ import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { Button } from "@/components/admin-antd/button";
 import { Input } from "@/components/admin-antd/input";
 import { NativeSelect } from "@/components/admin-antd/native-select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/admin-antd/table";
 import { useAdminResource } from "@/components/use-admin-resource";
-import type { AdminEventsData } from "@/lib/admin/events";
+import type { AdminEvent, AdminEventsData } from "@/lib/admin/events";
 import {
   formatAdminEventDate,
   formatAdminEventStatus,
@@ -96,6 +88,7 @@ function buildEventsFilterHref(
 }
 
 export function AdminEventsPageClient() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { data, error, isLoading, reload } =
     useAdminResource<AdminEventsData>("/api/admin/events");
@@ -150,11 +143,86 @@ export function AdminEventsPageClient() {
     Math.ceil(filteredEvents.length / EVENTS_PER_PAGE),
   );
   const currentEventPage = Math.min(requestedEventPage, totalEventPages);
-  const eventPageStartIndex = (currentEventPage - 1) * EVENTS_PER_PAGE;
-  const paginatedEvents = filteredEvents.slice(
-    eventPageStartIndex,
-    eventPageStartIndex + EVENTS_PER_PAGE,
-  );
+  const columns: TableColumnsType<AdminEvent> = [
+    {
+      title: "活动标题",
+      dataIndex: "title",
+      key: "title",
+      width: 360,
+      render: (title: string, event) => (
+        <Link
+          href={`/admin/events/${event.id}`}
+          className="font-semibold leading-6 text-foreground transition-colors hover:text-primary"
+        >
+          {title}
+        </Link>
+      ),
+    },
+    {
+      title: "状态",
+      dataIndex: "status",
+      key: "status",
+      width: 110,
+      render: (status: string) => (
+        <AdminStatusBadge tone={getAdminEventStatusTone(status) as AdminTone}>
+          {formatAdminEventStatus(status)}
+        </AdminStatusBadge>
+      ),
+    },
+    {
+      title: "时间",
+      dataIndex: "event_at",
+      key: "event_at",
+      width: 190,
+      render: (eventAt: string | null) => (
+        <span className="whitespace-nowrap text-sm text-muted-foreground">
+          {formatAdminEventDate(eventAt)}
+        </span>
+      ),
+    },
+    {
+      title: "地点",
+      key: "venue",
+      width: 300,
+      render: (_, event) => (
+        <span className="line-clamp-2 text-sm leading-6 text-muted-foreground">
+          {event.venue
+            ? `${event.city ?? "常州"} · ${event.venue}`
+            : (event.city ?? "常州")}
+        </span>
+      ),
+    },
+    {
+      title: "报名",
+      key: "registrations",
+      width: 90,
+      align: "center",
+      render: (_, event) => (
+        <span className="text-sm text-muted-foreground">
+          {event.registrations.length} 人
+        </span>
+      ),
+    },
+    {
+      title: "操作",
+      key: "actions",
+      width: 150,
+      align: "right",
+      fixed: "right",
+      render: (_, event) => (
+        <div className="flex justify-end gap-2">
+          <AdminEventEditorModal
+            eventId={event.id}
+            triggerLabel="编辑"
+            onChanged={reload}
+          />
+          <Button asChild size="sm" variant="outline">
+            <Link href={`/admin/events/${event.id}`}>详情</Link>
+          </Button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <AdminPageStack>
@@ -242,147 +310,47 @@ export function AdminEventsPageClient() {
           </form>
         </AdminPanelBody>
         <AdminPanelBody className="p-0">
-          {isLoading ? (
-            <div
-              className="grid min-h-48 place-items-center content-center gap-3 text-sm text-muted-foreground"
-              role="status"
-              aria-live="polite"
-            >
-              <Spin size="large" />
-              <span>正在加载活动数据</span>
-            </div>
-          ) : paginatedEvents.length > 0 ? (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="min-w-[220px]">活动标题</TableHead>
-                    <TableHead>状态</TableHead>
-                    <TableHead>时间</TableHead>
-                    <TableHead>地点</TableHead>
-                    <TableHead>报名</TableHead>
-                    <TableHead className="w-[96px] text-right">操作</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {paginatedEvents.map((event) => (
-                    <TableRow key={event.id}>
-                      <TableCell>
-                        <Link
-                          href={`/admin/events/${event.id}`}
-                          className="font-semibold text-foreground transition-colors hover:text-primary"
-                        >
-                          {event.title}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        <AdminStatusBadge
-                          tone={
-                            getAdminEventStatusTone(event.status) as AdminTone
-                          }
-                        >
-                          {formatAdminEventStatus(event.status)}
-                        </AdminStatusBadge>
-                      </TableCell>
-                      <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                        {formatAdminEventDate(event.event_at)}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {event.venue
-                          ? `${event.city ?? "常州"} · ${event.venue}`
-                          : (event.city ?? "常州")}
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">
-                        {event.registrations.length} 人
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex justify-end gap-2">
-                          <AdminEventEditorModal
-                            eventId={event.id}
-                            triggerLabel="编辑"
-                            onChanged={reload}
-                          />
-                          <Button asChild size="sm" variant="outline">
-                            <Link href={`/admin/events/${event.id}`}>详情</Link>
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-
-              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border/70 px-4 py-3">
-                <span className="text-sm text-muted-foreground">
-                  第 {currentEventPage} / {totalEventPages} 页
-                </span>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button asChild size="sm" variant="outline">
-                    <Link
-                      href={buildEventsFilterHref(
-                        statusFilter,
-                        timingFilter,
-                        eventQueryInput,
-                        1,
-                      )}
-                    >
-                      首页
-                    </Link>
-                  </Button>
-                  <Button asChild size="sm" variant="outline">
-                    <Link
-                      href={buildEventsFilterHref(
-                        statusFilter,
-                        timingFilter,
-                        eventQueryInput,
-                        Math.max(1, currentEventPage - 1),
-                      )}
-                    >
-                      上一页
-                    </Link>
-                  </Button>
-                  <Button asChild size="sm" variant="outline">
-                    <Link
-                      href={buildEventsFilterHref(
-                        statusFilter,
-                        timingFilter,
-                        eventQueryInput,
-                        Math.min(totalEventPages, currentEventPage + 1),
-                      )}
-                    >
-                      下一页
-                    </Link>
-                  </Button>
-                  <Button asChild size="sm" variant="outline">
-                    <Link
-                      href={buildEventsFilterHref(
-                        statusFilter,
-                        timingFilter,
-                        eventQueryInput,
-                        totalEventPages,
-                      )}
-                    >
-                      末页
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-            </>
-          ) : (
-            <div className="space-y-3 p-4">
-              <AdminNotice>
-                {data && data.events.length > 0
-                  ? "当前筛选条件下没有活动数据。"
-                  : "创建活动后，即可继续补充详情、相册和报名信息。"}
-              </AdminNotice>
-              {data && data.events.length > 0 ? null : (
-                <AdminEventEditorModal
-                  triggerLabel="去创建活动"
-                  onChanged={reload}
+          <Table<AdminEvent>
+            rowKey="id"
+            columns={columns}
+            dataSource={filteredEvents}
+            loading={{
+              spinning: isLoading,
+              description: "正在加载活动数据",
+            }}
+            size="middle"
+            tableLayout="fixed"
+            scroll={{ x: 1200 }}
+            locale={{
+              emptyText: (
+                <Empty
+                  image={Empty.PRESENTED_IMAGE_SIMPLE}
+                  description={
+                    data && data.events.length > 0
+                      ? "当前筛选条件下没有活动"
+                      : "暂时还没有活动"
+                  }
                 />
-              )}
-            </div>
-          )}
+              ),
+            }}
+            pagination={{
+              current: currentEventPage,
+              pageSize: EVENTS_PER_PAGE,
+              total: filteredEvents.length,
+              showSizeChanger: false,
+              showTotal: (total, range) =>
+                `第 ${range[0]}–${range[1]} 条，共 ${total} 场活动`,
+              onChange: (page) =>
+                router.push(
+                  buildEventsFilterHref(
+                    statusFilter,
+                    timingFilter,
+                    eventQueryInput,
+                    page,
+                  ),
+                ),
+            }}
+          />
         </AdminPanelBody>
       </AdminPanel>
     </AdminPageStack>
