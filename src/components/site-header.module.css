@@ -7,7 +7,7 @@
   backdrop-filter: blur(14px);
 }
 
-.site-header[data-home-header="true"] {
+.site-header[data-white-header="true"] {
   background: #ffffff;
   backdrop-filter: none;
 }
@@ -26,7 +26,7 @@
   box-shadow: none;
 }
 
-.site-header[data-home-header="true"] .header-inner {
+.site-header[data-white-header="true"] .header-inner {
   background: #ffffff;
 }
 

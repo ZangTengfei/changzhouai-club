@@ -67,7 +67,7 @@ export default async function EventsPage({
         latestCompletedEvent.imageUrl
       : null;
   return (
-    <div className={styles.pageStack}>
+    <div className={styles.pageStack} data-events-page>
       {params.registered ? (
         <div className={styles.statusNote}>报名成功，已经写入你的社区账号记录。</div>
       ) : null}
