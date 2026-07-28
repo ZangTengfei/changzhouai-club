@@ -16,9 +16,9 @@ import {
 } from "@/components/admin-ui";
 import { AdminEventEditorModal } from "@/components/admin-event-editor-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { NativeSelect } from "@/components/ui/native-select";
+import { Button } from "@/components/admin-antd/button";
+import { Input } from "@/components/admin-antd/input";
+import { NativeSelect } from "@/components/admin-antd/native-select";
 import {
   Table,
   TableBody,
@@ -26,7 +26,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/admin-antd/table";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminEventsData } from "@/lib/admin/events";
 import {

@@ -15,7 +15,7 @@ import {
 import { AdminSponsorEditorFormClient } from "@/components/admin-sponsor-editor-form-client";
 import { AdminSponsorImagesManagerClient } from "@/components/admin-sponsor-images-manager-client";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/admin-antd/button";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   getAdminErrorMessage,

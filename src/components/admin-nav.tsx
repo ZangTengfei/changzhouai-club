@@ -1,241 +1,93 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
-  BadgeCheck,
-  Boxes,
-  BriefcaseBusiness,
-  CalendarDays,
-  ChevronDown,
-  Handshake,
-  MessagesSquare,
-  Newspaper,
-  Settings2,
-  Share2,
-  Users,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+  CalendarOutlined,
+  FileTextOutlined,
+  FundProjectionScreenOutlined,
+  GiftOutlined,
+  NotificationOutlined,
+  ProjectOutlined,
+  ReadOutlined,
+  SettingOutlined,
+  ShareAltOutlined,
+  TeamOutlined,
+  UserSwitchOutlined,
+} from "@ant-design/icons";
+import { Menu, type MenuProps } from "antd";
+import { usePathname, useRouter } from "next/navigation";
+import { useMemo } from "react";
 
-import {
-  hasAnyAdminPermission,
-  type AdminPermissionKey,
-} from "@/lib/admin/permissions";
-import { cn, cssModuleCxWithGlobals } from "@/lib/utils";
+import { hasAnyAdminPermission, type AdminPermissionKey } from "@/lib/admin/permissions";
 
-import styles from "@/app/admin/admin-layout.module.css";
-
-type AdminNavItem = {
+type NavItem = {
   href: string;
   label: string;
-  icon: LucideIcon;
+  icon: React.ReactNode;
   permissions: AdminPermissionKey[];
 };
 
-type AdminNavGroup = {
-  id: string;
-  label: string;
-  items: AdminNavItem[];
-};
+type NavGroup = { key: string; label: string; items: NavItem[] };
 
-const adminNavGroups: AdminNavGroup[] = [
+const groups: NavGroup[] = [
   {
-    id: "content",
+    key: "content",
     label: "内容运营",
     items: [
-      {
-        href: "/admin/events",
-        label: "活动管理",
-        icon: CalendarDays,
-        permissions: ["events.read"],
-      },
-      {
-        href: "/admin/updates",
-        label: "社区动态",
-        icon: MessagesSquare,
-        permissions: ["updates.read"],
-      },
-      {
-        href: "/admin/reports",
-        label: "群聊日报",
-        icon: Newspaper,
-        permissions: ["updates.publish"],
-      },
-      {
-        href: "/admin/social",
-        label: "社媒素材",
-        icon: Share2,
-        permissions: ["social.write"],
-      },
+      { href: "/admin/events", label: "活动管理", icon: <CalendarOutlined />, permissions: ["events.read"] },
+      { href: "/admin/updates", label: "社区动态", icon: <NotificationOutlined />, permissions: ["updates.read"] },
+      { href: "/admin/reports", label: "群聊日报", icon: <ReadOutlined />, permissions: ["updates.publish"] },
+      { href: "/admin/social", label: "社媒素材", icon: <ShareAltOutlined />, permissions: ["social.write"] },
     ],
   },
   {
-    id: "community",
+    key: "community",
     label: "成员生态",
     items: [
-      {
-        href: "/admin/members",
-        label: "成员管理",
-        icon: Users,
-        permissions: ["members.read"],
-      },
-      {
-        href: "/admin/projects",
-        label: "共建项目",
-        icon: BriefcaseBusiness,
-        permissions: ["projects.read"],
-      },
-      {
-        href: "/admin/works",
-        label: "成员作品",
-        icon: Boxes,
-        permissions: ["works.read", "updates.review"],
-      },
+      { href: "/admin/members", label: "成员管理", icon: <TeamOutlined />, permissions: ["members.read"] },
+      { href: "/admin/projects", label: "共建项目", icon: <ProjectOutlined />, permissions: ["projects.read"] },
+      { href: "/admin/works", label: "成员作品", icon: <FundProjectionScreenOutlined />, permissions: ["works.read", "updates.review"] },
     ],
   },
   {
-    id: "partnership",
+    key: "partnership",
     label: "合作资源",
     items: [
-      {
-        href: "/admin/leads",
-        label: "合作线索",
-        icon: Handshake,
-        permissions: ["leads.read"],
-      },
-      {
-        href: "/admin/sponsors",
-        label: "赞助者",
-        icon: BadgeCheck,
-        permissions: ["sponsors.read"],
-      },
+      { href: "/admin/leads", label: "合作线索", icon: <UserSwitchOutlined />, permissions: ["leads.read"] },
+      { href: "/admin/sponsors", label: "赞助者", icon: <GiftOutlined />, permissions: ["sponsors.read"] },
     ],
   },
   {
-    id: "system",
-    label: "系统",
+    key: "system",
+    label: "系统管理",
     items: [
-      {
-        href: "/admin/settings",
-        label: "站点设置",
-        icon: Settings2,
-        permissions: ["system.manage_settings"],
-      },
+      { href: "/admin/settings", label: "站点设置", icon: <SettingOutlined />, permissions: ["system.manage_settings"] },
     ],
   },
 ];
 
-const cx = cssModuleCxWithGlobals.bind(null, styles);
-
-function isActivePath(pathname: string, href: string) {
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
-
 export function AdminNav({ permissions }: { permissions: string[] }) {
   const pathname = usePathname();
-  const visibleGroups = useMemo(
-    () =>
-      adminNavGroups
-        .map((group) => ({
-          ...group,
-          items: group.items.filter((item) =>
-            hasAnyAdminPermission(permissions, item.permissions),
-          ),
-        }))
-        .filter((group) => group.items.length > 0),
-    [permissions],
-  );
-  const activeGroupId = useMemo<string | null>(
-    () =>
-      visibleGroups.find((group) =>
-        group.items.some((item) => isActivePath(pathname, item.href)),
-      )?.id ?? visibleGroups[0]?.id ?? null,
-    [pathname, visibleGroups],
-  );
-  const [openGroupId, setOpenGroupId] = useState<string | null>(activeGroupId);
+  const router = useRouter();
 
-  useEffect(() => {
-    setOpenGroupId(activeGroupId);
-  }, [activeGroupId]);
+  const items = useMemo<MenuProps["items"]>(() => groups.map((group) => {
+    const children = group.items
+      .filter((item) => hasAnyAdminPermission(permissions, item.permissions))
+      .map((item) => ({ key: item.href, label: item.label, icon: item.icon }));
+
+    return children.length ? { type: "group" as const, key: group.key, label: group.label, children } : null;
+  }).filter(Boolean), [permissions]);
+
+  const selectedKey = groups
+    .flatMap((group) => group.items)
+    .find((item) => pathname === item.href || pathname.startsWith(`${item.href}/`))?.href;
 
   return (
-    <nav className={cx("admin-nav")} aria-label="后台导航">
-      {visibleGroups.map((group) => {
-        const isOpen = openGroupId === group.id;
-        const isGroupActive = activeGroupId === group.id;
-        const panelId = `admin-nav-group-${group.id}`;
-
-        return (
-          <section
-            key={group.id}
-            className={cn(
-              cx("admin-nav-group"),
-              isGroupActive ? cx("admin-nav-group-active") : null,
-            )}
-          >
-            <button
-              type="button"
-              className={cx("admin-nav-group-trigger")}
-              aria-expanded={isOpen}
-              aria-controls={panelId}
-              onClick={() =>
-                setOpenGroupId((currentGroupId) =>
-                  currentGroupId === group.id && group.id !== activeGroupId
-                    ? null
-                    : group.id,
-                )
-              }
-            >
-              <span className={cx("admin-nav-group-copy")}>
-                <strong>{group.label}</strong>
-              </span>
-              <span className={cx("admin-nav-group-meta")}>
-                <ChevronDown
-                  aria-hidden="true"
-                  className={cn(
-                    cx("admin-nav-group-chevron"),
-                    isOpen ? cx("admin-nav-group-chevron-open") : null,
-                  )}
-                />
-              </span>
-            </button>
-
-            {isOpen ? (
-              <div id={panelId} className={cx("admin-nav-group-items")}>
-                {group.items.map((item) => {
-                  const isActive = isActivePath(pathname, item.href);
-                  const Icon = item.icon;
-
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      aria-current={isActive ? "page" : undefined}
-                      className={cn(
-                        cx("admin-nav-item group transition-colors"),
-                        isActive ? cx("admin-nav-item-active") : null,
-                      )}
-                    >
-                      <span
-                        className={cn(
-                          cx("admin-nav-icon flex size-8 shrink-0 items-center justify-center rounded-lg"),
-                          isActive ? cx("admin-nav-icon-active") : null,
-                        )}
-                      >
-                        <Icon className="size-4" />
-                      </span>
-                      <span className={cx("admin-nav-item-copy")}>
-                        <strong className="text-sm font-semibold">{item.label}</strong>
-                      </span>
-                    </Link>
-                  );
-                })}
-              </div>
-            ) : null}
-          </section>
-        );
-      })}
-    </nav>
+    <Menu
+      className="admin-antd-menu"
+      mode="inline"
+      items={items}
+      selectedKeys={selectedKey ? [selectedKey] : []}
+      onClick={({ key }) => router.push(key)}
+    />
   );
 }

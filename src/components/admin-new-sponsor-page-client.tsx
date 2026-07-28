@@ -8,7 +8,7 @@ import {
   AdminPanelHeader,
 } from "@/components/admin-ui";
 import { AdminSponsorEditorFormClient } from "@/components/admin-sponsor-editor-form-client";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/admin-antd/button";
 
 export function AdminNewSponsorPageClient() {
   return (

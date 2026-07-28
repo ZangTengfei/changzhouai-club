@@ -10,7 +10,7 @@ import {
   AdminPanelBody,
   AdminPanelHeader,
 } from "@/components/admin-ui";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/admin-antd/button";
 import { listAdminWeDailyReports } from "@/lib/admin/wedaily-admin";
 import { requireAdminPermission } from "@/lib/supabase/guards";
 import { parseWeDailyMarkdown } from "@/lib/wedaily";

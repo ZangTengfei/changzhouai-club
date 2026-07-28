@@ -1,9 +1,7 @@
 import type { ReactNode } from "react";
 
 import Link from "next/link";
-
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, Tag } from "antd";
 import { cn, cssModuleCxWithGlobals } from "@/lib/utils";
 
 import styles from "./admin-ui.module.css";
@@ -70,10 +68,9 @@ export function AdminPanel({
 }) {
   return (
     <Card
+      variant="borderless"
       className={cn(
-        cx(
-          "admin-panel border-border/70 bg-card/95 shadow-[0_10px_28px_rgba(15,23,42,0.05)] backdrop-blur",
-        ),
+        cx("admin-panel"),
         className,
       )}
     >
@@ -94,11 +91,9 @@ export function AdminPanelHeader({
   className?: string;
 }) {
   return (
-    <CardHeader
+    <div
       className={cn(
-        cx(
-          "admin-panel-header flex flex-col gap-3 border-b border-border/70 px-4 py-4 sm:flex-row sm:items-start sm:justify-between",
-        ),
+        cx("admin-panel-header"),
         className,
       )}
     >
@@ -108,12 +103,10 @@ export function AdminPanelHeader({
             {eyebrow}
           </p>
         ) : null}
-        <CardTitle className={cx("admin-panel-title text-lg text-foreground")}>
-          {title}
-        </CardTitle>
+        <h2 className={cx("admin-panel-title")}>{title}</h2>
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
-    </CardHeader>
+    </div>
   );
 }
 
@@ -125,11 +118,9 @@ export function AdminPanelBody({
   children: ReactNode;
 }) {
   return (
-    <CardContent
-      className={cn(cx("admin-panel-body px-4 pb-4 pt-4"), className)}
-    >
+    <div className={cn(cx("admin-panel-body"), className)}>
       {children}
-    </CardContent>
+    </div>
   );
 }
 
@@ -190,16 +181,15 @@ export function AdminStatusBadge({
   className?: string;
 }) {
   return (
-    <Badge
-      variant="outline"
+    <Tag
       className={cn(
-        "rounded-full border px-2.5 py-1 text-[11px] font-semibold tracking-wide",
+        "rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide",
         toneClassName[tone],
         className,
       )}
     >
       {children}
-    </Badge>
+    </Tag>
   );
 }
 

@@ -11,8 +11,8 @@ import {
   AdminPanelHeader,
 } from "@/components/admin-ui";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/admin-antd/button";
+import { Input } from "@/components/admin-antd/input";
 import {
   COMMUNITY_MEMBER_COUNT_KEY,
   DEFAULT_COMMUNITY_MEMBER_COUNT,

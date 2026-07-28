@@ -13,8 +13,8 @@ import {
   AdminStatusBadge,
 } from "@/components/admin-ui";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/admin-antd/button";
+import { Input } from "@/components/admin-antd/input";
 import { getAdminErrorMessage, getAdminSavedMessage } from "@/lib/admin/event-feedback";
 
 type EventPhoto = {

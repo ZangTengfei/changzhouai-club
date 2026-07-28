@@ -8,7 +8,7 @@ import {
   AdminPanel,
   AdminPanelHeader,
 } from "@/components/admin-ui";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/admin-antd/button";
 import { WechatArticleComposer } from "@/components/wechat-article-composer";
 import { loadAdminSocialMaterial } from "@/lib/admin/social";
 

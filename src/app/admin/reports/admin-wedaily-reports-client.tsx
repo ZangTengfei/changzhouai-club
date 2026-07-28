@@ -5,8 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Download, Eye, EyeOff, Images, RefreshCcw, Save } from "lucide-react";
 
 import { AdminNotice, AdminStatusBadge } from "@/components/admin-ui";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/admin-antd/button";
+import { Textarea } from "@/components/admin-antd/textarea";
 import type { AdminWeDailyReport, AdminWeDailyReportExportTemplate } from "@/lib/admin/wedaily-admin";
 import { downloadWeDailyReportTemplatePng } from "@/lib/wedaily-report-export";
 import { appendWeDailyReportQrCode } from "@/lib/wedaily-report-qr";

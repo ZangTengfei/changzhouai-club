@@ -14,7 +14,7 @@ import {
 } from "@/components/admin-ui";
 import { AdminSponsorEditorModal } from "@/components/admin-sponsor-editor-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/admin-antd/button";
 import {
   Table,
   TableBody,
@@ -22,7 +22,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/admin-antd/table";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   getAdminErrorMessage,

@@ -20,9 +20,9 @@ import {
 import { AdminModal } from "@/components/admin-modal";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/admin-antd/button";
+import { Input } from "@/components/admin-antd/input";
+import { Textarea } from "@/components/admin-antd/textarea";
 import {
   getAdminErrorMessage,
   getAdminSavedMessage,

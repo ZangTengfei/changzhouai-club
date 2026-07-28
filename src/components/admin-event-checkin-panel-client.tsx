@@ -11,8 +11,8 @@ import {
   AdminPanelBody,
   AdminPanelHeader,
 } from "@/components/admin-ui";
-import { Button } from "@/components/ui/button";
-import { NativeSelect } from "@/components/ui/native-select";
+import { Button } from "@/components/admin-antd/button";
+import { NativeSelect } from "@/components/admin-antd/native-select";
 
 type CheckinCode = {
   qrDataUrl: string;

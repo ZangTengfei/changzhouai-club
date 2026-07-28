@@ -16,8 +16,8 @@ import {
   type AdminTone,
 } from "@/components/admin-ui";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/admin-antd/button";
+import { Input } from "@/components/admin-antd/input";
 import {
   Table,
   TableBody,
@@ -25,7 +25,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/admin-antd/table";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminLeadsData } from "@/lib/admin/leads";
 import {

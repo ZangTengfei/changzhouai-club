@@ -19,8 +19,8 @@ import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { AdminEventEditorFormClient } from "@/components/admin-event-editor-form-client";
 import { AdminEventCheckinPanelClient } from "@/components/admin-event-checkin-panel-client";
 import { AdminEventPhotosManagerClient } from "@/components/admin-event-photos-manager-client";
-import { Button } from "@/components/ui/button";
-import { NativeSelect } from "@/components/ui/native-select";
+import { Button } from "@/components/admin-antd/button";
+import { NativeSelect } from "@/components/admin-antd/native-select";
 import {
   Table,
   TableBody,
@@ -28,7 +28,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
+} from "@/components/admin-antd/table";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   formatAdminEventDate,

@@ -4,9 +4,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Copy, Download, LoaderCircle, ShieldCheck, X } from "lucide-react";
 
 import { AdminNotice, AdminStatusBadge } from "@/components/admin-ui";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/admin-antd/button";
+import { Input } from "@/components/admin-antd/input";
+import { Textarea } from "@/components/admin-antd/textarea";
 import type { AdminWeDailyReport } from "@/lib/admin/wedaily-admin";
 import type { ParsedWeDailyMarkdown } from "@/lib/wedaily";
 import {

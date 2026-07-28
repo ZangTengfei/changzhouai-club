@@ -1,15 +1,9 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { cloneElement, isValidElement, useState, type ReactElement, type ReactNode } from "react";
+import { Modal } from "antd";
 
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Button } from "@/components/admin-antd/button";
 
 export function AdminModal({
   title,
@@ -26,20 +20,23 @@ export function AdminModal({
   onOpenChange?: (open: boolean) => void;
   children: ReactNode;
 }) {
+  const [internalOpen, setInternalOpen] = useState(false);
+  const actualOpen = open ?? internalOpen;
+  const setOpen = (next: boolean) => {
+    if (open === undefined) setInternalOpen(next);
+    onOpenChange?.(next);
+  };
+  const triggerNode = trigger && isValidElement(trigger)
+    ? cloneElement(trigger as ReactElement<{ onClick?: () => void }>, { onClick: () => setOpen(true) })
+    : trigger;
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
-      {triggerLabel ? (
-        <DialogTrigger asChild>
-          <Button type="button">{triggerLabel}</Button>
-        </DialogTrigger>
-      ) : null}
-      <DialogContent className="max-h-[min(86vh,820px)] max-w-2xl overflow-y-auto border-border/70 bg-card p-0 text-card-foreground">
-        <DialogHeader className="border-b border-border/70 px-4 py-4">
-          <DialogTitle className="text-base text-foreground">{title}</DialogTitle>
-        </DialogHeader>
-        <div className="p-4">{children}</div>
-      </DialogContent>
-    </Dialog>
+    <>
+      {triggerNode}
+      {triggerLabel ? <Button type="button" onClick={() => setOpen(true)}>{triggerLabel}</Button> : null}
+      <Modal title={title} open={actualOpen} onCancel={() => setOpen(false)} footer={null} width={720} destroyOnHidden>
+        {children}
+      </Modal>
+    </>
   );
 }

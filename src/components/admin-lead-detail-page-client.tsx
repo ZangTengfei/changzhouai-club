@@ -17,10 +17,10 @@ import {
 } from "@/components/admin-ui";
 import { AdminToastSignals } from "@/components/admin-toast-signals";
 import { ToneBadge } from "@/components/tone-badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { NativeSelect } from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/admin-antd/button";
+import { Input } from "@/components/admin-antd/input";
+import { NativeSelect } from "@/components/admin-antd/native-select";
+import { Textarea } from "@/components/admin-antd/textarea";
 import { useAdminResource } from "@/components/use-admin-resource";
 import {
   formatAdminLeadMatchStatus,
