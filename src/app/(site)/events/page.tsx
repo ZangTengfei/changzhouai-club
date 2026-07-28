@@ -3,17 +3,13 @@ import Link from "next/link";
 import {
   ArrowRight,
   CalendarDays,
-  Camera,
   Lightbulb,
   Mic,
   MapPin,
-  Sparkles,
-  UsersRound,
 } from "lucide-react";
 
 import { RevealImage } from "@/components/reveal-image";
 
-import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
 import { EventsRegistrationGrid } from "@/components/events-registration-grid";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import { getCompletedEventRecaps, getScheduledEvents } from "@/lib/community-events";
@@ -25,20 +21,6 @@ export const metadata: Metadata = {
   title: "活动",
   description: "浏览常州 AI Club 的近期活动与往期回顾。",
 };
-
-function formatEventMetricDate(value: string | null) {
-  if (!value) {
-    return "待公布";
-  }
-
-  const [, month, day] = value.split("-");
-
-  if (!month || !day) {
-    return value.replaceAll("-", ".");
-  }
-
-  return `${month}.${day}`;
-}
 
 function formatEventDateTime(value: string | null) {
   if (!value) {
@@ -54,24 +36,6 @@ function formatEventDateTime(value: string | null) {
   });
 }
 
-const eventFlowSteps = [
-  {
-    title: "先来听一场",
-    summary: "从 AI 工具、产品实践到真实案例，快速找到你感兴趣的话题。",
-    tone: "green",
-  },
-  {
-    title: "现场认识人",
-    summary: "和开发者、产品人、创业者面对面交流，把名字变成真实连接。",
-    tone: "orange",
-  },
-  {
-    title: "把想法带走",
-    summary: "把灵感沉淀成项目、合作线索或下一次分享的主题。",
-    tone: "blue",
-  },
-] as const;
-
 const eventProposalNotes = [
   {
     title: "发起人主讲",
@@ -84,12 +48,6 @@ const eventProposalNotes = [
     icon: Lightbulb,
   },
 ] as const;
-
-const eventFlowToneClassName = {
-  green: "",
-  orange: styles.flowCardOrange,
-  blue: styles.flowCardBlue,
-} satisfies Record<(typeof eventFlowSteps)[number]["tone"], string>;
 
 export default async function EventsPage({
   searchParams,
@@ -108,37 +66,6 @@ export default async function EventsPage({
       ? getEventImageUrl(latestCompletedEvent.imageUrl, "event-detail-hero") ??
         latestCompletedEvent.imageUrl
       : null;
-  const totalPhotoCount = completedEvents.reduce(
-    (count, event) => count + (event.gallery?.length ?? 0),
-    0,
-  );
-  const eventStats = [
-    {
-      value: scheduledEvents.length > 0 ? `${scheduledEvents.length} 场` : "开放中",
-      label: "近期活动",
-      detail: nextEvent?.title ?? "下一场主题正在筹备",
-      icon: CalendarDays,
-    },
-    {
-      value: `${completedEvents.length} 场`,
-      label: "往期回顾",
-      detail: "技术分享与线下交流",
-      icon: UsersRound,
-    },
-    {
-      value: totalPhotoCount > 0 ? `${totalPhotoCount} 张` : "持续补充",
-      label: "现场记录",
-      detail: "用图片保留活动氛围",
-      icon: Camera,
-    },
-    {
-      value: formatEventMetricDate(latestCompletedEvent?.isoDate ?? null),
-      label: "最近更新",
-      detail: latestCompletedEvent?.title ?? "活动内容陆续归档",
-      icon: Sparkles,
-    },
-  ];
-
   return (
     <div className={styles.pageStack}>
       {params.registered ? (
@@ -155,12 +82,11 @@ export default async function EventsPage({
         <div className={styles.heroCopy}>
           <p className="home-kicker">Events · 线下相遇</p>
           <h1 id="events-hero-title">
-            把每一次相遇，
-            <span>变成下一次共创</span>
+            一起见面，
+            <span>做点新东西</span>
           </h1>
           <p>
-            在这里找到近期开放报名的社区活动与外部精选 AI 活动，也回看过去的分享、讨论和现场照片。
-            活动是常州 AI Club 连接本地 AI 伙伴的稳定入口。
+            查看近期开放报名的活动，也回看社区现场。
           </p>
 
           <div className={styles.heroActions}>
@@ -171,24 +97,6 @@ export default async function EventsPage({
             <Link href="#reviews" className="button home-ghost-button">
               往期回顾
             </Link>
-            <Link href="/events/propose" prefetch={false} className="button home-ghost-button">
-              发起活动申请
-            </Link>
-          </div>
-
-          <div className={styles.heroProof}>
-            {eventStats.map((item) => {
-              const Icon = item.icon;
-
-              return (
-                <article key={item.label}>
-                  <Icon aria-hidden="true" strokeWidth={1.9} />
-                  <strong>{item.value}</strong>
-                  <span>{item.label}</span>
-                  <small>{item.detail}</small>
-                </article>
-              );
-            })}
           </div>
         </div>
 
@@ -229,26 +137,7 @@ export default async function EventsPage({
             </Link>
           </article>
 
-          <div className={styles.stickyNote}>
-            <span>活动现场</span>
-            <strong>见面聊，比群里聊更快一步</strong>
-          </div>
-          <DoodleSparkles className={styles.heroDoodle} />
-          <HandDrawnArrow className={styles.heroArrow} />
         </div>
-      </section>
-
-      <section className={styles.flowStrip} aria-label="活动参与方式">
-        {eventFlowSteps.map((item, index) => (
-          <article
-            className={`${styles.flowCard} ${eventFlowToneClassName[item.tone]}`}
-            key={item.title}
-          >
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <h2>{item.title}</h2>
-            <p>{item.summary}</p>
-          </article>
-        ))}
       </section>
 
       <section className={styles.proposalSection} aria-labelledby="event-proposal-title">
@@ -256,8 +145,7 @@ export default async function EventsPage({
           <p className="home-kicker">Host · 群友发起</p>
           <h2 id="event-proposal-title">有主题，也可以申请发起一场活动</h2>
           <p>
-            社区欢迎成员把真实实践带到线下。发起人默认是活动的主要分享者，
-            申请通过后再共同确认排期、场地、报名和现场支持。
+            有实践、有案例，也可以申请发起一场活动。审核通过后，再一起确认排期和现场支持。
           </p>
         </div>
 
@@ -290,7 +178,6 @@ export default async function EventsPage({
           <p className="home-kicker">Upcoming</p>
           <div>
             <h2>近期活动报名</h2>
-            <p>查看开放报名的社区活动和外部精选活动，获取时间、地点、主题介绍与报名入口。</p>
           </div>
         </div>
 
@@ -309,9 +196,7 @@ export default async function EventsPage({
           <p className="home-kicker">Recap</p>
           <div>
             <h2>往期活动回顾</h2>
-            <p>
-              共收录 {completedEvents.length} 场活动，用照片、主题和摘要保留现场发生过的连接。
-            </p>
+            <p>已收录 {completedEvents.length} 场活动</p>
           </div>
         </div>
 

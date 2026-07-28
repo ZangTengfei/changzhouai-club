@@ -8,9 +8,9 @@ import {
   UsersRound,
 } from "lucide-react";
 
-import { RevealImage, RevealNextImage } from "@/components/reveal-image";
+import { RevealImage } from "@/components/reveal-image";
 
-import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets";
+import { DoodleSparkles } from "@/components/home-visual-assets";
 import { HeroPhotoCarousel } from "@/components/hero-photo-carousel";
 import { SiteSponsors } from "@/components/site-sponsors";
 import { SocialPlatformIcon } from "@/components/social-platform-icon";
@@ -34,20 +34,6 @@ import styles from "./home-page.module.css";
 
 const cx = cssModuleCx.bind(null, styles);
 const HERO_CAROUSEL_IMAGE_LIMIT = 3;
-
-function formatMetricDate(isoDate: string | null) {
-  if (!isoDate) {
-    return "时间待定";
-  }
-
-  const [, month, day] = isoDate.split("-");
-
-  if (!month || !day) {
-    return isoDate.replaceAll("-", ".");
-  }
-
-  return `${month}.${day}`;
-}
 
 function formatEventDateTime(value: string | null) {
   if (!value) {
@@ -89,55 +75,17 @@ function extractShortBio(value: string | null) {
   return normalized.length > 42 ? `${normalized.slice(0, 42)}...` : normalized;
 }
 
-const homeFlowSteps = [
-  {
-    step: "01",
-    title: "带来问题",
-    summary: "从成员实践和企业场景里发现值得验证的 AI 问题",
-    tone: "green",
-    illustrationSrc: "/home-flow-participate-card.webp",
-    illustrationAlt: "",
-  },
-  {
-    step: "02",
-    title: "共创原型",
-    summary: "用活动、工作坊和项目小队把想法做成最小版本",
-    tone: "orange",
-    illustrationSrc: "/home-flow-connect-card.webp",
-    illustrationAlt: "",
-  },
-  {
-    step: "03",
-    title: "试点沉淀",
-    summary: "把反馈、案例和方法写下来，反哺下一次项目",
-    tone: "blue",
-    illustrationSrc: "/home-flow-build-card.webp",
-    illustrationAlt: "",
-  },
-] as const;
-
 const heroNotes = [
   {
     className: "home-sticky-note home-sticky-note-green",
     lines: ["带着问题来", "一起找到", "可验证的方向"],
     icon: "heart",
   },
-  {
-    className: "home-sticky-note home-sticky-note-yellow",
-    lines: ["从想法", "到原型", "再到试点"],
-    icon: "arrow",
-  },
-  {
-    className: "home-sticky-note home-sticky-note-blue",
-    lines: ["每次活动", "都沉淀成", "新的上下文"],
-    icon: "smile",
-  },
 ] as const;
 
 const statIcons = {
   people: UsersRound,
   calendar: CalendarDays,
-  clock: Clock3,
   pin: MapPin,
 } as const;
 
@@ -165,7 +113,6 @@ export default async function HomePage() {
   const primaryScheduledEvent = scheduledEvents[0];
   const hasUpcomingEvent = Boolean(primaryScheduledEvent);
   const latestCompletedEvent = recentCompletedEvents[0];
-  const recentEvents = recentCompletedEvents;
   const heroCarouselImages = recentCompletedEvents
     .flatMap((event) => {
       const imageUrl = event.imageUrl ?? event.gallery[0]?.imageUrl ?? null;
@@ -192,10 +139,6 @@ export default async function HomePage() {
       items.findIndex((candidate) => candidate.mainSrc === item.mainSrc) === index
     ))
     .slice(0, HERO_CAROUSEL_IMAGE_LIMIT);
-  const memberAvatars = directory.members
-    .map((member) => member.avatarUrl)
-    .filter((avatarUrl): avatarUrl is string => Boolean(avatarUrl))
-    .slice(0, 6);
   const communityStats = [
     {
       value: communityMemberCountLabel,
@@ -208,12 +151,6 @@ export default async function HomePage() {
       label: "线下活动",
       detail: "技术分享与交流",
       icon: "calendar",
-    },
-    {
-      value: formatMetricDate(latestCompletedEvent?.isoDate ?? null),
-      label: "最近一次活动",
-      detail: latestCompletedEvent?.title ?? "活动回顾待更新",
-      icon: "clock",
     },
     {
       value: "常州",
@@ -237,7 +174,7 @@ export default async function HomePage() {
       : "新活动发布后会同步时间和地点";
   const storyMembers = directory.members
     .filter((member) => member.avatarUrl || member.bio || member.roleLabel)
-    .slice(0, 4)
+    .slice(0, 2)
     .map((member) => {
       const metaParts = [member.roleLabel, member.organization].filter(Boolean);
       const storyTags = member.skills
@@ -288,8 +225,7 @@ export default async function HomePage() {
             <span className={cx("home-hero-title-line")}>让真实问题长成 AI 项目</span>
           </h1>
           <p className={cx("home-hero-lede")}>
-            连接常州的 AI 实践者、企业场景方和共建者，
-            把真实问题推进到问题验证、AI 原型、场景试点和案例沉淀。
+            连接常州 AI 实践者，一起参加活动、认识伙伴，把真实问题推进成项目。
           </p>
 
           <div className={cx("home-hero-actions")}>
@@ -302,36 +238,6 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className={cx("home-member-proof")} aria-label="社区成员规模">
-            <div className={cx("home-avatar-stack")} aria-hidden="true">
-              {memberAvatars.length > 0 ? (
-                memberAvatars.map((avatarUrl, index) => (
-                  <RevealImage
-                    key={`${avatarUrl}-${index}`}
-                    src={avatarUrl}
-                    alt=""
-                    loading="eager"
-                    style={{ zIndex: memberAvatars.length - index }}
-                    referrerPolicy="no-referrer"
-                  />
-                ))
-              ) : (
-                ["AI", "CA", "AG", "PM", "OP"].map((label, index) => (
-                  <span key={label} style={{ zIndex: 5 - index }}>
-                    {label}
-                  </span>
-                ))
-              )}
-            </div>
-            <div className={cx("home-member-proof-copy")}>
-              <span className={cx("home-member-proof-line")}>
-                <strong>{communityMemberCountLabel}</strong>
-                <span>位成员已加入我们</span>
-              </span>
-              <small>期待你的加入！</small>
-            </div>
-            <HandDrawnArrow className={cx("home-hero-arrow")} />
-          </div>
         </div>
 
         <HeroPhotoCarousel
@@ -369,44 +275,8 @@ export default async function HomePage() {
         })}
       </section>
 
-      <section className={cx("home-flow-section")} aria-labelledby="home-flow-title">
-        <div className={cx("home-section-heading home-flow-heading")}>
-          <h2 id="home-flow-title">从活动到合作</h2>
-          <p>活动不是终点，而是让问题、伙伴和项目进入同一个现场</p>
-        </div>
-
-        <div className={cx("home-flow-layout")}>
-          <div className={cx("home-flow-cards")}>
-            {homeFlowSteps.map((item, index) => (
-              <article
-                className={cx("home-flow-card", `home-flow-card-${item.tone}`)}
-                key={item.title}
-              >
-                <span>{item.step}</span>
-                <h3>{item.title}</h3>
-                <p>{item.summary}</p>
-                <div
-                  className={cx("home-flow-illustration")}
-                  aria-hidden="true"
-                >
-                  <Image
-                    src={item.illustrationSrc}
-                    alt={item.illustrationAlt}
-                    width={1124}
-                    height={1400}
-                    className={cx("home-flow-illustration-image")}
-                    aria-hidden="true"
-                    sizes="(max-width: 820px) 70vw, 220px"
-                  />
-                </div>
-                {index < homeFlowSteps.length - 1 ? (
-                  <i className={cx("home-flow-arrow")} aria-hidden="true" />
-                ) : null}
-              </article>
-            ))}
-          </div>
-
-          <article className={cx("home-next-event-card")}>
+      <section className={cx("home-current-section")} aria-label="近期活动">
+        <article className={cx("home-next-event-card")}>
             <div className={cx("home-next-event-copy")}>
               <p className={cx("home-next-event-kicker")}>
                 {hasUpcomingEvent ? "下一场活动等你来！" : "下一场活动筹备中"}
@@ -449,15 +319,13 @@ export default async function HomePage() {
               sizes="(max-width: 1024px) 1px, 220px"
             />
             <DoodleSparkles className={cx("home-doodle home-doodle-event-sparkles")} />
-          </article>
-        </div>
+        </article>
       </section>
 
       <section className={cx("home-member-stories")} aria-labelledby="home-member-stories-title">
         <div className={cx("home-card-heading home-showcase-heading")}>
           <div>
             <h2 id="home-member-stories-title">成员故事</h2>
-            <p>他们在这里把经验、问题和 AI 能力连接起来</p>
           </div>
           <Link href="/members" prefetch={false}>查看更多故事 →</Link>
         </div>
@@ -506,7 +374,6 @@ export default async function HomePage() {
         <div className={cx("home-card-heading home-showcase-heading")}>
           <div>
             <h2 id="home-community-updates-title">社区动态</h2>
-            <p>活动报道、成员分享和项目进展，会先在这里轻量沉淀</p>
           </div>
           <Link href="/updates" prefetch={false}>查看全部动态 →</Link>
         </div>
@@ -577,53 +444,6 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section className={cx("home-event-review-section")} aria-labelledby="home-event-review-title">
-        <div className={cx("home-card-heading home-showcase-heading")}>
-          <div>
-            <h2 id="home-event-review-title">近期活动回顾</h2>
-            <p>看看最近几场线下活动如何沉淀问题、案例和连接</p>
-          </div>
-          <Link href="/events" prefetch={false}>查看更多 →</Link>
-        </div>
-
-        {recentEvents.length > 0 ? (
-          <div className={cx("home-event-review-grid")}>
-            {recentEvents.map((item) => (
-              <Link
-                href={`/events/${item.slug}`}
-                prefetch={false}
-                className={cx("home-event-review-card")}
-                key={item.id}
-              >
-                <div className={cx("home-event-review-media")}>
-                  {item.imageUrl ? (
-                    <RevealNextImage
-                      src={getEventImageUrl(item.imageUrl, "review-card") ?? item.imageUrl}
-                      alt={item.title}
-                      width={640}
-                      height={320}
-                      unoptimized
-                      sizes="(max-width: 820px) 100vw, 25vw"
-                    />
-                  ) : (
-                    <span>AI</span>
-                  )}
-                </div>
-                <div className={cx("home-event-review-copy")}>
-                  <small>{formatReviewDate(item.isoDate)}</small>
-                  <h3>{item.title}</h3>
-                  <p>{item.locationLabel}</p>
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className={cx("home-empty-state")}>
-            暂无活动回顾内容，欢迎稍后再来查看社区最新记录。
-          </div>
-        )}
-      </section>
-
       <SiteSponsors />
 
       <section className={cx("home-join-banner")} aria-labelledby="home-join-banner-title">
@@ -637,10 +457,6 @@ export default async function HomePage() {
               申请加入
               <span aria-hidden="true">→</span>
             </Link>
-            <div className={cx("home-join-banner-proof")}>
-              <strong>{communityMemberCountLabel}</strong>
-              <span>位成员已加入我们</span>
-            </div>
           </div>
         </div>
 

@@ -37,7 +37,7 @@
   margin: 0;
   color: #111b1f;
   font-size: clamp(2.65rem, 4.6vw, 4rem);
-  font-weight: 880;
+  font-weight: 740;
   line-height: 1.1;
   letter-spacing: -0.052em;
 }
@@ -233,7 +233,7 @@
 .nextCard p {
   color: #149064;
   font-size: 0.9rem;
-  font-weight: 900;
+  font-weight: 720;
 }
 
 .nextCard h2 {
@@ -426,7 +426,7 @@
 .proposalCopy h2 {
   color: #111a1d;
   font-size: clamp(1.55rem, 2.4vw, 2rem);
-  font-weight: 900;
+  font-weight: 720;
   line-height: 1.12;
 }
 
@@ -465,7 +465,7 @@
 .proposalNotes strong {
   color: #111a1d;
   font-size: 0.98rem;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 1.2;
 }
 
@@ -502,7 +502,7 @@
 .sectionHeading h2 {
   color: #111a1d;
   font-size: clamp(2rem, 3.4vw, 2.55rem);
-  font-weight: 900;
+  font-weight: 720;
   line-height: 1.08;
   letter-spacing: -0.055em;
 }
@@ -899,12 +899,15 @@
   }
 
   .heroCopy {
-    gap: 18px;
+    gap: 14px;
     padding-top: 18px;
   }
 
   .heroCopy h1 {
-    font-size: clamp(2.5rem, 14vw, 3.5rem);
+    font-size: clamp(2.15rem, 10vw, 2.5rem);
+    font-weight: 720;
+    line-height: 1.16;
+    letter-spacing: -0.025em;
   }
 
   .heroCopy h1::after {
@@ -913,13 +916,16 @@
   }
 
   .heroActions {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-wrap: wrap;
     gap: 10px;
   }
 
   .heroActions :global(.button) {
-    width: 100%;
+    width: auto;
+    min-height: 42px;
+    padding-inline: 17px;
+    font-size: 0.9rem;
   }
 
   .heroPhoto {
@@ -930,7 +936,7 @@
 
   .heroPhoto img,
   .heroPhotoFallback {
-    height: 286px;
+    height: 240px;
   }
 
   .stickyNote {
@@ -947,7 +953,6 @@
   }
 
   .nextCard,
-  .flowCard,
   .proposalSection,
   .upcomingSection :global(.event-registration-card),
   .emptyPanel,
@@ -957,7 +962,26 @@
 
   .sectionHeading {
     grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 8px;
+  }
+
+  .sectionHeading h2 {
+    font-size: 1.65rem;
+    font-weight: 720;
+    letter-spacing: -0.025em;
+  }
+
+  .nextCard h2 {
+    font-size: 1.3rem;
+  }
+
+  .proposalCopy h2 {
+    font-size: 1.45rem;
+    line-height: 1.2;
+  }
+
+  .proposalCta {
+    width: fit-content;
   }
 
   .recapMedia {
