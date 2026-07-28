@@ -55,6 +55,7 @@ interface MiniappProfileOptions {
 }
 
 interface MiniappProfile {
+  shareHandle: string;
   displayName: string;
   avatarUrl: string | null;
   wechat: string;
@@ -75,6 +76,25 @@ interface MiniappProfile {
   privacyAccepted: boolean;
   privacyPolicyVersion: string;
   completion: MiniappProfileCompletion;
+}
+
+interface MiniappSharedProfile {
+  shareHandle: string;
+  displayName: string;
+  avatarUrl: string | null;
+  city: string;
+  roleLabel: string;
+  organization: string;
+  bio: string;
+  industryTags: string[];
+  skills: string[];
+  interests: string[];
+  capabilitySummary: string;
+  seekingSummary: string;
+  willingToAttend: boolean;
+  willingToShare: boolean;
+  willingToJoinProjects: boolean;
+  identityLabel: string;
 }
 
 interface MiniappProfileUpdate {

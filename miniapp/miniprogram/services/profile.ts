@@ -22,3 +22,9 @@ export async function updateProfile(profile: MiniappProfileUpdate) {
     data: profile,
   });
 }
+
+export async function loadSharedProfile(handle: string) {
+  return apiRequest<{ profile: MiniappSharedProfile }>({
+    path: `/api/miniapp/members/${encodeURIComponent(handle)}`,
+  });
+}

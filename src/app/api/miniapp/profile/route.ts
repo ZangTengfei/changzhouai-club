@@ -54,7 +54,7 @@ async function loadProfile(supabase: SupabaseClient, userId: string) {
     supabase
       .from("profiles")
       .select(
-        "display_name, avatar_url, wechat, city, role_label, organization, monthly_time, bio, industry_tags, skills, interests, capability_summary, seeking_summary",
+        "public_slug, display_name, avatar_url, wechat, city, role_label, organization, monthly_time, bio, industry_tags, skills, interests, capability_summary, seeking_summary",
       )
       .eq("id", userId)
       .maybeSingle(),
@@ -91,6 +91,7 @@ async function loadProfile(supabase: SupabaseClient, userId: string) {
   });
 
   return {
+    shareHandle: profile?.public_slug?.trim() || userId,
     displayName: profile?.display_name ?? "",
     avatarUrl: profile?.avatar_url ?? null,
     wechat: profile?.wechat ?? "",

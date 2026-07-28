@@ -167,15 +167,29 @@
 }
 
 .profile-view-actions {
+  display: flex;
   position: sticky;
   z-index: 10;
   bottom: 0;
+  gap: 16rpx;
   margin: 28rpx -32rpx -64rpx;
   padding: 20rpx 32rpx calc(20rpx + env(safe-area-inset-bottom));
   border-top: 2rpx solid var(--color-line);
   background: rgba(255, 255, 255, 0.96);
 }
 
-.profile-view-actions .primary-button {
-  width: 100%;
+.profile-view-actions .primary-button,
+.profile-view-actions .secondary-button {
+  min-width: 0;
+  min-height: 92rpx;
+  flex: 1;
+}
+
+.profile-share-canvas {
+  position: fixed;
+  top: 0;
+  left: -10000px;
+  width: 750px;
+  height: 600px;
+  pointer-events: none;
 }

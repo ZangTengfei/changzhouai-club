@@ -1,0 +1,5 @@
+@import "../index.wxss";
+
+.shared-profile-notice {
+  margin-bottom: 12rpx;
+}

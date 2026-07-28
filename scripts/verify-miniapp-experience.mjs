@@ -134,7 +134,7 @@ try {
       willingToAttend: true,
       willingToShare: false,
       willingToJoinProjects: false,
-      isPubliclyVisible: false,
+      isPubliclyVisible: true,
       privacyAccepted: true,
     }),
   });
@@ -143,7 +143,34 @@ try {
   assert.equal(profilePut.body?.user?.profileComplete, true);
   assert.equal(profilePut.body?.user?.capabilityProfileComplete, true);
   assert.equal(profilePut.body?.profile?.completion?.percent, 100);
+  assert.equal(profilePut.body?.profile?.shareHandle, userId);
   pass("profile_saved_with_consent");
+
+  const sharedProfile = await request(
+    `/api/miniapp/members/${encodeURIComponent(userId)}`,
+  );
+  assert.equal(sharedProfile.response.status, 200);
+  assert.equal(sharedProfile.body?.profile?.displayName, "体验版测试用户");
+  assert.equal(sharedProfile.body?.profile?.capabilitySummary, "可以协助自动化验收");
+  assert.equal("wechat" in (sharedProfile.body?.profile ?? {}), false);
+  pass("public_member_profile_loaded_without_private_fields");
+
+  const { error: hideProfileError } = await supabase
+    .from("members")
+    .update({ is_publicly_visible: false })
+    .eq("id", userId);
+  if (hideProfileError) throw hideProfileError;
+  const hiddenProfile = await request(
+    `/api/miniapp/members/${encodeURIComponent(userId)}`,
+  );
+  assert.equal(hiddenProfile.response.status, 404);
+  pass("private_member_profile_hidden");
+
+  const { error: restoreProfileError } = await supabase
+    .from("members")
+    .update({ is_publicly_visible: true })
+    .eq("id", userId);
+  if (restoreProfileError) throw restoreProfileError;
 
   const legacyProfilePut = await request("/api/miniapp/profile", {
     method: "PUT",

@@ -5,14 +5,15 @@
     "pages/me/index",
     "pages/events/detail/index",
     "pages/event-consent/index",
-    "pages/intro/index",
     "pages/profile/index",
+    "pages/profile/shared/index",
     "pages/profile/edit/index",
     "pages/registrations/index",
     "pages/settings/index",
     "pages/account-recovery/index",
     "pages/growth/index",
-    "pages/privacy/index"
+    "pages/privacy/index",
+    "pages/intro/index"
   ],
   "window": {
     "backgroundColor": "#ffffff",
