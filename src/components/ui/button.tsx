@@ -18,12 +18,19 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive text-white shadow-sm hover:bg-destructive/90",
         link: "text-primary underline-offset-4 hover:underline",
+        sitePrimary:
+          "border border-transparent bg-primary text-primary-foreground shadow-site-button transition-[transform,background-color,border-color] hover:-translate-y-px hover:bg-primary-strong focus-visible:-translate-y-px focus-visible:bg-primary-strong",
+        siteSecondary:
+          "border border-primary-border bg-primary-soft text-ink transition-[transform,background-color,border-color] hover:-translate-y-px hover:bg-primary-soft-hover focus-visible:-translate-y-px focus-visible:bg-primary-soft-hover",
       },
       size: {
         default: "h-9 px-4 py-2",
         sm: "h-8 rounded-[calc(var(--radius)-4px)] px-3 text-xs",
         lg: "h-10 px-5",
         icon: "size-9",
+        site: "min-h-13.5 rounded-sm px-7 py-2 text-base [&_svg]:size-4.5",
+        siteDefault: "min-h-11 rounded-sm px-4.5 py-2 [&_svg]:size-4.5",
+        siteCompact: "min-h-10.5 rounded-sm px-4.5 py-2 text-sm [&_svg]:size-4.25",
       },
     },
     defaultVariants: {

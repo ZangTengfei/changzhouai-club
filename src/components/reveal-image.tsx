@@ -11,8 +11,6 @@ import Image, { type ImageProps } from "next/image";
 
 import { cn } from "@/lib/utils";
 
-import styles from "./reveal-image.module.css";
-
 type RevealImageProps = Omit<
   ComponentPropsWithoutRef<"img">,
   "onLoad" | "onError"
@@ -42,7 +40,11 @@ export function RevealImage({
       {...props}
       ref={imageRef}
       src={src}
-      className={cn(styles.image, isLoaded ? styles.loaded : null, className)}
+      className={cn(
+        "invisible opacity-0",
+        isLoaded && "visible opacity-100 transition-opacity duration-150 motion-reduce:transition-none",
+        className,
+      )}
       loading={loading}
       decoding={decoding}
       onLoad={() => source && setLoadedSrc(source)}
@@ -57,7 +59,11 @@ export function RevealNextImage({ className, onLoad, ...props }: ImageProps) {
   return (
     <Image
       {...props}
-      className={cn(styles.image, isLoaded ? styles.loaded : null, className)}
+      className={cn(
+        "invisible opacity-0",
+        isLoaded && "visible opacity-100 transition-opacity duration-150 motion-reduce:transition-none",
+        className,
+      )}
       onLoad={(event) => {
         setIsLoaded(true);
         onLoad?.(event);

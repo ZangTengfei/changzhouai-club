@@ -5,8 +5,6 @@ import { MailCheck } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 
-import styles from "./wechat-account-recovery-form.module.css";
-
 type StartResponse = {
   message?: string;
   recoveryToken?: string;
@@ -95,8 +93,8 @@ export function WechatAccountRecoveryForm() {
   }
 
   return (
-    <div className={styles.stack}>
-      <form className={styles.form} onSubmit={sendVerification}>
+    <div className="grid gap-3.5">
+      <form className="grid max-w-130 gap-3.5 [&>.button]:justify-self-start" onSubmit={sendVerification}>
         <label className="form-field">
           <span>原账号邮箱</span>
           <input
@@ -127,7 +125,7 @@ export function WechatAccountRecoveryForm() {
       </form>
 
       {recoveryToken ? (
-        <form className={styles.form} onSubmit={verifyCode}>
+        <form className="grid max-w-130 gap-3.5 [&>.button]:justify-self-start" onSubmit={verifyCode}>
           <label className="form-field">
             <span>6 位验证码</span>
             <input
@@ -150,12 +148,12 @@ export function WechatAccountRecoveryForm() {
           >
             {pending === "verify" ? "正在验证..." : "验证并查看合并预览"}
           </button>
-          <p className={styles.hint}>也可以直接点击邮件里的验证链接。</p>
+          <p className="m-0 text-[0.88rem] text-muted-foreground">也可以直接点击邮件里的验证链接。</p>
         </form>
       ) : null}
 
       {message ? <p className="note-strip">{message}</p> : null}
-      {error ? <p className={`note-strip ${styles.error}`}>{error}</p> : null}
+      {error ? <p className="note-strip !border-[rgba(139,46,36,0.22)] !bg-[rgba(255,241,237,0.88)] !text-[#8b2e24]">{error}</p> : null}
     </div>
   );
 }

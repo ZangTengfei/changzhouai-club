@@ -21,8 +21,23 @@ import { ToneBadge } from "@/components/tone-badge";
 import { getPublicMemberByHandle, isCorePublicMember } from "@/lib/community-members";
 import { getPublicWorksByMemberId } from "@/lib/community-works";
 import { getMemberPublicSlugPath, isUuidLike } from "@/lib/member-public-slug";
+import { cn } from "@/lib/utils";
 
-import styles from "./member-detail-page.module.css";
+const memberSectionClassName =
+  "grid gap-4 rounded-[var(--radius-md)] bg-white p-5 shadow-[0_14px_34px_rgba(var(--ink-rgb),0.07)] max-sm:p-4";
+const memberSectionHeadingClassName =
+  "grid gap-1.5 [&_h2]:m-0 [&_h2]:text-[1.72rem] [&_h2]:leading-[1.12] [&_h2]:font-black [&_h2]:tracking-normal [&_h2]:text-[#111a1d] [&_div>p]:mt-[5px] [&_div>p]:mb-0 [&_div>p]:max-w-[44rem] [&_div>p]:text-[0.95rem] [&_div>p]:leading-[1.58] [&_div>p]:font-semibold [&_div>p]:text-[rgba(var(--ink-rgb),0.64)] max-sm:[&_h2]:text-[1.48rem]";
+const signalCardToneClassNames = {
+  green: "text-primary",
+  orange: "text-[#ee7f18]",
+  blue: "text-[#2a7bd3]",
+} as const;
+const signalCardBackgroundClassNames = [
+  "bg-[#edf5ff]",
+  "bg-[#fff2e5]",
+  "bg-[#f3efff]",
+  "bg-[#edf5ff]",
+] as const;
 
 function formatMemberHeadline(member: {
   roleLabel: string | null;
@@ -175,29 +190,29 @@ export default async function MemberDetailPage({
   ] as const;
 
   return (
-    <div className={styles.memberDetailPage}>
-      <section className={styles.memberHero} aria-labelledby="member-detail-title">
-        <div className={styles.memberHeroCopy}>
+    <div className="grid gap-[22px] max-sm:gap-[18px]">
+      <section className="grid grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)] items-stretch gap-6 pt-[18px] pb-0.5 max-lg:grid-cols-1 max-sm:gap-[18px] max-sm:pt-0" aria-labelledby="member-detail-title">
+        <div className="grid min-w-0 content-center gap-4 max-sm:gap-3.5">
           <p className="home-kicker">Member · 成员主页</p>
-          <h1 id="member-detail-title">
+          <h1 className="m-0 max-w-[760px] text-[3.3rem] leading-[1.04] font-black tracking-normal text-[#111b1f] max-lg:text-5xl max-sm:text-[2.42rem]" id="member-detail-title">
             {member.displayName}
-            <span>的公开成员卡</span>
+            <span className="ml-[0.28em] inline text-primary max-sm:ml-0 max-sm:block">的公开成员卡</span>
           </h1>
 
-          {headline ? <p>{headline}</p> : null}
+          {headline ? <p className="m-0 max-w-[42rem] text-[1.02rem] leading-[1.72] text-[rgba(var(--ink-rgb),0.72)]">{headline}</p> : null}
 
-          <p className={styles.memberHeroSummary}>
+          <p className="m-0 max-w-[45rem] rounded-[var(--radius-sm)] bg-[#e9f9f0] px-4 py-3.5 text-[1.02rem] leading-[1.72] text-[rgba(var(--ink-rgb),0.72)]">
             {member.bio?.trim() ||
               "这位成员已经加入社区，目前公开展示的是基础资料与参与方向。"}
           </p>
 
-          <div className={styles.memberSignalRow}>
+          <div className="flex flex-wrap items-center gap-2">
             {signals.map((item) => (
-              <span key={item}>{item}</span>
+              <span className="inline-flex min-h-8 items-center rounded-[var(--radius-pill)] border border-[rgba(var(--accent-rgb),0.14)] bg-[rgba(255,252,247,0.78)] px-[11px] text-[0.84rem] font-[850] text-[var(--accent-strong)]" key={item}>{item}</span>
             ))}
           </div>
 
-          <div className={styles.memberHeroActions}>
+          <div className="mt-0.5 flex flex-wrap items-center gap-2.5 max-sm:[&>.button]:w-full [&_svg]:size-[18px]">
             <Link href="/members" className="button home-ghost-button">
               <ArrowLeft aria-hidden="true" strokeWidth={2} />
               返回成员地图
@@ -209,25 +224,25 @@ export default async function MemberDetailPage({
           </div>
         </div>
 
-        <div className={styles.memberIdentityPanel}>
-          <div className={styles.memberAvatarStage}>
+        <div className="grid gap-4 rounded-[var(--radius-md)] bg-white p-[18px] shadow-[0_14px_34px_rgba(var(--ink-rgb),0.07)] max-sm:p-4">
+          <div className="grid min-w-0 grid-cols-[96px_minmax(0,1fr)] items-center gap-x-4 gap-y-2 rounded-[var(--radius-sm)] border border-[rgba(var(--ink-rgb),0.08)] bg-[rgba(255,252,247,0.74)] p-3.5 max-sm:grid-cols-1 max-sm:justify-items-center max-sm:text-center [&_.member-avatar]:row-span-2 [&_.member-avatar]:size-24 [&_.member-avatar]:rounded-[var(--radius-lg)] [&_.member-avatar]:shadow-[var(--shadow-md)] max-sm:[&_.member-avatar]:row-auto max-sm:[&_.member-avatar]:size-28 [&_.member-avatar-fallback]:text-[1.85rem]">
             <MemberAvatar
               name={member.displayName}
               avatarUrl={member.avatarUrl}
             />
-            <strong>{member.displayName}</strong>
-            <span>{headline || "常州 AI Club 成员"}</span>
+            <strong className="min-w-0 overflow-hidden text-[1.65rem] leading-[1.1] font-black text-ellipsis whitespace-nowrap text-[#111b1f] max-sm:whitespace-normal">{member.displayName}</strong>
+            <span className="min-w-0 overflow-hidden text-[0.9rem] leading-[1.35] font-extrabold text-ellipsis whitespace-nowrap text-[rgba(var(--ink-rgb),0.62)] max-sm:whitespace-normal">{headline || "常州 AI Club 成员"}</span>
           </div>
 
-          <div className={styles.memberProfileFacts} aria-label="公开资料">
+          <div className="grid grid-cols-2 gap-2.5 max-sm:grid-cols-1" aria-label="公开资料">
             {profileFacts.map((item) => {
               const Icon = item.icon;
 
               return (
-                <article key={item.label}>
-                  <Icon aria-hidden="true" strokeWidth={1.9} />
-                  <span>{item.label}</span>
-                  <strong>{item.value}</strong>
+                <article className="grid min-w-0 grid-cols-[30px_minmax(0,1fr)] items-center gap-x-2.5 gap-y-[3px] rounded-[var(--radius-sm)] border border-[rgba(var(--ink-rgb),0.07)] bg-[rgba(255,252,247,0.6)] p-3" key={item.label}>
+                  <Icon className="row-span-2 size-6 text-primary" aria-hidden="true" strokeWidth={1.9} />
+                  <span className="min-w-0 overflow-hidden text-[0.78rem] font-[850] text-ellipsis whitespace-nowrap text-[rgba(var(--ink-rgb),0.5)]">{item.label}</span>
+                  <strong className="min-w-0 overflow-hidden text-[0.98rem] font-black text-ellipsis whitespace-nowrap text-[#152524]">{item.value}</strong>
                 </article>
               );
             })}
@@ -235,9 +250,9 @@ export default async function MemberDetailPage({
         </div>
       </section>
 
-      <div className={styles.memberContentGrid}>
-        <section className={styles.memberSkillsSection}>
-          <div className={styles.memberSectionHeading}>
+      <div className="grid grid-cols-[minmax(0,1fr)_minmax(320px,0.84fr)] items-start gap-[18px] max-lg:grid-cols-1">
+        <section className={memberSectionClassName}>
+          <div className={memberSectionHeadingClassName}>
             <p className="home-kicker">Skills</p>
             <div>
               <h2>技能与方向</h2>
@@ -246,21 +261,21 @@ export default async function MemberDetailPage({
           </div>
 
           {member.skills.length > 0 ? (
-            <div className={styles.memberSkillCloud}>
+            <div className="flex flex-wrap items-center gap-2.5">
               {member.skills.map((skill) => (
                 <ToneBadge key={`${member.id}-${skill}`} label={skill} />
               ))}
             </div>
           ) : (
-            <div className={styles.memberSoftNote}>
-              <Tags aria-hidden="true" strokeWidth={1.9} />
+            <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2.5 rounded-[var(--radius-sm)] border border-dashed border-[rgba(var(--accent-rgb),0.2)] bg-[rgba(var(--accent-rgb),0.07)] p-3.5 text-[0.92rem] leading-[1.58] font-bold text-[rgba(var(--ink-rgb),0.68)]">
+              <Tags className="size-5 text-primary" aria-hidden="true" strokeWidth={1.9} />
               <span>这位成员暂未补充技能标签。</span>
             </div>
           )}
         </section>
 
-        <section className={styles.memberSignalsSection}>
-          <div className={styles.memberSectionHeading}>
+        <section className={memberSectionClassName}>
+          <div className={memberSectionHeadingClassName}>
             <p className="home-kicker">Signals</p>
             <div>
               <h2>参与信号</h2>
@@ -268,13 +283,17 @@ export default async function MemberDetailPage({
             </div>
           </div>
 
-          <div className={styles.memberSignalList}>
-            {signalCards.map((item) => {
+          <div className="grid gap-2.5">
+            {signalCards.map((item, index) => {
               const Icon = item.icon;
 
               return (
                 <article
-                  className={`${styles.memberSignalCard} ${styles[`memberSignalCard${item.tone}`]}`}
+                  className={cn(
+                    "grid min-w-0 grid-cols-[36px_minmax(0,1fr)_auto] items-center gap-3 rounded-[var(--radius-sm)] p-[13px] max-sm:grid-cols-1 max-sm:items-start [&_h3]:m-0 [&_h3]:text-base [&_h3]:leading-[1.2] [&_h3]:font-black [&_h3]:text-[#111a1d] [&_p]:mt-1 [&_p]:mb-0 [&_p]:text-[0.88rem] [&_p]:leading-normal [&_p]:text-[rgba(var(--ink-rgb),0.62)] [&>strong]:justify-self-end [&>strong]:text-base [&>strong]:font-black max-lg:[&>strong]:justify-self-start [&>svg]:size-7",
+                    signalCardBackgroundClassNames[index],
+                    signalCardToneClassNames[item.tone],
+                  )}
                   key={item.title}
                 >
                   <Icon aria-hidden="true" strokeWidth={1.8} />
@@ -291,8 +310,8 @@ export default async function MemberDetailPage({
       </div>
 
       {works.length > 0 ? (
-        <section className={styles.memberWorksSection}>
-          <div className={styles.memberSectionHeading}>
+        <section className={memberSectionClassName}>
+          <div className={memberSectionHeadingClassName}>
             <p className="home-kicker">Works</p>
             <div>
               <h2>作品与产品</h2>
@@ -300,7 +319,7 @@ export default async function MemberDetailPage({
             </div>
           </div>
 
-          <div className={styles.memberWorksGrid}>
+          <div className="grid grid-cols-3 gap-3.5 max-lg:grid-cols-1">
             {works.map((work) => (
               <MemberWorkCard key={work.id} work={work} compact />
             ))}
@@ -308,14 +327,14 @@ export default async function MemberDetailPage({
         </section>
       ) : null}
 
-      <section className={styles.memberJoinPanel}>
-        <Sparkles aria-hidden="true" strokeWidth={1.8} />
+      <section className="grid grid-cols-[42px_minmax(0,1fr)_auto] items-center gap-4 rounded-[var(--radius-md)] bg-[#e9f9f0] p-5 max-lg:grid-cols-1 max-sm:p-4 max-sm:[&>.button]:w-full">
+        <Sparkles className="size-[34px] text-primary" aria-hidden="true" strokeWidth={1.8} />
         <div>
           <p className="home-kicker">Next</p>
-          <h2>想和这位成员进一步连接？</h2>
-          <p>可以先通过活动现场、项目协作或合作联系留下明确的交流场景。</p>
+          <h2 className="mt-[5px] mb-0 text-[1.68rem] leading-[1.16] font-black tracking-normal text-[#111a1d] max-sm:text-[1.48rem]">想和这位成员进一步连接？</h2>
+          <p className="mt-1.5 mb-0 leading-[1.62] text-[rgba(var(--ink-rgb),0.66)]">可以先通过活动现场、项目协作或合作联系留下明确的交流场景。</p>
         </div>
-        <Link href="/cooperate" className="button home-primary-button">
+        <Link href="/cooperate" className="button home-primary-button [&_svg]:size-[18px]">
           合作联系
           <ArrowRight aria-hidden="true" strokeWidth={2} />
         </Link>

@@ -83,7 +83,7 @@ export function AdminNav({ permissions }: { permissions: string[] }) {
 
   return (
     <Menu
-      className="admin-antd-menu"
+      className="admin-antd-menu flex-1 overflow-y-auto border-e-0! bg-transparent! [&_.ant-menu-item-group-title]:px-4 [&_.ant-menu-item-group-title]:pt-3.5 [&_.ant-menu-item-group-title]:pb-1.5 [&_.ant-menu-item-group-title]:text-[11px] [&_.ant-menu-item-group-title]:font-semibold [&_.ant-menu-item-group-title]:tracking-[0.08em] [&_.ant-menu-item-group-title]:text-[#8c8c8c] [&_.ant-menu-item]:mx-1 [&_.ant-menu-item]:w-[calc(100%-8px)]"
       mode="inline"
       items={items}
       selectedKeys={selectedKey ? [selectedKey] : []}

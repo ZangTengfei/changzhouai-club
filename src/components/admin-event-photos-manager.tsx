@@ -4,10 +4,6 @@ import {
   setAdminEventCoverImage,
 } from "@/app/admin/actions";
 import { StorageImageUrlField } from "@/components/storage-image-url-field";
-import { cssModuleCx } from "@/lib/utils";
-import styles from "./admin-event-photos-manager.module.css";
-
-const cx = cssModuleCx.bind(null, styles);
 
 type EventPhoto = {
   id: string;
@@ -37,7 +33,7 @@ export function AdminEventPhotosManager({
         <p>统一维护活动封面、相册图片、说明文字与展示顺序，便于公开页展示和归档回顾。</p>
       </div>
 
-      <div className={cx("admin-cover-panel")}>
+      <div className="grid gap-4 [&_h3]:m-0">
         <div>
           <h3>当前封面</h3>
           <p>
@@ -46,9 +42,9 @@ export function AdminEventPhotosManager({
         </div>
 
         {coverImageUrl ? (
-          <div className={cx("admin-image-preview")}>
+          <div className="grid gap-2 rounded-md bg-white p-3 [&_img]:max-h-70 [&_img]:w-[min(100%,420px)] [&_img]:rounded-sm [&_img]:border [&_img]:border-site-border-subtle [&_img]:bg-[#f5f7fb] [&_img]:object-cover [&_p]:m-0">
             <img src={coverImageUrl} alt={`${eventTitle} 封面`} loading="lazy" />
-            <p className={cx("admin-image-url")}>{coverImageUrl}</p>
+            <p className="text-[0.8rem] text-muted-foreground [overflow-wrap:anywhere]">{coverImageUrl}</p>
           </div>
         ) : (
           <div className="note-strip">暂未设置封面图。</div>
@@ -56,29 +52,29 @@ export function AdminEventPhotosManager({
       </div>
 
       {photos.length > 0 ? (
-        <div className={cx("admin-photo-list")}>
+        <div className="grid gap-4">
           {photos.map((photo) => {
             const isCover = coverImageUrl === photo.image_url;
 
             return (
-              <article className={cx("admin-photo-card")} key={photo.id}>
-                <div className={cx("admin-image-preview")}>
+              <article className="grid gap-4 rounded-md border border-site-border-subtle p-4" key={photo.id}>
+                <div className="grid gap-2 rounded-md bg-white p-3 [&_img]:max-h-70 [&_img]:w-[min(100%,420px)] [&_img]:rounded-sm [&_img]:border [&_img]:border-site-border-subtle [&_img]:bg-[#f5f7fb] [&_img]:object-cover [&_p]:m-0">
                   <img src={photo.image_url} alt={photo.caption ?? eventTitle} loading="lazy" />
-                  <p className={cx("admin-image-url")}>{photo.image_url}</p>
+                  <p className="text-[0.8rem] text-muted-foreground [overflow-wrap:anywhere]">{photo.image_url}</p>
                 </div>
 
-                <div className={cx("admin-photo-body")}>
-                  <div className={cx("pill-row admin-photo-meta")}>
+                <div className="grid min-w-0 gap-3.5 rounded-md bg-[#f9fafb] p-3 [&_p]:m-0 [&>*]:min-w-0">
+                  <div className="pill-row !gap-2">
                     <span className="pill">排序 {photo.sort_order}</span>
                     {isCover ? <span className="pill">当前封面</span> : null}
                   </div>
 
-                  <form action={saveAdminEventPhoto} className={cx("account-form admin-photo-form")}>
+                  <form action={saveAdminEventPhoto} className="account-form !gap-3">
                     <input type="hidden" name="event_id" value={eventId} />
                     <input type="hidden" name="event_slug" value={eventSlug} />
                     <input type="hidden" name="photo_id" value={photo.id} />
 
-                    <div className={cx("form-grid admin-photo-form-grid")}>
+                    <div className="form-grid !gap-3">
                       <label className="form-field form-field-wide">
                         <span>图片路径</span>
                         <StorageImageUrlField
@@ -112,14 +108,14 @@ export function AdminEventPhotosManager({
                       </label>
                     </div>
 
-                    <div className={cx("cta-row admin-photo-actions")}>
+                    <div className="cta-row items-center">
                       <button type="submit" className="button">
                         保存照片
                       </button>
                     </div>
                   </form>
 
-                  <div className={cx("cta-row admin-photo-actions")}>
+                  <div className="cta-row items-center [&_form]:m-0">
                     {!isCover ? (
                       <form action={setAdminEventCoverImage}>
                         <input type="hidden" name="event_id" value={eventId} />
@@ -151,18 +147,18 @@ export function AdminEventPhotosManager({
         </div>
       )}
 
-      <article className={cx("admin-photo-create")}>
+      <article className="grid gap-4 [&_h3]:m-0">
         <div className="section-heading">
           <p className="eyebrow">New Photo</p>
           <h3>新增活动照片</h3>
           <p>上传图片后可补充说明与排序，用于活动详情页和往期回顾展示。</p>
         </div>
 
-        <form action={saveAdminEventPhoto} className={cx("account-form admin-photo-form")}>
+        <form action={saveAdminEventPhoto} className="account-form !gap-3">
           <input type="hidden" name="event_id" value={eventId} />
           <input type="hidden" name="event_slug" value={eventSlug} />
 
-          <div className={cx("form-grid admin-photo-form-grid")}>
+          <div className="form-grid !gap-3">
             <label className="form-field form-field-wide">
               <span>图片路径</span>
               <StorageImageUrlField

@@ -1,4 +1,4 @@
-import styles from "./member-avatar.module.css";
+import { cn } from "@/lib/utils";
 import { RevealImage } from "./reveal-image";
 
 type MemberAvatarProps = {
@@ -32,17 +32,14 @@ export function MemberAvatar({
   avatarUrl,
   size = "lg",
 }: MemberAvatarProps) {
-  const className =
-    size === "sm"
-      ? [
-          styles["member-avatar"],
-          styles["member-avatar-sm"],
-          "member-avatar",
-          "member-avatar-sm",
-        ].join(" ")
-      : `${styles["member-avatar"]} member-avatar`;
-  const imageClassName = `${styles["member-avatar-image"]} member-avatar-image`;
-  const fallbackClassName = `${styles["member-avatar-fallback"]} member-avatar-fallback`;
+  const className = cn(
+    "member-avatar inline-grid size-16 place-items-center overflow-hidden rounded-lg border border-primary-border bg-white/90 shadow-md",
+    size === "sm" && "member-avatar-sm size-13 rounded-md",
+  );
+  const imageClassName =
+    "member-avatar-image grid size-full place-items-center object-cover";
+  const fallbackClassName =
+    "member-avatar-fallback grid size-full place-items-center bg-[linear-gradient(135deg,rgba(var(--accent-rgb),0.9),rgba(var(--accent-warm-rgb),0.86))] text-[0.9rem] font-extrabold tracking-[0.04em] text-white";
 
   if (avatarUrl) {
     return (

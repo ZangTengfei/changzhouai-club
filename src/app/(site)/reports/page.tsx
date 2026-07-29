@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 
 import { PageHero } from "@/components/page-hero";
-
-import styles from "./reports-page.module.css";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "研究与报告",
@@ -73,42 +73,70 @@ const reports = [
 
 export default function ReportsPage() {
   return (
-    <div className="page-stack">
+    <div className="grid gap-6 max-sm:gap-5">
       <PageHero
         eyebrow="Reports"
         title="研究与报告"
         description="这里沉淀社区面向真实活动、企业培训和本地 AI 应用场景形成的公开分析，方便合作方、讲师和共建成员复用。"
       />
 
-      <section className={styles.reportList} aria-label="公开报告列表">
+      <section className="grid gap-5" aria-label="公开报告列表">
         {reports.map((report) => (
-          <article className={styles.reportCard} key={report.href}>
-            <div className={styles.reportCardCopy}>
-              <span>{report.date}</span>
-              <h2>
+          <article
+            className="grid grid-cols-[minmax(0,1fr)_minmax(360px,0.72fr)_auto] items-center gap-5.5 rounded-lg bg-white p-6 shadow-site-card max-lg:grid-cols-1 max-lg:items-start max-sm:rounded-md max-sm:p-4.5"
+            key={report.href}
+          >
+            <div className="grid min-w-0 gap-2.5">
+              <span className="font-[var(--font-latin-rounded)] text-[0.86rem] font-[850] text-primary">
+                {report.date}
+              </span>
+              <h2 className="m-0 text-[clamp(1.42rem,2.6vw,2.05rem)] leading-[1.16] tracking-normal text-heading">
                 <Link href={report.href}>{report.title}</Link>
               </h2>
-              <p>{report.description}</p>
+              <p className="m-0 max-w-[43rem] text-copy-muted leading-[1.72]">
+                {report.description}
+              </p>
             </div>
 
-            <div className={styles.reportStats} aria-label={`${report.title} 数据摘要`}>
-              {report.stats.map((item) => {
+            <div
+              className="grid grid-cols-3 gap-2.5 max-sm:grid-cols-1"
+              aria-label={`${report.title} 数据摘要`}
+            >
+              {report.stats.map((item, index) => {
                 const Icon = item.icon;
 
                 return (
-                  <div className={styles.reportStat} key={item.label}>
-                    <Icon aria-hidden="true" strokeWidth={1.8} />
-                    <strong>{item.value}</strong>
-                    <span>{item.label}</span>
+                  <div
+                    className={cn(
+                      "grid min-h-29 gap-1 rounded-md p-4 max-sm:min-h-23",
+                      index === 0 && "bg-highlight-green",
+                      index === 1 && "bg-highlight-orange",
+                      index === 2 && "bg-highlight-blue",
+                    )}
+                    key={item.label}
+                  >
+                    <Icon
+                      className="size-6 text-primary"
+                      aria-hidden="true"
+                      strokeWidth={1.8}
+                    />
+                    <strong className="font-[var(--font-latin-rounded)] text-[1.8rem] leading-none text-heading">
+                      {item.value}
+                    </strong>
+                    <span className="text-[0.84rem] font-bold leading-[1.28] text-copy-subtle">
+                      {item.label}
+                    </span>
                   </div>
                 );
               })}
             </div>
 
-            <Link href={report.href} className="button home-primary-button">
-              查看报告
-              <ArrowRight aria-hidden="true" strokeWidth={2} />
-            </Link>
+            <Button asChild variant="sitePrimary" size="site">
+              <Link href={report.href}>
+                查看报告
+                <ArrowRight aria-hidden="true" strokeWidth={2} />
+              </Link>
+            </Button>
           </article>
         ))}
       </section>

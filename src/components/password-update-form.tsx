@@ -5,8 +5,6 @@ import { Eye, EyeOff } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 
-import styles from "./password-update-form.module.css";
-
 type PasswordUpdateFormProps = {
   enabled: boolean;
 };
@@ -77,7 +75,7 @@ export function PasswordUpdateForm({ enabled }: PasswordUpdateFormProps) {
   const renderPasswordToggle = () => (
     <button
       type="button"
-      className={styles.passwordToggle}
+      className="absolute top-1/2 right-2 grid size-8.5 -translate-y-1/2 cursor-pointer place-items-center rounded-full border border-transparent bg-transparent p-0 text-copy-muted transition-[background-color,border-color,color] hover:border-primary-border hover:bg-primary-soft hover:text-primary focus-visible:border-primary-border focus-visible:bg-primary-soft focus-visible:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary/25 disabled:cursor-not-allowed disabled:opacity-45 [&_svg]:size-4.5"
       onClick={() => setShowPassword((current) => !current)}
       disabled={!enabled || pending}
       aria-label={passwordToggleLabel}
@@ -88,10 +86,10 @@ export function PasswordUpdateForm({ enabled }: PasswordUpdateFormProps) {
   );
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
+    <form className="grid gap-4" onSubmit={handleSubmit}>
       <label className="form-field">
         <span>新密码</span>
-        <span className={styles.passwordField}>
+        <span className="relative block min-w-0 [&_.input]:pr-12.5">
           <input
             className="input"
             type={inputType}
@@ -110,7 +108,7 @@ export function PasswordUpdateForm({ enabled }: PasswordUpdateFormProps) {
 
       <label className="form-field">
         <span>确认新密码</span>
-        <span className={styles.passwordField}>
+        <span className="relative block min-w-0 [&_.input]:pr-12.5">
           <input
             className="input"
             type={inputType}
@@ -127,8 +125,8 @@ export function PasswordUpdateForm({ enabled }: PasswordUpdateFormProps) {
         </span>
       </label>
 
-      {error ? <div className={`note-strip ${styles.message}`}>{error}</div> : null}
-      {message ? <div className={`note-strip ${styles.message}`}>{message}</div> : null}
+      {error ? <div className="note-strip !px-3.5 !py-3">{error}</div> : null}
+      {message ? <div className="note-strip !px-3.5 !py-3">{message}</div> : null}
 
       <button
         type="submit"

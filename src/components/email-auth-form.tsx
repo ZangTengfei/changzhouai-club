@@ -5,8 +5,7 @@ import { Eye, EyeOff, KeyRound } from "lucide-react";
 
 import { getPublicSiteUrl } from "@/lib/env";
 import { createClient } from "@/lib/supabase/client";
-
-import styles from "./email-auth-form.module.css";
+import { cn } from "@/lib/utils";
 
 type EmailAuthMode = "sign-in" | "sign-up" | "reset";
 
@@ -23,6 +22,12 @@ type EmailAuthFormProps = {
   showModeTabs?: boolean;
   onResetBack?: () => void;
 };
+
+const textButtonClassName =
+  "w-fit cursor-pointer border-0 bg-transparent p-0 text-left font-[inherit] text-[0.9rem] leading-[1.5] font-extrabold text-primary hover:text-primary-strong hover:underline hover:underline-offset-4 focus-visible:text-primary-strong focus-visible:underline focus-visible:underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[rgba(var(--accent-rgb),0.26)] disabled:cursor-not-allowed disabled:opacity-50";
+
+const passwordToggleClassName =
+  "absolute top-1/2 right-2 grid size-8.5 -translate-y-1/2 cursor-pointer place-items-center rounded-full border border-transparent bg-transparent p-0 text-[rgba(var(--ink-rgb),0.58)] transition-colors duration-[180ms] hover:border-[rgba(var(--accent-rgb),0.16)] hover:bg-primary-soft hover:text-primary focus-visible:border-[rgba(var(--accent-rgb),0.16)] focus-visible:bg-primary-soft focus-visible:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgba(var(--accent-rgb),0.26)] disabled:cursor-not-allowed disabled:opacity-46 [&_svg]:size-4.5";
 
 function getSafeNextPath(nextPath: string) {
   if (!nextPath.startsWith("/") || nextPath.startsWith("//")) {
@@ -113,6 +118,15 @@ export function EmailAuthForm({
   const resetRedirectTo = useMemo(() => {
     return getAuthCallbackUrl(getPasswordResetPath());
   }, []);
+  const inputClassName = cn(
+    "input",
+    compact && "min-h-11.5! rounded-md! bg-[rgba(255,252,247,0.94)]!",
+  );
+  const authButtonClassName = cn(
+    "button auth-button",
+    compact &&
+      "min-h-11! border-[rgba(var(--accent-strong-rgb),0.22)]! bg-[#0f6f62]! text-white! shadow-[inset_0_1px_0_rgba(255,255,255,0.2),0_12px_24px_rgba(var(--accent-rgb),0.18)]! transition-[transform,background-color,border-color,box-shadow] duration-[180ms] hover:border-[rgba(var(--accent-strong-rgb),0.34)]! hover:bg-primary-strong! hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_14px_28px_rgba(var(--accent-strong-rgb),0.2)]! focus-visible:border-[rgba(var(--accent-strong-rgb),0.34)]! focus-visible:bg-primary-strong! focus-visible:shadow-[inset_0_1px_0_rgba(255,255,255,0.16),0_14px_28px_rgba(var(--accent-strong-rgb),0.2)]! disabled:shadow-none!",
+  );
 
   function handleEmailChange(value: string) {
     setEmail(value);
@@ -350,7 +364,7 @@ export function EmailAuthForm({
   const renderPasswordToggle = () => (
     <button
       type="button"
-      className={styles.passwordToggle}
+      className={passwordToggleClassName}
       onClick={() => setShowPassword((current) => !current)}
       disabled={!enabled || pending}
       aria-label={passwordToggleLabel}
@@ -361,17 +375,20 @@ export function EmailAuthForm({
   );
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit}>
+    <form className="mt-0 grid gap-4" onSubmit={handleSubmit}>
       {mode === "reset" ? (
-        <div className={styles.resetHeading}>
-          <strong>{resetTitle}</strong>
-          <span>{resetDescription}</span>
+        <div className="grid gap-1.5">
+          <strong className="text-base leading-[1.35] font-black text-ink">{resetTitle}</strong>
+          <span className="text-[0.92rem] leading-[1.68] text-muted-foreground">{resetDescription}</span>
         </div>
       ) : allowSignUp && showModeTabs ? (
-        <div className={styles.modeTabs} role="tablist" aria-label="邮箱认证方式">
+        <div className="inline-grid w-fit grid-cols-[repeat(2,minmax(86px,1fr))] rounded-full border border-primary-border bg-[rgba(var(--surface-muted-rgb),0.86)] p-1" role="tablist" aria-label="邮箱认证方式">
           <button
             type="button"
-            className={`${styles.modeTab} ${mode === "sign-in" ? styles.modeTabActive : ""}`}
+            className={cn(
+              "min-h-9.5 cursor-pointer rounded-full border-0 bg-transparent px-4.5 py-0 font-[inherit] font-extrabold text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgba(var(--accent-rgb),0.36)]",
+              mode === "sign-in" && "bg-primary text-white",
+            )}
             onClick={() => {
               setMode("sign-in");
               setConfirmPassword("");
@@ -385,7 +402,10 @@ export function EmailAuthForm({
           </button>
           <button
             type="button"
-            className={`${styles.modeTab} ${mode === "sign-up" ? styles.modeTabActive : ""}`}
+            className={cn(
+              "min-h-9.5 cursor-pointer rounded-full border-0 bg-transparent px-4.5 py-0 font-[inherit] font-extrabold text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgba(var(--accent-rgb),0.36)]",
+              mode === "sign-up" && "bg-primary text-white",
+            )}
             onClick={() => {
               setMode("sign-up");
               setResetCode("");
@@ -398,9 +418,11 @@ export function EmailAuthForm({
           </button>
         </div>
       ) : compact ? null : (
-        <div className={styles.resetHeading}>
-          <strong>邮箱账号登录</strong>
-          <span>使用原邮箱账号进入账号中心，再绑定微信作为新的登录方式。</span>
+        <div className="grid gap-1.5">
+          <strong className="text-base leading-[1.35] font-black text-ink">邮箱账号登录</strong>
+          <span className="text-[0.92rem] leading-[1.68] text-muted-foreground">
+            使用原邮箱账号进入账号中心，再绑定微信作为新的登录方式。
+          </span>
         </div>
       )}
 
@@ -408,7 +430,7 @@ export function EmailAuthForm({
         <label className="form-field">
           <span>昵称</span>
           <input
-            className="input"
+            className={inputClassName}
             type="text"
             name="display_name"
             value={displayName}
@@ -424,7 +446,7 @@ export function EmailAuthForm({
       <label className="form-field">
         <span>邮箱</span>
         <input
-          className="input"
+          className={inputClassName}
           type="email"
           name="email"
           value={email}
@@ -439,9 +461,9 @@ export function EmailAuthForm({
       {mode !== "reset" ? (
         <label className="form-field">
           <span>密码</span>
-          <span className={styles.passwordField}>
+          <span className="relative block min-w-0">
             <input
-              className="input"
+              className={cn(inputClassName, "pr-12.5!")}
               type={passwordInputType}
               name="password"
               value={password}
@@ -460,9 +482,9 @@ export function EmailAuthForm({
       {allowSignUp && mode === "sign-up" ? (
         <label className="form-field">
           <span>确认密码</span>
-          <span className={styles.passwordField}>
+          <span className="relative block min-w-0">
             <input
-              className="input"
+              className={cn(inputClassName, "pr-12.5!")}
               type={passwordInputType}
               name="confirm_password"
               value={confirmPassword}
@@ -478,20 +500,24 @@ export function EmailAuthForm({
         </label>
       ) : null}
 
-      {error ? <div className={`note-strip ${styles.message}`}>{error}</div> : null}
-      {message ? <div className={`note-strip ${styles.message}`}>{message}</div> : null}
+      {error ? <div className="note-strip px-3.5 py-3">{error}</div> : null}
+      {message ? <div className="note-strip px-3.5 py-3">{message}</div> : null}
 
       {mode === "reset" && resetEmailSent ? (
-        <div className={styles.resetCodePanel}>
-          <div className={styles.resetCodeIntro}>
-            <strong>输入验证码继续设置密码</strong>
-            <span>邮件链接打不开时，复制邮件里的 6 位数字到这里。</span>
+        <div className="mt-0.5 grid gap-3.5 border-t border-site-border-subtle pt-4.5 [&_.auth-button]:w-full!">
+          <div className="grid gap-1 border-l-3 border-primary bg-[rgba(var(--accent-rgb),0.06)] px-3.5 py-3">
+            <strong className="text-[0.95rem] leading-[1.45] font-black text-ink">
+              输入验证码继续设置密码
+            </strong>
+            <span className="text-[0.88rem] leading-[1.62] text-muted-foreground">
+              邮件链接打不开时，复制邮件里的 6 位数字到这里。
+            </span>
           </div>
 
           <label className="form-field">
             <span>6 位验证码</span>
             <input
-              className="input"
+              className={inputClassName}
               type="text"
               name="reset_code"
               value={resetCode}
@@ -507,7 +533,7 @@ export function EmailAuthForm({
 
           <button
             type="submit"
-            className="button auth-button"
+            className={cn(authButtonClassName, "w-full!")}
             disabled={!enabled || pending}
           >
             {resetPendingAction === "verify" ? "正在验证..." : "使用验证码继续设置密码"}
@@ -515,7 +541,7 @@ export function EmailAuthForm({
 
           <button
             type="button"
-            className={styles.textButton}
+            className={textButtonClassName}
             onClick={handleSendResetEmail}
             disabled={!enabled || pending}
           >
@@ -527,7 +553,7 @@ export function EmailAuthForm({
       {mode === "sign-up" ? (
         <button
           type="submit"
-          className="button auth-button"
+          className={authButtonClassName}
           disabled={!enabled || pending}
         >
           {submitText}
@@ -535,10 +561,10 @@ export function EmailAuthForm({
       ) : null}
 
       {mode === "reset" && !resetEmailSent ? (
-        <div className={styles.actionRow}>
+        <div className="flex items-center justify-between gap-3.5 max-[360px]:flex-col max-[360px]:items-start">
           <button
             type="submit"
-            className="button auth-button"
+            className={cn(authButtonClassName, "min-w-33! flex-[0_0_auto]!")}
             disabled={!enabled || pending}
           >
             {submitText}
@@ -546,7 +572,10 @@ export function EmailAuthForm({
 
           <button
             type="button"
-            className={styles.textButton}
+            className={cn(
+              textButtonClassName,
+              "ml-auto flex-[0_0_auto] text-right whitespace-nowrap max-[360px]:ml-0 max-[360px]:text-left",
+            )}
             onClick={handleResetBack}
             disabled={!enabled || pending}
           >
@@ -556,11 +585,11 @@ export function EmailAuthForm({
       ) : null}
 
       {mode === "sign-in" ? (
-        <div className={styles.signInActions}>
+        <div className="grid gap-2.5">
           {showGoogleRecoveryAction ? (
             <button
               type="button"
-              className={styles.googleRecoveryButton}
+              className="grid min-h-14.5 w-full cursor-pointer grid-cols-[auto_minmax(0,1fr)] items-center gap-2.5 rounded-md border border-[rgba(238,127,24,0.2)] bg-[rgba(255,247,235,0.92)] px-3 py-2.5 text-left font-[inherit] text-[#8d4a10] transition-[background-color,border-color,box-shadow,color] duration-[180ms] hover:border-[rgba(238,127,24,0.34)] hover:bg-[rgba(255,241,217,0.98)] hover:text-[#7a3f0c] hover:shadow-[0_10px_22px_rgba(238,127,24,0.12)] focus-visible:border-[rgba(238,127,24,0.34)] focus-visible:bg-[rgba(255,241,217,0.98)] focus-visible:text-[#7a3f0c] focus-visible:shadow-[0_10px_22px_rgba(238,127,24,0.12)] focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-[rgba(238,127,24,0.28)] disabled:cursor-not-allowed disabled:opacity-58 disabled:shadow-none [&>span]:grid [&>span]:min-w-0 [&>span]:gap-0.5 [&_small]:text-[0.82rem] [&_small]:leading-[1.45] [&_small]:font-bold [&_small]:text-copy-subtle [&_strong]:text-[0.94rem] [&_strong]:leading-[1.32] [&_strong]:font-black [&_strong]:text-inherit [&_svg]:size-5"
               onClick={openPasswordReset}
               disabled={!enabled || pending}
             >
@@ -572,10 +601,10 @@ export function EmailAuthForm({
             </button>
           ) : null}
 
-          <div className={styles.actionRow}>
+          <div className="flex items-center justify-between gap-3.5 max-[360px]:flex-col max-[360px]:items-start">
             <button
               type="submit"
-              className="button auth-button"
+              className={cn(authButtonClassName, "min-w-33! flex-[0_0_auto]!")}
               disabled={!enabled || pending}
             >
               {submitText}
@@ -583,7 +612,10 @@ export function EmailAuthForm({
 
             <button
               type="button"
-              className={styles.textButton}
+              className={cn(
+                textButtonClassName,
+                "ml-auto flex-[0_0_auto] text-right whitespace-nowrap max-[360px]:ml-0 max-[360px]:text-left",
+              )}
               onClick={openPasswordReset}
               disabled={!enabled || pending}
             >
@@ -596,7 +628,7 @@ export function EmailAuthForm({
       {mode === "reset" && resetEmailSent ? (
         <button
           type="button"
-          className={styles.textButton}
+          className={textButtonClassName}
           onClick={handleResetBack}
           disabled={!enabled || pending}
         >

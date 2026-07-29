@@ -7,7 +7,15 @@ import { hasSupabaseEnv } from "@/lib/env";
 import { resolveCommunityUserId } from "@/lib/community-user";
 import { createClient } from "@/lib/supabase/server";
 
-import styles from "../../account-page.module.css";
+import {
+  accountPageClassName,
+  accountWorkSubmitHeaderClassName,
+  accountWorkSubmitSectionClassName,
+  disabledPanelClassName,
+  statusNoteClassName,
+  statusNoteErrorClassName,
+} from "../../account-tailwind";
+import { cn } from "@/lib/utils";
 import { AccountWorkSubmitForm } from "./account-work-submit-form";
 
 export const metadata: Metadata = {
@@ -45,8 +53,8 @@ export default async function NewAccountWorkPage({
 
   if (!enabled) {
     return (
-      <div className={styles.accountPage}>
-        <section className={styles.disabledPanel}>
+      <div className={accountPageClassName}>
+        <section className={disabledPanelClassName}>
           <p className="home-kicker">Works · 案例提交</p>
           <h1>账号服务暂未开放</h1>
           <p>当前账号服务暂未启用，请稍后再试。</p>
@@ -72,9 +80,9 @@ export default async function NewAccountWorkPage({
   const statusMessage = getWorkErrorMessage(params.error);
 
   return (
-    <div className={styles.accountPage}>
-      <section className={styles.accountWorkSubmitSection} aria-labelledby="work-submit-title">
-        <div className={styles.accountWorkSubmitHeader}>
+    <div className={accountPageClassName}>
+      <section className={accountWorkSubmitSectionClassName} aria-labelledby="work-submit-title">
+        <div className={accountWorkSubmitHeaderClassName}>
           <div>
             <p className="home-kicker">Works · 案例提交</p>
             <h1 id="work-submit-title">提交作品/案例</h1>
@@ -89,7 +97,7 @@ export default async function NewAccountWorkPage({
         </div>
 
         {statusMessage ? (
-          <div className={`${styles.statusNote} ${styles.statusNoteError}`}>
+          <div className={cn(statusNoteClassName, statusNoteErrorClassName)}>
             <CircleAlert aria-hidden="true" strokeWidth={1.9} />
             <span>{statusMessage}</span>
           </div>

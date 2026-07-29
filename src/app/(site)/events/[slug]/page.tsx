@@ -27,8 +27,21 @@ import {
   getRegistrationNoteWithoutUrl,
 } from "@/lib/event-registration-link";
 import { getEventImageUrl } from "@/lib/public-image-url";
+import { cn } from "@/lib/utils";
 
-import styles from "./event-detail-page.module.css";
+const eventPanelClassName =
+  "grid min-w-0 gap-5 rounded-[var(--radius-lg)] bg-white p-6 shadow-[0_14px_34px_rgba(var(--ink-rgb),0.07)] max-sm:p-5";
+const eventSectionHeadingClassName =
+  "grid grid-cols-[auto_minmax(0,1fr)] items-start gap-4 max-[820px]:grid-cols-1 max-[820px]:gap-3 [&_h2]:m-0 [&_h2]:text-[2rem] [&_h2]:leading-[1.1] [&_h2]:font-black [&_h2]:tracking-normal [&_h2]:text-[#111a1d] [&_div>p]:mt-2 [&_div>p]:mb-0 [&_div>p]:text-[0.98rem] [&_div>p]:leading-[1.65] [&_div>p]:font-[650] [&_div>p]:text-[rgba(var(--ink-rgb),0.64)]";
+const eventStatusPillClassName =
+  "inline-flex min-h-[30px] max-w-full items-center justify-self-start rounded-[var(--radius-pill)] px-3 text-[0.88rem] leading-[1.2] font-[850]";
+const eventStatusToneClassNames: Record<string, string> = {
+  green: "bg-[rgba(var(--accent-rgb),0.1)] text-[var(--accent-strong)]",
+  orange: "bg-[rgba(238,127,24,0.12)] text-[#b95e14]",
+  blue: "bg-[rgba(42,123,211,0.12)] text-[#2363b8]",
+};
+const eventSoftNoteClassName =
+  "min-w-0 rounded-[var(--radius-md)] border border-dashed border-[rgba(var(--accent-rgb),0.2)] bg-[rgba(var(--accent-rgb),0.07)] px-4 py-[15px] text-[0.95rem] leading-[1.62] font-bold text-[rgba(var(--ink-rgb),0.68)] [overflow-wrap:anywhere] [word-break:break-word]";
 
 type EventDetailSearchParams = {
   registered?: string;
@@ -133,25 +146,25 @@ export default async function EventDetailPage({
   ];
 
   return (
-    <div className={styles.eventDetailPage}>
+    <div className="grid min-w-0 gap-7 max-sm:gap-[22px]">
       {query.registered ? (
-        <div className={styles.statusNote}>
-          <CheckCircle2 aria-hidden="true" strokeWidth={1.9} />
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2.5 rounded-[var(--radius-md)] border border-dashed border-[rgba(var(--accent-rgb),0.28)] bg-[rgba(var(--accent-rgb),0.08)] px-[18px] py-4 font-extrabold text-[var(--accent-strong)]">
+          <CheckCircle2 className="size-5" aria-hidden="true" strokeWidth={1.9} />
           <span>报名成功，已经写入你的社区账号记录。</span>
         </div>
       ) : null}
 
       {query.error ? (
-        <div className={`${styles.statusNote} ${styles.statusNoteError}`}>
-          <Clock3 aria-hidden="true" strokeWidth={1.9} />
+        <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2.5 rounded-[var(--radius-md)] border border-dashed border-[rgba(197,91,79,0.28)] bg-[rgba(197,91,79,0.08)] px-[18px] py-4 font-extrabold text-[var(--destructive)]">
+          <Clock3 className="size-5" aria-hidden="true" strokeWidth={1.9} />
           <span>报名失败，请稍后再试。</span>
         </div>
       ) : null}
 
-      <section className={styles.eventHero} aria-labelledby="event-detail-title">
-        <div className={styles.eventHeroCopy}>
-          <div className={styles.eventMetaRow}>
-            <span className={`${styles.eventStatusPill} ${styles[`eventStatusPill${statusTone}`]}`}>
+      <section className="grid grid-cols-[minmax(0,1fr)_minmax(360px,0.82fr)] items-center gap-8 pt-[18px] max-lg:grid-cols-1 max-sm:pt-0" aria-labelledby="event-detail-title">
+        <div className="grid content-start gap-5 pt-9 max-lg:pt-2.5 max-sm:gap-[18px] max-sm:pt-[18px]">
+          <div className="flex flex-wrap items-center gap-2.5 [&>span:not(:first-child)]:inline-flex [&>span:not(:first-child)]:min-h-9 [&>span:not(:first-child)]:items-center [&>span:not(:first-child)]:rounded-[var(--radius-pill)] [&>span:not(:first-child)]:border [&>span:not(:first-child)]:border-[rgba(var(--ink-rgb),0.08)] [&>span:not(:first-child)]:bg-[rgba(255,252,247,0.74)] [&>span:not(:first-child)]:px-[13px] [&>span:not(:first-child)]:text-[0.88rem] [&>span:not(:first-child)]:font-[850] [&>span:not(:first-child)]:text-[rgba(var(--ink-rgb),0.64)]">
+            <span className={cn(eventStatusPillClassName, eventStatusToneClassNames[statusTone])}>
               {event.statusLabel}
             </span>
             <span>{event.dateLabel}</span>
@@ -159,17 +172,17 @@ export default async function EventDetailPage({
             <span>{event.city ?? "常州"}</span>
           </div>
 
-          <div className={styles.eventHeroHeading}>
+          <div className="grid gap-4">
             <p className="home-kicker">Event Detail · 活动详情</p>
-            <h1 id="event-detail-title">{event.title}</h1>
-            <p>{event.summary}</p>
+            <h1 className="m-0 text-[3.45rem] leading-[1.08] font-black tracking-normal text-[#111b1f] after:mt-0.5 after:block after:h-[13px] after:w-[min(190px,44vw)] after:-rotate-3 after:rounded-[50%] after:border-[3px] after:border-transparent after:border-t-[rgba(244,190,75,0.78)] after:content-[''] after:[margin-left:38%] max-lg:text-[3.2rem] max-sm:text-[2.72rem] max-sm:after:ml-[34%] max-sm:after:w-[154px]" id="event-detail-title">{event.title}</h1>
+            <p className="m-0 max-w-[34rem] text-[1.08rem] leading-[1.82] text-[rgba(var(--ink-rgb),0.72)]">{event.summary}</p>
           </div>
 
           {externalRegistrationUrl ? (
-            <div className={styles.eventHeroActions}>
+            <div className="flex flex-wrap items-center gap-3 max-sm:w-full">
               <a
                 href={externalRegistrationUrl}
-                className={`button home-primary-button ${styles.eventHeroRegistrationButton}`}
+                className="button home-primary-button min-h-[46px] max-sm:w-full max-sm:justify-center [&_span]:min-w-0 [&_span]:overflow-hidden [&_span]:text-ellipsis [&_span]:whitespace-nowrap [&_svg]:size-[18px] [&_svg]:flex-none"
                 target="_blank"
                 rel="noreferrer"
               >
@@ -181,8 +194,8 @@ export default async function EventDetailPage({
           ) : null}
         </div>
 
-        <div className={styles.eventHeroVisual}>
-          <div className={styles.eventHeroMedia}>
+        <div className="relative overflow-hidden rounded-[var(--radius-lg)] border border-[rgba(212,216,209,0.7)] bg-[linear-gradient(180deg,rgba(246,244,238,0.94),rgba(241,239,232,0.88))] p-4 shadow-[0_18px_38px_rgba(var(--ink-rgb),0.08),inset_0_1px_0_rgba(255,255,255,0.7)] max-[820px]:p-3.5">
+          <div className="relative z-[2] aspect-[4/3] w-full overflow-hidden rounded-[var(--radius-lg)] border border-[rgba(var(--ink-rgb),0.08)] bg-[rgba(255,252,247,0.78)] [&_img]:block [&_img]:size-full [&_img]:object-cover [&_img]:object-center">
             {event.imageUrl ? (
               <RevealImage
                 src={getEventImageUrl(event.imageUrl, "event-detail-hero") ?? event.imageUrl}
@@ -191,34 +204,34 @@ export default async function EventDetailPage({
                 fetchPriority="high"
               />
             ) : (
-              <div className={styles.eventImageFallback}>
-                <span>AI</span>
-                <strong>活动图片待补充</strong>
+              <div className="grid min-h-full place-content-center place-items-center gap-2.5 text-primary">
+                <span className="text-5xl font-black">AI</span>
+                <strong className="text-[rgba(var(--ink-rgb),0.68)]">活动图片待补充</strong>
               </div>
             )}
           </div>
         </div>
       </section>
 
-      <section className={styles.eventQuickFacts} aria-label="活动概览">
+      <section className="grid grid-cols-4 gap-0 rounded-[var(--radius-md)] border border-[rgba(212,216,209,0.7)] bg-[linear-gradient(180deg,rgba(246,244,238,0.94),rgba(241,239,232,0.88))] px-7 pt-[25px] pb-6 shadow-[0_12px_28px_rgba(var(--ink-rgb),0.04),inset_0_1px_0_rgba(255,255,255,0.5)] max-lg:grid-cols-2 max-lg:px-[22px] max-lg:py-5 max-sm:grid-cols-1 max-sm:px-[18px] max-sm:py-1.5" aria-label="活动概览">
         {eventHighlights.map((item, index) => {
           const Icon = item.icon;
 
           return (
-            <article className={styles.eventQuickFact} key={item.label}>
-              <Icon aria-hidden="true" strokeWidth={1.9} />
-              <strong>{item.value}</strong>
-              <span>{item.label}</span>
-              <small>{String(index + 1).padStart(2, "0")}</small>
+            <article className="relative grid min-h-24 min-w-0 grid-cols-[46px_minmax(0,1fr)] items-center gap-x-3.5 gap-y-[7px] border-r border-[rgba(var(--ink-rgb),0.075)] px-[22px] last:border-r-0 max-lg:border-r-0 max-lg:border-b max-lg:px-6 max-lg:py-[18px] max-lg:odd:border-r max-lg:[&:nth-last-child(-n+2)]:border-b-0 max-sm:min-h-[78px] max-sm:border-r-0! max-sm:border-b! max-sm:px-0 max-sm:py-[18px] max-sm:last:border-b-0!" key={item.label}>
+              <Icon className={cn("row-span-3 size-[38px]", ["text-primary", "text-[#ee7f18]", "text-[#2a7bd3]", "text-[#7d63f1]"][index] ?? "text-primary")} aria-hidden="true" strokeWidth={1.9} />
+              <strong className={cn("line-clamp-2 overflow-hidden font-[var(--font-latin-rounded)] text-[1.42rem] leading-[1.18] font-[850] [overflow-wrap:anywhere]", ["text-primary", "text-[#ee7f18]", "text-[#2a7bd3]", "text-[#7d63f1]"][index] ?? "text-primary")}>{item.value}</strong>
+              <span className="overflow-hidden text-[0.9rem] leading-[1.2] font-[850] text-ellipsis whitespace-nowrap text-[#152524]">{item.label}</span>
+              <small className="overflow-hidden text-[0.78rem] leading-[1.2] font-[850] text-ellipsis whitespace-nowrap text-[rgba(var(--ink-rgb),0.42)]">{String(index + 1).padStart(2, "0")}</small>
             </article>
           );
         })}
       </section>
 
-      <div className={styles.eventBodyLayout}>
-        <main className={styles.eventMainFlow}>
-          <article className={styles.eventContentPanel}>
-            <div className={styles.eventSectionHeading}>
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_minmax(300px,340px)] items-start gap-[22px] max-lg:grid-cols-1">
+        <main className="grid min-w-0 gap-[22px]">
+          <article className={eventPanelClassName}>
+            <div className={eventSectionHeadingClassName}>
               <p className="home-kicker">Story</p>
               <div>
                 <h2>活动介绍</h2>
@@ -227,21 +240,21 @@ export default async function EventDetailPage({
             </div>
 
             {hasOverview ? (
-              <div className={styles.eventRichtext}>
+              <div className="grid gap-3.5 [&_p]:m-0 [&_p]:text-base [&_p]:leading-[1.82] [&_p]:text-[rgba(var(--ink-rgb),0.68)]">
                 {event.descriptionParagraphs.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
                 ))}
               </div>
             ) : (
-              <div className={styles.eventSoftNote}>
+              <div className={eventSoftNoteClassName}>
                 活动介绍将围绕主题背景、交流内容与适合参与的人群持续补充。
               </div>
             )}
           </article>
 
           {hasAgenda || hasSpeakers ? (
-            <article className={styles.eventContentPanel}>
-              <div className={styles.eventSectionHeading}>
+            <article className={eventPanelClassName}>
+              <div className={eventSectionHeadingClassName}>
                 <p className="home-kicker">Flow</p>
                 <div>
                   <h2>议程与分享</h2>
@@ -250,9 +263,9 @@ export default async function EventDetailPage({
               </div>
 
               {hasAgenda ? (
-                <div className={styles.eventListBlock}>
+                <div className="grid gap-2.5 [&_h3]:m-0 [&_h3]:text-[1.18rem] [&_h3]:text-[#111a1d]">
                   <h3>议程安排</h3>
-                  <ul className={styles.eventStepList}>
+                  <ul className="m-0 grid list-none gap-2.5 p-0 [counter-reset:event-step] [&_li]:relative [&_li]:grid [&_li]:grid-cols-[36px_minmax(0,1fr)] [&_li]:items-start [&_li]:gap-2.5 [&_li]:leading-[1.62] [&_li]:text-[rgba(var(--ink-rgb),0.68)] [&_li]:[counter-increment:event-step] [&_li]:before:grid [&_li]:before:h-[30px] [&_li]:before:w-9 [&_li]:before:place-items-center [&_li]:before:rounded-[var(--radius-pill)] [&_li]:before:bg-[rgba(var(--accent-rgb),0.1)] [&_li]:before:font-[var(--font-latin-rounded)] [&_li]:before:text-xs [&_li]:before:font-black [&_li]:before:text-primary [&_li]:before:content-[counter(event-step,decimal-leading-zero)]">
                     {event.agendaItems.map((item) => (
                       <li key={item}>{item}</li>
                     ))}
@@ -261,9 +274,9 @@ export default async function EventDetailPage({
               ) : null}
 
               {hasSpeakers ? (
-                <div className={styles.eventListBlock}>
+                <div className="grid gap-2.5 [&_h3]:m-0 [&_h3]:text-[1.18rem] [&_h3]:text-[#111a1d]">
                   <h3>分享人与组织者</h3>
-                  <ul className={styles.eventStepList}>
+                  <ul className="m-0 grid list-none gap-2.5 p-0 [counter-reset:event-step] [&_li]:relative [&_li]:grid [&_li]:grid-cols-[36px_minmax(0,1fr)] [&_li]:items-start [&_li]:gap-2.5 [&_li]:leading-[1.62] [&_li]:text-[rgba(var(--ink-rgb),0.68)] [&_li]:[counter-increment:event-step] [&_li]:before:grid [&_li]:before:h-[30px] [&_li]:before:w-9 [&_li]:before:place-items-center [&_li]:before:rounded-[var(--radius-pill)] [&_li]:before:bg-[rgba(var(--accent-rgb),0.1)] [&_li]:before:font-[var(--font-latin-rounded)] [&_li]:before:text-xs [&_li]:before:font-black [&_li]:before:text-primary [&_li]:before:content-[counter(event-step,decimal-leading-zero)]">
                     {event.speakerItems.map((item) => (
                       <li key={item}>{item}</li>
                     ))}
@@ -272,8 +285,8 @@ export default async function EventDetailPage({
               ) : null}
             </article>
           ) : (
-            <article className={styles.eventContentPanel}>
-              <div className={styles.eventSectionHeading}>
+            <article className={eventPanelClassName}>
+              <div className={eventSectionHeadingClassName}>
                 <p className="home-kicker">Flow</p>
                 <div>
                   <h2>议程与分享</h2>
@@ -281,15 +294,15 @@ export default async function EventDetailPage({
                 </div>
               </div>
 
-              <div className={styles.eventSoftNote}>
+              <div className={eventSoftNoteClassName}>
                 活动基本信息已发布，详细介绍与议程内容将陆续补充。
               </div>
             </article>
           )}
 
           {event.video ? (
-            <article className={styles.eventVideoPanel}>
-              <div className={styles.eventSectionHeading}>
+            <article className={eventPanelClassName}>
+              <div className={eventSectionHeadingClassName}>
                 <p className="home-kicker">Video</p>
                 <div>
                   <h2>活动视频</h2>
@@ -297,7 +310,7 @@ export default async function EventDetailPage({
                 </div>
               </div>
 
-              <div className={styles.eventVideoFrame}>
+              <div className="aspect-video overflow-hidden rounded-[var(--radius-md)] border border-[rgba(var(--ink-rgb),0.08)] bg-[#101518] shadow-[var(--shadow-md)] [&_video]:block [&_video]:size-full [&_video]:bg-[#101518] [&_video]:object-contain">
                 <video
                   controls
                   playsInline
@@ -310,8 +323,8 @@ export default async function EventDetailPage({
                 </video>
               </div>
 
-              <div className={styles.eventVideoMeta}>
-                <a href={event.video.url} target="_blank" rel="noreferrer">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <a className="inline-flex min-h-[34px] items-center gap-[7px] rounded-[var(--radius-pill)] border border-[rgba(var(--ink-rgb),0.08)] bg-[rgba(255,252,247,0.72)] px-3 text-[0.86rem] leading-[1.2] font-[850] text-[#2363b8] no-underline [&_svg]:size-[17px]" href={event.video.url} target="_blank" rel="noreferrer">
                   新窗口打开
                   <ArrowRight aria-hidden="true" strokeWidth={1.8} />
                 </a>
@@ -320,8 +333,8 @@ export default async function EventDetailPage({
           ) : null}
 
           {hasRecap ? (
-            <section className={styles.eventRecapPanel}>
-              <div className={styles.eventSectionHeading}>
+            <section className={eventPanelClassName}>
+              <div className={eventSectionHeadingClassName}>
                 <p className="home-kicker">After Event</p>
                 <div>
                   <h2>活动回顾</h2>
@@ -329,7 +342,7 @@ export default async function EventDetailPage({
                 </div>
               </div>
 
-              <div className={styles.eventRichtext}>
+              <div className="grid gap-3.5 [&_p]:m-0 [&_p]:text-base [&_p]:leading-[1.82] [&_p]:text-[rgba(var(--ink-rgb),0.68)]">
                 {event.recapParagraphs.map((paragraph) => (
                   <p key={paragraph}>{paragraph}</p>
                 ))}
@@ -338,16 +351,16 @@ export default async function EventDetailPage({
           ) : null}
         </main>
 
-        <aside className={styles.eventSidebar} aria-label="活动侧栏">
-          <article className={styles.eventSidebarCard}>
-            <div className={styles.eventSidebarHeading}>
-              <span className={`${styles.eventStatusPill} ${styles[`eventStatusPill${statusTone}`]}`}>
+        <aside className="sticky top-[92px] grid min-w-0 gap-4 max-lg:static" aria-label="活动侧栏">
+          <article className={`${eventPanelClassName} gap-[18px] p-5`}>
+            <div className="grid justify-items-start gap-3">
+              <span className={cn(eventStatusPillClassName, eventStatusToneClassNames[statusTone])}>
                 {event.statusLabel}
               </span>
-              <h2>活动信息</h2>
+              <h2 className="m-0 text-[1.45rem] leading-[1.12] font-black text-[#111a1d]">活动信息</h2>
             </div>
 
-            <ul className={styles.eventDetailList}>
+            <ul className="m-0 grid list-none gap-3 p-0 [&_li]:grid [&_li]:min-h-14 [&_li]:min-w-0 [&_li]:grid-cols-[32px_minmax(0,1fr)] [&_li]:items-start [&_li]:gap-x-3 [&_li]:gap-y-1.5 [&_li]:rounded-[var(--radius-md)] [&_li]:border [&_li]:border-[rgba(var(--ink-rgb),0.06)] [&_li]:bg-[rgba(255,252,247,0.62)] [&_li]:p-3 max-sm:[&_li]:gap-x-2.5 max-sm:[&_li]:gap-y-2 [&_li_svg]:row-span-2 [&_li_svg]:size-[22px] [&_li_svg]:text-primary [&_li_span]:text-[0.86rem] [&_li_span]:font-extrabold [&_li_span]:text-[rgba(var(--ink-rgb),0.52)] [&_li_strong]:col-start-2 [&_li_strong]:overflow-hidden [&_li_strong]:text-[0.94rem] [&_li_strong]:leading-[1.45] [&_li_strong]:text-ellipsis [&_li_strong]:text-[#132321] [&_li_strong]:[overflow-wrap:anywhere]">
               <li>
                 <Sparkles aria-hidden="true" strokeWidth={1.8} />
                 <span>活动类型</span>
@@ -397,10 +410,10 @@ export default async function EventDetailPage({
             </ul>
 
             {registrationNote ? (
-              <div className={styles.eventSoftNote}>{registrationNote}</div>
+              <div className={eventSoftNoteClassName}>{registrationNote}</div>
             ) : null}
 
-            <div className={styles.eventSidebarActions}>
+            <div className="grid gap-2.5 [&_.button]:w-full [&_.button]:max-w-full [&_.button]:justify-center [&_svg]:size-[18px]">
               <Link href="/events" className="button home-ghost-button">
                 <ArrowLeft aria-hidden="true" strokeWidth={2} />
                 返回活动列表
@@ -425,12 +438,12 @@ export default async function EventDetailPage({
           </article>
 
           {event.status === "scheduled" ? (
-            <div className={styles.eventRegistrationPanel}>
+            <div className="min-w-0 [&_.event-registration-card]:grid [&_.event-registration-card]:min-w-0 [&_.event-registration-card]:gap-3.5 [&_.event-registration-card]:rounded-[var(--radius-lg)] [&_.event-registration-card]:border [&_.event-registration-card]:border-[rgba(var(--accent-rgb),0.15)] [&_.event-registration-card]:bg-white [&_.event-registration-card]:p-[22px] [&_.event-registration-card]:shadow-[0_14px_34px_rgba(var(--ink-rgb),0.07)] max-sm:[&_.event-registration-card]:p-5 [&_.event-registration-card_h3]:m-0 [&_.event-registration-card_h3]:text-[1.45rem] [&_.event-registration-card_h3]:leading-[1.18] [&_.event-registration-card_h3]:text-[#111a1d] [&_.event-registration-card_p]:m-0 [&_.event-registration-card_p]:leading-[1.62] [&_.event-registration-card_p]:text-[rgba(var(--ink-rgb),0.64)] [&_.note-strip]:min-w-0 [&_.note-strip]:[overflow-wrap:anywhere] [&_.note-strip]:[word-break:break-word] [&_.detail-list]:m-0 [&_.detail-list]:grid [&_.detail-list]:gap-2 [&_.detail-list]:pl-[18px] [&_.registration-form]:grid [&_.registration-form]:gap-3 [&_.textarea]:min-h-[110px]">
               <EventDetailRegistrationPanel event={event} redirectTo={detailHref} />
             </div>
           ) : (
-            <article className={styles.eventStatusPanel}>
-              <Sparkles aria-hidden="true" strokeWidth={1.9} />
+            <article className="grid min-w-0 grid-cols-[34px_minmax(0,1fr)] gap-3 rounded-[var(--radius-md)] bg-[#e9f9f0] p-[18px] max-sm:p-5 [&_h2]:m-0 [&_h2]:text-[1.12rem] [&_h2]:font-black [&_h2]:text-[#111a1d] [&_p]:mt-1.5 [&_p]:mb-0 [&_p]:text-[0.92rem] [&_p]:leading-[1.58] [&_p]:font-[650] [&_p]:text-[rgba(var(--ink-rgb),0.64)]">
+              <Sparkles className="size-7 text-[#f4c75d]" aria-hidden="true" strokeWidth={1.9} />
               <div>
                 <h2>{event.status === "completed" ? "活动已结束" : "当前状态"}</h2>
                 <p>
@@ -445,8 +458,8 @@ export default async function EventDetailPage({
       </div>
 
       {hasRelatedUpdates ? (
-        <section className={styles.eventRelatedUpdatesPanel}>
-          <div className={styles.eventSectionHeading}>
+        <section className={eventPanelClassName}>
+          <div className={eventSectionHeadingClassName}>
             <p className="home-kicker">Updates</p>
             <div>
               <h2>活动报道与社区动态</h2>
@@ -454,22 +467,21 @@ export default async function EventDetailPage({
             </div>
           </div>
 
-          <div className={styles.eventRelatedUpdateList}>
+          <div className="grid grid-cols-2 gap-3.5 max-lg:grid-cols-1">
             {relatedUpdates.map((update) => {
               const coverImage = update.images[0];
 
               return (
                 <Link
                   href={update.href}
-                  className={
-                    coverImage
-                      ? styles.eventRelatedUpdateCard
-                      : `${styles.eventRelatedUpdateCard} ${styles.eventRelatedUpdateCardNoMedia}`
-                  }
+                  className={cn(
+                    "grid min-h-[148px] min-w-0 grid-cols-[minmax(110px,0.42fr)_minmax(0,1fr)] items-stretch gap-3.5 rounded-[var(--radius-md)] bg-[#edf5ff] p-3.5 text-inherit no-underline transition-transform duration-200 hover:-translate-y-0.5 focus-visible:-translate-y-0.5 max-sm:grid-cols-1 [&>i]:col-span-full [&>i]:inline-flex [&>i]:items-center [&>i]:justify-self-start [&>i]:gap-[7px] [&>i]:text-[0.86rem] [&>i]:font-black [&>i]:not-italic [&>i]:text-primary [&>i_svg]:size-4",
+                    !coverImage && "grid-cols-1",
+                  )}
                   key={update.id}
                 >
                   {coverImage ? (
-                    <span className={styles.eventRelatedUpdateMedia}>
+                    <span className="min-w-0 overflow-hidden rounded-[var(--radius-sm)] bg-[rgba(var(--accent-rgb),0.08)] max-sm:aspect-[1.9/1] [&_img]:block [&_img]:h-full [&_img]:min-h-[120px] [&_img]:w-full [&_img]:object-cover">
                       <RevealImage
                         src={coverImage.imageUrl}
                         alt={coverImage.alt ?? update.title ?? update.typeLabel}
@@ -477,13 +489,13 @@ export default async function EventDetailPage({
                       />
                     </span>
                   ) : null}
-                  <span className={styles.eventRelatedUpdateCopy}>
-                    <small>
+                  <span className="grid min-w-0 content-start gap-[7px]">
+                    <small className="min-w-0 text-[0.8rem] font-extrabold text-[rgba(var(--ink-rgb),0.52)]">
                       {update.typeLabel} ·{" "}
                       {formatRelatedUpdateDate(update.publishedAt ?? update.createdAt)}
                     </small>
-                    <strong>{update.title ?? update.typeLabel}</strong>
-                    <span>{update.excerpt}</span>
+                    <strong className="line-clamp-2 min-w-0 overflow-hidden text-[1.04rem] leading-[1.38] text-[#111a1d]">{update.title ?? update.typeLabel}</strong>
+                    <span className="line-clamp-3 min-w-0 overflow-hidden text-[0.9rem] leading-[1.58] text-[rgba(var(--ink-rgb),0.66)]">{update.excerpt}</span>
                   </span>
                   <i>
                     阅读全文
@@ -497,8 +509,8 @@ export default async function EventDetailPage({
       ) : null}
 
       {event.gallery.length > 0 ? (
-        <section className={styles.eventGallerySection}>
-          <div className={styles.eventSectionHeading}>
+        <section className={eventPanelClassName}>
+          <div className={eventSectionHeadingClassName}>
             <p className="home-kicker">Gallery</p>
             <div>
               <h2>现场照片</h2>
@@ -506,19 +518,19 @@ export default async function EventDetailPage({
             </div>
           </div>
 
-          <div className={styles.eventGalleryGrid}>
+          <div className="grid grid-cols-3 gap-[18px] max-lg:grid-cols-2 max-sm:grid-cols-1">
             {event.gallery.map((image) => (
-              <article className={styles.eventGalleryCard} key={image.id}>
-                <div className={styles.eventGalleryMedia}>
+              <article className="min-w-0 overflow-hidden rounded-[var(--radius-lg)] bg-white shadow-[0_14px_34px_rgba(var(--ink-rgb),0.07)]" key={image.id}>
+                <div className="aspect-[4/3] overflow-hidden bg-[rgba(var(--accent-rgb),0.08)] [&_img]:block [&_img]:size-full [&_img]:object-cover">
                   <RevealImage
                     src={getEventImageUrl(image.imageUrl, "gallery") ?? image.imageUrl}
                     alt={image.caption ?? event.title}
                     loading="lazy"
                   />
                 </div>
-                <div className={styles.eventGalleryCopy}>
-                  <h3>{event.title}</h3>
-                  {image.caption && image.caption !== event.title ? <p>{image.caption}</p> : null}
+                <div className="grid gap-1.5 p-4">
+                  <h3 className="m-0 overflow-hidden text-base leading-[1.25] text-ellipsis whitespace-nowrap text-[#111a1d]">{event.title}</h3>
+                  {image.caption && image.caption !== event.title ? <p className="m-0 text-[0.9rem] leading-[1.52] text-[rgba(var(--ink-rgb),0.62)]">{image.caption}</p> : null}
                 </div>
               </article>
             ))}

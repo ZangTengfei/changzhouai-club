@@ -2,12 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import galleryStyles from "@/components/content-gallery.module.css";
 import { RevealImage } from "@/components/reveal-image";
+import { Button } from "@/components/ui/button";
 import { getPublicSponsorBySlug } from "@/lib/sponsors";
-import { cn } from "@/lib/utils";
-
-import styles from "./sponsor-detail-page.module.css";
 
 export async function generateMetadata({
   params,
@@ -43,9 +40,9 @@ export default async function SponsorDetailPage({
   }
 
   return (
-    <div className="page-stack">
-      <section className={cn("surface", styles["sponsor-detail-hero"])}>
-        <div className={styles["sponsor-detail-copy"]}>
+    <div className="grid gap-6 max-sm:gap-5">
+      <section className="grid grid-cols-[minmax(0,1fr)_minmax(280px,0.62fr)] items-stretch gap-7 rounded-lg bg-white p-7 shadow-site-card max-lg:grid-cols-1 max-sm:p-5">
+        <div className="grid gap-5.5">
           <div className="pill-row">
             <span className="pill">{sponsor.tierLabel}</span>
             <span className="pill">{sponsor.sponsorLabel}</span>
@@ -58,26 +55,25 @@ export default async function SponsorDetailPage({
             <h1>{sponsor.name}</h1>
           </div>
 
-          <p className={styles["sponsor-detail-summary"]}>{sponsor.summary}</p>
+          <p className="max-w-208 text-[1.08rem] text-muted-foreground">
+            {sponsor.summary}
+          </p>
 
           <div className="cta-row">
-            <Link href="/" className="button button-secondary">
-              返回首页
-            </Link>
+            <Button asChild variant="siteSecondary" size="siteDefault">
+              <Link href="/">返回首页</Link>
+            </Button>
             {sponsor.websiteUrl ? (
-              <Link
-                href={sponsor.websiteUrl}
-                className="button"
-                target="_blank"
-                rel="noreferrer"
-              >
-                访问官网
-              </Link>
+              <Button asChild variant="sitePrimary" size="siteDefault">
+                <Link href={sponsor.websiteUrl} target="_blank" rel="noreferrer">
+                  访问官网
+                </Link>
+              </Button>
             ) : null}
           </div>
         </div>
 
-        <div className={styles["sponsor-logo-panel"]}>
+        <div className="grid min-h-70 place-items-center rounded-[calc(var(--radius-lg)-8px)] bg-highlight-blue p-7.5 [&_img]:block [&_img]:max-h-45 [&_img]:max-w-[min(100%,340px)] [&_img]:object-contain">
           {sponsor.logoUrl ? (
             <RevealImage
               src={sponsor.logoUrl}
@@ -86,20 +82,22 @@ export default async function SponsorDetailPage({
               fetchPriority="high"
             />
           ) : (
-            <div className={styles["sponsor-logo-fallback"]}>Logo 待补充</div>
+            <div className="grid min-h-45 w-full place-items-center rounded-[calc(var(--radius-lg)-12px)] border border-dashed border-[rgba(11,99,206,0.22)] text-muted-foreground">
+              Logo 待补充
+            </div>
           )}
         </div>
       </section>
 
       <section className="two-up">
-        <article className={cn("card", styles["sponsor-detail-panel"])}>
+        <article className="grid gap-4.5 rounded-md bg-white p-5.5 shadow-site-card">
           <div className="section-heading">
             <p className="eyebrow">Profile</p>
             <h2>赞助者信息</h2>
           </div>
 
           {sponsor.descriptionParagraphs.length > 0 ? (
-            <div className={styles["sponsor-detail-richtext"]}>
+            <div className="grid gap-3.5 text-muted-foreground [&_p]:m-0">
               {sponsor.descriptionParagraphs.map((paragraph) => (
                 <p key={paragraph}>{paragraph}</p>
               ))}
@@ -111,7 +109,7 @@ export default async function SponsorDetailPage({
           )}
         </article>
 
-        <article className={cn("card", styles["sponsor-detail-panel"])}>
+        <article className="grid gap-4.5 rounded-md bg-white p-5.5 shadow-site-card">
           <div className="section-heading">
             <p className="eyebrow">Support</p>
             <h2>共建关系</h2>
@@ -133,13 +131,13 @@ export default async function SponsorDetailPage({
             <p>展示赞助者相关图片、空间、活动支持或共建现场。</p>
           </div>
 
-          <div className={galleryStyles["gallery-grid"]}>
+          <div className="grid grid-cols-3 gap-4.5 max-lg:grid-cols-2 max-md:grid-cols-1">
             {sponsor.images.map((image) => (
-              <article className={galleryStyles["gallery-card"]} key={image.id}>
-                <div className={galleryStyles["gallery-media"]}>
-                  <RevealImage src={image.imageUrl} alt={image.caption ?? sponsor.name} />
+              <article className="min-w-0 overflow-hidden" key={image.id}>
+                <div className="min-w-0 overflow-hidden bg-primary-soft">
+                  <RevealImage className="block h-auto w-full" src={image.imageUrl} alt={image.caption ?? sponsor.name} />
                 </div>
-                <div className={galleryStyles["gallery-copy"]}>
+                <div className="px-5.5 pt-5 pb-5.5 max-sm:p-4.5">
                   <h3>{sponsor.name}</h3>
                   {image.caption ? <p>{image.caption}</p> : null}
                 </div>

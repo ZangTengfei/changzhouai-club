@@ -9,7 +9,11 @@ import { resolveCommunityUserId } from "@/lib/community-user";
 import { hasSupabaseEnv } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
-import styles from "../account-page.module.css";
+import {
+  accountPageClassName,
+  accountWorkSubmitHeaderClassName,
+  accountWorkSubmitSectionClassName,
+} from "../account-tailwind";
 
 export const metadata: Metadata = {
   title: "找回旧账号",
@@ -36,9 +40,9 @@ export default async function RecoverAccountPage() {
   }
 
   return (
-    <div className={styles.accountPage}>
-      <section className={styles.accountWorkSubmitSection}>
-        <div className={styles.accountWorkSubmitHeader}>
+    <div className={accountPageClassName}>
+      <section className={accountWorkSubmitSectionClassName}>
+        <div className={accountWorkSubmitHeaderClassName}>
           <div>
             <p className="home-kicker">Account recovery · 账号找回</p>
             <h1>找回原 Google 账号</h1>

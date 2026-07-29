@@ -8,9 +8,15 @@ import { MemberAvatar } from "@/components/member-avatar";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
 
-import styles from "../../account-page.module.css";
+import {
+  accountPageClassName,
+  accountWorkSubmitHeaderClassName,
+  accountWorkSubmitSectionClassName,
+} from "../../account-tailwind";
 import { confirmWechatAccountRecovery } from "./actions";
-import confirmStyles from "./confirm.module.css";
+
+const choiceGroupClass =
+  "m-0 grid gap-2.5 rounded-md border border-[rgba(208,214,207,0.8)] p-4 [&_img]:rounded-full [&_img]:object-cover [&_label]:flex [&_label]:cursor-pointer [&_label]:items-center [&_label]:gap-2.5 [&_legend]:px-1.5 [&_legend]:font-semibold";
 
 export const metadata: Metadata = {
   title: "确认合并账号",
@@ -37,7 +43,7 @@ function ConflictChoice({
   }
 
   return (
-    <fieldset className={confirmStyles.choiceGroup}>
+    <fieldset className={choiceGroupClass}>
       <legend>{label}使用哪一边？</legend>
       <label>
         <input type="radio" name={`${name}_choice`} value="target" defaultChecked />
@@ -82,9 +88,9 @@ export default async function ConfirmAccountRecoveryPage({
   }
 
   return (
-    <div className={styles.accountPage}>
-      <section className={styles.accountWorkSubmitSection}>
-        <div className={styles.accountWorkSubmitHeader}>
+    <div className={accountPageClassName}>
+      <section className={accountWorkSubmitSectionClassName}>
+        <div className={accountWorkSubmitHeaderClassName}>
           <div>
             <p className="home-kicker">Merge preview · 合并预览</p>
             <h1>确认合并两个账号</h1>
@@ -96,7 +102,7 @@ export default async function ConfirmAccountRecoveryPage({
           </Link>
         </div>
 
-        <div className={confirmStyles.accountGrid}>
+        <div className="grid grid-cols-2 gap-3.5 max-[720px]:grid-cols-1 [&_article]:grid [&_article]:gap-1.75 [&_article]:rounded-md [&_article]:border [&_article]:border-[rgba(208,214,207,0.8)] [&_article]:bg-white/60 [&_article]:p-4.5 [&_small]:text-muted-foreground [&_span]:text-muted-foreground [&_strong]:text-[1.08rem]">
           <article>
             <span>原账号 · 合并后保留</span>
             <strong>{valueLabel(preview.targetProfile.display_name, "原账号用户")}</strong>
@@ -113,7 +119,7 @@ export default async function ConfirmAccountRecoveryPage({
           </article>
         </div>
 
-        <form action={confirmWechatAccountRecovery} className={confirmStyles.form}>
+        <form action={confirmWechatAccountRecovery} className="grid max-w-170 gap-4.5 [&>.button]:justify-self-start">
           <input type="hidden" name="recovery_token" value={intent} />
           <ConflictChoice
             name="display_name"
@@ -130,7 +136,7 @@ export default async function ConfirmAccountRecoveryPage({
 
           {preview.targetProfile.avatar_url && preview.sourceProfile.avatar_url &&
           preview.targetProfile.avatar_url !== preview.sourceProfile.avatar_url ? (
-            <fieldset className={confirmStyles.choiceGroup}>
+            <fieldset className={choiceGroupClass}>
               <legend>头像使用哪一边？</legend>
               <label>
                 <input type="radio" name="avatar_url_choice" value="target" defaultChecked />

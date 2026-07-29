@@ -12,8 +12,9 @@ import {
   UsersRound,
 } from "lucide-react";
 
+import { cn } from "@/lib/utils";
+
 import { submitEventProposal } from "./actions";
-import styles from "./event-proposal-page.module.css";
 
 export const metadata: Metadata = {
   title: "发起活动申请",
@@ -43,6 +44,15 @@ const proposalPrinciples = [
   },
 ] as const;
 
+const formFieldClassName =
+  "grid min-w-0 gap-2 [&>span]:font-extrabold [&>span]:text-ink";
+
+const principleCardClassName = [
+  "bg-highlight-green",
+  "bg-highlight-orange",
+  "bg-highlight-blue",
+] as const;
+
 function getStatusMessage(error?: string) {
   if (!error) {
     return null;
@@ -68,62 +78,68 @@ export default async function EventProposalPage({
   const errorMessage = getStatusMessage(params.error);
 
   return (
-    <div className={styles.proposalPageStack}>
-      <Link href="/events" className={styles.backLink}>
+    <div className="grid gap-6 pt-5 pb-11 max-[820px]:gap-5.5 max-[820px]:pt-3.5">
+      <Link href="/events" className="inline-flex w-fit items-center gap-2 text-[0.92rem] font-[850] text-primary-strong [&_svg]:size-4.25">
         <ArrowLeft aria-hidden="true" strokeWidth={2} />
         返回活动页
       </Link>
 
-      <section className={styles.proposalHero} aria-labelledby="event-proposal-title">
-        <div className={styles.proposalIntro}>
+      <section className="grid grid-cols-[minmax(280px,0.42fr)_minmax(0,0.58fr)] items-start gap-6 max-[1024px]:grid-cols-1" aria-labelledby="event-proposal-title">
+        <div className="grid content-start gap-4.5 pt-3">
           <p className="home-kicker">Host · 群友发起</p>
-          <h1 id="event-proposal-title">
+          <h1 className="m-0 text-[clamp(2.35rem,4.2vw,3.45rem)] leading-[1.08] font-black tracking-[-0.04em] text-heading max-[820px]:text-[clamp(2rem,11vw,2.8rem)]" id="event-proposal-title">
             申请发起一场
-            <span>由你主讲的活动</span>
+            <span className="block text-primary">由你主讲的活动</span>
           </h1>
-          <p>
+          <p className="m-0 max-w-xl text-[1.02rem] leading-[1.78] font-[650] text-[rgba(var(--ink-rgb),0.7)]">
             如果你有正在实践的 AI 工具、项目经验、行业场景或学习方法，可以先提交活动想法。
             通过后由社区一起确认排期和现场支持。
           </p>
 
-          <div className={styles.principleList} aria-label="活动发起原则">
-            {proposalPrinciples.map((item) => {
+          <div className="grid gap-3" aria-label="活动发起原则">
+            {proposalPrinciples.map((item, index) => {
               const Icon = item.icon;
 
               return (
-                <article className={styles.principleCard} key={item.title}>
+                <article
+                  className={cn(
+                    "grid min-w-0 grid-cols-[38px_minmax(0,1fr)] items-start gap-x-3 gap-y-1.5 rounded-md border-0 p-4 shadow-none [&_svg]:row-span-2 [&_svg]:size-8 [&_svg]:text-primary",
+                    principleCardClassName[index],
+                  )}
+                  key={item.title}
+                >
                   <Icon aria-hidden="true" strokeWidth={1.8} />
-                  <h2>{item.title}</h2>
-                  <p>{item.summary}</p>
+                  <h2 className="m-0 text-[1.05rem] leading-[1.2] font-black text-[#111a1d]">{item.title}</h2>
+                  <p className="m-0 text-[0.92rem] leading-[1.62] font-[650] text-[rgba(var(--ink-rgb),0.64)]">{item.summary}</p>
                 </article>
               );
             })}
           </div>
         </div>
 
-        <div className={styles.formPanel}>
-          <div className={styles.formPanelHeader}>
+        <div className="grid min-w-0 gap-4 rounded-lg border-0 bg-white p-5.5 shadow-site-card max-[820px]:p-4.5">
+          <div className="grid gap-2 [&>*]:m-0">
             <p className="home-kicker">Application</p>
-            <h2>活动发起申请</h2>
+            <h2 className="text-[clamp(1.65rem,2.6vw,2.08rem)] leading-[1.12] font-black text-[#111a1d]">活动发起申请</h2>
           </div>
 
           {params.submitted ? (
-            <div className={styles.statusNote}>
+            <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2.5 rounded-md border border-dashed border-[rgba(var(--accent-rgb),0.28)] bg-primary-soft px-4 py-3.5 font-extrabold text-primary-strong [&_svg]:size-5">
               <CheckCircle2 aria-hidden="true" strokeWidth={1.9} />
               <span>提交成功，社区运营会根据你的联系方式沟通主题和排期。</span>
             </div>
           ) : null}
 
           {errorMessage ? (
-            <div className={`${styles.statusNote} ${styles.statusNoteError}`}>
+            <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2.5 rounded-md border border-dashed border-[rgba(197,91,79,0.28)] bg-[rgba(197,91,79,0.08)] px-4 py-3.5 font-extrabold text-destructive [&_svg]:size-5">
               <Lightbulb aria-hidden="true" strokeWidth={1.9} />
               <span>{errorMessage}</span>
             </div>
           ) : null}
 
-          <form action={submitEventProposal} className={styles.proposalForm}>
-            <div className={styles.formGrid}>
-              <label className={styles.formField}>
+          <form action={submitEventProposal} className="grid min-w-0 gap-4.5 rounded-md border-0 bg-white p-5 shadow-site-card max-[820px]:p-4.5">
+            <div className="grid grid-cols-2 gap-4 max-[820px]:grid-cols-1">
+              <label className={formFieldClassName}>
                 <span>发起人</span>
                 <input
                   className="input"
@@ -133,7 +149,7 @@ export default async function EventProposalPage({
                 />
               </label>
 
-              <label className={styles.formField}>
+              <label className={formFieldClassName}>
                 <span>身份 / 单位</span>
                 <input
                   className="input"
@@ -142,7 +158,7 @@ export default async function EventProposalPage({
                 />
               </label>
 
-              <label className={styles.formField}>
+              <label className={formFieldClassName}>
                 <span>微信号</span>
                 <input
                   className="input"
@@ -151,7 +167,7 @@ export default async function EventProposalPage({
                 />
               </label>
 
-              <label className={styles.formField}>
+              <label className={formFieldClassName}>
                 <span>手机号</span>
                 <input
                   className="input"
@@ -160,7 +176,7 @@ export default async function EventProposalPage({
                 />
               </label>
 
-              <label className={styles.formField}>
+              <label className={formFieldClassName}>
                 <span>活动形式</span>
                 <select className="input" name="preferred_format" defaultValue="">
                   <option value="">待沟通</option>
@@ -171,7 +187,7 @@ export default async function EventProposalPage({
                 </select>
               </label>
 
-              <label className={styles.formField}>
+              <label className={formFieldClassName}>
                 <span>期望时间</span>
                 <input
                   className="input"
@@ -180,7 +196,7 @@ export default async function EventProposalPage({
                 />
               </label>
 
-              <label className={`${styles.formField} ${styles.formFieldWide}`}>
+              <label className={cn(formFieldClassName, "col-span-full")}>
                 <span>分享主题</span>
                 <input
                   className="input"
@@ -190,7 +206,7 @@ export default async function EventProposalPage({
                 />
               </label>
 
-              <label className={`${styles.formField} ${styles.formFieldWide}`}>
+              <label className={cn(formFieldClassName, "col-span-full")}>
                 <span>发起人背景</span>
                 <textarea
                   className="input textarea"
@@ -200,7 +216,7 @@ export default async function EventProposalPage({
                 />
               </label>
 
-              <label className={`${styles.formField} ${styles.formFieldWide}`}>
+              <label className={cn(formFieldClassName, "col-span-full")}>
                 <span>主题简介</span>
                 <textarea
                   className="input textarea"
@@ -211,7 +227,7 @@ export default async function EventProposalPage({
                 />
               </label>
 
-              <label className={`${styles.formField} ${styles.formFieldWide}`}>
+              <label className={cn(formFieldClassName, "col-span-full")}>
                 <span>希望社区支持</span>
                 <textarea
                   className="input textarea"
@@ -222,8 +238,8 @@ export default async function EventProposalPage({
               </label>
             </div>
 
-            <div className={styles.formActions}>
-              <button type="submit" className="button home-primary-button">
+            <div className="flex justify-start">
+              <button type="submit" className="button home-primary-button gap-2 border-0 [&_svg]:size-4.5">
                 提交申请
                 <ArrowRight aria-hidden="true" strokeWidth={2} />
               </button>
@@ -232,21 +248,21 @@ export default async function EventProposalPage({
         </div>
       </section>
 
-      <section className={styles.processStrip} aria-label="申请处理方式">
-        <article>
+      <section className="grid grid-cols-3 gap-3.5 max-[820px]:grid-cols-1" aria-label="申请处理方式">
+        <article className="grid min-w-0 grid-cols-[36px_minmax(0,1fr)] gap-x-3 gap-y-1.25 rounded-md border border-[rgba(208,214,207,0.7)] bg-site-note p-4.5 shadow-[var(--shadow-sm)] [&_svg]:row-span-2 [&_svg]:size-7.5 [&_svg]:text-primary">
           <MessageCircle aria-hidden="true" strokeWidth={1.8} />
-          <strong>运营确认</strong>
-          <span>先沟通主题边界、主讲内容和目标听众。</span>
+          <strong className="text-[1.04rem] leading-[1.2] font-black text-[#111a1d]">运营确认</strong>
+          <span className="text-[0.92rem] leading-[1.55] font-[650] text-[rgba(var(--ink-rgb),0.64)]">先沟通主题边界、主讲内容和目标听众。</span>
         </article>
-        <article>
+        <article className="grid min-w-0 grid-cols-[36px_minmax(0,1fr)] gap-x-3 gap-y-1.25 rounded-md border border-[rgba(208,214,207,0.7)] bg-site-note p-4.5 shadow-[var(--shadow-sm)] [&_svg]:row-span-2 [&_svg]:size-7.5 [&_svg]:text-primary">
           <CalendarClock aria-hidden="true" strokeWidth={1.8} />
-          <strong>共同排期</strong>
-          <span>主题合适后，再确认时间、地点和报名节奏。</span>
+          <strong className="text-[1.04rem] leading-[1.2] font-black text-[#111a1d]">共同排期</strong>
+          <span className="text-[0.92rem] leading-[1.55] font-[650] text-[rgba(var(--ink-rgb),0.64)]">主题合适后，再确认时间、地点和报名节奏。</span>
         </article>
-        <article>
+        <article className="grid min-w-0 grid-cols-[36px_minmax(0,1fr)] gap-x-3 gap-y-1.25 rounded-md border border-[rgba(208,214,207,0.7)] bg-site-note p-4.5 shadow-[var(--shadow-sm)] [&_svg]:row-span-2 [&_svg]:size-7.5 [&_svg]:text-primary">
           <CheckCircle2 aria-hidden="true" strokeWidth={1.8} />
-          <strong>发布活动</strong>
-          <span>信息确认后发布到官网和社区通知。</span>
+          <strong className="text-[1.04rem] leading-[1.2] font-black text-[#111a1d]">发布活动</strong>
+          <span className="text-[0.92rem] leading-[1.55] font-[650] text-[rgba(var(--ink-rgb),0.64)]">信息确认后发布到官网和社区通知。</span>
         </article>
       </section>
     </div>

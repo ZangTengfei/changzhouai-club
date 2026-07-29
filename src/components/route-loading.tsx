@@ -6,7 +6,7 @@ import styles from "./route-loading.module.css";
 const cx = cssModuleCx.bind(null, styles);
 const adminSkeletonRows = Array.from({ length: 4 });
 const adminSkeletonClass =
-  "block animate-pulse rounded bg-[#edf0f2] motion-reduce:animate-none";
+  "block animate-pulse rounded-admin bg-admin-skeleton motion-reduce:animate-none";
 
 function AdminSkeleton({ className }: { className: string }) {
   return <span className={cx(adminSkeletonClass, className)} />;
@@ -73,7 +73,7 @@ export function AdminRouteLoading() {
   return (
     <section
       className={cx(
-        "admin-region-loading mx-auto grid w-full max-w-[1600px] gap-3 font-sans text-[#1f2937]",
+        "admin-region-loading mx-auto grid w-full max-w-admin gap-3 font-sans text-admin-foreground",
       )}
       role="status"
       aria-live="polite"
@@ -81,30 +81,30 @@ export function AdminRouteLoading() {
       data-admin-route-loading
     >
       <header
-        className="flex min-h-[84px] items-center justify-between gap-4 rounded-lg border border-[#e5e7eb] bg-white px-5 py-[18px] shadow-sm max-sm:min-h-[74px] max-sm:p-3.5"
+        className="flex min-h-21 items-center justify-between gap-4 rounded-admin-lg border border-admin-border bg-admin-surface px-5 py-4.5 shadow-admin max-sm:min-h-[74px] max-sm:p-3.5"
         aria-hidden="true"
       >
         <div className="grid min-w-0 gap-[9px]">
-          <AdminSkeleton className="h-[11px] w-[72px]" />
-          <AdminSkeleton className="h-6 w-[168px] max-w-[42vw]" />
+          <AdminSkeleton className="h-2.75 w-18" />
+          <AdminSkeleton className="h-6 w-42 max-w-[42vw]" />
         </div>
-        <AdminSkeleton className="h-[34px] w-24 bg-[#e6f4ff]" />
+        <AdminSkeleton className="h-8.5 w-24 bg-admin-primary-soft" />
       </header>
 
       <div
-        className="overflow-hidden rounded-lg border border-[#e5e7eb] bg-white shadow-sm"
+        className="overflow-hidden rounded-admin-lg border border-admin-border bg-admin-surface shadow-admin"
         aria-hidden="true"
       >
         {adminSkeletonRows.map((_, index) => (
           <div
-            className="flex min-h-[72px] items-center justify-between gap-4 border-b border-[#f0f0f0] px-[18px] py-3.5 last:border-b-0 max-sm:px-3.5"
+            className="flex min-h-18 items-center justify-between gap-4 border-b border-admin-divider px-4.5 py-3.5 last:border-b-0 max-sm:px-3.5"
             key={index}
           >
             <div className="grid min-w-0 gap-[9px]">
-              <AdminSkeleton className="h-[15px] w-[min(280px,46vw)]" />
-              <AdminSkeleton className="h-[11px] w-[72px]" />
+              <AdminSkeleton className="h-3.75 w-[min(280px,46vw)]" />
+              <AdminSkeleton className="h-2.75 w-18" />
             </div>
-            <AdminSkeleton className="h-6 w-16 flex-none rounded-full bg-[#f0f7ff]" />
+            <AdminSkeleton className="h-6 w-16 flex-none rounded-full bg-admin-primary-subtle" />
           </div>
         ))}
       </div>

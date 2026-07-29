@@ -6,11 +6,6 @@ import {
   LogoDraftCityAgent,
   LogoDraftCityNodes,
 } from "@/components/logo-drafts";
-import { cssModuleCx } from "@/lib/utils";
-
-import styles from "./brand-lab-page.module.css";
-
-const cx = cssModuleCx.bind(null, styles);
 
 export const metadata: Metadata = {
   title: "品牌视觉",
@@ -58,7 +53,7 @@ const logoDrafts = [
 
 export default function BrandLabPage() {
   return (
-    <div className="page-stack">
+    <div className="grid gap-6 max-sm:gap-5">
       <section className="surface page-hero">
         <div className="section-heading">
           <p className="eyebrow">Brand Lab</p>
@@ -69,32 +64,34 @@ export default function BrandLabPage() {
         </div>
       </section>
 
-      <section className={cx("logo-lab-grid")}>
+      <section className="grid grid-cols-[repeat(auto-fit,minmax(260px,1fr))] gap-5 max-lg:grid-cols-2 max-md:grid-cols-1">
         {logoDrafts.map(({ id, eyebrow, title, summary, note, Mark }) => (
-          <article key={id} className={cx("surface logo-draft-card")}>
+          <article key={id} className="grid gap-5 rounded-lg bg-white p-6 shadow-site-card">
             <div className="section-heading">
               <p className="eyebrow">{eyebrow}</p>
               <h2>{title}</h2>
               <p>{summary}</p>
             </div>
 
-            <div className={cx("logo-draft-preview")}>
-              <div className={cx("logo-draft-mark-shell")}>
-                <Mark className={cx("logo-draft-mark")} />
+            <div className="grid gap-4.5">
+              <div className="grid min-h-60 place-items-center rounded-lg bg-[radial-gradient(circle_at_20%_20%,rgba(var(--accent-warm-rgb),0.16),transparent_30%),linear-gradient(180deg,rgba(var(--accent-rgb),0.96),rgba(var(--accent-strong-rgb),0.98))]">
+                <Mark className="h-auto w-[min(72%,220px)]" />
               </div>
 
-              <div className={cx("logo-draft-meta")}>
-                <div className={cx("logo-draft-favicon")}>
-                  <Mark className={cx("logo-draft-favicon-mark")} />
+              <div className="grid gap-3.5">
+                <div className="grid size-18 place-items-center rounded-md bg-primary">
+                  <Mark className="size-11.5" />
                 </div>
 
-                <div className={cx("logo-draft-header-demo")}>
-                  <div className={cx("logo-draft-header-badge")}>
-                    <Mark className={cx("logo-draft-header-mark")} />
+                <div className="flex min-w-0 items-center gap-3 rounded-full border border-border bg-muted/80 px-4 py-3.5">
+                  <div className="grid size-11.5 flex-none place-items-center rounded-md bg-primary">
+                    <Mark className="size-7.5" />
                   </div>
-                  <div className={cx("logo-draft-header-copy")}>
-                    <strong>常州 AI Club</strong>
-                    <small>Changzhou AI Club</small>
+                  <div className="grid min-w-0 gap-0.5">
+                    <strong className="text-[0.95rem]">常州 AI Club</strong>
+                    <small className="text-[0.78rem] text-muted-foreground">
+                      Changzhou AI Club
+                    </small>
                   </div>
                 </div>
               </div>

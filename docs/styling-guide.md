@@ -1,62 +1,70 @@
 # 样式开发约定
 
-本文件是常州 AI Club 站点样式的权威约定。站点前台以 **CSS Module 为主体**,Tailwind 作为**布局工具**配合使用,设计令牌(颜色/圆角/阴影)统一用 CSS 变量管理。目标是终结"这个样式该写在哪"的困惑。
+本文件是常州 AI Club 站点样式的权威约定。当前代码以 **Tailwind CSS v4 为默认方案**，CSS 变量负责设计令牌，CSS Module 只保留给复杂排版和动画等明确例外。
 
-## 一、四类样式的边界
+## 一、默认选择
 
-### CSS Module —— 主体(保留)
-- **位置**:与组件/页面同目录的 `*.module.css`。
-- **用途**:组件视觉、复杂选择器、伪类/动画、品牌视觉(手账、便利贴、渐变、插画)。
-- **引用**:`styles.xxx` 或经 `cssModuleCx` 绑定后 `cx("xxx")`。
-- **原则**:高度定制化的品牌视觉优先写 Module,Tailwind utility 表达这些会很笨重。
+### Tailwind —— 页面和组件的首选
 
-### Tailwind —— 辅助(仅布局工具)
-- **用途**:**仅布局类**——`flex / grid / gap-* / p-* / m-* / hidden`、响应式 `sm: / md: / lg:`。
-- **范围**:新代码按需使用,**不要**把现有 CSS Module 批量迁移成 utility。
-- **品牌色**:经 `@theme inline` 映射后可用 `bg-accent` / `text-muted-foreground` / `bg-primary` 等。
+- 新增或修改普通页面时，布局、间距、颜色、圆角、阴影、响应式、状态样式都优先写 Tailwind utility。
+- 动态组合使用 `cn()`，不要为几个条件类新建 CSS Module。
+- 前台品牌值优先使用 `@theme inline` 已映射的语义值；尚未映射的设计值直接引用 CSS 变量，例如 `rounded-[var(--radius-md)]`。
+- 后台继续使用 Ant Design 控件，外层布局和局部覆盖使用 Tailwind，不再单独维护后台布局 Module。
 
-### 全局类(`src/app/globals.css`)
-- **范围**:仅真正全局、高频复用的基础类:`.button` / `.input` / `.surface` / `.section` / `.card` / `.eyebrow` / `.pill` / `.textarea` 等。
-- **原则**:低频或单页使用的类应放进对应 Module,**不要堆积在 globals**。globals 定期清理 0 使用的死代码(见 `scripts/prune-globals.mjs`)。
+### 全局样式 —— 令牌和真正共享的基础能力
 
-### 设计令牌(CSS 变量,`globals.css` `:root`)
-- **颜色**:`var(--accent)` / `var(--accent-strong)` / `var(--accent-warm)` / `var(--ink)` / `var(--muted)` 等。
-- **圆角**:`var(--radius-pill)` / `var(--radius-sm)` 12 / `var(--radius-md)` 18 / `var(--radius-lg)` 28。
-- **阴影**:`var(--shadow-sm)` / `var(--shadow-md)` / `var(--shadow-lg)`。
-- **桥接**:`@theme inline` 把这些变量映射给 Tailwind,使 utility 也能用品牌值。
+`src/app/globals.css` 只承载：
 
-## 二、重要:@theme radius 分轨(勿混用)
+- `:root` 设计令牌及 Tailwind `@theme inline` 映射；
+- `body`、链接、图片、容器等基础规则；
+- 仍被多处复用的语义基础类，如 `.button`、`.input`、`.textarea`、`.surface`、`.home-kicker`；
+- 少量无法由组件局部表达的跨页面兼容规则。
 
-Tailwind 的 `rounded-*` 与设计的 `--radius-*` **有意保持两套不同值**:
+不要向 `globals.css` 添加单页类。准备新增全局类前，先确认至少有多个独立调用方；否则直接使用 Tailwind。
 
-| 体系 | 值 | 服务对象 |
-|---|---|---|
-| Tailwind `rounded-sm/md/lg` | 小(约 10/12/14px) | admin 后台 shadcn 组件的紧凑视觉 |
-| 设计 `var(--radius-sm/md/lg)` | 12 / 18 / 28px | site 前台 CSS Module 的大圆角视觉 |
+### CSS Module —— 有审核门槛的例外
 
-- **site 前台页面用 `var(--radius-*)`**,不要用 Tailwind 的 `rounded-lg`(会得到小值,与设计冲突)。
-- admin 后台用 shadcn,自然用 Tailwind `rounded-*`。
-- 这是 DS-06 的既定处理:**文档说明、不强改值**(强行统一会破坏 admin 视觉)。
+只有以下情况可以新增或扩展 `*.module.css`：
 
-## 三、子主题
+- Markdown、富文本等不可控后代结构；
+- 多阶段关键帧、复杂伪元素或需要精确降级的动画；
+- 打印、截图、海报导出、演示稿等独立排版系统；
+- 同一复杂报告模板被多个页面共享，utility 会明显降低可读性。
 
-| 子主题 | 位置 | 处理原则 |
-|---|---|---|
-| admin | `src/app/admin/admin-layout.module.css`(`--admin-*`) | token 尽量引用全局(已收敛 `--admin-border`/`--admin-radius-sm`);保留后台特有的紧凑圆角 `--admin-radius-lg: 22px` |
-| deck | `reports/opc-community-funding/`(`--deck-*`) | `--deck-green`/`--deck-orange` 已引用全局 `--accent`/`--accent-warm`;`--deck-blue` 是演示稿独有色,保留 |
+“页面比较大”或“className 比较长”本身不是使用 Module 的理由。普通品牌卡片、响应式网格、hover/focus 状态仍使用 Tailwind。
 
-## 四、新增样式决策树
+## 二、当前允许保留的 CSS Module
 
-写新组件/页面时,按顺序判断:
+| 文件 | 保留原因 |
+|---|---|
+| `src/components/markdown-content.module.css` | 富文本后代选择器和内容排版 |
+| `src/components/route-loading.module.css` | 路由加载关键帧和降级动画 |
+| `src/app/(site)/news/ai-news-page.module.css` | 资讯流、日报、群日报海报及导出组件共用的复合排版 |
+| `src/app/(site)/reports/ai-office-course-survey/survey-report-page.module.css` | 三个调研报告页面共享的图表/报告模板 |
+| `src/app/(site)/reports/opc-community-funding/opc-community-funding-page.module.css` | 可翻页演示稿和 deck 控件排版 |
 
-1. **全局高频复用**?(如按钮、输入框)→ 写进 `globals.css` 的语义类。
-2. **组件/页面局部视觉**?→ 写进对应 `*.module.css`。
-3. **纯布局**(flex/grid/间距/显隐/响应式)?→ 用 Tailwind utility(仅新代码)。
-4. **颜色/圆角/阴影**?→ 一律 `var(--token)`,不要硬编码。
+新增例外时应在本表补充原因；普通业务页面不应重新出现 CSS Module。
 
-## 五、相关脚本与文档
+## 三、设计令牌和圆角
 
-- `scripts/tokenize-design-tokens.mjs`:批量把圆角/阴影/断点裸值替换为令牌引用(幂等)。
-- `docs/site-ui-content-audit.md`:整站样式/文案审查与优化追踪。
+- 颜色：`var(--accent)`、`var(--accent-strong)`、`var(--accent-warm)`、`var(--ink)`、`var(--muted)`。
+- 圆角：`var(--radius-pill)`、`var(--radius-sm)`、`var(--radius-md)`、`var(--radius-lg)`。
+- 阴影：`var(--shadow-sm)`、`var(--shadow-md)`、`var(--shadow-lg)`。
+- 前台需要设计系统的大圆角时，写 `rounded-[var(--radius-lg)]`，不要依赖一个名字相近但语义不明确的默认 utility。
+- 不要为了单次使用新增 CSS 变量；只有跨组件复用的稳定视觉值才进入令牌层。
 
-> **globals 死代码清理警示**:不要用脚本直接删组合选择器(`.a, .b {}`)里的类——会留下悬空选择器、破坏共享规则(曾导致 `card-grid` 丢失 3 列定义,活动卡片塌缩)。如需清理 globals 死代码,只删「独占规则块」(该类是规则的唯一选择器),且确认不波及其它仍在用的类。
+## 四、新增样式决策顺序
+
+1. 现有 Tailwind utility 或语义 token 能表达：直接使用。
+2. 多处复用且属于基础控件：复用或补充全局语义类。
+3. 属于上文列出的复杂排版例外：使用局部 CSS Module，并写清边界。
+4. 其余情况不要新建样式文件。
+
+## 五、验证要求
+
+- 至少运行 `npm run build`。
+- 涉及公开页面时，抽查桌面与 390px 移动端，并确认 `scrollWidth === clientWidth`。
+- 涉及交互状态时，验证 hover/focus、展开收起及 reduced-motion 分支。
+- 清理全局规则前必须确认选择器没有调用方；组合选择器应人工拆分，避免误删仍在使用的共享规则。
+
+相关视觉规范见 `design/design-system.md`，历史审计记录见 `docs/site-ui-content-audit.md`。

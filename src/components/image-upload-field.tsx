@@ -10,9 +10,7 @@ import {
   compressImageFile,
   formatFileSize,
 } from "@/lib/client-image-compression";
-import { cssModuleCx } from "@/lib/utils";
-
-import styles from "./image-upload-field.module.css";
+import { cn } from "@/lib/utils";
 
 type UploadMode = "upload-only" | "upload-or-url";
 type UploadAppearance = "site" | "admin";
@@ -75,8 +73,6 @@ function getStorageUploadUrl(scope: StorageUploadScope) {
       return "/api/admin/storage/event-assets";
   }
 }
-
-const cx = cssModuleCx.bind(null, styles);
 
 export function ImageUploadField({
   name,
@@ -218,25 +214,25 @@ export function ImageUploadField({
 
   return (
     <div
-      className={cx(
-        "image-upload-field",
+      className={cn(
+        "grid min-w-0 gap-3",
         Boolean(resolvedPreview) &&
           appearance === "site" &&
-          "image-upload-field-split",
+          "grid-cols-[112px_minmax(0,1fr)] items-center gap-6 max-[820px]:grid-cols-1",
       )}
     >
       {resolvedPreview ? (
-        <div className={cx("image-upload-preview")}>{resolvedPreview}</div>
+        <div className="grid justify-items-start">{resolvedPreview}</div>
       ) : null}
 
-      <div className={cx("image-upload-body")}>
+      <div className="grid min-w-0 gap-3.5">
         {panelTitle || panelDescription ? (
-          <div className={cx("image-upload-copy")}>
+          <div className="grid gap-1.5">
             {panelTitle ? (
-              <p className={cx("image-upload-title")}>{panelTitle}</p>
+              <p className="m-0 text-base font-bold text-ink">{panelTitle}</p>
             ) : null}
             {panelDescription ? (
-              <p className={cx("image-upload-description")}>{panelDescription}</p>
+              <p className="m-0 text-[0.9rem] leading-[1.6] text-muted-foreground">{panelDescription}</p>
             ) : null}
           </div>
         ) : null}
@@ -265,9 +261,9 @@ export function ImageUploadField({
         )}
 
         <div
-          className={cx(
-            "image-upload-actions",
-            appearance === "admin" && "image-upload-actions-admin",
+          className={cn(
+            "flex flex-wrap items-center gap-2.5",
+            appearance === "admin" && "gap-2",
           )}
         >
           {appearance === "admin" ? (
@@ -316,7 +312,7 @@ export function ImageUploadField({
               )
             : null}
 
-          <span className={cx("image-upload-status")}>{statusText}</span>
+          <span className="text-[0.92rem] font-semibold text-copy-muted">{statusText}</span>
         </div>
       </div>
 

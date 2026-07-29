@@ -7,7 +7,13 @@ import { saveAccountMemberWork } from "@/app/(site)/account/actions";
 import { ImageUploadField } from "@/components/image-upload-field";
 import { workStatusLabels, workTypeLabels } from "@/lib/community-works";
 
-import styles from "../../account-page.module.css";
+import {
+  accountWorkFieldGroupClassName,
+  accountWorkFieldLabelClassName,
+  accountWorkFormClassName,
+  accountWorkFormFooterClassName,
+  accountWorkWideFieldClassName,
+} from "../../account-tailwind";
 
 const ACCOUNT_WORK_DRAFT_KEY = "changzhouai.account.member-work.new.v1";
 const ACCOUNT_WORK_NEW_PATH = "/account/works/new";
@@ -177,7 +183,7 @@ export function AccountWorkSubmitForm({ userId }: { userId: string }) {
   return (
     <form
       action={saveAccountMemberWork}
-      className={`${styles.accountWorkForm} ${styles.accountWorkSubmitForm}`}
+      className={accountWorkFormClassName}
       onSubmit={() => setDraftMessage("正在提交审核...")}
     >
       <input type="hidden" name="redirect_to" value={ACCOUNT_WORK_NEW_PATH} />
@@ -236,7 +242,7 @@ export function AccountWorkSubmitForm({ userId }: { userId: string }) {
         />
       </label>
 
-      <label className={styles.accountWorkWideField}>
+      <label className={accountWorkWideFieldClassName}>
         <span>一句话介绍</span>
         <textarea
           className="input textarea"
@@ -248,7 +254,7 @@ export function AccountWorkSubmitForm({ userId }: { userId: string }) {
         />
       </label>
 
-      <label className={styles.accountWorkWideField}>
+      <label className={accountWorkWideFieldClassName}>
         <span>详细说明</span>
         <textarea
           className="input textarea"
@@ -259,8 +265,8 @@ export function AccountWorkSubmitForm({ userId }: { userId: string }) {
         />
       </label>
 
-      <div className={`${styles.accountWorkWideField} ${styles.accountWorkFieldGroup}`}>
-        <span className={styles.accountWorkFieldLabel}>封面 / 产品图片</span>
+      <div className={`${accountWorkWideFieldClassName} ${accountWorkFieldGroupClassName}`}>
+        <span className={accountWorkFieldLabelClassName}>封面 / 产品图片</span>
         <ImageUploadField
           name="cover_image_url"
           value={values.cover_image_url}
@@ -281,8 +287,8 @@ export function AccountWorkSubmitForm({ userId }: { userId: string }) {
         />
       </div>
 
-      <div className={`${styles.accountWorkWideField} ${styles.accountWorkFieldGroup}`}>
-        <span className={styles.accountWorkFieldLabel}>小程序码 / 二维码</span>
+      <div className={`${accountWorkWideFieldClassName} ${accountWorkFieldGroupClassName}`}>
+        <span className={accountWorkFieldLabelClassName}>小程序码 / 二维码</span>
         <ImageUploadField
           name="qr_code_image_url"
           value={values.qr_code_image_url}
@@ -336,7 +342,7 @@ export function AccountWorkSubmitForm({ userId }: { userId: string }) {
         />
       </label>
 
-      <label className={styles.accountWorkWideField}>
+      <label className={accountWorkWideFieldClassName}>
         <span>标签</span>
         <input
           className="input"
@@ -347,7 +353,7 @@ export function AccountWorkSubmitForm({ userId }: { userId: string }) {
         />
       </label>
 
-      <div className={styles.accountWorkFormFooter}>
+      <div className={accountWorkFormFooterClassName}>
         <button type="submit" className="button home-primary-button">
           <Send aria-hidden="true" strokeWidth={2} />
           提交审核

@@ -16,14 +16,3 @@ export function cssModuleCx(styles: CssModuleStyles, ...inputs: ClassValue[]) {
     .map((className) => styles[className] ?? className)
     .join(" ");
 }
-
-export function cssModuleCxWithGlobals(
-  styles: CssModuleStyles,
-  ...inputs: ClassValue[]
-) {
-  return splitClassNames(inputs)
-    .map((className) =>
-      styles[className] ? `${styles[className]} ${className}` : className,
-    )
-    .join(" ");
-}

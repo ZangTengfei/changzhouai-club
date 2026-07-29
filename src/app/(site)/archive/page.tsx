@@ -3,7 +3,6 @@ import Link from "next/link";
 
 import { PageHero } from "@/components/page-hero";
 import { RevealImage } from "@/components/reveal-image";
-import galleryStyles from "@/components/content-gallery.module.css";
 import { getCompletedEventRecaps } from "@/lib/community-events";
 import { getEventImageUrl } from "@/lib/public-image-url";
 import { archiveItems } from "@/lib/site-data";
@@ -44,16 +43,17 @@ export default async function ArchivePage() {
       </section>
 
       {galleryItems.length > 0 ? (
-        <section className={galleryStyles["gallery-grid"]}>
+        <section className="grid grid-cols-3 gap-4.5 max-lg:grid-cols-2 max-md:grid-cols-1">
           {galleryItems.map((item) => (
-            <article className={galleryStyles["gallery-card"]} key={item.id}>
-              <div className={galleryStyles["gallery-media"]}>
+            <article className="min-w-0 overflow-hidden" key={item.id}>
+              <div className="min-w-0 overflow-hidden bg-primary-soft">
                 <RevealImage
+                  className="block h-auto w-full"
                   src={getEventImageUrl(item.imageUrl, "archive") ?? item.imageUrl}
                   alt={item.caption ?? item.eventTitle}
                 />
               </div>
-              <div className={galleryStyles["gallery-copy"]}>
+              <div className="px-5.5 pt-5 pb-5.5 max-sm:p-4.5">
                 <h3>
                   <Link href={`/events/${item.eventSlug}`}>{item.eventTitle}</Link>
                 </h3>

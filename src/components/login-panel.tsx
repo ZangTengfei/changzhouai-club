@@ -5,8 +5,7 @@ import { AtSign, Mail, MessageCircle } from "lucide-react";
 
 import { EmailAuthForm } from "@/components/email-auth-form";
 import { WechatQrLogin } from "@/components/wechat-qr-login";
-
-import styles from "./login-panel.module.css";
+import { cn } from "@/lib/utils";
 
 type LoginPanelProps = {
   enabled: boolean;
@@ -26,6 +25,9 @@ const errorMap: Record<string, string> = {
 
 type AuthIntent = "sign-in" | "sign-up";
 type AuthMethod = "email" | "google" | "wechat";
+
+const methodTabClassName =
+  "relative inline-flex min-h-12 cursor-pointer items-center gap-2 border-0 bg-transparent px-0.5 pt-0 pb-3 font-[inherit] text-[1.08rem] leading-[1.2] font-[850] text-copy-subtle after:absolute after:right-0 after:-bottom-px after:left-0 after:h-0.75 after:rounded-full after:bg-transparent after:transition-colors after:duration-[180ms] hover:text-ink focus-visible:text-ink focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[rgba(var(--accent-rgb),0.26)] [&_svg]:size-4.5";
 
 export function LoginPanel({
   enabled,
@@ -55,22 +57,24 @@ export function LoginPanel({
   }
 
   return (
-    <div className={`auth-stack ${styles.grid}`}>
+    <div className="grid w-full max-w-114 grid-cols-[minmax(0,1fr)] items-start justify-items-center gap-4 max-sm:gap-3.5">
       {error ? (
-        <div className={`note-strip ${styles.errorNote}`}>
+        <div className="note-strip w-full">
           {errorMap[error] ?? "登录过程中出现了未知错误。"}
         </div>
       ) : null}
 
-      <section className={`auth-card ${styles.flowCard}`}>
-        <div className={styles.authHeader}>
+      <section className="relative grid w-full gap-5.5 overflow-hidden rounded-lg border border-[rgba(var(--ink-rgb),0.12)] bg-[radial-gradient(circle_at_96%_6%,rgba(var(--accent-rgb),0.12),transparent_28%),rgba(var(--surface-rgb),0.92)] px-7 pt-7 pb-6 shadow-[var(--shadow-md)] max-sm:px-4.5 max-sm:pt-5.5 max-sm:pb-4.5">
+        <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3.5">
           <div>
-            <h1>{isSignIn ? "登录" : "注册"}</h1>
+            <h1 className="m-0 text-[1.42rem] leading-[1.2] font-black tracking-normal text-ink max-sm:text-[1.3rem]">
+              {isSignIn ? "登录" : "注册"}
+            </h1>
           </div>
 
           <button
             type="button"
-            className={styles.intentSwitch}
+            className="-mt-7 -mr-7 min-h-12 min-w-19.5 cursor-pointer rounded-bl-lg border-0 bg-[rgba(var(--accent-rgb),0.12)] pr-4.5 pl-6 font-[inherit] text-[0.95rem] leading-none font-black text-primary-strong transition-colors duration-[180ms] hover:bg-[rgba(var(--accent-rgb),0.18)] hover:text-primary focus-visible:bg-[rgba(var(--accent-rgb),0.18)] focus-visible:text-primary focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-[rgba(var(--accent-rgb),0.28)] max-sm:-mt-5.5 max-sm:-mr-4.5 max-sm:min-h-11 max-sm:min-w-17 max-sm:pr-3.5 max-sm:pl-4.5 max-sm:text-[0.9rem]"
             onClick={() => chooseIntent(isSignIn ? "sign-up" : "sign-in")}
           >
             {isSignIn ? "注册" : "登录"}
@@ -78,14 +82,17 @@ export function LoginPanel({
         </div>
 
         <div
-          className={`${styles.methodTabs} ${isSignIn ? "" : styles.methodTabsSingle}`}
+          className="flex min-w-0 justify-center gap-[clamp(28px,8vw,64px)] border-b border-site-border-subtle max-sm:gap-6"
           role="group"
           aria-label={isSignIn ? "选择登录方式" : "选择注册方式"}
         >
           {isSignIn && wechatEnabled ? (
             <button
               type="button"
-              className={`${styles.methodTab} ${isWechatMethod ? styles.methodTabActive : ""}`}
+              className={cn(
+                methodTabClassName,
+                isWechatMethod && "text-primary-strong after:bg-primary",
+              )}
               onClick={() => setAuthMethod("wechat")}
               aria-pressed={isWechatMethod}
             >
@@ -95,7 +102,10 @@ export function LoginPanel({
           ) : null}
           <button
             type="button"
-            className={`${styles.methodTab} ${isEmailMethod ? styles.methodTabActive : ""}`}
+            className={cn(
+              methodTabClassName,
+              isEmailMethod && "text-primary-strong after:bg-primary",
+            )}
             onClick={() => setAuthMethod("email")}
             aria-pressed={isEmailMethod}
           >
@@ -105,7 +115,10 @@ export function LoginPanel({
           {isSignIn ? (
             <button
               type="button"
-              className={`${styles.methodTab} ${isGoogleMethod ? styles.methodTabActive : ""}`}
+              className={cn(
+                methodTabClassName,
+                isGoogleMethod && "text-primary-strong after:bg-primary",
+              )}
               onClick={() => setAuthMethod("google")}
               aria-pressed={isGoogleMethod}
             >
@@ -116,7 +129,7 @@ export function LoginPanel({
         </div>
 
         {isEmailMethod ? (
-          <div className={styles.activePane}>
+          <div className="grid min-w-0 gap-4">
             <EmailAuthForm
               key={isSignIn ? "email-sign-in" : "email-sign-up"}
               enabled={enabled}
@@ -131,7 +144,7 @@ export function LoginPanel({
         ) : null}
 
         {isSignIn && isGoogleMethod ? (
-          <div className={styles.activePane}>
+          <div className="grid min-w-0 gap-4">
             <EmailAuthForm
               key="google-recovery"
               enabled={enabled}
@@ -149,7 +162,7 @@ export function LoginPanel({
         ) : null}
 
         {isSignIn && isWechatMethod ? (
-          <div className={styles.activePane}>
+          <div className="grid min-w-0 gap-4">
             <WechatQrLogin
               enabled={enabled && wechatEnabled}
               officialAccountEnabled={officialAccountEnabled}
@@ -160,7 +173,7 @@ export function LoginPanel({
       </section>
 
       {!enabled ? (
-        <p className={styles.hint}>当前登录服务暂未启用，请稍后再试。</p>
+        <p className="m-0 w-full text-muted-foreground">当前登录服务暂未启用，请稍后再试。</p>
       ) : null}
     </div>
   );

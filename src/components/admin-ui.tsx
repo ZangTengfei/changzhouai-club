@@ -2,9 +2,7 @@ import type { ReactNode } from "react";
 
 import Link from "next/link";
 import { Card, Tag } from "antd";
-import { cn, cssModuleCxWithGlobals } from "@/lib/utils";
-
-import styles from "./admin-ui.module.css";
+import { cn } from "@/lib/utils";
 
 export type AdminTone =
   | "neutral"
@@ -47,8 +45,6 @@ const toneClassName: Record<AdminTone, string> = {
   attended: "border-emerald-200 bg-emerald-100 text-emerald-700",
 };
 
-const cx = cssModuleCxWithGlobals.bind(null, styles);
-
 export function AdminPageStack({
   className,
   children,
@@ -70,7 +66,7 @@ export function AdminPanel({
     <Card
       variant="borderless"
       className={cn(
-        cx("admin-panel"),
+        "admin-panel overflow-hidden rounded-admin-lg border border-admin-border bg-admin-surface shadow-admin [&_.ant-card-body]:p-0",
         className,
       )}
     >
@@ -93,7 +89,7 @@ export function AdminPanelHeader({
   return (
     <div
       className={cn(
-        cx("admin-panel-header"),
+        "admin-panel-header flex items-start justify-between gap-4 border-b border-admin-divider bg-admin-surface px-5 py-4 max-sm:flex-col max-sm:px-4 max-sm:py-3.5 [&>div:first-child]:min-w-0 [&_p]:m-0 [&_p]:mb-1",
         className,
       )}
     >
@@ -103,7 +99,9 @@ export function AdminPanelHeader({
             {eyebrow}
           </p>
         ) : null}
-        <h2 className={cx("admin-panel-title")}>{title}</h2>
+        <h2 className="admin-panel-title m-0 text-[17px] font-semibold leading-[1.4] text-admin-foreground">
+          {title}
+        </h2>
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
     </div>
@@ -118,7 +116,7 @@ export function AdminPanelBody({
   children: ReactNode;
 }) {
   return (
-    <div className={cn(cx("admin-panel-body"), className)}>
+    <div className={cn("admin-panel-body bg-admin-surface p-5 max-sm:p-4", className)}>
       {children}
     </div>
   );
@@ -136,14 +134,12 @@ export function AdminMetric({
   return (
     <div
       className={cn(
-        cx(
-          "admin-metric min-w-[88px] rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/40 px-3 py-2",
-        ),
+        "admin-metric min-w-24 rounded-admin border border-admin-border bg-[#fafafa] px-3.5 py-3",
         className,
       )}
     >
-      <div className="text-lg font-semibold leading-none text-foreground">{value}</div>
-      <div className="mt-1 text-[11px] uppercase tracking-[0.14em] text-muted-foreground">
+      <div className="text-xl font-semibold leading-none text-admin-foreground">{value}</div>
+      <div className="mt-1 text-[11px] uppercase tracking-[0.14em] text-[#8c8c8c]">
         {label}
       </div>
     </div>
@@ -160,9 +156,7 @@ export function AdminNotice({
   return (
     <div
       className={cn(
-        cx(
-          "admin-notice rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/50 px-3 py-2 text-sm text-muted-foreground",
-        ),
+        "admin-notice rounded-admin border border-[#bae0ff] bg-admin-primary-soft px-3 py-2.5 text-sm text-[#475569]",
         className,
       )}
     >
@@ -203,8 +197,8 @@ export function AdminField({
   className?: string;
 }) {
   return (
-    <label className={cn(cx("admin-field grid gap-2"), className)}>
-      <span className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+    <label className={cn("admin-field grid gap-2", className)}>
+      <span className="text-[13px] font-medium tracking-normal text-[#4b5563] normal-case">
         {label}
       </span>
       {children}
@@ -222,9 +216,7 @@ export function AdminCheckboxRow({
   return (
     <label
       className={cn(
-        cx(
-          "admin-checkbox-row flex items-center gap-2 rounded-[calc(var(--radius)-4px)] border border-border/70 bg-muted/30 px-3 py-2 text-sm text-foreground",
-        ),
+        "admin-checkbox-row flex items-center gap-2 rounded-admin border border-admin-border bg-[#fafafa] px-3 py-2 text-sm text-[#374151]",
         className,
       )}
     >

@@ -172,7 +172,7 @@
 }
 
 :global(body:has([data-admin-route-loading])) {
-  background: #f5f5f5;
+  background: var(--color-admin-layout);
 }
 
 :global([data-admin-ui="antd"]) .admin-region-loading {

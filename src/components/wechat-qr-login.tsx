@@ -6,8 +6,6 @@ import { WechatAuthButton } from "@/components/wechat-auth-button";
 import { getPublicSiteUrl } from "@/lib/env";
 import { createClient } from "@/lib/supabase/client";
 
-import styles from "./wechat-qr-login.module.css";
-
 type WechatQrLoginProps = {
   enabled: boolean;
   officialAccountEnabled: boolean;
@@ -20,6 +18,12 @@ type EmbeddedUrlResponse = {
 };
 
 type LoginEnvironment = "checking" | "desktop" | "wechat" | "mobile";
+
+const mobileNoticeClassName =
+  "grid gap-1.5 rounded-md border border-primary-border bg-[rgba(var(--accent-rgb),0.07)] p-4 [&_span]:text-[0.9rem] [&_span]:leading-[1.62] [&_span]:font-bold [&_span]:text-[rgba(var(--ink-rgb),0.68)] [&_strong]:text-[0.98rem] [&_strong]:leading-[1.35] [&_strong]:font-black [&_strong]:text-ink";
+
+const fallbackButtonClassName =
+  "button button-secondary auth-button min-h-9.5! w-auto! justify-center px-4! text-[0.9rem]! max-sm:w-full!";
 
 function getSafeNextPath(nextPath: string) {
   if (!nextPath.startsWith("/") || nextPath.startsWith("//")) {
@@ -172,8 +176,8 @@ export function WechatQrLogin({
 
   if (loginEnvironment === "wechat") {
     return (
-      <div className={styles.stack}>
-        <div className={styles.mobileNotice}>
+      <div className="grid gap-2.5">
+        <div className={mobileNoticeClassName}>
           <strong>微信内快捷登录</strong>
           <span>确认授权后会自动回到社区账号页。</span>
         </div>
@@ -181,7 +185,7 @@ export function WechatQrLogin({
           enabled={enabled && officialAccountEnabled}
           mode="sign-in"
           nextPath={safeNextPath}
-          className="button button-secondary auth-button"
+          className={fallbackButtonClassName}
         />
         {!officialAccountEnabled ? (
           <p className="note-strip">服务号登录暂未启用，请稍后再试。</p>
@@ -192,7 +196,7 @@ export function WechatQrLogin({
 
   if (loginEnvironment !== "desktop") {
     return (
-      <div className={styles.mobileNotice}>
+      <div className={mobileNoticeClassName}>
         <strong>
           {loginEnvironment === "checking"
             ? "正在判断当前设备..."
@@ -204,36 +208,40 @@ export function WechatQrLogin({
   }
 
   return (
-    <div className={styles.stack}>
-      <div className={styles.qrBox}>
+    <div className="grid gap-2.5">
+      <div className="grid min-h-68 place-items-center overflow-hidden rounded-md border border-primary-border bg-white/78 pt-4 max-sm:min-h-64.5">
         {frameUrl ? (
-          <div className={styles.frameCrop}>
+          <div className="h-68 w-[min(100%,300px)] overflow-hidden max-sm:h-64.5">
             <iframe
               title="微信扫码登录"
               src={frameUrl}
-              className={styles.frame}
+              className="h-100 w-75 max-w-full border-0 max-sm:scale-92 max-sm:origin-top"
               loading="eager"
               referrerPolicy="no-referrer-when-downgrade"
             />
           </div>
         ) : (
-          <div className={styles.placeholder}>
+          <div className="grid min-h-60 w-full place-items-center px-5.5 py-5.5 text-center text-[0.94rem] leading-[1.56] font-[750] text-[rgba(var(--ink-rgb),0.58)]">
             {loading ? "正在准备微信二维码..." : "微信二维码暂不可用"}
           </div>
         )}
       </div>
 
-      <p className={styles.caption}>扫码确认后自动回到社区账号页。</p>
+      <p className="m-0 text-[0.9rem] leading-[1.58] font-bold text-[rgba(var(--ink-rgb),0.64)]">
+        扫码确认后自动回到社区账号页。
+      </p>
 
       {error ? <p className="note-strip">{error}</p> : null}
 
-      <div className={styles.fallbackAction}>
-        <span>二维码加载异常时</span>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 pt-0.5 max-sm:grid-cols-1 max-sm:gap-2">
+        <span className="text-[0.84rem] leading-[1.4] font-[750] text-[rgba(var(--ink-rgb),0.56)]">
+          二维码加载异常时
+        </span>
         <WechatAuthButton
           enabled={enabled}
           mode="sign-in"
           nextPath={safeNextPath}
-          className="button button-secondary auth-button"
+          className={fallbackButtonClassName}
         />
       </div>
     </div>

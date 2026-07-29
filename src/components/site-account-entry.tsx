@@ -11,7 +11,7 @@ import { hasSupabaseEnv } from "@/lib/env";
 import { getAvatarImageUrl } from "@/lib/public-image-url";
 import { createClient } from "@/lib/supabase/client";
 import { resolveCommunityUserId } from "@/lib/community-user";
-import styles from "./site-account-entry.module.css";
+import { cn } from "@/lib/utils";
 
 type AdminPermissionRow = {
   permission_key: string | null;
@@ -52,6 +52,12 @@ const defaultState: AccountState = {
   avatarUrl: null,
   isStaff: false,
 };
+
+const accountEntryClassName =
+  "inline-flex size-11.5 cursor-pointer items-center justify-center overflow-hidden rounded-[var(--radius-pill)] border border-[rgba(var(--accent-rgb),0.16)] bg-[rgba(var(--surface-muted-rgb),0.84)] p-0 shadow-[var(--shadow-md)] transition-[transform,border-color,background-color] duration-[180ms] hover:-translate-y-px hover:border-[rgba(var(--accent-rgb),0.28)] hover:bg-primary-soft focus-visible:-translate-y-px focus-visible:border-[rgba(var(--accent-rgb),0.28)] focus-visible:bg-primary-soft";
+
+const accountDropdownItemClassName =
+  "inline-flex min-h-10.5 w-full cursor-pointer items-center rounded-sm border-0 bg-transparent px-3.5 py-0 text-left font-[inherit] font-semibold text-ink transition-[background-color,color,transform] duration-[180ms] hover:-translate-y-px hover:bg-primary-soft hover:text-ink focus-visible:-translate-y-px focus-visible:bg-primary-soft focus-visible:text-ink disabled:cursor-not-allowed disabled:opacity-68";
 
 export function SiteAccountEntry({
   onAuthStateChange,
@@ -192,7 +198,10 @@ export function SiteAccountEntry({
       <Link
         href={account.href}
         prefetch={false}
-        className={`${styles["account-entry"]} ${styles["account-entry-login"]}`}
+        className={cn(
+          accountEntryClassName,
+          "h-10.5 w-auto min-w-17 overflow-visible border-[rgba(var(--accent-rgb),0.2)] bg-[rgba(var(--surface-soft-rgb),0.9)] px-4.5 text-[0.94rem] font-extrabold leading-none text-primary-strong shadow-[inset_0_1px_0_rgba(255,255,255,0.72),0_10px_22px_rgba(var(--ink-rgb),0.07)] hover:border-[rgba(var(--accent-rgb),0.34)] hover:bg-[rgba(var(--accent-rgb),0.1)] hover:text-primary-strong hover:shadow-[inset_0_1px_0_rgba(255,255,255,0.62),0_12px_24px_rgba(var(--accent-rgb),0.11)] focus-visible:border-[rgba(var(--accent-rgb),0.34)] focus-visible:bg-[rgba(var(--accent-rgb),0.1)] focus-visible:text-primary-strong focus-visible:shadow-[inset_0_1px_0_rgba(255,255,255,0.62),0_12px_24px_rgba(var(--accent-rgb),0.11)]",
+        )}
         aria-label={account.label}
         title={account.label}
       >
@@ -202,12 +211,13 @@ export function SiteAccountEntry({
   }
 
   return (
-    <div className={styles["account-menu"]} ref={menuRef}>
+    <div className="relative z-210" ref={menuRef}>
       <button
         type="button"
-        className={`${styles["account-entry"]}${
-          menuOpen ? ` ${styles["account-entry-active"]}` : ""
-        }`}
+        className={cn(
+          accountEntryClassName,
+          menuOpen && "-translate-y-px border-[rgba(var(--accent-rgb),0.28)] bg-primary-soft",
+        )}
         aria-label={account.label}
         aria-haspopup="menu"
         aria-expanded={menuOpen}
@@ -218,11 +228,11 @@ export function SiteAccountEntry({
           <img
             src={account.avatarUrl}
             alt={account.name}
-            className={styles["account-avatar-image"]}
+            className="block size-full object-cover object-center"
             referrerPolicy="no-referrer"
           />
         ) : (
-          <span className={styles["account-avatar-fallback"]}>
+          <span className="grid size-full place-items-center bg-[linear-gradient(135deg,rgba(var(--accent-rgb),0.92),rgba(var(--accent-warm-rgb),0.88))] text-[0.82rem] font-extrabold tracking-[0.04em] text-white">
             {getAccountInitials(account.name)}
           </span>
         )}
@@ -230,11 +240,15 @@ export function SiteAccountEntry({
       </button>
 
       {menuOpen ? (
-        <div className={styles["account-dropdown"]} role="menu" aria-label="账号菜单">
+        <div
+          className="absolute top-[calc(100%+10px)] right-0 z-220 grid min-w-45 gap-1.5 rounded-md border border-primary-border bg-[rgba(var(--surface-muted-rgb),0.98)] p-2.5 shadow-[var(--shadow-lg)] backdrop-blur-2xl max-[820px]:min-w-42"
+          role="menu"
+          aria-label="账号菜单"
+        >
           <Link
             href="/account"
             prefetch={false}
-            className={styles["account-dropdown-item"]}
+            className={accountDropdownItemClassName}
             role="menuitem"
             onClick={() => setMenuOpen(false)}
           >
@@ -245,7 +259,7 @@ export function SiteAccountEntry({
             <Link
               href="/admin"
               prefetch={false}
-              className={styles["account-dropdown-item"]}
+              className={accountDropdownItemClassName}
               role="menuitem"
               onClick={() => setMenuOpen(false)}
             >
@@ -255,7 +269,7 @@ export function SiteAccountEntry({
 
           <button
             type="button"
-            className={styles["account-dropdown-item"]}
+            className={accountDropdownItemClassName}
             role="menuitem"
             onClick={handleSignOut}
             disabled={pending}
