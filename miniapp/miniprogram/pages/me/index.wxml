@@ -49,9 +49,13 @@
           <view wx:else class="avatar avatar-placeholder">{{avatarInitial}}</view>
           <view class="identity-copy">
             <text class="profile-name">{{user.displayName}}</text>
-            <view class="identity-pill" catchtap="openGrowth" role="button" aria-label="查看成长档案">
-              <image src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
-              <text>{{user.identityLabel}}</text>
+            <view class="identity-tag-row" catchtap="openGrowth" role="button" aria-label="查看身份与社区标签">
+              <view class="identity-pill">
+                <image src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
+                <text>{{user.identityLabel}}</text>
+              </view>
+              <view wx:for="{{visibleCommunityTags}}" wx:key="code" class="community-tag-pill"><text>{{item.label}}</text></view>
+              <view wx:if="{{communityTagOverflowCount}}" class="community-tag-more"><text>+{{communityTagOverflowCount}}</text></view>
             </view>
           </view>
         </view>
@@ -102,11 +106,5 @@
     </view>
     <view wx:else class="empty-state" bindtap="openEvents" role="button">还没有活动记录，去看看社区活动</view>
 
-    <view wx:if="{{communityTags.length}}" class="honor-strip">
-      <text class="honor-heading">社区标签</text>
-      <view class="honor-items">
-        <view wx:for="{{communityTags}}" wx:key="code" class="honor-item"><image src="/assets/logo-mark.png" mode="aspectFit" /><text>{{item.label}}</text></view>
-      </view>
-    </view>
   </view>
 </view>

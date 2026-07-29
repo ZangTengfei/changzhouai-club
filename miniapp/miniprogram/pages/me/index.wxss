@@ -197,6 +197,13 @@
   line-height: 1.25;
 }
 
+.identity-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8rpx;
+}
+
 .identity-pill {
   display: flex;
   width: fit-content;
@@ -215,6 +222,32 @@
 .identity-pill image {
   width: 38rpx;
   height: 38rpx;
+}
+
+.community-tag-pill,
+.community-tag-more {
+  display: flex;
+  min-height: 44rpx;
+  box-sizing: border-box;
+  align-items: center;
+  padding: 4rpx 14rpx;
+  border: 2rpx solid rgba(115, 87, 232, 0.16);
+  border-radius: 22rpx;
+  background: rgba(255, 255, 255, 0.78);
+  color: #6554a9;
+  font-size: 21rpx;
+  font-weight: 680;
+}
+
+.community-tag-pill text {
+  max-width: 180rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.community-tag-more {
+  color: var(--color-muted);
 }
 
 .profile-completion {
@@ -442,39 +475,4 @@
   border-radius: 18rpx;
   color: var(--color-green-dark);
   font-size: 20rpx;
-}
-
-.honor-strip {
-  display: flex;
-  flex-direction: column;
-  gap: 18rpx;
-  margin-top: 24rpx;
-  padding: 24rpx;
-  border: 2rpx solid #f1e3ac;
-  border-radius: 28rpx;
-  background: var(--color-yellow-soft);
-}
-
-.honor-heading {
-  font-size: 27rpx;
-  font-weight: 790;
-}
-
-.honor-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18rpx 24rpx;
-}
-
-.honor-item {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  color: var(--color-muted);
-  font-size: 21rpx;
-}
-
-.honor-item image {
-  width: 44rpx;
-  height: 44rpx;
 }

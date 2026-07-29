@@ -10,11 +10,13 @@ type FootprintItem = MiniappUser["footprints"][number] & {
 
 function buildAccountViewData(user: MiniappUser) {
   const latestFootprint = user.footprints[0];
+  const communityTags = getCommunityTags(user);
 
   return {
     user,
     avatarInitial: user.displayName.slice(0, 1) || "微",
-    communityTags: getCommunityTags(user).slice(0, 2),
+    visibleCommunityTags: communityTags.slice(0, 2),
+    communityTagOverflowCount: Math.max(communityTags.length - 2, 0),
     latestFootprint: latestFootprint
       ? {
           ...latestFootprint,
@@ -30,7 +32,8 @@ Page({
   data: {
     user: null as MiniappUser | null,
     avatarInitial: "微",
-    communityTags: [] as MiniappUser["badges"],
+    visibleCommunityTags: [] as MiniappUser["badges"],
+    communityTagOverflowCount: 0,
     latestFootprint: null as FootprintItem | null,
     activitySummary: "",
     loading: true,
