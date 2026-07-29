@@ -79,34 +79,6 @@ type RenderWechatArticleOptions = {
   officialAccount?: WechatArticleOfficialAccount | null;
 };
 
-const articleCardTones = [
-  {
-    background: "#e9f9f0",
-    border: "#d5f0e1",
-    accent: "#08794a",
-  },
-  {
-    background: "#fff2e5",
-    border: "#ffe3c5",
-    accent: "#b85a12",
-  },
-  {
-    background: "#edf5ff",
-    border: "#d9e9ff",
-    accent: "#256ac2",
-  },
-  {
-    background: "#f3efff",
-    border: "#e5dcff",
-    accent: "#6548cc",
-  },
-  {
-    background: "#fff8dd",
-    border: "#f5e8ad",
-    accent: "#9f7200",
-  },
-] as const;
-
 const officialAccountQrUrl = "https://changzhouai.club/wechat-official-account-qr.jpg";
 
 export const wechatArticleTemplates: WechatArticleTemplate[] = [
@@ -613,19 +585,15 @@ export function renderWechatArticleHtml(
   const bodyBlocks = firstHeading
     ? blocks.filter((block) => block !== firstHeading)
     : blocks;
-  let sectionHeadingIndex = 0;
 
   const bodyHtml = bodyBlocks
     .map((block, index) => {
       if (block.type === "heading") {
         if (block.depth === 2) {
-          const tone = articleCardTones[sectionHeadingIndex % articleCardTones.length];
-          sectionHeadingIndex += 1;
-
-          return `<section style="margin:30px 0 14px;padding:14px 16px 15px;border:1px solid ${tone.border};border-radius:14px;background:${tone.background};"><h2 style="margin:0;color:${tone.accent};font-size:20px;line-height:1.45;font-weight:800;">${renderInline(
+          return `<h2 style="margin:30px 0 14px;color:${template.accent};font-size:20px;line-height:1.45;font-weight:800;">${renderInline(
             block.text,
             template,
-          )}</h2></section>`;
+          )}</h2>`;
         }
 
         return `<h3 style="margin:24px 0 10px;color:${template.accent};font-size:17px;line-height:1.5;font-weight:800;">${renderInline(
