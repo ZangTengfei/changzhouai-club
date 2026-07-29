@@ -95,19 +95,20 @@ export async function login() {
 export function ensureSession() {
   if (!pendingSession) {
     pendingSession = (async () => {
-      if (getStoredSessionToken()) {
-        try {
-          const response = await apiRequest<MeResponse>({
-            path: "/api/miniapp/auth/me",
-            authenticated: true,
-          });
-          return response.user;
-        } catch {
-          clearSessionToken();
-        }
+      if (!getStoredSessionToken()) {
+        throw new ApiError(401, "login_required");
       }
 
-      return login();
+      try {
+        const response = await apiRequest<MeResponse>({
+          path: "/api/miniapp/auth/me",
+          authenticated: true,
+        });
+        return response.user;
+      } catch (error) {
+        clearSessionToken();
+        throw error;
+      }
     })().finally(() => {
       pendingSession = null;
     });

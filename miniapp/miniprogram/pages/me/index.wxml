@@ -23,16 +23,17 @@
     </view>
   </view>
 
-  <view wx:elif="{{loggedOut}}" class="account-error">
-    <text class="section-title">已退出当前账号</text>
-    <text class="muted">重新进入后，可以继续使用微信登录。</text>
-    <button class="primary-button" bindtap="loadAccount">重新登录</button>
+  <view wx:elif="{{loginRequired}}" class="account-error">
+    <text class="section-title">登录后完善能力档案</text>
+    <text class="muted">登录由你主动发起。成功后将进入能力档案填写流程。</text>
+    <text wx:if="{{loginFailed}}" class="account-login-error">登录没有完成，请检查网络后重试。</text>
+    <button class="primary-button" loading="{{loggingIn}}" disabled="{{loggingIn}}" bindtap="handleLogin">{{loggingIn ? '登录中' : '微信登录'}}</button>
   </view>
 
   <view wx:elif="{{loginFailed}}" class="account-error">
-    <text class="section-title">暂时无法登录</text>
-    <text class="muted">请检查网络后重新尝试。</text>
-    <button class="primary-button" bindtap="loadAccount">重新登录</button>
+    <text class="section-title">登录状态已失效</text>
+    <text class="muted">请重新登录后继续使用。</text>
+    <button class="primary-button" bindtap="handleLogin">微信登录</button>
   </view>
 
   <view wx:elif="{{user}}" class="account-content">

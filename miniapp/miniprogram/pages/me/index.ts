@@ -1,4 +1,5 @@
-import { ensureSession } from "../../services/auth";
+import { getStoredSessionToken } from "../../services/api";
+import { ensureSession, login } from "../../services/auth";
 import { formatEventDate } from "../../services/events";
 import { getCommunityTags } from "../../utils/member-growth";
 
@@ -33,8 +34,9 @@ Page({
     latestFootprint: null as FootprintItem | null,
     activitySummary: "",
     loading: true,
+    loggingIn: false,
+    loginRequired: false,
     loginFailed: false,
-    loggedOut: false,
     suppressAutoLogin: false,
   },
 
@@ -42,7 +44,7 @@ Page({
     if (options.loggedOut === "1") {
       this.setData({
         loading: false,
-        loggedOut: true,
+        loginRequired: true,
         suppressAutoLogin: true,
       });
       return;
@@ -54,6 +56,11 @@ Page({
         ...buildAccountViewData(cachedUser),
         loading: false,
       });
+      return;
+    }
+
+    if (!getStoredSessionToken()) {
+      this.setData({ loading: false, loginRequired: true });
     }
   },
 
@@ -68,18 +75,24 @@ Page({
       this.setData({
         ...buildAccountViewData(cachedUser),
         loading: false,
+        loginRequired: false,
       });
+      return;
     }
 
-    void this.loadAccount();
+    if (getStoredSessionToken()) {
+      void this.loadAccount();
+    } else {
+      this.setData({ loading: false, loginRequired: true });
+    }
   },
 
   async loadAccount() {
     const hasVisibleUser = Boolean(this.data.user);
     this.setData({
       loading: !hasVisibleUser,
+      loginRequired: false,
       loginFailed: false,
-      loggedOut: false,
     });
 
     try {
@@ -97,6 +110,31 @@ Page({
       }
 
       this.setData({ user: null, loading: false, loginFailed: true });
+    }
+  },
+
+  async handleLogin() {
+    if (this.data.loggingIn) return;
+    this.setData({
+      loggingIn: true,
+      loginFailed: false,
+    });
+
+    try {
+      const user = await login();
+      getApp<IAppOption>().globalData.currentUser = user;
+      this.setData({
+        ...buildAccountViewData(user),
+        loggingIn: false,
+        loginRequired: false,
+      });
+      await wx.navigateTo({ url: "/pages/profile/edit/index" });
+    } catch {
+      this.setData({
+        loggingIn: false,
+        loginRequired: true,
+        loginFailed: true,
+      });
     }
   },
 

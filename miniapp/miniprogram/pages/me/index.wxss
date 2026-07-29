@@ -102,6 +102,12 @@
   padding-top: 80rpx;
 }
 
+.account-login-error {
+  color: #b54708;
+  font-size: 26rpx;
+  line-height: 1.6;
+}
+
 .identity-hero {
   position: relative;
   display: flex;
