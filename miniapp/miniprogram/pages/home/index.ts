@@ -14,7 +14,7 @@ type HomeEvent = EventSummary & {
 };
 
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
-const homeShareImageUrl = "/assets/share/home-share-v1.png";
+const homeShareImageUrl = "/assets/share/home-share-v2.png";
 
 function formatBriefDate() {
   const now = new Date();
@@ -155,7 +155,7 @@ Page({
       channel: "message",
     });
     return {
-      title: "常州 AI Club｜和有趣的人一起做点新东西",
+      title: "常州 AI Club｜连接常州 AI 实践者，一起把想法做成作品",
       path: "/pages/home/index",
       imageUrl: homeShareImageUrl,
     };
@@ -166,7 +166,7 @@ Page({
       channel: "timeline",
     });
     return {
-      title: "常州 AI Club｜和有趣的人一起做点新东西",
+      title: "常州 AI Club｜连接常州 AI 实践者，一起把想法做成作品",
       imageUrl: homeShareImageUrl,
     };
   },
