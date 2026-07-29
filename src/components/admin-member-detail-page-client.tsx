@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Award, Trash2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useTransition } from "react";
+import { Tabs } from "antd";
 import { toast } from "sonner";
 
 import {
@@ -213,7 +214,7 @@ export function AdminMemberDetailPageClient({
         toast.error(
           requestError instanceof Error
             ? requestError.message
-            : "徽章移除失败。",
+            : "标签移除失败。",
         );
       }
     });
@@ -273,503 +274,570 @@ export function AdminMemberDetailPageClient({
       {isLoading ? <AdminNotice>正在加载成员详情...</AdminNotice> : null}
 
       {member ? (
-        <>
-          {member.availableAdminRoles.length > 0 ? (
-            <AdminPanel>
-              <AdminPanelHeader eyebrow="Admin Roles" title="后台角色" />
-              <AdminPanelBody>
-                <form
-                  className="grid gap-4"
-                  onSubmit={(formEvent) => {
-                    formEvent.preventDefault();
-                    handleRolesSubmit(new FormData(formEvent.currentTarget));
-                  }}
-                >
-                  <div className="grid gap-3 md:grid-cols-2">
-                    {member.availableAdminRoles.map((role) => {
-                      const isAssigned = member.adminRoles.some(
-                        (assignment) => assignment.roleId === role.id,
-                      );
+        <Tabs
+          defaultActiveKey="overview"
+          items={[
+            ...(member.availableAdminRoles.length > 0
+              ? [
+                  {
+                    key: "roles",
+                    label: `后台角色（${member.adminRoles.length}）`,
+                    children: (
+                      <AdminPanel>
+                        <AdminPanelHeader
+                          eyebrow="Admin Roles"
+                          title="后台角色"
+                        />
+                        <AdminPanelBody>
+                          <form
+                            className="grid gap-4"
+                            onSubmit={(formEvent) => {
+                              formEvent.preventDefault();
+                              handleRolesSubmit(
+                                new FormData(formEvent.currentTarget),
+                              );
+                            }}
+                          >
+                            <div className="grid gap-3 md:grid-cols-2">
+                              {member.availableAdminRoles.map((role) => {
+                                const isAssigned = member.adminRoles.some(
+                                  (assignment) => assignment.roleId === role.id,
+                                );
 
-                      return (
-                        <AdminCheckboxRow key={role.id}>
+                                return (
+                                  <AdminCheckboxRow key={role.id}>
+                                    <input
+                                      type="checkbox"
+                                      name="role_id"
+                                      value={role.id}
+                                      defaultChecked={isAssigned}
+                                      className="size-4 accent-[var(--primary)]"
+                                    />
+                                    <span>
+                                      <strong>{role.name}</strong>
+                                      {role.description ? (
+                                        <small className="mt-1 block text-muted-foreground">
+                                          {role.description}
+                                        </small>
+                                      ) : null}
+                                    </span>
+                                  </AdminCheckboxRow>
+                                );
+                              })}
+                            </div>
+
+                            <AdminField label="授权备注">
+                              <Input
+                                name="note"
+                                placeholder="例如：负责 6 月活动发布"
+                              />
+                            </AdminField>
+
+                            <div className="flex flex-wrap gap-2">
+                              <Button type="submit" disabled={isPending}>
+                                {isPending ? "保存中..." : "保存后台角色"}
+                              </Button>
+                            </div>
+                          </form>
+                        </AdminPanelBody>
+                      </AdminPanel>
+                    ),
+                  },
+                ]
+              : []),
+
+            {
+              key: "tags",
+              label: `社区标签（${data?.badgeAwards.length ?? 0}）`,
+              children: (
+                <AdminPanel>
+                  <AdminPanelHeader eyebrow="Member Tags" title="社区标签" />
+                  <AdminPanelBody className="space-y-4">
+                    {data?.badgeAwards.length ? (
+                      <div className="divide-y divide-border/70 border-y border-border/70">
+                        {data.badgeAwards.map((badge) => (
+                          <div
+                            key={badge.id}
+                            className="flex items-center gap-3 py-3"
+                          >
+                            <Award
+                              className="size-4 shrink-0 text-primary"
+                              aria-hidden="true"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-foreground">
+                                {badge.label}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {badge.description ?? "社区授予的成员标签"} ·{" "}
+                                {formatDate(badge.awarded_at)}
+                              </p>
+                            </div>
+                            <Button
+                              type="button"
+                              size="icon"
+                              variant="ghost"
+                              title={`移除${badge.label}`}
+                              aria-label={`移除${badge.label}`}
+                              disabled={isPending}
+                              onClick={() =>
+                                handleBadgeRemove(badge.id, badge.label)
+                              }
+                            >
+                              <Trash2 className="size-4" aria-hidden="true" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <AdminNotice>
+                        尚未人工添加社区标签。基于签到自动生成的标签不在这里重复显示。
+                      </AdminNotice>
+                    )}
+
+                    <form
+                      className="grid gap-4 md:grid-cols-[minmax(0,0.5fr)_minmax(0,1fr)_auto] md:items-end"
+                      onSubmit={(formEvent) => {
+                        formEvent.preventDefault();
+                        handleBadgeSubmit(
+                          new FormData(formEvent.currentTarget),
+                        );
+                      }}
+                    >
+                      <AdminField label="标签名称">
+                        <Input
+                          name="badge_label"
+                          minLength={2}
+                          maxLength={20}
+                          required
+                          placeholder="例如：商业顾问"
+                        />
+                      </AdminField>
+                      <AdminField label="授予说明">
+                        <Input
+                          name="badge_description"
+                          maxLength={100}
+                          placeholder="说明标签对应的角色或贡献"
+                        />
+                      </AdminField>
+                      <Button type="submit" disabled={isPending}>
+                        <Award className="size-4" aria-hidden="true" />
+                        {isPending ? "处理中..." : "添加标签"}
+                      </Button>
+                    </form>
+                  </AdminPanelBody>
+                </AdminPanel>
+              ),
+            },
+
+            {
+              key: "overview",
+              label: "成员概览",
+              children: (
+                <AdminPanel>
+                  <AdminPanelHeader eyebrow="Profile" title="成员概览" />
+                  <AdminPanelBody className="space-y-4">
+                    <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+                      <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/20 p-4">
+                        <div className="flex items-start gap-3">
+                          <MemberAvatar
+                            name={member.displayName}
+                            avatarUrl={member.avatarUrl}
+                            size="sm"
+                          />
+                          <div className="grid gap-1">
+                            <h3 className="text-base font-semibold text-foreground">
+                              {member.displayName}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {member.email ?? "未提供邮箱"}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {member.wechat ?? "未填写微信号"}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              主页链接：
+                              {member.publicSlug
+                                ? `/members/${member.publicSlug}`
+                                : "未设置"}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {member.roleLabel ?? "未填写身份"}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {member.organization ??
+                                "未填写公司 / 学校 / 团队"}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {member.city}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid gap-3">
+                        <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                          <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                            参与概况
+                          </p>
+                          <div className="mt-3 grid gap-2 text-sm text-muted-foreground">
+                            <p>加入时间：{formatDate(member.joinedAt)}</p>
+                            <p>最近活跃：{formatDate(member.lastActiveAt)}</p>
+                            <p>活动报名：{member.registrationCount} 次</p>
+                            <p>
+                              每月可投入时间：{member.monthlyTime ?? "未填写"}
+                            </p>
+                            <p>
+                              能力档案：{member.profileCompletion.percent}%
+                              {member.profileCompletion.completed
+                                ? "（已完成）"
+                                : `（待补充 ${member.profileCompletion.missingItems.join("、")}）`}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                          <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                            参与意愿
+                          </p>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <AdminStatusBadge tone="neutral">
+                              {member.willingToAttend
+                                ? "愿意参加线下活动"
+                                : "暂不参加线下活动"}
+                            </AdminStatusBadge>
+                            <AdminStatusBadge tone="neutral">
+                              {member.willingToShare ? "愿意分享" : "暂不分享"}
+                            </AdminStatusBadge>
+                            <AdminStatusBadge tone="scheduled">
+                              {member.willingToJoinProjects
+                                ? "愿意共建"
+                                : "暂不共建"}
+                            </AdminStatusBadge>
+                            <AdminStatusBadge tone="completed">
+                              {member.isCoBuilder ? "共建成员" : "普通成员"}
+                            </AdminStatusBadge>
+                            <AdminStatusBadge tone="neutral">
+                              {member.isPubliclyVisible
+                                ? "公开展示中"
+                                : "未公开展示"}
+                            </AdminStatusBadge>
+                            <AdminStatusBadge tone="scheduled">
+                              {member.isFeaturedOnHome
+                                ? "首页展示中"
+                                : "未在首页展示"}
+                            </AdminStatusBadge>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                      <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                        个人介绍
+                      </p>
+                      <p className="mt-3 text-sm text-muted-foreground">
+                        {member.bio ?? "这位成员还没有补充个人介绍。"}
+                      </p>
+                    </div>
+
+                    {member.skills.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {member.skills.map((skill) => (
+                          <ToneBadge
+                            key={`${member.id}-${skill}`}
+                            label={skill}
+                          />
+                        ))}
+                      </div>
+                    ) : (
+                      <AdminNotice>这位成员尚未补充技能标签。</AdminNotice>
+                    )}
+
+                    {member.industryTags.length > 0 ? (
+                      <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                        <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                          行业方向
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {member.industryTags.map((industry) => (
+                            <ToneBadge
+                              key={`${member.id}-${industry}`}
+                              label={industry}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {member.capabilitySummary || member.seekingSummary ? (
+                      <div className="grid gap-3 md:grid-cols-2">
+                        <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                          <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                            可提供能力
+                          </p>
+                          <p className="mt-3 text-sm text-muted-foreground">
+                            {member.capabilitySummary ?? "未填写"}
+                          </p>
+                        </div>
+                        <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                          <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                            当前需要
+                          </p>
+                          <p className="mt-3 text-sm text-muted-foreground">
+                            {member.seekingSummary ?? "未填写"}
+                          </p>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {member.interests.length > 0 ? (
+                      <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
+                        <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                          感兴趣的主题
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {member.interests.map((interest) => (
+                            <ToneBadge
+                              key={`${member.id}-${interest}`}
+                              label={interest}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ) : null}
+                  </AdminPanelBody>
+                </AdminPanel>
+              ),
+            },
+
+            {
+              key: "profile",
+              label: "编辑资料",
+              children: (
+                <AdminPanel>
+                  <AdminPanelHeader
+                    eyebrow="Edit Profile"
+                    title="成员基础资料"
+                  />
+                  <AdminPanelBody>
+                    <form
+                      className="grid gap-4"
+                      onSubmit={(formEvent) => {
+                        formEvent.preventDefault();
+                        handleSubmit(new FormData(formEvent.currentTarget));
+                      }}
+                    >
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <AdminField label="显示名">
+                          <Input
+                            name="display_name"
+                            defaultValue={
+                              member.displayName === "未填写显示名"
+                                ? ""
+                                : member.displayName
+                            }
+                            placeholder="比如：张三"
+                          />
+                        </AdminField>
+
+                        <AdminField label="微信号">
+                          <Input
+                            name="wechat"
+                            defaultValue={member.wechat ?? ""}
+                            placeholder="用于联系"
+                          />
+                        </AdminField>
+
+                        <AdminField label="个人主页链接">
+                          <Input
+                            name="public_slug"
+                            defaultValue={member.publicSlug ?? ""}
+                            placeholder="例如：zhangsan-ai"
+                          />
+                        </AdminField>
+
+                        <AdminField label="城市">
+                          <Input
+                            name="city"
+                            defaultValue={member.city}
+                            placeholder="常州"
+                          />
+                        </AdminField>
+
+                        <AdminField label="身份 / 角色">
+                          <Input
+                            name="role_label"
+                            defaultValue={member.roleLabel ?? ""}
+                            placeholder="例如：开发者 / 产品经理 / 创业者 / 学生"
+                          />
+                        </AdminField>
+
+                        <AdminField label="公司 / 学校 / 团队">
+                          <Input
+                            name="organization"
+                            defaultValue={member.organization ?? ""}
+                            placeholder="例如：SenseLeap.ai / 常州大学 / 独立开发"
+                          />
+                        </AdminField>
+
+                        <AdminField label="每月可投入时间">
+                          <Input
+                            name="monthly_time"
+                            defaultValue={member.monthlyTime ?? ""}
+                            placeholder="例如：每周 2 小时 / 每月参加 1 次活动"
+                          />
+                        </AdminField>
+
+                        <AdminField label="成员状态">
+                          <NativeSelect
+                            name="status"
+                            defaultValue={member.status}
+                          >
+                            <option value="pending">pending</option>
+                            <option value="active">active</option>
+                            <option value="organizer">organizer</option>
+                            <option value="admin">admin</option>
+                            <option value="paused">paused</option>
+                          </NativeSelect>
+                        </AdminField>
+
+                        <AdminCheckboxRow className="self-end">
                           <input
                             type="checkbox"
-                            name="role_id"
-                            value={role.id}
-                            defaultChecked={isAssigned}
+                            name="is_publicly_visible"
+                            defaultChecked={member.isPubliclyVisible}
                             className="size-4 accent-[var(--primary)]"
                           />
-                          <span>
-                            <strong>{role.name}</strong>
-                            {role.description ? (
-                              <small className="mt-1 block text-muted-foreground">
-                                {role.description}
-                              </small>
-                            ) : null}
-                          </span>
+                          <span>公开展示到成员页</span>
                         </AdminCheckboxRow>
-                      );
-                    })}
-                  </div>
 
-                  <AdminField label="授权备注">
-                    <Input name="note" placeholder="例如：负责 6 月活动发布" />
-                  </AdminField>
+                        <AdminCheckboxRow className="self-end">
+                          <input
+                            type="checkbox"
+                            name="is_co_builder"
+                            defaultChecked={member.isCoBuilder}
+                            className="size-4 accent-[var(--primary)]"
+                          />
+                          <span>标记为已参与共建成员</span>
+                        </AdminCheckboxRow>
 
-                  <div className="flex flex-wrap gap-2">
-                    <Button type="submit" disabled={isPending}>
-                      {isPending ? "保存中..." : "保存后台角色"}
-                    </Button>
-                  </div>
-                </form>
-              </AdminPanelBody>
-            </AdminPanel>
-          ) : null}
+                        <AdminCheckboxRow className="self-end">
+                          <input
+                            type="checkbox"
+                            name="is_featured_on_home"
+                            defaultChecked={member.isFeaturedOnHome}
+                            className="size-4 accent-[var(--primary)]"
+                          />
+                          <span>展示到首页成员区</span>
+                        </AdminCheckboxRow>
 
-          <AdminPanel>
-            <AdminPanelHeader eyebrow="Member Tags" title="社区标签" />
-            <AdminPanelBody className="space-y-4">
-              {data?.badgeAwards.length ? (
-                <div className="divide-y divide-border/70 border-y border-border/70">
-                  {data.badgeAwards.map((badge) => (
-                    <div
-                      key={badge.id}
-                      className="flex items-center gap-3 py-3"
-                    >
-                      <Award
-                        className="size-4 shrink-0 text-primary"
-                        aria-hidden="true"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium text-foreground">
-                          {badge.label}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {badge.description ?? "社区授予的成员标签"} ·{" "}
-                          {formatDate(badge.awarded_at)}
-                        </p>
+                        <AdminField label="技能标签" className="md:col-span-2">
+                          <Input
+                            name="skills"
+                            defaultValue={member.skills.join("，")}
+                            placeholder="例如：Agent，RAG，前端工程，自动化工作流"
+                          />
+                        </AdminField>
+
+                        <AdminField label="行业方向" className="md:col-span-2">
+                          <Input
+                            name="industry_tags"
+                            defaultValue={member.industryTags.join("，")}
+                            placeholder="例如：制造业，软件与信息服务，企业服务"
+                          />
+                        </AdminField>
+
+                        <AdminField
+                          label="可提供能力"
+                          className="md:col-span-2"
+                        >
+                          <Textarea
+                            name="capability_summary"
+                            defaultValue={member.capabilitySummary ?? ""}
+                            rows={3}
+                            placeholder="成员可以分享、咨询、开发或连接的具体能力"
+                          />
+                        </AdminField>
+
+                        <AdminField label="当前需要" className="md:col-span-2">
+                          <Textarea
+                            name="seeking_summary"
+                            defaultValue={member.seekingSummary ?? ""}
+                            rows={3}
+                            placeholder="成员当前希望获得的场景、资源或合作方向"
+                          />
+                        </AdminField>
+
+                        <AdminField
+                          label="感兴趣的主题"
+                          className="md:col-span-2"
+                        >
+                          <Input
+                            name="interests"
+                            defaultValue={member.interests.join("，")}
+                            placeholder="例如：LLM 应用，自动化工作流，项目交付"
+                          />
+                        </AdminField>
+
+                        <AdminField label="个人简介" className="md:col-span-2">
+                          <Textarea
+                            name="bio"
+                            defaultValue={member.bio ?? ""}
+                            rows={5}
+                            placeholder="简单介绍一下这位成员的方向、经验，或者你们在线下交流中形成的了解。"
+                          />
+                        </AdminField>
                       </div>
-                      <Button
-                        type="button"
-                        size="icon"
-                        variant="ghost"
-                        title={`移除${badge.label}`}
-                        aria-label={`移除${badge.label}`}
-                        disabled={isPending}
-                        onClick={() => handleBadgeRemove(badge.id, badge.label)}
-                      >
-                        <Trash2 className="size-4" aria-hidden="true" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <AdminNotice>
-                  尚未人工添加社区标签。基于签到自动生成的标签不在这里重复显示。
-                </AdminNotice>
-              )}
 
-              <form
-                className="grid gap-4 md:grid-cols-[minmax(0,0.5fr)_minmax(0,1fr)_auto] md:items-end"
-                onSubmit={(formEvent) => {
-                  formEvent.preventDefault();
-                  handleBadgeSubmit(new FormData(formEvent.currentTarget));
-                }}
-              >
-                <AdminField label="标签名称">
-                  <Input
-                    name="badge_label"
-                    minLength={2}
-                    maxLength={20}
-                    required
-                    placeholder="例如：商业顾问"
-                  />
-                </AdminField>
-                <AdminField label="授予说明">
-                  <Input
-                    name="badge_description"
-                    maxLength={100}
-                    placeholder="说明这枚徽章对应的贡献"
-                  />
-                </AdminField>
-                <Button type="submit" disabled={isPending}>
-                  <Award className="size-4" aria-hidden="true" />
-                  {isPending ? "处理中..." : "添加标签"}
-                </Button>
-              </form>
-            </AdminPanelBody>
-          </AdminPanel>
+                      <div className="grid gap-2 md:grid-cols-3">
+                        <AdminCheckboxRow>
+                          <input
+                            type="checkbox"
+                            name="willing_to_attend"
+                            defaultChecked={member.willingToAttend}
+                            className="size-4 accent-[var(--primary)]"
+                          />
+                          <span>愿意参加线下活动</span>
+                        </AdminCheckboxRow>
 
-          <AdminPanel>
-            <AdminPanelHeader eyebrow="Profile" title="成员概览" />
-            <AdminPanelBody className="space-y-4">
-              <div className="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-                <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/20 p-4">
-                  <div className="flex items-start gap-3">
-                    <MemberAvatar
-                      name={member.displayName}
-                      avatarUrl={member.avatarUrl}
-                      size="sm"
-                    />
-                    <div className="grid gap-1">
-                      <h3 className="text-base font-semibold text-foreground">
-                        {member.displayName}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">
-                        {member.email ?? "未提供邮箱"}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {member.wechat ?? "未填写微信号"}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        主页链接：
-                        {member.publicSlug
-                          ? `/members/${member.publicSlug}`
-                          : "未设置"}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {member.roleLabel ?? "未填写身份"}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {member.organization ?? "未填写公司 / 学校 / 团队"}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        {member.city}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                        <AdminCheckboxRow>
+                          <input
+                            type="checkbox"
+                            name="willing_to_share"
+                            defaultChecked={member.willingToShare}
+                            className="size-4 accent-[var(--primary)]"
+                          />
+                          <span>愿意在社区活动里做主题分享</span>
+                        </AdminCheckboxRow>
 
-                <div className="grid gap-3">
-                  <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
-                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                      参与概况
-                    </p>
-                    <div className="mt-3 grid gap-2 text-sm text-muted-foreground">
-                      <p>加入时间：{formatDate(member.joinedAt)}</p>
-                      <p>最近活跃：{formatDate(member.lastActiveAt)}</p>
-                      <p>活动报名：{member.registrationCount} 次</p>
-                      <p>每月可投入时间：{member.monthlyTime ?? "未填写"}</p>
-                      <p>
-                        能力档案：{member.profileCompletion.percent}%
-                        {member.profileCompletion.completed
-                          ? "（已完成）"
-                          : `（待补充 ${member.profileCompletion.missingItems.join("、")}）`}
-                      </p>
-                    </div>
-                  </div>
+                        <AdminCheckboxRow>
+                          <input
+                            type="checkbox"
+                            name="willing_to_join_projects"
+                            defaultChecked={member.willingToJoinProjects}
+                            className="size-4 accent-[var(--primary)]"
+                          />
+                          <span>如有合适项目，愿意参与协作</span>
+                        </AdminCheckboxRow>
+                      </div>
 
-                  <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
-                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                      参与意愿
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <AdminStatusBadge tone="neutral">
-                        {member.willingToAttend
-                          ? "愿意参加线下活动"
-                          : "暂不参加线下活动"}
-                      </AdminStatusBadge>
-                      <AdminStatusBadge tone="neutral">
-                        {member.willingToShare ? "愿意分享" : "暂不分享"}
-                      </AdminStatusBadge>
-                      <AdminStatusBadge tone="scheduled">
-                        {member.willingToJoinProjects ? "愿意共建" : "暂不共建"}
-                      </AdminStatusBadge>
-                      <AdminStatusBadge tone="completed">
-                        {member.isCoBuilder ? "共建成员" : "普通成员"}
-                      </AdminStatusBadge>
-                      <AdminStatusBadge tone="neutral">
-                        {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
-                      </AdminStatusBadge>
-                      <AdminStatusBadge tone="scheduled">
-                        {member.isFeaturedOnHome
-                          ? "首页展示中"
-                          : "未在首页展示"}
-                      </AdminStatusBadge>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
-                <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                  个人介绍
-                </p>
-                <p className="mt-3 text-sm text-muted-foreground">
-                  {member.bio ?? "这位成员还没有补充个人介绍。"}
-                </p>
-              </div>
-
-              {member.skills.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {member.skills.map((skill) => (
-                    <ToneBadge key={`${member.id}-${skill}`} label={skill} />
-                  ))}
-                </div>
-              ) : (
-                <AdminNotice>这位成员尚未补充技能标签。</AdminNotice>
-              )}
-
-              {member.industryTags.length > 0 ? (
-                <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                    行业方向
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {member.industryTags.map((industry) => (
-                      <ToneBadge
-                        key={`${member.id}-${industry}`}
-                        label={industry}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-
-              {member.capabilitySummary || member.seekingSummary ? (
-                <div className="grid gap-3 md:grid-cols-2">
-                  <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
-                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                      可提供能力
-                    </p>
-                    <p className="mt-3 text-sm text-muted-foreground">
-                      {member.capabilitySummary ?? "未填写"}
-                    </p>
-                  </div>
-                  <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
-                    <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                      当前需要
-                    </p>
-                    <p className="mt-3 text-sm text-muted-foreground">
-                      {member.seekingSummary ?? "未填写"}
-                    </p>
-                  </div>
-                </div>
-              ) : null}
-
-              {member.interests.length > 0 ? (
-                <div className="rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
-                  <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">
-                    感兴趣的主题
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {member.interests.map((interest) => (
-                      <ToneBadge
-                        key={`${member.id}-${interest}`}
-                        label={interest}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-            </AdminPanelBody>
-          </AdminPanel>
-
-          <AdminPanel>
-            <AdminPanelHeader eyebrow="Edit Profile" title="成员基础资料" />
-            <AdminPanelBody>
-              <form
-                className="grid gap-4"
-                onSubmit={(formEvent) => {
-                  formEvent.preventDefault();
-                  handleSubmit(new FormData(formEvent.currentTarget));
-                }}
-              >
-                <div className="grid gap-4 md:grid-cols-2">
-                  <AdminField label="显示名">
-                    <Input
-                      name="display_name"
-                      defaultValue={
-                        member.displayName === "未填写显示名"
-                          ? ""
-                          : member.displayName
-                      }
-                      placeholder="比如：张三"
-                    />
-                  </AdminField>
-
-                  <AdminField label="微信号">
-                    <Input
-                      name="wechat"
-                      defaultValue={member.wechat ?? ""}
-                      placeholder="用于联系"
-                    />
-                  </AdminField>
-
-                  <AdminField label="个人主页链接">
-                    <Input
-                      name="public_slug"
-                      defaultValue={member.publicSlug ?? ""}
-                      placeholder="例如：zhangsan-ai"
-                    />
-                  </AdminField>
-
-                  <AdminField label="城市">
-                    <Input
-                      name="city"
-                      defaultValue={member.city}
-                      placeholder="常州"
-                    />
-                  </AdminField>
-
-                  <AdminField label="身份 / 角色">
-                    <Input
-                      name="role_label"
-                      defaultValue={member.roleLabel ?? ""}
-                      placeholder="例如：开发者 / 产品经理 / 创业者 / 学生"
-                    />
-                  </AdminField>
-
-                  <AdminField label="公司 / 学校 / 团队">
-                    <Input
-                      name="organization"
-                      defaultValue={member.organization ?? ""}
-                      placeholder="例如：SenseLeap.ai / 常州大学 / 独立开发"
-                    />
-                  </AdminField>
-
-                  <AdminField label="每月可投入时间">
-                    <Input
-                      name="monthly_time"
-                      defaultValue={member.monthlyTime ?? ""}
-                      placeholder="例如：每周 2 小时 / 每月参加 1 次活动"
-                    />
-                  </AdminField>
-
-                  <AdminField label="成员状态">
-                    <NativeSelect name="status" defaultValue={member.status}>
-                      <option value="pending">pending</option>
-                      <option value="active">active</option>
-                      <option value="organizer">organizer</option>
-                      <option value="admin">admin</option>
-                      <option value="paused">paused</option>
-                    </NativeSelect>
-                  </AdminField>
-
-                  <AdminCheckboxRow className="self-end">
-                    <input
-                      type="checkbox"
-                      name="is_publicly_visible"
-                      defaultChecked={member.isPubliclyVisible}
-                      className="size-4 accent-[var(--primary)]"
-                    />
-                    <span>公开展示到成员页</span>
-                  </AdminCheckboxRow>
-
-                  <AdminCheckboxRow className="self-end">
-                    <input
-                      type="checkbox"
-                      name="is_co_builder"
-                      defaultChecked={member.isCoBuilder}
-                      className="size-4 accent-[var(--primary)]"
-                    />
-                    <span>标记为已参与共建成员</span>
-                  </AdminCheckboxRow>
-
-                  <AdminCheckboxRow className="self-end">
-                    <input
-                      type="checkbox"
-                      name="is_featured_on_home"
-                      defaultChecked={member.isFeaturedOnHome}
-                      className="size-4 accent-[var(--primary)]"
-                    />
-                    <span>展示到首页成员区</span>
-                  </AdminCheckboxRow>
-
-                  <AdminField label="技能标签" className="md:col-span-2">
-                    <Input
-                      name="skills"
-                      defaultValue={member.skills.join("，")}
-                      placeholder="例如：Agent，RAG，前端工程，自动化工作流"
-                    />
-                  </AdminField>
-
-                  <AdminField label="行业方向" className="md:col-span-2">
-                    <Input
-                      name="industry_tags"
-                      defaultValue={member.industryTags.join("，")}
-                      placeholder="例如：制造业，软件与信息服务，企业服务"
-                    />
-                  </AdminField>
-
-                  <AdminField label="可提供能力" className="md:col-span-2">
-                    <Textarea
-                      name="capability_summary"
-                      defaultValue={member.capabilitySummary ?? ""}
-                      rows={3}
-                      placeholder="成员可以分享、咨询、开发或连接的具体能力"
-                    />
-                  </AdminField>
-
-                  <AdminField label="当前需要" className="md:col-span-2">
-                    <Textarea
-                      name="seeking_summary"
-                      defaultValue={member.seekingSummary ?? ""}
-                      rows={3}
-                      placeholder="成员当前希望获得的场景、资源或合作方向"
-                    />
-                  </AdminField>
-
-                  <AdminField label="感兴趣的主题" className="md:col-span-2">
-                    <Input
-                      name="interests"
-                      defaultValue={member.interests.join("，")}
-                      placeholder="例如：LLM 应用，自动化工作流，项目交付"
-                    />
-                  </AdminField>
-
-                  <AdminField label="个人简介" className="md:col-span-2">
-                    <Textarea
-                      name="bio"
-                      defaultValue={member.bio ?? ""}
-                      rows={5}
-                      placeholder="简单介绍一下这位成员的方向、经验，或者你们在线下交流中形成的了解。"
-                    />
-                  </AdminField>
-                </div>
-
-                <div className="grid gap-2 md:grid-cols-3">
-                  <AdminCheckboxRow>
-                    <input
-                      type="checkbox"
-                      name="willing_to_attend"
-                      defaultChecked={member.willingToAttend}
-                      className="size-4 accent-[var(--primary)]"
-                    />
-                    <span>愿意参加线下活动</span>
-                  </AdminCheckboxRow>
-
-                  <AdminCheckboxRow>
-                    <input
-                      type="checkbox"
-                      name="willing_to_share"
-                      defaultChecked={member.willingToShare}
-                      className="size-4 accent-[var(--primary)]"
-                    />
-                    <span>愿意在社区活动里做主题分享</span>
-                  </AdminCheckboxRow>
-
-                  <AdminCheckboxRow>
-                    <input
-                      type="checkbox"
-                      name="willing_to_join_projects"
-                      defaultChecked={member.willingToJoinProjects}
-                      className="size-4 accent-[var(--primary)]"
-                    />
-                    <span>如有合适项目，愿意参与协作</span>
-                  </AdminCheckboxRow>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  <Button type="submit" disabled={isPending}>
-                    {isPending ? "保存中..." : "保存成员资料"}
-                  </Button>
-                </div>
-              </form>
-            </AdminPanelBody>
-          </AdminPanel>
-        </>
+                      <div className="flex flex-wrap gap-2">
+                        <Button type="submit" disabled={isPending}>
+                          {isPending ? "保存中..." : "保存成员资料"}
+                        </Button>
+                      </div>
+                    </form>
+                  </AdminPanelBody>
+                </AdminPanel>
+              ),
+            },
+          ].sort(
+            (left, right) =>
+              ["overview", "profile", "tags", "roles"].indexOf(left.key) -
+              ["overview", "profile", "tags", "roles"].indexOf(right.key),
+          )}
+        />
       ) : null}
     </AdminPageStack>
   );
