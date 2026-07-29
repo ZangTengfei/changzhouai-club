@@ -1398,7 +1398,7 @@
   padding: 34px 48px 0;
   border: 0;
   border-radius: var(--radius-lg);
-  background: var(--home-purple-soft);
+  background: var(--home-orange-soft);
   box-shadow: var(--shadow-md);
   isolation: isolate;
 }
