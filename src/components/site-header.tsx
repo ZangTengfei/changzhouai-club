@@ -8,7 +8,7 @@ import { MobileMenuToggle } from "@/components/mobile-menu-toggle";
 import { SiteAccountEntry } from "@/components/site-account-entry";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { hasSupabaseEnv } from "@/lib/env";
-import { navItems, siteNameEn } from "@/lib/site-data";
+import { navItems } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
 
 function isMobileNavigationMode() {
@@ -94,8 +94,8 @@ export function SiteHeader() {
             <SiteLogoMark className="block size-full object-contain" />
           </span>
           <span className="flex flex-col gap-0.5">
-            <strong className="font-[var(--font-display)] text-base leading-[1.1] font-[760] text-[#111b1f] max-sm:text-[0.94rem]">常州 AI Club</strong>
-            <small className="font-[var(--font-latin-rounded)] text-[0.8rem] leading-[1.1] font-medium text-[rgba(var(--ink-rgb),0.5)] max-sm:text-[0.76rem]">{siteNameEn}</small>
+            <strong className="font-[var(--font-display)] text-base leading-[1.1] font-extrabold text-[#111b1f] max-sm:text-[0.94rem]">常州 AI Club</strong>
+            <small className="font-[var(--font-display)] text-[0.8rem] leading-[1.1] font-semibold text-[rgba(var(--ink-rgb),0.6)] max-sm:text-[0.76rem]">OPC 共创社区</small>
           </span>
         </Link>
 
