@@ -18,6 +18,8 @@ type UpcomingEvent = {
   slug: string;
   registration_note?: string | null;
   registration_url?: string | null;
+  registration_mode?: string | null;
+  registration_capacity?: number | null;
   event_type?: string | null;
   eventTypeLabel?: string;
 };
@@ -40,7 +42,7 @@ function formatEventDateTime(value: string | null) {
 export function EventRegistrationForm({
   event,
   authState,
-  isRegistered,
+  registrationStatus,
   redirectTo,
   showDetailLink = true,
   showEventSlug = true,
@@ -48,7 +50,7 @@ export function EventRegistrationForm({
 }: {
   event: UpcomingEvent;
   authState: "loading" | "logged_out" | "logged_in";
-  isRegistered: boolean;
+  registrationStatus: string | null;
   redirectTo?: string;
   showDetailLink?: boolean;
   showEventSlug?: boolean;
@@ -88,6 +90,18 @@ export function EventRegistrationForm({
       <p>{event.summary ?? "这是一场已经开放报名的社区活动。"}</p>
       <ul className="detail-list">
         <li>地点：{event.venue ?? "待公布"}</li>
+        <li>
+          名额：
+          {event.registration_capacity
+            ? `限 ${event.registration_capacity} 人`
+            : "不限人数"}
+        </li>
+        <li>
+          报名：
+          {event.registration_mode === "review"
+            ? "提交后由组织方审核"
+            : "提交后立即确认"}
+        </li>
         {showEventSlug ? <li>活动标识：{event.slug}</li> : null}
       </ul>
       {registrationNote ? <div className="note-strip">{registrationNote}</div> : null}
@@ -103,8 +117,14 @@ export function EventRegistrationForm({
             {getExternalRegistrationLabel(externalRegistrationUrl)}
           </a>
         </div>
-      ) : isRegistered ? (
-        <div className="note-strip">你已经报名这场活动了，可以去账号页查看报名记录。</div>
+      ) : registrationStatus ? (
+        <div className="note-strip">
+          {registrationStatus === "pending"
+            ? "报名申请已提交，正在等待组织方审核。"
+            : registrationStatus === "waitlisted"
+              ? "当前确认名额已满，你已进入候补。"
+              : "你已经报名这场活动了，可以去账号页查看报名记录。"}
+        </div>
       ) : authState === "logged_in" ? (
         <form action={registerForEvent} className="registration-form">
           <input type="hidden" name="event_id" value={event.id} />
@@ -119,7 +139,9 @@ export function EventRegistrationForm({
             />
           </label>
           <button type="submit" className="button">
-            报名这场活动
+            {event.registration_mode === "review"
+              ? "提交报名申请"
+              : "报名这场活动"}
           </button>
         </form>
       ) : authState === "loading" ? (

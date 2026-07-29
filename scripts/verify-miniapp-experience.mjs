@@ -244,6 +244,8 @@ try {
       summary: "仅用于自动化验收，完成后自动删除。",
       status: "scheduled",
       event_type: "community",
+      registration_mode: "review",
+      registration_capacity: 1,
       event_at: new Date(Date.now() + 48 * 60 * 60 * 1_000).toISOString(),
       city: "常州",
       venue: "自动化测试场地",
@@ -252,11 +254,6 @@ try {
     .single();
   if (createEventError) throw createEventError;
   temporaryEventId = event.id;
-
-  const { error: seedRegistrationError } = await supabase
-    .from("event_registrations")
-    .insert({ event_id: event.id, user_id: userId, status: "registered" });
-  if (seedRegistrationError) throw seedRegistrationError;
 
   const { error: badgeError } = await supabase
     .from("member_badge_awards")
@@ -299,7 +296,39 @@ try {
     },
   );
   assert.equal(registrationPut.response.status, 200);
-  assert.equal(registrationPut.body?.registration?.status, "registered");
+  assert.equal(registrationPut.body?.registration?.status, "pending");
+  pass("event_registration_pending_review");
+
+  const { data: approvedRegistration, error: approveRegistrationError } =
+    await supabase
+      .rpc("set_event_registration_status", {
+        p_event_id: event.id,
+        p_registration_id: registrationPut.body?.registration?.id,
+        p_status: "registered",
+      })
+      .single();
+  if (approveRegistrationError) throw approveRegistrationError;
+  assert.equal(approvedRegistration?.status, "registered");
+
+  const repeatedRegistrationPut = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
+    {
+      method: "PUT",
+      headers: authHeaders,
+      body: JSON.stringify({
+        note: "自动化验收",
+        registrationConsentAccepted: true,
+        portraitConsentAccepted: true,
+        registrationConsentVersion: eventRegistrationConsentVersion,
+        portraitConsentVersion: eventPortraitConsentVersion,
+      }),
+    },
+  );
+  assert.equal(repeatedRegistrationPut.response.status, 200);
+  assert.equal(
+    repeatedRegistrationPut.body?.registration?.status,
+    "registered",
+  );
   pass("event_registered_idempotently");
 
   const { data: eventConsents, error: eventConsentsError } = await supabase

@@ -168,7 +168,7 @@ function CompactEventCard({ item }: { item: CompletedEventRecap }) {
 export default async function EventsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ registered?: string; error?: string }>;
+  searchParams: Promise<{ registration?: string; error?: string }>;
 }) {
   const params = await searchParams;
   const [completedEvents, scheduledEvents] = await Promise.all([
@@ -188,8 +188,14 @@ export default async function EventsPage({
       : null;
   return (
     <div className="grid gap-7 max-sm:gap-[22px]" data-events-page>
-      {params.registered ? (
-        <div className="rounded-[var(--radius-md)] border border-dashed border-[rgba(var(--accent-rgb),0.28)] bg-[rgba(var(--accent-rgb),0.08)] px-[18px] py-4 font-extrabold text-[var(--accent-strong)]">报名成功，已经写入你的社区账号记录。</div>
+      {params.registration ? (
+        <div className="rounded-[var(--radius-md)] border border-dashed border-[rgba(var(--accent-rgb),0.28)] bg-[rgba(var(--accent-rgb),0.08)] px-[18px] py-4 font-extrabold text-[var(--accent-strong)]">
+          {params.registration === "pending"
+            ? "报名申请已提交，请等待组织方审核。"
+            : params.registration === "waitlisted"
+              ? "当前确认名额已满，你已进入候补。"
+              : "报名成功，已经写入你的社区账号记录。"}
+        </div>
       ) : null}
 
       {params.error ? (

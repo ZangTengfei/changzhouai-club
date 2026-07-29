@@ -33,6 +33,8 @@ type EditableAdminEvent = {
   speaker_lineup: string | null;
   registration_note: string | null;
   registration_url: string | null;
+  registration_mode: string;
+  registration_capacity: number | null;
   event_type: string;
   recap: string | null;
   docs_url: string | null;
@@ -69,6 +71,12 @@ function toPayload(formData: FormData) {
     speaker_lineup: String(formData.get("speaker_lineup") ?? ""),
     registration_note: String(formData.get("registration_note") ?? ""),
     registration_url: String(formData.get("registration_url") ?? ""),
+    registration_mode: String(
+      formData.get("registration_mode") ?? "instant",
+    ).trim(),
+    registration_capacity: String(
+      formData.get("registration_capacity") ?? "",
+    ).trim(),
     event_type: String(formData.get("event_type") ?? "community").trim(),
     recap: String(formData.get("recap") ?? ""),
     docs_url: String(formData.get("docs_url") ?? ""),
@@ -346,7 +354,29 @@ export function AdminEventEditorFormClient({
                   label: "报名设置",
                   forceRender: true,
                   children: (
-                    <div className="grid gap-4">
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <AdminField label="报名方式">
+                        <NativeSelect
+                          name="registration_mode"
+                          defaultValue={event?.registration_mode ?? "instant"}
+                        >
+                          <option value="instant">报名即成功</option>
+                          <option value="review">提交后待审核</option>
+                        </NativeSelect>
+                      </AdminField>
+                      <AdminField label="确认人数上限">
+                        <Input
+                          type="number"
+                          name="registration_capacity"
+                          min={1}
+                          step={1}
+                          defaultValue={event?.registration_capacity ?? ""}
+                          placeholder="留空表示不限人数"
+                        />
+                      </AdminField>
+                      <AdminNotice className="md:col-span-2">
+                        即时报名达到上限后自动进入候补；审核报名会先显示待审核，确认时再校验人数上限。
+                      </AdminNotice>
                       <AdminField label="报名提示">
                         <Textarea
                           name="registration_note"

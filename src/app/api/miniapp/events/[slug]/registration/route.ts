@@ -149,25 +149,37 @@ export async function PUT(
     }
   }
 
-  const { data: registration, error } = await auth.supabase
-    .from("event_registrations")
-    .upsert(
-      {
-        event_id: event.id,
-        user_id: userId,
-        note: note || null,
-        status: "registered",
-      },
-      { onConflict: "event_id,user_id" },
-    )
-    .select("id, status, note, created_at")
+  const { data: registrationData, error } = await auth.supabase
+    .rpc("submit_event_registration", {
+      p_event_id: event.id,
+      p_user_id: userId,
+      p_note: note || null,
+    })
     .single();
 
-  if (error) {
-    return miniappJson({ error: "registration_save_failed" }, 500);
+  if (error || !registrationData) {
+    const errorMessage = error?.message ?? "";
+    const errorCode = errorMessage.includes("registration_closed")
+      ? "registration_closed"
+      : errorMessage.includes("external_registration_required")
+        ? "external_registration_required"
+        : errorMessage.includes("invalid_registration_note")
+          ? "invalid_registration_note"
+          : "registration_save_failed";
+    return miniappJson(
+      { error: errorCode },
+      errorCode === "registration_save_failed" ? 500 : 409,
+    );
   }
 
-  if (existing?.status !== "registered") {
+  const registration = registrationData as {
+    id: string;
+    status: string;
+    note: string | null;
+    created_at: string;
+  };
+
+  if (existing?.status !== registration.status) {
     try {
       await sendAdminEventRegistrationNotification({
         eventTitle: event.title,

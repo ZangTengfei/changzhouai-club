@@ -189,6 +189,8 @@ Use these fields. `title` and `slug` are required.
   "agenda": ["签到与交流", "主题分享", "自由讨论"],
   "speaker_lineup": ["主办：...", "本地组织：..."],
   "event_type": "community",
+  "registration_mode": "instant",
+  "registration_capacity": null,
   "registration_note": "报名后请在备注里填写必要对接信息，最终安排以组织方通知为准。",
   "registration_url": null,
   "cover_image_url": null,
@@ -199,6 +201,10 @@ Use these fields. `title` and `slug` are required.
 Allowed `status` values are `draft`, `scheduled`, `completed`, and `cancelled`. Use `scheduled` for an activity that should appear on the public events page.
 
 Allowed `event_type` values are `community` and `external`. Use `external` for partner, government, institution, or other non-Changzhou AI Club hosted activities that should still appear on the site and support registration.
+
+Allowed `registration_mode` values are `instant` and `review`. Use `instant` when a valid submission should immediately become confirmed; use `review` when the user should see “待审核” until staff confirms the registration.
+
+Use a positive integer for `registration_capacity` when confirmed attendance is limited. Use `null` for unlimited attendance. In `instant` mode, submissions after the limit become waitlisted. In `review` mode, submissions remain pending until staff review, and the limit is enforced when staff confirms them.
 
 ## Authentication
 

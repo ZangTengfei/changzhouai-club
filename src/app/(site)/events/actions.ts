@@ -70,20 +70,22 @@ export async function registerForEvent(formData: FormData) {
         .maybeSingle(),
     ]);
 
-  const shouldNotifyAdmin = existingRegistration?.status !== "registered";
+  const { data: registrationData, error: registrationError } = await supabase
+    .rpc("submit_event_registration", {
+      p_event_id: eventId,
+      p_user_id: communityUserId,
+      p_note: note || null,
+    })
+    .single();
 
-  await supabase.from("event_registrations").upsert(
-    {
-      event_id: eventId,
-      user_id: communityUserId,
-      note: note || null,
-      status: "registered",
-    },
-    {
-      onConflict: "event_id,user_id",
-      ignoreDuplicates: false,
-    },
-  );
+  if (registrationError || !registrationData) {
+    redirect(withQuery(redirectTo, { error: "registration_failed" }));
+  }
+
+  const registration = registrationData as { status: string };
+
+  const shouldNotifyAdmin =
+    existingRegistration?.status !== registration.status;
 
   if (shouldNotifyAdmin && eventData) {
     try {
@@ -112,5 +114,5 @@ export async function registerForEvent(formData: FormData) {
   revalidatePath("/events");
   revalidatePath(redirectTo);
   revalidatePath("/account");
-  redirect(withQuery(redirectTo, { registered: "1" }));
+  redirect(withQuery(redirectTo, { registration: registration.status }));
 }

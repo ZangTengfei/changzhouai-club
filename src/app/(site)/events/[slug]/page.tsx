@@ -44,7 +44,7 @@ const eventSoftNoteClassName =
   "min-w-0 rounded-[var(--radius-md)] border border-dashed border-[rgba(var(--accent-rgb),0.2)] bg-[rgba(var(--accent-rgb),0.07)] px-4 py-[15px] text-[0.95rem] leading-[1.62] font-bold text-[rgba(var(--ink-rgb),0.68)] [overflow-wrap:anywhere] [word-break:break-word]";
 
 type EventDetailSearchParams = {
-  registered?: string;
+  registration?: string;
   error?: string;
 };
 
@@ -147,10 +147,16 @@ export default async function EventDetailPage({
 
   return (
     <div className="grid min-w-0 gap-7 max-sm:gap-[22px]">
-      {query.registered ? (
+      {query.registration ? (
         <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2.5 rounded-[var(--radius-md)] border border-dashed border-[rgba(var(--accent-rgb),0.28)] bg-[rgba(var(--accent-rgb),0.08)] px-[18px] py-4 font-extrabold text-[var(--accent-strong)]">
           <CheckCircle2 className="size-5" aria-hidden="true" strokeWidth={1.9} />
-          <span>报名成功，已经写入你的社区账号记录。</span>
+          <span>
+            {query.registration === "pending"
+              ? "报名申请已提交，请等待组织方审核。"
+              : query.registration === "waitlisted"
+                ? "当前确认名额已满，你已进入候补。"
+                : "报名成功，已经写入你的社区账号记录。"}
+          </span>
         </div>
       ) : null}
 

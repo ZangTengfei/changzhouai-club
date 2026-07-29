@@ -35,7 +35,9 @@ Page({
           dateLabel: formatEventDate(item.events?.event_at ?? null),
           locationLabel: item.events?.venue || item.events?.city || "常州",
           statusLabel:
-            item.status === "registered"
+            item.status === "pending"
+              ? "待审核"
+              : item.status === "registered"
               ? "已报名"
               : item.status === "waitlisted"
                 ? "候补中"

@@ -31,6 +31,8 @@ type EventRow = {
   speaker_lineup: string | null;
   registration_note: string | null;
   registration_url: string | null;
+  registration_mode: string;
+  registration_capacity: number | null;
   event_type: string;
   recap: string | null;
   docs_url: string | null;
@@ -70,6 +72,8 @@ export type PublicScheduledEvent = {
   cover_image_url: string | null;
   registration_note?: string | null;
   registration_url?: string | null;
+  registration_mode?: string | null;
+  registration_capacity?: number | null;
   event_type?: string | null;
   eventTypeLabel: string;
 };
@@ -139,6 +143,8 @@ export type PublicEventDetail = {
   speakerItems: string[];
   registrationNote: string | null;
   registrationUrl: string | null;
+  registrationMode: string;
+  registrationCapacity: number | null;
   recapParagraphs: string[];
   docsUrl: string | null;
   video: PublicEventVideo | null;
@@ -355,6 +361,9 @@ function mapPublicEventDetail(row: EventRow): PublicEventDetail {
     speakerItems: parseLineList(row.speaker_lineup),
     registrationNote: row.registration_note,
     registrationUrl: row.registration_url,
+    registrationMode:
+      row.registration_mode === "review" ? "review" : "instant",
+    registrationCapacity: row.registration_capacity,
     recapParagraphs: parseParagraphs(row.recap),
     docsUrl: row.docs_url,
     video,
@@ -503,7 +512,7 @@ const getCachedScheduledEvents = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, title, summary, event_at, venue, city, slug, cover_image_url, registration_note, registration_url, event_type",
+        "id, title, summary, event_at, venue, city, slug, cover_image_url, registration_note, registration_url, registration_mode, registration_capacity, event_type",
       )
       .eq("status", "scheduled")
       .order("event_at", { ascending: true, nullsFirst: false });
@@ -548,7 +557,7 @@ const getCachedHomeScheduledEvents = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, title, summary, event_at, venue, city, slug, cover_image_url, registration_note, registration_url, event_type",
+        "id, title, summary, event_at, venue, city, slug, cover_image_url, registration_note, registration_url, registration_mode, registration_capacity, event_type",
       )
       .eq("status", "scheduled")
       .eq("event_type", "community")
@@ -571,7 +580,7 @@ const getCachedPublicEventBySlug = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, event_type, recap, docs_url, video_url, video_title, video_cover_url, status, event_photos(id, image_url, caption, sort_order)",
+        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, registration_mode, registration_capacity, event_type, recap, docs_url, video_url, video_title, video_cover_url, status, event_photos(id, image_url, caption, sort_order)",
       )
       .eq("slug", slug)
       .in("status", ["scheduled", "completed", "cancelled"])

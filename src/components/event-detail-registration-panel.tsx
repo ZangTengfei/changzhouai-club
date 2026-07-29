@@ -18,7 +18,9 @@ export function EventDetailRegistrationPanel({
   redirectTo: string;
 }) {
   const [authState, setAuthState] = useState<AuthState>("loading");
-  const [isRegistered, setIsRegistered] = useState(false);
+  const [registrationStatus, setRegistrationStatus] = useState<string | null>(
+    null,
+  );
   const externalRegistrationUrl = getExternalRegistrationUrl(
     event.registrationUrl,
     event.registrationNote,
@@ -26,7 +28,7 @@ export function EventDetailRegistrationPanel({
 
   useEffect(() => {
     if (externalRegistrationUrl) {
-      setIsRegistered(false);
+      setRegistrationStatus(null);
       setAuthState("logged_out");
       return;
     }
@@ -47,7 +49,7 @@ export function EventDetailRegistrationPanel({
 
       if (!resolvedUserId) {
         if (!cancelled) {
-          setIsRegistered(false);
+          setRegistrationStatus(null);
           setAuthState("logged_out");
         }
         return;
@@ -55,14 +57,14 @@ export function EventDetailRegistrationPanel({
 
       const { data: registration } = await supabase
         .from("event_registrations")
-        .select("id")
+        .select("status")
         .eq("event_id", event.id)
         .eq("user_id", resolvedUserId)
-        .eq("status", "registered")
+        .in("status", ["pending", "registered", "waitlisted"])
         .maybeSingle();
 
       if (!cancelled) {
-        setIsRegistered(Boolean(registration));
+        setRegistrationStatus(registration?.status ?? null);
         setAuthState("logged_in");
       }
     }
@@ -93,11 +95,13 @@ export function EventDetailRegistrationPanel({
         slug: event.slug,
         registration_note: event.registrationNote,
         registration_url: event.registrationUrl,
+        registration_mode: event.registrationMode,
+        registration_capacity: event.registrationCapacity,
         event_type: event.eventType,
         eventTypeLabel: event.eventTypeLabel,
       }}
       authState={authState}
-      isRegistered={isRegistered}
+      registrationStatus={registrationStatus}
       redirectTo={redirectTo}
       showDetailLink={false}
     />

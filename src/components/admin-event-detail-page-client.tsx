@@ -48,6 +48,7 @@ type AdminEventDetailData = {
   queryErrors: string[];
   permissions?: {
     canExportRegistrations: boolean;
+    canManageRegistrations: boolean;
     canManageCheckin: boolean;
   };
 };
@@ -60,6 +61,7 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
   const queryError = searchParams.get("error") ?? undefined;
   const eventDetail = data?.event;
   const [isAttendancePending, startAttendanceTransition] = useTransition();
+  const [isRegistrationPending, startRegistrationTransition] = useTransition();
   const averageFeedbackRating = eventDetail?.feedback.length
     ? (
         eventDetail.feedback.reduce(
@@ -68,6 +70,14 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
         ) / eventDetail.feedback.length
       ).toFixed(1)
     : null;
+  const confirmedRegistrationCount =
+    eventDetail?.registrations.filter(
+      (registration) => registration.status === "registered",
+    ).length ?? 0;
+  const pendingRegistrationCount =
+    eventDetail?.registrations.filter(
+      (registration) => registration.status === "pending",
+    ).length ?? 0;
 
   function updateAttendance(userId: string, status: string) {
     if (!eventDetail) return;
@@ -90,6 +100,37 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
     });
   }
 
+  function updateRegistrationStatus(registrationId: string, status: string) {
+    if (!eventDetail) return;
+    startRegistrationTransition(async () => {
+      try {
+        const response = await fetch(
+          `/api/admin/events/${eventDetail.id}/registrations/${registrationId}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status }),
+          },
+        );
+        const payload = (await response.json().catch(() => null)) as {
+          error?: string;
+        } | null;
+        if (!response.ok) {
+          throw new Error(payload?.error ?? "registration_update_failed");
+        }
+        toast.success("报名状态已更新。");
+        reload();
+      } catch (updateError) {
+        toast.error(
+          updateError instanceof Error &&
+            updateError.message === "event_capacity_reached"
+            ? "确认人数已经达到上限，可将该报名设为候补。"
+            : "报名状态更新失败，请稍后重试。",
+        );
+      }
+    });
+  }
+
   return (
     <AdminPageStack>
       <AdminToastSignals
@@ -105,9 +146,16 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
             actions={
               <>
                 <AdminMetric
-                  label="当前报名"
-                  value={eventDetail.registrations.length}
+                  label="已确认"
+                  value={`${confirmedRegistrationCount}${
+                    eventDetail.registration_capacity
+                      ? ` / ${eventDetail.registration_capacity}`
+                      : ""
+                  }`}
                 />
+                {pendingRegistrationCount > 0 ? (
+                  <AdminMetric label="待审核" value={pendingRegistrationCount} />
+                ) : null}
                 <Button asChild>
                   <Link
                     href={`/events/${eventDetail.slug}`}
@@ -139,7 +187,14 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
               照片 {eventDetail.photos.length}
             </AdminStatusBadge>
             <AdminStatusBadge tone="neutral">
-              报名 {eventDetail.registrations.length}
+              {eventDetail.registration_mode === "review"
+                ? "报名后审核"
+                : "报名即确认"}
+            </AdminStatusBadge>
+            <AdminStatusBadge tone="neutral">
+              {eventDetail.registration_capacity
+                ? `限 ${eventDetail.registration_capacity} 人`
+                : "不限人数"}
             </AdminStatusBadge>
           </AdminPanelBody>
         </AdminPanel>
@@ -256,17 +311,38 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
                                   </div>
                                 </TableCell>
                                 <TableCell>
-                                  <AdminStatusBadge
-                                    tone={
-                                      getAdminRegistrationStatusTone(
-                                        registration.status,
-                                      ) as AdminTone
+                                  <NativeSelect
+                                    value={registration.status}
+                                    disabled={
+                                      isRegistrationPending ||
+                                      !data?.permissions?.canManageRegistrations
+                                    }
+                                    aria-label={`更新${registration.profile?.display_name ?? "成员"}的报名状态`}
+                                    onChange={(event) =>
+                                      updateRegistrationStatus(
+                                        registration.id,
+                                        event.target.value,
+                                      )
                                     }
                                   >
-                                    {formatAdminRegistrationStatus(
-                                      registration.status,
-                                    )}
-                                  </AdminStatusBadge>
+                                    <option value="pending">待审核</option>
+                                    <option value="registered">已确认</option>
+                                    <option value="waitlisted">候补</option>
+                                    <option value="cancelled">已取消</option>
+                                  </NativeSelect>
+                                  <div className="mt-1">
+                                    <AdminStatusBadge
+                                      tone={
+                                        getAdminRegistrationStatusTone(
+                                          registration.status,
+                                        ) as AdminTone
+                                      }
+                                    >
+                                      {formatAdminRegistrationStatus(
+                                        registration.status,
+                                      )}
+                                    </AdminStatusBadge>
+                                  </div>
                                 </TableCell>
                                 <TableCell>
                                   <AdminStatusBadge

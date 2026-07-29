@@ -79,6 +79,18 @@
         <button class="secondary-button" loading="{{checkinSubmitting}}" disabled="{{checkinSubmitting}}" bindtap="scanCheckinCode">{{attendance ? '已签到' : '扫码签到'}}</button>
         <button class="secondary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="cancelRegistration">取消报名</button>
       </block>
+      <block wx:elif="{{registration && registration.status === 'pending'}}">
+        <text class="registration-kicker">报名状态</text>
+        <text class="registration-title">报名待审核</text>
+        <text class="registration-copy">申请已提交，组织方确认后会更新为“已报名”。</text>
+        <button class="secondary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="cancelRegistration">取消申请</button>
+      </block>
+      <block wx:elif="{{registration && registration.status === 'waitlisted'}}">
+        <text class="registration-kicker">报名状态</text>
+        <text class="registration-title">候补中</text>
+        <text class="registration-copy">当前确认名额已满，组织方调整名额后可将你转为已报名。</text>
+        <button class="secondary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="cancelRegistration">取消候补</button>
+      </block>
       <block wx:elif="{{!user || !user.registrationReady}}">
         <text class="registration-kicker">活动报名</text>
         <text class="registration-title">完善资料后报名</text>
@@ -87,7 +99,8 @@
       </block>
       <block wx:else>
         <text class="registration-kicker">活动报名</text>
-        <text class="registration-title">报名这场活动</text>
+        <text class="registration-title">{{event.registrationMode === 'review' ? '提交报名申请' : '报名这场活动'}}</text>
+        <text class="registration-copy">{{event.registrationCapacity ? '确认名额限 ' + event.registrationCapacity + ' 人' : '本场不限报名人数'}}{{event.registrationMode === 'review' ? '，提交后由组织方审核。' : '。'}}</text>
         <textarea class="registration-textarea" maxlength="500" value="{{registrationNote}}" bindinput="handleNoteInput" placeholder="可选：写下你特别想交流的话题" />
         <checkbox-group class="registration-consents" bindchange="handleRegistrationConsentChange">
           <label class="registration-consent-row">
@@ -99,7 +112,7 @@
             <view class="registration-consent-copy"><text>我自愿授权活动现场肖像及影像用于常州 AI 社区非商业活动记录和宣传</text><text class="registration-consent-optional">可选，不影响报名</text></view>
           </label>
         </checkbox-group>
-        <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitRegistration">确认报名</button>
+        <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitRegistration">{{event.registrationMode === 'review' ? '提交申请' : '确认报名'}}</button>
       </block>
     </view>
 

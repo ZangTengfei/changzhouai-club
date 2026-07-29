@@ -10,6 +10,7 @@ const DATETIME_LOCAL_PATTERN =
 const TIMEZONE_SUFFIX_PATTERN = /(Z|[+-]\d{2}:?\d{2})$/i;
 const STATUS_VALUES = new Set(["draft", "scheduled", "completed", "cancelled"]);
 const EVENT_TYPE_VALUES = new Set(["community", "external"]);
+const REGISTRATION_MODE_VALUES = new Set(["instant", "review"]);
 const CHANGZHOU_TIMEZONE_OFFSET = "+08:00";
 const TEXT_LIST_FIELDS = new Set(["agenda", "speaker_lineup"]);
 const PARAGRAPH_FIELDS = new Set(["description", "recap"]);
@@ -22,6 +23,8 @@ const EVENT_FIELDS = new Set([
   "speaker_lineup",
   "registration_note",
   "registration_url",
+  "registration_mode",
+  "registration_capacity",
   "event_type",
   "recap",
   "docs_url",
@@ -70,7 +73,8 @@ Required JSON fields:
 
 Common JSON fields:
   summary, description, event_at, venue, city, agenda, speaker_lineup,
-  registration_note, registration_url, event_type, cover_image_url,
+  registration_note, registration_url, registration_mode, registration_capacity,
+  event_type, cover_image_url,
   video_url, video_provider, video_file_id, video_title, video_cover_url, status
 `);
 }
@@ -295,6 +299,30 @@ function normalizeEventType(value) {
   return eventType;
 }
 
+function normalizeRegistrationMode(value) {
+  const mode = getOptionalString(value) ?? "instant";
+
+  if (!REGISTRATION_MODE_VALUES.has(mode)) {
+    throw new Error(
+      `registration_mode must be one of: ${Array.from(REGISTRATION_MODE_VALUES).join(", ")}`,
+    );
+  }
+
+  return mode;
+}
+
+function normalizeRegistrationCapacity(value) {
+  const normalized = getOptionalString(value);
+  if (!normalized) return null;
+
+  const capacity = Number(normalized);
+  if (!Number.isInteger(capacity) || capacity < 1) {
+    throw new Error("registration_capacity must be a positive integer or null.");
+  }
+
+  return capacity;
+}
+
 function assertNoUnknownFields(payload) {
   const unknownFields = Object.keys(payload).filter((key) => !EVENT_FIELDS.has(key));
 
@@ -360,6 +388,8 @@ function normalizePayload(rawPayload, options) {
     speaker_lineup: getTextField(rawPayload, "speaker_lineup"),
     registration_note: getTextField(rawPayload, "registration_note"),
     registration_url: normalizeOptionalUrlValue(rawPayload.registration_url, "registration_url"),
+    registration_mode: normalizeRegistrationMode(rawPayload.registration_mode),
+    registration_capacity: normalizeRegistrationCapacity(rawPayload.registration_capacity),
     event_type: normalizeEventType(rawPayload.event_type),
     recap: getTextField(rawPayload, "recap"),
     docs_url: getTextField(rawPayload, "docs_url"),

@@ -482,7 +482,7 @@ export async function loadMiniappAccountSnapshot(
       .select(
         "id, event_id, status, created_at, events(id, slug, title, event_at, venue, city, cover_image_url, status)",
       )
-      .in("status", ["registered", "waitlisted"])
+      .in("status", ["pending", "registered", "waitlisted"])
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
       .limit(20),
@@ -651,7 +651,11 @@ export async function loadMiniappAccountSnapshot(
     footprints.set(event.id, {
       ...event,
       participationLabel:
-        registration.status === "waitlisted" ? "候补中" : "已报名",
+        registration.status === "pending"
+          ? "待审核"
+          : registration.status === "waitlisted"
+            ? "候补中"
+            : "已报名",
       participationAt: registration.created_at ?? event.event_at ?? "",
     });
   });

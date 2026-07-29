@@ -220,7 +220,7 @@ interface MiniappRegistrationEvent {
 
 interface MiniappRegistration {
   id: string;
-  status: "registered" | "waitlisted" | "cancelled";
+  status: "pending" | "registered" | "waitlisted" | "cancelled";
   note: string | null;
   created_at: string;
   events?: MiniappRegistrationEvent | null;

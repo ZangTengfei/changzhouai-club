@@ -40,6 +40,8 @@ export type EventDetail = {
   speakerItems: string[];
   registrationNote: string | null;
   registrationUrl: string | null;
+  registrationMode: "instant" | "review";
+  registrationCapacity: number | null;
   status: string;
   eventType: string;
   recapParagraphs: string[];

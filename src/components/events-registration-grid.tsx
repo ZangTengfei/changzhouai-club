@@ -15,7 +15,9 @@ export function EventsRegistrationGrid({
   events: PublicScheduledEvent[];
 }) {
   const [authState, setAuthState] = useState<AuthState>("loading");
-  const [registeredEventIds, setRegisteredEventIds] = useState<Set<string>>(new Set());
+  const [registrationStatuses, setRegistrationStatuses] = useState<
+    Map<string, string>
+  >(new Map());
 
   useEffect(() => {
     if (!hasSupabaseEnv()) {
@@ -34,7 +36,7 @@ export function EventsRegistrationGrid({
 
       if (!resolvedUserId) {
         if (!cancelled) {
-          setRegisteredEventIds(new Set());
+          setRegistrationStatuses(new Map());
           setAuthState("logged_out");
         }
         return;
@@ -42,13 +44,15 @@ export function EventsRegistrationGrid({
 
       const { data: registrations } = await supabase
         .from("event_registrations")
-        .select("event_id")
+        .select("event_id, status")
         .eq("user_id", resolvedUserId)
-        .eq("status", "registered");
+        .in("status", ["pending", "registered", "waitlisted"]);
 
       if (!cancelled) {
-        setRegisteredEventIds(
-          new Set((registrations ?? []).map((item) => item.event_id)),
+        setRegistrationStatuses(
+          new Map(
+            (registrations ?? []).map((item) => [item.event_id, item.status]),
+          ),
         );
         setAuthState("logged_in");
       }
@@ -75,7 +79,7 @@ export function EventsRegistrationGrid({
           key={event.id}
           event={event}
           authState={authState}
-          isRegistered={registeredEventIds.has(event.id)}
+          registrationStatus={registrationStatuses.get(event.id) ?? null}
           redirectTo={`/events/${event.slug}`}
           highlightEventType
           showEventSlug={false}

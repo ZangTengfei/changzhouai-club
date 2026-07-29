@@ -5,6 +5,10 @@ import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { loadAdminEventsData } from "@/lib/admin/events";
 import { revalidateAdminEventPaths } from "@/lib/admin/revalidate";
 import { normalizeEventType } from "@/lib/event-type";
+import {
+  parseEventRegistrationCapacity,
+  parseEventRegistrationMode,
+} from "@/lib/event-registration-options";
 import { canAdmin } from "@/lib/supabase/guards";
 
 export async function GET() {
@@ -60,6 +64,20 @@ export async function POST(request: Request) {
   const slugInput = String(payload.slug ?? "").trim();
   const slug = normalizeSlug(slugInput || title);
   const status = String(payload.status ?? "draft").trim();
+  let registrationCapacity: number | null;
+  let registrationMode: "instant" | "review";
+
+  try {
+    registrationCapacity = parseEventRegistrationCapacity(
+      payload.registration_capacity,
+    );
+    registrationMode = parseEventRegistrationMode(payload.registration_mode);
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "invalid_payload" },
+      { status: 400 },
+    );
+  }
 
   if (!title || !slug) {
     return NextResponse.json({ error: "missing_required_fields" }, { status: 400 });
@@ -83,6 +101,8 @@ export async function POST(request: Request) {
       speaker_lineup: getOptionalValue(payload, "speaker_lineup"),
       registration_note: getOptionalValue(payload, "registration_note"),
       registration_url: normalizeOptionalUrlValue(getOptionalValue(payload, "registration_url")),
+      registration_mode: registrationMode,
+      registration_capacity: registrationCapacity,
       event_type: normalizeEventType(getOptionalValue(payload, "event_type")),
       recap: getOptionalValue(payload, "recap"),
       docs_url: getOptionalValue(payload, "docs_url"),

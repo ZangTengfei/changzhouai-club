@@ -198,8 +198,18 @@ Page({
       trackEvent("registration_created", "/pages/events/detail/index", {
         slug: this.data.slug,
       });
-      void this.loadReminder(this.data.slug);
-      void wx.showToast({ title: "报名成功", icon: "success" });
+      if (registration?.status === "registered") {
+        void this.loadReminder(this.data.slug);
+      }
+      void wx.showToast({
+        title:
+          registration?.status === "pending"
+            ? "已提交，等待审核"
+            : registration?.status === "waitlisted"
+              ? "已进入候补"
+              : "报名成功",
+        icon: registration?.status === "registered" ? "success" : "none",
+      });
     } catch (error) {
       if (
         error instanceof ApiError &&

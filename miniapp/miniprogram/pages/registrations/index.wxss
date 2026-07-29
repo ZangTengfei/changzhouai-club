@@ -60,6 +60,11 @@
   color: #8d6810;
 }
 
+.status-pending {
+  background: #fff3d8;
+  color: #956400;
+}
+
 .status-cancelled {
   background: #f1f3f2;
   color: var(--color-subtle);

@@ -48,6 +48,9 @@ const adminErrorMessageMap: Record<string, string> = {
   invalid_public_slug: "成员主页链接无效，请使用 3-32 位小写英文、数字或短横线。",
   public_slug_taken: "成员主页链接已被占用，请换一个。",
   database_write_failed: "保存失败，请稍后再试。",
+  invalid_registration_capacity: "人数上限必须是大于 0 的整数，或留空表示不限人数。",
+  invalid_registration_mode: "报名方式无效，请重新选择。",
+  event_capacity_reached: "确认人数已经达到上限，可将该报名设为候补。",
   permission_required: "当前账号没有执行这个操作所需的后台权限。",
   forbidden: "当前账号没有执行这个操作所需的后台权限。",
 };
@@ -60,7 +63,8 @@ const adminEventStatusLabelMap: Record<string, string> = {
 };
 
 const adminRegistrationStatusLabelMap: Record<string, string> = {
-  registered: "已报名",
+  pending: "待审核",
+  registered: "已确认",
   waitlist: "候补",
   waitlisted: "候补",
   cancelled: "已取消",
@@ -161,6 +165,8 @@ export function formatAdminLeadMatchStatus(status: string) {
 
 export function getAdminEventStatusTone(status: string) {
   switch (status) {
+    case "pending":
+      return "draft";
     case "draft":
       return "draft";
     case "scheduled":

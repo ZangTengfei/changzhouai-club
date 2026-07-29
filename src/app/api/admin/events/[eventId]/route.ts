@@ -5,6 +5,10 @@ import { normalizeAdminEventDateTime } from "@/lib/admin/event-datetime";
 import { loadAdminEventsData } from "@/lib/admin/events";
 import { revalidateAdminEventPaths } from "@/lib/admin/revalidate";
 import { normalizeEventType } from "@/lib/event-type";
+import {
+  parseEventRegistrationCapacity,
+  parseEventRegistrationMode,
+} from "@/lib/event-registration-options";
 import { canAdmin } from "@/lib/supabase/guards";
 
 function getOptionalValue(payload: Record<string, unknown>, key: string) {
@@ -51,6 +55,10 @@ export async function GET(
     debugSnapshot: data.debugSnapshot,
     permissions: {
       canExportRegistrations: canAdmin(staffContext, "events.export_registrations"),
+      canManageRegistrations: canAdmin(
+        staffContext,
+        "events.update_registration_status",
+      ),
       canManageCheckin: canAdmin(
         staffContext,
         "events.update_registration_status",
@@ -76,6 +84,20 @@ export async function PATCH(
   const title = String(payload.title ?? "").trim();
   const slug = String(payload.slug ?? "").trim();
   const status = String(payload.status ?? "draft").trim();
+  let registrationCapacity: number | null;
+  let registrationMode: "instant" | "review";
+
+  try {
+    registrationCapacity = parseEventRegistrationCapacity(
+      payload.registration_capacity,
+    );
+    registrationMode = parseEventRegistrationMode(payload.registration_mode);
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "invalid_payload" },
+      { status: 400 },
+    );
+  }
 
   if (!title || !slug) {
     return NextResponse.json({ error: "missing_required_fields" }, { status: 400 });
@@ -99,6 +121,8 @@ export async function PATCH(
       speaker_lineup: getOptionalValue(payload, "speaker_lineup"),
       registration_note: getOptionalValue(payload, "registration_note"),
       registration_url: normalizeOptionalUrlValue(getOptionalValue(payload, "registration_url")),
+      registration_mode: registrationMode,
+      registration_capacity: registrationCapacity,
       event_type: normalizeEventType(getOptionalValue(payload, "event_type")),
       recap: getOptionalValue(payload, "recap"),
       docs_url: getOptionalValue(payload, "docs_url"),
