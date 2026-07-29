@@ -15,7 +15,7 @@ type HomeEvent = EventSummary & {
 };
 
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
-const homeShareImageUrl = "/assets/share/home-share-v2.png";
+const homeShareImageUrl = "/assets/share/home-share-v3.png";
 
 function formatBriefDate() {
   const now = new Date();
