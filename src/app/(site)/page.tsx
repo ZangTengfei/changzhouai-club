@@ -92,7 +92,7 @@ const statIconTones = {
   pin: "text-[#7d63f1]",
 } satisfies Record<StatIconKey, string>;
 
-const homeButtonClass = "button min-h-[54px] rounded-[var(--radius-sm)] px-7 text-base shadow-[0_14px_28px_rgba(var(--accent-rgb),0.16)] max-sm:min-h-[42px] max-sm:w-auto! max-sm:px-[17px] max-sm:text-[0.9rem]";
+const homeButtonClass = "inline-flex min-h-[54px] items-center justify-center rounded-[var(--radius-sm)] border border-transparent px-7 text-center text-base font-bold transition-[transform,background-color,border-color] duration-180 hover:-translate-y-px focus-visible:-translate-y-px max-sm:min-h-[46px] max-sm:w-auto max-sm:px-[17px] max-sm:text-[0.9rem]";
 const sectionHeadingClass = "flex items-center justify-between gap-4 [&_h2]:m-0 [&_h2]:text-[clamp(1.75rem,3.2vw,2.2rem)] [&_h2]:leading-[1.16] [&_h2]:tracking-[-0.04em] [&_h2]:text-[#172020] [&_a]:shrink-0 [&_a]:text-[0.92rem] [&_a]:font-extrabold [&_a]:text-[rgba(var(--ink-rgb),0.66)]";
 
 type StatIconKey = keyof typeof statIcons;
@@ -234,11 +234,11 @@ export default async function HomePage() {
           </p>
 
           <div className="mt-0.5 flex flex-wrap items-center gap-[18px] max-sm:gap-2.5">
-            <Link href="/join" prefetch={false} className={cn(homeButtonClass, "gap-2 bg-[var(--accent)] hover:bg-[var(--accent-strong)] focus-visible:bg-[var(--accent-strong)]")}>
+            <Link href="/join" prefetch={false} className={cn(homeButtonClass, "gap-2 bg-[var(--accent)] text-white! shadow-[0_14px_28px_rgba(var(--accent-rgb),0.16)] hover:bg-[var(--accent-strong)] focus-visible:bg-[var(--accent-strong)]")}>
               申请加入
               <span aria-hidden="true">→</span>
             </Link>
-            <Link href="/events" prefetch={false} className={cn(homeButtonClass, "border-[rgba(var(--ink-rgb),0.16)] bg-white/82 text-[var(--ink)] shadow-[var(--shadow-md)] hover:bg-white focus-visible:bg-white")}>
+            <Link href="/events" prefetch={false} className={cn(homeButtonClass, "border-[rgba(var(--ink-rgb),0.18)] bg-white text-[var(--ink)] shadow-[0_8px_20px_rgba(var(--ink-rgb),0.06)] hover:border-[rgba(var(--accent-rgb),0.34)] hover:bg-[rgba(var(--accent-rgb),0.06)] focus-visible:border-[rgba(var(--accent-rgb),0.34)] focus-visible:bg-[rgba(var(--accent-rgb),0.06)]")}>
               参加活动
             </Link>
           </div>
@@ -270,7 +270,7 @@ export default async function HomePage() {
               >
                 <StatIcon strokeWidth={1.9} />
               </span>
-              <div className="[&_>span]:mt-[7px] [&_>span]:block [&_>span]:whitespace-nowrap [&_>span]:text-[0.92rem] [&_>span]:leading-[1.18] [&_>span]:font-extrabold [&_>span]:text-[#152524] [&_small]:mt-[7px] [&_small]:block [&_small]:overflow-hidden [&_small]:text-[0.84rem] [&_small]:leading-[1.35] [&_small]:font-semibold [&_small]:text-ellipsis [&_small]:whitespace-nowrap [&_small]:text-[rgba(var(--ink-rgb),0.56)] max-sm:[&_>span]:mt-[3px] max-sm:[&_>span]:text-[0.72rem] max-sm:[&_small]:hidden">
+              <div className="[&_>span]:mt-[7px] [&_>span]:block [&_>span]:whitespace-nowrap [&_>span]:text-[0.92rem] [&_>span]:leading-[1.18] [&_>span]:font-extrabold [&_>span]:text-[#152524] [&_small]:mt-[7px] [&_small]:block [&_small]:overflow-hidden [&_small]:text-[0.88rem] [&_small]:leading-[1.35] [&_small]:font-semibold [&_small]:text-ellipsis [&_small]:whitespace-nowrap [&_small]:text-[rgba(var(--ink-rgb),0.68)] max-sm:[&_>span]:mt-[3px] max-sm:[&_>span]:text-[0.72rem] max-sm:[&_small]:hidden">
                 <strong>{item.value}</strong>
                 <span>{item.label}</span>
                 <small>{item.detail}</small>
@@ -287,18 +287,18 @@ export default async function HomePage() {
         <div className={cn(sectionHeadingClass, "m-0")}>
           <div>
             <h2 id="home-current-events-title">近期活动</h2>
-            <p className="mt-1.5 mb-0 text-[rgba(var(--ink-rgb),0.62)]">报名下一场，也看看我们最近一起做过什么</p>
+            <p className="mt-1.5 mb-0 text-[rgba(var(--ink-rgb),0.68)]">报名下一场，也看看我们最近一起做过什么</p>
           </div>
           <Link href="/events" prefetch={false}>全部活动 →</Link>
         </div>
 
-        <div className="grid grid-cols-2 items-stretch gap-[18px] max-lg:grid-cols-1">
-          <article className="relative grid min-h-[346px] w-full self-start overflow-hidden rounded-[var(--radius-lg)] border-0 bg-white px-[30px] py-7 shadow-[0_16px_36px_rgba(var(--ink-rgb),0.075)] before:absolute before:top-[82px] before:right-[114px] before:size-2 before:rounded-[var(--radius-pill)] before:bg-[#7fcf92] before:shadow-[28px_-18px_0_0_#f4c75d,52px_6px_0_0_#8bbcf7,-18px_102px_0_0_rgba(127,207,146,0.76)] before:content-[''] max-[820px]:min-h-0 max-sm:rounded-[var(--radius-md)] max-sm:px-4 max-sm:py-[18px] max-sm:before:hidden">
-            <div className="relative z-[1] grid max-w-full content-start gap-4 max-sm:gap-2.5">
+        <div className={cn("grid items-stretch gap-[18px] max-lg:grid-cols-1", hasUpcomingEvent ? "grid-cols-2" : "grid-cols-[minmax(280px,0.72fr)_minmax(0,1.28fr)]")}>
+          <article className={cn("relative grid w-full self-start overflow-hidden rounded-[var(--radius-lg)] border-0 bg-white shadow-[0_16px_36px_rgba(var(--ink-rgb),0.075)] before:absolute before:top-[82px] before:right-[114px] before:size-2 before:rounded-[var(--radius-pill)] before:bg-[#7fcf92] before:shadow-[28px_-18px_0_0_#f4c75d,52px_6px_0_0_#8bbcf7,-18px_102px_0_0_rgba(127,207,146,0.76)] before:content-[''] max-[820px]:min-h-0 max-sm:rounded-[var(--radius-md)] max-sm:px-4 max-sm:py-[18px] max-sm:before:hidden", hasUpcomingEvent ? "min-h-[346px] px-[30px] py-7" : "min-h-0 px-6 py-5 before:hidden")}>
+            <div className={cn("relative z-[1] grid max-w-full content-start max-sm:gap-2.5", hasUpcomingEvent ? "gap-4" : "gap-3")}>
               <p className="m-0 text-[0.95rem] leading-[1.1] font-black text-[#149064] max-sm:text-[0.86rem]">
                 {hasUpcomingEvent ? "下一场活动等你来！" : "下一场活动筹备中"}
               </p>
-              <h3 className="m-0 text-[clamp(1.8rem,2.6vw,2.18rem)] leading-[1.18] font-[740] tracking-[-0.045em] text-[var(--ink)] max-sm:text-[1.32rem] max-sm:font-[720] max-sm:tracking-normal">
+              <h3 className={cn("m-0 leading-[1.18] font-[740] text-[var(--ink)] max-sm:text-[1.32rem] max-sm:font-[720] max-sm:tracking-normal", hasUpcomingEvent ? "text-[clamp(1.8rem,2.6vw,2.18rem)] tracking-[-0.045em]" : "text-[clamp(1.45rem,2vw,1.72rem)] tracking-[-0.03em]")}>
                 {primaryScheduledEvent?.title ?? "近期活动正在筹备中"}
               </h3>
               <ul className="m-0 grid list-none gap-[11px] p-0 text-[rgba(var(--ink-rgb),0.72)] max-sm:gap-[7px] [&_li]:flex [&_li]:items-center [&_li]:gap-2.5 [&_li]:text-[0.96rem] [&_li]:leading-[1.45] [&_li]:font-semibold max-sm:[&_li]:gap-2 max-sm:[&_li]:text-[0.88rem] max-sm:[&_li]:leading-[1.35] [&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-[rgba(var(--ink-rgb),0.72)]">
@@ -319,7 +319,7 @@ export default async function HomePage() {
               <Link
                 href={primaryScheduledEvent ? `/events/${primaryScheduledEvent.slug}` : "/events"}
                 prefetch={false}
-                className={cn(homeButtonClass, "w-fit gap-2 bg-[var(--accent)] px-[22px] shadow-[var(--shadow-lg)] hover:bg-[var(--accent-strong)] focus-visible:bg-[var(--accent-strong)] max-sm:min-h-11 max-sm:justify-center max-sm:px-4")}
+                className={cn(homeButtonClass, "w-fit gap-2 bg-[var(--accent)] px-[22px] text-white! shadow-[var(--shadow-lg)] hover:bg-[var(--accent-strong)] focus-visible:bg-[var(--accent-strong)] max-sm:min-h-11 max-sm:justify-center max-sm:px-4")}
               >
                 {hasUpcomingEvent ? "查看活动详情" : "查看活动列表"}
                 <span aria-hidden="true">→</span>
@@ -332,7 +332,7 @@ export default async function HomePage() {
             className="grid min-w-0 grid-rows-[auto_1fr] gap-3 rounded-[var(--radius-lg)] border border-[rgba(var(--ink-rgb),0.1)] bg-white/74 p-5 shadow-[0_10px_24px_rgba(var(--ink-rgb),0.035)] max-[820px]:p-4"
             aria-labelledby="home-event-history-title"
           >
-            <div className="flex items-end justify-between gap-4 [&_span]:mb-1 [&_span]:block [&_span]:text-[0.78rem] [&_span]:font-black [&_span]:tracking-[0.08em] [&_span]:text-[#2f82ed] [&_h3]:m-0 [&_h3]:text-[1.24rem] [&_h3]:leading-[1.2] [&_h3]:text-[var(--ink)] [&_small]:block [&_small]:whitespace-nowrap [&_small]:text-[0.78rem] [&_small]:font-bold [&_small]:text-[rgba(var(--ink-rgb),0.52)]">
+            <div className="flex items-end justify-between gap-4 [&_span]:mb-1 [&_span]:block [&_span]:text-[0.78rem] [&_span]:font-black [&_span]:tracking-[0.08em] [&_span]:text-[#2f82ed] [&_h3]:m-0 [&_h3]:text-[1.24rem] [&_h3]:leading-[1.2] [&_h3]:text-[var(--ink)] [&_small]:block [&_small]:whitespace-nowrap [&_small]:text-[0.82rem] [&_small]:font-bold [&_small]:text-[rgba(var(--ink-rgb),0.68)]">
               <div>
                 <span>活动回顾</span>
                 <h3 id="home-event-history-title">最近举办</h3>
@@ -364,9 +364,9 @@ export default async function HomePage() {
                       )}
                     </div>
                     <div className="min-w-0 max-lg:pt-0.5 max-[820px]:pt-0">
-                      <small className="m-0 block text-[0.76rem] font-bold text-[rgba(var(--ink-rgb),0.5)]">{formatReviewDate(item.isoDate)}</small>
+                      <small className="m-0 block text-[0.82rem] font-bold text-[rgba(var(--ink-rgb),0.68)]">{formatReviewDate(item.isoDate)}</small>
                       <h4 className="mt-[5px] line-clamp-2 text-[0.94rem] leading-[1.34] text-[#152022]">{item.title}</h4>
-                      <p className="mt-[5px] overflow-hidden text-[0.78rem] leading-[1.35] text-ellipsis whitespace-nowrap text-[rgba(var(--ink-rgb),0.54)]">{item.locationLabel}</p>
+                      <p className="mt-[5px] overflow-hidden text-[0.84rem] leading-[1.35] text-ellipsis whitespace-nowrap text-[rgba(var(--ink-rgb),0.66)]">{item.locationLabel}</p>
                     </div>
                     <ArrowRight aria-hidden="true" strokeWidth={1.8} />
                   </Link>
@@ -398,7 +398,7 @@ export default async function HomePage() {
                 className="relative grid min-h-[214px] gap-4 rounded-[var(--radius-md)] border-0 bg-white px-[18px] pt-[18px] pb-4 shadow-[0_10px_28px_rgba(var(--ink-rgb),0.065)] transition-[transform,box-shadow] duration-180 hover:-translate-y-0.5 hover:shadow-[0_14px_28px_rgba(var(--ink-rgb),0.05)] focus-visible:-translate-y-0.5 focus-visible:shadow-[0_14px_28px_rgba(var(--ink-rgb),0.05)] max-sm:min-h-0 max-sm:gap-2.5 max-sm:p-3"
                 key={item.id}
               >
-                <div className="grid grid-cols-[56px_minmax(0,1fr)] items-start gap-3.5 max-sm:grid-cols-[44px_minmax(0,1fr)] max-sm:items-center max-sm:gap-3 [&_strong]:block [&_strong]:text-[0.98rem] [&_strong]:text-[#152022] max-sm:[&_strong]:overflow-hidden max-sm:[&_strong]:text-ellipsis max-sm:[&_strong]:whitespace-nowrap [&_small]:mt-1 [&_small]:block [&_small]:text-[0.83rem] [&_small]:text-[rgba(var(--ink-rgb),0.54)] max-sm:[&_small]:line-clamp-2">
+                <div className="grid grid-cols-[56px_minmax(0,1fr)] items-start gap-3.5 max-sm:grid-cols-[44px_minmax(0,1fr)] max-sm:items-center max-sm:gap-3 [&_strong]:block [&_strong]:text-[0.98rem] [&_strong]:text-[#152022] max-sm:[&_strong]:overflow-hidden max-sm:[&_strong]:text-ellipsis max-sm:[&_strong]:whitespace-nowrap [&_small]:mt-1 [&_small]:block [&_small]:text-[0.85rem] [&_small]:text-[rgba(var(--ink-rgb),0.66)] max-sm:[&_small]:line-clamp-2">
                   <div className="size-14 overflow-hidden rounded-[var(--radius-pill)] bg-white shadow-[var(--shadow-md)] max-sm:size-11 [&_img]:block [&_img]:size-full [&_img]:object-cover [&_span]:grid [&_span]:size-full [&_span]:place-items-center [&_span]:text-[1.15rem] [&_span]:font-black [&_span]:text-[var(--accent-strong)]" aria-hidden="true">
                     {"avatarUrl" in item && item.avatarUrl ? (
                       <RevealImage

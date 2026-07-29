@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, CirclePlay, Heart, Smile } from "lucide-react";
+import { ArrowUpRight, CirclePlay, Heart, Pause, Play, Smile } from "lucide-react";
 
 import { DoodleSparkles } from "@/components/home-visual-assets";
 import { RevealNextImage } from "@/components/reveal-image";
@@ -59,6 +59,7 @@ export function HeroPhotoCarousel({
   notes,
 }: HeroPhotoCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const [retreatingNote, setRetreatingNote] = useState<number | null>(null);
   const retreatTimerRef = useRef<number | null>(null);
   const visibleImages = images.slice(0, MAX_CAROUSEL_IMAGES);
@@ -71,7 +72,7 @@ export function HeroPhotoCarousel({
   }, []);
 
   useEffect(() => {
-    if (visibleImages.length <= 1 || activeItemHasVideo) {
+    if (visibleImages.length <= 1 || activeItemHasVideo || isPaused) {
       return undefined;
     }
 
@@ -89,7 +90,7 @@ export function HeroPhotoCarousel({
     }, AUTO_ADVANCE_DELAY);
 
     return () => window.clearInterval(timer);
-  }, [activeItemHasVideo, visibleImages.length]);
+  }, [activeItemHasVideo, isPaused, visibleImages.length]);
 
   useEffect(() => {
     if (activeIndex < visibleImages.length) {
@@ -171,6 +172,18 @@ export function HeroPhotoCarousel({
         )}
       </div>
 
+      {visibleImages.length > 1 && !activeItemHasVideo ? (
+        <button
+          type="button"
+          className="absolute top-[84px] right-3 z-[5] grid size-11 place-items-center rounded-[var(--radius-pill)] border border-white/70 bg-white/90 text-[var(--accent-strong)] shadow-[var(--shadow-md)] transition-[transform,background-color] duration-180 hover:-translate-y-px hover:bg-white focus-visible:-translate-y-px focus-visible:outline-3 focus-visible:outline-offset-3 focus-visible:outline-[rgba(var(--accent-rgb),0.72)] max-sm:top-[50px] max-sm:right-2.5"
+          aria-label={isPaused ? "继续自动播放活动照片" : "暂停自动播放活动照片"}
+          aria-pressed={isPaused}
+          onClick={() => setIsPaused((current) => !current)}
+        >
+          {isPaused ? <Play aria-hidden="true" className="size-[18px]" /> : <Pause aria-hidden="true" className="size-[18px]" />}
+        </button>
+      ) : null}
+
       {visibleImages.length > 0 ? (
         <div className="mt-2 ml-[-16px] grid w-[76%] max-sm:mt-3 max-sm:ml-0 max-sm:w-[88%]" aria-label="活动照片切换">
           <div className="grid grid-cols-3 gap-2.5 overflow-visible p-0" role="tablist" aria-label="活动照片">
@@ -183,7 +196,7 @@ export function HeroPhotoCarousel({
                 aria-label={`${image.videoUrl ? "播放" : "查看"}${image.alt}`}
                 className={cn(
                   "group min-w-0 appearance-none overflow-visible rounded-[var(--radius-sm)] border-0 bg-transparent p-0 text-left transition-[transform,opacity] duration-220 focus-visible:outline-none",
-                  index === activeIndex && "-translate-y-[3px]",
+                  index === activeIndex && "-translate-y-[3px] ring-2 ring-[var(--accent)] ring-offset-2",
                 )}
                 onClick={() => setActiveIndex(index)}
               >
