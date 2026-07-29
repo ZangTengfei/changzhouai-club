@@ -30,6 +30,7 @@
   display: grid;
   place-items: center;
   min-height: 272px;
+  padding-top: 16px;
   overflow: hidden;
   border: 1px solid rgba(var(--accent-rgb), 0.14);
   border-radius: var(--radius-md);
