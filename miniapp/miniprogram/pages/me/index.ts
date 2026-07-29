@@ -8,15 +8,15 @@ type FootprintItem = MiniappUser["footprints"][number] & {
   locationLabel: string;
 };
 
-type LoginDestination = "profile" | "growth" | "registrations";
+type LoginDestination = "account" | "profile" | "growth" | "registrations";
 
 function readLoginDestination(
   event: WechatMiniprogram.TouchEvent,
 ): LoginDestination {
   const destination = String(event.currentTarget.dataset.destination ?? "");
-  return ["growth", "registrations"].includes(destination)
+  return ["account", "profile", "growth", "registrations"].includes(destination)
     ? (destination as LoginDestination)
-    : "profile";
+    : "account";
 }
 
 function navigateAfterLogin(destination: LoginDestination, user: MiniappUser) {
@@ -25,6 +25,11 @@ function navigateAfterLogin(destination: LoginDestination, user: MiniappUser) {
   }
   if (destination === "registrations") {
     return wx.navigateTo({ url: "/pages/registrations/index" });
+  }
+  if (destination === "account") {
+    return user.profileCompletion.completed
+      ? undefined
+      : wx.navigateTo({ url: "/pages/profile/edit/index" });
   }
   return wx.navigateTo({
     url: user.profileCompletion.completed

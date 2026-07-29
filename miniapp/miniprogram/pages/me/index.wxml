@@ -33,7 +33,7 @@
         </view>
       </view>
 
-      <button class="primary-button guest-login-button" data-destination="profile" loading="{{loggingIn}}" disabled="{{loggingIn}}" bindtap="handleLogin">{{loggingIn ? '登录中' : '微信登录'}}</button>
+      <button class="primary-button guest-login-button" data-destination="account" loading="{{loggingIn}}" disabled="{{loggingIn}}" bindtap="handleLogin">{{loggingIn ? '登录中' : '微信登录'}}</button>
       <text wx:if="{{loginFailed}}" class="account-login-error">{{loginRequired ? '登录没有完成，请检查网络后重试。' : '登录状态已失效，请重新登录。'}}</text>
       <text wx:if="{{loginRequestId}}" class="account-login-diagnostic">诊断编号：{{loginRequestId}}</text>
     </view>
