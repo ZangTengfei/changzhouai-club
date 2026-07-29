@@ -10,6 +10,11 @@ import {
 
 const MINIAPP_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1_000;
 const WECHAT_PROVIDER = "wechat";
+const MEMBERSHIP_BADGE_CODES = new Set([
+  "co_builder",
+  "core_builder",
+  "honor_builder",
+]);
 
 type WechatChannel = "website" | "official_account" | "mini_program";
 
@@ -609,7 +614,7 @@ export async function loadMiniappAccountSnapshot(
     badges.set(badge.badge_code, {
       code: badge.badge_code,
       label: badge.label,
-      description: badge.description ?? "社区授予的成员徽章",
+      description: badge.description ?? "社区授予的成员标签",
       source: badge.source,
       awardedAt: badge.awarded_at,
     });
@@ -676,7 +681,9 @@ export async function loadMiniappAccountSnapshot(
     stats: {
       registrationCount: registrations.length,
       attendanceCount,
-      badgeCount: badges.size,
+      badgeCount: Array.from(badges.keys()).filter(
+        (code) => !MEMBERSHIP_BADGE_CODES.has(code),
+      ).length,
     },
     badges: Array.from(badges.values()),
     footprints: recentFootprints,

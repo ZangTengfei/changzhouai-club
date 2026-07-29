@@ -1,6 +1,6 @@
 import { ensureSession } from "../../services/auth";
 import { formatEventDate } from "../../services/events";
-import { getHonorBadges } from "../../utils/member-growth";
+import { getCommunityTags } from "../../utils/member-growth";
 
 type FootprintItem = MiniappUser["footprints"][number] & {
   dateLabel: string;
@@ -13,7 +13,7 @@ function buildAccountViewData(user: MiniappUser) {
   return {
     user,
     avatarInitial: user.displayName.slice(0, 1) || "微",
-    honorTags: getHonorBadges(user).slice(0, 2),
+    communityTags: getCommunityTags(user).slice(0, 2),
     latestFootprint: latestFootprint
       ? {
           ...latestFootprint,
@@ -29,7 +29,7 @@ Page({
   data: {
     user: null as MiniappUser | null,
     avatarInitial: "微",
-    honorTags: [] as MiniappUser["badges"],
+    communityTags: [] as MiniappUser["badges"],
     latestFootprint: null as FootprintItem | null,
     activitySummary: "",
     loading: true,

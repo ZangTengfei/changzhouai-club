@@ -185,20 +185,20 @@ export function AdminMemberDetailPageClient({
           }),
         });
         await readApiResult(response);
-        toast.success("成员徽章已授予。");
+        toast.success("社区标签已添加。");
         reload();
       } catch (requestError) {
         toast.error(
           requestError instanceof Error
             ? requestError.message
-            : "徽章授予失败。",
+            : "标签添加失败。",
         );
       }
     });
   }
 
   function handleBadgeRemove(awardId: string, label: string) {
-    if (!window.confirm(`确认移除“${label}”徽章吗？`)) return;
+    if (!window.confirm(`确认移除“${label}”标签吗？`)) return;
     startTransition(async () => {
       try {
         const response = await fetch(`/api/admin/members/${memberId}/badges`, {
@@ -207,7 +207,7 @@ export function AdminMemberDetailPageClient({
           body: JSON.stringify({ awardId }),
         });
         await readApiResult(response);
-        toast.success("成员徽章已移除。");
+        toast.success("社区标签已移除。");
         reload();
       } catch (requestError) {
         toast.error(
@@ -328,7 +328,7 @@ export function AdminMemberDetailPageClient({
           ) : null}
 
           <AdminPanel>
-            <AdminPanelHeader eyebrow="Member Badges" title="公开徽章" />
+            <AdminPanelHeader eyebrow="Member Tags" title="社区标签" />
             <AdminPanelBody className="space-y-4">
               {data?.badgeAwards.length ? (
                 <div className="divide-y divide-border/70 border-y border-border/70">
@@ -346,7 +346,7 @@ export function AdminMemberDetailPageClient({
                           {badge.label}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {badge.description ?? "社区授予的成员徽章"} ·{" "}
+                          {badge.description ?? "社区授予的成员标签"} ·{" "}
                           {formatDate(badge.awarded_at)}
                         </p>
                       </div>
@@ -366,7 +366,7 @@ export function AdminMemberDetailPageClient({
                 </div>
               ) : (
                 <AdminNotice>
-                  尚未人工授予徽章。基于签到和共建身份的自动徽章不在这里重复显示。
+                  尚未人工添加社区标签。基于签到自动生成的标签不在这里重复显示。
                 </AdminNotice>
               )}
 
@@ -377,13 +377,13 @@ export function AdminMemberDetailPageClient({
                   handleBadgeSubmit(new FormData(formEvent.currentTarget));
                 }}
               >
-                <AdminField label="徽章名称">
+                <AdminField label="标签名称">
                   <Input
                     name="badge_label"
                     minLength={2}
                     maxLength={20}
                     required
-                    placeholder="例如：社区引路人"
+                    placeholder="例如：商业顾问"
                   />
                 </AdminField>
                 <AdminField label="授予说明">
@@ -395,7 +395,7 @@ export function AdminMemberDetailPageClient({
                 </AdminField>
                 <Button type="submit" disabled={isPending}>
                   <Award className="size-4" aria-hidden="true" />
-                  {isPending ? "处理中..." : "授予徽章"}
+                  {isPending ? "处理中..." : "添加标签"}
                 </Button>
               </form>
             </AdminPanelBody>

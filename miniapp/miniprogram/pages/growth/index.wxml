@@ -16,7 +16,7 @@
     <view class="growth-stats">
       <view class="stat-item"><text class="stat-value">{{user.stats.registrationCount}}</text><text class="stat-label">活动报名</text></view>
       <view class="stat-item"><text class="stat-value">{{user.stats.attendanceCount}}</text><text class="stat-label">实际到场</text></view>
-      <view class="stat-item"><text class="stat-value">{{honorBadges.length}}</text><text class="stat-label">社区荣誉</text></view>
+      <view class="stat-item"><text class="stat-value">{{communityTags.length}}</text><text class="stat-label">社区标签</text></view>
     </view>
 
     <view class="growth-section">
@@ -40,16 +40,16 @@
 
     <view class="growth-section">
       <view class="section-heading">
-        <text class="section-title">社区荣誉</text>
-        <text class="section-note">真实参与与社区授予</text>
+        <text class="section-title">社区标签</text>
+        <text class="section-note">社区角色与真实贡献</text>
       </view>
-      <view wx:if="{{honorBadges.length}}" class="honor-list">
-        <view wx:for="{{honorBadges}}" wx:key="code" class="honor-row">
+      <view wx:if="{{communityTags.length}}" class="honor-list">
+        <view wx:for="{{communityTags}}" wx:key="code" class="honor-row">
           <image src="/assets/logo-mark.png" mode="aspectFit" />
           <view class="honor-copy"><text class="honor-name">{{item.label}}</text><text class="honor-description">{{item.description}}</text></view>
         </view>
       </view>
-      <view wx:else class="honor-empty">社区荣誉会根据真实参与和贡献逐步记录。</view>
+      <view wx:else class="honor-empty">社区标签会根据成员职责与真实贡献逐步记录。</view>
     </view>
   </block>
 </view>

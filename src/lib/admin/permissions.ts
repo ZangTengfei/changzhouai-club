@@ -38,7 +38,7 @@ export const ADMIN_PERMISSION_DEFINITIONS = [
   { key: "members.write_profile", label: "编辑成员资料", module: "members", sensitivity: "L1" },
   { key: "members.manage_status", label: "管理成员状态", module: "members", sensitivity: "L3" },
   { key: "members.manage_co_builder", label: "管理共建身份", module: "members", sensitivity: "L2" },
-  { key: "members.manage_badges", label: "管理成员徽章", module: "members", sensitivity: "L2" },
+  { key: "members.manage_badges", label: "管理社区标签", module: "members", sensitivity: "L2" },
   { key: "members.manage_roles", label: "管理成员后台角色", module: "members", sensitivity: "L4" },
   { key: "members.export", label: "导出成员数据", module: "members", sensitivity: "L4" },
 

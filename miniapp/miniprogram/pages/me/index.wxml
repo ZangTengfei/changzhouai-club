@@ -64,14 +64,14 @@
     <view class="stats-card surface-card">
       <view class="stat-item"><text>{{user.stats.registrationCount}}</text><text>活动报名</text></view>
       <view class="stat-item"><text>{{user.stats.attendanceCount}}</text><text>实际到场</text></view>
-      <view class="stat-item"><text>{{user.stats.badgeCount}}</text><text>社区荣誉</text></view>
+      <view class="stat-item"><text>{{user.stats.badgeCount}}</text><text>社区标签</text></view>
     </view>
 
     <view class="section-heading-row"><text class="section-title">我的空间</text></view>
     <view class="space-grid">
       <view class="space-card space-green space-card-featured" bindtap="openGrowth" role="button" aria-label="查看成长档案">
         <view class="icon-tile"><image src="/assets/icons/growth-purple-v2.png" mode="aspectFit" /></view>
-        <text class="space-title">成长档案</text><text class="space-copy">查看身份路径与社区荣誉</text>
+        <text class="space-title">成长档案</text><text class="space-copy">查看身份路径与社区标签</text>
         <image class="space-arrow" src="/assets/icons/chevron-green-v2.png" mode="aspectFit" />
       </view>
       <view class="space-card space-orange" bindtap="openRegistrations" role="button">
@@ -99,11 +99,10 @@
     </view>
     <view wx:else class="empty-state" bindtap="openEvents" role="button">还没有活动记录，去看看社区活动</view>
 
-    <view class="honor-strip">
-      <text class="honor-heading">社区荣誉</text>
+    <view wx:if="{{communityTags.length}}" class="honor-strip">
+      <text class="honor-heading">社区标签</text>
       <view class="honor-items">
-        <view class="honor-item"><image src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" /><text>{{user.identityLabel}}</text></view>
-        <view wx:for="{{honorTags}}" wx:key="code" class="honor-item"><image src="/assets/logo-mark.png" mode="aspectFit" /><text>{{item.label}}</text></view>
+        <view wx:for="{{communityTags}}" wx:key="code" class="honor-item"><image src="/assets/logo-mark.png" mode="aspectFit" /><text>{{item.label}}</text></view>
       </view>
     </view>
   </view>

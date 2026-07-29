@@ -63,7 +63,7 @@ export function getGrowthSteps(currentLevel: number): GrowthStep[] {
   }));
 }
 
-export function getHonorBadges(user: MiniappUser) {
+export function getCommunityTags(user: MiniappUser) {
   return user.badges.filter(
     (badge) => !membershipBadgeCodes.has(badge.code),
   );

@@ -360,6 +360,18 @@ try {
       (badge) => badge.code === "verification_badge",
     ),
   );
+  const membershipBadgeCodes = new Set([
+    "co_builder",
+    "core_builder",
+    "honor_builder",
+  ]);
+  assert.equal(
+    accountSnapshot.body?.user?.stats?.badgeCount,
+    accountSnapshot.body?.user?.badges?.filter(
+      (badge) => !membershipBadgeCodes.has(badge.code),
+    ).length,
+  );
+  pass("community_tag_count_excludes_membership_level");
   assert.ok(
     accountSnapshot.body?.user?.footprints?.some(
       (footprint) =>

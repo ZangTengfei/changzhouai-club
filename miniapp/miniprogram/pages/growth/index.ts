@@ -1,7 +1,7 @@
 import { ensureSession } from "../../services/auth";
 import {
   getGrowthSteps,
-  getHonorBadges,
+  getCommunityTags,
   getMembershipLevel,
   membershipLevels,
 } from "../../utils/member-growth";
@@ -21,7 +21,7 @@ Page({
     nextLevelLabel: membershipLevels[1].label as string,
     joinedLabel: "",
     growthSteps: getGrowthSteps(0),
-    honorBadges: [] as MiniappUser["badges"],
+    communityTags: [] as MiniappUser["badges"],
     loading: true,
     loadFailed: false,
   },
@@ -44,7 +44,7 @@ Page({
           membershipLevels[currentLevel + 1]?.label ?? "已到达当前最高等级",
         joinedLabel: formatJoinedAt(user.joinedAt),
         growthSteps: getGrowthSteps(currentLevel),
-        honorBadges: getHonorBadges(user),
+        communityTags: getCommunityTags(user),
         loading: false,
       });
     } catch {
