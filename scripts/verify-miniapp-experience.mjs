@@ -112,6 +112,8 @@ try {
       willingToAttend: true,
       willingToShare: false,
       willingToJoinProjects: false,
+      status: "admin",
+      isCoBuilder: true,
       privacyAccepted: true,
     }),
   });
@@ -120,13 +122,16 @@ try {
   assert.equal(legacyBootstrapPut.body?.user?.capabilityProfileComplete, false);
   const { data: bootstrapMember, error: bootstrapMemberError } = await supabase
     .from("members")
-    .select("is_publicly_visible")
+    .select("status, is_co_builder, is_publicly_visible")
     .eq("id", userId)
     .single();
   if (bootstrapMemberError) throw bootstrapMemberError;
   assert.equal(bootstrapMember.is_publicly_visible, false);
+  assert.notEqual(bootstrapMember.status, "admin");
+  assert.equal(bootstrapMember.is_co_builder, false);
   pass("legacy_profile_keeps_registration_ready");
   pass("incomplete_profile_not_published_before_completion");
+  pass("self_profile_cannot_grant_member_identity");
 
   const profilePut = await request("/api/miniapp/profile", {
     method: "PUT",

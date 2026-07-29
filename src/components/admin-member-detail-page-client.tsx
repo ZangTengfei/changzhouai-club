@@ -117,12 +117,10 @@ export function AdminMemberDetailPageClient({
             ),
             seeking_summary: String(formData.get("seeking_summary") ?? ""),
             bio: String(formData.get("bio") ?? ""),
-            status: String(formData.get("status") ?? "pending"),
             willing_to_attend: formData.get("willing_to_attend") === "on",
             willing_to_share: formData.get("willing_to_share") === "on",
             willing_to_join_projects:
               formData.get("willing_to_join_projects") === "on",
-            is_co_builder: formData.get("is_co_builder") === "on",
             is_publicly_visible: formData.get("is_publicly_visible") === "on",
             is_featured_on_home: formData.get("is_featured_on_home") === "on",
           }),
@@ -138,6 +136,35 @@ export function AdminMemberDetailPageClient({
           requestError instanceof Error
             ? requestError.message
             : "保存失败，请稍后再试。",
+        );
+      }
+    });
+  }
+
+  function handleIdentitySubmit(formData: FormData) {
+    startTransition(async () => {
+      try {
+        const response = await fetch(
+          `/api/admin/members/${memberId}/identity`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              status: String(formData.get("status") ?? "pending"),
+              is_co_builder: formData.get("is_co_builder") === "on",
+            }),
+          },
+        );
+        await readApiResult(response);
+        toast.success("成员身份已更新。");
+        reload();
+      } catch (requestError) {
+        toast.error(
+          requestError instanceof Error
+            ? requestError.message
+            : "成员身份保存失败，请稍后再试。",
         );
       }
     });
@@ -250,7 +277,7 @@ export function AdminMemberDetailPageClient({
               {formatAdminMemberStatus(member.status)}
             </AdminStatusBadge>
             {member.isCoBuilder ? (
-              <AdminStatusBadge tone="completed">共建成员</AdminStatusBadge>
+              <AdminStatusBadge tone="completed">共建伙伴</AdminStatusBadge>
             ) : null}
             {member.adminRoles.map((role) => (
               <AdminStatusBadge key={role.roleId} tone="scheduled">
@@ -347,86 +374,139 @@ export function AdminMemberDetailPageClient({
               : []),
 
             {
-              key: "tags",
-              label: `社区标签（${data?.badgeAwards.length ?? 0}）`,
+              key: "identity",
+              label: `身份与标签（${data?.badgeAwards.length ?? 0}）`,
               children: (
-                <AdminPanel>
-                  <AdminPanelHeader eyebrow="Member Tags" title="社区标签" />
-                  <AdminPanelBody className="space-y-4">
-                    {data?.badgeAwards.length ? (
-                      <div className="divide-y divide-border/70 border-y border-border/70">
-                        {data.badgeAwards.map((badge) => (
-                          <div
-                            key={badge.id}
-                            className="flex items-center gap-3 py-3"
-                          >
-                            <Award
-                              className="size-4 shrink-0 text-primary"
-                              aria-hidden="true"
-                            />
-                            <div className="min-w-0 flex-1">
-                              <p className="text-sm font-medium text-foreground">
-                                {badge.label}
-                              </p>
-                              <p className="text-xs text-muted-foreground">
-                                {badge.description ?? "社区授予的成员标签"} ·{" "}
-                                {formatDate(badge.awarded_at)}
-                              </p>
-                            </div>
-                            <Button
-                              type="button"
-                              size="icon"
-                              variant="ghost"
-                              title={`移除${badge.label}`}
-                              aria-label={`移除${badge.label}`}
-                              disabled={isPending}
-                              onClick={() =>
-                                handleBadgeRemove(badge.id, badge.label)
-                              }
-                            >
-                              <Trash2 className="size-4" aria-hidden="true" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
+                <div className="grid gap-4">
+                  <AdminPanel>
+                    <AdminPanelHeader
+                      eyebrow="Member Identity"
+                      title="成员身份"
+                    />
+                    <AdminPanelBody className="space-y-4">
                       <AdminNotice>
-                        尚未人工添加社区标签。基于签到自动生成的标签不在这里重复显示。
+                        成员可以表达参与共建的意愿；“共建伙伴”身份必须由管理员在这里认定。
                       </AdminNotice>
-                    )}
+                      <form
+                        className="grid gap-4 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1fr)_auto] md:items-end"
+                        onSubmit={(formEvent) => {
+                          formEvent.preventDefault();
+                          handleIdentitySubmit(
+                            new FormData(formEvent.currentTarget),
+                          );
+                        }}
+                      >
+                        <AdminField label="成员状态">
+                          <NativeSelect
+                            name="status"
+                            defaultValue={member.status}
+                          >
+                            <option value="pending">待完善</option>
+                            <option value="active">活跃成员</option>
+                            <option value="organizer">组织者</option>
+                            <option value="admin">管理员</option>
+                            <option value="paused">暂停中</option>
+                          </NativeSelect>
+                        </AdminField>
+                        <AdminCheckboxRow>
+                          <input
+                            type="checkbox"
+                            name="is_co_builder"
+                            defaultChecked={member.isCoBuilder}
+                            className="size-4 accent-[var(--primary)]"
+                          />
+                          <span>
+                            <strong>管理员认定为共建伙伴</strong>
+                            <small className="mt-1 block text-muted-foreground">
+                              该身份会展示在小程序成员名片和成长档案中
+                            </small>
+                          </span>
+                        </AdminCheckboxRow>
+                        <Button type="submit" disabled={isPending}>
+                          {isPending ? "保存中..." : "保存成员身份"}
+                        </Button>
+                      </form>
+                    </AdminPanelBody>
+                  </AdminPanel>
 
-                    <form
-                      className="grid gap-4 md:grid-cols-[minmax(0,0.5fr)_minmax(0,1fr)_auto] md:items-end"
-                      onSubmit={(formEvent) => {
-                        formEvent.preventDefault();
-                        handleBadgeSubmit(
-                          new FormData(formEvent.currentTarget),
-                        );
-                      }}
-                    >
-                      <AdminField label="标签名称">
-                        <Input
-                          name="badge_label"
-                          minLength={2}
-                          maxLength={20}
-                          required
-                          placeholder="例如：商业顾问"
-                        />
-                      </AdminField>
-                      <AdminField label="授予说明">
-                        <Input
-                          name="badge_description"
-                          maxLength={100}
-                          placeholder="说明标签对应的角色或贡献"
-                        />
-                      </AdminField>
-                      <Button type="submit" disabled={isPending}>
-                        <Award className="size-4" aria-hidden="true" />
-                        {isPending ? "处理中..." : "添加标签"}
-                      </Button>
-                    </form>
-                  </AdminPanelBody>
-                </AdminPanel>
+                  <AdminPanel>
+                    <AdminPanelHeader eyebrow="Member Tags" title="社区标签" />
+                    <AdminPanelBody className="space-y-4">
+                      {data?.badgeAwards.length ? (
+                        <div className="divide-y divide-border/70 border-y border-border/70">
+                          {data.badgeAwards.map((badge) => (
+                            <div
+                              key={badge.id}
+                              className="flex items-center gap-3 py-3"
+                            >
+                              <Award
+                                className="size-4 shrink-0 text-primary"
+                                aria-hidden="true"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <p className="text-sm font-medium text-foreground">
+                                  {badge.label}
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {badge.description ?? "社区授予的成员标签"} ·{" "}
+                                  {formatDate(badge.awarded_at)}
+                                </p>
+                              </div>
+                              <Button
+                                type="button"
+                                size="icon"
+                                variant="ghost"
+                                title={`移除${badge.label}`}
+                                aria-label={`移除${badge.label}`}
+                                disabled={isPending}
+                                onClick={() =>
+                                  handleBadgeRemove(badge.id, badge.label)
+                                }
+                              >
+                                <Trash2 className="size-4" aria-hidden="true" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <AdminNotice>
+                          尚未人工添加社区标签。基于签到自动生成的标签不在这里重复显示。
+                        </AdminNotice>
+                      )}
+
+                      <form
+                        className="grid gap-4 md:grid-cols-[minmax(0,0.5fr)_minmax(0,1fr)_auto] md:items-end"
+                        onSubmit={(formEvent) => {
+                          formEvent.preventDefault();
+                          handleBadgeSubmit(
+                            new FormData(formEvent.currentTarget),
+                          );
+                        }}
+                      >
+                        <AdminField label="标签名称">
+                          <Input
+                            name="badge_label"
+                            minLength={2}
+                            maxLength={20}
+                            required
+                            placeholder="例如：商业顾问"
+                          />
+                        </AdminField>
+                        <AdminField label="授予说明">
+                          <Input
+                            name="badge_description"
+                            maxLength={100}
+                            placeholder="说明标签对应的角色或贡献"
+                          />
+                        </AdminField>
+                        <Button type="submit" disabled={isPending}>
+                          <Award className="size-4" aria-hidden="true" />
+                          {isPending ? "处理中..." : "添加标签"}
+                        </Button>
+                      </form>
+                    </AdminPanelBody>
+                  </AdminPanel>
+                </div>
               ),
             },
 
@@ -515,7 +595,7 @@ export function AdminMemberDetailPageClient({
                                 : "暂不共建"}
                             </AdminStatusBadge>
                             <AdminStatusBadge tone="completed">
-                              {member.isCoBuilder ? "共建成员" : "普通成员"}
+                              {member.isCoBuilder ? "共建伙伴" : "普通成员"}
                             </AdminStatusBadge>
                             <AdminStatusBadge tone="neutral">
                               {member.isPubliclyVisible
@@ -665,7 +745,7 @@ export function AdminMemberDetailPageClient({
                           />
                         </AdminField>
 
-                        <AdminField label="身份 / 角色">
+                        <AdminField label="职业 / 个人角色">
                           <Input
                             name="role_label"
                             defaultValue={member.roleLabel ?? ""}
@@ -689,19 +769,6 @@ export function AdminMemberDetailPageClient({
                           />
                         </AdminField>
 
-                        <AdminField label="成员状态">
-                          <NativeSelect
-                            name="status"
-                            defaultValue={member.status}
-                          >
-                            <option value="pending">pending</option>
-                            <option value="active">active</option>
-                            <option value="organizer">organizer</option>
-                            <option value="admin">admin</option>
-                            <option value="paused">paused</option>
-                          </NativeSelect>
-                        </AdminField>
-
                         <AdminCheckboxRow className="self-end">
                           <input
                             type="checkbox"
@@ -710,16 +777,6 @@ export function AdminMemberDetailPageClient({
                             className="size-4 accent-[var(--primary)]"
                           />
                           <span>公开展示到成员页</span>
-                        </AdminCheckboxRow>
-
-                        <AdminCheckboxRow className="self-end">
-                          <input
-                            type="checkbox"
-                            name="is_co_builder"
-                            defaultChecked={member.isCoBuilder}
-                            className="size-4 accent-[var(--primary)]"
-                          />
-                          <span>标记为已参与共建成员</span>
                         </AdminCheckboxRow>
 
                         <AdminCheckboxRow className="self-end">
@@ -834,8 +891,8 @@ export function AdminMemberDetailPageClient({
             },
           ].sort(
             (left, right) =>
-              ["overview", "profile", "tags", "roles"].indexOf(left.key) -
-              ["overview", "profile", "tags", "roles"].indexOf(right.key),
+              ["overview", "identity", "profile", "roles"].indexOf(left.key) -
+              ["overview", "identity", "profile", "roles"].indexOf(right.key),
           )}
         />
       ) : null}
