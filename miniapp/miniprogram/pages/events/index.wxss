@@ -6,6 +6,15 @@
   margin-bottom: 20rpx;
 }
 
+.event-mode-swiper {
+  width: 100%;
+  transition: height 180ms ease;
+}
+
+.event-mode-panel {
+  min-height: 220rpx;
+}
+
 .month-group {
   margin-top: 8rpx;
 }

@@ -1,6 +1,6 @@
 <custom-navigation title="活动" />
 
-<view class="page-shell events-page" bindtouchstart="handleModeSwipeStart" bindtouchend="handleModeSwipeEnd" bindtouchcancel="handleModeSwipeCancel">
+<view class="page-shell events-page">
   <view class="page-intro">
     <text class="page-intro-title">一起见面，做点新东西</text>
     <text class="page-intro-copy">发现社区现场，也记录每一次真实连接。</text>
@@ -25,42 +25,55 @@
     <text class="retry-copy">网络可能开了个小差，请重新加载</text>
     <button class="retry-button" bindtap="retryLoad" aria-label="重新加载活动列表">重新加载</button>
   </view>
-  <view wx:elif="{{visibleEvents.length === 0}}" class="empty-state">当前范围暂时没有活动</view>
+  <swiper wx:else class="event-mode-swiper" style="height: {{swiperHeight}}px;" current="{{activeModeIndex}}" duration="280" bindchange="handleModeChange">
+    <swiper-item wx:for="{{modePanels}}" wx:key="mode" wx:for-item="panel">
+      <view id="event-mode-panel-{{panel.mode}}" class="event-mode-panel">
+        <view wx:if="{{panel.loading}}" class="empty-state loading-state"><view class="loading-spinner" aria-hidden="true"></view><text>正在整理活动</text></view>
+        <view wx:elif="{{panel.loadFailed}}" class="empty-state retry-state">
+          <text class="retry-icon">↻</text>
+          <text class="retry-title">活动加载失败</text>
+          <text class="retry-copy">网络可能开了个小差，请重新加载</text>
+          <button class="retry-button" data-mode="{{panel.mode}}" bindtap="retryMode" aria-label="重新加载当前活动列表">重新加载</button>
+        </view>
+        <view wx:elif="{{panel.visibleEvents.length === 0}}" class="empty-state">当前范围暂时没有活动</view>
 
-  <view wx:else class="event-index">
-    <view wx:for="{{eventGroups}}" wx:key="key" wx:for-item="group" class="month-group">
-      <view class="section-heading-row month-heading">
-        <view class="month-copy"><text class="month-label">{{group.monthLabel}}</text><text class="year-label">{{group.yearLabel}}</text></view>
-        <text class="month-count">{{group.countLabel}}</text>
-      </view>
+        <view wx:else class="event-index">
+          <view wx:for="{{panel.eventGroups}}" wx:key="key" wx:for-item="group" class="month-group">
+            <view class="section-heading-row month-heading">
+              <view class="month-copy"><text class="month-label">{{group.monthLabel}}</text><text class="year-label">{{group.yearLabel}}</text></view>
+              <text class="month-count">{{group.countLabel}}</text>
+            </view>
 
-      <view class="month-events">
-        <view wx:for="{{group.events}}" wx:key="id" wx:for-item="event" class="event-card surface-card" data-slug="{{event.slug}}" bindtap="openEvent">
-          <view class="event-media">
-            <image wx:if="{{event.cover_image_url}}" class="event-image" src="{{event.cover_image_url}}" mode="{{event.coverMode}}" />
-            <view wx:else class="event-image event-image-placeholder"><image src="/assets/logo-mark.png" mode="aspectFit" /></view>
-            <view class="event-date-tile"><text>{{event.dateDayLabel}}</text><text>{{event.dateTimeLabel}}</text></view>
-          </view>
-          <view class="event-content">
-            <text class="event-type {{event.typeClass}}">{{event.eventTypeLabel}}</text>
-            <text class="event-name">{{event.title}}</text>
-            <view wx:if="{{event.registrationTags.length}}" class="registration-tag-row">
-              <text wx:for="{{event.registrationTags}}" wx:key="label" class="registration-meta-tag registration-meta-tag-{{item.tone}}">{{item.label}}</text>
+            <view class="month-events">
+              <view wx:for="{{group.events}}" wx:key="id" wx:for-item="event" class="event-card surface-card" data-slug="{{event.slug}}" bindtap="openEvent">
+                <view class="event-media">
+                  <image wx:if="{{event.cover_image_url}}" class="event-image" src="{{event.cover_image_url}}" mode="{{event.coverMode}}" />
+                  <view wx:else class="event-image event-image-placeholder"><image src="/assets/logo-mark.png" mode="aspectFit" /></view>
+                  <view class="event-date-tile"><text>{{event.dateDayLabel}}</text><text>{{event.dateTimeLabel}}</text></view>
+                </view>
+                <view class="event-content">
+                  <text class="event-type {{event.typeClass}}">{{event.eventTypeLabel}}</text>
+                  <text class="event-name">{{event.title}}</text>
+                  <view wx:if="{{event.registrationTags.length}}" class="registration-tag-row">
+                    <text wx:for="{{event.registrationTags}}" wx:key="label" class="registration-meta-tag registration-meta-tag-{{item.tone}}">{{item.label}}</text>
+                  </view>
+                  <view class="event-footer">
+                    <text class="event-location">{{event.locationLabel}}</text>
+                    <text class="event-status">{{event.statusLabel}}</text>
+                    <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
+                  </view>
+                </view>
+              </view>
             </view>
-            <view class="event-footer">
-              <text class="event-location">{{event.locationLabel}}</text>
-              <text class="event-status">{{event.statusLabel}}</text>
-              <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
-            </view>
           </view>
+
+          <view wx:if="{{panel.loadingMore}}" class="pagination-status">正在加载更多活动</view>
+          <view wx:elif="{{panel.hasMore}}" class="pagination-status">上拉加载更多</view>
+          <view wx:elif="{{panel.visibleEvents.length >= 5}}" class="pagination-status">已显示全部活动</view>
         </view>
       </view>
-    </view>
-
-    <view wx:if="{{loadingMore}}" class="pagination-status">正在加载更多活动</view>
-    <view wx:elif="{{hasMore}}" class="pagination-status">上拉加载更多</view>
-    <view wx:elif="{{visibleEvents.length >= 5}}" class="pagination-status">已显示全部活动</view>
-  </view>
+    </swiper-item>
+  </swiper>
 
   <view wx:if="{{counts.history}}" class="history-teaser" data-mode="history" bindtap="switchMode" role="button">
     <view class="icon-tile"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view>

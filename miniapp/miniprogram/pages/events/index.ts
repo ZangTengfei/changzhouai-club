@@ -1,6 +1,7 @@
 import {
   getEventRegistrationTags,
   loadEvents,
+  type EventCatalog,
   type EventFilter,
   type EventMode,
   type EventSummary,
@@ -28,11 +29,19 @@ type EventGroup = {
   events: EventListItem[];
 };
 
+type EventModePanel = {
+  mode: EventMode;
+  visibleEvents: EventListItem[];
+  eventGroups: EventGroup[];
+  loading: boolean;
+  loadingMore: boolean;
+  hasMore: boolean;
+  loadFailed: boolean;
+};
+
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
 const pageSize = 5;
-const modeSwipeThreshold = 72;
 let requestVersion = 0;
-let modeSwipeStart: { x: number; y: number } | null = null;
 
 function getCoverMode(url: string | null): "aspectFill" | "aspectFit" {
   return url && /poster|layout|challenge|registration/i.test(url)
@@ -88,23 +97,56 @@ function groupEvents(events: EventListItem[]) {
   return Array.from(groups.values());
 }
 
-Page({
-  data: {
-    visibleEvents: [] as EventListItem[],
-    eventGroups: [] as EventGroup[],
-    activeMode: "history" as EventMode,
-    activeFilter: "all" as EventFilter,
-    counts: { upcoming: 0, history: 0, draft: 0 },
-    canPreviewDrafts: false,
-    categoryCounts: { all: 0, community: 0, external: 0 },
+function createModePanel(
+  mode: EventMode,
+  options: Partial<EventModePanel> = {},
+): EventModePanel {
+  return {
+    mode,
+    visibleEvents: [],
+    eventGroups: [],
     loading: true,
     loadingMore: false,
     hasMore: false,
     loadFailed: false,
+    ...options,
+  };
+}
+
+function buildLoadedPanel(mode: EventMode, catalog: EventCatalog) {
+  const visibleEvents = catalog.events.map(mapEvent);
+  return createModePanel(mode, {
+    visibleEvents,
+    eventGroups: groupEvents(visibleEvents),
+    loading: false,
+    hasMore: catalog.pagination.hasMore,
+  });
+}
+
+function getAvailableModes(canPreviewDrafts: boolean): EventMode[] {
+  return canPreviewDrafts
+    ? ["upcoming", "history", "draft"]
+    : ["upcoming", "history"];
+}
+
+Page({
+  data: {
+    modePanels: [
+      createModePanel("upcoming"),
+      createModePanel("history"),
+    ] as EventModePanel[],
+    activeMode: "history" as EventMode,
+    activeModeIndex: 1,
+    activeFilter: "all" as EventFilter,
+    counts: { upcoming: 0, history: 0, draft: 0 },
+    canPreviewDrafts: false,
+    swiperHeight: 260,
+    loading: true,
+    loadFailed: false,
   },
 
   onLoad() {
-    void this.loadFirstPage();
+    void this.loadInitialPage();
   },
 
   onShow() {
@@ -114,13 +156,8 @@ Page({
   },
 
   onPullDownRefresh() {
-    const hasEvents =
-      this.data.counts.upcoming ||
-      this.data.counts.history ||
-      this.data.counts.draft;
-    const mode = hasEvents ? this.data.activeMode : undefined;
-    void this.loadFirstPage(
-      mode,
+    void this.refreshMode(
+      this.data.activeMode,
       this.data.activeFilter,
       true,
     ).finally(() => wx.stopPullDownRefresh());
@@ -131,80 +168,195 @@ Page({
   },
 
   retryLoad() {
-    const hasEvents =
-      this.data.counts.upcoming ||
-      this.data.counts.history ||
-      this.data.counts.draft;
-    const mode = hasEvents ? this.data.activeMode : undefined;
-    void this.loadFirstPage(mode, this.data.activeFilter);
+    void this.loadInitialPage();
   },
 
-  async loadFirstPage(
-    mode?: EventMode,
-    filter: EventFilter = "all",
-    preserveContent = false,
-  ) {
+  async loadInitialPage() {
     const currentRequest = ++requestVersion;
     this.setData({
-      loading: !preserveContent,
+      loading: true,
       loadFailed: false,
-      loadingMore: false,
-      ...(preserveContent ? {} : {
-        visibleEvents: [],
-        eventGroups: [],
-        hasMore: false,
-      }),
     });
+
+    try {
+      const catalog = await loadEvents({
+        filter: this.data.activeFilter,
+        limit: pageSize,
+      });
+      if (currentRequest !== requestVersion) return;
+
+      const modes = getAvailableModes(catalog.canPreviewDrafts);
+      const modePanels = modes.map((mode) =>
+        mode === catalog.mode
+          ? buildLoadedPanel(mode, catalog)
+          : createModePanel(mode),
+      );
+      const activeModeIndex = modes.indexOf(catalog.mode);
+      this.setData(
+        {
+          modePanels,
+          activeModeIndex,
+          activeMode: catalog.mode,
+          activeFilter: catalog.filter,
+          counts: catalog.counts,
+          canPreviewDrafts: catalog.canPreviewDrafts,
+          loading: false,
+        },
+        () => this.measureActivePanel(),
+      );
+
+      void this.preloadModePanels(
+        modes.filter((mode) => mode !== catalog.mode),
+        catalog.filter,
+        currentRequest,
+      );
+    } catch {
+      if (currentRequest !== requestVersion) return;
+      this.setData({ loading: false, loadFailed: true });
+    }
+  },
+
+  async preloadModePanels(
+    modes: EventMode[],
+    filter: EventFilter,
+    currentRequest: number,
+  ) {
+    const results = await Promise.all(
+      modes.map(async (mode) => {
+        try {
+          return {
+            mode,
+            catalog: await loadEvents({ mode, filter, limit: pageSize }),
+          };
+        } catch {
+          return { mode, catalog: null };
+        }
+      }),
+    );
+    if (currentRequest !== requestVersion) return;
+
+    const resultsByMode = new Map(results.map((result) => [result.mode, result]));
+    const modePanels = this.data.modePanels.map((panel) => {
+      const result = resultsByMode.get(panel.mode);
+      if (!result) return panel;
+      return result.catalog
+        ? buildLoadedPanel(panel.mode, result.catalog)
+        : createModePanel(panel.mode, { loading: false, loadFailed: true });
+    });
+    this.setData({ modePanels }, () => this.measureActivePanel());
+  },
+
+  updateModePanel(mode: EventMode, panel: EventModePanel) {
+    const modePanels = this.data.modePanels.map((item) =>
+      item.mode === mode ? panel : item,
+    );
+    this.setData({ modePanels }, () => {
+      if (mode === this.data.activeMode) this.measureActivePanel();
+    });
+  },
+
+  async refreshMode(
+    mode: EventMode,
+    filter: EventFilter,
+    preserveContent = false,
+  ) {
+    const currentRequest = requestVersion;
+    const currentPanel = this.data.modePanels.find((panel) => panel.mode === mode);
+    if (!currentPanel) return;
+
+    this.updateModePanel(
+      mode,
+      preserveContent
+        ? { ...currentPanel, loadFailed: false }
+        : createModePanel(mode),
+    );
 
     try {
       const catalog = await loadEvents({ mode, filter, limit: pageSize });
       if (currentRequest !== requestVersion) return;
-      const visibleEvents = catalog.events.map(mapEvent);
       this.setData({
-        visibleEvents,
-        eventGroups: groupEvents(visibleEvents),
         activeMode: catalog.mode,
         activeFilter: catalog.filter,
         counts: catalog.counts,
         canPreviewDrafts: catalog.canPreviewDrafts,
-        categoryCounts: catalog.categoryCounts,
-        hasMore: catalog.pagination.hasMore,
-        loading: false,
       });
+      this.updateModePanel(mode, buildLoadedPanel(mode, catalog));
     } catch {
       if (currentRequest !== requestVersion) return;
       if (preserveContent) {
-        this.setData({ loading: false });
+        this.updateModePanel(mode, currentPanel);
         void wx.showToast({ title: "刷新失败，请稍后重试", icon: "none" });
         return;
       }
-      this.setData({
-        visibleEvents: [],
-        eventGroups: [],
-        loading: false,
-        loadFailed: true,
-      });
+      this.updateModePanel(
+        mode,
+        createModePanel(mode, { loading: false, loadFailed: true }),
+      );
     }
   },
 
+  async loadAllModePanels(filter: EventFilter) {
+    const currentRequest = ++requestVersion;
+    const modes = this.data.modePanels.map((panel) => panel.mode);
+    this.setData({
+      activeFilter: filter,
+      modePanels: modes.map((mode) => createModePanel(mode)),
+    }, () => this.measureActivePanel());
+
+    const results = await Promise.all(
+      modes.map(async (mode) => {
+        try {
+          return {
+            mode,
+            catalog: await loadEvents({ mode, filter, limit: pageSize }),
+          };
+        } catch {
+          return { mode, catalog: null };
+        }
+      }),
+    );
+    if (currentRequest !== requestVersion) return;
+
+    const successfulCatalog = results.find((result) => result.catalog)?.catalog;
+    const modePanels = results.map((result) =>
+      result.catalog
+        ? buildLoadedPanel(result.mode, result.catalog)
+        : createModePanel(result.mode, { loading: false, loadFailed: true }),
+    );
+    this.setData(
+      {
+        modePanels,
+        ...(successfulCatalog ? { counts: successfulCatalog.counts } : {}),
+      },
+      () => this.measureActivePanel(),
+    );
+  },
+
   async loadMore() {
-    if (this.data.loading || this.data.loadingMore || !this.data.hasMore) return;
+    const panel = this.data.modePanels.find(
+      (item) => item.mode === this.data.activeMode,
+    );
+    if (!panel || panel.loading || panel.loadingMore || !panel.hasMore) return;
     const currentRequest = requestVersion;
-    this.setData({ loadingMore: true });
+    this.updateModePanel(this.data.activeMode, {
+      ...panel,
+      loadingMore: true,
+    });
 
     try {
       const catalog = await loadEvents({
         mode: this.data.activeMode,
         filter: this.data.activeFilter,
-        offset: this.data.visibleEvents.length,
+        offset: panel.visibleEvents.length,
         limit: pageSize,
       });
       if (currentRequest !== requestVersion) return;
       const visibleEvents = [
-        ...this.data.visibleEvents,
+        ...panel.visibleEvents,
         ...catalog.events.map(mapEvent),
       ];
-      this.setData({
+      this.updateModePanel(panel.mode, {
+        ...panel,
         visibleEvents,
         eventGroups: groupEvents(visibleEvents),
         hasMore: catalog.pagination.hasMore,
@@ -212,58 +364,60 @@ Page({
       });
     } catch {
       if (currentRequest !== requestVersion) return;
-      this.setData({ loadingMore: false });
+      this.updateModePanel(panel.mode, { ...panel, loadingMore: false });
       void wx.showToast({ title: "加载更多失败，请稍后重试", icon: "none" });
     }
   },
 
   switchMode(event: WechatMiniprogram.TouchEvent) {
     const mode = String(event.currentTarget.dataset.mode ?? "") as EventMode;
-    if (mode !== "upcoming" && mode !== "history" && mode !== "draft") return;
-    if (mode === this.data.activeMode) return;
-    void this.loadFirstPage(mode, this.data.activeFilter);
+    const activeModeIndex = this.data.modePanels.findIndex(
+      (panel) => panel.mode === mode,
+    );
+    if (activeModeIndex < 0 || activeModeIndex === this.data.activeModeIndex) return;
+    this.setData({ activeModeIndex, activeMode: mode });
   },
 
-  handleModeSwipeStart(event: WechatMiniprogram.TouchEvent) {
-    const touch = event.touches[0];
-    modeSwipeStart = touch ? { x: touch.clientX, y: touch.clientY } : null;
+  handleModeChange(
+    event: WechatMiniprogram.CustomEvent<{ current: number }>,
+  ) {
+    const activeModeIndex = event.detail.current;
+    const panel = this.data.modePanels[activeModeIndex];
+    if (!panel) return;
+    this.setData(
+      { activeModeIndex, activeMode: panel.mode },
+      () => this.measureActivePanel(),
+    );
   },
 
-  handleModeSwipeCancel() {
-    modeSwipeStart = null;
+  retryMode(event: WechatMiniprogram.TouchEvent) {
+    const mode = String(event.currentTarget.dataset.mode ?? "") as EventMode;
+    if (!this.data.modePanels.some((panel) => panel.mode === mode)) return;
+    void this.refreshMode(mode, this.data.activeFilter);
   },
 
-  handleModeSwipeEnd(event: WechatMiniprogram.TouchEvent) {
-    const start = modeSwipeStart;
-    const touch = event.changedTouches[0];
-    modeSwipeStart = null;
-    if (!start || !touch || this.data.loading) return;
-
-    const deltaX = touch.clientX - start.x;
-    const deltaY = touch.clientY - start.y;
-    if (
-      Math.abs(deltaX) < modeSwipeThreshold ||
-      Math.abs(deltaX) <= Math.abs(deltaY) * 1.2
-    ) {
-      return;
-    }
-
-    const modes: EventMode[] = this.data.canPreviewDrafts
-      ? ["upcoming", "history", "draft"]
-      : ["upcoming", "history"];
-    const currentIndex = modes.indexOf(this.data.activeMode);
-    const nextIndex = currentIndex + (deltaX < 0 ? 1 : -1);
-    const nextMode = modes[nextIndex];
-    if (!nextMode) return;
-
-    void this.loadFirstPage(nextMode, this.data.activeFilter);
+  measureActivePanel() {
+    const panel = this.data.modePanels[this.data.activeModeIndex];
+    if (!panel) return;
+    wx.nextTick(() => {
+      this.createSelectorQuery()
+        .select(`#event-mode-panel-${panel.mode}`)
+        .boundingClientRect((rect) => {
+          if (!rect || Array.isArray(rect) || !rect.height) return;
+          const swiperHeight = Math.ceil(rect.height);
+          if (swiperHeight !== this.data.swiperHeight) {
+            this.setData({ swiperHeight });
+          }
+        })
+        .exec();
+    });
   },
 
   switchFilter(event: WechatMiniprogram.TouchEvent) {
     const filter = String(event.currentTarget.dataset.filter ?? "") as EventFilter;
     if (filter !== "all" && filter !== "community" && filter !== "external") return;
     if (filter === this.data.activeFilter) return;
-    void this.loadFirstPage(this.data.activeMode, filter);
+    void this.loadAllModePanels(filter);
   },
 
   openEvent(event: WechatMiniprogram.TouchEvent) {
