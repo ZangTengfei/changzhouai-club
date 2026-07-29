@@ -7,7 +7,7 @@ import type { WeDailyReport } from "@/lib/wedaily";
 import { downloadWeDailyReportTemplatePng } from "@/lib/wedaily-report-export";
 import { appendWeDailyReportQrCode } from "@/lib/wedaily-report-qr";
 
-import styles from "./ai-news-page.module.css";
+import { newsStyles as styles } from "./news-tailwind";
 
 type ExportState = "idle" | "exporting" | "done" | "error";
 

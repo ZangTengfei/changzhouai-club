@@ -41,7 +41,7 @@ import {
 
 import { DailyReportExportButton } from "./daily-report-export-button";
 import { GroupDailyReportExportButton } from "./group-daily-report-export-button";
-import styles from "./ai-news-page.module.css";
+import { newsStyles as styles } from "./news-tailwind";
 
 export const metadata: Metadata = {
   title: "AI 资讯",
@@ -241,14 +241,9 @@ async function getLocalViewerCanEditReports() {
   return context.isAuthorized;
 }
 
-function FeedItem({ item, index }: { item: AiNewsItem; index: number }) {
+function FeedItem({ item }: { item: AiNewsItem }) {
   return (
     <article className={styles.feedItem}>
-      <div className={styles.feedItemRail}>
-        <span>{String(index + 1).padStart(2, "0")}</span>
-        <i aria-hidden="true" />
-      </div>
-
       <div className={styles.feedItemBody}>
         <div className={styles.feedItemMeta}>
           <time dateTime={item.publishedAt ?? undefined}>{formatAiNewsDateTime(item.publishedAt)}</time>
@@ -258,11 +253,11 @@ function FeedItem({ item, index }: { item: AiNewsItem; index: number }) {
           </span>
         </div>
 
-        <h2>
+        <h3>
           <Link href={item.href} target="_blank" rel="noreferrer" aria-label={`打开原文：${item.title}`}>
             {item.title}
           </Link>
-        </h2>
+        </h3>
         {item.summary ? <p className={styles.feedSummary}>{item.summary}</p> : null}
 
         {item.recommendationReason ? (
@@ -281,22 +276,6 @@ function FeedItem({ item, index }: { item: AiNewsItem; index: number }) {
         </div>
       </div>
     </article>
-  );
-}
-
-function SmallNewsLink({ item, index }: { item: AiNewsItem; index: number }) {
-  return (
-    <Link
-      className={styles.smallNewsLink}
-      href={item.href}
-      target="_blank"
-      rel="noreferrer"
-      aria-label={`打开今日必看：${item.title}`}
-    >
-      <span>{String(index + 1).padStart(2, "0")}</span>
-      <strong>{item.title}</strong>
-      <small>{formatAiNewsDateTime(item.publishedAt)}</small>
-    </Link>
   );
 }
 
@@ -723,7 +702,8 @@ export default async function AiNewsPage({
     isLocalView ? getWeDailyReports({ limit: 20 }) : Promise.resolve({ error: null, reports: [] }),
   ]);
   const visibleItems = feed?.items ?? [];
-  const leadItems = visibleItems.slice(0, 5);
+  const initialFeedItems = visibleItems.slice(0, 12);
+  const deferredFeedItems = visibleItems.slice(12);
   const dailyReport = daily.dailyReport;
   const dailyItemCount = dailyReport ? countDailyItems(dailyReport.sections) : 0;
   const groupReports = groupDaily.reports;
@@ -884,11 +864,26 @@ export default async function AiNewsPage({
               </div>
 
               {visibleItems.length > 0 ? (
-                <div className={styles.feedList}>
-                  {visibleItems.map((item, index) => (
-                    <FeedItem item={item} index={index} key={item.id} />
-                  ))}
-                </div>
+                <>
+                  <div className={styles.feedList}>
+                    {initialFeedItems.map((item) => (
+                      <FeedItem item={item} key={item.id} />
+                    ))}
+                  </div>
+                  {deferredFeedItems.length > 0 ? (
+                    <details className="group mt-3 rounded-[var(--radius-md)] border border-[rgba(var(--ink-rgb),0.08)] bg-white/70 p-3 shadow-[var(--shadow-sm)]">
+                      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-center rounded-[var(--radius-sm)] px-3 text-sm font-black text-primary transition hover:bg-[rgba(var(--accent-rgb),0.08)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary [&::-webkit-details-marker]:hidden">
+                        <span className="group-open:hidden">查看其余 {deferredFeedItems.length} 条资讯</span>
+                        <span className="hidden group-open:inline">收起更多资讯</span>
+                      </summary>
+                      <div className={`${styles.feedList} mt-3 border-t border-[rgba(var(--ink-rgb),0.08)] pt-3`}>
+                        {deferredFeedItems.map((item) => (
+                          <FeedItem item={item} key={item.id} />
+                        ))}
+                      </div>
+                    </details>
+                  ) : null}
+                </>
               ) : (
                 <div className={styles.emptyState}>
                   <strong>当前筛选下没有资讯</strong>
@@ -899,20 +894,6 @@ export default async function AiNewsPage({
             </main>
 
             <aside className={styles.sideRail}>
-              <section className={styles.sideCard}>
-                <div className={styles.sideCardTitle}>
-                  <span>Today</span>
-                  <h2>今日必看</h2>
-                </div>
-                <div className={styles.smallNewsList}>
-                  {leadItems.length > 0 ? (
-                    leadItems.map((item, index) => <SmallNewsLink item={item} index={index} key={item.id} />)
-                  ) : (
-                    <p className={styles.sideMuted}>正在整理今日内容。</p>
-                  )}
-                </div>
-              </section>
-
               <section className={styles.sideCard} id="daily-report">
                 <div className={styles.sideCardTitle}>
                   <span>Daily</span>

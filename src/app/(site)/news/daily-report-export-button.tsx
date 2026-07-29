@@ -6,7 +6,7 @@ import { Download, LoaderCircle } from "lucide-react";
 import type { AiHotDailyItem, AiHotDailyReport } from "@/lib/aihot";
 import { createQrMatrix } from "@/lib/qr-svg";
 
-import styles from "./ai-news-page.module.css";
+import { newsStyles as styles } from "./news-tailwind";
 
 const POSTER_WIDTH = 1080;
 const POSTER_PADDING = 64;
