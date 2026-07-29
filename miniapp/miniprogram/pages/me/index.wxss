@@ -148,23 +148,8 @@
   margin: 0;
 }
 
-.guest-stats-card {
-  position: relative;
-  padding-bottom: 46rpx;
-}
-
 .guest-stats-card .stat-item text:first-child {
   color: #98a49f;
-}
-
-.guest-stats-hint {
-  position: absolute;
-  right: 0;
-  bottom: 12rpx;
-  left: 0;
-  color: var(--color-subtle);
-  font-size: 20rpx;
-  text-align: center;
 }
 
 .guest-recent-card {

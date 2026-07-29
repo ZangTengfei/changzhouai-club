@@ -42,7 +42,6 @@
       <view class="stat-item"><text>--</text><text>活动报名</text></view>
       <view class="stat-item"><text>--</text><text>实际到场</text></view>
       <view class="stat-item"><text>--</text><text>社区标签</text></view>
-      <text class="guest-stats-hint">登录后可见</text>
     </view>
 
     <view class="section-heading-row"><text class="section-title">我的空间</text></view>
