@@ -933,6 +933,7 @@
   gap: 12px;
   min-width: 0;
   padding: 20px;
+  border: 1px solid rgba(var(--ink-rgb), 0.1);
   border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.74);
   box-shadow: 0 10px 24px rgba(var(--ink-rgb), 0.035);
