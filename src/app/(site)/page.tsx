@@ -113,6 +113,7 @@ export default async function HomePage() {
   const primaryScheduledEvent = scheduledEvents[0];
   const hasUpcomingEvent = Boolean(primaryScheduledEvent);
   const latestCompletedEvent = recentCompletedEvents[0];
+  const recentEvents = recentCompletedEvents.slice(0, 3);
   const heroCarouselImages = recentCompletedEvents
     .flatMap((event) => {
       const imageUrl = event.imageUrl ?? event.gallery[0]?.imageUrl ?? null;
@@ -275,8 +276,20 @@ export default async function HomePage() {
         })}
       </section>
 
-      <section className={cx("home-current-section")} aria-label="近期活动">
-        <article className={cx("home-next-event-card")}>
+      <section
+        className={cx("home-current-section")}
+        aria-labelledby="home-current-events-title"
+      >
+        <div className={cx("home-card-heading home-showcase-heading home-current-heading")}>
+          <div>
+            <h2 id="home-current-events-title">近期活动</h2>
+            <p>报名下一场，也看看我们最近一起做过什么</p>
+          </div>
+          <Link href="/events" prefetch={false}>全部活动 →</Link>
+        </div>
+
+        <div className={cx("home-activity-layout")}>
+          <article className={cx("home-next-event-card")}>
             <div className={cx("home-next-event-copy")}>
               <p className={cx("home-next-event-kicker")}>
                 {hasUpcomingEvent ? "下一场活动等你来！" : "下一场活动筹备中"}
@@ -319,7 +332,59 @@ export default async function HomePage() {
               sizes="(max-width: 1024px) 1px, 220px"
             />
             <DoodleSparkles className={cx("home-doodle home-doodle-event-sparkles")} />
-        </article>
+          </article>
+
+          <aside
+            className={cx("home-event-history-card")}
+            aria-labelledby="home-event-history-title"
+          >
+            <div className={cx("home-event-history-heading")}>
+              <div>
+                <span>活动回顾</span>
+                <h3 id="home-event-history-title">最近举办</h3>
+              </div>
+              <small>{completedEventsCount || recentEvents.length} 场活动已沉淀</small>
+            </div>
+
+            {recentEvents.length > 0 ? (
+              <div className={cx("home-event-history-list")}>
+                {recentEvents.map((item) => (
+                  <Link
+                    href={`/events/${item.slug}`}
+                    prefetch={false}
+                    className={cx("home-event-history-item")}
+                    key={item.id}
+                  >
+                    <div className={cx("home-event-history-media")}>
+                      {item.imageUrl ? (
+                        <Image
+                          src={getEventImageUrl(item.imageUrl, "review-card") ?? item.imageUrl}
+                          alt={item.title}
+                          width={320}
+                          height={180}
+                          unoptimized
+                          loading="lazy"
+                        />
+                      ) : (
+                        <span>AI</span>
+                      )}
+                    </div>
+                    <div className={cx("home-event-history-copy")}>
+                      <small>{formatReviewDate(item.isoDate)}</small>
+                      <h4>{item.title}</h4>
+                      <p>{item.locationLabel}</p>
+                    </div>
+                    <ArrowRight aria-hidden="true" strokeWidth={1.8} />
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <div className={cx("home-empty-state")}>
+                暂无活动回顾内容，活动结束后会在这里留下记录。
+              </div>
+            )}
+          </aside>
+        </div>
       </section>
 
       <section className={cx("home-member-stories")} aria-labelledby="home-member-stories-title">
