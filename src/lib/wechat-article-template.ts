@@ -79,6 +79,34 @@ type RenderWechatArticleOptions = {
   officialAccount?: WechatArticleOfficialAccount | null;
 };
 
+const articleCardTones = [
+  {
+    background: "#e9f9f0",
+    border: "#d5f0e1",
+    accent: "#08794a",
+  },
+  {
+    background: "#fff2e5",
+    border: "#ffe3c5",
+    accent: "#b85a12",
+  },
+  {
+    background: "#edf5ff",
+    border: "#d9e9ff",
+    accent: "#256ac2",
+  },
+  {
+    background: "#f3efff",
+    border: "#e5dcff",
+    accent: "#6548cc",
+  },
+  {
+    background: "#fff8dd",
+    border: "#f5e8ad",
+    accent: "#9f7200",
+  },
+] as const;
+
 const officialAccountQrUrl = "https://changzhouai.club/wechat-official-account-qr.jpg";
 
 export const wechatArticleTemplates: WechatArticleTemplate[] = [
@@ -585,12 +613,16 @@ export function renderWechatArticleHtml(
   const bodyBlocks = firstHeading
     ? blocks.filter((block) => block !== firstHeading)
     : blocks;
+  let sectionHeadingIndex = 0;
 
   const bodyHtml = bodyBlocks
     .map((block, index) => {
       if (block.type === "heading") {
         if (block.depth === 2) {
-          return `<section style="margin:30px 0 14px;padding:0 0 0 12px;border-left:4px solid ${template.accent};"><h2 style="margin:0;color:${template.text};font-size:20px;line-height:1.45;font-weight:800;">${renderInline(
+          const tone = articleCardTones[sectionHeadingIndex % articleCardTones.length];
+          sectionHeadingIndex += 1;
+
+          return `<section style="margin:30px 0 14px;padding:14px 16px 15px;border:1px solid ${tone.border};border-radius:14px;background:${tone.background};"><h2 style="margin:0;color:${tone.accent};font-size:20px;line-height:1.45;font-weight:800;">${renderInline(
             block.text,
             template,
           )}</h2></section>`;
@@ -609,9 +641,9 @@ export function renderWechatArticleHtml(
       }
 
       if (block.type === "quote") {
-        return `<section style="margin:20px 0;padding:16px 17px 16px;border:1px solid ${template.accentSoft};border-radius:12px;background:${template.background};">
+        return `<section style="margin:20px 0;padding:16px 17px 16px;border:1px solid #f5e8ad;border-radius:12px;background:#fff8dd;">
           <section style="display:table;width:100%;border-collapse:collapse;">
-            <section style="display:table-cell;width:26px;vertical-align:top;color:${template.accent};font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1;font-weight:700;">“</section>
+            <section style="display:table-cell;width:26px;vertical-align:top;color:#9f7200;font-family:Georgia,'Times New Roman',serif;font-size:26px;line-height:1;font-weight:700;">“</section>
             <section style="display:table-cell;vertical-align:top;">
               <p style="margin:0;color:${template.text};font-size:15px;line-height:1.85;">${block.lines
           .map((line) => renderInline(line, template))
@@ -724,18 +756,20 @@ export function renderWechatArticleHtml(
 
   const headerHtml = showTitle
     ? `<section style="padding:26px 20px 8px;">
-    <section style="display:inline-block;margin:0 0 14px;padding:5px 10px;border-radius:999px;background:${template.accentSoft};color:${template.accent};font-size:12px;font-weight:700;letter-spacing:0.08em;">${escapeHtml(
-      template.label,
-    )}</section>
-    <h1 style="margin:0;color:${template.text};font-size:28px;line-height:1.28;font-weight:900;letter-spacing:0;">${renderInline(
-      title,
-      template,
-    )}</h1>
-    <section style="width:42px;height:4px;margin:18px 0 0;border-radius:999px;background:${template.accentWarm};"></section>
+    <section style="padding:18px 18px 20px;border:1px solid #d5f0e1;border-radius:18px;background:#e9f9f0;">
+      <section style="display:inline-block;margin:0 0 14px;padding:5px 10px;border-radius:999px;background:#fff2e5;color:#b85a12;font-size:12px;font-weight:700;letter-spacing:0.08em;">${escapeHtml(
+        template.label,
+      )}</section>
+      <h1 style="margin:0;color:${template.text};font-size:28px;line-height:1.28;font-weight:900;letter-spacing:0;">${renderInline(
+        title,
+        template,
+      )}</h1>
+      <section style="width:42px;height:4px;margin:18px 0 0;border-radius:999px;background:${template.accent};"></section>
+    </section>
   </section>`
     : `<section style="padding:22px 20px 8px;">
-    <section style="padding:15px 16px;border:1px solid ${template.accentSoft};border-radius:14px;background:${template.background};">
-      <section style="display:inline-block;padding:3px 9px;border:1px solid ${template.accent};border-radius:999px;background:${template.background};color:${template.accent};font-size:11px;line-height:1.5;font-weight:800;letter-spacing:0.08em;">${escapeHtml(
+    <section style="padding:15px 16px;border:1px solid #d5f0e1;border-radius:14px;background:#e9f9f0;">
+      <section style="display:inline-block;padding:3px 9px;border-radius:999px;background:#fff2e5;color:#b85a12;font-size:11px;line-height:1.5;font-weight:800;letter-spacing:0.08em;">${escapeHtml(
         template.label,
       )}</section>
       <strong style="display:block;margin:10px 0 0;color:${template.text};font-size:17px;line-height:1.5;font-weight:800;">${escapeHtml(
