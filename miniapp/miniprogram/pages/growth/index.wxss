@@ -147,18 +147,16 @@
 
 .growth-step-badge-background {
   position: absolute;
-  right: -8rpx;
-  bottom: -28rpx;
-  width: 206rpx;
-  height: 206rpx;
+  right: 12rpx;
+  bottom: 12rpx;
+  width: 132rpx;
+  height: 132rpx;
   opacity: 0.38;
 }
 
 .growth-step-current .growth-step-badge-background {
-  right: -2rpx;
-  bottom: -24rpx;
-  width: 220rpx;
-  height: 220rpx;
+  width: 136rpx;
+  height: 136rpx;
   opacity: 0.62;
 }
 

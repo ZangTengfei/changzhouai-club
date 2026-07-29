@@ -383,3 +383,44 @@ The mobile above-the-fold comparison is sufficient for the shared design surface
 - P3: the long-form report pages retain their deliberately dense data layouts. They now share the public visual baseline, but individual chart/table redesigns can be handled separately if a lighter editorial treatment is desired.
 
 final result: passed
+
+---
+
+# Miniapp Growth Badge Padding QA
+
+## Comparison setup
+
+- Source visual truth: `output/design-qa/2026-07-29-miniapp-growth-badge/source.png`
+- Rendered implementation: `output/design-qa/2026-07-29-miniapp-growth-badge/growth-final-v2.png`
+- Focused implementation crop: `output/design-qa/2026-07-29-miniapp-growth-badge/badge-final-v2.png`
+- Side-by-side evidence: `output/design-qa/2026-07-29-miniapp-growth-badge/comparison-v2.png`
+- Simulator viewport: iPhone 12/13 Pro, 390 x 762 CSS px; screenshot 780 x 1524 pixels at 2x capture density
+- Source pixels: 238 x 163; focused implementation crop: 195 x 170; comparison normalized to equal 260 x 180 slots
+- State: 成长档案“身份成长”区域，社区成员为当前身份，其余三级未解锁
+
+## Findings
+
+- No remaining P0, P1, or P2 visual issue was found after the second sizing pass.
+- Fonts and typography: identity names, descriptions, and unlock labels retain their existing size, weight, wrapping, and hierarchy.
+- Spacing and layout: all four badge assets now fit inside their cards. The current badge uses 136rpx and locked badges use 132rpx, with 12rpx right and bottom padding.
+- Colors and visual tokens: current and locked opacity, border colors, and card backgrounds are unchanged.
+- Image quality and asset fidelity: the original badge raster assets remain in use with `aspectFit`; the outer ring and bottom star are fully visible without clipping.
+- Copy and content: no identity or unlock-state copy changed.
+- Accessibility and interaction: the badges remain decorative backgrounds and do not alter the readable identity or state text.
+
+## Comparison history
+
+1. Initial evidence showed the 220rpx current badge extending beyond the clipped card boundary, hiding part of its outer ring.
+2. First pass reduced it to 184rpx and added 12rpx right/bottom spacing, but the badge still exceeded the card's 164rpx minimum height and remained clipped at the top.
+3. Second pass reduced the current badge to 136rpx and locked badges to 132rpx while preserving 12rpx inset spacing.
+4. Post-fix evidence shows the complete circular rim and star with visible breathing room inside every card.
+
+## Focused region comparison
+
+The focused comparison isolates the same current badge and card corner before and after the change. The full implementation screenshot additionally confirms consistent sizing and padding across all four identity cards.
+
+## Follow-up polish
+
+- None required for this scoped adjustment.
+
+final result: passed
