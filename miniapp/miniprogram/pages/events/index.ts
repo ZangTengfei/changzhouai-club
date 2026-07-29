@@ -1,9 +1,11 @@
-import { loadEvents, type EventSummary } from "../../services/events";
+import {
+  loadEvents,
+  type EventFilter,
+  type EventMode,
+  type EventSummary,
+} from "../../services/events";
 import { trackEvent } from "../../services/analytics";
 import { ensureSession } from "../../services/auth";
-
-type EventMode = "upcoming" | "history";
-type EventFilter = "all" | "community" | "external";
 
 type EventListItem = EventSummary & {
   coverMode: "aspectFill" | "aspectFit";
@@ -25,6 +27,8 @@ type EventGroup = {
 };
 
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+const pageSize = 5;
+let requestVersion = 0;
 
 function getCoverMode(url: string | null): "aspectFill" | "aspectFit" {
   return url && /poster|layout|challenge|registration/i.test(url)
@@ -56,19 +60,6 @@ function mapEvent(event: EventSummary): EventListItem {
   };
 }
 
-function filterEvents(events: EventListItem[], filter: EventFilter) {
-  if (filter === "all") return events;
-  return events.filter((event) => event.event_type === filter);
-}
-
-function getCategoryCounts(events: EventListItem[]) {
-  return {
-    all: events.length,
-    community: events.filter((event) => event.event_type === "community").length,
-    external: events.filter((event) => event.event_type === "external").length,
-  };
-}
-
 function groupEvents(events: EventListItem[]) {
   const groups = new Map<string, EventGroup>();
 
@@ -94,8 +85,6 @@ function groupEvents(events: EventListItem[]) {
 
 Page({
   data: {
-    upcoming: [] as EventListItem[],
-    history: [] as EventListItem[],
     visibleEvents: [] as EventListItem[],
     eventGroups: [] as EventGroup[],
     activeMode: "history" as EventMode,
@@ -103,41 +92,81 @@ Page({
     counts: { upcoming: 0, history: 0 },
     categoryCounts: { all: 0, community: 0, external: 0 },
     loading: true,
+    loadingMore: false,
+    hasMore: false,
     loadFailed: false,
+  },
+
+  onLoad() {
+    void this.loadFirstPage();
   },
 
   onShow() {
     void ensureSession().then(() =>
       trackEvent("event_list_view", "/pages/events/index"),
     ).catch(() => undefined);
-    void this.loadPage();
   },
 
   onPullDownRefresh() {
-    void this.loadPage().finally(() => wx.stopPullDownRefresh());
+    const mode = this.data.counts.upcoming || this.data.counts.history
+      ? this.data.activeMode
+      : undefined;
+    void this.loadFirstPage(
+      mode,
+      this.data.activeFilter,
+      true,
+    ).finally(() => wx.stopPullDownRefresh());
   },
 
-  async loadPage() {
-    this.setData({ loading: true, loadFailed: false });
+  onReachBottom() {
+    void this.loadMore();
+  },
+
+  retryLoad() {
+    const mode = this.data.counts.upcoming || this.data.counts.history
+      ? this.data.activeMode
+      : undefined;
+    void this.loadFirstPage(mode, this.data.activeFilter);
+  },
+
+  async loadFirstPage(
+    mode?: EventMode,
+    filter: EventFilter = "all",
+    preserveContent = false,
+  ) {
+    const currentRequest = ++requestVersion;
+    this.setData({
+      loading: !preserveContent,
+      loadFailed: false,
+      loadingMore: false,
+      ...(preserveContent ? {} : {
+        visibleEvents: [],
+        eventGroups: [],
+        hasMore: false,
+      }),
+    });
 
     try {
-      const catalog = await loadEvents();
-      const upcoming = catalog.upcoming.map(mapEvent);
-      const history = catalog.history.map(mapEvent);
-      const activeMode: EventMode = upcoming.length > 0 ? "upcoming" : "history";
-      const sourceEvents = activeMode === "upcoming" ? upcoming : history;
+      const catalog = await loadEvents({ mode, filter, limit: pageSize });
+      if (currentRequest !== requestVersion) return;
+      const visibleEvents = catalog.events.map(mapEvent);
       this.setData({
-        upcoming,
-        history,
-        visibleEvents: sourceEvents,
-        eventGroups: groupEvents(sourceEvents),
-        activeMode,
-        activeFilter: "all",
+        visibleEvents,
+        eventGroups: groupEvents(visibleEvents),
+        activeMode: catalog.mode,
+        activeFilter: catalog.filter,
         counts: catalog.counts,
-        categoryCounts: getCategoryCounts(sourceEvents),
+        categoryCounts: catalog.categoryCounts,
+        hasMore: catalog.pagination.hasMore,
         loading: false,
       });
     } catch {
+      if (currentRequest !== requestVersion) return;
+      if (preserveContent) {
+        this.setData({ loading: false });
+        void wx.showToast({ title: "刷新失败，请稍后重试", icon: "none" });
+        return;
+      }
       this.setData({
         visibleEvents: [],
         eventGroups: [],
@@ -147,29 +176,48 @@ Page({
     }
   },
 
+  async loadMore() {
+    if (this.data.loading || this.data.loadingMore || !this.data.hasMore) return;
+    const currentRequest = requestVersion;
+    this.setData({ loadingMore: true });
+
+    try {
+      const catalog = await loadEvents({
+        mode: this.data.activeMode,
+        filter: this.data.activeFilter,
+        offset: this.data.visibleEvents.length,
+        limit: pageSize,
+      });
+      if (currentRequest !== requestVersion) return;
+      const visibleEvents = [
+        ...this.data.visibleEvents,
+        ...catalog.events.map(mapEvent),
+      ];
+      this.setData({
+        visibleEvents,
+        eventGroups: groupEvents(visibleEvents),
+        hasMore: catalog.pagination.hasMore,
+        loadingMore: false,
+      });
+    } catch {
+      if (currentRequest !== requestVersion) return;
+      this.setData({ loadingMore: false });
+      void wx.showToast({ title: "加载更多失败，请稍后重试", icon: "none" });
+    }
+  },
+
   switchMode(event: WechatMiniprogram.TouchEvent) {
     const mode = String(event.currentTarget.dataset.mode ?? "") as EventMode;
     if (mode !== "upcoming" && mode !== "history") return;
-    const sourceEvents = mode === "upcoming" ? this.data.upcoming : this.data.history;
-    const visibleEvents = filterEvents(sourceEvents, this.data.activeFilter);
-    this.setData({
-      activeMode: mode,
-      visibleEvents,
-      eventGroups: groupEvents(visibleEvents),
-      categoryCounts: getCategoryCounts(sourceEvents),
-    });
+    if (mode === this.data.activeMode) return;
+    void this.loadFirstPage(mode, this.data.activeFilter);
   },
 
   switchFilter(event: WechatMiniprogram.TouchEvent) {
     const filter = String(event.currentTarget.dataset.filter ?? "") as EventFilter;
     if (filter !== "all" && filter !== "community" && filter !== "external") return;
-    const sourceEvents = this.data.activeMode === "upcoming" ? this.data.upcoming : this.data.history;
-    const visibleEvents = filterEvents(sourceEvents, filter);
-    this.setData({
-      activeFilter: filter,
-      visibleEvents,
-      eventGroups: groupEvents(visibleEvents),
-    });
+    if (filter === this.data.activeFilter) return;
+    void this.loadFirstPage(this.data.activeMode, filter);
   },
 
   openEvent(event: WechatMiniprogram.TouchEvent) {

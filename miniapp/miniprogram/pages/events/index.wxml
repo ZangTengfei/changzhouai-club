@@ -22,7 +22,7 @@
     <text class="retry-icon">↻</text>
     <text class="retry-title">活动加载失败</text>
     <text class="retry-copy">网络可能开了个小差，请重新加载</text>
-    <button class="retry-button" bindtap="loadPage" aria-label="重新加载活动列表">重新加载</button>
+    <button class="retry-button" bindtap="retryLoad" aria-label="重新加载活动列表">重新加载</button>
   </view>
   <view wx:elif="{{visibleEvents.length === 0}}" class="empty-state">当前范围暂时没有活动</view>
 
@@ -52,6 +52,10 @@
         </view>
       </view>
     </view>
+
+    <view wx:if="{{loadingMore}}" class="pagination-status">正在加载更多活动</view>
+    <view wx:elif="{{hasMore}}" class="pagination-status">上拉加载更多</view>
+    <view wx:elif="{{visibleEvents.length >= 5}}" class="pagination-status">已显示全部活动</view>
   </view>
 
   <view wx:if="{{counts.history}}" class="history-teaser" data-mode="history" bindtap="switchMode" role="button">

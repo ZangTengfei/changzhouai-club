@@ -77,10 +77,9 @@ Page({
     this.setData({ loading: true, loadFailed: false });
 
     try {
-      const catalog = await loadEvents();
-      const showingHistory = catalog.upcoming.length === 0;
-      const events = showingHistory ? catalog.history : catalog.upcoming;
-      const mappedEvents = events.slice(0, 4).map((event, index) => ({
+      const catalog = await loadEvents({ limit: 4 });
+      const showingHistory = catalog.mode === "history";
+      const mappedEvents = catalog.events.map((event, index) => ({
         ...event,
         coverMode: getCoverMode(event.cover_image_url),
         dateLabel: formatEventDate(event.event_at),

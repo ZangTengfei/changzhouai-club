@@ -3,5 +3,6 @@
   "usingComponents": {
     "custom-navigation": "/components/custom-navigation/index"
   },
-  "enablePullDownRefresh": true
+  "enablePullDownRefresh": true,
+  "onReachBottomDistance": 160
 }

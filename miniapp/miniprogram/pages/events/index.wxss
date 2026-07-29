@@ -144,6 +144,13 @@
   font-weight: 700;
 }
 
+.pagination-status {
+  padding: 34rpx 0 12rpx;
+  color: var(--color-subtle);
+  font-size: 23rpx;
+  text-align: center;
+}
+
 .history-teaser {
   display: flex;
   min-height: 126rpx;

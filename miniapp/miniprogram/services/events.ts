@@ -15,12 +15,27 @@ export type EventSummary = {
   statusLabel: string;
 };
 
+export type EventMode = "upcoming" | "history";
+export type EventFilter = "all" | "community" | "external";
+
 export type EventCatalog = {
-  upcoming: EventSummary[];
-  history: EventSummary[];
+  events: EventSummary[];
+  mode: EventMode;
+  filter: EventFilter;
   counts: {
     upcoming: number;
     history: number;
+  };
+  categoryCounts: {
+    all: number;
+    community: number;
+    external: number;
+  };
+  pagination: {
+    offset: number;
+    limit: number;
+    total: number;
+    hasMore: boolean;
   };
 };
 
@@ -59,9 +74,21 @@ export type EventDetail = {
   }>;
 };
 
-export async function loadEvents() {
+export async function loadEvents(options: {
+  mode?: EventMode;
+  filter?: EventFilter;
+  offset?: number;
+  limit?: number;
+} = {}) {
+  const search = [
+    options.mode ? `mode=${options.mode}` : "",
+    options.filter && options.filter !== "all" ? `filter=${options.filter}` : "",
+    `offset=${options.offset ?? 0}`,
+    `limit=${options.limit ?? 5}`,
+  ].filter(Boolean).join("&");
+
   return apiRequest<EventCatalog>({
-    path: "/api/miniapp/events",
+    path: `/api/miniapp/events?${search}`,
   });
 }
 
