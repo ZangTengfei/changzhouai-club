@@ -66,6 +66,12 @@
   height: 100%;
 }
 
+.event-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .event-image-placeholder image {
   width: 126rpx;
   height: 126rpx;
