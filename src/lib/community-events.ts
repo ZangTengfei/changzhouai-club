@@ -1,4 +1,5 @@
 import { unstable_cache } from "next/cache";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { formatChangzhouDateTime, formatChangzhouIsoDate } from "@/lib/changzhou-time";
 import { hasSupabaseEnv } from "@/lib/env";
@@ -89,7 +90,9 @@ export type PublicEventSummary = {
   cover_image_url: string | null;
   event_type: string;
   eventTypeLabel: string;
-  status: "scheduled" | "completed";
+  registration_mode: "instant" | "review";
+  registration_capacity: number | null;
+  status: "draft" | "scheduled" | "completed";
   statusLabel: string;
 };
 
@@ -272,6 +275,18 @@ function formatPublicEventStatus(status: string) {
   return publicEventStatusLabelMap[status] ?? status;
 }
 
+function mapEventSummary(
+  event: Omit<PublicEventSummary, "eventTypeLabel" | "statusLabel">,
+): PublicEventSummary {
+  return {
+    ...event,
+    registration_mode:
+      event.registration_mode === "review" ? "review" : "instant",
+    eventTypeLabel: formatEventType(event.event_type),
+    statusLabel: formatPublicEventStatus(event.status),
+  };
+}
+
 function mapCompletedEvent(row: EventRow): PublicEventRecap {
   const gallery = buildEventGallery(row);
   const eventType = normalizeEventType(row.event_type);
@@ -435,6 +450,38 @@ export async function getPublicEventBySlug(slug: string) {
   return getCachedPublicEventBySlug(slug);
 }
 
+export async function getDraftEventSummaries(supabase: SupabaseClient) {
+  const { data, error } = await supabase
+    .from("events")
+    .select(
+      "id, slug, title, summary, event_at, venue, city, cover_image_url, event_type, registration_mode, registration_capacity, status",
+    )
+    .eq("status", "draft")
+    .order("event_at", { ascending: true, nullsFirst: false });
+
+  if (error) throw new Error("draft_events_load_failed");
+  return ((data ?? []) as Array<
+    Omit<PublicEventSummary, "eventTypeLabel" | "statusLabel">
+  >).map(mapEventSummary);
+}
+
+export async function getDraftEventBySlug(
+  supabase: SupabaseClient,
+  slug: string,
+) {
+  const { data, error } = await supabase
+    .from("events")
+    .select(
+      "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, registration_mode, registration_capacity, event_type, recap, docs_url, video_url, video_title, video_cover_url, status, event_photos(id, image_url, caption, sort_order)",
+    )
+    .eq("slug", slug)
+    .eq("status", "draft")
+    .maybeSingle();
+
+  if (error) throw new Error("draft_event_load_failed");
+  return data ? mapPublicEventDetail(data as EventRow) : null;
+}
+
 const getCachedCompletedEventRecaps = unstable_cache(
   async () => {
     const supabase = createPublicServerClient();
@@ -534,20 +581,16 @@ const getCachedPublishedEventSummaries = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, slug, title, summary, event_at, venue, city, cover_image_url, event_type, status",
+        "id, slug, title, summary, event_at, venue, city, cover_image_url, event_type, registration_mode, registration_capacity, status",
       )
       .in("status", ["scheduled", "completed"])
       .order("event_at", { ascending: false, nullsFirst: false });
 
-    return ((data ?? []) as Array<Omit<PublicEventSummary, "eventTypeLabel" | "statusLabel">>).map(
-      (event) => ({
-        ...event,
-        eventTypeLabel: formatEventType(event.event_type),
-        statusLabel: formatPublicEventStatus(event.status),
-      }),
-    );
+    return ((data ?? []) as Array<
+      Omit<PublicEventSummary, "eventTypeLabel" | "statusLabel">
+    >).map(mapEventSummary);
   },
-  ["public-published-event-summaries"],
+  ["public-published-event-summaries-with-registration-meta"],
   { revalidate: PUBLIC_EVENTS_REVALIDATE_SECONDS },
 );
 

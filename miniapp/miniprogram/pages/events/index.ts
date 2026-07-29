@@ -1,4 +1,5 @@
 import {
+  getEventRegistrationTags,
   loadEvents,
   type EventFilter,
   type EventMode,
@@ -14,6 +15,7 @@ type EventListItem = EventSummary & {
   locationLabel: string;
   monthKey: string;
   monthLabel: string;
+  registrationTags: ReturnType<typeof getEventRegistrationTags>;
   typeClass: string;
   yearLabel: string;
 };
@@ -55,6 +57,7 @@ function mapEvent(event: EventSummary): EventListItem {
     locationLabel: event.venue || event.city || "常州",
     monthKey: validDate ? `${year}-${String(month).padStart(2, "0")}` : "pending",
     monthLabel: validDate ? `${month}月` : "待定",
+    registrationTags: getEventRegistrationTags(event),
     typeClass: event.event_type === "external" ? "event-type-external" : "",
     yearLabel: validDate ? String(year) : "",
   };
@@ -89,7 +92,8 @@ Page({
     eventGroups: [] as EventGroup[],
     activeMode: "history" as EventMode,
     activeFilter: "all" as EventFilter,
-    counts: { upcoming: 0, history: 0 },
+    counts: { upcoming: 0, history: 0, draft: 0 },
+    canPreviewDrafts: false,
     categoryCounts: { all: 0, community: 0, external: 0 },
     loading: true,
     loadingMore: false,
@@ -108,9 +112,11 @@ Page({
   },
 
   onPullDownRefresh() {
-    const mode = this.data.counts.upcoming || this.data.counts.history
-      ? this.data.activeMode
-      : undefined;
+    const hasEvents =
+      this.data.counts.upcoming ||
+      this.data.counts.history ||
+      this.data.counts.draft;
+    const mode = hasEvents ? this.data.activeMode : undefined;
     void this.loadFirstPage(
       mode,
       this.data.activeFilter,
@@ -123,9 +129,11 @@ Page({
   },
 
   retryLoad() {
-    const mode = this.data.counts.upcoming || this.data.counts.history
-      ? this.data.activeMode
-      : undefined;
+    const hasEvents =
+      this.data.counts.upcoming ||
+      this.data.counts.history ||
+      this.data.counts.draft;
+    const mode = hasEvents ? this.data.activeMode : undefined;
     void this.loadFirstPage(mode, this.data.activeFilter);
   },
 
@@ -156,6 +164,7 @@ Page({
         activeMode: catalog.mode,
         activeFilter: catalog.filter,
         counts: catalog.counts,
+        canPreviewDrafts: catalog.canPreviewDrafts,
         categoryCounts: catalog.categoryCounts,
         hasMore: catalog.pagination.hasMore,
         loading: false,
@@ -208,7 +217,7 @@ Page({
 
   switchMode(event: WechatMiniprogram.TouchEvent) {
     const mode = String(event.currentTarget.dataset.mode ?? "") as EventMode;
-    if (mode !== "upcoming" && mode !== "history") return;
+    if (mode !== "upcoming" && mode !== "history" && mode !== "draft") return;
     if (mode === this.data.activeMode) return;
     void this.loadFirstPage(mode, this.data.activeFilter);
   },

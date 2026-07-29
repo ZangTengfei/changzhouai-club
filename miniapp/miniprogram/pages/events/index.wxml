@@ -9,6 +9,7 @@
   <view class="segmented-control" aria-label="活动范围">
     <view class="segmented-item {{activeMode === 'upcoming' ? 'segmented-item-active' : ''}}" data-mode="upcoming" bindtap="switchMode">即将开始 {{counts.upcoming}}</view>
     <view class="segmented-item {{activeMode === 'history' ? 'segmented-item-active' : ''}}" data-mode="history" bindtap="switchMode">往期回顾 {{counts.history}}</view>
+    <view wx:if="{{canPreviewDrafts}}" class="segmented-item {{activeMode === 'draft' ? 'segmented-item-active' : ''}}" data-mode="draft" bindtap="switchMode">草稿 {{counts.draft}}</view>
   </view>
 
   <view class="chip-row" aria-label="活动类型">
@@ -43,6 +44,9 @@
           <view class="event-content">
             <text class="event-type {{event.typeClass}}">{{event.eventTypeLabel}}</text>
             <text class="event-name">{{event.title}}</text>
+            <view wx:if="{{event.registrationTags.length}}" class="registration-tag-row">
+              <text wx:for="{{event.registrationTags}}" wx:key="label" class="registration-meta-tag registration-meta-tag-{{item.tone}}">{{item.label}}</text>
+            </view>
             <view class="event-footer">
               <text class="event-location">{{event.locationLabel}}</text>
               <text class="event-status">{{event.statusLabel}}</text>

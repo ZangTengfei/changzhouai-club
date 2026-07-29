@@ -9,8 +9,8 @@ const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
 const serviceRoleKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY;
-const eventRegistrationConsentVersion = "2026-07-28";
-const eventPortraitConsentVersion = "2026-07-28";
+const eventRegistrationConsentVersion = "2026-07-30";
+const eventPortraitConsentVersion = "2026-07-30";
 
 if (!supabaseUrl || !serviceRoleKey) {
   throw new Error("Missing Supabase server configuration.");
@@ -23,6 +23,7 @@ const checks = [];
 let userId = null;
 let avatarPath = null;
 let temporaryEventId = null;
+let temporaryDraftEventId = null;
 let eventGroupQrPath = null;
 
 async function request(path, options = {}) {
@@ -255,6 +256,71 @@ try {
     .single();
   if (createEventError) throw createEventError;
   temporaryEventId = event.id;
+
+  const draftSlug = `miniapp-verify-draft-${randomUUID()}`;
+  const { data: draftEvent, error: createDraftEventError } = await supabase
+    .from("events")
+    .insert({
+      slug: draftSlug,
+      title: "小程序管理员草稿预览活动",
+      summary: "仅用于验证管理员草稿预览，完成后自动删除。",
+      status: "draft",
+      event_type: "community",
+      registration_mode: "instant",
+      registration_capacity: 12,
+      event_at: new Date(Date.now() + 72 * 60 * 60 * 1_000).toISOString(),
+      city: "常州",
+      venue: "自动化测试场地",
+    })
+    .select("id, slug")
+    .single();
+  if (createDraftEventError) throw createDraftEventError;
+  temporaryDraftEventId = draftEvent.id;
+
+  const publicDraftCatalog = await request("/api/miniapp/events?mode=draft");
+  assert.equal(publicDraftCatalog.response.status, 200);
+  assert.equal(publicDraftCatalog.body?.canPreviewDrafts, false);
+  assert.equal(
+    publicDraftCatalog.body?.events?.some((item) => item.id === draftEvent.id),
+    false,
+  );
+  const publicDraftDetail = await request(
+    `/api/miniapp/events/${encodeURIComponent(draftEvent.slug)}`,
+  );
+  assert.equal(publicDraftDetail.response.status, 404);
+  pass("event_draft_hidden_from_public");
+
+  const { error: promoteAdminError } = await supabase
+    .from("members")
+    .update({ status: "admin" })
+    .eq("id", userId);
+  if (promoteAdminError) throw promoteAdminError;
+  const adminDraftCatalog = await request(
+    "/api/miniapp/events?mode=draft&limit=20",
+    { headers: authHeaders },
+  );
+  assert.equal(adminDraftCatalog.response.status, 200);
+  assert.equal(adminDraftCatalog.body?.canPreviewDrafts, true);
+  assert.equal(adminDraftCatalog.body?.mode, "draft");
+  const draftSummary = adminDraftCatalog.body?.events?.find(
+    (item) => item.id === draftEvent.id,
+  );
+  assert.equal(draftSummary?.id, draftEvent.id);
+  assert.equal(draftSummary?.registration_capacity, 12);
+  const adminDraftDetail = await request(
+    `/api/miniapp/events/${encodeURIComponent(draftEvent.slug)}`,
+    { headers: authHeaders },
+  );
+  assert.equal(adminDraftDetail.response.status, 200);
+  assert.equal(adminDraftDetail.body?.event?.status, "draft");
+  pass("event_draft_visible_to_admin");
+
+  const { error: restoreMemberStatusError } = await supabase
+    .from("members")
+    .update({ status: "active" })
+    .eq("id", userId);
+  if (restoreMemberStatusError) throw restoreMemberStatusError;
+
   eventGroupQrPath = `events/${event.slug}/group-qr/verification.png`;
   const { error: groupQrUploadError } = await supabase.storage
     .from("event-private-assets")
@@ -297,6 +363,27 @@ try {
   );
   pass("event_registration_requires_consent");
 
+  const registrationWithoutPortraitConsent = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
+    {
+      method: "PUT",
+      headers: authHeaders,
+      body: JSON.stringify({
+        note: "未同意影像授权",
+        registrationConsentAccepted: true,
+        portraitConsentAccepted: false,
+        registrationConsentVersion: eventRegistrationConsentVersion,
+        portraitConsentVersion: eventPortraitConsentVersion,
+      }),
+    },
+  );
+  assert.equal(registrationWithoutPortraitConsent.response.status, 400);
+  assert.equal(
+    registrationWithoutPortraitConsent.body?.error,
+    "portrait_consent_required",
+  );
+  pass("event_registration_requires_portrait_consent");
+
   const registrationPut = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
     {
@@ -332,6 +419,14 @@ try {
       .single();
   if (approveRegistrationError) throw approveRegistrationError;
   assert.equal(approvedRegistration?.status, "registered");
+
+  const registrationGet = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
+    { headers: authHeaders },
+  );
+  assert.equal(registrationGet.response.status, 200);
+  assert.equal(registrationGet.body?.registration?.status, "registered");
+  pass("event_registration_status_loaded");
 
   const confirmedGroupQr = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/group-qr`,
@@ -727,5 +822,8 @@ try {
   }
   if (temporaryEventId) {
     await supabase.from("events").delete().eq("id", temporaryEventId);
+  }
+  if (temporaryDraftEventId) {
+    await supabase.from("events").delete().eq("id", temporaryDraftEventId);
   }
 }

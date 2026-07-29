@@ -1,5 +1,6 @@
 import {
   formatEventDate,
+  getEventRegistrationTags,
   loadEvents,
   type EventSummary,
 } from "../../services/events";
@@ -12,6 +13,7 @@ type HomeEvent = EventSummary & {
   dateLabel: string;
   indexLabel: string;
   locationLabel: string;
+  registrationTags: ReturnType<typeof getEventRegistrationTags>;
 };
 
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
@@ -85,6 +87,7 @@ Page({
         dateLabel: formatEventDate(event.event_at),
         indexLabel: String(index + 1).padStart(2, "0"),
         locationLabel: event.venue || event.city || "常州",
+        registrationTags: getEventRegistrationTags(event),
       }));
       this.setData({
         upcomingCount: catalog.counts.upcoming,

@@ -15,6 +15,14 @@ export function miniappJson(body: Record<string, unknown>, status = 200) {
   });
 }
 
+export async function loadOptionalMiniappSession(request: Request) {
+  const supabase = createSupabaseAdminClient();
+  if (!supabase) return null;
+
+  const session = await loadMiniappSession(supabase, request);
+  return session ? { supabase, session } : null;
+}
+
 export async function requireMiniappSession(request: Request): Promise<
   | {
       supabase: SupabaseClient;

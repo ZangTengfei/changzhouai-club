@@ -39,6 +39,26 @@
   line-height: 1.65;
 }
 
+.registration-status-tag {
+  align-self: flex-start;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
+  font-size: 22rpx;
+  font-weight: 780;
+}
+
+.registration-status-tag-pending {
+  background: var(--color-yellow-soft);
+  color: #745811;
+}
+
+.registration-status-tag-waitlisted {
+  background: var(--color-purple-soft);
+  color: var(--color-purple);
+}
+
 .fact-band {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -343,16 +363,9 @@
   font-weight: 720;
 }
 
-.registration-consent-row-optional {
+.draft-preview-panel {
   border-color: #e6e0f8;
-  background: rgba(255, 255, 255, 0.68);
-}
-
-.registration-consent-optional {
-  width: 100%;
-  color: var(--color-purple);
-  font-size: 20rpx;
-  font-weight: 700;
+  background: var(--color-purple-soft);
 }
 
 .reminder-status,

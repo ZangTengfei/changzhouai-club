@@ -11,20 +11,29 @@ export type EventSummary = {
   cover_image_url: string | null;
   event_type: string;
   eventTypeLabel: string;
-  status: "scheduled" | "completed";
+  registration_mode: "instant" | "review";
+  registration_capacity: number | null;
+  status: "draft" | "scheduled" | "completed";
   statusLabel: string;
 };
 
-export type EventMode = "upcoming" | "history";
+export type EventMode = "upcoming" | "history" | "draft";
 export type EventFilter = "all" | "community" | "external";
+
+export type EventRegistrationTag = {
+  label: string;
+  tone: "mode" | "success" | "capacity";
+};
 
 export type EventCatalog = {
   events: EventSummary[];
   mode: EventMode;
   filter: EventFilter;
+  canPreviewDrafts: boolean;
   counts: {
     upcoming: number;
     history: number;
+    draft: number;
   };
   categoryCounts: {
     all: number;
@@ -89,14 +98,43 @@ export async function loadEvents(options: {
 
   return apiRequest<EventCatalog>({
     path: `/api/miniapp/events?${search}`,
+    authenticated: true,
   });
 }
 
 export async function loadEventDetail(slug: string) {
   const response = await apiRequest<{ event: EventDetail }>({
     path: `/api/miniapp/events/${encodeURIComponent(slug)}`,
+    authenticated: true,
   });
   return response.event;
+}
+
+export function getEventRegistrationTags(
+  event: Pick<
+    EventSummary,
+    "registration_capacity" | "registration_mode" | "status"
+  >,
+): EventRegistrationTag[] {
+  if (event.status === "completed") return [];
+
+  return [
+    {
+      label: event.registration_mode === "review" ? "需申请" : "无需申请",
+      tone: "mode",
+    },
+    {
+      label:
+        event.registration_mode === "review" ? "审核后确认" : "报名即成功",
+      tone: "success",
+    },
+    {
+      label: event.registration_capacity
+        ? `限 ${event.registration_capacity} 人`
+        : "不限人数",
+      tone: "capacity",
+    },
+  ];
 }
 
 export function formatEventDate(value: string | null) {

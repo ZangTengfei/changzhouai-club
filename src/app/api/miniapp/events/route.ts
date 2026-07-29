@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 
-import { getPublishedEventSummaries } from "@/lib/community-events";
+import {
+  getDraftEventSummaries,
+  getPublishedEventSummaries,
+} from "@/lib/community-events";
+import { canPreviewMiniappDraftEvents } from "@/lib/miniapp-admin";
+import { loadOptionalMiniappSession } from "@/lib/miniapp-api";
 
 const DEFAULT_PAGE_SIZE = 5;
 const MAX_PAGE_SIZE = 20;
@@ -19,6 +24,13 @@ export async function GET(request: Request) {
     !searchParams.has("offset") &&
     !searchParams.has("limit");
   const events = await getPublishedEventSummaries();
+  const auth = await loadOptionalMiniappSession(request);
+  const canPreviewDrafts = auth
+    ? await canPreviewMiniappDraftEvents(auth.supabase, auth.session.user_id)
+    : false;
+  const drafts = canPreviewDrafts
+    ? await getDraftEventSummaries(auth!.supabase)
+    : [];
   const upcoming = events
     .filter((event) => event.status === "scheduled")
     .sort((left, right) => {
@@ -28,14 +40,18 @@ export async function GET(request: Request) {
     });
   const history = events.filter((event) => event.status === "completed");
   const requestedMode = searchParams.get("mode");
-  const mode = requestedMode === "history" || requestedMode === "upcoming"
+  const mode = requestedMode === "draft" && canPreviewDrafts
+    ? "draft"
+    : requestedMode === "history" || requestedMode === "upcoming"
     ? requestedMode
     : upcoming.length > 0 ? "upcoming" : "history";
   const requestedFilter = searchParams.get("filter");
   const filter = requestedFilter === "community" || requestedFilter === "external"
     ? requestedFilter
     : "all";
-  const sourceEvents = mode === "upcoming" ? upcoming : history;
+  const sourceEvents = mode === "draft"
+    ? drafts
+    : mode === "upcoming" ? upcoming : history;
   const filteredEvents = filter === "all"
     ? sourceEvents
     : sourceEvents.filter((event) => event.event_type === filter);
@@ -52,7 +68,12 @@ export async function GET(request: Request) {
       events: pagedEvents,
       mode,
       filter,
-      counts: { upcoming: upcoming.length, history: history.length },
+      canPreviewDrafts,
+      counts: {
+        upcoming: upcoming.length,
+        history: history.length,
+        draft: drafts.length,
+      },
       categoryCounts: {
         all: sourceEvents.length,
         community: sourceEvents.filter((event) => event.event_type === "community").length,
@@ -67,7 +88,9 @@ export async function GET(request: Request) {
     },
     {
       headers: {
-        "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
+        "Cache-Control": canPreviewDrafts
+          ? "private, no-store"
+          : "public, s-maxage=60, stale-while-revalidate=300",
       },
     },
   );

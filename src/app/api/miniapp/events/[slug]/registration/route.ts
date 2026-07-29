@@ -74,16 +74,15 @@ export async function PUT(
   if (payload?.registrationConsentAccepted !== true) {
     return miniappJson({ error: "registration_consent_required" }, 400);
   }
+  if (payload?.portraitConsentAccepted !== true) {
+    return miniappJson({ error: "portrait_consent_required" }, 400);
+  }
   if (
     payload.registrationConsentVersion !== EVENT_REGISTRATION_CONSENT_VERSION ||
     payload.portraitConsentVersion !== EVENT_PORTRAIT_CONSENT_VERSION
   ) {
     return miniappJson({ error: "registration_consent_version_mismatch" }, 409);
   }
-  if (typeof payload.portraitConsentAccepted !== "boolean") {
-    return miniappJson({ error: "invalid_portrait_consent" }, 400);
-  }
-
   const { slug } = await context.params;
   const event = await loadEvent(auth.supabase, slug);
   if (!event) return miniappJson({ error: "not_found" }, 404);
@@ -123,32 +122,19 @@ export async function PUT(
   const { error: registrationConsentError } = await auth.supabase
     .from("miniapp_consents")
     .upsert(
-      payload.portraitConsentAccepted
-        ? [
-            registrationConsent,
-            {
-              user_id: userId,
-              policy_version: portraitConsentKey,
-              accepted_at: acceptedAt,
-            },
-          ]
-        : [registrationConsent],
+      [
+        registrationConsent,
+        {
+          user_id: userId,
+          policy_version: portraitConsentKey,
+          accepted_at: acceptedAt,
+        },
+      ],
       { onConflict: "user_id,policy_version" },
     );
   if (registrationConsentError) {
     return miniappJson({ error: "registration_consent_save_failed" }, 500);
   }
-  if (!payload.portraitConsentAccepted) {
-    const { error: portraitConsentError } = await auth.supabase
-      .from("miniapp_consents")
-      .delete()
-      .eq("user_id", userId)
-      .eq("policy_version", portraitConsentKey);
-    if (portraitConsentError) {
-      return miniappJson({ error: "registration_consent_save_failed" }, 500);
-    }
-  }
-
   const { data: registrationData, error } = await auth.supabase
     .rpc("submit_event_registration", {
       p_event_id: event.id,

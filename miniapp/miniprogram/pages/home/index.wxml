@@ -50,6 +50,9 @@
       </view>
       <text class="featured-title">{{featuredEvent.title}}</text>
       <text class="featured-detail">{{featuredEvent.dateLabel}} · {{featuredEvent.locationLabel}}</text>
+      <view wx:if="{{featuredEvent.registrationTags.length}}" class="featured-registration-tags">
+        <text wx:for="{{featuredEvent.registrationTags}}" wx:key="label" class="featured-registration-tag">{{item.label}}</text>
+      </view>
       <text wx:if="{{featuredEvent.summary}}" class="featured-summary">{{featuredEvent.summary}}</text>
       <view class="featured-footer">
         <text>社区现场</text>

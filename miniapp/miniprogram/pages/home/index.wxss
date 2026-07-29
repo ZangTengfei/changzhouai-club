@@ -147,6 +147,21 @@
   font-size: 25rpx;
 }
 
+.featured-registration-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.featured-registration-tag {
+  padding: 7rpx 14rpx;
+  border-radius: 999rpx;
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
+  font-size: 20rpx;
+  font-weight: 700;
+}
+
 .featured-summary {
   display: -webkit-box;
   overflow: hidden;

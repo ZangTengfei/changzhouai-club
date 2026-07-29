@@ -123,6 +123,31 @@
   -webkit-line-clamp: 2;
 }
 
+.registration-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.registration-meta-tag {
+  padding: 7rpx 14rpx;
+  border-radius: 999rpx;
+  background: var(--color-blue-soft);
+  color: var(--color-blue);
+  font-size: 20rpx;
+  font-weight: 700;
+}
+
+.registration-meta-tag-success {
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
+}
+
+.registration-meta-tag-capacity {
+  background: var(--color-yellow-soft);
+  color: #745811;
+}
+
 .event-footer {
   display: flex;
   min-height: 54rpx;

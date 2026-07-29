@@ -2,7 +2,7 @@
   <view class="consent-hero">
     <text class="consent-kicker">报名隐私与肖像授权</text>
     <text class="consent-title">活动报名与影像使用说明</text>
-    <text class="consent-summary">报名信息用于活动组织与联系；肖像及影像使用由你单独、自愿决定。</text>
+    <text class="consent-summary">报名信息用于活动组织与联系；活动现场将进行拍摄，报名需同时同意影像使用说明。</text>
   </view>
 
   <view class="consent-section consent-section-green">
@@ -14,7 +14,7 @@
   <view class="consent-section consent-section-purple">
     <text class="consent-index">02</text>
     <text class="consent-heading">肖像及影像授权范围</text>
-    <text class="consent-copy">活动现场可能进行摄影、录像和录音。只有当你在报名时单独勾选肖像授权，我们才会在可识别你的情况下，将你的肖像、现场影像或发言片段用于常州 AI 社区的活动记录与非商业宣传。</text>
+    <text class="consent-copy">活动现场会进行摄影、录像或录音。报名时需单独勾选肖像及影像授权，我们可能在可识别你的情况下，将你的肖像、现场影像或发言片段用于常州 AI Club 的活动记录与宣传。</text>
     <text class="consent-copy">使用渠道限于常州 AI 社区运营的官网、小程序、微信公众号、小红书等自有账号，以及社区活动回顾、海报和介绍材料。该授权为非独占、无偿授权，不包含第三方商业广告、产品代言、转授权或与活动无关的用途。</text>
   </view>
 
@@ -26,16 +26,16 @@
 
   <view class="consent-section consent-section-blue">
     <text class="consent-index">04</text>
-    <text class="consent-heading">自愿选择与撤回</text>
-    <text class="consent-copy">肖像授权不是报名条件；不勾选不会影响报名。未授权时，你也可以在活动现场告知摄影或工作人员，我们会尽量避免使用可清晰识别你的近景影像。</text>
+    <text class="consent-heading">报名条件与撤回</text>
+    <text class="consent-copy">由于活动现场固定安排拍摄，肖像及影像授权是本活动的报名条件；未勾选时无法提交报名。如果你不接受该授权，请勿报名参加。</text>
     <text class="consent-copy">授权自勾选之日起生效，至你撤回之日止。你可以通过常州 AI 社区官方微信或活动管理员申请撤回。身份核验后，我们将停止后续使用，并在合理可控范围内处理自有渠道上的相关素材；撤回不影响撤回前已经完成的合法使用。</text>
   </view>
 
   <view class="consent-section consent-section-yellow">
     <text class="consent-index">05</text>
     <text class="consent-heading">保存、删除与未成年人</text>
-    <text class="consent-copy">报名与同意记录会在活动服务、争议处理和必要运营审计所需期限内保存。你可以通过社区官方微信申请查询、更正或删除相关信息。未满十八周岁的参与者，请在监护人知情同意后报名和勾选肖像授权。</text>
+    <text class="consent-copy">报名与同意记录会在活动服务、争议处理和必要运营审计所需期限内保存。你可以通过社区官方微信申请查询、更正或删除相关信息。未满十八周岁的参与者，请在监护人知情同意后报名并同意肖像及影像授权。</text>
   </view>
 
-  <text class="consent-version">版本：2026-07-28</text>
+  <text class="consent-version">版本：2026-07-30</text>
 </view>

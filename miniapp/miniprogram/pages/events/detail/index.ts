@@ -25,6 +25,19 @@ import {
   type ReminderConfig,
 } from "../../../services/subscriptions";
 
+function getRegistrationStatusView(registration: MiniappRegistration | null) {
+  if (registration?.status === "registered") {
+    return { label: "已报名", tone: "registered" };
+  }
+  if (registration?.status === "pending") {
+    return { label: "待审核", tone: "pending" };
+  }
+  if (registration?.status === "waitlisted") {
+    return { label: "候补中", tone: "waitlisted" };
+  }
+  return { label: "", tone: "" };
+}
+
 Page({
   data: {
     event: null as EventDetail | null,
@@ -34,9 +47,11 @@ Page({
     slug: "",
     user: null as MiniappUser | null,
     registration: null as MiniappRegistration | null,
+    registrationStatusLabel: "",
+    registrationStatusTone: "",
     registrationNote: "",
-    registrationConsentAccepted: false,
-    portraitConsentAccepted: false,
+    registrationConsentAccepted: true,
+    portraitConsentAccepted: true,
     registrationLoading: true,
     submitting: false,
     reminder: null as ReminderConfig | null,
@@ -98,7 +113,14 @@ Page({
     try {
       const user = await ensureSession();
       const registration = await loadEventRegistration(slug);
-      this.setData({ user, registration, registrationLoading: false });
+      const statusView = getRegistrationStatusView(registration);
+      this.setData({
+        user,
+        registration,
+        registrationStatusLabel: statusView.label,
+        registrationStatusTone: statusView.tone,
+        registrationLoading: false,
+      });
       void this.loadEngagement(slug);
       if (registration?.status === "registered") {
         void this.loadReminder(slug);
@@ -110,6 +132,8 @@ Page({
       this.setData({
         user: null,
         registration: null,
+        registrationStatusLabel: "",
+        registrationStatusTone: "",
         registrationLoading: false,
         groupQr: null,
       });
@@ -206,6 +230,10 @@ Page({
       void wx.showToast({ title: "请先同意活动报名隐私说明", icon: "none" });
       return;
     }
+    if (!this.data.portraitConsentAccepted) {
+      void wx.showToast({ title: "请先同意活动影像授权", icon: "none" });
+      return;
+    }
 
     this.setData({ submitting: true });
     try {
@@ -218,7 +246,12 @@ Page({
           portraitConsentAccepted: this.data.portraitConsentAccepted,
         },
       );
-      this.setData({ registration });
+      const statusView = getRegistrationStatusView(registration);
+      this.setData({
+        registration,
+        registrationStatusLabel: statusView.label,
+        registrationStatusTone: statusView.tone,
+      });
       trackEvent("registration_created", "/pages/events/detail/index", {
         slug: this.data.slug,
       });
@@ -241,6 +274,11 @@ Page({
         error.errorCode === "profile_incomplete"
       ) {
         this.openProfile();
+      } else if (
+        error instanceof ApiError &&
+        error.errorCode === "portrait_consent_required"
+      ) {
+        void wx.showToast({ title: "请先同意活动影像授权", icon: "none" });
       } else {
         void wx.showToast({ title: "报名失败，请重试", icon: "none" });
       }
@@ -265,12 +303,15 @@ Page({
     this.setData({ submitting: true });
     try {
       const registration = await cancelEventRegistration(this.data.slug);
+      const statusView = getRegistrationStatusView(registration);
       this.setData({
         registration,
+        registrationStatusLabel: statusView.label,
+        registrationStatusTone: statusView.tone,
         reminder: null,
         groupQr: null,
-        registrationConsentAccepted: false,
-        portraitConsentAccepted: false,
+        registrationConsentAccepted: true,
+        portraitConsentAccepted: true,
       });
       trackEvent("registration_cancelled", "/pages/events/detail/index", {
         slug: this.data.slug,
