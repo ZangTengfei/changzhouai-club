@@ -1,6 +1,6 @@
 <custom-navigation title="活动" />
 
-<view class="page-shell events-page">
+<view class="page-shell events-page" bindtouchstart="handleModeSwipeStart" bindtouchend="handleModeSwipeEnd" bindtouchcancel="handleModeSwipeCancel">
   <view class="page-intro">
     <text class="page-intro-title">一起见面，做点新东西</text>
     <text class="page-intro-copy">发现社区现场，也记录每一次真实连接。</text>

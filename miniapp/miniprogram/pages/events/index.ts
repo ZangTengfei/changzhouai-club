@@ -30,7 +30,9 @@ type EventGroup = {
 
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
 const pageSize = 5;
+const modeSwipeThreshold = 72;
 let requestVersion = 0;
+let modeSwipeStart: { x: number; y: number } | null = null;
 
 function getCoverMode(url: string | null): "aspectFill" | "aspectFit" {
   return url && /poster|layout|challenge|registration/i.test(url)
@@ -220,6 +222,41 @@ Page({
     if (mode !== "upcoming" && mode !== "history" && mode !== "draft") return;
     if (mode === this.data.activeMode) return;
     void this.loadFirstPage(mode, this.data.activeFilter);
+  },
+
+  handleModeSwipeStart(event: WechatMiniprogram.TouchEvent) {
+    const touch = event.touches[0];
+    modeSwipeStart = touch ? { x: touch.clientX, y: touch.clientY } : null;
+  },
+
+  handleModeSwipeCancel() {
+    modeSwipeStart = null;
+  },
+
+  handleModeSwipeEnd(event: WechatMiniprogram.TouchEvent) {
+    const start = modeSwipeStart;
+    const touch = event.changedTouches[0];
+    modeSwipeStart = null;
+    if (!start || !touch || this.data.loading) return;
+
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    if (
+      Math.abs(deltaX) < modeSwipeThreshold ||
+      Math.abs(deltaX) <= Math.abs(deltaY) * 1.2
+    ) {
+      return;
+    }
+
+    const modes: EventMode[] = this.data.canPreviewDrafts
+      ? ["upcoming", "history", "draft"]
+      : ["upcoming", "history"];
+    const currentIndex = modes.indexOf(this.data.activeMode);
+    const nextIndex = currentIndex + (deltaX < 0 ? 1 : -1);
+    const nextMode = modes[nextIndex];
+    if (!nextMode) return;
+
+    void this.loadFirstPage(nextMode, this.data.activeFilter);
   },
 
   switchFilter(event: WechatMiniprogram.TouchEvent) {
