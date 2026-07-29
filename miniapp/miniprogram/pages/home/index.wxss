@@ -170,11 +170,15 @@
 
 .featured-action {
   display: flex;
+  flex: 0 0 auto;
   min-width: 176rpx;
   min-height: 72rpx;
   align-items: center;
   justify-content: center;
-  margin: 0;
+  margin-top: 0;
+  margin-right: 0;
+  margin-bottom: 0;
+  margin-left: auto;
   padding: 0 30rpx;
   border-radius: 36rpx;
   background: var(--color-green);
@@ -182,10 +186,6 @@
   font-size: 25rpx;
   font-weight: 720;
   line-height: 1;
-}
-
-.featured-action::after {
-  border: 0;
 }
 
 .compact-events {

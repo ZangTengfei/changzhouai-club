@@ -53,7 +53,7 @@
       <text wx:if="{{featuredEvent.summary}}" class="featured-summary">{{featuredEvent.summary}}</text>
       <view class="featured-footer">
         <text>社区现场</text>
-        <button class="featured-action" data-slug="{{featuredEvent.slug}}" catchtap="openEvent">查看活动</button>
+        <view class="featured-action" data-slug="{{featuredEvent.slug}}" catchtap="openEvent" role="button" aria-label="查看活动">查看活动</view>
       </view>
     </view>
   </view>

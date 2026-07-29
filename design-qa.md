@@ -37,6 +37,47 @@ final result: passed
 
 ---
 
+# Miniapp Featured Activity Action QA
+
+## Comparison setup
+
+- Source visual truth: `output/design-qa/2026-07-29-miniapp-featured-action/source.png`
+- Rendered implementation: `output/design-qa/2026-07-29-miniapp-featured-action/devtools-final.png`
+- Focused implementation crop: `output/design-qa/2026-07-29-miniapp-featured-action/featured-card-final.png`
+- Side-by-side evidence: `output/design-qa/2026-07-29-miniapp-featured-action/comparison.png`
+- Simulator viewport: iPhone 12/13 Pro, 390 x 762 CSS px, device pixel ratio 3
+- Source pixels: 640 x 688; full implementation pixels: 3024 x 1964 desktop capture; focused crop: 620 x 680
+- State: 首页“本周精选”已结束活动卡片，默认未交互状态
+
+## Findings
+
+- No remaining P0, P1, or P2 layout mismatch was found after the fix.
+- Fonts and typography: the action keeps the existing 25rpx bold label and does not introduce wrapping or truncation.
+- Spacing and layout: the action is now anchored to the right edge of the footer content while “社区现场” remains left-aligned. The native button's computed 45px horizontal auto margins are gone.
+- Colors and visual tokens: the existing green CTA token and white label are unchanged by this position-only fix.
+- Image quality and asset fidelity: the existing event cover remains sharp and keeps its aspect-fill crop; no asset was replaced.
+- Copy and content: “查看活动” and all event information remain unchanged.
+- Accessibility and interaction: the replacement view retains `role="button"`, `aria-label="查看活动"`, and the existing `catchtap="openEvent"` handler. No navigation behavior was changed.
+
+## Comparison history
+
+1. Initial evidence showed the native `<button>` computing `0px 45px` horizontal margins, visually centering the action in the footer's remaining area.
+2. Explicit flex sizing and margins alone did not remove the platform button's rendered right margin.
+3. Replaced the native button element with a role-labeled view button, preserving the tap handler and allowing the footer flex layout to place it at the right edge.
+4. Post-fix side-by-side evidence shows the action aligned to the card's right content edge with no overlap or overflow.
+
+## Focused region comparison
+
+The focused comparison covers the full featured card and makes the footer alignment, label position, card padding, image crop, typography, and CTA size legible. No additional state capture was needed because this change only affects the default static alignment.
+
+## Follow-up polish
+
+- P3: the source inspector reports a 3.18 contrast ratio for the existing green/white CTA. This was not changed in the position-only fix and can be handled as a separate color-token accessibility pass.
+
+final result: passed
+
+---
+
 # 身份成长状态标签位置 Design QA
 
 - 日期：2026-07-29
