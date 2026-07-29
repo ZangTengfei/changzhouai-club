@@ -8,6 +8,7 @@ export class ApiError extends Error {
   constructor(
     readonly statusCode: number,
     readonly errorCode: string,
+    readonly requestId: string | null = null,
   ) {
     super(errorCode);
     this.name = "ApiError";
@@ -36,7 +37,7 @@ export function apiRequest<T>(options: {
   const token = options.authenticated ? getStoredSessionToken() : null;
 
   return new Promise<T>((resolve, reject) => {
-    wx.request<T & { error?: string }>({
+    wx.request<T & { error?: string; requestId?: string }>({
       url: `${getApiBaseUrl()}${options.path}`,
       method: options.method ?? "GET",
       data: options.data,
@@ -59,6 +60,9 @@ export function apiRequest<T>(options: {
           new ApiError(
             response.statusCode,
             response.data?.error ?? "request_failed",
+            typeof response.data?.requestId === "string"
+              ? response.data.requestId
+              : null,
           ),
         );
       },

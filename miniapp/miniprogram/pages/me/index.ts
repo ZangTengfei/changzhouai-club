@@ -1,4 +1,4 @@
-import { getStoredSessionToken } from "../../services/api";
+import { ApiError, getStoredSessionToken } from "../../services/api";
 import { ensureSession, login } from "../../services/auth";
 import { formatEventDate } from "../../services/events";
 import { getCommunityTags } from "../../utils/member-growth";
@@ -37,6 +37,7 @@ Page({
     loggingIn: false,
     loginRequired: false,
     loginFailed: false,
+    loginRequestId: "",
     suppressAutoLogin: false,
   },
 
@@ -118,6 +119,7 @@ Page({
     this.setData({
       loggingIn: true,
       loginFailed: false,
+      loginRequestId: "",
     });
 
     try {
@@ -129,11 +131,13 @@ Page({
         loginRequired: false,
       });
       await wx.navigateTo({ url: "/pages/profile/edit/index" });
-    } catch {
+    } catch (error) {
       this.setData({
         loggingIn: false,
         loginRequired: true,
         loginFailed: true,
+        loginRequestId:
+          error instanceof ApiError && error.requestId ? error.requestId : "",
       });
     }
   },

@@ -20,7 +20,24 @@ type MeResponse = {
   user: MiniappUser;
 };
 
+class WechatLoginClientError extends Error {
+  constructor(
+    readonly errorCode: "missing_wechat_login_code" | "wechat_login_failed",
+    readonly errno: number | null,
+    readonly errorMessage: string,
+  ) {
+    super(errorCode);
+    this.name = "WechatLoginClientError";
+  }
+}
+
 let pendingSession: Promise<MiniappUser> | null = null;
+
+function sanitizeClientErrorMessage(message: unknown) {
+  return typeof message === "string"
+    ? message.replace(/[\r\n\t]+/g, " ").trim().slice(0, 160)
+    : "";
+}
 
 function getWechatLoginCode() {
   return new Promise<string>((resolve, reject) => {
@@ -31,10 +48,22 @@ function getWechatLoginCode() {
           return;
         }
 
-        reject(new Error("missing_wechat_login_code"));
+        reject(
+          new WechatLoginClientError(
+            "missing_wechat_login_code",
+            null,
+            sanitizeClientErrorMessage(result.errMsg),
+          ),
+        );
       },
-      fail() {
-        reject(new Error("wechat_login_failed"));
+      fail(error) {
+        reject(
+          new WechatLoginClientError(
+            "wechat_login_failed",
+            Number.isFinite(error.errno) ? error.errno : null,
+            sanitizeClientErrorMessage(error.errMsg),
+          ),
+        );
       },
     });
   });
@@ -55,9 +84,50 @@ function isRetryableLoginError(error: unknown) {
   }
 
   return (
-    error instanceof Error &&
-    ["missing_wechat_login_code", "wechat_login_failed"].includes(error.message)
+    error instanceof WechatLoginClientError &&
+    ["missing_wechat_login_code", "wechat_login_failed"].includes(
+      error.errorCode,
+    )
   );
+}
+
+function recordRealtimeLoginFailure(
+  error: unknown,
+  attempt: number,
+  retrying: boolean,
+) {
+  const runtimeInfo = getMiniappRuntimeInfo();
+  const details =
+    error instanceof WechatLoginClientError
+      ? {
+          stage: "wx_login",
+          errorCode: error.errorCode,
+          errno: error.errno,
+          errorMessage: error.errorMessage,
+        }
+      : error instanceof ApiError
+        ? {
+            stage: "login_request",
+            errorCode: error.errorCode,
+            statusCode: error.statusCode,
+            requestId: error.requestId,
+          }
+        : {
+            stage: "unexpected",
+            errorCode: "unknown_login_error",
+          };
+
+  try {
+    const logger = wx.getRealtimeLogManager();
+    logger[retrying ? "warn" : "error"]("miniapp_login_failed", {
+      ...runtimeInfo,
+      ...details,
+      attempt,
+      retrying,
+    });
+  } catch {
+    // Login must not depend on diagnostic logging support.
+  }
 }
 
 function waitForLoginRetry() {
@@ -80,7 +150,9 @@ export async function login() {
       trackEvent("login_success", "app", { attempts: attempt + 1 });
       return response.user;
     } catch (error) {
-      if (attempt === 0 && isRetryableLoginError(error)) {
+      const retrying = attempt === 0 && isRetryableLoginError(error);
+      recordRealtimeLoginFailure(error, attempt + 1, retrying);
+      if (retrying) {
         await waitForLoginRetry();
         continue;
       }

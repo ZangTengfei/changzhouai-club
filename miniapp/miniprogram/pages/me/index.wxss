@@ -108,6 +108,14 @@
   line-height: 1.6;
 }
 
+.account-login-diagnostic {
+  color: #66756e;
+  font-family: monospace;
+  font-size: 22rpx;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
 .identity-hero {
   position: relative;
   display: flex;

@@ -13,6 +13,7 @@
     "miniapp:verify-account-link": "node --env-file=.env.local scripts/verify-wechat-account-unification.mjs",
     "miniapp:verify-api": "node --env-file=.env.local scripts/verify-miniapp-experience.mjs",
     "miniapp:metrics": "node --env-file=.env.local scripts/report-miniapp-metrics.mjs",
+    "miniapp:login-failures": "node --env-file=.env.local scripts/report-miniapp-login-failures.mjs",
     "news:radar": "node scripts/ai-news-radar.mjs",
     "news:radar:md": "node scripts/ai-news-radar.mjs --format markdown --limit 12",
     "news:social": "node scripts/ai-daily-social-materials.mjs",
