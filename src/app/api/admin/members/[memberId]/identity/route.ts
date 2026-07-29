@@ -26,7 +26,6 @@ export async function PATCH(
     unknown
   > | null;
   const status = String(payload?.status ?? "").trim();
-  const isCoBuilder = payload?.is_co_builder === true;
 
   if (!memberId || !MEMBER_STATUSES.has(status)) {
     return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
@@ -34,7 +33,7 @@ export async function PATCH(
 
   const { data: member, error: lookupError } = await staffContext.supabase
     .from("members")
-    .select("status, is_co_builder")
+    .select("status")
     .eq("id", memberId)
     .maybeSingle();
 
@@ -59,19 +58,9 @@ export async function PATCH(
     );
   }
 
-  if (
-    isCoBuilder !== member.is_co_builder &&
-    !canAdmin(staffContext, "members.manage_co_builder")
-  ) {
-    return NextResponse.json(
-      { error: "forbidden", permission: "members.manage_co_builder" },
-      { status: 403 },
-    );
-  }
-
   const { error } = await staffContext.supabase
     .from("members")
-    .update({ status, is_co_builder: isCoBuilder })
+    .update({ status })
     .eq("id", memberId);
 
   if (error) {

@@ -47,6 +47,42 @@ type AdminMemberDetailData = {
   queryErrors: string[];
 };
 
+const MEMBERSHIP_LEVELS = [
+  {
+    label: "社区成员",
+    description: "完成社区注册",
+  },
+  {
+    label: "共建伙伴",
+    description: "参与社区共建并获得认证",
+  },
+  {
+    label: "核心共建",
+    description: "持续承担社区核心工作",
+  },
+  {
+    label: "荣誉共建",
+    description: "长期贡献并获得社区授予",
+  },
+] as const;
+
+const MEMBERSHIP_BADGE_CODES = new Set([
+  "co_builder",
+  "core_builder",
+  "honor_builder",
+]);
+
+function getMembershipLevel(
+  member: AdminMember,
+  badgeAwards: AdminMemberDetailData["badgeAwards"],
+) {
+  const badgeCodes = new Set(badgeAwards.map((award) => award.badge_code));
+  if (badgeCodes.has("honor_builder")) return 3;
+  if (badgeCodes.has("core_builder")) return 2;
+  if (member.isCoBuilder || badgeCodes.has("co_builder")) return 1;
+  return 0;
+}
+
 function formatDate(value: string | null) {
   if (!value) {
     return "暂无记录";
@@ -89,6 +125,11 @@ export function AdminMemberDetailPageClient({
     useAdminResource<AdminMemberDetailData>(`/api/admin/members/${memberId}`);
   const [isPending, startTransition] = useTransition();
   const member = data?.member;
+  const badgeAwards = data?.badgeAwards ?? [];
+  const communityBadgeAwards = badgeAwards.filter(
+    (award) => !MEMBERSHIP_BADGE_CODES.has(award.badge_code),
+  );
+  const membershipLevel = member ? getMembershipLevel(member, badgeAwards) : 0;
   const querySaved = searchParams.get("saved") ?? undefined;
   const queryError = searchParams.get("error") ?? undefined;
   const backHref = getBackHref(searchParams.get("from"));
@@ -153,7 +194,6 @@ export function AdminMemberDetailPageClient({
             },
             body: JSON.stringify({
               status: String(formData.get("status") ?? "pending"),
-              is_co_builder: formData.get("is_co_builder") === "on",
             }),
           },
         );
@@ -165,6 +205,35 @@ export function AdminMemberDetailPageClient({
           requestError instanceof Error
             ? requestError.message
             : "成员身份保存失败，请稍后再试。",
+        );
+      }
+    });
+  }
+
+  function handleMembershipSubmit(formData: FormData) {
+    startTransition(async () => {
+      try {
+        const response = await fetch(
+          `/api/admin/members/${memberId}/membership`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              level: Number(formData.get("membership_level")),
+              note: String(formData.get("membership_note") ?? ""),
+            }),
+          },
+        );
+        await readApiResult(response);
+        toast.success("成员等级认证已更新。");
+        reload();
+      } catch (requestError) {
+        toast.error(
+          requestError instanceof Error
+            ? requestError.message
+            : "成员等级认证失败，请稍后再试。",
         );
       }
     });
@@ -276,8 +345,10 @@ export function AdminMemberDetailPageClient({
             >
               {formatAdminMemberStatus(member.status)}
             </AdminStatusBadge>
-            {member.isCoBuilder ? (
-              <AdminStatusBadge tone="completed">共建伙伴</AdminStatusBadge>
+            {membershipLevel > 0 ? (
+              <AdminStatusBadge tone="completed">
+                {MEMBERSHIP_LEVELS[membershipLevel].label}
+              </AdminStatusBadge>
             ) : null}
             {member.adminRoles.map((role) => (
               <AdminStatusBadge key={role.roleId} tone="scheduled">
@@ -375,20 +446,20 @@ export function AdminMemberDetailPageClient({
 
             {
               key: "identity",
-              label: `身份与标签（${data?.badgeAwards.length ?? 0}）`,
+              label: `身份与标签（${communityBadgeAwards.length}）`,
               children: (
                 <div className="grid gap-4">
                   <AdminPanel>
                     <AdminPanelHeader
                       eyebrow="Member Identity"
-                      title="成员身份"
+                      title="成员状态与社区角色"
                     />
                     <AdminPanelBody className="space-y-4">
                       <AdminNotice>
-                        成员可以表达参与共建的意愿；“共建伙伴”身份必须由管理员在这里认定。
+                        管理员和组织者会在小程序中显示为“社区主理人”；成员成长等级在下方单独认证。
                       </AdminNotice>
                       <form
-                        className="grid gap-4 md:grid-cols-[minmax(0,0.7fr)_minmax(0,1fr)_auto] md:items-end"
+                        className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
                         onSubmit={(formEvent) => {
                           formEvent.preventDefault();
                           handleIdentitySubmit(
@@ -408,23 +479,80 @@ export function AdminMemberDetailPageClient({
                             <option value="paused">暂停中</option>
                           </NativeSelect>
                         </AdminField>
-                        <AdminCheckboxRow>
-                          <input
-                            type="checkbox"
-                            name="is_co_builder"
-                            defaultChecked={member.isCoBuilder}
-                            className="size-4 accent-[var(--primary)]"
-                          />
-                          <span>
-                            <strong>管理员认定为共建伙伴</strong>
-                            <small className="mt-1 block text-muted-foreground">
-                              该身份会展示在小程序成员名片和成长档案中
-                            </small>
-                          </span>
-                        </AdminCheckboxRow>
                         <Button type="submit" disabled={isPending}>
-                          {isPending ? "保存中..." : "保存成员身份"}
+                          {isPending ? "保存中..." : "保存成员状态"}
                         </Button>
+                      </form>
+                    </AdminPanelBody>
+                  </AdminPanel>
+
+                  <AdminPanel>
+                    <AdminPanelHeader
+                      eyebrow="Membership Level"
+                      title="成员等级认证"
+                    />
+                    <AdminPanelBody className="space-y-4">
+                      <AdminNotice>
+                        成员只能表达参与意愿，不能自行选择等级。等级由管理员根据真实共建与贡献进行认证。
+                      </AdminNotice>
+                      <form
+                        key={`${member.id}-${membershipLevel}`}
+                        className="grid gap-4"
+                        onSubmit={(formEvent) => {
+                          formEvent.preventDefault();
+                          handleMembershipSubmit(
+                            new FormData(formEvent.currentTarget),
+                          );
+                        }}
+                      >
+                        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                          {MEMBERSHIP_LEVELS.map((level, index) => (
+                            <label
+                              key={level.label}
+                              className={`grid cursor-pointer gap-2 rounded-[calc(var(--radius)-2px)] border p-4 transition-colors ${
+                                membershipLevel === index
+                                  ? "border-primary bg-primary/5"
+                                  : "border-border/70 bg-background hover:border-primary/45"
+                              }`}
+                            >
+                              <span className="flex items-center justify-between gap-3">
+                                <input
+                                  type="radio"
+                                  name="membership_level"
+                                  value={index}
+                                  defaultChecked={membershipLevel === index}
+                                  className="size-4 accent-[var(--primary)]"
+                                />
+                                <span className="text-xs text-muted-foreground">
+                                  身份 {index + 1}
+                                </span>
+                              </span>
+                              <strong className="text-sm text-foreground">
+                                {level.label}
+                              </strong>
+                              <small className="text-xs text-muted-foreground">
+                                {level.description}
+                              </small>
+                              {membershipLevel === index ? (
+                                <span className="text-xs font-medium text-primary">
+                                  当前认证等级
+                                </span>
+                              ) : null}
+                            </label>
+                          ))}
+                        </div>
+                        <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+                          <AdminField label="认证说明">
+                            <Input
+                              name="membership_note"
+                              maxLength={100}
+                              placeholder="例如：持续负责活动组织与成员连接"
+                            />
+                          </AdminField>
+                          <Button type="submit" disabled={isPending}>
+                            {isPending ? "认证中..." : "保存等级认证"}
+                          </Button>
+                        </div>
                       </form>
                     </AdminPanelBody>
                   </AdminPanel>
@@ -432,9 +560,9 @@ export function AdminMemberDetailPageClient({
                   <AdminPanel>
                     <AdminPanelHeader eyebrow="Member Tags" title="社区标签" />
                     <AdminPanelBody className="space-y-4">
-                      {data?.badgeAwards.length ? (
+                      {communityBadgeAwards.length ? (
                         <div className="divide-y divide-border/70 border-y border-border/70">
-                          {data.badgeAwards.map((badge) => (
+                          {communityBadgeAwards.map((badge) => (
                             <div
                               key={badge.id}
                               className="flex items-center gap-3 py-3"
@@ -595,7 +723,8 @@ export function AdminMemberDetailPageClient({
                                 : "暂不共建"}
                             </AdminStatusBadge>
                             <AdminStatusBadge tone="completed">
-                              {member.isCoBuilder ? "共建伙伴" : "普通成员"}
+                              成长等级：
+                              {MEMBERSHIP_LEVELS[membershipLevel].label}
                             </AdminStatusBadge>
                             <AdminStatusBadge tone="neutral">
                               {member.isPubliclyVisible
