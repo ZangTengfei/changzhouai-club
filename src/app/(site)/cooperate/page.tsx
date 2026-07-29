@@ -1,21 +1,12 @@
 import type { Metadata } from "next";
-import Image from "next/image";
-import Link from "next/link";
 import {
   ArrowRight,
   CheckCircle2,
   Lightbulb,
 } from "lucide-react";
 
-import { RevealImage } from "@/components/reveal-image";
-
 import { submitCooperationLead } from "@/app/(site)/cooperate/actions";
 import { ToneBadge } from "@/components/tone-badge";
-import {
-  formatCommunityMemberCount,
-  getCommunityMemberCount,
-} from "@/lib/community-metrics";
-import { getCurrentWechatQrCode } from "@/lib/community-social";
 import { cooperationAreas } from "@/lib/site-data";
 
 import styles from "./cooperate-page.module.css";
@@ -66,14 +57,7 @@ export default async function CooperatePage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const [params, wechatQrCode, communityMemberCount] = await Promise.all([
-    searchParams,
-    getCurrentWechatQrCode(),
-    getCommunityMemberCount(),
-  ]);
-  const communityMemberCountLabel = formatCommunityMemberCount(
-    communityMemberCount,
-  );
+  const params = await searchParams;
   const errorMessage = getStatusMessage(params.error);
 
   return (
@@ -202,56 +186,6 @@ export default async function CooperatePage({
             </article>
           ))}
         </div>
-      </section>
-
-      <section className={styles.joinBanner} aria-labelledby="cooperate-join-banner-title">
-        <div className={styles.joinBannerIllustration} aria-hidden="true">
-          <Image
-            src="/join-card-optimized.webp"
-            alt=""
-            width={1000}
-            height={577}
-            sizes="(max-width: 820px) 138px, 196px"
-            className={styles.joinBannerIllustrationImage}
-          />
-        </div>
-
-        <div className={styles.joinBannerCopy}>
-          <h2 id="cooperate-join-banner-title">加入我们，一起把真实问题推进到试点</h2>
-          <p>
-            扫描二维码添加社区官方微信，备注来意后由运营同学邀请你进入交流群。
-          </p>
-        </div>
-
-        <div className={styles.joinBannerSide}>
-          <div className={styles.joinBannerQr}>
-            {wechatQrCode ? (
-              <RevealImage
-                src={wechatQrCode.imageUrl}
-                alt={wechatQrCode.title}
-                width={180}
-                height={180}
-              />
-            ) : (
-              <div className={styles.wechatPlaceholder}>微信</div>
-            )}
-          </div>
-
-          <div className={styles.joinBannerInfo}>
-            <span>社区官方微信</span>
-            <strong>{wechatQrCode?.title ?? "常州 AI Club 官方微信"}</strong>
-            <small>{communityMemberCountLabel} 位成员</small>
-            <p>添加好友・备注来意・邀请进群</p>
-          </div>
-        </div>
-
-        <Link
-          href="/join"
-          prefetch={false}
-          className={`button home-primary-button ${styles.joinBannerButton}`}
-        >
-          申请加入
-        </Link>
       </section>
     </div>
   );
