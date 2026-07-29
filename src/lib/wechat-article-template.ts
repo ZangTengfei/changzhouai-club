@@ -756,20 +756,18 @@ export function renderWechatArticleHtml(
 
   const headerHtml = showTitle
     ? `<section style="padding:26px 20px 8px;">
-    <section style="padding:18px 18px 20px;border:1px solid #d5f0e1;border-radius:18px;background:#e9f9f0;">
-      <section style="display:inline-block;margin:0 0 14px;padding:5px 10px;border-radius:999px;background:#fff2e5;color:#b85a12;font-size:12px;font-weight:700;letter-spacing:0.08em;">${escapeHtml(
-        template.label,
-      )}</section>
-      <h1 style="margin:0;color:${template.text};font-size:28px;line-height:1.28;font-weight:900;letter-spacing:0;">${renderInline(
-        title,
-        template,
-      )}</h1>
-      <section style="width:42px;height:4px;margin:18px 0 0;border-radius:999px;background:${template.accent};"></section>
-    </section>
+    <section style="display:inline-block;margin:0 0 14px;padding:5px 10px;border-radius:999px;background:${template.accentSoft};color:${template.accent};font-size:12px;font-weight:700;letter-spacing:0.08em;">${escapeHtml(
+      template.label,
+    )}</section>
+    <h1 style="margin:0;color:${template.text};font-size:28px;line-height:1.28;font-weight:900;letter-spacing:0;">${renderInline(
+      title,
+      template,
+    )}</h1>
+    <section style="width:42px;height:4px;margin:18px 0 0;border-radius:999px;background:${template.accentWarm};"></section>
   </section>`
     : `<section style="padding:22px 20px 8px;">
-    <section style="padding:15px 16px;border:1px solid #d5f0e1;border-radius:14px;background:#e9f9f0;">
-      <section style="display:inline-block;padding:3px 9px;border-radius:999px;background:#fff2e5;color:#b85a12;font-size:11px;line-height:1.5;font-weight:800;letter-spacing:0.08em;">${escapeHtml(
+    <section style="padding:15px 16px;border:1px solid ${template.accentSoft};border-radius:14px;background:${template.background};">
+      <section style="display:inline-block;padding:3px 9px;border:1px solid ${template.accent};border-radius:999px;background:${template.background};color:${template.accent};font-size:11px;line-height:1.5;font-weight:800;letter-spacing:0.08em;">${escapeHtml(
         template.label,
       )}</section>
       <strong style="display:block;margin:10px 0 0;color:${template.text};font-size:17px;line-height:1.5;font-weight:800;">${escapeHtml(
