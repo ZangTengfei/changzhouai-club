@@ -34,7 +34,6 @@
 - `npm run miniapp:verify-api`：既有签到验收夹具在 check-in 步骤返回 409；本次未修改后端签到逻辑，单列为后续测试维护项。
 
 final result: passed
-
 ---
 
 # Miniapp Featured Activity Action QA
@@ -422,5 +421,65 @@ The focused comparison isolates the same current badge and card corner before an
 ## Follow-up polish
 
 - None required for this scoped adjustment.
+
+final result: passed
+
+---
+
+**Design QA：网站底部重设计**
+
+- Source visual truth: `/Users/nobugai/.codex/generated_images/019fad6e-bddd-7c42-918f-518227c8290f/exec-0f2524c2-545f-43a8-b474-901590670fda.png`
+- Desktop implementation: `/Users/nobugai/develop/changzhouai-club/output/design-qa/footer-desktop-implementation-1586x992.png`
+- Mobile implementation: `/Users/nobugai/develop/changzhouai-club/output/design-qa/footer-mobile-implementation.png`
+- Side-by-side evidence: `/Users/nobugai/develop/changzhouai-club/output/design-qa/footer-side-by-side.png`
+- Viewport: desktop `1586 × 992` CSS px; mobile `390 × 844` CSS px
+- Pixel dimensions: source `1586 × 992`; desktop implementation `1586 × 992`; mobile implementation `390 × 844`
+- Density normalization: source and desktop implementation were compared at matching pixel and CSS dimensions with device scale factor 1; no resampling was required.
+- State: homepage scrolled to the final sponsors and footer region, default light theme, unauthenticated.
+
+**Findings**
+
+- No actionable P0, P1, or P2 mismatch remains.
+- Fonts and typography: the implementation uses the existing website display/body font stack and preserves the source hierarchy. The community heading, platform names, supporting copy, and legal text remain readable without oversized marketing type.
+- Spacing and layout rhythm: the pale-green community band follows the selected three-part structure—join action, WeChat QR, and social platforms—using separators instead of nested cards. The white lower footer retains the source's brand-left/navigation-right composition at a deliberately tighter height.
+- Colors and visual tokens: the implementation uses the existing brand green, graphite text, cold-white base, and a subtle green-tinted surface. Contrast and section separation are clear without gradients or heavy shadows.
+- Image quality and asset fidelity: the existing real logo, official-account QR image, and supplied social-platform image assets are used directly. No placeholder, CSS-drawn, or approximated brand asset was introduced.
+- Copy and content: the source mock's invented member count, email address, and unsupported navigation labels were intentionally replaced with verified existing website copy and routes.
+- Responsive result: at `390 × 844`, the QR, four social icons, two real navigation groups, and legal information stack without horizontal overflow or clipped controls.
+
+**Full-view comparison evidence**
+
+- The side-by-side image confirms the selected information hierarchy, surface split, QR/social grouping, and lower brand/navigation structure.
+- The implementation shows real sponsor content above the footer where the source concept used blank canvas; this is an expected page-state difference rather than footer drift.
+
+**Focused region comparison evidence**
+
+- The community band was checked separately at desktop and mobile sizes because the fidelity-critical details are the QR scale, separator positions, icon spacing, and social-label wrapping.
+- Social descriptions were shortened to verified platform-purpose labels after the first desktop capture showed unnecessary wrapping.
+
+**Interaction and runtime checks**
+
+- The footer's primary `申请加入` action was activated and navigated to `/join` successfully.
+- All social entries retain their existing external URLs and open in a new tab.
+- Browser console errors checked on the homepage footer state: `0`.
+- Production build and TypeScript validation passed; all 83 static pages generated.
+
+**Comparison history**
+
+- Initial P2: desktop social descriptions wrapped across multiple lines and made the four-platform row feel crowded.
+- Fix: shortened footer-only descriptions and reduced horizontal item padding while preserving canonical external links.
+- Post-fix evidence: `footer-desktop-implementation-1586x992.png` shows a single-line, evenly spaced social row matching the selected concept.
+
+**Implementation Checklist**
+
+- [x] Remove the oversized homepage join card.
+- [x] Group official-account QR and social platforms in the footer.
+- [x] Preserve a compact join action and verified internal navigation.
+- [x] Verify desktop and mobile layouts.
+- [x] Verify the primary CTA and browser console.
+
+**Follow-up Polish**
+
+- P3: if the footer later gains more verified navigation destinations, the two navigation groups can expand toward the three-column density shown in the concept without changing the community band.
 
 final result: passed

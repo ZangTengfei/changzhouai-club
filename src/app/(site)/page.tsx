@@ -12,7 +12,6 @@ import { RevealImage } from "@/components/reveal-image";
 import { DoodleSparkles } from "@/components/home-visual-assets";
 import { HeroPhotoCarousel } from "@/components/hero-photo-carousel";
 import { SiteSponsors } from "@/components/site-sponsors";
-import { SocialPlatformIcon } from "@/components/social-platform-icon";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import {
   getHomeCompletedEventRecaps,
@@ -25,7 +24,6 @@ import {
 } from "@/lib/community-metrics";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import { getEventImageUrl } from "@/lib/public-image-url";
-import { officialCommunityChannels } from "@/lib/site-data";
 import { cssModuleCx } from "@/lib/utils";
 
 import styles from "./home-page.module.css";
@@ -422,42 +420,6 @@ export default async function HomePage() {
       </section>
 
       <SiteSponsors />
-
-      <section className={cx("home-join-banner")} aria-labelledby="home-join-banner-title">
-        <div className={cx("home-join-banner-copy")}>
-          <span className={cx("home-join-banner-eyebrow")}>连接・分享・共创</span>
-          <h2 id="home-join-banner-title">
-            <span>加入社区，</span>把问题带到现场
-          </h2>
-          <div className={cx("home-join-banner-actions")}>
-            <Link href="/join" prefetch={false} className={cx("button home-primary-button home-join-banner-button")}>
-              申请加入
-              <span aria-hidden="true">→</span>
-            </Link>
-          </div>
-        </div>
-
-        <div className={cx("home-join-official")}>
-          <div className={cx("home-join-official-copy")}>
-            <span>关注公众号</span>
-            <strong>常州 AI Club 共创社区</strong>
-          </div>
-          <div className={cx("home-join-official-qr")}>
-            <Image
-              src={officialCommunityChannels[0].qrImageUrl}
-              alt="常州 AI Club 共创社区公众号二维码"
-              width={196}
-              height={196}
-              unoptimized
-              loading="lazy"
-            />
-          </div>
-          <div className={cx("home-join-official-action")}>
-            <SocialPlatformIcon tone="wechat" className={cx("home-join-official-icon")} />
-            <span>扫码关注</span>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
