@@ -376,7 +376,7 @@ export default async function HomePage() {
       <section className={cx("home-member-stories")} aria-labelledby="home-member-stories-title">
         <div className={cx("home-card-heading home-showcase-heading")}>
           <div>
-            <h2 id="home-member-stories-title">成员故事</h2>
+            <h2 id="home-member-stories-title">社区成员</h2>
           </div>
           <Link href="/members" prefetch={false}>查看更多故事 →</Link>
         </div>
