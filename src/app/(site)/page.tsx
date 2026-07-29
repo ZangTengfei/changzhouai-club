@@ -3,7 +3,6 @@ import Link from "next/link";
 import {
   ArrowRight,
   CalendarDays,
-  Clock3,
   MapPin,
   UsersRound,
 } from "lucide-react";
@@ -25,7 +24,6 @@ import {
   getCommunityMemberCount,
 } from "@/lib/community-metrics";
 import { getPublicMembersDirectory } from "@/lib/community-members";
-import { getHomeCommunityUpdates } from "@/lib/community-updates";
 import { getEventImageUrl } from "@/lib/public-image-url";
 import { officialCommunityChannels } from "@/lib/site-data";
 import { cssModuleCx } from "@/lib/utils";
@@ -95,14 +93,12 @@ export default async function HomePage() {
   const [
     scheduledEvents,
     recentCompletedEvents,
-    recentCommunityUpdates,
     completedEventsCount,
     directory,
     communityMemberCount,
   ] = await Promise.all([
     getHomeScheduledEvents(),
     getHomeCompletedEventRecaps(),
-    getHomeCommunityUpdates(),
     getHomeCompletedEventsCount(),
     getPublicMembersDirectory(),
     getCommunityMemberCount(),
@@ -431,80 +427,6 @@ export default async function HomePage() {
         ) : (
           <div className={cx("home-empty-state")}>
             暂无成员故事，期待你加入后在这里分享经验。
-          </div>
-        )}
-      </section>
-
-      <section className={cx("home-community-updates")} aria-labelledby="home-community-updates-title">
-        <div className={cx("home-card-heading home-showcase-heading")}>
-          <div>
-            <h2 id="home-community-updates-title">社区动态</h2>
-          </div>
-          <Link href="/updates" prefetch={false}>查看全部动态 →</Link>
-        </div>
-
-        {recentCommunityUpdates.length > 0 ? (
-          <div className={cx("home-community-update-list")}>
-            {recentCommunityUpdates.map((update) => {
-              const updateDate = update.publishedAt ?? update.createdAt;
-              const coverImage = update.images[0];
-
-              return (
-                <Link
-                  href={update.href}
-                  prefetch={false}
-                  className={cx("home-community-update-card")}
-                  key={update.id}
-                >
-                  <div className={cx("home-community-update-head")}>
-                    <div className={cx("home-community-update-avatar")} aria-hidden="true">
-                      {update.author.avatarUrl ? (
-                        <RevealImage
-                          src={update.author.avatarUrl}
-                          alt=""
-                          referrerPolicy="no-referrer"
-                        />
-                      ) : (
-                        <span>{update.author.displayName.slice(0, 1)}</span>
-                      )}
-                    </div>
-                    <div>
-                      <strong>{update.author.displayName}</strong>
-                      <small>
-                        {update.author.roleLabel ?? update.author.organization ?? update.author.city}
-                      </small>
-                    </div>
-                  </div>
-
-                  <div className={cx("home-community-update-body")}>
-                    <h3>{update.title ?? update.typeLabel}</h3>
-                    <p>{update.excerpt}</p>
-                  </div>
-
-                  {coverImage ? (
-                    <div className={cx("home-community-update-media")}>
-                      <RevealImage
-                        src={coverImage.imageUrl}
-                        alt={coverImage.alt ?? update.title ?? update.typeLabel}
-                        loading="lazy"
-                      />
-                    </div>
-                  ) : null}
-
-                  <div className={cx("home-community-update-foot")}>
-                    <span>{update.typeLabel}</span>
-                    <small>
-                      <Clock3 aria-hidden="true" strokeWidth={1.8} />
-                      {formatReviewDate(updateDate)}
-                    </small>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        ) : (
-          <div className={cx("home-empty-state")}>
-            暂无公开社区动态。活动报道、成员分享和项目进展发布后会出现在这里。
           </div>
         )}
       </section>
