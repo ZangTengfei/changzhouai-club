@@ -23,22 +23,56 @@
     </view>
   </view>
 
-  <view wx:elif="{{loginRequired}}" class="account-error">
-    <text class="section-title">登录后完善能力档案</text>
-    <text class="muted">登录由你主动发起。成功后将进入能力档案填写流程。</text>
-    <text wx:if="{{loginFailed}}" class="account-login-error">登录没有完成，请检查网络后重试。</text>
-    <text wx:if="{{loginRequestId}}" class="account-login-diagnostic">诊断编号：{{loginRequestId}}</text>
-    <button class="primary-button" loading="{{loggingIn}}" disabled="{{loggingIn}}" bindtap="handleLogin">{{loggingIn ? '登录中' : '微信登录'}}</button>
+  <view wx:elif="{{!user}}" class="account-content guest-account">
+    <view class="identity-hero guest-identity-hero">
+      <view class="identity-main">
+        <view class="avatar avatar-placeholder guest-avatar"><image src="/assets/logo-mark.png" mode="aspectFit" /></view>
+        <view class="identity-copy guest-identity-copy">
+          <text class="profile-name">欢迎来到社区</text>
+          <text class="guest-identity-hint">登录后查看你的社区身份与成长记录</text>
+        </view>
+      </view>
+
+      <button class="primary-button guest-login-button" data-destination="profile" loading="{{loggingIn}}" disabled="{{loggingIn}}" bindtap="handleLogin">{{loggingIn ? '登录中' : '微信登录'}}</button>
+      <text wx:if="{{loginFailed}}" class="account-login-error">{{loginRequired ? '登录没有完成，请检查网络后重试。' : '登录状态已失效，请重新登录。'}}</text>
+      <text wx:if="{{loginRequestId}}" class="account-login-diagnostic">诊断编号：{{loginRequestId}}</text>
+    </view>
+
+    <view class="stats-card surface-card guest-stats-card">
+      <view class="stat-item"><text>--</text><text>活动报名</text></view>
+      <view class="stat-item"><text>--</text><text>实际到场</text></view>
+      <view class="stat-item"><text>--</text><text>社区标签</text></view>
+      <text class="guest-stats-hint">登录后可见</text>
+    </view>
+
+    <view class="section-heading-row"><text class="section-title">我的空间</text></view>
+    <view class="space-grid">
+      <view class="space-card space-green space-card-featured" data-destination="growth" bindtap="handleLogin" role="button" aria-label="登录后查看成长档案">
+        <view class="icon-tile"><image src="/assets/icons/growth-purple-v2.png" mode="aspectFit" /></view>
+        <text class="space-title">成长档案</text><text class="space-copy">登录后查看身份路径与社区标签</text>
+        <image class="space-arrow" src="/assets/icons/chevron-green-v2.png" mode="aspectFit" />
+      </view>
+      <view class="space-card space-orange" data-destination="registrations" bindtap="handleLogin" role="button" aria-label="登录后查看我的活动">
+        <view class="icon-tile"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view>
+        <text class="space-title">我的活动</text><text class="space-copy">登录后查看参与记录</text>
+        <image class="space-arrow" src="/assets/icons/chevron-orange-v2.png" mode="aspectFit" />
+      </view>
+      <view class="space-card space-blue" data-destination="profile" bindtap="handleLogin" role="button" aria-label="登录后查看能力档案">
+        <view class="icon-tile"><image src="/assets/icons/profile-blue-v2.png" mode="aspectFit" /></view>
+        <text class="space-title">能力档案</text><text class="space-copy">登录后完善技能与方向</text>
+        <image class="space-arrow" src="/assets/icons/chevron-blue-v2.png" mode="aspectFit" />
+      </view>
+    </view>
+
+    <view class="section-heading-row"><text class="section-title">最近参与</text></view>
+    <view class="guest-recent-card surface-card" data-destination="registrations" bindtap="handleLogin" role="button" aria-label="登录后查看最近参与">
+      <view class="guest-recent-icon"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view>
+      <view class="recent-copy"><text class="recent-title">登录后查看参与记录</text><text>报名、到场和共建足迹都会记录在这里</text></view>
+      <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
+    </view>
   </view>
 
-  <view wx:elif="{{loginFailed}}" class="account-error">
-    <text class="section-title">登录状态已失效</text>
-    <text class="muted">请重新登录后继续使用。</text>
-    <text wx:if="{{loginRequestId}}" class="account-login-diagnostic">诊断编号：{{loginRequestId}}</text>
-    <button class="primary-button" bindtap="handleLogin">微信登录</button>
-  </view>
-
-  <view wx:elif="{{user}}" class="account-content">
+  <view wx:else class="account-content">
     <view class="identity-hero">
       <view class="account-settings-button" bindtap="openSettings" role="button" aria-label="打开账号设置">
         <image src="/assets/icons/settings-purple-v2.png" mode="aspectFit" />

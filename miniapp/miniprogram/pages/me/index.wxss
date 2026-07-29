@@ -116,6 +116,81 @@
   overflow-wrap: anywhere;
 }
 
+.guest-account {
+  padding-bottom: 24rpx;
+}
+
+.guest-identity-hero {
+  gap: 20rpx;
+}
+
+.guest-avatar {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.guest-avatar image {
+  width: 92rpx;
+  height: 68rpx;
+}
+
+.guest-identity-copy {
+  padding-right: 0;
+}
+
+.guest-identity-hint {
+  color: var(--color-subtle);
+  font-size: 23rpx;
+  line-height: 1.5;
+}
+
+.guest-login-button {
+  width: 100%;
+  margin: 0;
+}
+
+.guest-stats-card {
+  position: relative;
+  padding-bottom: 46rpx;
+}
+
+.guest-stats-card .stat-item text:first-child {
+  color: #98a49f;
+}
+
+.guest-stats-hint {
+  position: absolute;
+  right: 0;
+  bottom: 12rpx;
+  left: 0;
+  color: var(--color-subtle);
+  font-size: 20rpx;
+  text-align: center;
+}
+
+.guest-recent-card {
+  display: flex;
+  min-height: 120rpx;
+  align-items: center;
+  gap: 18rpx;
+  padding: 18rpx;
+}
+
+.guest-recent-icon {
+  display: flex;
+  width: 82rpx;
+  height: 82rpx;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24rpx;
+  background: var(--color-orange-soft);
+}
+
+.guest-recent-icon image {
+  width: 48rpx;
+  height: 48rpx;
+}
+
 .identity-hero {
   position: relative;
   display: flex;

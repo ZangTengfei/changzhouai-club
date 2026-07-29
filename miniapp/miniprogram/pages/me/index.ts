@@ -8,6 +8,31 @@ type FootprintItem = MiniappUser["footprints"][number] & {
   locationLabel: string;
 };
 
+type LoginDestination = "profile" | "growth" | "registrations";
+
+function readLoginDestination(
+  event: WechatMiniprogram.TouchEvent,
+): LoginDestination {
+  const destination = String(event.currentTarget.dataset.destination ?? "");
+  return ["growth", "registrations"].includes(destination)
+    ? (destination as LoginDestination)
+    : "profile";
+}
+
+function navigateAfterLogin(destination: LoginDestination, user: MiniappUser) {
+  if (destination === "growth") {
+    return wx.navigateTo({ url: "/pages/growth/index" });
+  }
+  if (destination === "registrations") {
+    return wx.navigateTo({ url: "/pages/registrations/index" });
+  }
+  return wx.navigateTo({
+    url: user.profileCompletion.completed
+      ? "/pages/profile/index"
+      : "/pages/profile/edit/index",
+  });
+}
+
 function buildAccountViewData(user: MiniappUser) {
   const latestFootprint = user.footprints[0];
   const communityTags = getCommunityTags(user);
@@ -117,8 +142,9 @@ Page({
     }
   },
 
-  async handleLogin() {
+  async handleLogin(event: WechatMiniprogram.TouchEvent) {
     if (this.data.loggingIn) return;
+    const destination = readLoginDestination(event);
     this.setData({
       loggingIn: true,
       loginFailed: false,
@@ -133,7 +159,7 @@ Page({
         loggingIn: false,
         loginRequired: false,
       });
-      await wx.navigateTo({ url: "/pages/profile/edit/index" });
+      await navigateAfterLogin(destination, user);
     } catch (error) {
       this.setData({
         loggingIn: false,
