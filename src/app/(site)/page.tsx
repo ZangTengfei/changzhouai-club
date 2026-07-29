@@ -317,16 +317,6 @@ export default async function HomePage() {
                 <span aria-hidden="true">→</span>
               </Link>
             </div>
-            <Image
-              src="/event-card-character-v2-card.webp"
-              alt=""
-              width={1024}
-              height={1536}
-              className={cx("home-event-person")}
-              aria-hidden="true"
-              priority={false}
-              sizes="(max-width: 1024px) 1px, 220px"
-            />
             <DoodleSparkles className={cx("home-doodle home-doodle-event-sparkles")} />
           </article>
 
@@ -447,28 +437,19 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <div className={cx("home-join-banner-illustration")} aria-hidden="true">
-          <Image
-            src="/join-card-optimized.webp"
-            alt=""
-            width={1000}
-            height={577}
-            sizes="(max-width: 820px) 180px, 320px"
-            className={cx("home-join-banner-illustration-image")}
-          />
-        </div>
-
         <div className={cx("home-join-official")}>
           <div className={cx("home-join-official-copy")}>
             <span>关注公众号</span>
             <strong>常州 AI Club 共创社区</strong>
           </div>
           <div className={cx("home-join-official-qr")}>
-            <RevealImage
+            <Image
               src={officialCommunityChannels[0].qrImageUrl}
               alt="常州 AI Club 共创社区公众号二维码"
               width={196}
               height={196}
+              unoptimized
+              loading="lazy"
             />
           </div>
           <div className={cx("home-join-official-action")}>
