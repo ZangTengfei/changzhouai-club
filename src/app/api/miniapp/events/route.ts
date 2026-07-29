@@ -13,6 +13,11 @@ function parseInteger(value: string | null, fallback: number) {
 
 export async function GET(request: Request) {
   const searchParams = new URL(request.url).searchParams;
+  const includeLegacyCatalog =
+    !searchParams.has("mode") &&
+    !searchParams.has("filter") &&
+    !searchParams.has("offset") &&
+    !searchParams.has("limit");
   const events = await getPublishedEventSummaries();
   const upcoming = events
     .filter((event) => event.status === "scheduled")
@@ -43,6 +48,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json(
     {
+      ...(includeLegacyCatalog ? { upcoming, history } : {}),
       events: pagedEvents,
       mode,
       filter,
