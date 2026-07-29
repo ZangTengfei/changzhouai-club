@@ -4,6 +4,7 @@ import {
   type EventSummary,
 } from "../../services/events";
 import { trackEvent } from "../../services/analytics";
+import { getStoredSessionToken } from "../../services/api";
 import { ensureSession } from "../../services/auth";
 
 type HomeEvent = EventSummary & {
@@ -127,6 +128,11 @@ Page({
   },
 
   openProfile() {
+    if (!getStoredSessionToken()) {
+      void wx.switchTab({ url: "/pages/me/index" });
+      return;
+    }
+
     const completed = this.data.profileCompletion?.completed ?? false;
     void wx.navigateTo({
       url: completed ? "/pages/profile/index" : "/pages/profile/edit/index",
