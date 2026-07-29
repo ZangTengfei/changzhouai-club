@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 import { ImageUploadField } from "@/components/image-upload-field";
 
 export function StorageImageUrlField({
@@ -13,11 +15,17 @@ export function StorageImageUrlField({
   filledStatusText = "已填写图片地址",
   emptyStatusText = "当前未设置图片",
   compressUpload = true,
+  preview,
 }: {
   name: string;
   defaultValue?: string;
   eventSlug: string;
-  uploadScope?: "event" | "sponsor" | "community" | "project";
+  uploadScope?:
+    | "event"
+    | "event-group-qr"
+    | "sponsor"
+    | "community"
+    | "project";
   placeholder: string;
   uploadLabel?: string;
   required?: boolean;
@@ -26,6 +34,7 @@ export function StorageImageUrlField({
   filledStatusText?: string;
   emptyStatusText?: string;
   compressUpload?: boolean;
+  preview?: ReactNode;
 }) {
   return (
     <ImageUploadField
@@ -45,6 +54,7 @@ export function StorageImageUrlField({
       emptyStatusText={emptyStatusText}
       required={required}
       compressUpload={compressUpload}
+      preview={preview}
     />
   );
 }

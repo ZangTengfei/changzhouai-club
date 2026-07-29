@@ -10,6 +10,10 @@ import {
   type EventFeedback,
 } from "../../../services/engagement";
 import {
+  loadEventGroupQr,
+  type EventGroupQr,
+} from "../../../services/group-qr";
+import {
   cancelEventRegistration,
   loadEventRegistration,
   registerForEvent,
@@ -37,6 +41,7 @@ Page({
     submitting: false,
     reminder: null as ReminderConfig | null,
     reminderSubmitting: false,
+    groupQr: null as EventGroupQr | null,
     galleryUrls: [] as string[],
     attendance: null as EventAttendance | null,
     feedback: null as EventFeedback | null,
@@ -97,12 +102,16 @@ Page({
       void this.loadEngagement(slug);
       if (registration?.status === "registered") {
         void this.loadReminder(slug);
+        void this.loadGroupQr(slug);
+      } else {
+        this.setData({ groupQr: null });
       }
     } catch {
       this.setData({
         user: null,
         registration: null,
         registrationLoading: false,
+        groupQr: null,
       });
     }
   },
@@ -128,6 +137,21 @@ Page({
     } catch {
       this.setData({ reminder: null });
     }
+  },
+
+  async loadGroupQr(slug: string) {
+    try {
+      const groupQr = await loadEventGroupQr(slug);
+      this.setData({ groupQr });
+    } catch {
+      this.setData({ groupQr: null });
+    }
+  },
+
+  previewGroupQr() {
+    const imageUrl = this.data.groupQr?.imageUrl;
+    if (!imageUrl) return;
+    void wx.previewImage({ current: imageUrl, urls: [imageUrl] });
   },
 
   handleNoteInput(event: WechatMiniprogram.TextareaInput) {
@@ -200,6 +224,7 @@ Page({
       });
       if (registration?.status === "registered") {
         void this.loadReminder(this.data.slug);
+        void this.loadGroupQr(this.data.slug);
       }
       void wx.showToast({
         title:
@@ -243,6 +268,7 @@ Page({
       this.setData({
         registration,
         reminder: null,
+        groupQr: null,
         registrationConsentAccepted: false,
         portraitConsentAccepted: false,
       });

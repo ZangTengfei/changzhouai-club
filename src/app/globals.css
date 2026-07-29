@@ -58,6 +58,48 @@
   --container-admin: 100rem;
 }
 
+.event-group-qr-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 168px;
+  align-items: center;
+  gap: 24px;
+  padding: 22px;
+  border: 1px solid rgba(var(--accent-rgb), 0.15);
+  border-radius: var(--radius-lg);
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(var(--ink-rgb), 0.07);
+}
+
+.event-group-qr-card h3,
+.event-group-qr-card p {
+  margin: 0;
+}
+
+.event-group-qr-card h3 {
+  margin-top: 8px;
+  font-size: 1.35rem;
+}
+
+.event-group-qr-card p {
+  margin-top: 8px;
+  color: rgba(var(--ink-rgb), 0.64);
+  line-height: 1.62;
+}
+
+.event-group-qr-image {
+  width: 168px;
+  height: 168px;
+  border: 1px solid rgba(var(--ink-rgb), 0.1);
+  border-radius: var(--radius-sm);
+  object-fit: contain;
+}
+
+@media (max-width: 640px) {
+  .event-group-qr-card {
+    grid-template-columns: 1fr;
+  }
+}
+
 :root {
   --font-display:
     "Avenir Next", "Nunito Sans", "PingFang SC", "Hiragino Sans GB",

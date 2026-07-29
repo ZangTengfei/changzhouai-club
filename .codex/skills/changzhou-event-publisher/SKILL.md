@@ -28,6 +28,7 @@ Use this workflow whenever the user is preparing a repeatable community event:
    - If a Feishu/browser session is available and the user asked you to operate it, use the browser/Chrome workflow to create the form.
    - If authentication or workspace access is not available, provide the generated prompt and ask the user to create/export the form link or QR code.
    - Decode or verify the final QR when possible, for example with OpenCV `QRCodeDetector`.
+   - Treat an activity WeChat group QR as a separate private asset, not as the public registration QR. Configure it in the event admin only after the event is created; it must remain hidden until a registration is confirmed.
 6. **Poster**
    - Put working assets under `output/posters/<slug>/`.
    - Use the community logo from `public/logo.png` unless a stronger current brand asset is provided.
@@ -216,7 +217,9 @@ Do not automate the web admin form for normal event publishing. The website admi
 
 - Always run `--dry-run` before writing.
 - Keep raw source material in `output/` if you need a working note; do not add `files/` or `knowledge/` content to Git.
-- Do not publish private group QR codes, unreviewed screenshots, raw报名名单, phone numbers, WeChat IDs, or internal organizer notes.
+- Do not put private group QR codes in event JSON, public copy, posters, or public storage. Configure them through the event admin so only confirmed registrations receive a short-lived private image URL.
+- Keep group QR codes hidden from pending, waitlisted, cancelled, and logged-out users. Use the optional expiry and active switch when the organizer replaces or disables a code.
+- Do not publish unreviewed screenshots, raw报名名单, phone numbers, WeChat IDs, or internal organizer notes.
 - The script rejects phone-like values in public fields by default. Remove the contact detail or use a generic instruction such as “请在报名备注中填写手机号或微信号”.
 - Use `--allow-contact-info` only when the user explicitly confirms that the contact information is meant to be public.
 - After deploying website code changes, verify both the detail page and `/events`; homepage and events-page visibility can intentionally differ.

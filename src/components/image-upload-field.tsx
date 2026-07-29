@@ -16,6 +16,7 @@ type UploadMode = "upload-only" | "upload-or-url";
 type UploadAppearance = "site" | "admin";
 type StorageUploadScope =
   | "event"
+  | "event-group-qr"
   | "sponsor"
   | "community"
   | "project"
@@ -61,6 +62,8 @@ type ImageUploadFieldProps = {
 
 function getStorageUploadUrl(scope: StorageUploadScope) {
   switch (scope) {
+    case "event-group-qr":
+      return "/api/admin/storage/event-group-qr";
     case "community":
       return "/api/admin/storage/community-assets";
     case "project":
@@ -180,14 +183,15 @@ export function ImageUploadField({
           body: payload,
         });
         const result = (await response.json().catch(() => null)) as
-          | { publicUrl?: string; message?: string }
+          | { publicUrl?: string; value?: string; message?: string }
           | null;
 
-        if (!response.ok || !result?.publicUrl) {
+        const uploadedValue = result?.value ?? result?.publicUrl;
+        if (!response.ok || !uploadedValue) {
           throw new Error(result?.message || "图片上传失败，请稍后再试。");
         }
 
-        updateValue(result.publicUrl);
+        updateValue(uploadedValue);
       }
     } catch (uploadError) {
       const message =

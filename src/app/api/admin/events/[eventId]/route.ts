@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 
 import { requireAdminApiPermission } from "@/lib/admin/api-auth";
+import {
+  createAdminEventGroupQrPreviewUrl,
+  deleteAdminEventGroupQrObject,
+  parseAdminEventGroupQrInput,
+  saveAdminEventGroupQrCode,
+} from "@/lib/admin/event-group-qr";
 import { normalizeAdminEventDateTime } from "@/lib/admin/event-datetime";
 import { loadAdminEventsData } from "@/lib/admin/events";
 import { revalidateAdminEventPaths } from "@/lib/admin/revalidate";
@@ -50,7 +56,17 @@ export async function GET(
   }
 
   return NextResponse.json({
-    event,
+    event: {
+      ...event,
+      groupQrCode: event.groupQrCode
+        ? {
+            ...event.groupQrCode,
+            previewUrl: await createAdminEventGroupQrPreviewUrl(
+              event.groupQrCode.storage_path,
+            ),
+          }
+        : null,
+    },
     queryErrors: data.queryErrors,
     debugSnapshot: data.debugSnapshot,
     permissions: {
@@ -86,12 +102,14 @@ export async function PATCH(
   const status = String(payload.status ?? "draft").trim();
   let registrationCapacity: number | null;
   let registrationMode: "instant" | "review";
+  let groupQrInput: ReturnType<typeof parseAdminEventGroupQrInput>;
 
   try {
     registrationCapacity = parseEventRegistrationCapacity(
       payload.registration_capacity,
     );
     registrationMode = parseEventRegistrationMode(payload.registration_mode);
+    groupQrInput = parseAdminEventGroupQrInput(payload);
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "invalid_payload" },
@@ -143,6 +161,17 @@ export async function PATCH(
     return NextResponse.json({ error: "database_write_failed" }, { status: 400 });
   }
 
+  try {
+    await saveAdminEventGroupQrCode({
+      supabase: staffContext.supabase,
+      eventId,
+      actorId: staffContext.user.id,
+      input: groupQrInput,
+    });
+  } catch {
+    return NextResponse.json({ error: "group_qr_save_failed" }, { status: 400 });
+  }
+
   revalidateAdminEventPaths(eventId, slug);
   return NextResponse.json({ saved: "event" });
 }
@@ -156,17 +185,26 @@ export async function DELETE(
 
   const { eventId } = await context.params;
 
-  const { data: existingEvent } = await staffContext.supabase
-    .from("events")
-    .select("slug")
-    .eq("id", eventId)
-    .maybeSingle();
+  const [{ data: existingEvent }, { data: existingGroupQr }] = await Promise.all([
+    staffContext.supabase
+      .from("events")
+      .select("slug")
+      .eq("id", eventId)
+      .maybeSingle(),
+    staffContext.supabase
+      .from("event_group_qr_codes")
+      .select("storage_path")
+      .eq("event_id", eventId)
+      .maybeSingle(),
+  ]);
 
   const { error } = await staffContext.supabase.from("events").delete().eq("id", eventId);
 
   if (error) {
     return NextResponse.json({ error: "database_write_failed" }, { status: 400 });
   }
+
+  await deleteAdminEventGroupQrObject(existingGroupQr?.storage_path);
 
   revalidateAdminEventPaths(eventId, existingEvent?.slug ?? undefined);
   return NextResponse.json({ saved: "deleted" });

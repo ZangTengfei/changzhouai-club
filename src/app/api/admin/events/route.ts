@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
 import { normalizeAdminEventDateTime } from "@/lib/admin/event-datetime";
+import {
+  parseAdminEventGroupQrInput,
+  saveAdminEventGroupQrCode,
+} from "@/lib/admin/event-group-qr";
 import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { loadAdminEventsData } from "@/lib/admin/events";
 import { revalidateAdminEventPaths } from "@/lib/admin/revalidate";
@@ -66,12 +70,14 @@ export async function POST(request: Request) {
   const status = String(payload.status ?? "draft").trim();
   let registrationCapacity: number | null;
   let registrationMode: "instant" | "review";
+  let groupQrInput: ReturnType<typeof parseAdminEventGroupQrInput>;
 
   try {
     registrationCapacity = parseEventRegistrationCapacity(
       payload.registration_capacity,
     );
     registrationMode = parseEventRegistrationMode(payload.registration_mode);
+    groupQrInput = parseAdminEventGroupQrInput(payload);
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "invalid_payload" },
@@ -123,6 +129,19 @@ export async function POST(request: Request) {
 
   if (error || !createdEvent?.id) {
     return NextResponse.json({ error: "database_write_failed" }, { status: 400 });
+  }
+
+  if (groupQrInput.storagePath) {
+    try {
+      await saveAdminEventGroupQrCode({
+        supabase: context.supabase,
+        eventId: createdEvent.id,
+        actorId: context.user.id,
+        input: groupQrInput,
+      });
+    } catch {
+      return NextResponse.json({ error: "group_qr_save_failed" }, { status: 400 });
+    }
   }
 
   revalidateAdminEventPaths(createdEvent.id, slug);

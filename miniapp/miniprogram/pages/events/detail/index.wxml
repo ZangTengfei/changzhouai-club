@@ -74,6 +74,11 @@
         <text class="registration-kicker">报名状态</text>
         <text class="registration-title">你已报名</text>
         <text class="registration-copy">活动开始前可以在“我的活动”中再次查看。</text>
+        <view wx:if="{{groupQr}}" class="group-qr-card">
+          <text class="group-qr-title">加入活动微信群</text>
+          <text class="group-qr-copy">{{groupQr.note || '请长按或点击二维码，用微信扫码加入本场活动群。'}}</text>
+          <image class="group-qr-image" src="{{groupQr.imageUrl}}" mode="widthFix" show-menu-by-longpress="{{true}}" bindtap="previewGroupQr" />
+        </view>
         <button wx:if="{{reminder && reminder.available && (!reminder.subscription || reminder.subscription.status !== 'accepted')}}" class="primary-button" loading="{{reminderSubmitting}}" disabled="{{reminderSubmitting}}" bindtap="enableReminder">开启活动提醒</button>
         <view wx:elif="{{reminder && reminder.subscription && reminder.subscription.status === 'accepted'}}" class="reminder-status">活动提醒已开启</view>
         <button class="secondary-button" loading="{{checkinSubmitting}}" disabled="{{checkinSubmitting}}" bindtap="scanCheckinCode">{{attendance ? '已签到' : '扫码签到'}}</button>

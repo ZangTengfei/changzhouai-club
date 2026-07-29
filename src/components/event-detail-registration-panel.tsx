@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { EventRegistrationForm } from "@/components/event-registration-form";
+import { EventGroupQrCard } from "@/components/event-group-qr-card";
 import type { PublicEventDetail } from "@/lib/community-events";
 import { hasSupabaseEnv } from "@/lib/env";
 import { getExternalRegistrationUrl } from "@/lib/event-registration-link";
@@ -84,7 +85,8 @@ export function EventDetailRegistrationPanel({
   }, [event.id, externalRegistrationUrl]);
 
   return (
-    <EventRegistrationForm
+    <div className="grid gap-4">
+      <EventRegistrationForm
       event={{
         id: event.id,
         title: event.title,
@@ -104,6 +106,11 @@ export function EventDetailRegistrationPanel({
       registrationStatus={registrationStatus}
       redirectTo={redirectTo}
       showDetailLink={false}
-    />
+      />
+      <EventGroupQrCard
+        eventSlug={event.slug}
+        enabled={registrationStatus === "registered"}
+      />
+    </div>
   );
 }

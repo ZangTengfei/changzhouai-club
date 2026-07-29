@@ -10,6 +10,7 @@ import {
   getAdminContextResult,
   requireAdminPermission,
 } from "@/lib/supabase/guards";
+import type { AdminEventGroupQrCode } from "@/lib/admin/event-group-qr";
 
 export type AdminEventRow = {
   id: string;
@@ -97,6 +98,7 @@ export type AdminEventFeedback = AdminEventFeedbackRow & {
 };
 
 export type AdminEvent = AdminEventRow & {
+  groupQrCode: AdminEventGroupQrCode | null;
   photos: AdminEventPhotoRow[];
   registrations: AdminRegistration[];
   feedback: AdminEventFeedback[];
@@ -147,6 +149,7 @@ export async function loadAdminEventsData(
     { data: attendanceData, error: attendanceError },
     { data: profilesData, error: profilesError },
     { data: portraitConsentsData, error: portraitConsentsError },
+    { data: groupQrCodesData, error: groupQrCodesError },
   ] = await Promise.all([
     supabase
       .from("events")
@@ -187,6 +190,11 @@ export async function loadAdminEventsData(
             `event-portrait:${EVENT_PORTRAIT_CONSENT_VERSION}:%`,
           )
       : Promise.resolve({ data: [], error: null }),
+    supabase
+      .from("event_group_qr_codes")
+      .select(
+        "event_id, storage_path, note, expires_at, is_active, created_at, updated_at",
+      ),
   ]);
 
   const events = (eventsData ?? []) as AdminEventRow[];
@@ -196,6 +204,7 @@ export async function loadAdminEventsData(
   const feedback = (feedbackData ?? []) as AdminEventFeedbackRow[];
   const profiles = (profilesData ?? []) as AdminProfileRow[];
   const portraitConsents = (portraitConsentsData ?? []) as AdminConsentRow[];
+  const groupQrCodes = (groupQrCodesData ?? []) as AdminEventGroupQrCode[];
   const queryErrors = [
     eventsError?.message,
     photosError?.message,
@@ -204,6 +213,7 @@ export async function loadAdminEventsData(
     feedbackError?.message,
     profilesError?.message,
     portraitConsentsError?.message,
+    groupQrCodesError?.message,
   ].filter(Boolean) as string[];
 
   const profilesByUserId = new Map(profiles.map((profile) => [profile.id, profile]));
@@ -221,6 +231,9 @@ export async function loadAdminEventsData(
       `${consent.user_id}:${consent.policy_version}`,
       consent,
     ]),
+  );
+  const groupQrCodeByEventId = new Map(
+    groupQrCodes.map((qrCode) => [qrCode.event_id, qrCode]),
   );
 
   feedback.forEach((item) => {
@@ -267,6 +280,7 @@ export async function loadAdminEventsData(
   return {
     events: events.map((event) => ({
       ...event,
+      groupQrCode: groupQrCodeByEventId.get(event.id) ?? null,
       photos: sortPhotos(photosByEventId.get(event.id) ?? []),
       registrations: registrationsByEventId.get(event.id) ?? [],
       feedback: feedbackByEventId.get(event.id) ?? [],

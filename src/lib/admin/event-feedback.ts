@@ -51,6 +51,10 @@ const adminErrorMessageMap: Record<string, string> = {
   invalid_registration_capacity: "人数上限必须是大于 0 的整数，或留空表示不限人数。",
   invalid_registration_mode: "报名方式无效，请重新选择。",
   event_capacity_reached: "确认人数已经达到上限，可将该报名设为候补。",
+  invalid_group_qr_path: "活动群二维码路径无效，请重新上传。",
+  invalid_group_qr_note: "活动群说明不能超过 300 个字符。",
+  invalid_group_qr_expiration: "活动群二维码有效期格式无效。",
+  group_qr_save_failed: "活动已保存，但活动群二维码配置保存失败，请重试。",
   permission_required: "当前账号没有执行这个操作所需的后台权限。",
   forbidden: "当前账号没有执行这个操作所需的后台权限。",
 };

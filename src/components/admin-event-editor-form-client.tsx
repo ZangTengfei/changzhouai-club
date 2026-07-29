@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import {
   AdminField,
+  AdminCheckboxRow,
   AdminNotice,
   AdminPageStack,
   AdminPanel,
@@ -48,6 +49,13 @@ type EditableAdminEvent = {
   video_title: string | null;
   video_cover_url: string | null;
   status: string;
+  groupQrCode: {
+    storage_path: string;
+    note: string | null;
+    expires_at: string | null;
+    is_active: boolean;
+    previewUrl?: string | null;
+  } | null;
 };
 
 function toDatetimeLocal(value: string | null) {
@@ -77,6 +85,14 @@ function toPayload(formData: FormData) {
     registration_capacity: String(
       formData.get("registration_capacity") ?? "",
     ).trim(),
+    group_qr_storage_path: String(
+      formData.get("group_qr_storage_path") ?? "",
+    ).trim(),
+    group_qr_note: String(formData.get("group_qr_note") ?? ""),
+    group_qr_expires_at: String(
+      formData.get("group_qr_expires_at") ?? "",
+    ).trim(),
+    group_qr_active: formData.get("group_qr_active") === "on",
     event_type: String(formData.get("event_type") ?? "community").trim(),
     recap: String(formData.get("recap") ?? ""),
     docs_url: String(formData.get("docs_url") ?? ""),
@@ -392,6 +408,77 @@ export function AdminEventEditorFormClient({
                           placeholder="https://..."
                         />
                       </AdminField>
+                      {isEditing ? (
+                        <>
+                          <AdminField
+                            label="活动微信群二维码"
+                            className="md:col-span-2"
+                          >
+                            <StorageImageUrlField
+                              name="group_qr_storage_path"
+                              defaultValue={
+                                event?.groupQrCode?.storage_path ?? ""
+                              }
+                              eventSlug={event?.slug ?? ""}
+                              uploadScope="event-group-qr"
+                              mode="upload-only"
+                              placeholder=""
+                              uploadLabel="上传或更换二维码"
+                              clearLabel="移除二维码"
+                              filledStatusText="已设置活动群二维码"
+                              emptyStatusText="当前未设置活动群二维码"
+                              compressUpload={false}
+                              preview={
+                                event?.groupQrCode?.previewUrl ? (
+                                  <img
+                                    src={event.groupQrCode.previewUrl}
+                                    alt={`${event.title} 活动微信群二维码`}
+                                    className="h-36 w-36 rounded-admin border border-admin-border bg-white object-contain p-2"
+                                  />
+                                ) : undefined
+                              }
+                            />
+                          </AdminField>
+                          <AdminCheckboxRow>
+                            <input
+                              type="checkbox"
+                              name="group_qr_active"
+                              defaultChecked={
+                                event?.groupQrCode?.is_active ?? true
+                              }
+                            />
+                            启用二维码
+                          </AdminCheckboxRow>
+                          <AdminField label="二维码失效时间">
+                            <Input
+                              type="datetime-local"
+                              name="group_qr_expires_at"
+                              defaultValue={toDatetimeLocal(
+                                event?.groupQrCode?.expires_at ?? null,
+                              )}
+                            />
+                          </AdminField>
+                          <AdminField
+                            label="入群说明"
+                            className="md:col-span-2"
+                          >
+                            <Textarea
+                              name="group_qr_note"
+                              defaultValue={event?.groupQrCode?.note ?? ""}
+                              rows={3}
+                              maxLength={300}
+                              placeholder="例如：报名确认后，请扫码加入本场活动群。"
+                            />
+                          </AdminField>
+                          <AdminNotice className="md:col-span-2">
+                            二维码存放在私密空间，仅向报名状态为“已报名”的用户短时授权展示；待审核、候补和已取消用户不可见。
+                          </AdminNotice>
+                        </>
+                      ) : (
+                        <AdminNotice className="md:col-span-2">
+                          先创建活动，保存后即可上传活动微信群二维码。
+                        </AdminNotice>
+                      )}
                     </div>
                   ),
                 },

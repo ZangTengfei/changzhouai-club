@@ -23,6 +23,7 @@ const checks = [];
 let userId = null;
 let avatarPath = null;
 let temporaryEventId = null;
+let eventGroupQrPath = null;
 
 async function request(path, options = {}) {
   const response = await fetch(`${apiBaseUrl}${path}`, {
@@ -254,6 +255,21 @@ try {
     .single();
   if (createEventError) throw createEventError;
   temporaryEventId = event.id;
+  eventGroupQrPath = `events/${event.slug}/group-qr/verification.png`;
+  const { error: groupQrUploadError } = await supabase.storage
+    .from("event-private-assets")
+    .upload(eventGroupQrPath, png, { contentType: "image/png" });
+  if (groupQrUploadError) throw groupQrUploadError;
+  const { error: groupQrCreateError } = await supabase
+    .from("event_group_qr_codes")
+    .insert({
+      event_id: event.id,
+      storage_path: eventGroupQrPath,
+      note: "自动化验收入群说明",
+      expires_at: new Date(Date.now() + 60 * 60 * 1_000).toISOString(),
+      is_active: true,
+    });
+  if (groupQrCreateError) throw groupQrCreateError;
 
   const { error: badgeError } = await supabase
     .from("member_badge_awards")
@@ -299,6 +315,13 @@ try {
   assert.equal(registrationPut.body?.registration?.status, "pending");
   pass("event_registration_pending_review");
 
+  const pendingGroupQr = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}/group-qr`,
+    { headers: authHeaders },
+  );
+  assert.equal(pendingGroupQr.response.status, 404);
+  pass("event_group_qr_hidden_before_confirmation");
+
   const { data: approvedRegistration, error: approveRegistrationError } =
     await supabase
       .rpc("set_event_registration_status", {
@@ -309,6 +332,15 @@ try {
       .single();
   if (approveRegistrationError) throw approveRegistrationError;
   assert.equal(approvedRegistration?.status, "registered");
+
+  const confirmedGroupQr = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}/group-qr`,
+    { headers: authHeaders },
+  );
+  assert.equal(confirmedGroupQr.response.status, 200);
+  assert.equal(confirmedGroupQr.body?.groupQr?.note, "自动化验收入群说明");
+  assert.match(confirmedGroupQr.body?.groupQr?.imageUrl ?? "", /token=/);
+  pass("event_group_qr_visible_after_confirmation");
 
   const repeatedRegistrationPut = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
@@ -507,6 +539,13 @@ try {
   assert.equal(registrationDelete.body?.registration?.status, "cancelled");
   pass("event_registration_cancelled");
 
+  const cancelledGroupQr = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}/group-qr`,
+    { headers: authHeaders },
+  );
+  assert.equal(cancelledGroupQr.response.status, 404);
+  pass("event_group_qr_hidden_after_cancellation");
+
   const { data: portraitConsentAfterCancel, error: portraitConsentLoadError } =
     await supabase
       .from("miniapp_consents")
@@ -669,6 +708,11 @@ try {
 
   console.log(JSON.stringify({ ok: true, checks }, null, 2));
 } finally {
+  if (eventGroupQrPath) {
+    await supabase.storage
+      .from("event-private-assets")
+      .remove([eventGroupQrPath]);
+  }
   if (avatarPath) {
     await supabase.storage.from("member-avatars").remove([avatarPath]);
   }

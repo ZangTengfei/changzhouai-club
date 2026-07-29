@@ -1,4 +1,5 @@
 export const EVENT_ASSETS_BUCKET = "event-assets";
+export const EVENT_PRIVATE_ASSETS_BUCKET = "event-private-assets";
 export const MEMBER_AVATARS_BUCKET = "member-avatars";
 export const MEMBER_WORK_ASSETS_BUCKET = "member-work-assets";
 export const COMMUNITY_UPDATE_ASSETS_BUCKET = "community-update-assets";
@@ -21,6 +22,16 @@ export function buildEventAssetPath(eventSlug: string, fileName: string) {
   const timestamp = Date.now();
 
   return `events/${safeEventSlug}/${timestamp}-${safeFileName}`;
+}
+
+export function buildEventGroupQrPath(eventSlug: string, fileName: string) {
+  const safeEventSlug = sanitizeSegment(eventSlug || "event");
+  const safeFileName =
+    sanitizeSegment(fileName || "wechat-group-qr.jpg") ||
+    "wechat-group-qr.jpg";
+  const timestamp = Date.now();
+
+  return `events/${safeEventSlug}/group-qr/${timestamp}-${safeFileName}`;
 }
 
 export function buildSponsorAssetPath(sponsorSlug: string, fileName: string) {
