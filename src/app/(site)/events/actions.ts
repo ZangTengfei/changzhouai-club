@@ -75,6 +75,7 @@ export async function registerForEvent(formData: FormData) {
       p_event_id: eventId,
       p_user_id: communityUserId,
       p_note: note || null,
+      p_allow_admin_only: false,
     })
     .single();
 

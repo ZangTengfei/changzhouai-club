@@ -21,6 +21,7 @@ import { Input } from "@/components/admin-antd/input";
 import { NativeSelect } from "@/components/admin-antd/native-select";
 import { useAdminResource } from "@/components/use-admin-resource";
 import type { AdminEvent, AdminEventsData } from "@/lib/admin/events";
+import { formatEventVisibility } from "@/lib/event-visibility";
 import {
   formatAdminEventDate,
   formatAdminEventStatus,
@@ -166,6 +167,17 @@ export function AdminEventsPageClient() {
       render: (status: string) => (
         <AdminStatusBadge tone={getAdminEventStatusTone(status) as AdminTone}>
           {formatAdminEventStatus(status)}
+        </AdminStatusBadge>
+      ),
+    },
+    {
+      title: "可见范围",
+      dataIndex: "visibility",
+      key: "visibility",
+      width: 130,
+      render: (visibility: string) => (
+        <AdminStatusBadge tone={visibility === "admin_only" ? "admin" : "neutral"}>
+          {formatEventVisibility(visibility)}
         </AdminStatusBadge>
       ),
     },

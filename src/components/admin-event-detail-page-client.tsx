@@ -42,6 +42,7 @@ import {
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 import type { AdminEvent } from "@/lib/admin/events";
+import { formatEventVisibility } from "@/lib/event-visibility";
 
 type AdminEventDetailData = {
   event: AdminEvent;
@@ -179,6 +180,11 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
             </AdminStatusBadge>
             <AdminStatusBadge tone="neutral">
               {formatAdminEventType(eventDetail.event_type)}
+            </AdminStatusBadge>
+            <AdminStatusBadge
+              tone={eventDetail.visibility === "admin_only" ? "admin" : "neutral"}
+            >
+              {formatEventVisibility(eventDetail.visibility)}
             </AdminStatusBadge>
             <AdminStatusBadge tone="neutral">
               {formatAdminEventDate(eventDetail.event_at)}

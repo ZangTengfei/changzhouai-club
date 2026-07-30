@@ -8,23 +8,32 @@ import {
   eventRegistrationConsentKey,
 } from "@/lib/event-registration-consent";
 import { miniappJson, requireMiniappSession } from "@/lib/miniapp-api";
+import { canPreviewMiniappDraftEvents } from "@/lib/miniapp-admin";
 
 export const runtime = "nodejs";
 
 async function loadEvent(
   supabase: SupabaseClient,
   slug: string,
+  userId: string,
 ) {
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, slug, title, summary, event_at, venue, city, status, event_type, registration_url",
+      "id, slug, title, summary, event_at, venue, city, status, visibility, event_type, registration_url",
     )
     .eq("slug", slug)
     .neq("status", "draft")
     .maybeSingle();
 
   if (error) throw new Error("event_load_failed");
+  if (!data) return null;
+  if (
+    data.visibility === "admin_only" &&
+    !(await canPreviewMiniappDraftEvents(supabase, userId))
+  ) {
+    return null;
+  }
   return data;
 }
 
@@ -36,7 +45,7 @@ export async function GET(
   if (auth.response) return auth.response;
 
   const { slug } = await context.params;
-  const event = await loadEvent(auth.supabase, slug);
+  const event = await loadEvent(auth.supabase, slug, auth.session.user_id);
   if (!event) return miniappJson({ error: "not_found" }, 404);
 
   const { data, error } = await auth.supabase
@@ -84,7 +93,7 @@ export async function PUT(
     return miniappJson({ error: "registration_consent_version_mismatch" }, 409);
   }
   const { slug } = await context.params;
-  const event = await loadEvent(auth.supabase, slug);
+  const event = await loadEvent(auth.supabase, slug, auth.session.user_id);
   if (!event) return miniappJson({ error: "not_found" }, 404);
   if (event.status !== "scheduled") {
     return miniappJson({ error: "registration_closed" }, 409);
@@ -140,6 +149,7 @@ export async function PUT(
       p_event_id: event.id,
       p_user_id: userId,
       p_note: note || null,
+      p_allow_admin_only: event.visibility === "admin_only",
     })
     .single();
 
@@ -199,7 +209,7 @@ export async function DELETE(
   if (auth.response) return auth.response;
 
   const { slug } = await context.params;
-  const event = await loadEvent(auth.supabase, slug);
+  const event = await loadEvent(auth.supabase, slug, auth.session.user_id);
   if (!event) return miniappJson({ error: "not_found" }, 404);
 
   const userId = auth.session.user_id;

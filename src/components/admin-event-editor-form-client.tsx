@@ -49,6 +49,7 @@ type EditableAdminEvent = {
   video_title: string | null;
   video_cover_url: string | null;
   status: string;
+  visibility: string;
   groupQrCode: {
     storage_path: string;
     note: string | null;
@@ -106,6 +107,7 @@ function toPayload(formData: FormData) {
     video_title: String(formData.get("video_title") ?? ""),
     video_cover_url: String(formData.get("video_cover_url") ?? ""),
     status: String(formData.get("status") ?? "draft").trim(),
+    visibility: String(formData.get("visibility") ?? "public").trim(),
   };
 }
 
@@ -237,7 +239,7 @@ export function AdminEventEditorFormClient({
               handleSubmit(new FormData(formEvent.currentTarget));
             }}
           >
-            <section className="grid gap-4 rounded-lg border border-blue-200 bg-blue-50 p-4 lg:grid-cols-[minmax(180px,0.8fr)_minmax(220px,1fr)_minmax(180px,0.8fr)_auto] lg:items-end">
+            <section className="grid gap-4 rounded-lg border border-blue-200 bg-blue-50 p-4 lg:grid-cols-[minmax(160px,0.8fr)_minmax(160px,0.8fr)_minmax(220px,1fr)_minmax(160px,0.8fr)_auto] lg:items-end">
               <AdminField label="活动状态">
                 <NativeSelect
                   name="status"
@@ -250,6 +252,16 @@ export function AdminEventEditorFormClient({
                   <option value="scheduled">已发布 · 公开展示</option>
                   <option value="completed">已结束</option>
                   <option value="cancelled">已取消</option>
+                </NativeSelect>
+              </AdminField>
+
+              <AdminField label="可见范围">
+                <NativeSelect
+                  name="visibility"
+                  defaultValue={event?.visibility ?? "public"}
+                >
+                  <option value="public">公开可见</option>
+                  <option value="admin_only">仅管理员可见</option>
                 </NativeSelect>
               </AdminField>
 
@@ -275,8 +287,9 @@ export function AdminEventEditorFormClient({
                 {isPending ? "保存中..." : isEditing ? "保存活动" : "创建活动"}
               </Button>
 
-              <p className="text-sm text-blue-800 lg:col-span-4">
+              <p className="text-sm text-blue-800 lg:col-span-5">
                 {statusHint}
+                {" "}测试报名时可选择“已发布”并设置为“仅管理员可见”。
               </p>
             </section>
 

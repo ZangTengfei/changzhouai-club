@@ -10,6 +10,8 @@ import {
   COMMUNITY_METRICS_CACHE_TAG,
 } from "@/lib/community-metrics";
 import { normalizeEventType } from "@/lib/event-type";
+import { parseEventVisibility } from "@/lib/event-visibility";
+import { PUBLIC_EVENTS_CACHE_TAG } from "@/lib/community-events";
 import { canAdmin, requireAdminPermission } from "@/lib/supabase/guards";
 
 const ADMIN_EVENTS_PATH = "/admin/events";
@@ -231,6 +233,7 @@ function revalidateRedirectPath(redirectTo: string | null) {
 }
 
 function revalidateEventPaths(eventId?: string, eventSlug?: string) {
+  updateTag(PUBLIC_EVENTS_CACHE_TAG);
   revalidatePath(ADMIN_EVENTS_PATH);
   revalidatePath("/");
   revalidatePath("/events");
@@ -382,6 +385,7 @@ export async function saveAdminEvent(formData: FormData) {
     video_title: getOptionalValue(formData, "video_title"),
     video_cover_url: normalizeOptionalUrlValue(getOptionalValue(formData, "video_cover_url")),
     status,
+    visibility: parseEventVisibility(formData.get("visibility")),
   };
 
   if (eventId) {

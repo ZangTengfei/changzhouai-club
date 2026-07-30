@@ -1,4 +1,6 @@
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+
+import { PUBLIC_EVENTS_CACHE_TAG } from "@/lib/community-events";
 
 const ADMIN_EVENTS_PATH = "/admin/events";
 const ADMIN_LEADS_PATH = "/admin/leads";
@@ -6,6 +8,7 @@ const ADMIN_MEMBERS_PATH = "/admin/members";
 const ADMIN_SPONSORS_PATH = "/admin/sponsors";
 
 export function revalidateAdminEventPaths(eventId?: string, eventSlug?: string) {
+  revalidateTag(PUBLIC_EVENTS_CACHE_TAG, { expire: 0 });
   revalidatePath(ADMIN_EVENTS_PATH);
   revalidatePath("/");
   revalidatePath("/events");

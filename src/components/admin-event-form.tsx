@@ -23,6 +23,7 @@ type AdminEvent = {
   video_title: string | null;
   video_cover_url: string | null;
   status: string;
+  visibility: string;
 };
 
 function toDatetimeLocal(value: string | null) {
@@ -53,6 +54,11 @@ export function AdminEventForm({
 
       <form action={saveAdminEvent} className="account-form">
         {isEditing ? <input type="hidden" name="event_id" value={event?.id} /> : null}
+        <input
+          type="hidden"
+          name="visibility"
+          value={event?.visibility ?? "public"}
+        />
 
         <div className="form-grid">
           <label className="form-field">

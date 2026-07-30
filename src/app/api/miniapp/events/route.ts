@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import {
+  getAdminOnlyEventSummaries,
   getDraftEventSummaries,
   getPublishedEventSummaries,
 } from "@/lib/community-events";
@@ -23,7 +24,7 @@ export async function GET(request: Request) {
     !searchParams.has("filter") &&
     !searchParams.has("offset") &&
     !searchParams.has("limit");
-  const events = await getPublishedEventSummaries();
+  const publicEvents = await getPublishedEventSummaries();
   const auth = await loadOptionalMiniappSession(request);
   const canPreviewDrafts = auth
     ? await canPreviewMiniappDraftEvents(auth.supabase, auth.session.user_id)
@@ -31,6 +32,10 @@ export async function GET(request: Request) {
   const drafts = canPreviewDrafts
     ? await getDraftEventSummaries(auth!.supabase)
     : [];
+  const adminOnlyEvents = canPreviewDrafts
+    ? await getAdminOnlyEventSummaries(auth!.supabase)
+    : [];
+  const events = [...publicEvents, ...adminOnlyEvents];
   const upcoming = events
     .filter((event) => event.status === "scheduled")
     .sort((left, right) => {

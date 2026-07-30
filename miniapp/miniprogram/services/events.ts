@@ -15,6 +15,7 @@ export type EventSummary = {
   registration_capacity: number | null;
   status: "draft" | "scheduled" | "completed";
   statusLabel: string;
+  visibility: "public" | "admin_only";
 };
 
 export type EventMode = "upcoming" | "history" | "draft";
@@ -67,6 +68,7 @@ export type EventDetail = {
   registrationMode: "instant" | "review";
   registrationCapacity: number | null;
   status: string;
+  visibility: "public" | "admin_only";
   eventType: string;
   recapParagraphs: string[];
   docsUrl: string | null;

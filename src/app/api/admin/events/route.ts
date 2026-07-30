@@ -14,6 +14,7 @@ import {
   parseEventRegistrationMode,
 } from "@/lib/event-registration-options";
 import { canAdmin } from "@/lib/supabase/guards";
+import { parseEventVisibility } from "@/lib/event-visibility";
 
 export async function GET() {
   const { context, response } = await requireAdminApiPermission("events.read");
@@ -122,6 +123,7 @@ export async function POST(request: Request) {
       video_title: getOptionalValue(payload, "video_title"),
       video_cover_url: normalizeOptionalUrlValue(getOptionalValue(payload, "video_cover_url")),
       status,
+      visibility: parseEventVisibility(payload.visibility),
       created_by: context.user.id,
     })
     .select("id")

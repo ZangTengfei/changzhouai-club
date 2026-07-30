@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import {
-  getDraftEventBySlug,
+  getAdminPreviewEventBySlug,
   getPublicEventBySlug,
 } from "@/lib/community-events";
 import { canPreviewMiniappDraftEvents } from "@/lib/miniapp-admin";
@@ -30,7 +30,7 @@ export async function GET(
     ? await canPreviewMiniappDraftEvents(auth.supabase, auth.session.user_id)
     : false;
   const event = canPreviewDrafts && slug
-    ? await getDraftEventBySlug(auth!.supabase, slug)
+    ? await getAdminPreviewEventBySlug(auth!.supabase, slug)
     : null;
 
   if (!event) {
