@@ -2,39 +2,39 @@
   <view class="consent-hero">
     <text class="consent-kicker">活动报名</text>
     <text class="consent-title">隐私协议</text>
-    <text class="consent-summary">本协议说明报名信息、活动现场记录及相关权益的处理方式，请阅读后确认。</text>
+    <text class="consent-summary">我们只会把报名信息用来联系你和组织活动。现场可能拍照或录像，具体说明如下。</text>
   </view>
 
   <view class="consent-section consent-section-green">
     <text class="consent-index">01</text>
     <text class="consent-heading">报名信息如何使用</text>
-    <text class="consent-copy">报名时，我们会使用你的昵称、微信号、城市、报名备注和报名状态，用于报名确认、活动通知、现场组织、安全联络、活动统计与必要的后续回访。我们仅在上述目的所需范围内处理这些信息，不会在公开页面展示微信号。</text>
+    <text class="consent-copy">报名时，我们会用到你的昵称、微信号、城市、报名备注和报名状态。这些信息只用于确认报名、发送通知、组织现场活动和必要的后续联系。微信号不会公开展示。</text>
   </view>
 
   <view class="consent-section consent-section-purple">
     <text class="consent-index">02</text>
     <text class="consent-heading">活动现场记录</text>
-    <text class="consent-copy">活动现场会进行摄影、录像或录音。勾选同意本协议后，我们可能在可识别你的情况下，将你的肖像、现场影像或发言片段用于常州 AI Club 的活动记录与宣传。</text>
-    <text class="consent-copy">使用渠道限于常州 AI 社区运营的官网、小程序、微信公众号、小红书等自有账号，以及社区活动回顾、海报和介绍材料。该授权为非独占、无偿授权，不包含第三方商业广告、产品代言、转授权或与活动无关的用途。</text>
+    <text class="consent-copy">现场可能会拍照、录像或录音。部分照片、视频或发言可能用于常州 AI Club 的活动回顾和宣传。</text>
+    <text class="consent-copy">这些内容可能发布在官网、小程序、微信公众号、小红书、活动海报和介绍材料中。不会用于第三方广告、产品代言，也不会交给其他机构使用。</text>
   </view>
 
   <view class="consent-section consent-section-orange">
     <text class="consent-index">03</text>
     <text class="consent-heading">我们不会怎样使用</text>
-    <text class="consent-copy">我们不会歪曲、丑化、污损你的形象，不会使用换脸、仿声等技术伪造你的肖像或声音，也不会把现场素材出售给第三方。编辑仅限于活动内容呈现所需的裁剪、排版、字幕和基础画面调整。</text>
+    <text class="consent-copy">我们不会故意歪曲或损害你的形象，不会用换脸、仿声等方式伪造内容，也不会出售现场素材。我们只会做正常的裁剪、排版、加字幕等编辑。</text>
   </view>
 
   <view class="consent-section consent-section-blue">
     <text class="consent-index">04</text>
     <text class="consent-heading">报名条件与撤回</text>
-    <text class="consent-copy">勾选同意本协议后方可提交报名。如果你不接受协议内容，请勿报名参加。</text>
-    <text class="consent-copy">你的同意自勾选之日起生效，至你撤回之日止。你可以通过常州 AI 社区官方微信或活动管理员申请撤回。身份核验后，我们将停止后续使用，并在合理可控范围内处理自有渠道上的相关素材；撤回不影响撤回前已经完成的合法使用。</text>
+    <text class="consent-copy">勾选同意后才能提交报名。如果你不同意，请不要报名。</text>
+    <text class="consent-copy">如果之后想撤回，可以联系常州 AI 社区官方微信或活动管理员。核实身份后，我们会停止后续使用，并尽量处理已经发布在自有渠道上的内容。撤回不影响此前已经发生的使用。</text>
   </view>
 
   <view class="consent-section consent-section-yellow">
     <text class="consent-index">05</text>
     <text class="consent-heading">保存、删除与未成年人</text>
-    <text class="consent-copy">报名与同意记录会在活动服务、争议处理和必要运营审计所需期限内保存。你可以通过社区官方微信申请查询、更正或删除相关信息。未满十八周岁的参与者，请在监护人知情同意后报名。</text>
+    <text class="consent-copy">报名和同意记录会保存一段必要的时间，用于组织活动、处理问题和留存记录。你可以联系社区官方微信，申请查询、更正或删除相关信息。未满十八周岁的参与者，请在监护人知情同意后报名。</text>
   </view>
 
   <text class="consent-version">版本：2026-07-30</text>
