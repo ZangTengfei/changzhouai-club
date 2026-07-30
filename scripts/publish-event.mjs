@@ -11,6 +11,7 @@ const TIMEZONE_SUFFIX_PATTERN = /(Z|[+-]\d{2}:?\d{2})$/i;
 const STATUS_VALUES = new Set(["draft", "scheduled", "completed", "cancelled"]);
 const EVENT_TYPE_VALUES = new Set(["community", "external"]);
 const REGISTRATION_MODE_VALUES = new Set(["instant", "review"]);
+const VISIBILITY_VALUES = new Set(["public", "admin_only"]);
 const CHANGZHOU_TIMEZONE_OFFSET = "+08:00";
 const TEXT_LIST_FIELDS = new Set(["agenda", "speaker_lineup"]);
 const PARAGRAPH_FIELDS = new Set(["description", "recap"]);
@@ -38,6 +39,7 @@ const EVENT_FIELDS = new Set([
   "city",
   "cover_image_url",
   "status",
+  "visibility",
 ]);
 const PUBLIC_TEXT_FIELDS = [
   "title",
@@ -75,7 +77,8 @@ Common JSON fields:
   summary, description, event_at, venue, city, agenda, speaker_lineup,
   registration_note, registration_url, registration_mode, registration_capacity,
   event_type, cover_image_url,
-  video_url, video_provider, video_file_id, video_title, video_cover_url, status
+  video_url, video_provider, video_file_id, video_title, video_cover_url, status,
+  visibility
 `);
 }
 
@@ -323,6 +326,18 @@ function normalizeRegistrationCapacity(value) {
   return capacity;
 }
 
+function normalizeVisibility(value) {
+  const visibility = getOptionalString(value) ?? "public";
+
+  if (!VISIBILITY_VALUES.has(visibility)) {
+    throw new Error(
+      `visibility must be one of: ${Array.from(VISIBILITY_VALUES).join(", ")}`,
+    );
+  }
+
+  return visibility;
+}
+
 function assertNoUnknownFields(payload) {
   const unknownFields = Object.keys(payload).filter((key) => !EVENT_FIELDS.has(key));
 
@@ -403,6 +418,7 @@ function normalizePayload(rawPayload, options) {
     city: getTextField(rawPayload, "city") ?? "常州",
     cover_image_url: getTextField(rawPayload, "cover_image_url"),
     status,
+    visibility: normalizeVisibility(rawPayload.visibility),
   };
 }
 
