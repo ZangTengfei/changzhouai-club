@@ -374,6 +374,13 @@
   font-weight: 720;
 }
 
+.registration-submit-button-disabled {
+  background: #c7cfcb;
+  color: #ffffff;
+  box-shadow: none;
+  opacity: 1;
+}
+
 .draft-preview-panel {
   border-color: #e6e0f8;
   background: var(--color-purple-soft);

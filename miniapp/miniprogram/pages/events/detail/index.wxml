@@ -112,14 +112,10 @@
         <checkbox-group class="registration-consents" bindchange="handleRegistrationConsentChange">
           <label class="registration-consent-row">
             <checkbox value="registration" checked="{{registrationConsentAccepted}}" color="#147a5b" />
-            <view class="registration-consent-copy"><text>我已阅读并同意</text><text class="registration-consent-link" catchtap="openRegistrationConsent">《活动报名与影像使用说明》</text><text> *</text></view>
-          </label>
-          <label class="registration-consent-row">
-            <checkbox value="portrait" checked="{{portraitConsentAccepted}}" color="#147a5b" />
-            <view class="registration-consent-copy"><text>我同意活动现场肖像及影像用于常州 AI Club 活动记录与宣传 *</text></view>
+            <view class="registration-consent-copy"><text>我已阅读并同意</text><text class="registration-consent-link" catchtap="openRegistrationConsent">《隐私协议》</text><text> *</text></view>
           </label>
         </checkbox-group>
-        <button class="primary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="submitRegistration">{{event.registrationMode === 'review' ? '提交申请' : '确认报名'}}</button>
+        <button class="primary-button registration-submit-button {{!registrationConsentAccepted ? 'registration-submit-button-disabled' : ''}}" loading="{{submitting}}" disabled="{{submitting || !registrationConsentAccepted}}" bindtap="submitRegistration">{{event.registrationMode === 'review' ? '提交申请' : '确认报名'}}</button>
       </block>
     </view>
 

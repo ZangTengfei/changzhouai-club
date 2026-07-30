@@ -50,8 +50,7 @@ Page({
     registrationStatusLabel: "",
     registrationStatusTone: "",
     registrationNote: "",
-    registrationConsentAccepted: true,
-    portraitConsentAccepted: true,
+    registrationConsentAccepted: false,
     registrationLoading: true,
     submitting: false,
     reminder: null as ReminderConfig | null,
@@ -188,7 +187,6 @@ Page({
     this.setData({
       registrationConsentAccepted:
         event.detail.value.includes("registration"),
-      portraitConsentAccepted: event.detail.value.includes("portrait"),
     });
   },
 
@@ -252,11 +250,6 @@ Page({
       void wx.showToast({ title: "请先同意活动报名隐私说明", icon: "none" });
       return;
     }
-    if (!this.data.portraitConsentAccepted) {
-      void wx.showToast({ title: "请先同意活动影像授权", icon: "none" });
-      return;
-    }
-
     this.setData({ submitting: true });
     try {
       const registration = await registerForEvent(
@@ -265,7 +258,7 @@ Page({
         {
           registrationConsentAccepted:
             this.data.registrationConsentAccepted,
-          portraitConsentAccepted: this.data.portraitConsentAccepted,
+          portraitConsentAccepted: this.data.registrationConsentAccepted,
         },
       );
       const statusView = getRegistrationStatusView(registration);
@@ -332,8 +325,7 @@ Page({
         registrationStatusTone: statusView.tone,
         reminder: null,
         groupQr: null,
-        registrationConsentAccepted: true,
-        portraitConsentAccepted: true,
+        registrationConsentAccepted: false,
       });
       trackEvent("registration_cancelled", "/pages/events/detail/index", {
         slug: this.data.slug,
