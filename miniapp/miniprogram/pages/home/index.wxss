@@ -156,10 +156,20 @@
 .featured-registration-tag {
   padding: 7rpx 14rpx;
   border-radius: 999rpx;
-  background: var(--color-green-soft);
-  color: var(--color-green-dark);
+  background: var(--color-blue-soft);
+  color: var(--color-blue);
   font-size: 20rpx;
   font-weight: 700;
+}
+
+.featured-registration-tag-success {
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
+}
+
+.featured-registration-tag-capacity {
+  background: var(--color-yellow-soft);
+  color: #745811;
 }
 
 .featured-summary {
