@@ -108,14 +108,16 @@
         <text class="registration-kicker">活动报名</text>
         <text class="registration-title">{{event.registrationMode === 'review' ? '提交报名申请' : '报名这场活动'}}</text>
         <text class="registration-copy">{{event.registrationCapacity ? '确认名额限 ' + event.registrationCapacity + ' 人' : '本场不限报名人数'}}{{event.registrationMode === 'review' ? '，提交后由组织方审核。' : '。'}}</text>
-        <textarea class="registration-textarea" maxlength="500" value="{{registrationNote}}" bindinput="handleNoteInput" placeholder="可选：写下你特别想交流的话题" />
+        <view class="registration-field-heading"><text>报名补充信息</text><text>{{event.registrationMode === 'review' ? '必填' : '选填'}}</text></view>
+        <textarea class="registration-textarea" maxlength="500" value="{{registrationNote}}" bindinput="handleNoteInput" placeholder="{{event.registrationMode === 'review' ? '请简单说说你在做什么、目前做到哪一步，以及最想解决的问题' : '写下你特别想交流的话题'}}" />
+        <text wx:if="{{event.registrationMode === 'review'}}" class="registration-field-help">我们会根据这段内容安排现场讨论和确认名额，请尽量写具体一些。</text>
         <checkbox-group class="registration-consents" bindchange="handleRegistrationConsentChange">
           <label class="registration-consent-row">
             <checkbox value="registration" checked="{{registrationConsentAccepted}}" color="#147a5b" />
             <view class="registration-consent-copy"><text>我已阅读并同意</text><text class="registration-consent-link" catchtap="openRegistrationConsent">《隐私协议》</text><text> *</text></view>
           </label>
         </checkbox-group>
-        <button class="primary-button registration-submit-button {{!registrationConsentAccepted ? 'registration-submit-button-disabled' : ''}}" loading="{{submitting}}" disabled="{{submitting || !registrationConsentAccepted}}" bindtap="submitRegistration">{{event.registrationMode === 'review' ? '提交申请' : '确认报名'}}</button>
+        <button class="primary-button registration-submit-button {{!registrationConsentAccepted || (event.registrationMode === 'review' && !registrationNoteProvided) ? 'registration-submit-button-disabled' : ''}}" loading="{{submitting}}" disabled="{{submitting || !registrationConsentAccepted || (event.registrationMode === 'review' && !registrationNoteProvided)}}" bindtap="submitRegistration">{{event.registrationMode === 'review' ? '提交申请' : '确认报名'}}</button>
       </block>
     </view>
 

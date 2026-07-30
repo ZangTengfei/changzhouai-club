@@ -20,7 +20,7 @@ async function loadEvent(
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, slug, title, summary, event_at, venue, city, status, visibility, event_type, registration_url",
+      "id, slug, title, summary, event_at, venue, city, status, visibility, event_type, registration_url, registration_mode",
     )
     .eq("slug", slug)
     .neq("status", "draft")
@@ -100,6 +100,9 @@ export async function PUT(
   }
   if (event.event_type === "external" || event.registration_url) {
     return miniappJson({ error: "external_registration_required" }, 409);
+  }
+  if (event.registration_mode === "review" && !note) {
+    return miniappJson({ error: "registration_note_required" }, 400);
   }
 
   const userId = auth.session.user_id;

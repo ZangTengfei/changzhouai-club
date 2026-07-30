@@ -384,6 +384,27 @@ try {
   );
   pass("event_registration_requires_portrait_consent");
 
+  const reviewRegistrationWithoutNote = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
+    {
+      method: "PUT",
+      headers: authHeaders,
+      body: JSON.stringify({
+        note: "   ",
+        registrationConsentAccepted: true,
+        portraitConsentAccepted: true,
+        registrationConsentVersion: eventRegistrationConsentVersion,
+        portraitConsentVersion: eventPortraitConsentVersion,
+      }),
+    },
+  );
+  assert.equal(reviewRegistrationWithoutNote.response.status, 400);
+  assert.equal(
+    reviewRegistrationWithoutNote.body?.error,
+    "registration_note_required",
+  );
+  pass("event_review_registration_requires_note");
+
   const registrationPut = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
     {

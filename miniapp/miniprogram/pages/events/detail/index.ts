@@ -50,6 +50,7 @@ Page({
     registrationStatusLabel: "",
     registrationStatusTone: "",
     registrationNote: "",
+    registrationNoteProvided: false,
     registrationConsentAccepted: false,
     registrationLoading: true,
     submitting: false,
@@ -178,7 +179,10 @@ Page({
   },
 
   handleNoteInput(event: WechatMiniprogram.TextareaInput) {
-    this.setData({ registrationNote: event.detail.value });
+    this.setData({
+      registrationNote: event.detail.value,
+      registrationNoteProvided: Boolean(event.detail.value.trim()),
+    });
   },
 
   handleRegistrationConsentChange(
@@ -250,6 +254,13 @@ Page({
       void wx.showToast({ title: "请先同意活动报名隐私说明", icon: "none" });
       return;
     }
+    if (
+      this.data.event.registrationMode === "review" &&
+      !this.data.registrationNote.trim()
+    ) {
+      void wx.showToast({ title: "请填写报名补充信息", icon: "none" });
+      return;
+    }
     this.setData({ submitting: true });
     try {
       const registration = await registerForEvent(
@@ -291,6 +302,11 @@ Page({
         this.openProfile();
       } else if (
         error instanceof ApiError &&
+        error.errorCode === "registration_note_required"
+      ) {
+        void wx.showToast({ title: "请填写报名补充信息", icon: "none" });
+      } else if (
+        error instanceof ApiError &&
         error.errorCode === "portrait_consent_required"
       ) {
         void wx.showToast({ title: "请先同意活动影像授权", icon: "none" });
@@ -325,6 +341,8 @@ Page({
         registrationStatusTone: statusView.tone,
         reminder: null,
         groupQr: null,
+        registrationNote: "",
+        registrationNoteProvided: false,
         registrationConsentAccepted: false,
       });
       trackEvent("registration_cancelled", "/pages/events/detail/index", {

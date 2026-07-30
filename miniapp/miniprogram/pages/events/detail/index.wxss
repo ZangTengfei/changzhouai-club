@@ -338,6 +338,26 @@
   line-height: 1.55;
 }
 
+.registration-field-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--color-ink);
+  font-size: 24rpx;
+  font-weight: 760;
+}
+
+.registration-field-heading text:last-child {
+  color: var(--color-green-dark);
+  font-size: 21rpx;
+}
+
+.registration-field-help {
+  color: var(--color-muted);
+  font-size: 22rpx;
+  line-height: 1.55;
+}
+
 .registration-consents {
   display: flex;
   flex-direction: column;
