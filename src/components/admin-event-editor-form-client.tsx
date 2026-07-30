@@ -42,6 +42,8 @@ type EditableAdminEvent = {
   event_at: string | null;
   venue: string | null;
   city: string | null;
+  location_latitude: number | null;
+  location_longitude: number | null;
   cover_image_url: string | null;
   video_url: string | null;
   video_provider: string | null;
@@ -100,6 +102,8 @@ function toPayload(formData: FormData) {
     event_at: String(formData.get("event_at") ?? "").trim(),
     venue: String(formData.get("venue") ?? ""),
     city: String(formData.get("city") ?? ""),
+    location_latitude: String(formData.get("location_latitude") ?? "").trim(),
+    location_longitude: String(formData.get("location_longitude") ?? "").trim(),
     cover_image_url: String(formData.get("cover_image_url") ?? ""),
     video_url: String(formData.get("video_url") ?? ""),
     video_provider: String(formData.get("video_provider") ?? ""),
@@ -344,6 +348,28 @@ export function AdminEventEditorFormClient({
                           name="city"
                           defaultValue={event?.city ?? "常州"}
                           placeholder="常州"
+                        />
+                      </AdminField>
+                      <AdminField label="地图纬度">
+                        <Input
+                          type="number"
+                          name="location_latitude"
+                          min="-90"
+                          max="90"
+                          step="any"
+                          defaultValue={event?.location_latitude ?? ""}
+                          placeholder="例如：31.810689"
+                        />
+                      </AdminField>
+                      <AdminField label="地图经度">
+                        <Input
+                          type="number"
+                          name="location_longitude"
+                          min="-180"
+                          max="180"
+                          step="any"
+                          defaultValue={event?.location_longitude ?? ""}
+                          placeholder="例如：119.974061"
                         />
                       </AdminField>
                     </div>

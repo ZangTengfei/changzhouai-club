@@ -15,6 +15,7 @@ import {
 } from "@/lib/event-registration-options";
 import { canAdmin } from "@/lib/supabase/guards";
 import { parseEventVisibility } from "@/lib/event-visibility";
+import { parseEventMapCoordinates } from "@/lib/event-location";
 
 export async function GET() {
   const { context, response } = await requireAdminApiPermission("events.read");
@@ -72,6 +73,7 @@ export async function POST(request: Request) {
   let registrationCapacity: number | null;
   let registrationMode: "instant" | "review";
   let groupQrInput: ReturnType<typeof parseAdminEventGroupQrInput>;
+  let mapCoordinates: ReturnType<typeof parseEventMapCoordinates>;
 
   try {
     registrationCapacity = parseEventRegistrationCapacity(
@@ -79,6 +81,10 @@ export async function POST(request: Request) {
     );
     registrationMode = parseEventRegistrationMode(payload.registration_mode);
     groupQrInput = parseAdminEventGroupQrInput(payload);
+    mapCoordinates = parseEventMapCoordinates(
+      payload.location_latitude,
+      payload.location_longitude,
+    );
   } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "invalid_payload" },
@@ -116,6 +122,8 @@ export async function POST(request: Request) {
       event_at: normalizeAdminEventDateTime(getOptionalValue(payload, "event_at")),
       venue: getOptionalValue(payload, "venue"),
       city: getOptionalValue(payload, "city") ?? "常州",
+      location_latitude: mapCoordinates.latitude,
+      location_longitude: mapCoordinates.longitude,
       cover_image_url: getOptionalValue(payload, "cover_image_url"),
       video_url: normalizeOptionalUrlValue(getOptionalValue(payload, "video_url")),
       video_provider: getOptionalValue(payload, "video_provider"),

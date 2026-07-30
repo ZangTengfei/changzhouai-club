@@ -58,6 +58,8 @@ export type EventDetail = {
   statusLabel: string;
   eventTypeLabel: string;
   locationLabel: string;
+  locationLatitude: number | null;
+  locationLongitude: number | null;
   imageUrl: string | null;
   imageThumbnailUrl: string | null;
   descriptionParagraphs: string[];

@@ -76,6 +76,17 @@
   border-radius: 26rpx;
 }
 
+.fact-row-action {
+  cursor: pointer;
+}
+
+.fact-action-arrow {
+  flex: none;
+  color: #2870a7;
+  font-size: 40rpx;
+  line-height: 1;
+}
+
 .fact-row-orange {
   background: var(--color-orange-soft);
 }

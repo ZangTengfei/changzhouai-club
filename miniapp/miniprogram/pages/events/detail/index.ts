@@ -220,6 +220,28 @@ Page({
     void wx.previewImage({ current, urls: this.data.galleryUrls });
   },
 
+  openEventLocation() {
+    const event = this.data.event;
+    if (
+      !event ||
+      event.locationLatitude === null ||
+      event.locationLongitude === null
+    ) {
+      return;
+    }
+
+    void wx.openLocation({
+      latitude: event.locationLatitude,
+      longitude: event.locationLongitude,
+      name: event.locationLabel,
+      address: event.locationLabel,
+      scale: 16,
+      fail: () => {
+        void wx.showToast({ title: "暂时无法打开地图", icon: "none" });
+      },
+    });
+  },
+
   async submitRegistration() {
     if (this.data.submitting || !this.data.event) return;
     if (!this.data.user?.registrationReady) {

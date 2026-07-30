@@ -27,6 +27,8 @@ type EventRow = {
   event_at: string | null;
   venue: string | null;
   city: string | null;
+  location_latitude: number | null;
+  location_longitude: number | null;
   cover_image_url: string | null;
   agenda: string | null;
   speaker_lineup: string | null;
@@ -142,6 +144,8 @@ export type PublicEventDetail = {
   city: string | null;
   venue: string | null;
   locationLabel: string;
+  locationLatitude: number | null;
+  locationLongitude: number | null;
   imageUrl: string | null;
   imageThumbnailUrl: string | null;
   descriptionParagraphs: string[];
@@ -378,6 +382,8 @@ function mapPublicEventDetail(row: EventRow): PublicEventDetail {
     city: row.city,
     venue: row.venue,
     locationLabel: buildLocationLabel(row.city, row.venue),
+    locationLatitude: row.location_latitude,
+    locationLongitude: row.location_longitude,
     imageUrl,
     imageThumbnailUrl: getEventImageUrl(imageUrl, "miniapp-detail-cover"),
     descriptionParagraphs: parseParagraphs(row.description),
@@ -481,7 +487,7 @@ export async function getDraftEventBySlug(
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, registration_mode, registration_capacity, event_type, recap, docs_url, video_url, video_title, video_cover_url, status, visibility, event_photos(id, image_url, caption, sort_order)",
+      "id, slug, title, summary, description, event_at, venue, city, location_latitude, location_longitude, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, registration_mode, registration_capacity, event_type, recap, docs_url, video_url, video_title, video_cover_url, status, visibility, event_photos(id, image_url, caption, sort_order)",
     )
     .eq("slug", slug)
     .eq("status", "draft")
@@ -514,7 +520,7 @@ export async function getAdminPreviewEventBySlug(
   const { data, error } = await supabase
     .from("events")
     .select(
-      "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, registration_mode, registration_capacity, event_type, recap, docs_url, video_url, video_title, video_cover_url, status, visibility, event_photos(id, image_url, caption, sort_order)",
+      "id, slug, title, summary, description, event_at, venue, city, location_latitude, location_longitude, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, registration_mode, registration_capacity, event_type, recap, docs_url, video_url, video_title, video_cover_url, status, visibility, event_photos(id, image_url, caption, sort_order)",
     )
     .eq("slug", slug)
     .or("status.eq.draft,visibility.eq.admin_only")
@@ -672,7 +678,7 @@ const getCachedPublicEventBySlug = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, slug, title, summary, description, event_at, venue, city, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, registration_mode, registration_capacity, event_type, recap, docs_url, video_url, video_title, video_cover_url, status, visibility, event_photos(id, image_url, caption, sort_order)",
+        "id, slug, title, summary, description, event_at, venue, city, location_latitude, location_longitude, cover_image_url, agenda, speaker_lineup, registration_note, registration_url, registration_mode, registration_capacity, event_type, recap, docs_url, video_url, video_title, video_cover_url, status, visibility, event_photos(id, image_url, caption, sort_order)",
       )
       .eq("slug", slug)
       .in("status", ["scheduled", "completed", "cancelled"])
