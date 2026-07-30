@@ -7,14 +7,15 @@
 }
 
 .event-mode-swiper {
-  width: 100%;
+  width: calc(100% + 64rpx);
+  margin-left: -32rpx;
   transition: height 180ms ease;
 }
 
 .event-mode-panel {
   box-sizing: border-box;
   min-height: 220rpx;
-  padding-bottom: 36rpx;
+  padding: 0 32rpx 36rpx;
 }
 
 .month-group {
