@@ -12,7 +12,9 @@
 }
 
 .event-mode-panel {
+  box-sizing: border-box;
   min-height: 220rpx;
+  padding-bottom: 36rpx;
 }
 
 .month-group {
