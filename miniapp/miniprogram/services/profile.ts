@@ -23,8 +23,12 @@ export async function updateProfile(profile: MiniappProfileUpdate) {
   });
 }
 
-export async function loadSharedProfile(handle: string) {
+export async function loadSharedProfile(handle: string, eventSlug = "") {
+  const eventQuery = eventSlug
+    ? `?event=${encodeURIComponent(eventSlug)}`
+    : "";
   return apiRequest<{ profile: MiniappSharedProfile }>({
-    path: `/api/miniapp/members/${encodeURIComponent(handle)}`,
+    path: `/api/miniapp/members/${encodeURIComponent(handle)}${eventQuery}`,
+    authenticated: Boolean(eventSlug),
   });
 }

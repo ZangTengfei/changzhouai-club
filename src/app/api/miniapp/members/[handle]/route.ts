@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 
 import { isUuidLike, isValidMemberPublicSlug } from "@/lib/member-public-slug";
+import { canPreviewMiniappDraftEvents } from "@/lib/miniapp-admin";
+import { loadOptionalMiniappSession } from "@/lib/miniapp-api";
 import { getAvatarImageUrl } from "@/lib/public-image-url";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -13,11 +15,12 @@ function getIdentityLabel(status: string, isCoBuilder: boolean) {
 }
 
 export async function GET(
-  _request: Request,
+  request: Request,
   context: { params: Promise<{ handle: string }> },
 ) {
   const { handle } = await context.params;
   const normalizedHandle = handle.trim().toLowerCase();
+  const eventSlug = new URL(request.url).searchParams.get("event")?.trim() ?? "";
 
   if (
     !normalizedHandle ||
@@ -52,6 +55,44 @@ export async function GET(
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
+  let isConfirmedEventParticipant = false;
+  if (eventSlug) {
+    const { data: event, error: eventError } = await supabase
+      .from("events")
+      .select("id, visibility")
+      .eq("slug", eventSlug)
+      .neq("status", "draft")
+      .maybeSingle();
+    if (eventError) {
+      return NextResponse.json({ error: "profile_load_failed" }, { status: 500 });
+    }
+    if (!event) {
+      return NextResponse.json({ error: "not_found" }, { status: 404 });
+    }
+
+    if (event.visibility === "admin_only") {
+      const auth = await loadOptionalMiniappSession(request);
+      const canPreview = auth
+        ? await canPreviewMiniappDraftEvents(auth.supabase, auth.session.user_id)
+        : false;
+      if (!canPreview) {
+        return NextResponse.json({ error: "not_found" }, { status: 404 });
+      }
+    }
+
+    const { data: registration, error: registrationError } = await supabase
+      .from("event_registrations")
+      .select("id")
+      .eq("event_id", event.id)
+      .eq("user_id", profile.id)
+      .eq("status", "registered")
+      .maybeSingle();
+    if (registrationError) {
+      return NextResponse.json({ error: "profile_load_failed" }, { status: 500 });
+    }
+    isConfirmedEventParticipant = Boolean(registration);
+  }
+
   const { data: member, error: memberError } = await supabase
     .from("members")
     .select(
@@ -67,7 +108,10 @@ export async function GET(
     return NextResponse.json({ error: "profile_load_failed" }, { status: 500 });
   }
 
-  if (!member?.is_publicly_visible) {
+  if (
+    !member ||
+    (!member.is_publicly_visible && !isConfirmedEventParticipant)
+  ) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 

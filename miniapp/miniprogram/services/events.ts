@@ -1,5 +1,12 @@
 import { apiRequest } from "./api";
 
+export type EventParticipantPreview = {
+  shareHandle: string;
+  displayName: string;
+  avatarUrl: string | null;
+  avatarInitial: string;
+};
+
 export type EventSummary = {
   id: string;
   slug: string;
@@ -16,6 +23,8 @@ export type EventSummary = {
   status: "draft" | "scheduled" | "completed";
   statusLabel: string;
   visibility: "public" | "admin_only";
+  confirmed_count: number;
+  participant_preview: EventParticipantPreview[];
 };
 
 export type EventMode = "upcoming" | "history" | "draft";
@@ -69,6 +78,8 @@ export type EventDetail = {
   registrationUrl: string | null;
   registrationMode: "instant" | "review";
   registrationCapacity: number | null;
+  confirmedCount: number;
+  participants: EventParticipantPreview[];
   status: string;
   visibility: "public" | "admin_only";
   eventType: string;

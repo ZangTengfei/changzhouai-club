@@ -4,6 +4,7 @@ import { createProfileShareCard } from "../../../utils/profile-share-card";
 Page({
   data: {
     handle: "",
+    eventSlug: "",
     profile: null as MiniappSharedProfile | null,
     avatarInitial: "微",
     preferenceLabels: [] as string[],
@@ -14,7 +15,8 @@ Page({
 
   onLoad(options: Record<string, string | undefined>) {
     const handle = String(options.handle ?? "").trim();
-    this.setData({ handle });
+    const eventSlug = String(options.event ?? "").trim();
+    this.setData({ handle, eventSlug });
     void this.loadPage();
   },
 
@@ -30,7 +32,10 @@ Page({
 
     this.setData({ loading: true, loadFailed: false });
     try {
-      const { profile } = await loadSharedProfile(this.data.handle);
+      const { profile } = await loadSharedProfile(
+        this.data.handle,
+        this.data.eventSlug,
+      );
       const preferenceLabels = [
         profile.willingToAttend ? "参加社区活动" : "",
         profile.willingToShare ? "分享实践经验" : "",
@@ -77,7 +82,9 @@ Page({
         : "常州 AI Club 成员名片",
       path: `/pages/profile/shared/index?handle=${encodeURIComponent(
         profile?.shareHandle || this.data.handle,
-      )}`,
+      )}${this.data.eventSlug
+        ? `&event=${encodeURIComponent(this.data.eventSlug)}`
+        : ""}`,
       imageUrl: this.data.shareCardImageUrl || undefined,
     };
   },

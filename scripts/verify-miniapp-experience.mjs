@@ -9,7 +9,7 @@ const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
 const serviceRoleKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY;
-const eventRegistrationConsentVersion = "2026-07-30";
+const eventRegistrationConsentVersion = "2026-07-30-v2";
 const eventPortraitConsentVersion = "2026-07-30";
 
 if (!supabaseUrl || !serviceRoleKey) {
@@ -449,6 +449,57 @@ try {
   assert.equal(registrationGet.body?.registration?.status, "registered");
   pass("event_registration_status_loaded");
 
+  const { error: hideConfirmedParticipantError } = await supabase
+    .from("members")
+    .update({ is_publicly_visible: false })
+    .eq("id", userId);
+  if (hideConfirmedParticipantError) throw hideConfirmedParticipantError;
+
+  const eventWithParticipants = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}`,
+  );
+  assert.equal(eventWithParticipants.response.status, 200);
+  assert.equal(eventWithParticipants.body?.event?.confirmedCount, 1);
+  assert.equal(eventWithParticipants.body?.event?.participants?.length, 1);
+  assert.equal(
+    eventWithParticipants.body?.event?.participants?.[0]?.displayName,
+    "体验版测试用户",
+  );
+  assert.equal(
+    "wechat" in (eventWithParticipants.body?.event?.participants?.[0] ?? {}),
+    false,
+  );
+
+  const eventScopedProfile = await request(
+    `/api/miniapp/members/${encodeURIComponent(userId)}?event=${encodeURIComponent(event.slug)}`,
+  );
+  assert.equal(eventScopedProfile.response.status, 200);
+  assert.equal(eventScopedProfile.body?.profile?.displayName, "体验版测试用户");
+  assert.equal("wechat" in (eventScopedProfile.body?.profile ?? {}), false);
+  pass("confirmed_participant_visible_with_event_profile");
+
+  const directHiddenProfile = await request(
+    `/api/miniapp/members/${encodeURIComponent(userId)}`,
+  );
+  assert.equal(directHiddenProfile.response.status, 404);
+  pass("event_profile_access_does_not_publish_member_globally");
+
+  const eventCatalogWithParticipants = await request(
+    "/api/miniapp/events?mode=upcoming&limit=20",
+  );
+  const eventPreview = eventCatalogWithParticipants.body?.events?.find(
+    (item) => item.id === event.id,
+  );
+  assert.equal(eventPreview?.confirmed_count, 1);
+  assert.equal(eventPreview?.participant_preview?.length, 1);
+  pass("event_card_participant_preview_loaded");
+
+  const { error: restoreConfirmedParticipantError } = await supabase
+    .from("members")
+    .update({ is_publicly_visible: true })
+    .eq("id", userId);
+  if (restoreConfirmedParticipantError) throw restoreConfirmedParticipantError;
+
   const confirmedGroupQr = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/group-qr`,
     { headers: authHeaders },
@@ -654,6 +705,14 @@ try {
   assert.equal(registrationDelete.response.status, 200);
   assert.equal(registrationDelete.body?.registration?.status, "cancelled");
   pass("event_registration_cancelled");
+
+  const eventAfterCancellation = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}`,
+  );
+  assert.equal(eventAfterCancellation.response.status, 200);
+  assert.equal(eventAfterCancellation.body?.event?.confirmedCount, 0);
+  assert.equal(eventAfterCancellation.body?.event?.participants?.length, 0);
+  pass("cancelled_participant_removed_from_event");
 
   const cancelledGroupQr = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/group-qr`,

@@ -8,7 +8,7 @@
   <view class="consent-section consent-section-green">
     <text class="consent-index">01</text>
     <text class="consent-heading">报名信息如何使用</text>
-    <text class="consent-copy">报名时，我们会用到你的昵称、微信号、城市、报名备注和报名状态。这些信息只用于确认报名、发送通知、组织现场活动和必要的后续联系。微信号不会公开展示。</text>
+    <text class="consent-copy">报名时，我们会用到你的昵称、头像、微信号、城市、成员资料、报名备注和报名状态。报名确认后，昵称、头像和成员资料会展示在活动页面，其他用户可以点击查看。微信号、报名备注和账号信息不会公开；其余信息只用于确认报名、发送通知、组织现场活动和必要的后续联系。</text>
   </view>
 
   <view class="consent-section consent-section-purple">
@@ -37,5 +37,5 @@
     <text class="consent-copy">报名和同意记录会保存一段必要的时间，用于组织活动、处理问题和留存记录。你可以联系社区官方微信，申请查询、更正或删除相关信息。未满十八周岁的参与者，请在监护人知情同意后报名。</text>
   </view>
 
-  <text class="consent-version">版本：2026-07-30</text>
+  <text class="consent-version">版本：2026-07-30-v2</text>
 </view>

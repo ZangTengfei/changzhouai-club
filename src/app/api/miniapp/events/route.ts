@@ -5,6 +5,10 @@ import {
   getDraftEventSummaries,
   getPublishedEventSummaries,
 } from "@/lib/community-events";
+import {
+  getEventParticipantSummaries,
+  type EventParticipantSummary,
+} from "@/lib/event-participants";
 import { canPreviewMiniappDraftEvents } from "@/lib/miniapp-admin";
 import { loadOptionalMiniappSession } from "@/lib/miniapp-api";
 
@@ -66,11 +70,46 @@ export async function GET(request: Request) {
     Math.max(1, parseInteger(searchParams.get("limit"), DEFAULT_PAGE_SIZE)),
   );
   const pagedEvents = filteredEvents.slice(offset, offset + limit);
+  const responseEvents = includeLegacyCatalog
+    ? Array.from(
+        new Map(
+          [...upcoming, ...history, ...pagedEvents].map((event) => [
+            event.id,
+            event,
+          ]),
+        ).values(),
+      )
+    : pagedEvents;
+  let participantSummaries = new Map<string, EventParticipantSummary>();
+  try {
+    participantSummaries = await getEventParticipantSummaries(
+      responseEvents.map((event) => event.id),
+      4,
+    );
+  } catch (error) {
+    console.error(
+      "Failed to load mini-program event participant previews.",
+      error,
+    );
+  }
+  const withParticipants = <T extends { id: string }>(event: T) => {
+    const summary = participantSummaries.get(event.id);
+    return {
+      ...event,
+      confirmed_count: summary?.confirmedCount ?? 0,
+      participant_preview: summary?.participants ?? [],
+    };
+  };
 
   return NextResponse.json(
     {
-      ...(includeLegacyCatalog ? { upcoming, history } : {}),
-      events: pagedEvents,
+      ...(includeLegacyCatalog
+        ? {
+            upcoming: upcoming.map(withParticipants),
+            history: history.map(withParticipants),
+          }
+        : {}),
+      events: pagedEvents.map(withParticipants),
       mode,
       filter,
       canPreviewDrafts,

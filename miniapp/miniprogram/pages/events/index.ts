@@ -420,6 +420,17 @@ Page({
     void this.loadAllModePanels(filter);
   },
 
+  openParticipantProfile(event: WechatMiniprogram.TouchEvent) {
+    const handle = String(event.currentTarget.dataset.handle ?? "");
+    const eventSlug = String(event.currentTarget.dataset.event ?? "");
+    if (!handle || !eventSlug) return;
+    void wx.navigateTo({
+      url: `/pages/profile/shared/index?handle=${encodeURIComponent(
+        handle,
+      )}&event=${encodeURIComponent(eventSlug)}`,
+    });
+  },
+
   openEvent(event: WechatMiniprogram.TouchEvent) {
     const slug = String(event.currentTarget.dataset.slug ?? "");
     if (slug) {

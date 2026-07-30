@@ -202,6 +202,16 @@ Page({
     void wx.navigateTo({ url: "/pages/profile/edit/index" });
   },
 
+  openParticipantProfile(event: WechatMiniprogram.TouchEvent) {
+    const handle = String(event.currentTarget.dataset.handle ?? "");
+    if (!handle || !this.data.slug) return;
+    void wx.navigateTo({
+      url: `/pages/profile/shared/index?handle=${encodeURIComponent(
+        handle,
+      )}&event=${encodeURIComponent(this.data.slug)}`,
+    });
+  },
+
   copyExternalLink() {
     const url = this.data.event?.registrationUrl;
     if (url) {
@@ -284,6 +294,7 @@ Page({
       if (registration?.status === "registered") {
         void this.loadReminder(this.data.slug);
         void this.loadGroupQr(this.data.slug);
+        void this.refreshEventParticipants();
       }
       void wx.showToast({
         title:
@@ -345,6 +356,7 @@ Page({
         registrationNoteProvided: false,
         registrationConsentAccepted: false,
       });
+      void this.refreshEventParticipants();
       trackEvent("registration_cancelled", "/pages/events/detail/index", {
         slug: this.data.slug,
       });
@@ -353,6 +365,15 @@ Page({
       void wx.showToast({ title: "取消失败，请重试", icon: "none" });
     } finally {
       this.setData({ submitting: false });
+    }
+  },
+
+  async refreshEventParticipants() {
+    try {
+      const event = await loadEventDetail(this.data.slug);
+      this.setData({ event });
+    } catch {
+      // Keep the current event content when the participant refresh fails.
     }
   },
 

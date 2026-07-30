@@ -25,7 +25,7 @@
           <text class="profile-view-location">{{profile.city}}</text>
         </view>
       </view>
-      <view class="profile-view-status"><text>{{profile.identityLabel}}</text><text>公开成员名片</text></view>
+      <view class="profile-view-status"><text>{{profile.identityLabel}}</text><text>{{eventSlug ? '活动参与者名片' : '公开成员名片'}}</text></view>
     </view>
 
     <view wx:if="{{profile.bio}}" class="profile-view-intro">{{profile.bio}}</view>
@@ -47,7 +47,7 @@
       <view wx:if="{{preferenceLabels.length}}" class="profile-view-field"><text class="profile-view-label">参与意愿</text><view class="profile-view-tags profile-view-tags-purple"><text wx:for="{{preferenceLabels}}" wx:key="*this">{{item}}</text></view></view>
     </view>
 
-    <view class="profile-view-privacy shared-profile-notice"><text>这是成员主动公开的社区名片</text><text>微信号和账号信息不会展示。</text></view>
+    <view class="profile-view-privacy shared-profile-notice"><text>{{eventSlug ? '这是已确认报名者的成员资料' : '这是成员主动公开的社区名片'}}</text><text>微信号、报名备注和账号信息不会展示。</text></view>
 
     <view class="profile-view-actions">
       <button class="primary-button" open-type="share">转发这张名片</button>

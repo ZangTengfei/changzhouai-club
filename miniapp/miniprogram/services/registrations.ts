@@ -1,6 +1,6 @@
 import { apiRequest } from "./api";
 
-const EVENT_REGISTRATION_CONSENT_VERSION = "2026-07-30";
+const EVENT_REGISTRATION_CONSENT_VERSION = "2026-07-30-v2";
 const EVENT_PORTRAIT_CONSENT_VERSION = "2026-07-30";
 
 type RegistrationResponse = {

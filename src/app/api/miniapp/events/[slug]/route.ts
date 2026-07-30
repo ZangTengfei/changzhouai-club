@@ -4,8 +4,24 @@ import {
   getAdminPreviewEventBySlug,
   getPublicEventBySlug,
 } from "@/lib/community-events";
+import { getEventParticipantSummaries } from "@/lib/event-participants";
 import { canPreviewMiniappDraftEvents } from "@/lib/miniapp-admin";
 import { loadOptionalMiniappSession } from "@/lib/miniapp-api";
+
+async function withParticipants<T extends { id: string }>(event: T) {
+  try {
+    const summaries = await getEventParticipantSummaries([event.id], 12);
+    const summary = summaries.get(event.id);
+    return {
+      ...event,
+      confirmedCount: summary?.confirmedCount ?? 0,
+      participants: summary?.participants ?? [],
+    };
+  } catch (error) {
+    console.error("Failed to load mini-program event participants.", error);
+    return { ...event, confirmedCount: 0, participants: [] };
+  }
+}
 
 export async function GET(
   request: Request,
@@ -16,7 +32,7 @@ export async function GET(
 
   if (publicEvent) {
     return NextResponse.json(
-      { event: publicEvent },
+      { event: await withParticipants(publicEvent) },
       {
         headers: {
           "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300",
@@ -38,7 +54,7 @@ export async function GET(
   }
 
   return NextResponse.json(
-    { event },
+    { event: await withParticipants(event) },
     {
       headers: {
         "Cache-Control": "private, no-store",

@@ -150,6 +150,17 @@ Page({
     }
   },
 
+  openParticipantProfile(event: WechatMiniprogram.TouchEvent) {
+    const handle = String(event.currentTarget.dataset.handle ?? "");
+    const eventSlug = String(event.currentTarget.dataset.event ?? "");
+    if (!handle || !eventSlug) return;
+    void wx.navigateTo({
+      url: `/pages/profile/shared/index?handle=${encodeURIComponent(
+        handle,
+      )}&event=${encodeURIComponent(eventSlug)}`,
+    });
+  },
+
   openEvents() {
     void wx.switchTab({ url: "/pages/events/index" });
   },
