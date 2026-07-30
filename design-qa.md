@@ -483,3 +483,60 @@ final result: passed
 - P3: if the footer later gains more verified navigation destinations, the two navigation groups can expand toward the three-column density shown in the concept without changing the community band.
 
 final result: passed
+
+---
+
+# 后台活动报名列表 Design QA
+
+- Source visual truth: `/var/folders/m9/rb2gjwb53zjbjdk39rf2v2nm0000gn/T/codex-clipboard-bb79d4ea-50a1-4dc0-a69d-4a6f06c8ce4e.png`
+- Implementation screenshot: `output/design-qa/admin-registration-layout-final-3.png`
+- Combined comparison: `output/design-qa/admin-registration-comparison-final.png`
+- Viewport: 2008 × 900 CSS px; implementation full-page capture 2008 × 1117 px; device scale factor 1
+- Source pixels: 2010 × 500 px
+- Focused comparison: source resized proportionally to 1552 × 386 px; implementation registration panel cropped to 1552 × 340 px
+- State: 活动详情页“报名与签到（2）”标签，2 条真实报名记录，管理员可编辑状态
+
+## Findings
+
+- 未发现仍需修复的 P0、P1 或 P2 问题。
+- 字体与层级：沿用后台现有字体、字号和标题层级；成员名以现有主色链接呈现，辅助信息降低字号和对比度。
+- 间距与布局：7 列使用明确比例和 16px 单元格内边距；长用户 ID 截断并保留完整悬浮提示；日期与时间分两行展示，内容不再串列。
+- 颜色与视觉 token：继续使用现有前景色、弱化文字、主色链接和状态标签，没有引入新颜色。
+- 图片与素材：该区域不包含图片素材，无缺失或替代素材。
+- 文案与内容：原报名信息完整保留；城市增加字段标签；只读报名状态使用状态标签，可编辑状态使用下拉框，避免重复展示。
+
+## Full-view comparison evidence
+
+- 2008px 桌面视口下，报名表完整落在面板内，7 列边界清晰，两个下拉框宽度一致。
+- 浏览器控制台无 error。
+
+## Focused region comparison evidence
+
+- `output/design-qa/admin-registration-comparison-final.png` 将用户截图和最终报名面板放在同一画布中对照。
+- 原图中用户 ID、城市、授权时间、报名时间和备注视觉串连；最终实现通过列宽、内边距、截断和日期分行消除了串列。
+
+## Interaction and responsive checks
+
+- 点击用户名成功进入对应的 `/admin/members/[memberId]`，页面标题为“成员详情 | 常州 AI Club”。
+- 1280 × 900 CSS px 下，页面本身无横向溢出；报名表容器为 `overflow-x: auto`，容器宽 942px、内容宽 1180px，可在面板内横向滚动。
+
+## Comparison history
+
+1. 初始实现为表格设置列宽、长文本处理和时间分行，但视觉对照发现单元格默认无横向内边距，相邻字段仍显得连在一起。
+2. 为表头和数据单元格增加 16px 横向内边距，并为窄屏面板增加内部横向滚动。
+3. 最终截图确认字段边界清晰，桌面与窄屏均无页面级横向溢出。
+
+## Implementation checklist
+
+- [x] 用户名跳转成员详情页
+- [x] 长用户 ID 安全截断并保留完整提示
+- [x] 联系信息、状态、授权、签到、时间、备注列保持独立
+- [x] 窄屏在报名面板内部横向滚动
+- [x] 生产构建通过
+- [x] 浏览器交互、控制台与视觉对照通过
+
+## Follow-up polish
+
+- 无阻塞项。
+
+final result: passed

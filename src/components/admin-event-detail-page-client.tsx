@@ -276,9 +276,18 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
                         ) : null
                       }
                     />
-                    <AdminPanelBody className="p-0">
+                    <AdminPanelBody className="overflow-x-auto p-0">
                       {eventDetail.registrations.length > 0 ? (
-                        <Table>
+                        <Table className="min-w-[1180px] table-fixed [&_td]:px-4 [&_td]:py-3 [&_td]:align-top [&_th]:px-4 [&_th]:py-3 [&_th]:whitespace-nowrap">
+                          <colgroup>
+                            <col className="w-[22%]" />
+                            <col className="w-[18%]" />
+                            <col className="w-[11%]" />
+                            <col className="w-[13%]" />
+                            <col className="w-[11%]" />
+                            <col className="w-[13%]" />
+                            <col className="w-[12%]" />
+                          </colgroup>
                           <TableHeader>
                             <TableRow>
                               <TableHead>成员</TableHead>
@@ -295,48 +304,53 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
                               <TableRow key={registration.id}>
                                 <TableCell>
                                   <div className="grid gap-1">
-                                    <span className="font-semibold text-foreground">
+                                    <Link
+                                      href={`/admin/members/${registration.user_id}`}
+                                      className="w-fit font-semibold text-foreground transition-colors hover:text-primary hover:underline focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                    >
                                       {registration.profile?.display_name ??
                                         "未填写显示名"}
-                                    </span>
-                                    <span className="text-sm text-muted-foreground">
+                                    </Link>
+                                    <span
+                                      className="block truncate whitespace-nowrap font-mono text-xs leading-5 text-muted-foreground"
+                                      title={`用户 ID: ${registration.user_id}`}
+                                    >
                                       用户 ID: {registration.user_id}
                                     </span>
                                   </div>
                                 </TableCell>
-                                <TableCell className="text-sm text-muted-foreground">
+                                <TableCell className="ant-table-cell text-sm text-muted-foreground">
                                   <div className="grid gap-1">
-                                    <span>
+                                    <span className="break-all">
                                       {registration.profile?.email ??
                                         "未提供邮箱"}
                                     </span>
-                                    <span>
-                                      {registration.profile?.city ??
-                                        "未填写城市"}
+                                    <span className="text-xs">
+                                      城市：{registration.profile?.city ?? "未填写"}
                                     </span>
                                   </div>
                                 </TableCell>
                                 <TableCell>
-                                  <NativeSelect
-                                    value={registration.status}
-                                    disabled={
-                                      isRegistrationPending ||
-                                      !data?.permissions?.canManageRegistrations
-                                    }
-                                    aria-label={`更新${registration.profile?.display_name ?? "成员"}的报名状态`}
-                                    onChange={(event) =>
-                                      updateRegistrationStatus(
-                                        registration.id,
-                                        event.target.value,
-                                      )
-                                    }
-                                  >
-                                    <option value="pending">待审核</option>
-                                    <option value="registered">已确认</option>
-                                    <option value="waitlisted">候补</option>
-                                    <option value="cancelled">已取消</option>
-                                  </NativeSelect>
-                                  <div className="mt-1">
+                                  {data?.permissions
+                                    ?.canManageRegistrations ? (
+                                    <NativeSelect
+                                      className="w-full"
+                                      value={registration.status}
+                                      disabled={isRegistrationPending}
+                                      aria-label={`更新${registration.profile?.display_name ?? "成员"}的报名状态`}
+                                      onChange={(event) =>
+                                        updateRegistrationStatus(
+                                          registration.id,
+                                          event.target.value,
+                                        )
+                                      }
+                                    >
+                                      <option value="pending">待审核</option>
+                                      <option value="registered">已确认</option>
+                                      <option value="waitlisted">候补</option>
+                                      <option value="cancelled">已取消</option>
+                                    </NativeSelect>
+                                  ) : (
                                     <AdminStatusBadge
                                       tone={
                                         getAdminRegistrationStatusTone(
@@ -348,7 +362,7 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
                                         registration.status,
                                       )}
                                     </AdminStatusBadge>
-                                  </div>
+                                  )}
                                 </TableCell>
                                 <TableCell>
                                   <AdminStatusBadge
@@ -363,15 +377,30 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
                                       : "未授权"}
                                   </AdminStatusBadge>
                                   {registration.portraitConsentAcceptedAt ? (
-                                    <div className="mt-1 text-xs text-muted-foreground">
-                                      {new Date(
-                                        registration.portraitConsentAcceptedAt,
-                                      ).toLocaleString("zh-CN")}
-                                    </div>
+                                    <time
+                                      dateTime={
+                                        registration.portraitConsentAcceptedAt
+                                      }
+                                      className="mt-2 grid text-xs leading-5 text-muted-foreground"
+                                    >
+                                      <span>
+                                        {new Date(
+                                          registration.portraitConsentAcceptedAt,
+                                        ).toLocaleDateString("zh-CN")}
+                                      </span>
+                                      <span>
+                                        {new Date(
+                                          registration.portraitConsentAcceptedAt,
+                                        ).toLocaleTimeString("zh-CN", {
+                                          hour12: false,
+                                        })}
+                                      </span>
+                                    </time>
                                   ) : null}
                                 </TableCell>
                                 <TableCell>
                                   <NativeSelect
+                                    className="w-full"
                                     value={
                                       registration.attendance?.status ?? "none"
                                     }
@@ -394,12 +423,26 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
                                     <option value="absent">缺席</option>
                                   </NativeSelect>
                                 </TableCell>
-                                <TableCell className="text-sm text-muted-foreground">
-                                  {new Date(
-                                    registration.created_at,
-                                  ).toLocaleString("zh-CN")}
+                                <TableCell className="ant-table-cell text-sm text-muted-foreground">
+                                  <time
+                                    dateTime={registration.created_at}
+                                    className="grid whitespace-nowrap leading-5"
+                                  >
+                                    <span>
+                                      {new Date(
+                                        registration.created_at,
+                                      ).toLocaleDateString("zh-CN")}
+                                    </span>
+                                    <span>
+                                      {new Date(
+                                        registration.created_at,
+                                      ).toLocaleTimeString("zh-CN", {
+                                        hour12: false,
+                                      })}
+                                    </span>
+                                  </time>
                                 </TableCell>
-                                <TableCell className="text-sm text-muted-foreground">
+                                <TableCell className="ant-table-cell break-words text-sm leading-5 text-muted-foreground">
                                   {registration.note ?? "无备注"}
                                 </TableCell>
                               </TableRow>
