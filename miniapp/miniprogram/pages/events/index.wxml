@@ -35,7 +35,14 @@
           <text class="retry-copy">网络可能开了个小差，请重新加载</text>
           <button class="retry-button" data-mode="{{panel.mode}}" bindtap="retryMode" aria-label="重新加载当前活动列表">重新加载</button>
         </view>
-        <view wx:elif="{{panel.visibleEvents.length === 0}}" class="empty-state">当前范围暂时没有活动</view>
+        <view wx:elif="{{panel.visibleEvents.length === 0}}">
+          <view class="empty-state">当前范围暂时没有活动</view>
+          <view wx:if="{{panel.mode === 'upcoming' && counts.history}}" class="history-teaser" data-mode="history" bindtap="switchMode" role="button">
+            <view class="icon-tile"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view>
+            <view class="history-copy"><text>看看我们一起做过的事</text><text>{{counts.history}} 场活动记录</text></view>
+            <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
+          </view>
+        </view>
 
         <view wx:else class="event-index">
           <view wx:for="{{panel.eventGroups}}" wx:key="key" wx:for-item="group" class="month-group">
@@ -75,9 +82,4 @@
     </swiper-item>
   </swiper>
 
-  <view wx:if="{{counts.history}}" class="history-teaser" data-mode="history" bindtap="switchMode" role="button">
-    <view class="icon-tile"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view>
-    <view class="history-copy"><text>看看我们一起做过的事</text><text>{{counts.history}} 场活动记录</text></view>
-    <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
-  </view>
 </view>
