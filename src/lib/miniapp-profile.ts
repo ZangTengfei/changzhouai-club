@@ -79,17 +79,22 @@ function hasItems(value: string[] | null | undefined) {
   return Boolean(value?.some((item) => item.trim()));
 }
 
+export function isMiniappDisplayNameReady(value: string | null | undefined) {
+  const displayName = value?.trim();
+  return Boolean(displayName && displayName !== "微信用户");
+}
+
 export function isMiniappRegistrationReady(
-  profile: Pick<MiniappProfileCompletionInput, "displayName" | "wechat">,
+  profile: MiniappProfileCompletionInput,
 ) {
-  return hasText(profile.displayName) && hasText(profile.wechat);
+  return getMiniappProfileCompletion(profile).completed;
 }
 
 export function getMiniappProfileCompletion(
   profile: MiniappProfileCompletionInput,
 ) {
   const values: Record<(typeof completionChecks)[number]["key"], boolean> = {
-    displayName: hasText(profile.displayName),
+    displayName: isMiniappDisplayNameReady(profile.displayName),
     wechat: hasText(profile.wechat),
     city: hasText(profile.city),
     roleLabel: hasText(profile.roleLabel),

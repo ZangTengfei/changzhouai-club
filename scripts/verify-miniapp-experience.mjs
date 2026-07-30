@@ -120,7 +120,8 @@ try {
     }),
   });
   assert.equal(legacyBootstrapPut.response.status, 200);
-  assert.equal(legacyBootstrapPut.body?.user?.profileComplete, true);
+  assert.equal(legacyBootstrapPut.body?.user?.registrationReady, false);
+  assert.equal(legacyBootstrapPut.body?.user?.profileComplete, false);
   assert.equal(legacyBootstrapPut.body?.user?.capabilityProfileComplete, false);
   const { data: bootstrapMember, error: bootstrapMemberError } = await supabase
     .from("members")
@@ -131,31 +132,47 @@ try {
   assert.equal(bootstrapMember.is_publicly_visible, false);
   assert.notEqual(bootstrapMember.status, "admin");
   assert.equal(bootstrapMember.is_co_builder, false);
-  pass("legacy_profile_keeps_registration_ready");
+  pass("incomplete_profile_blocks_registration");
   pass("incomplete_profile_not_published_before_completion");
   pass("self_profile_cannot_grant_member_identity");
+
+  const completeProfilePayload = {
+    wechat: "miniapp_verify",
+    city: "常州",
+    roleLabel: "测试",
+    organization: "常州 AI Club",
+    monthlyTime: "每月 2 小时",
+    bio: "自动化验收临时账号",
+    industryTags: ["软件与信息服务"],
+    skills: ["测试"],
+    interests: ["社区活动"],
+    capabilitySummary: "可以协助自动化验收",
+    seekingSummary: "",
+    willingToAttend: true,
+    willingToShare: false,
+    willingToJoinProjects: false,
+    isPubliclyVisible: true,
+    privacyAccepted: true,
+  };
+  const defaultNameProfilePut = await request("/api/miniapp/profile", {
+    method: "PUT",
+    headers: authHeaders,
+    body: JSON.stringify({
+      ...completeProfilePayload,
+      displayName: "微信用户",
+    }),
+  });
+  assert.equal(defaultNameProfilePut.response.status, 200);
+  assert.equal(defaultNameProfilePut.body?.user?.registrationReady, false);
+  assert.equal(defaultNameProfilePut.body?.profile?.completion?.percent, 86);
+  pass("default_display_name_blocks_registration");
 
   const profilePut = await request("/api/miniapp/profile", {
     method: "PUT",
     headers: authHeaders,
     body: JSON.stringify({
+      ...completeProfilePayload,
       displayName: "体验版测试用户",
-      wechat: "miniapp_verify",
-      city: "常州",
-      roleLabel: "测试",
-      organization: "常州 AI Club",
-      monthlyTime: "每月 2 小时",
-      bio: "自动化验收临时账号",
-      industryTags: ["软件与信息服务"],
-      skills: ["测试"],
-      interests: ["社区活动"],
-      capabilitySummary: "可以协助自动化验收",
-      seekingSummary: "",
-      willingToAttend: true,
-      willingToShare: false,
-      willingToJoinProjects: false,
-      isPubliclyVisible: true,
-      privacyAccepted: true,
     }),
   });
   assert.equal(profilePut.response.status, 200);
@@ -404,6 +421,34 @@ try {
     "registration_note_required",
   );
   pass("event_review_registration_requires_note");
+
+  const { error: defaultNameUpdateError } = await supabase
+    .from("profiles")
+    .update({ display_name: "微信用户" })
+    .eq("id", userId);
+  if (defaultNameUpdateError) throw defaultNameUpdateError;
+  const defaultNameRegistration = await request(
+    `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
+    {
+      method: "PUT",
+      headers: authHeaders,
+      body: JSON.stringify({
+        note: "默认昵称不应允许报名",
+        registrationConsentAccepted: true,
+        portraitConsentAccepted: true,
+        registrationConsentVersion: eventRegistrationConsentVersion,
+        portraitConsentVersion: eventPortraitConsentVersion,
+      }),
+    },
+  );
+  assert.equal(defaultNameRegistration.response.status, 409);
+  assert.equal(defaultNameRegistration.body?.error, "profile_incomplete");
+  const { error: displayNameRestoreError } = await supabase
+    .from("profiles")
+    .update({ display_name: "体验版测试用户" })
+    .eq("id", userId);
+  if (displayNameRestoreError) throw displayNameRestoreError;
+  pass("event_registration_rejects_default_display_name");
 
   const registrationPut = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,

@@ -529,7 +529,7 @@ export async function loadMiniappAccountSnapshot(
     ),
   );
   const displayName = profile?.display_name?.trim() || "微信用户";
-  const profileCompletion = getMiniappProfileCompletion({
+  const profileCompletionInput = {
     displayName: profile?.display_name,
     wechat: profile?.wechat,
     city: profile?.city,
@@ -538,11 +538,13 @@ export async function loadMiniappAccountSnapshot(
     skills: profile?.skills,
     capabilitySummary: profile?.capability_summary,
     seekingSummary: profile?.seeking_summary,
-  });
-  const registrationReady = isMiniappRegistrationReady({
-    displayName: profile?.display_name,
-    wechat: profile?.wechat,
-  });
+  };
+  const profileCompletion = getMiniappProfileCompletion(
+    profileCompletionInput,
+  );
+  const registrationReady = isMiniappRegistrationReady(
+    profileCompletionInput,
+  );
   const identityLabel =
     member?.status === "admin" || member?.status === "organizer"
       ? "社区主理人"

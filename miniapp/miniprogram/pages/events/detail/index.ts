@@ -202,6 +202,18 @@ Page({
     void wx.navigateTo({ url: "/pages/profile/edit/index" });
   },
 
+  promptProfileCompletion() {
+    void wx.showModal({
+      title: "请先完善个人信息",
+      content:
+        "昵称不能使用默认的“微信用户”，且能力档案需达到 100% 后才能报名。",
+      confirmText: "去完善",
+      success: (result) => {
+        if (result.confirm) this.openProfile();
+      },
+    });
+  },
+
   openParticipantProfile(event: WechatMiniprogram.TouchEvent) {
     const handle = String(event.currentTarget.dataset.handle ?? "");
     if (!handle || !this.data.slug) return;
@@ -257,7 +269,7 @@ Page({
   async submitRegistration() {
     if (this.data.submitting || !this.data.event) return;
     if (!this.data.user?.registrationReady) {
-      this.openProfile();
+      this.promptProfileCompletion();
       return;
     }
     if (!this.data.registrationConsentAccepted) {
@@ -310,7 +322,7 @@ Page({
         error instanceof ApiError &&
         error.errorCode === "profile_incomplete"
       ) {
-        this.openProfile();
+        this.promptProfileCompletion();
       } else if (
         error instanceof ApiError &&
         error.errorCode === "registration_note_required"

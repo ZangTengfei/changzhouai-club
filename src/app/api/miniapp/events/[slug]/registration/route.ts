@@ -9,6 +9,7 @@ import {
 } from "@/lib/event-registration-consent";
 import { miniappJson, requireMiniappSession } from "@/lib/miniapp-api";
 import { canPreviewMiniappDraftEvents } from "@/lib/miniapp-admin";
+import { isMiniappRegistrationReady } from "@/lib/miniapp-profile";
 
 export const runtime = "nodejs";
 
@@ -115,12 +116,26 @@ export async function PUT(
       .maybeSingle(),
     auth.supabase
       .from("profiles")
-      .select("display_name, email, wechat, city")
+      .select(
+        "display_name, email, wechat, city, role_label, industry_tags, skills, capability_summary, seeking_summary",
+      )
       .eq("id", userId)
       .maybeSingle(),
   ]);
 
-  if (!profile?.display_name?.trim() || !profile.wechat?.trim()) {
+  if (
+    !profile ||
+    !isMiniappRegistrationReady({
+      displayName: profile.display_name,
+      wechat: profile.wechat,
+      city: profile.city,
+      roleLabel: profile.role_label,
+      industryTags: profile.industry_tags,
+      skills: profile.skills,
+      capabilitySummary: profile.capability_summary,
+      seekingSummary: profile.seeking_summary,
+    })
+  ) {
     return miniappJson({ error: "profile_incomplete" }, 409);
   }
 
