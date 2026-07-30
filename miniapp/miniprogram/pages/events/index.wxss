@@ -8,14 +8,14 @@
 
 .event-mode-swiper {
   width: calc(100% + 64rpx);
-  min-height: 110vh;
+  min-height: 960rpx;
   margin-left: -32rpx;
   transition: height 180ms ease;
 }
 
 .event-mode-panel {
   box-sizing: border-box;
-  min-height: 110vh;
+  min-height: 960rpx;
   padding: 0 32rpx 36rpx;
 }
 
