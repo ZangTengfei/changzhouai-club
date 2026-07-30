@@ -49,6 +49,10 @@
   gap: 22rpx;
 }
 
+.month-events .event-card:last-child {
+  margin-bottom: 16rpx;
+}
+
 .event-card {
   overflow: hidden;
 }
