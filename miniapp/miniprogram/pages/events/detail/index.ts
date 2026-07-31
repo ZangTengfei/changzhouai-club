@@ -1,4 +1,4 @@
-import { ApiError } from "../../../services/api";
+import { ApiError, getStoredSessionToken } from "../../../services/api";
 import { trackEvent } from "../../../services/analytics";
 import { ensureSession } from "../../../services/auth";
 import { loadEventDetail, type EventDetail } from "../../../services/events";
@@ -199,6 +199,11 @@ Page({
   },
 
   openProfile() {
+    if (!getStoredSessionToken()) {
+      void wx.switchTab({ url: "/pages/me/index" });
+      return;
+    }
+
     void wx.navigateTo({ url: "/pages/profile/edit/index" });
   },
 
