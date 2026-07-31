@@ -1,5 +1,13 @@
 <view class="page-shell growth-page">
   <view wx:if="{{loading}}" class="empty-state loading-state"><view class="loading-spinner" aria-hidden="true"></view><text>正在加载成长档案</text></view>
+  <view wx:elif="{{loginRequired}}" class="empty-state retry-state">
+    <view class="growth-guest-icon"><image src="/assets/icons/growth-purple-v2.png" mode="aspectFit" /></view>
+    <text class="retry-title">登录后查看成长档案</text>
+    <text class="retry-copy">查看你的成员身份、真实参与记录和社区标签。</text>
+    <button class="primary-button growth-login-button" loading="{{loggingIn}}" disabled="{{loggingIn}}" bindtap="handleLogin">{{loggingIn ? '登录中' : '微信登录并查看'}}</button>
+    <text wx:if="{{loginFailed}}" class="growth-login-error">登录没有完成，请检查网络后重试。</text>
+    <text wx:if="{{loginRequestId}}" class="growth-login-diagnostic">诊断编号：{{loginRequestId}}</text>
+  </view>
   <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadGrowth">成长档案加载失败，轻触重试</view>
 
   <block wx:elif="{{user}}">

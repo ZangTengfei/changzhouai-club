@@ -1,4 +1,5 @@
-import { ensureSession } from "../../services/auth";
+import { ApiError, getStoredSessionToken } from "../../services/api";
+import { ensureSession, login } from "../../services/auth";
 import {
   getGrowthSteps,
   getCommunityTags,
@@ -24,6 +25,10 @@ Page({
     communityTags: [] as MiniappUser["badges"],
     loading: true,
     loadFailed: false,
+    loginRequired: false,
+    loggingIn: false,
+    loginFailed: false,
+    loginRequestId: "",
   },
 
   onShow() {
@@ -31,24 +36,68 @@ Page({
   },
 
   async loadGrowth() {
-    this.setData({ loading: true, loadFailed: false });
+    if (!getStoredSessionToken()) {
+      this.setData({
+        loading: false,
+        loadFailed: false,
+        loginRequired: true,
+      });
+      return;
+    }
+
+    this.setData({ loading: true, loadFailed: false, loginRequired: false });
     try {
       const user = await ensureSession();
-      const currentLevel = getMembershipLevel(user);
       getApp<IAppOption>().globalData.currentUser = user;
-      this.setData({
-        user,
-        currentLevelAsset: membershipLevels[currentLevel].asset,
-        currentLevelLabel: membershipLevels[currentLevel].label,
-        nextLevelLabel:
-          membershipLevels[currentLevel + 1]?.label ?? "已到达当前最高等级",
-        joinedLabel: formatJoinedAt(user.joinedAt),
-        growthSteps: getGrowthSteps(currentLevel),
-        communityTags: getCommunityTags(user),
-        loading: false,
-      });
+      this.showGrowth(user);
     } catch {
-      this.setData({ loading: false, loadFailed: true });
+      const loginRequired = !getStoredSessionToken();
+      this.setData({
+        loading: false,
+        loadFailed: !loginRequired,
+        loginRequired,
+      });
+    }
+  },
+
+  showGrowth(user: MiniappUser) {
+    const currentLevel = getMembershipLevel(user);
+    this.setData({
+      user,
+      currentLevelAsset: membershipLevels[currentLevel].asset,
+      currentLevelLabel: membershipLevels[currentLevel].label,
+      nextLevelLabel:
+        membershipLevels[currentLevel + 1]?.label ?? "已到达当前最高等级",
+      joinedLabel: formatJoinedAt(user.joinedAt),
+      growthSteps: getGrowthSteps(currentLevel),
+      communityTags: getCommunityTags(user),
+      loading: false,
+      loadFailed: false,
+      loginRequired: false,
+      loggingIn: false,
+    });
+  },
+
+  async handleLogin() {
+    if (this.data.loggingIn) return;
+    this.setData({
+      loggingIn: true,
+      loginFailed: false,
+      loginRequestId: "",
+    });
+
+    try {
+      const user = await login();
+      getApp<IAppOption>().globalData.currentUser = user;
+      this.showGrowth(user);
+    } catch (error) {
+      this.setData({
+        loggingIn: false,
+        loginRequired: true,
+        loginFailed: true,
+        loginRequestId:
+          error instanceof ApiError && error.requestId ? error.requestId : "",
+      });
     }
   },
 });

@@ -3,6 +3,7 @@
   show-avatar="{{true}}"
   avatar-url="{{avatarUrl}}"
   avatar-initial="{{avatarInitial}}"
+  avatar-guest="{{!isLoggedIn}}"
   bindavatartap="openProfile"
 />
 
@@ -19,10 +20,10 @@
       <text class="quick-copy">{{upcomingCount}} 场活动即将开始</text>
       <image class="quick-arrow quick-arrow-orange" src="/assets/icons/chevron-orange-v2.png" mode="aspectFit" />
     </view>
-    <view class="quick-card quick-card-green" bindtap="openGrowth" role="button" aria-label="查看成长档案">
+    <view class="quick-card quick-card-green" bindtap="openGrowth" role="button" aria-label="{{isLoggedIn ? '查看成长档案' : '登录后查看成长档案'}}">
       <view class="icon-tile"><image src="/assets/icons/growth-purple-v2.png" mode="aspectFit" /></view>
       <text class="quick-title">成长档案</text>
-      <text class="quick-copy">查看身份路径与社区标签</text>
+      <text class="quick-copy">{{isLoggedIn ? '查看身份路径与社区标签' : '登录后查看身份路径与社区标签'}}</text>
       <image class="quick-arrow quick-arrow-green" src="/assets/icons/chevron-green-v2.png" mode="aspectFit" />
     </view>
   </view>

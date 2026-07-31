@@ -22,6 +22,7 @@
 .custom-navigation-brand {
   display: flex;
   min-width: 0;
+  flex: 1;
   align-items: center;
   gap: 8px;
 }
@@ -62,4 +63,21 @@
 .custom-navigation-avatar image {
   width: 100%;
   height: 100%;
+}
+
+.custom-navigation-login {
+  width: auto;
+  min-width: 54px;
+  box-sizing: border-box;
+  gap: 4px;
+  padding: 0 9px;
+  border-color: #cde5d8;
+  border-radius: 15px;
+  background: #ffffff;
+  font-size: 12px;
+}
+
+.custom-navigation-avatar .custom-navigation-login-icon {
+  width: 15px;
+  height: 15px;
 }

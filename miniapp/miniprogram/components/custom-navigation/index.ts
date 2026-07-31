@@ -21,6 +21,10 @@ Component({
       type: String,
       value: "",
     },
+    avatarGuest: {
+      type: Boolean,
+      value: false,
+    },
     showMark: {
       type: Boolean,
       value: false,

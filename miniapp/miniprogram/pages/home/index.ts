@@ -43,9 +43,10 @@ Page({
     greeting: getGreeting(),
     greetingName: "朋友",
     avatarUrl: "",
-    avatarInitial: "微",
-    memberIdentity: "社区成员",
-    attendanceSummary: "参与记录会在这里更新",
+    avatarInitial: "我",
+    isLoggedIn: Boolean(getStoredSessionToken()),
+    memberIdentity: "登录后查看成长身份",
+    attendanceSummary: "查看真实参与与社区标签",
     upcomingCount: 0,
     featuredEvent: null as HomeEvent | null,
     events: [] as HomeEvent[],
@@ -118,14 +119,27 @@ Page({
         profileCompletion: user.profileCompletion,
         greetingName: user.displayName || "朋友",
         avatarUrl: user.avatarUrl || "",
-        avatarInitial: user.displayName.slice(0, 1) || "微",
+        avatarInitial: user.displayName.slice(0, 1) || "我",
+        isLoggedIn: true,
         memberIdentity: user.identityLabel || "社区成员",
         attendanceSummary: user.stats.attendanceCount
           ? `已真实到场 ${user.stats.attendanceCount} 次`
           : "完成第一次真实参与",
       });
     } catch {
-      this.setData({ profileCompletion: null });
+      const isLoggedIn = Boolean(getStoredSessionToken());
+      this.setData({
+        profileCompletion: null,
+        isLoggedIn,
+        ...(!isLoggedIn
+          ? {
+              greetingName: "朋友",
+              avatarUrl: "",
+              memberIdentity: "登录后查看成长身份",
+              attendanceSummary: "查看真实参与与社区标签",
+            }
+          : {}),
+      });
     }
   },
 
