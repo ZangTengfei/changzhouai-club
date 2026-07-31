@@ -10,8 +10,15 @@ import {
 
 export const runtime = "nodejs";
 
-const MAX_AVATAR_BYTES = 2 * 1024 * 1024;
-const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const MAX_AVATAR_BYTES = 10 * 1024 * 1024;
+
+function hasSupportedReportedType(file: File) {
+  return (
+    !file.type ||
+    file.type === "application/octet-stream" ||
+    file.type.startsWith("image/")
+  );
+}
 
 export async function POST(request: Request) {
   const auth = await requireMiniappSession(request);
@@ -30,7 +37,11 @@ export async function POST(request: Request) {
   if (!(file instanceof File)) {
     return miniappJson({ error: "missing_avatar" }, 400);
   }
-  if (!ALLOWED_TYPES.has(file.type) || file.size > MAX_AVATAR_BYTES) {
+  if (
+    file.size === 0 ||
+    file.size > MAX_AVATAR_BYTES ||
+    !hasSupportedReportedType(file)
+  ) {
     return miniappJson({ error: "invalid_avatar" }, 400);
   }
 
@@ -51,9 +62,15 @@ export async function POST(request: Request) {
 
   const path = buildMemberAvatarPath(userId);
   let publicUrl: string;
+  let optimizedFile: File;
 
   try {
-    const optimizedFile = await optimizeAvatarUpload(file);
+    optimizedFile = await optimizeAvatarUpload(file);
+  } catch {
+    return miniappJson({ error: "invalid_avatar" }, 400);
+  }
+
+  try {
     ({ publicUrl } = await uploadPublicAsset({
       bucket: MEMBER_AVATARS_BUCKET,
       path,

@@ -1,5 +1,9 @@
 import { getApiBaseUrl } from "./config";
-import { getStoredSessionToken } from "./api";
+import {
+  ApiError,
+  clearSessionToken,
+  getStoredSessionToken,
+} from "./api";
 
 export function uploadAvatar(filePath: string, policyVersion: string) {
   const token = getStoredSessionToken();
@@ -21,6 +25,8 @@ export function uploadAvatar(filePath: string, policyVersion: string) {
             return JSON.parse(response.data) as {
               avatarUrl?: string;
               user?: MiniappUser;
+              error?: string;
+              requestId?: string;
             };
           } catch {
             return null;
@@ -37,9 +43,20 @@ export function uploadAvatar(filePath: string, policyVersion: string) {
           return;
         }
 
-        reject(new Error("avatar_upload_failed"));
+        if (response.statusCode === 401) {
+          clearSessionToken();
+        }
+        reject(
+          new ApiError(
+            response.statusCode,
+            body?.error ?? "avatar_upload_failed",
+            typeof body?.requestId === "string" ? body.requestId : null,
+          ),
+        );
       },
-      fail: reject,
+      fail() {
+        reject(new ApiError(0, "network_error"));
+      },
     });
   });
 }

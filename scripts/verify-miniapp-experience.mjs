@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 
 import { createClient } from "@supabase/supabase-js";
+import COS from "cos-nodejs-sdk-v5";
 
 const apiBaseUrl =
   process.env.MINIAPP_VERIFY_API_BASE_URL?.trim() || "http://localhost:3000";
@@ -9,16 +10,28 @@ const supabaseUrl =
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
 const serviceRoleKey =
   process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY;
+const cosBucket = process.env.TENCENT_COS_BUCKET?.trim();
+const cosRegion = process.env.TENCENT_COS_REGION?.trim();
+const cosSecretId = process.env.TENCENT_COS_SECRET_ID?.trim();
+const cosSecretKey = process.env.TENCENT_COS_SECRET_KEY?.trim();
 const eventRegistrationConsentVersion = "2026-07-30-v2";
 const eventPortraitConsentVersion = "2026-07-30";
 
-if (!supabaseUrl || !serviceRoleKey) {
-  throw new Error("Missing Supabase server configuration.");
+if (
+  !supabaseUrl ||
+  !serviceRoleKey ||
+  !cosBucket ||
+  !cosRegion ||
+  !cosSecretId ||
+  !cosSecretKey
+) {
+  throw new Error("Missing Supabase or Tencent COS server configuration.");
 }
 
 const supabase = createClient(supabaseUrl, serviceRoleKey, {
   auth: { persistSession: false, autoRefreshToken: false },
 });
+const cos = new COS({ SecretId: cosSecretId, SecretKey: cosSecretKey });
 const checks = [];
 let userId = null;
 let avatarPath = null;
@@ -182,6 +195,21 @@ try {
   assert.equal(profilePut.body?.profile?.shareHandle, userId);
   pass("profile_saved_with_consent");
 
+  const legacyLongSkill = "旧版成员资料中的能力方向需要在小程序中继续保留".repeat(2);
+  assert.ok(legacyLongSkill.length > 40);
+  const legacyLongSkillPut = await request("/api/miniapp/profile", {
+    method: "PUT",
+    headers: authHeaders,
+    body: JSON.stringify({
+      ...completeProfilePayload,
+      displayName: "体验版测试用户",
+      skills: [legacyLongSkill],
+    }),
+  });
+  assert.equal(legacyLongSkillPut.response.status, 200);
+  assert.deepEqual(legacyLongSkillPut.body?.profile?.skills, [legacyLongSkill]);
+  pass("legacy_long_skill_preserved");
+
   const sharedProfile = await request(
     `/api/miniapp/members/${encodeURIComponent(userId)}`,
   );
@@ -238,8 +266,8 @@ try {
   );
   avatarForm.append(
     "file",
-    new Blob([png], { type: "image/png" }),
-    "avatar.png",
+    new Blob([png], { type: "application/octet-stream" }),
+    "avatar.tmp",
   );
   avatarForm.append("privacyAccepted", "true");
   avatarForm.append("policyVersion", "2026-07-18");
@@ -251,7 +279,7 @@ try {
   assert.equal(avatarUpload.response.status, 200);
   assert.match(avatarUpload.body?.avatarUrl ?? "", /member-avatars/);
   avatarPath = `${userId}/avatar`;
-  pass("avatar_uploaded");
+  pass("avatar_with_unknown_mime_uploaded");
 
   const slug = `miniapp-verify-${randomUUID()}`;
   const { data: event, error: createEventError } = await supabase
@@ -933,7 +961,11 @@ try {
       .remove([eventGroupQrPath]);
   }
   if (avatarPath) {
-    await supabase.storage.from("member-avatars").remove([avatarPath]);
+    await cos.deleteObject({
+      Bucket: cosBucket,
+      Region: cosRegion,
+      Key: `member-avatars/${avatarPath}`,
+    });
   }
   if (userId) {
     await supabase

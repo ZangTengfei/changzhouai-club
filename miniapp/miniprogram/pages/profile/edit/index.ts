@@ -1,6 +1,7 @@
 import { ensureSession } from "../../../services/auth";
 import { trackEvent } from "../../../services/analytics";
 import { uploadAvatar } from "../../../services/avatar";
+import { ApiError } from "../../../services/api";
 import { loadProfile, updateProfile } from "../../../services/profile";
 
 type SelectableTag = {
@@ -49,6 +50,26 @@ function splitTags(value: string) {
 function isDisplayNameReady(value: string) {
   const displayName = value.trim();
   return Boolean(displayName && displayName !== "微信用户");
+}
+
+function getAvatarFailureMessage(error: unknown) {
+  if (!(error instanceof ApiError)) return "头像上传失败，请重试";
+  if (error.errorCode === "invalid_avatar") {
+    return "请选择 10MB 内的图片";
+  }
+  if (error.statusCode === 401) return "登录已失效，请重新登录";
+  if (error.statusCode === 0) return "网络异常，请稍后重试";
+  return "头像上传失败，请重试";
+}
+
+function getProfileSaveFailureMessage(error: unknown) {
+  if (!(error instanceof ApiError)) return "保存失败，请重试";
+  if (error.errorCode === "invalid_profile") {
+    return "资料格式有误，请检查后重试";
+  }
+  if (error.statusCode === 401) return "登录已失效，请重新登录";
+  if (error.statusCode === 0) return "网络异常，请稍后重试";
+  return "保存失败，请重试";
 }
 
 function buildSelectableTags(options: string[], selected: string[]) {
@@ -348,8 +369,11 @@ Page({
       getApp<IAppOption>().globalData.currentUser = response.user;
       this.setData({ avatarUrl: response.avatarUrl });
       void wx.showToast({ title: "头像已更新", icon: "success" });
-    } catch {
-      void wx.showToast({ title: "头像上传失败", icon: "none" });
+    } catch (error) {
+      void wx.showToast({
+        title: getAvatarFailureMessage(error),
+        icon: "none",
+      });
     } finally {
       this.setData({ avatarUploading: false });
     }
@@ -460,8 +484,11 @@ Page({
       });
       const currentStep = this.data.currentStep + 1;
       this.setData(getStepState(currentStep));
-    } catch {
-      void wx.showToast({ title: "保存失败，请重试", icon: "none" });
+    } catch (error) {
+      void wx.showToast({
+        title: getProfileSaveFailureMessage(error),
+        icon: "none",
+      });
     } finally {
       this.setData({ saving: false });
     }
@@ -498,8 +525,11 @@ Page({
         () => void wx.redirectTo({ url: "/pages/profile/index" }),
         500,
       );
-    } catch {
-      void wx.showToast({ title: "保存失败，请重试", icon: "none" });
+    } catch (error) {
+      void wx.showToast({
+        title: getProfileSaveFailureMessage(error),
+        icon: "none",
+      });
     } finally {
       this.setData({ saving: false });
     }

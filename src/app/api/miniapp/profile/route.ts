@@ -41,14 +41,14 @@ function readText(value: unknown, maxLength: number) {
   return text.length <= maxLength ? text : null;
 }
 
-function readList(value: unknown, maxItems = 20) {
+function readList(value: unknown, maxItems = 20, maxItemLength = 40) {
   if (!Array.isArray(value) || value.length > maxItems) return null;
 
   const items = value
     .map((item) => (typeof item === "string" ? item.trim() : ""))
     .filter(Boolean);
 
-  return items.every((item) => item.length <= 40)
+  return items.every((item) => item.length <= maxItemLength)
     ? Array.from(new Set(items))
     : null;
 }
@@ -164,7 +164,7 @@ export async function PUT(request: Request) {
     payload?.industryTags === undefined
       ? undefined
       : readList(payload.industryTags, 8);
-  const skills = readList(payload?.skills);
+  const skills = readList(payload?.skills, 20, 100);
   const interests = readList(payload?.interests);
   const capabilitySummary =
     payload?.capabilitySummary === undefined
