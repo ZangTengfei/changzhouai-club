@@ -46,6 +46,11 @@ function splitTags(value: string) {
   );
 }
 
+function isDisplayNameReady(value: string) {
+  const displayName = value.trim();
+  return Boolean(displayName && displayName !== "微信用户");
+}
+
 function buildSelectableTags(options: string[], selected: string[]) {
   return Array.from(new Set([...options, ...selected])).map((label) => ({
     label,
@@ -353,12 +358,18 @@ Page({
   validateStep(step: number) {
     if (step === 0) {
       if (
-        !this.data.displayName.trim() ||
+        !isDisplayNameReady(this.data.displayName) ||
         !this.data.wechat.trim() ||
         !this.data.city.trim() ||
         !this.data.roleLabel.trim()
       ) {
-        void wx.showToast({ title: "请完成带星号的资料", icon: "none" });
+        void wx.showToast({
+          title:
+            this.data.displayName.trim() === "微信用户"
+              ? "请设置真实昵称"
+              : "请完成带星号的资料",
+          icon: "none",
+        });
         return false;
       }
       if (!this.data.privacyAccepted) {
@@ -467,6 +478,11 @@ Page({
     this.setData({ saving: true });
     try {
       const response = await this.persistProfile(true);
+      if (!response.profile.completion.completed) {
+        this.setData(getStepState(getInitialStep(response.profile)));
+        void wx.showToast({ title: "请补全能力档案", icon: "none" });
+        return;
+      }
       trackEvent("profile_saved", "/pages/profile/edit/index", {
         completion: response.profile.completion.percent,
       });

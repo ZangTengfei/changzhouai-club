@@ -5,6 +5,7 @@ import { miniappJson, requireMiniappSession } from "@/lib/miniapp-api";
 import {
   MINIAPP_CITY_OPTIONS,
   getMiniappProfileCompletion,
+  isMiniappDisplayNameReady,
   MINIAPP_INDUSTRY_OPTIONS,
   MINIAPP_MONTHLY_TIME_OPTIONS,
   MINIAPP_PRIVACY_POLICY_VERSION,
@@ -175,7 +176,7 @@ export async function PUT(request: Request) {
       : readText(payload.seekingSummary, 300);
 
   if (
-    !displayName ||
+    !isMiniappDisplayNameReady(displayName) ||
     !wechat ||
     city === null ||
     roleLabel === null ||

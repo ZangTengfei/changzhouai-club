@@ -215,8 +215,6 @@ async function createWechatAccountAnchor(supabase: SupabaseClient) {
     email_confirm: true,
     app_metadata: { account_anchor: "wechat_miniapp" },
     user_metadata: {
-      name: "微信用户",
-      full_name: "微信用户",
       account_anchor: "wechat_miniapp",
     },
   });
@@ -237,7 +235,7 @@ async function createWechatAccountAnchor(supabase: SupabaseClient) {
     ),
     supabase
       .from("profiles")
-      .update({ email: null, display_name: "微信用户" })
+      .update({ email: null, display_name: null })
       .eq("id", userId),
   ]);
 
@@ -528,7 +526,7 @@ export async function loadMiniappAccountSnapshot(
         .filter((channel): channel is string => Boolean(channel)),
     ),
   );
-  const displayName = profile?.display_name?.trim() || "微信用户";
+  const displayName = profile?.display_name?.trim() || "";
   const profileCompletionInput = {
     displayName: profile?.display_name,
     wechat: profile?.wechat,

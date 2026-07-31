@@ -81,7 +81,7 @@
           <image wx:if="{{user.avatarUrl}}" class="avatar" src="{{user.avatarUrl}}" mode="aspectFill" />
           <view wx:else class="avatar avatar-placeholder">{{avatarInitial}}</view>
           <view class="identity-copy">
-            <text class="profile-name">{{user.displayName}}</text>
+            <text class="profile-name">{{user.displayName || '未设置昵称'}}</text>
             <view class="identity-tag-row" catchtap="openGrowth" role="button" aria-label="查看身份与社区标签">
               <view class="identity-pill">
                 <image src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
