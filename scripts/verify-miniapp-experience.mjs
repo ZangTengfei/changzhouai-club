@@ -162,10 +162,9 @@ try {
       displayName: "微信用户",
     }),
   });
-  assert.equal(defaultNameProfilePut.response.status, 200);
-  assert.equal(defaultNameProfilePut.body?.user?.registrationReady, false);
-  assert.equal(defaultNameProfilePut.body?.profile?.completion?.percent, 86);
-  pass("default_display_name_blocks_registration");
+  assert.equal(defaultNameProfilePut.response.status, 400);
+  assert.equal(defaultNameProfilePut.body?.error, "invalid_profile");
+  pass("default_display_name_rejected");
 
   const profilePut = await request("/api/miniapp/profile", {
     method: "PUT",
