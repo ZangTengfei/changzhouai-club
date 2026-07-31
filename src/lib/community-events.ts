@@ -288,6 +288,7 @@ function mapEventSummary(
 ): PublicEventSummary {
   return {
     ...event,
+    cover_image_url: getEventImageUrl(event.cover_image_url, "miniapp-card"),
     registration_mode:
       event.registration_mode === "review" ? "review" : "instant",
     eventTypeLabel: formatEventType(event.event_type),

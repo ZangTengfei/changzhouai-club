@@ -2,6 +2,7 @@ import { loadMiniappAccountSnapshot } from "@/lib/miniapp-auth";
 import { miniappJson, requireMiniappSession } from "@/lib/miniapp-api";
 import { MINIAPP_PRIVACY_POLICY_VERSION } from "@/lib/miniapp-profile";
 import { uploadPublicAsset } from "@/lib/public-asset-storage";
+import { optimizeAvatarUpload } from "@/lib/uploaded-image-optimization";
 import {
   buildMemberAvatarPath,
   MEMBER_AVATARS_BUCKET,
@@ -52,10 +53,11 @@ export async function POST(request: Request) {
   let publicUrl: string;
 
   try {
+    const optimizedFile = await optimizeAvatarUpload(file);
     ({ publicUrl } = await uploadPublicAsset({
       bucket: MEMBER_AVATARS_BUCKET,
       path,
-      file,
+      file: optimizedFile,
     }));
   } catch (error) {
     console.error("Failed to upload miniapp avatar to Tencent COS.", error);

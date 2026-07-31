@@ -11,6 +11,7 @@ type EventImageVariant =
   | "review-card"
   | "event-feature"
   | "event-detail-hero"
+  | "miniapp-card"
   | "miniapp-detail-cover"
   | "miniapp-gallery"
   | "gallery"
@@ -57,6 +58,12 @@ const eventImageVariantMap: Record<EventImageVariant, PublicImageTransformOption
     quality: 82,
     resize: "cover",
   },
+  "miniapp-card": {
+    width: 720,
+    height: 405,
+    quality: 72,
+    resize: "cover",
+  },
   "miniapp-detail-cover": {
     width: 900,
     quality: 80,
@@ -91,12 +98,59 @@ function getConfiguredSupabaseOrigin() {
   }
 }
 
+function getConfiguredImageCdnOrigin() {
+  const imageCdnUrl = process.env.NEXT_PUBLIC_IMAGE_CDN_URL?.trim();
+
+  if (!imageCdnUrl) {
+    return null;
+  }
+
+  try {
+    return new URL(imageCdnUrl).origin;
+  } catch {
+    return null;
+  }
+}
+
 function isKnownSupabaseStorageUrl(url: URL) {
   if (url.hostname.endsWith(".supabase.co")) {
     return true;
   }
 
   return url.origin === getConfiguredSupabaseOrigin();
+}
+
+function getCosImageUrl(url: URL, options: PublicImageTransformOptions) {
+  if (url.origin !== getConfiguredImageCdnOrigin()) {
+    return null;
+  }
+
+  const operations = ["imageMogr2"];
+  if (options.width || options.height) {
+    const width = options.width ? String(options.width) : "";
+    const height = options.height ? String(options.height) : "";
+
+    if (options.width && options.height && options.resize === "cover") {
+      operations.push(
+        `thumbnail/${width}x${height}^`,
+        "gravity/center",
+        `crop/${width}x${height}`,
+      );
+    } else if (options.width && options.height && options.resize === "fill") {
+      operations.push(`thumbnail/${width}x${height}!`);
+    } else {
+      operations.push(`thumbnail/${width}x${height}`);
+    }
+  }
+
+  operations.push("format/webp", `quality/${options.quality ?? 75}`);
+
+  const existingParams = url.search
+    .slice(1)
+    .split("&")
+    .filter((value) => value && !value.startsWith("imageMogr2/"));
+  url.search = [...existingParams, operations.join("/")].join("&");
+  return url.toString();
 }
 
 export function getPublicImageUrl(
@@ -113,6 +167,11 @@ export function getPublicImageUrl(
     url = new URL(imageUrl);
   } catch {
     return imageUrl;
+  }
+
+  const cosImageUrl = getCosImageUrl(url, options);
+  if (cosImageUrl) {
+    return cosImageUrl;
   }
 
   if (!isKnownSupabaseStorageUrl(url)) {

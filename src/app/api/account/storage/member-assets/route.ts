@@ -1,6 +1,7 @@
 import { resolveCommunityUserId } from "@/lib/community-user";
 import { uploadPublicAsset } from "@/lib/public-asset-storage";
 import { createClient } from "@/lib/supabase/server";
+import { optimizeAvatarUpload } from "@/lib/uploaded-image-optimization";
 import {
   buildMemberAvatarPath,
   buildMemberWorkAssetPath,
@@ -41,12 +42,13 @@ export async function POST(request: Request) {
   try {
     const communityUserId = await resolveCommunityUserId(supabase, user.id);
     const isAvatar = assetType === "avatar";
+    const uploadFile = isAvatar ? await optimizeAvatarUpload(file) : file;
     const result = await uploadPublicAsset({
       bucket: isAvatar ? MEMBER_AVATARS_BUCKET : MEMBER_WORK_ASSETS_BUCKET,
       path: isAvatar
         ? buildMemberAvatarPath(communityUserId)
         : buildMemberWorkAssetPath(communityUserId, file.name),
-      file,
+      file: uploadFile,
     });
 
     return Response.json({ publicUrl: result.publicUrl });

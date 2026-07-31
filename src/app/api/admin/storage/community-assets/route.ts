@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { uploadPublicAsset } from "@/lib/public-asset-storage";
+import { optimizeQrCodeUpload } from "@/lib/uploaded-image-optimization";
 import {
   buildCommunityQrCodePath,
   EVENT_ASSETS_BUCKET,
@@ -19,10 +20,11 @@ export async function POST(request: Request) {
   }
 
   try {
+    const optimizedFile = await optimizeQrCodeUpload(file);
     const result = await uploadPublicAsset({
       bucket: EVENT_ASSETS_BUCKET,
-      path: buildCommunityQrCodePath(file.name),
-      file,
+      path: buildCommunityQrCodePath(optimizedFile.name),
+      file: optimizedFile,
     });
 
     return NextResponse.json({ publicUrl: result.publicUrl });

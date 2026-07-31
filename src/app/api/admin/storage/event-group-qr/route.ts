@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { optimizeQrCodeUpload } from "@/lib/uploaded-image-optimization";
 import {
   buildEventGroupQrPath,
   EVENT_PRIVATE_ASSETS_BUCKET,
@@ -31,12 +32,17 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "storage_not_configured" }, { status: 503 });
   }
 
-  const storagePath = buildEventGroupQrPath(eventSlug, file.name);
+  const optimizedFile = await optimizeQrCodeUpload(file).catch(() => null);
+  if (!optimizedFile) {
+    return NextResponse.json({ error: "invalid_file" }, { status: 400 });
+  }
+
+  const storagePath = buildEventGroupQrPath(eventSlug, optimizedFile.name);
   const { error } = await supabase.storage
     .from(EVENT_PRIVATE_ASSETS_BUCKET)
-    .upload(storagePath, file, {
+    .upload(storagePath, optimizedFile, {
       cacheControl: "private, max-age=300",
-      contentType: file.type,
+      contentType: optimizedFile.type,
       upsert: false,
     });
 
