@@ -25,7 +25,21 @@ import {
   type ReminderConfig,
 } from "../../../services/subscriptions";
 
-function getRegistrationStatusView(registration: MiniappRegistration | null) {
+function getRegistrationStatusView(
+  registration: MiniappRegistration | null,
+  eventStatus = "",
+) {
+  if (eventStatus === "completed") {
+    if (registration?.status === "registered") {
+      return { label: "已结束", tone: "completed" };
+    }
+    if (registration?.status === "pending") {
+      return { label: "审核结束", tone: "completed" };
+    }
+    if (registration?.status === "waitlisted") {
+      return { label: "候补结束", tone: "completed" };
+    }
+  }
   if (registration?.status === "registered") {
     return { label: "已报名", tone: "registered" };
   }
@@ -113,7 +127,10 @@ Page({
     try {
       const user = await ensureSession();
       const registration = await loadEventRegistration(slug);
-      const statusView = getRegistrationStatusView(registration);
+      const statusView = getRegistrationStatusView(
+        registration,
+        this.data.event?.status,
+      );
       this.setData({
         user,
         registration,
@@ -299,7 +316,10 @@ Page({
           portraitConsentAccepted: this.data.registrationConsentAccepted,
         },
       );
-      const statusView = getRegistrationStatusView(registration);
+      const statusView = getRegistrationStatusView(
+        registration,
+        this.data.event?.status,
+      );
       this.setData({
         registration,
         registrationStatusLabel: statusView.label,
@@ -362,7 +382,10 @@ Page({
     this.setData({ submitting: true });
     try {
       const registration = await cancelEventRegistration(this.data.slug);
-      const statusView = getRegistrationStatusView(registration);
+      const statusView = getRegistrationStatusView(
+        registration,
+        this.data.event?.status,
+      );
       this.setData({
         registration,
         registrationStatusLabel: statusView.label,
