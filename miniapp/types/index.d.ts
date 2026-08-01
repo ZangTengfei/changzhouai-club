@@ -14,6 +14,10 @@ interface MiniappUser {
   capabilityProfileComplete: boolean;
   profileCompletion: MiniappProfileCompletion;
   channels: string[];
+  privacyAccepted: boolean;
+  privacyPolicyVersion: string;
+  phoneBound: boolean;
+  phoneMasked: string | null;
   accountRecoveryAvailable: boolean;
   stats: {
     registrationCount: number;

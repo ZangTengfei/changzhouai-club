@@ -33,7 +33,7 @@ export async function submitJoinRequest(formData: FormData) {
   const willingToShare = formData.get("willing_to_share") === "on";
   const willingToJoinProjects = formData.get("willing_to_join_projects") === "on";
 
-  if (!displayName || !wechat) {
+  if (!displayName) {
     redirect("/join?error=missing_required_fields");
   }
 

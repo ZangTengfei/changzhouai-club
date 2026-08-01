@@ -23,6 +23,15 @@ export async function updateProfile(profile: MiniappProfileUpdate) {
   });
 }
 
+export async function updateDisplayName(displayName: string) {
+  return apiRequest<{ user: MiniappUser }>({
+    path: "/api/miniapp/profile/basic",
+    method: "PUT",
+    authenticated: true,
+    data: { displayName },
+  });
+}
+
 export async function loadSharedProfile(handle: string, eventSlug = "") {
   const eventQuery = eventSlug
     ? `?event=${encodeURIComponent(eventSlug)}`

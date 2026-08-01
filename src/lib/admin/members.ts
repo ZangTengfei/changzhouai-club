@@ -325,7 +325,6 @@ export async function loadAdminMembersData(
 
       const profileCompletion = getMiniappProfileCompletion({
         displayName: profile?.display_name,
-        wechat: profile?.wechat,
         city: profile?.city,
         roleLabel: profile?.role_label,
         industryTags: profile?.industry_tags,

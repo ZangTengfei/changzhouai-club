@@ -6,6 +6,7 @@ import { isMiniappAccountRecoveryAvailable } from "@/lib/account-recovery";
 import {
   getMiniappProfileCompletion,
   isMiniappRegistrationReady,
+  MINIAPP_PRIVACY_POLICY_VERSION,
 } from "@/lib/miniapp-profile";
 
 const MINIAPP_SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1_000;
@@ -456,6 +457,8 @@ export async function loadMiniappAccountSnapshot(
     registrationResult,
     attendanceResult,
     badgeResult,
+    consentResult,
+    contactResult,
     accountRecoveryAvailable,
   ] = await Promise.all([
     supabase
@@ -498,6 +501,17 @@ export async function loadMiniappAccountSnapshot(
       .select("badge_code, label, description, source, awarded_at")
       .eq("user_id", userId)
       .order("awarded_at", { ascending: false }),
+    supabase
+      .from("miniapp_consents")
+      .select("policy_version")
+      .eq("user_id", userId)
+      .eq("policy_version", MINIAPP_PRIVACY_POLICY_VERSION)
+      .maybeSingle(),
+    supabase
+      .from("member_private_contacts")
+      .select("phone_last4")
+      .eq("user_id", userId)
+      .maybeSingle(),
     isMiniappAccountRecoveryAvailable(supabase, userId).catch(() => false),
   ]);
 
@@ -507,7 +521,9 @@ export async function loadMiniappAccountSnapshot(
     identityResult.error ||
     registrationResult.error ||
     attendanceResult.error ||
-    badgeResult.error
+    badgeResult.error ||
+    consentResult.error ||
+    contactResult.error
   ) {
     throw new MiniappAuthError("account_snapshot_failed");
   }
@@ -529,7 +545,6 @@ export async function loadMiniappAccountSnapshot(
   const displayName = profile?.display_name?.trim() || "";
   const profileCompletionInput = {
     displayName: profile?.display_name,
-    wechat: profile?.wechat,
     city: profile?.city,
     roleLabel: profile?.role_label,
     industryTags: profile?.industry_tags,
@@ -681,6 +696,12 @@ export async function loadMiniappAccountSnapshot(
     capabilityProfileComplete: profileCompletion.completed,
     profileCompletion,
     channels,
+    privacyAccepted: Boolean(consentResult.data),
+    privacyPolicyVersion: MINIAPP_PRIVACY_POLICY_VERSION,
+    phoneBound: Boolean(contactResult.data?.phone_last4),
+    phoneMasked: contactResult.data?.phone_last4
+      ? `****${contactResult.data.phone_last4}`
+      : null,
     accountRecoveryAvailable,
     stats: {
       registrationCount: registrations.length,

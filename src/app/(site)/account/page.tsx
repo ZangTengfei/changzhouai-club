@@ -159,7 +159,7 @@ function getStatusMessage(error?: string) {
   }
 
   if (error === "missing_required_fields") {
-    return "请先填写显示名和微信号这两个必填项。";
+    return "请先填写显示名这个必填项。";
   }
 
   if (error === "invalid_avatar_url") {
@@ -439,9 +439,7 @@ export default async function AccountPage({
     : null;
   const displayName =
     profile?.display_name?.trim() || user.email?.split("@")[0] || "社区成员";
-  const profileComplete = Boolean(
-    profile?.display_name?.trim() && profile?.wechat?.trim(),
-  );
+  const profileComplete = Boolean(profile?.display_name?.trim());
   const publicProfilePath = member?.is_publicly_visible
     ? getMemberPublicSlugPath({
         id: communityUserId,
@@ -465,7 +463,7 @@ export default async function AccountPage({
     {
       label: "资料状态",
       value: profileComplete ? "已完成" : "待完善",
-      detail: profileComplete ? "可以继续补充公开资料" : "显示名和微信号为必填",
+      detail: profileComplete ? "可以继续补充公开资料" : "显示名为必填",
       icon: BadgeCheck,
     },
     {
@@ -519,7 +517,7 @@ export default async function AccountPage({
               description={
                 profileComplete
                   ? "更新头像、公开主页链接、城市、技能标签和协作偏好。"
-                  : "先填写显示名和微信号，其他公开资料可以稍后继续补充。"
+                  : "先填写显示名，其他公开资料可以稍后继续补充。"
               }
               defaultOpen={shouldOpenProfileModal}
               trigger={
@@ -629,7 +627,7 @@ export default async function AccountPage({
         <div className={statusNoteClassName}>
           <Sparkles aria-hidden="true" strokeWidth={1.9} />
           <span>
-            先补完显示名和微信号这两个必填项，就可以完成加入；其他资料都可以稍后继续完善。
+            先填写显示名就可以完成加入；微信号和其他资料都可以稍后继续完善。
           </span>
         </div>
       ) : null}

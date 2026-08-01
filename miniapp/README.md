@@ -28,7 +28,7 @@ npm run miniapp:metrics
 - request 合法域名：`https://changzhouai.club`
 - uploadFile 合法域名：`https://changzhouai.club`
 - downloadFile 合法域名：主站域名以及活动图片实际使用的 Supabase Storage 域名
-- 用户隐私保护指引：说明昵称、头像、微信号、城市和社区资料的使用目的
+- 用户隐私保护指引：说明昵称、头像、选填微信号、授权手机号、城市和社区资料的使用目的
 - 订阅消息模板：配置活动名称、活动时间、活动地点三个字段
 
 订阅消息服务端环境变量：

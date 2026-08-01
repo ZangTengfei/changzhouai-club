@@ -104,13 +104,12 @@ export function AccountProfileForm({
         </label>
 
         <label className="form-field">
-          <FieldLabel label="微信号" required />
+          <FieldLabel label="微信号" required={false} />
           <input
             className="input"
             name="wechat"
             defaultValue={profile?.wechat ?? ""}
-            placeholder="用于社区联系"
-            required
+            placeholder="选填，用于社区联系"
           />
         </label>
 

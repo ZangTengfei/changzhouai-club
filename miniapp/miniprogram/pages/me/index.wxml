@@ -77,11 +77,17 @@
         <image src="/assets/icons/settings-purple-v2.png" mode="aspectFit" />
       </view>
       <view class="identity-main">
-        <view class="identity-profile-trigger" bindtap="openProfile" role="button" aria-label="查看成员资料">
+        <button class="avatar-editor" open-type="chooseAvatar" bindchooseavatar="chooseAvatar" loading="{{avatarUploading}}" disabled="{{avatarUploading}}" aria-label="更换头像">
           <image wx:if="{{user.avatarUrl}}" class="avatar" src="{{user.avatarUrl}}" mode="aspectFill" />
           <view wx:else class="avatar avatar-placeholder">{{avatarInitial}}</view>
+          <text class="avatar-edit-label">换头像</text>
+        </button>
+        <view class="identity-profile-trigger">
           <view class="identity-copy">
-            <text class="profile-name">{{user.displayName || '未设置昵称'}}</text>
+            <view class="profile-name-editor" bindtap="openNameEditor" role="button" aria-label="编辑昵称">
+              <text class="profile-name">{{user.displayName || '未设置昵称'}}</text>
+              <text class="profile-name-action">编辑</text>
+            </view>
             <view class="identity-tag-row" catchtap="openGrowth" role="button" aria-label="查看身份与社区标签">
               <view class="identity-pill">
                 <image src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
@@ -139,5 +145,17 @@
     </view>
     <view wx:else class="empty-state" bindtap="openEvents" role="button">还没有活动记录，去看看社区活动</view>
 
+  </view>
+</view>
+
+<view wx:if="{{nameEditorOpen}}" class="name-editor-mask" catchtap="closeNameEditor">
+  <view class="name-editor-sheet" catchtap="keepNameEditorOpen">
+    <text class="name-editor-title">修改昵称</text>
+    <text class="name-editor-hint">这是社区伙伴看到并称呼你的名称。</text>
+    <input class="name-editor-input" type="nickname" maxlength="60" value="{{displayNameDraft}}" bindinput="handleNameInput" confirm-type="done" bindconfirm="saveDisplayName" focus />
+    <view class="name-editor-actions">
+      <button class="name-editor-cancel" bindtap="closeNameEditor" disabled="{{displayNameSaving}}">取消</button>
+      <button class="name-editor-save" bindtap="saveDisplayName" loading="{{displayNameSaving}}" disabled="{{displayNameSaving}}">保存</button>
+    </view>
   </view>
 </view>

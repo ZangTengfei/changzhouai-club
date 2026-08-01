@@ -83,7 +83,7 @@ function getInitialStep(profile: MiniappProfile) {
   const missing = new Set(profile.completion.missingItems);
 
   if (
-    ["昵称", "微信号", "城市/辖区", "当前身份"].some((item) =>
+    ["昵称", "城市/辖区", "当前身份"].some((item) =>
       missing.has(item),
     )
   ) {
@@ -383,7 +383,6 @@ Page({
     if (step === 0) {
       if (
         !isDisplayNameReady(this.data.displayName) ||
-        !this.data.wechat.trim() ||
         !this.data.city.trim() ||
         !this.data.roleLabel.trim()
       ) {

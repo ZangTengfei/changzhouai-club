@@ -36,8 +36,13 @@ type ProfileRow = {
   city: string | null;
 };
 
+type PrivateContactRow = {
+  user_id: string;
+  phone_number: string;
+};
+
 const csvHeaders =
-  "活动标题,活动链接,活动类型,活动状态,活动时间,活动地点,报名状态,肖像授权,肖像授权时间,成员昵称,账号邮箱,微信,城市,报名备注,报名时间,报名 ID,用户 ID,活动 ID".split(
+  "活动标题,活动链接,活动类型,活动状态,活动时间,活动地点,报名状态,肖像授权,肖像授权时间,成员昵称,账号邮箱,手机号,微信,城市,报名备注,报名时间,报名 ID,用户 ID,活动 ID".split(
     ",",
   );
 
@@ -149,6 +154,24 @@ export async function GET(request: Request) {
   const profilesByUserId = new Map(
     ((profilesData ?? []) as ProfileRow[]).map((profile) => [profile.id, profile]),
   );
+  const { data: privateContactsData, error: privateContactsError } =
+    userIds.length > 0
+      ? await context.supabase
+          .from("member_private_contacts")
+          .select("user_id, phone_number")
+          .in("user_id", userIds)
+      : { data: [], error: null };
+
+  if (privateContactsError) {
+    return NextResponse.json({ error: "database_read_failed" }, { status: 400 });
+  }
+
+  const privateContactsByUserId = new Map(
+    ((privateContactsData ?? []) as PrivateContactRow[]).map((contact) => [
+      contact.user_id,
+      contact.phone_number,
+    ]),
+  );
   const { data: portraitConsentsData, error: portraitConsentsError } =
     userIds.length > 0
       ? await context.supabase
@@ -195,6 +218,7 @@ export async function GET(request: Request) {
       formatCsvDateTime(portraitConsentAcceptedAt ?? null),
       profile?.display_name ?? "",
       profile?.email ?? "",
+      privateContactsByUserId.get(registration.user_id) ?? "",
       profile?.wechat ?? "",
       profile?.city ?? "",
       registration.note ?? "",

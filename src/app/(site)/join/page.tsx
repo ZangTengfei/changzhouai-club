@@ -35,14 +35,10 @@ const requiredFields = [
     summary: "会出现在社区账号、报名记录和成员资料里。",
     icon: IdCard,
   },
-  {
-    title: "微信号",
-    summary: "用于活动通知、入群邀请和后续沟通确认。",
-    icon: MessageCircle,
-  },
 ] as const;
 
 const optionalFields = [
+  "微信号",
   "所在城市",
   "身份 / 公司 / 学校",
   "每月可投入时间",

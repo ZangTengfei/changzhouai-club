@@ -2,6 +2,8 @@ const WECHAT_CODE2SESSION_URL = "https://api.weixin.qq.com/sns/jscode2session";
 const WECHAT_ACCESS_TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token";
 const WECHAT_SUBSCRIBE_SEND_URL =
   "https://api.weixin.qq.com/cgi-bin/message/subscribe/send";
+const WECHAT_PHONE_NUMBER_URL =
+  "https://api.weixin.qq.com/wxa/business/getuserphonenumber";
 const WECHAT_REQUEST_TIMEOUT_MS = 8_000;
 
 type WechatCode2SessionResponse = {
@@ -17,6 +19,16 @@ type WechatApiResponse = {
   expires_in?: number;
   errcode?: number;
   errmsg?: string;
+};
+
+type WechatPhoneNumberResponse = {
+  errcode?: number;
+  errmsg?: string;
+  phone_info?: {
+    phoneNumber?: string;
+    purePhoneNumber?: string;
+    countryCode?: string;
+  };
 };
 
 export class WechatMiniappApiError extends Error {
@@ -125,6 +137,50 @@ export async function getWechatMiniappAccessToken(
   }
 
   return body.access_token;
+}
+
+export async function exchangeWechatMiniappPhoneCode(
+  config: NonNullable<ReturnType<typeof getWechatMiniappConfig>>,
+  code: string,
+) {
+  const accessToken = await getWechatMiniappAccessToken(config);
+  let response: Response;
+
+  try {
+    response = await fetch(
+      `${WECHAT_PHONE_NUMBER_URL}?access_token=${encodeURIComponent(accessToken)}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code }),
+        signal: AbortSignal.timeout(WECHAT_REQUEST_TIMEOUT_MS),
+      },
+    );
+  } catch {
+    throw new WechatMiniappApiError("wechat_phone_request_failed");
+  }
+
+  const body = (await response
+    .json()
+    .catch(() => null)) as WechatPhoneNumberResponse | null;
+  const phoneNumber = body?.phone_info?.purePhoneNumber?.trim();
+
+  if (
+    !response.ok ||
+    body?.errcode ||
+    !phoneNumber ||
+    !/^\d{6,20}$/.test(phoneNumber)
+  ) {
+    throw new WechatMiniappApiError(
+      "wechat_phone_exchange_failed",
+      body?.errcode,
+    );
+  }
+
+  return {
+    phoneNumber,
+    countryCode: body?.phone_info?.countryCode?.trim() || null,
+  };
 }
 
 export async function sendWechatMiniappSubscribeMessage(input: {

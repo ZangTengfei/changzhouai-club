@@ -82,7 +82,7 @@ Page({
     void wx.showModal({
       title: "先确认公开范围",
       content:
-        "分享后，昵称、头像、城市、身份、能力与连接方向会作为公开成员资料展示；微信号不会公开。",
+        "分享后，昵称、头像、城市、身份、能力与连接方向会作为公开成员资料展示；微信号和手机号不会公开。",
       confirmText: "去设置",
       success: ({ confirm }) => {
         if (confirm) {

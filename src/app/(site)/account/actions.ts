@@ -182,7 +182,7 @@ export async function updateAccountProfile(formData: FormData) {
   const avatarUrl = normalizeAvatarUrl(rawAvatarUrl);
   const publicSlug = normalizeMemberPublicSlug(rawPublicSlug);
 
-  if (!displayName || !wechat) {
+  if (!displayName) {
     redirect("/account?error=missing_required_fields");
   }
 
@@ -194,7 +194,7 @@ export async function updateAccountProfile(formData: FormData) {
     redirect("/account?error=invalid_public_slug");
   }
 
-  const completedProfileNow = Boolean(displayName && wechat);
+  const completedProfileNow = Boolean(displayName);
   const shouldMarkOnboardingComplete =
     supportsRegistrationTracking &&
     completedProfileNow &&

@@ -223,6 +223,36 @@
   gap: 24rpx;
 }
 
+.avatar-editor {
+  position: relative;
+  width: 146rpx;
+  height: 146rpx;
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border-radius: 50%;
+  background: transparent;
+  line-height: normal;
+}
+
+.avatar-editor::after {
+  border: 0;
+}
+
+.avatar-edit-label {
+  position: absolute;
+  right: -4rpx;
+  bottom: 2rpx;
+  padding: 7rpx 13rpx;
+  border: 2rpx solid #ffffff;
+  border-radius: 18rpx;
+  background: #147a5b;
+  color: #ffffff;
+  font-size: 19rpx;
+  font-weight: 720;
+}
+
 .avatar {
   display: flex;
   width: 146rpx;
@@ -255,6 +285,97 @@
   font-size: 42rpx;
   font-weight: 830;
   line-height: 1.25;
+}
+
+.profile-name-editor {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.profile-name-action {
+  flex: 0 0 auto;
+  padding: 5rpx 11rpx;
+  border-radius: 16rpx;
+  background: rgba(20, 122, 91, 0.1);
+  color: var(--color-green-dark);
+  font-size: 19rpx;
+  font-weight: 700;
+}
+
+.name-editor-mask {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  padding: 28rpx;
+  background: rgba(17, 23, 21, 0.42);
+}
+
+.name-editor-sheet {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 34rpx;
+  border-radius: 34rpx;
+  background: #ffffff;
+}
+
+.name-editor-title {
+  display: block;
+  font-size: 34rpx;
+  font-weight: 820;
+}
+
+.name-editor-hint {
+  display: block;
+  margin-top: 8rpx;
+  color: var(--color-subtle);
+  font-size: 23rpx;
+}
+
+.name-editor-input {
+  box-sizing: border-box;
+  width: 100%;
+  height: 92rpx;
+  margin-top: 28rpx;
+  padding: 0 24rpx;
+  border: 2rpx solid var(--color-line);
+  border-radius: 22rpx;
+  background: #f8faf9;
+  font-size: 30rpx;
+}
+
+.name-editor-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18rpx;
+  margin-top: 24rpx;
+}
+
+.name-editor-cancel,
+.name-editor-save {
+  width: 100%;
+  margin: 0;
+  border-radius: 44rpx;
+  font-size: 27rpx;
+  font-weight: 720;
+}
+
+.name-editor-cancel {
+  background: #eef2f0;
+  color: var(--color-text);
+}
+
+.name-editor-save {
+  background: var(--color-green);
+  color: #ffffff;
+}
+
+.name-editor-cancel::after,
+.name-editor-save::after {
+  border: 0;
 }
 
 .identity-tag-row {

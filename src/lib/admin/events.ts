@@ -81,6 +81,12 @@ export type AdminProfileRow = {
   display_name: string | null;
   email: string | null;
   city: string | null;
+  phone_number: string | null;
+};
+
+type AdminPrivateContactRow = {
+  user_id: string;
+  phone_number: string;
 };
 
 export type AdminRegistration = AdminRegistrationRow & {
@@ -205,7 +211,26 @@ export async function loadAdminEventsData(
   const registrations = (registrationsData ?? []) as AdminRegistrationRow[];
   const attendance = (attendanceData ?? []) as AdminAttendanceRow[];
   const feedback = (feedbackData ?? []) as AdminEventFeedbackRow[];
-  const profiles = (profilesData ?? []) as AdminProfileRow[];
+  const registrationUserIds = Array.from(
+    new Set(registrations.map((registration) => registration.user_id)),
+  );
+  const { data: privateContactsData, error: privateContactsError } =
+    canReadRegistrationContact && registrationUserIds.length > 0
+      ? await supabase
+          .from("member_private_contacts")
+          .select("user_id, phone_number")
+          .in("user_id", registrationUserIds)
+      : { data: [], error: null };
+  const privateContacts = (privateContactsData ?? []) as AdminPrivateContactRow[];
+  const privateContactsByUserId = new Map(
+    privateContacts.map((contact) => [contact.user_id, contact.phone_number]),
+  );
+  const profiles = ((profilesData ?? []) as Omit<AdminProfileRow, "phone_number">[]).map(
+    (profile) => ({
+      ...profile,
+      phone_number: privateContactsByUserId.get(profile.id) ?? null,
+    }),
+  );
   const portraitConsents = (portraitConsentsData ?? []) as AdminConsentRow[];
   const groupQrCodes = (groupQrCodesData ?? []) as AdminEventGroupQrCode[];
   const queryErrors = [
@@ -217,6 +242,7 @@ export async function loadAdminEventsData(
     profilesError?.message,
     portraitConsentsError?.message,
     groupQrCodesError?.message,
+    privateContactsError?.message,
   ].filter(Boolean) as string[];
 
   const profilesByUserId = new Map(profiles.map((profile) => [profile.id, profile]));
@@ -243,7 +269,9 @@ export async function loadAdminEventsData(
     const eventFeedback = feedbackByEventId.get(item.event_id) ?? [];
     eventFeedback.push({
       ...item,
-      profile: profilesByUserId.get(item.user_id) ?? null,
+      profile: profilesByUserId.has(item.user_id)
+        ? { ...profilesByUserId.get(item.user_id)!, phone_number: null }
+        : null,
     });
     feedbackByEventId.set(item.event_id, eventFeedback);
   });

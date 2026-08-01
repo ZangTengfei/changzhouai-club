@@ -322,9 +322,16 @@ export function AdminEventDetailPageClient({ eventId }: { eventId: string }) {
                                 <TableCell className="ant-table-cell text-sm text-muted-foreground">
                                   <div className="grid gap-1">
                                     <span className="break-all">
-                                      {registration.profile?.email ??
-                                        "未提供邮箱"}
+                                      {registration.profile?.phone_number ??
+                                        registration.profile?.email ??
+                                        "未提供联系方式"}
                                     </span>
+                                    {registration.profile?.phone_number &&
+                                    registration.profile.email ? (
+                                      <span className="break-all text-xs">
+                                        邮箱：{registration.profile.email}
+                                      </span>
+                                    ) : null}
                                     <span className="text-xs">
                                       城市：{registration.profile?.city ?? "未填写"}
                                     </span>

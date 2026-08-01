@@ -8,7 +8,7 @@
   <view class="consent-section consent-section-green">
     <text class="consent-index">01</text>
     <text class="consent-heading">报名信息如何使用</text>
-    <text class="consent-copy">报名时，我们会用到你的昵称、头像、微信号、城市、成员资料、报名备注和报名状态。报名确认后，昵称、头像和成员资料会展示在活动页面，其他用户可以点击查看。微信号、报名备注和账号信息不会公开；其余信息只用于确认报名、发送通知、组织现场活动和必要的后续联系。</text>
+    <text class="consent-copy">报名时，我们会用到你的昵称、头像、城市、成员资料、报名备注、报名状态，以及你主动提供的联系方式。报名确认后，昵称、头像和成员资料会展示在活动页面，其他用户可以点击查看。微信号、已授权手机号、报名备注和账号信息不会公开；其余信息只用于确认报名、发送通知、组织现场活动和必要的后续联系。</text>
   </view>
 
   <view class="consent-section consent-section-purple">

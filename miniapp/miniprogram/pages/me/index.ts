@@ -1,6 +1,8 @@
 import { ApiError, getStoredSessionToken } from "../../services/api";
 import { ensureSession, login } from "../../services/auth";
 import { formatEventDate } from "../../services/events";
+import { uploadAvatar } from "../../services/avatar";
+import { updateDisplayName } from "../../services/profile";
 import { getCommunityTags } from "../../utils/member-growth";
 
 type FootprintItem = MiniappUser["footprints"][number] & {
@@ -72,6 +74,10 @@ Page({
     loginFailed: false,
     loginRequestId: "",
     suppressAutoLogin: false,
+    avatarUploading: false,
+    nameEditorOpen: false,
+    displayNameDraft: "",
+    displayNameSaving: false,
   },
 
   onLoad(options: Record<string, string | undefined>) {
@@ -197,6 +203,101 @@ Page({
     void wx.navigateTo({
       url: completed ? "/pages/profile/index" : "/pages/profile/edit/index",
     });
+  },
+
+  ensureProfilePrivacyAccepted() {
+    if (this.data.user?.privacyAccepted) return true;
+    void wx.showModal({
+      title: "请先确认隐私说明",
+      content: "头像、昵称和联系方式的使用范围需要先由你确认。",
+      confirmText: "去确认",
+      success: (result) => {
+        if (result.confirm) {
+          void wx.navigateTo({ url: "/pages/profile/edit/index?step=0" });
+        }
+      },
+    });
+    return false;
+  },
+
+  async chooseAvatar(
+    event: WechatMiniprogram.CustomEvent<{ avatarUrl: string }>,
+  ) {
+    const filePath = event.detail.avatarUrl;
+    if (!filePath || this.data.avatarUploading) return;
+    if (!this.ensureProfilePrivacyAccepted() || !this.data.user) return;
+
+    this.setData({ avatarUploading: true });
+    try {
+      const response = await uploadAvatar(
+        filePath,
+        this.data.user.privacyPolicyVersion,
+      );
+      getApp<IAppOption>().globalData.currentUser = response.user;
+      this.setData({
+        ...buildAccountViewData(response.user),
+        avatarUploading: false,
+      });
+      void wx.showToast({ title: "头像已更新", icon: "success" });
+    } catch (error) {
+      this.setData({ avatarUploading: false });
+      const message =
+        error instanceof ApiError &&
+        error.errorCode === "privacy_consent_required"
+          ? "请先确认隐私说明"
+          : "头像更新失败，请重试";
+      void wx.showToast({ title: message, icon: "none" });
+    }
+  },
+
+  openNameEditor() {
+    if (!this.ensureProfilePrivacyAccepted() || !this.data.user) return;
+    this.setData({
+      nameEditorOpen: true,
+      displayNameDraft: this.data.user.displayName,
+    });
+  },
+
+  closeNameEditor() {
+    if (this.data.displayNameSaving) return;
+    this.setData({ nameEditorOpen: false });
+  },
+
+  keepNameEditorOpen() {},
+
+  handleNameInput(event: WechatMiniprogram.Input) {
+    this.setData({ displayNameDraft: event.detail.value });
+  },
+
+  async saveDisplayName() {
+    const displayName = this.data.displayNameDraft.trim();
+    if (!displayName || displayName === "微信用户") {
+      void wx.showToast({ title: "请输入有效昵称", icon: "none" });
+      return;
+    }
+    if (this.data.displayNameSaving) return;
+
+    this.setData({ displayNameSaving: true });
+    try {
+      const { user } = await updateDisplayName(displayName);
+      getApp<IAppOption>().globalData.currentUser = user;
+      this.setData({
+        ...buildAccountViewData(user),
+        displayNameSaving: false,
+        nameEditorOpen: false,
+      });
+      void wx.showToast({ title: "昵称已更新", icon: "success" });
+    } catch (error) {
+      this.setData({ displayNameSaving: false });
+      void wx.showToast({
+        title:
+          error instanceof ApiError &&
+          error.errorCode === "invalid_display_name"
+            ? "请输入有效昵称"
+            : "昵称更新失败，请重试",
+        icon: "none",
+      });
+    }
   },
 
   openEvent(event: WechatMiniprogram.TouchEvent) {

@@ -1,6 +1,7 @@
 import { memberTags } from "@/lib/site-data";
 
 export const MINIAPP_PRIVACY_POLICY_VERSION = "2026-07-18";
+export const MINIAPP_PHONE_CONTACT_POLICY_VERSION = "phone-contact:2026-08-01";
 
 export const MINIAPP_CITY_OPTIONS = [
   "常州",
@@ -52,7 +53,6 @@ export const MINIAPP_SKILL_OPTIONS = memberTags;
 
 type MiniappProfileCompletionInput = {
   displayName?: string | null;
-  wechat?: string | null;
   city?: string | null;
   roleLabel?: string | null;
   industryTags?: string[] | null;
@@ -63,7 +63,6 @@ type MiniappProfileCompletionInput = {
 
 const completionChecks = [
   { key: "displayName", label: "昵称" },
-  { key: "wechat", label: "微信号" },
   { key: "city", label: "城市/辖区" },
   { key: "roleLabel", label: "当前身份" },
   { key: "industryTags", label: "行业方向" },
@@ -95,7 +94,6 @@ export function getMiniappProfileCompletion(
 ) {
   const values: Record<(typeof completionChecks)[number]["key"], boolean> = {
     displayName: isMiniappDisplayNameReady(profile.displayName),
-    wechat: hasText(profile.wechat),
     city: hasText(profile.city),
     roleLabel: hasText(profile.roleLabel),
     industryTags: hasItems(profile.industryTags),

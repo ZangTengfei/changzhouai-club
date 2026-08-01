@@ -85,7 +85,6 @@ async function loadProfile(supabase: SupabaseClient, userId: string) {
   const member = memberResult.data;
   const completion = getMiniappProfileCompletion({
     displayName: profile?.display_name,
-    wechat: profile?.wechat,
     city: profile?.city,
     roleLabel: profile?.role_label,
     industryTags: profile?.industry_tags,
@@ -177,7 +176,7 @@ export async function PUT(request: Request) {
 
   if (
     !isMiniappDisplayNameReady(displayName) ||
-    !wechat ||
+    wechat === null ||
     city === null ||
     roleLabel === null ||
     organization === null ||

@@ -150,7 +150,7 @@ try {
   pass("self_profile_cannot_grant_member_identity");
 
   const completeProfilePayload = {
-    wechat: "miniapp_verify",
+    wechat: "",
     city: "常州",
     roleLabel: "测试",
     organization: "常州 AI Club",
@@ -193,7 +193,44 @@ try {
   assert.equal(profilePut.body?.user?.capabilityProfileComplete, true);
   assert.equal(profilePut.body?.profile?.completion?.percent, 100);
   assert.equal(profilePut.body?.profile?.shareHandle, userId);
-  pass("profile_saved_with_consent");
+  pass("profile_saved_without_wechat");
+
+  const invalidBasicProfilePut = await request("/api/miniapp/profile/basic", {
+    method: "PUT",
+    headers: authHeaders,
+    body: JSON.stringify({ displayName: "微信用户" }),
+  });
+  assert.equal(invalidBasicProfilePut.response.status, 400);
+  assert.equal(invalidBasicProfilePut.body?.error, "invalid_display_name");
+
+  const basicProfilePut = await request("/api/miniapp/profile/basic", {
+    method: "PUT",
+    headers: authHeaders,
+    body: JSON.stringify({ displayName: "快捷编辑测试用户" }),
+  });
+  assert.equal(basicProfilePut.response.status, 200);
+  assert.equal(basicProfilePut.body?.user?.displayName, "快捷编辑测试用户");
+  pass("display_name_quick_edit_saved");
+
+  const { error: contactInsertError } = await supabase
+    .from("member_private_contacts")
+    .insert({
+      user_id: userId,
+      phone_number: "13800138000",
+      phone_country_code: "86",
+      phone_last4: "8000",
+      phone_verified_at: new Date().toISOString(),
+      phone_source: "wechat",
+    });
+  if (contactInsertError) throw contactInsertError;
+  const accountWithPhone = await request("/api/miniapp/auth/me", {
+    headers: authHeaders,
+  });
+  assert.equal(accountWithPhone.response.status, 200);
+  assert.equal(accountWithPhone.body?.user?.phoneBound, true);
+  assert.equal(accountWithPhone.body?.user?.phoneMasked, "****8000");
+  assert.equal("phoneNumber" in (accountWithPhone.body?.user ?? {}), false);
+  pass("private_phone_returned_masked");
 
   const legacyLongSkill = "旧版成员资料中的能力方向需要在小程序中继续保留".repeat(2);
   assert.ok(legacyLongSkill.length > 40);
@@ -202,7 +239,7 @@ try {
     headers: authHeaders,
     body: JSON.stringify({
       ...completeProfilePayload,
-      displayName: "体验版测试用户",
+      displayName: "快捷编辑测试用户",
       skills: [legacyLongSkill],
     }),
   });

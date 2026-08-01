@@ -56,7 +56,7 @@
 
     <view class="profile-view-privacy">
       <text>{{profile.isPubliclyVisible ? '当前档案已进入社区公开展示范围' : '当前档案仅自己可见'}}</text>
-      <text>微信号不会在公开成员页面展示。</text>
+      <text>微信号和手机号不会在公开成员页面展示。</text>
     </view>
 
     <view class="profile-view-actions">

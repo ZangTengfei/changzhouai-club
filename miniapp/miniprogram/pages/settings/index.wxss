@@ -74,6 +74,29 @@
   border-bottom: 0;
 }
 
+.phone-row {
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-bottom: 2rpx solid var(--color-line);
+  border-radius: 0;
+  background: #ffffff;
+  color: inherit;
+  line-height: normal;
+  text-align: left;
+}
+
+.phone-row::after {
+  border: 0;
+}
+
+.phone-status {
+  flex: 0 0 auto;
+  color: var(--color-green-dark);
+  font-size: 21rpx;
+  font-weight: 700;
+}
+
 .settings-icon {
   box-sizing: border-box;
   width: 64rpx;
