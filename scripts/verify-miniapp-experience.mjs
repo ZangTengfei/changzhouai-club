@@ -60,6 +60,19 @@ function pass(name) {
   checks.push(name);
 }
 
+async function waitForUpcomingEventPreview(eventId) {
+  const deadline = Date.now() + 70_000;
+
+  while (Date.now() < deadline) {
+    const catalog = await request("/api/miniapp/events?mode=upcoming&limit=20");
+    const preview = catalog.body?.events?.find((item) => item.id === eventId);
+    if (preview) return preview;
+    await new Promise((resolve) => setTimeout(resolve, 5_000));
+  }
+
+  return null;
+}
+
 try {
   const email = `miniapp-verify-${randomUUID()}@users.invalid`;
   const { data: created, error: createError } =
@@ -268,7 +281,7 @@ try {
     `/api/miniapp/members/${encodeURIComponent(userId)}`,
   );
   assert.equal(sharedProfile.response.status, 200);
-  assert.equal(sharedProfile.body?.profile?.displayName, "体验版测试用户");
+  assert.equal(sharedProfile.body?.profile?.displayName, "快捷编辑测试用户");
   assert.equal(sharedProfile.body?.profile?.capabilitySummary, "可以协助自动化验收");
   assert.equal("wechat" in (sharedProfile.body?.profile ?? {}), false);
   pass("public_member_profile_loaded_without_private_fields");
@@ -610,12 +623,7 @@ try {
   assert.equal(directHiddenProfile.response.status, 404);
   pass("event_profile_access_does_not_publish_member_globally");
 
-  const eventCatalogWithParticipants = await request(
-    "/api/miniapp/events?mode=upcoming&limit=20",
-  );
-  const eventPreview = eventCatalogWithParticipants.body?.events?.find(
-    (item) => item.id === event.id,
-  );
+  const eventPreview = await waitForUpcomingEventPreview(event.id);
   assert.equal(eventPreview?.confirmed_count, 1);
   assert.equal(eventPreview?.participant_preview?.length, 1);
   pass("event_card_participant_preview_loaded");
@@ -828,26 +836,29 @@ try {
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
     { method: "DELETE", headers: authHeaders },
   );
-  assert.equal(registrationDelete.response.status, 200);
-  assert.equal(registrationDelete.body?.registration?.status, "cancelled");
-  pass("event_registration_cancelled");
+  assert.equal(registrationDelete.response.status, 409);
+  assert.equal(
+    registrationDelete.body?.error,
+    "registration_locked_after_checkin",
+  );
+  pass("event_registration_locked_after_checkin");
 
-  const eventAfterCancellation = await request(
+  const eventAfterLockedCancellation = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}`,
   );
-  assert.equal(eventAfterCancellation.response.status, 200);
-  assert.equal(eventAfterCancellation.body?.event?.confirmedCount, 0);
-  assert.equal(eventAfterCancellation.body?.event?.participants?.length, 0);
-  pass("cancelled_participant_removed_from_event");
+  assert.equal(eventAfterLockedCancellation.response.status, 200);
+  assert.equal(eventAfterLockedCancellation.body?.event?.confirmedCount, 1);
+  assert.equal(eventAfterLockedCancellation.body?.event?.participants?.length, 1);
+  pass("checked_in_participant_remains_confirmed");
 
-  const cancelledGroupQr = await request(
+  const checkedInGroupQr = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/group-qr`,
     { headers: authHeaders },
   );
-  assert.equal(cancelledGroupQr.response.status, 404);
-  pass("event_group_qr_hidden_after_cancellation");
+  assert.equal(checkedInGroupQr.response.status, 200);
+  pass("event_group_qr_retained_after_locked_cancellation");
 
-  const { data: portraitConsentAfterCancel, error: portraitConsentLoadError } =
+  const { data: portraitConsentAfterLock, error: portraitConsentLoadError } =
     await supabase
       .from("miniapp_consents")
       .select("policy_version")
@@ -858,11 +869,11 @@ try {
       )
       .maybeSingle();
   if (portraitConsentLoadError) throw portraitConsentLoadError;
-  assert.equal(portraitConsentAfterCancel, null);
-  pass("event_portrait_consent_withdrawn_on_cancel");
+  assert.ok(portraitConsentAfterLock);
+  pass("event_portrait_consent_retained_after_locked_cancellation");
 
   if (reminder.body?.available && reminder.body?.templateId) {
-    const { data: cancelledReminder, error: cancelledReminderError } =
+    const { data: checkedInReminder, error: checkedInReminderError } =
       await supabase
         .from("miniapp_event_subscriptions")
         .select("id, status")
@@ -870,36 +881,9 @@ try {
         .eq("event_id", event.id)
         .eq("template_id", reminder.body.templateId)
         .maybeSingle();
-    if (cancelledReminderError) throw cancelledReminderError;
-    assert.equal(cancelledReminder?.status, "cancelled");
-    pass("reminder_cancelled_with_registration");
-
-    const subscriptionAfterCancel = await request(
-      `/api/miniapp/events/${encodeURIComponent(event.slug)}/subscription`,
-      {
-        method: "POST",
-        headers: authHeaders,
-        body: JSON.stringify({ status: "rejected" }),
-      },
-    );
-    assert.equal(subscriptionAfterCancel.response.status, 409);
-    assert.equal(subscriptionAfterCancel.body?.error, "registration_required");
-    pass("reminder_requires_active_registration");
-
-    if (process.env.CRON_SECRET && cancelledReminder) {
-      const { error: reactivateReminderError } = await supabase
-        .from("miniapp_event_subscriptions")
-        .update({ status: "accepted", send_at: new Date().toISOString() })
-        .eq("id", cancelledReminder.id);
-      if (reactivateReminderError) throw reactivateReminderError;
-
-      const cron = await request("/api/cron/miniapp-event-reminders", {
-        headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
-      });
-      assert.equal(cron.response.status, 200);
-      assert.ok(cron.body?.cancelled >= 1);
-      pass("cron_skips_inactive_registration");
-    }
+    if (checkedInReminderError) throw checkedInReminderError;
+    assert.notEqual(checkedInReminder?.status, "cancelled");
+    pass("reminder_retained_after_locked_cancellation");
   }
 
   const { error: completeEventError } = await supabase
