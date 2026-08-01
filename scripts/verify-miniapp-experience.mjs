@@ -111,6 +111,22 @@ try {
   pass("profile_loaded");
   pass("new_profile_visibility_defaults_on");
 
+  const preConsentBasicProfilePut = await request(
+    "/api/miniapp/profile/basic",
+    {
+      method: "PUT",
+      headers: authHeaders,
+      body: JSON.stringify({ displayName: "免隐私弹窗测试用户" }),
+    },
+  );
+  assert.equal(preConsentBasicProfilePut.response.status, 200);
+  assert.equal(
+    preConsentBasicProfilePut.body?.user?.displayName,
+    "免隐私弹窗测试用户",
+  );
+  assert.equal(preConsentBasicProfilePut.body?.user?.privacyAccepted, false);
+  pass("display_name_quick_edit_does_not_require_privacy_consent");
+
   const legacyBootstrapPut = await request("/api/miniapp/profile", {
     method: "PUT",
     headers: authHeaders,

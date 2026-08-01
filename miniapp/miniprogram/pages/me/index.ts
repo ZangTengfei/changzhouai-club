@@ -205,7 +205,7 @@ Page({
     });
   },
 
-  ensureProfilePrivacyAccepted() {
+  ensureAvatarPrivacyAccepted() {
     if (this.data.user?.privacyAccepted) return true;
     void wx.showModal({
       title: "请先确认隐私说明",
@@ -225,7 +225,7 @@ Page({
   ) {
     const filePath = event.detail.avatarUrl;
     if (!filePath || this.data.avatarUploading) return;
-    if (!this.ensureProfilePrivacyAccepted() || !this.data.user) return;
+    if (!this.ensureAvatarPrivacyAccepted() || !this.data.user) return;
 
     this.setData({ avatarUploading: true });
     try {
@@ -251,7 +251,7 @@ Page({
   },
 
   openNameEditor() {
-    if (!this.ensureProfilePrivacyAccepted() || !this.data.user) return;
+    if (!this.data.user) return;
     this.setData({
       nameEditorOpen: true,
       displayNameDraft: this.data.user.displayName,
