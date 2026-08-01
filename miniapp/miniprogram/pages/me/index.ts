@@ -117,6 +117,9 @@ Page({
         loading: false,
         loginRequired: false,
       });
+      if (getStoredSessionToken()) {
+        void this.loadAccount();
+      }
       return;
     }
 
