@@ -215,28 +215,27 @@
   gap: 24rpx;
 }
 
-.identity-profile-trigger {
-  display: flex;
-  min-width: 0;
-  flex: 1;
-  align-items: center;
-  gap: 24rpx;
-}
-
 .avatar-editor {
   position: relative;
+  box-sizing: border-box;
   width: 146rpx;
   height: 146rpx;
   flex: 0 0 auto;
+}
+
+.avatar-picker-button {
+  box-sizing: border-box;
+  width: 146rpx;
+  height: 146rpx;
   margin: 0;
   padding: 0;
-  overflow: visible;
+  overflow: hidden;
   border-radius: 50%;
   background: transparent;
   line-height: normal;
 }
 
-.avatar-editor::after {
+.avatar-picker-button::after {
   border: 0;
 }
 
@@ -251,10 +250,12 @@
   color: #ffffff;
   font-size: 19rpx;
   font-weight: 720;
+  pointer-events: none;
 }
 
 .avatar {
   display: flex;
+  box-sizing: border-box;
   width: 146rpx;
   height: 146rpx;
   flex: 0 0 auto;
@@ -282,6 +283,10 @@
 }
 
 .profile-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: 42rpx;
   font-weight: 830;
   line-height: 1.25;
@@ -309,6 +314,7 @@
   z-index: 20;
   inset: 0;
   display: flex;
+  box-sizing: border-box;
   align-items: flex-end;
   padding: 28rpx;
   background: rgba(17, 23, 21, 0.42);
@@ -349,15 +355,18 @@
 
 .name-editor-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18rpx;
   margin-top: 24rpx;
 }
 
 .name-editor-cancel,
 .name-editor-save {
+  box-sizing: border-box;
+  min-width: 0;
   width: 100%;
   margin: 0;
+  padding: 0 24rpx;
   border-radius: 44rpx;
   font-size: 27rpx;
   font-weight: 720;
