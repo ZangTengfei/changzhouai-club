@@ -41,6 +41,7 @@ interface MiniappUser {
     cover_image_url: string | null;
     status: string;
     participationLabel: string;
+    participationTone: "active" | "attended" | "completed";
     participationAt: string;
   }>;
 }

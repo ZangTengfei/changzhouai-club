@@ -33,6 +33,21 @@ type MiniappSessionRow = {
   expires_at: string;
 };
 
+function getRegistrationParticipationLabel(
+  registrationStatus: string,
+  eventStatus: string,
+) {
+  if (eventStatus === "completed") {
+    if (registrationStatus === "waitlisted") return "候补结束";
+    if (registrationStatus === "pending") return "审核结束";
+    return "已结束";
+  }
+
+  if (registrationStatus === "pending") return "待审核";
+  if (registrationStatus === "waitlisted") return "候补中";
+  return "已报名";
+}
+
 export class MiniappAuthError extends Error {
   constructor(readonly code: string) {
     super(code);
@@ -643,6 +658,7 @@ export async function loadMiniappAccountSnapshot(
     string,
     FootprintEvent & {
       participationLabel: string;
+      participationTone: "active" | "attended" | "completed";
       participationAt: string;
     }
   >();
@@ -653,6 +669,7 @@ export async function loadMiniappAccountSnapshot(
       ...event,
       participationLabel:
         attendance.status === "speaker" ? "分享嘉宾" : "已参加",
+      participationTone: "attended",
       participationAt:
         attendance.checked_in_at ??
         attendance.created_at ??
@@ -665,12 +682,12 @@ export async function loadMiniappAccountSnapshot(
     if (!event || footprints.has(event.id)) return;
     footprints.set(event.id, {
       ...event,
-      participationLabel:
-        registration.status === "pending"
-          ? "待审核"
-          : registration.status === "waitlisted"
-            ? "候补中"
-            : "已报名",
+      participationLabel: getRegistrationParticipationLabel(
+        registration.status,
+        event.status,
+      ),
+      participationTone:
+        event.status === "completed" ? "completed" : "active",
       participationAt: registration.created_at ?? event.event_at ?? "",
     });
   });

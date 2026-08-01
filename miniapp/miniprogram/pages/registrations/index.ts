@@ -6,7 +6,30 @@ type RegistrationItem = MiniappRegistration & {
   dateLabel: string;
   locationLabel: string;
   statusLabel: string;
+  statusTone: string;
 };
+
+function getRegistrationStatusView(item: MiniappRegistration) {
+  if (item.status === "cancelled") {
+    return { label: "已取消", tone: "cancelled" };
+  }
+  if (item.events?.status === "completed") {
+    return {
+      label:
+        item.status === "waitlisted"
+          ? "候补结束"
+          : item.status === "pending"
+            ? "审核结束"
+            : "已结束",
+      tone: "completed",
+    };
+  }
+  if (item.status === "pending") return { label: "待审核", tone: "pending" };
+  if (item.status === "waitlisted") {
+    return { label: "候补中", tone: "waitlisted" };
+  }
+  return { label: "已报名", tone: "registered" };
+}
 
 Page({
   data: {
@@ -30,19 +53,16 @@ Page({
       const registrations = await loadMyRegistrations();
       this.setData({
         loading: false,
-        registrations: registrations.map((item) => ({
-          ...item,
-          dateLabel: formatEventDate(item.events?.event_at ?? null),
-          locationLabel: item.events?.venue || item.events?.city || "常州",
-          statusLabel:
-            item.status === "pending"
-              ? "待审核"
-              : item.status === "registered"
-              ? "已报名"
-              : item.status === "waitlisted"
-                ? "候补中"
-                : "已取消",
-        })),
+        registrations: registrations.map((item) => {
+          const statusView = getRegistrationStatusView(item);
+          return {
+            ...item,
+            dateLabel: formatEventDate(item.events?.event_at ?? null),
+            locationLabel: item.events?.venue || item.events?.city || "常州",
+            statusLabel: statusView.label,
+            statusTone: statusView.tone,
+          };
+        }),
       });
     } catch {
       this.setData({ loading: false, loadFailed: true });

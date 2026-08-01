@@ -669,3 +669,8 @@
   color: var(--color-green-dark);
   font-size: 20rpx;
 }
+
+.recent-status-completed {
+  border-color: #d5dcda;
+  color: var(--color-subtle);
+}

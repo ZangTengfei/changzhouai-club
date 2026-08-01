@@ -70,6 +70,11 @@
   color: var(--color-subtle);
 }
 
+.status-completed {
+  background: #f1f3f2;
+  color: var(--color-subtle);
+}
+
 .registration-title {
   font-size: 32rpx;
   font-weight: 810;

@@ -37,6 +37,7 @@ let userId = null;
 let avatarPath = null;
 let temporaryEventId = null;
 let temporaryDraftEventId = null;
+let temporaryCompletedWaitlistEventId = null;
 let eventGroupQrPath = null;
 
 async function request(path, options = {}) {
@@ -926,6 +927,47 @@ try {
   assert.equal(feedbackGet.body?.feedback?.comment, "自动化验收反馈");
   pass("event_feedback_saved_and_loaded");
 
+  const completedWaitlistSlug = `miniapp-verify-waitlist-${randomUUID()}`;
+  const { data: completedWaitlistEvent, error: completedWaitlistEventError } =
+    await supabase
+      .from("events")
+      .insert({
+        slug: completedWaitlistSlug,
+        title: "小程序已结束候补状态验收活动",
+        status: "completed",
+        event_type: "community",
+        registration_mode: "instant",
+        event_at: new Date(Date.now() - 60 * 60 * 1_000).toISOString(),
+        city: "常州",
+      })
+      .select("id")
+      .single();
+  if (completedWaitlistEventError) throw completedWaitlistEventError;
+  temporaryCompletedWaitlistEventId = completedWaitlistEvent.id;
+
+  const { error: completedWaitlistRegistrationError } = await supabase
+    .from("event_registrations")
+    .insert({
+      event_id: completedWaitlistEvent.id,
+      user_id: userId,
+      status: "waitlisted",
+    });
+  if (completedWaitlistRegistrationError) {
+    throw completedWaitlistRegistrationError;
+  }
+
+  const completedWaitlistSnapshot = await request("/api/miniapp/auth/me", {
+    headers: authHeaders,
+  });
+  assert.equal(completedWaitlistSnapshot.response.status, 200);
+  const completedWaitlistFootprint =
+    completedWaitlistSnapshot.body?.user?.footprints?.find(
+      (footprint) => footprint.id === completedWaitlistEvent.id,
+    );
+  assert.equal(completedWaitlistFootprint?.participationLabel, "候补结束");
+  assert.equal(completedWaitlistFootprint?.participationTone, "completed");
+  pass("completed_event_waitlist_status_not_active");
+
   const analytics = await request("/api/miniapp/analytics", {
     method: "POST",
     headers: authHeaders,
@@ -1034,5 +1076,11 @@ try {
   }
   if (temporaryDraftEventId) {
     await supabase.from("events").delete().eq("id", temporaryDraftEventId);
+  }
+  if (temporaryCompletedWaitlistEventId) {
+    await supabase
+      .from("events")
+      .delete()
+      .eq("id", temporaryCompletedWaitlistEventId);
   }
 }

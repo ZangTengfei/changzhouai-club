@@ -139,7 +139,7 @@
       <image wx:if="{{latestFootprint.cover_image_url}}" class="recent-cover" src="{{latestFootprint.cover_image_url}}" mode="aspectFill" />
       <image wx:else class="recent-cover recent-placeholder" src="/assets/logo-mark.png" mode="aspectFit" />
       <view class="recent-copy"><text class="recent-title">{{latestFootprint.title}}</text><text>{{latestFootprint.dateLabel}} · {{latestFootprint.locationLabel}}</text></view>
-      <text class="recent-status">{{latestFootprint.participationLabel}}</text>
+      <text class="recent-status recent-status-{{latestFootprint.participationTone}}">{{latestFootprint.participationLabel}}</text>
       <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
     </view>
     <view wx:else class="empty-state" bindtap="openEvents" role="button">还没有活动记录，去看看社区活动</view>
