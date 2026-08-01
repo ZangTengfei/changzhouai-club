@@ -30,14 +30,14 @@ function getRegistrationStatusView(
   eventStatus = "",
 ) {
   if (eventStatus === "completed") {
+    if (registration?.status === "waitlisted") {
+      return { label: "", tone: "" };
+    }
     if (registration?.status === "registered") {
       return { label: "已结束", tone: "completed" };
     }
     if (registration?.status === "pending") {
       return { label: "审核结束", tone: "completed" };
-    }
-    if (registration?.status === "waitlisted") {
-      return { label: "候补结束", tone: "completed" };
     }
   }
   if (registration?.status === "registered") {

@@ -297,9 +297,21 @@
 
 .profile-name-editor {
   display: flex;
+  box-sizing: border-box;
   min-width: 0;
+  max-width: 100%;
   align-items: center;
   gap: 12rpx;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  line-height: normal;
+  text-align: left;
+}
+
+.profile-name-editor::after {
+  border: 0;
 }
 
 .profile-name-action {
@@ -399,6 +411,7 @@
 
 .identity-pill {
   display: flex;
+  box-sizing: border-box;
   width: fit-content;
   min-height: 48rpx;
   align-items: center;
@@ -408,8 +421,8 @@
   border-radius: 24rpx;
   background: var(--color-yellow-soft);
   color: var(--color-green-dark);
-  font-size: 23rpx;
-  font-weight: 720;
+  font-size: 22rpx;
+  font-weight: 700;
 }
 
 .identity-pill image {
@@ -420,16 +433,16 @@
 .community-tag-pill,
 .community-tag-more {
   display: flex;
-  min-height: 44rpx;
+  min-height: 48rpx;
   box-sizing: border-box;
   align-items: center;
   padding: 4rpx 14rpx;
   border: 2rpx solid rgba(115, 87, 232, 0.16);
-  border-radius: 22rpx;
+  border-radius: 24rpx;
   background: rgba(255, 255, 255, 0.78);
   color: #6554a9;
-  font-size: 21rpx;
-  font-weight: 680;
+  font-size: 22rpx;
+  font-weight: 700;
 }
 
 .community-tag-pill text {

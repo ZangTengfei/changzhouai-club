@@ -84,10 +84,10 @@
           <text class="avatar-edit-label">{{avatarUploading ? '上传中' : '换头像'}}</text>
         </view>
         <view class="identity-copy">
-          <view class="profile-name-editor" bindtap="openNameEditor" role="button" aria-label="编辑昵称">
+          <button class="profile-name-editor" bindtap="openNameEditor" hover-class="none" aria-label="编辑昵称">
             <text class="profile-name">{{user.displayName || '未设置昵称'}}</text>
             <text class="profile-name-action">编辑</text>
-          </view>
+          </button>
           <view class="identity-tag-row" catchtap="openGrowth" role="button" aria-label="查看身份与社区标签">
             <view class="identity-pill">
               <image src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
