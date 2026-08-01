@@ -454,11 +454,53 @@ export async function cancelRegistration(formData: FormData) {
   const registrationId = String(formData.get("registration_id") ?? "").trim();
 
   if (registrationId) {
-    await supabase
+    const { data: registration, error: registrationError } = await supabase
+      .from("event_registrations")
+      .select("event_id, events(status)")
+      .eq("id", registrationId)
+      .eq("user_id", communityUserId)
+      .maybeSingle();
+
+    const rawEvent = registration?.events as
+      | { status: string | null }
+      | { status: string | null }[]
+      | null
+      | undefined;
+    const event = Array.isArray(rawEvent) ? rawEvent[0] : rawEvent;
+
+    if (registrationError || !registration) {
+      redirect("/account?error=registration_cancel_failed#registrations");
+    }
+    if (event?.status !== "scheduled") {
+      redirect("/account?error=registration_closed#registrations");
+    }
+
+    const { data: attendance, error: attendanceError } = await supabase
+      .from("event_attendance")
+      .select("id")
+      .eq("event_id", registration.event_id)
+      .eq("user_id", communityUserId)
+      .not("checked_in_at", "is", null)
+      .maybeSingle();
+
+    if (attendanceError) {
+      redirect("/account?error=registration_cancel_failed#registrations");
+    }
+    if (attendance) {
+      redirect("/account?error=registration_locked_after_checkin#registrations");
+    }
+
+    const { data: cancelledRegistration } = await supabase
       .from("event_registrations")
       .update({ status: "cancelled" })
       .eq("id", registrationId)
-      .eq("user_id", communityUserId);
+      .eq("user_id", communityUserId)
+      .select("id")
+      .maybeSingle();
+
+    if (!cancelledRegistration) {
+      redirect("/account?error=registration_cancel_failed#registrations");
+    }
   }
 
   revalidatePath("/account");

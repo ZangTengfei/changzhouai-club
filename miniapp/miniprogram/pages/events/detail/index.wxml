@@ -99,7 +99,8 @@
         <button wx:if="{{reminder && reminder.available && (!reminder.subscription || reminder.subscription.status !== 'accepted')}}" class="primary-button" loading="{{reminderSubmitting}}" disabled="{{reminderSubmitting}}" bindtap="enableReminder">开启活动提醒</button>
         <view wx:elif="{{reminder && reminder.subscription && reminder.subscription.status === 'accepted'}}" class="reminder-status">活动提醒已开启</view>
         <button class="secondary-button" loading="{{checkinSubmitting}}" disabled="{{checkinSubmitting}}" bindtap="scanCheckinCode">{{attendance ? '已签到' : '扫码签到'}}</button>
-        <button class="secondary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="cancelRegistration">取消报名</button>
+        <button wx:if="{{!attendance || !attendance.checked_in_at}}" class="secondary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="cancelRegistration">取消报名</button>
+        <text wx:else class="registration-copy">已完成签到，报名与到场记录已锁定。</text>
       </block>
       <block wx:elif="{{registration && registration.status === 'pending'}}">
         <text class="registration-kicker">报名状态</text>

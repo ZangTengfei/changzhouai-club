@@ -229,8 +229,26 @@ export async function DELETE(
   const { slug } = await context.params;
   const event = await loadEvent(auth.supabase, slug, auth.session.user_id);
   if (!event) return miniappJson({ error: "not_found" }, 404);
+  if (event.status !== "scheduled") {
+    return miniappJson({ error: "registration_closed" }, 409);
+  }
 
   const userId = auth.session.user_id;
+  const { data: attendance, error: attendanceError } = await auth.supabase
+    .from("event_attendance")
+    .select("id")
+    .eq("event_id", event.id)
+    .eq("user_id", userId)
+    .not("checked_in_at", "is", null)
+    .maybeSingle();
+
+  if (attendanceError) {
+    return miniappJson({ error: "registration_cancel_failed" }, 500);
+  }
+  if (attendance) {
+    return miniappJson({ error: "registration_locked_after_checkin" }, 409);
+  }
+
   const [
     { data, error },
     { error: subscriptionError },

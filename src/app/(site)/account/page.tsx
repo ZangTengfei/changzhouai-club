@@ -206,6 +206,18 @@ function getStatusMessage(error?: string) {
     return "账号资料合并失败，原账号资料没有被删除，请稍后重试。";
   }
 
+  if (error === "registration_locked_after_checkin") {
+    return "已经完成签到，不能再取消报名；报名与到场记录会继续保留。";
+  }
+
+  if (error === "registration_closed") {
+    return "活动已经结束，不能再取消报名。";
+  }
+
+  if (error === "registration_cancel_failed") {
+    return "取消报名失败，请刷新后重试。";
+  }
+
   return "资料保存失败，请稍后再试。";
 }
 
@@ -355,6 +367,7 @@ export default async function AccountPage({
     { data: profile },
     { data: member },
     { data: registrations },
+    { data: attendances },
     { data: works },
   ] = await Promise.all([
       supabase.auth.getUserIdentities(),
@@ -380,10 +393,15 @@ export default async function AccountPage({
       supabase
         .from("event_registrations")
         .select(
-          "id, status, note, created_at, events(title, event_at, city, venue, slug, status)",
+          "id, status, note, created_at, events(id, title, event_at, city, venue, slug, status)",
         )
         .eq("user_id", communityUserId)
         .order("created_at", { ascending: false }),
+      supabase
+        .from("event_attendance")
+        .select("event_id")
+        .eq("user_id", communityUserId)
+        .not("checked_in_at", "is", null),
       supabase
         .from("member_works")
         .select(
@@ -437,6 +455,9 @@ export default async function AccountPage({
   }));
   const activeRegistrationCount =
     registrations?.filter((item) => item.status !== "cancelled").length ?? 0;
+  const checkedInEventIds = new Set(
+    attendances?.map((attendance) => attendance.event_id) ?? [],
+  );
   const statusMessage = getStatusMessage(params.error);
   const shouldOpenProfileModal =
     Boolean(params.onboarding) || profileModalErrorCodes.has(params.error ?? "");
@@ -859,6 +880,7 @@ export default async function AccountPage({
             {registrations.map((registration) => {
               const rawEvent = registration.events as
                 | {
+                    id: string;
                     title: string | null;
                     event_at: string | null;
                     city: string | null;
@@ -867,6 +889,7 @@ export default async function AccountPage({
                     status: string | null;
                   }
                 | {
+                    id: string;
                     title: string | null;
                     event_at: string | null;
                     city: string | null;
@@ -901,7 +924,9 @@ export default async function AccountPage({
                     {registration.note ? <p className="mt-[7px] mb-0 text-[0.92rem] leading-[1.55] text-[rgba(var(--ink-rgb),0.62)]">报名备注：{registration.note}</p> : null}
                   </div>
 
-                  {registration.status !== "cancelled" ? (
+                  {registration.status !== "cancelled" &&
+                  event?.status === "scheduled" &&
+                  !checkedInEventIds.has(event?.id ?? "") ? (
                     <form action={cancelRegistration}>
                       <input
                         type="hidden"
@@ -912,6 +937,16 @@ export default async function AccountPage({
                         取消报名
                       </button>
                     </form>
+                  ) : registration.status !== "cancelled" &&
+                    checkedInEventIds.has(event?.id ?? "") ? (
+                    <span className="text-sm font-bold text-muted-foreground">
+                      已签到，记录已锁定
+                    </span>
+                  ) : registration.status !== "cancelled" &&
+                    event?.status !== "scheduled" ? (
+                    <span className="text-sm font-bold text-muted-foreground">
+                      活动已结束，记录已锁定
+                    </span>
                   ) : null}
                 </article>
               );

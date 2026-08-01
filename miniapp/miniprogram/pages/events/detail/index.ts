@@ -378,8 +378,17 @@ Page({
         slug: this.data.slug,
       });
       void wx.showToast({ title: "已取消报名", icon: "success" });
-    } catch {
-      void wx.showToast({ title: "取消失败，请重试", icon: "none" });
+    } catch (error) {
+      const errorCode = error instanceof ApiError ? error.errorCode : "";
+      void wx.showToast({
+        title:
+          errorCode === "registration_locked_after_checkin"
+            ? "已签到，不能取消报名"
+            : errorCode === "registration_closed"
+              ? "活动已结束，不能取消报名"
+              : "取消失败，请重试",
+        icon: "none",
+      });
     } finally {
       this.setData({ submitting: false });
     }
