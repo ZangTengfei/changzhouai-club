@@ -11,6 +11,7 @@ const ALLOWED_EVENTS = new Set([
 ]);
 const ALLOWED_NAVIGATION_TYPES = new Set(["push", "replace", "traverse"]);
 const ALLOWED_CONNECTION_TYPES = new Set(["slow-2g", "2g", "3g", "4g"]);
+const ALLOWED_PROTOCOLS = new Set(["h3", "h2", "http/1.1"]);
 const ALLOWED_RESOURCE_KINDS = new Set([
   "first_party",
   "asset_cdn",
@@ -63,6 +64,9 @@ export async function POST(request: NextRequest) {
     durationMs,
     rscDurationMs: optionalBoundedNumber(input.rscDurationMs, 120_000),
     rscStatus: optionalBoundedNumber(input.rscStatus, 599),
+    rscProtocol: ALLOWED_PROTOCOLS.has(String(input.rscProtocol))
+      ? input.rscProtocol
+      : undefined,
     slowestResourceDurationMs: optionalBoundedNumber(
       input.slowestResourceDurationMs,
       120_000,
@@ -72,6 +76,14 @@ export async function POST(request: NextRequest) {
     )
       ? input.slowestResourceKind
       : undefined,
+    slowestResourceProtocol: ALLOWED_PROTOCOLS.has(
+      String(input.slowestResourceProtocol),
+    )
+      ? input.slowestResourceProtocol
+      : undefined,
+    documentProtocol: ALLOWED_PROTOCOLS.has(String(input.documentProtocol))
+      ? input.documentProtocol
+      : undefined,
     connectionType: ALLOWED_CONNECTION_TYPES.has(String(input.connectionType))
       ? input.connectionType
       : undefined,
@@ -79,6 +91,7 @@ export async function POST(request: NextRequest) {
     errorType: ALLOWED_ERROR_TYPES.has(String(input.errorType))
       ? input.errorType
       : undefined,
+    recoveryAttempted: input.recoveryAttempted === true ? true : undefined,
     deploymentId:
       typeof input.deploymentId === "string" &&
       /^[a-f0-9]{32}$/i.test(input.deploymentId)
