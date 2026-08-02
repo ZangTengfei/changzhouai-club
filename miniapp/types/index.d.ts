@@ -211,6 +211,76 @@ interface MiniappDailyBrief {
   }>;
 }
 
+type MiniappCommunityResourceType = "desk" | "meeting_room";
+type MiniappCommunityAvailability =
+  | "available"
+  | "booked"
+  | "fixed"
+  | "disabled";
+
+interface MiniappCommunitySpaceResource {
+  id: string;
+  code: string;
+  name: string;
+  resourceType: MiniappCommunityResourceType;
+  deskMode: "flexible" | "fixed" | null;
+  capacity: number;
+  areaLabel: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
+  availability: MiniappCommunityAvailability;
+  isMine: boolean;
+}
+
+interface MiniappCommunitySpaceBooking {
+  id: string;
+  resourceId: string;
+  resourceCode: string;
+  resourceName: string;
+  resourceType: MiniappCommunityResourceType;
+  startsAt: string;
+  endsAt: string;
+  purpose: string | null;
+  attendeeCount: number;
+  status: "confirmed" | "cancelled" | "completed" | "no_show";
+  createdAt: string;
+}
+
+interface MiniappCommunityAccessRequest {
+  id: string;
+  contact: string;
+  note: string | null;
+  status: "submitted" | "processed";
+  processedAt: string | null;
+  createdAt: string;
+}
+
+interface MiniappCommunitySpaceSnapshot {
+  community: {
+    title: string;
+    summary: string;
+    location: string;
+    openHours: string;
+    pricing: string;
+    eligibility: string;
+    deskCount: number;
+    flexibleDeskMinimum: number;
+    meetingRoomCount: number;
+  };
+  window: { startsAt: string; endsAt: string };
+  resources: MiniappCommunitySpaceResource[];
+  availability: {
+    flexibleDeskCount: number;
+    availableDeskCount: number;
+    availableMeetingRoomCount: number;
+  };
+  myBookings: MiniappCommunitySpaceBooking[];
+  accessRequest: MiniappCommunityAccessRequest | null;
+}
+
 interface MiniappRegistrationEvent {
   id: string;
   slug: string;

@@ -6,7 +6,8 @@ type LoginIntent =
   | "event_registration"
   | "profile"
   | "growth"
-  | "registrations";
+  | "registrations"
+  | "community";
 
 function readLoginIntent(value: string | undefined): LoginIntent {
   return [
@@ -14,6 +15,7 @@ function readLoginIntent(value: string | undefined): LoginIntent {
     "profile",
     "growth",
     "registrations",
+    "community",
   ].includes(value ?? "")
     ? (value as LoginIntent)
     : "profile";
@@ -38,6 +40,12 @@ function getLoginCopy(intent: LoginIntent, eventTitle: string) {
     return {
       title: "登录后查看我的活动",
       copy: "查看报名、审核、候补与签到记录",
+    };
+  }
+  if (intent === "community") {
+    return {
+      title: "登录后预约社区空间",
+      copy: "选择流动工位、预约会议室或提交门禁卡申领记录",
     };
   }
   return {

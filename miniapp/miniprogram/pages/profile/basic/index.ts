@@ -4,10 +4,16 @@ import { uploadAvatar } from "../../../services/avatar";
 import { updateDisplayName } from "../../../services/profile";
 import { isMiniappBasicProfileReady } from "../../../utils/profile-state";
 
-type BasicProfileIntent = "event_registration" | "profile" | "account";
+type BasicProfileIntent =
+  | "event_registration"
+  | "profile"
+  | "account"
+  | "community";
 
 function readIntent(value: string | undefined): BasicProfileIntent {
-  return ["event_registration", "profile", "account"].includes(value ?? "")
+  return ["event_registration", "profile", "account", "community"].includes(
+    value ?? "",
+  )
     ? (value as BasicProfileIntent)
     : "account";
 }

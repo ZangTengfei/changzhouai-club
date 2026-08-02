@@ -316,6 +316,179 @@ try {
     .eq("id", userId);
   if (restoreProfileError) throw restoreProfileError;
 
+  const communityStartsAt = new Date(Date.now() + 10 * 24 * 60 * 60 * 1_000);
+  communityStartsAt.setUTCHours(1, 0, 0, 0);
+  const communityEndsAt = new Date(
+    communityStartsAt.getTime() + 2 * 60 * 60 * 1_000,
+  );
+  const communityQuery = [
+    `startsAt=${encodeURIComponent(communityStartsAt.toISOString())}`,
+    `endsAt=${encodeURIComponent(communityEndsAt.toISOString())}`,
+  ].join("&");
+  const communityPublic = await request(
+    `/api/miniapp/community?${communityQuery}`,
+  );
+  assert.equal(communityPublic.response.status, 200);
+  assert.equal(
+    communityPublic.body?.resources?.filter(
+      (resource) => resource.resourceType === "desk",
+    ).length,
+    24,
+  );
+  assert.equal(
+    communityPublic.body?.resources?.filter(
+      (resource) => resource.resourceType === "meeting_room",
+    ).length,
+    2,
+  );
+  const availableDesk = communityPublic.body?.resources?.find(
+    (resource) =>
+      resource.resourceType === "desk" &&
+      resource.availability === "available",
+  );
+  const availableMeetingRoom = communityPublic.body?.resources?.find(
+    (resource) =>
+      resource.resourceType === "meeting_room" &&
+      resource.availability === "available",
+  );
+  assert.ok(availableDesk?.id);
+  assert.ok(availableMeetingRoom?.id);
+  pass("community_space_catalog_loaded");
+
+  const unauthorizedCommunityBooking = await request(
+    "/api/miniapp/community/bookings",
+    {
+      method: "POST",
+      body: JSON.stringify({
+        resourceId: availableDesk.id,
+        startsAt: communityStartsAt.toISOString(),
+        endsAt: communityEndsAt.toISOString(),
+        attendeeCount: 1,
+      }),
+    },
+  );
+  assert.equal(unauthorizedCommunityBooking.response.status, 401);
+  pass("community_booking_requires_login");
+
+  const deskBooking = await request("/api/miniapp/community/bookings", {
+    method: "POST",
+    headers: authHeaders,
+    body: JSON.stringify({
+      resourceId: availableDesk.id,
+      startsAt: communityStartsAt.toISOString(),
+      endsAt: communityEndsAt.toISOString(),
+      attendeeCount: 1,
+    }),
+  });
+  assert.equal(deskBooking.response.status, 201);
+  assert.ok(deskBooking.body?.booking?.id);
+
+  const overlappingDeskBooking = await request(
+    "/api/miniapp/community/bookings",
+    {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({
+        resourceId: availableDesk.id,
+        startsAt: communityStartsAt.toISOString(),
+        endsAt: communityEndsAt.toISOString(),
+        attendeeCount: 1,
+      }),
+    },
+  );
+  assert.equal(overlappingDeskBooking.response.status, 409);
+  assert.equal(
+    overlappingDeskBooking.body?.error,
+    "space_resource_already_booked",
+  );
+  pass("community_booking_overlap_rejected");
+
+  const missingMeetingPurpose = await request(
+    "/api/miniapp/community/bookings",
+    {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({
+        resourceId: availableMeetingRoom.id,
+        startsAt: communityStartsAt.toISOString(),
+        endsAt: communityEndsAt.toISOString(),
+        attendeeCount: 2,
+      }),
+    },
+  );
+  assert.equal(missingMeetingPurpose.response.status, 409);
+  assert.equal(missingMeetingPurpose.body?.error, "meeting_purpose_required");
+
+  const meetingBooking = await request("/api/miniapp/community/bookings", {
+    method: "POST",
+    headers: authHeaders,
+    body: JSON.stringify({
+      resourceId: availableMeetingRoom.id,
+      startsAt: communityStartsAt.toISOString(),
+      endsAt: communityEndsAt.toISOString(),
+      purpose: "自动化验收会议",
+      attendeeCount: 2,
+    }),
+  });
+  assert.equal(meetingBooking.response.status, 201);
+  assert.ok(meetingBooking.body?.booking?.id);
+  pass("community_meeting_room_booked_with_purpose");
+
+  const communityAuthenticated = await request(
+    `/api/miniapp/community?${communityQuery}`,
+    { headers: authHeaders },
+  );
+  assert.equal(communityAuthenticated.response.status, 200);
+  const bookedDeskSnapshot = communityAuthenticated.body?.resources?.find(
+    (resource) => resource.id === availableDesk.id,
+  );
+  assert.equal(bookedDeskSnapshot?.availability, "booked");
+  assert.equal(bookedDeskSnapshot?.isMine, true);
+  assert.equal("userId" in (bookedDeskSnapshot ?? {}), false);
+  assert.ok(communityAuthenticated.body?.myBookings?.length >= 2);
+  pass("community_booking_snapshot_preserves_privacy");
+
+  const accessRequest = await request(
+    "/api/miniapp/community/access-requests",
+    {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({
+        contact: "miniapp_verify",
+        note: "自动化验收门禁申领",
+      }),
+    },
+  );
+  assert.equal(accessRequest.response.status, 201);
+  assert.equal(accessRequest.body?.accessRequest?.status, "submitted");
+  const duplicateAccessRequest = await request(
+    "/api/miniapp/community/access-requests",
+    {
+      method: "POST",
+      headers: authHeaders,
+      body: JSON.stringify({ contact: "miniapp_verify" }),
+    },
+  );
+  assert.equal(duplicateAccessRequest.response.status, 200);
+  assert.equal(
+    duplicateAccessRequest.body?.accessRequest?.id,
+    accessRequest.body?.accessRequest?.id,
+  );
+  pass("community_access_request_recorded_once");
+
+  for (const bookingId of [
+    deskBooking.body.booking.id,
+    meetingBooking.body.booking.id,
+  ]) {
+    const cancelled = await request(
+      `/api/miniapp/community/bookings/${encodeURIComponent(bookingId)}`,
+      { method: "DELETE", headers: authHeaders },
+    );
+    assert.equal(cancelled.response.status, 200);
+    assert.equal(cancelled.body?.booking?.status, "cancelled");
+  }
+  pass("community_bookings_cancelled");
+
   const legacyProfilePut = await request("/api/miniapp/profile", {
     method: "PUT",
     headers: authHeaders,

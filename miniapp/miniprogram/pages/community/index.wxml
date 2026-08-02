@@ -1,0 +1,146 @@
+<custom-navigation title="社区" show-avatar="{{true}}" avatar-url="{{avatarUrl}}" avatar-initial="{{avatarInitial}}" avatar-guest="{{!isLoggedIn}}" bindavatartap="openProfile" />
+
+<view class="page-shell community-page">
+  <view class="community-hero">
+    <view class="hero-topline"><image src="/assets/logo-mark.png" mode="aspectFit" /><text>AI CLUB · OPC 共创社区</text></view>
+    <text class="hero-title">一个随时可以来，<br />也容易遇见伙伴的地方</text>
+    <text class="hero-copy">{{community.summary}}</text>
+    <view class="hero-location"><image src="/assets/icons/location-blue-v2.png" mode="aspectFit" /><text>{{community.location}}</text></view>
+    <view class="hero-stats">
+      <view><text>{{community.deskCount}}</text><text>办公工位</text></view>
+      <view><text>{{community.flexibleDeskMinimum}}+</text><text>流动工位</text></view>
+      <view><text>{{community.meetingRoomCount}}</text><text>会议室</text></view>
+    </view>
+    <view class="hero-tags"><text>{{community.openHours}}</text><text>{{community.pricing}}</text><text>无人值守</text></view>
+  </view>
+
+  <view class="section-heading-row community-section-heading">
+    <view><text class="section-eyebrow">COMMUNITY OPC</text><text class="section-title">在这里，把一人公司的事做大一点</text></view>
+  </view>
+  <view class="opc-card surface-card">
+    <view class="opc-point">
+      <view class="opc-icon tone-green"><image src="/assets/icons/cocreate-green-v2.png" mode="aspectFit" /></view>
+      <view><text>常驻共创</text><text>已入驻 OPC 可申请固定工位，形成稳定的工作现场。</text></view>
+    </view>
+    <view class="opc-point">
+      <view class="opc-icon tone-orange"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view>
+      <view><text>项目协作</text><text>让能力、场景与交付伙伴在空间里持续发生连接。</text></view>
+    </view>
+    <view class="opc-point">
+      <view class="opc-icon tone-blue"><image src="/assets/icons/profile-blue-v2.png" mode="aspectFit" /></view>
+      <view><text>开放连接</text><text>社区成员可免费预约流动工位和会议室，随时来办公。</text></view>
+    </view>
+  </view>
+
+  <view id="space-booking" class="section-heading-row community-section-heading">
+    <view><text class="section-eyebrow">SPACE BOOKING</text><text class="section-title">预约社区空间</text></view>
+    <text class="section-side-note">免费 · 24 小时</text>
+  </view>
+
+  <view class="booking-card surface-card">
+    <view class="segmented-control resource-segmented" aria-label="预约类型">
+      <view class="segmented-item {{activeMode === 'desk' ? 'segmented-item-active' : ''}}" data-mode="desk" bindtap="switchMode">选工位</view>
+      <view class="segmented-item {{activeMode === 'meeting_room' ? 'segmented-item-active' : ''}}" data-mode="meeting_room" bindtap="switchMode">约会议室</view>
+    </view>
+
+    <scroll-view class="date-scroller" scroll-x="{{true}}" show-scrollbar="{{false}}" enhanced="{{true}}">
+      <view class="date-row">
+        <view wx:for="{{dateOptions}}" wx:key="value" class="date-chip {{selectedDateIndex === index ? 'date-chip-active' : ''}}" data-index="{{index}}" bindtap="changeDate">
+          <text>{{item.label}}</text><text>{{item.shortDate}}</text>
+        </view>
+      </view>
+    </scroll-view>
+
+    <view class="time-controls">
+      <picker mode="time" value="{{startTime}}" bindchange="changeStartTime">
+        <view class="time-picker"><text>开始时间</text><text>{{startTime}}</text></view>
+      </picker>
+      <view class="duration-group">
+        <text class="control-label">使用时长</text>
+        <view class="duration-row"><view wx:for="{{durationOptions}}" wx:key="*this" class="duration-chip {{durationHours === item ? 'duration-chip-active' : ''}}" data-duration="{{item}}" bindtap="changeDuration">{{item}}小时</view></view>
+      </view>
+    </view>
+
+    <view class="availability-strip">
+      <view><text>{{activeMode === 'desk' ? availability.availableDeskCount : availability.availableMeetingRoomCount}}</text><text>{{activeMode === 'desk' ? '个工位可选' : '间会议室可选'}}</text></view>
+      <text>{{windowLabel}}</text>
+    </view>
+
+    <view wx:if="{{loadFailed}}" class="space-warning"><text>预约状态暂时没有加载成功，平面图仅供查看。</text><text bindtap="loadPage">重新加载</text></view>
+    <view wx:elif="{{loading}}" class="space-loading"><view class="loading-spinner"></view><text>正在读取空间状态</text></view>
+
+    <view class="map-toolbar">
+      <view class="mini-segmented"><view class="{{viewMode === 'map' ? 'active' : ''}}" data-view="map" bindtap="switchView">平面图</view><view class="{{viewMode === 'list' ? 'active' : ''}}" data-view="list" bindtap="switchView">列表</view></view>
+      <view wx:if="{{viewMode === 'map'}}" class="map-reset" bindtap="resetMap">复位</view>
+    </view>
+
+    <view wx:if="{{viewMode === 'map'}}" class="map-section">
+      <movable-area class="space-map-viewport" scale-area="{{true}}">
+        <movable-view class="space-map" direction="all" x="{{mapX}}" y="{{mapY}}" scale="{{true}}" scale-min="1" scale-max="2.4" scale-value="{{mapScale}}" inertia="{{true}}" out-of-bounds="{{true}}" bindscale="handleMapScale">
+          <view class="floor-shell">
+            <view class="floor-window floor-window-left"></view>
+            <view class="floor-window floor-window-top"></view>
+            <view class="static-room office-room office-room-one"><text>独立办公室</text></view>
+            <view class="static-room office-room office-room-two"><text>独立办公室</text></view>
+            <view class="static-room reception-zone"><text>前台</text></view>
+            <view class="static-room lounge-zone"><text>洽谈区</text></view>
+            <view class="print-zone"><image src="/assets/icons/news-blue-v2.png" mode="aspectFit" /><text>打印区</text></view>
+            <view class="hall-label">办公大厅 · 4×6 工位</view>
+            <view class="entrance-label">入口</view>
+
+            <button wx:for="{{resources}}" wx:key="id" class="map-resource map-resource-{{item.resourceType}} resource-{{item.availabilityClass}} {{item.isActiveMode ? 'map-resource-active-mode' : 'map-resource-muted'}} {{selectedResource && selectedResource.id === item.id ? 'map-resource-selected' : ''}}" style="{{item.style}}" data-id="{{item.id}}" catchtap="selectResource" hover-class="none" aria-label="{{item.name}}，{{item.availabilityLabel}}">
+              <text class="resource-code">{{item.resourceType === 'desk' ? item.code : item.name}}</text>
+              <text wx:if="{{item.resourceType === 'meeting_room'}}" class="room-capacity">{{item.capacity}} 人</text>
+              <text wx:if="{{item.isMine}}" class="mine-dot">我的</text>
+            </button>
+          </view>
+        </movable-view>
+      </movable-area>
+      <view class="map-legend"><view><text class="legend-dot available"></text><text>可预约</text></view><view><text class="legend-dot booked"></text><text>已预约</text></view><view><text class="legend-dot fixed"></text><text>固定工位</text></view></view>
+      <text class="map-tip">双指缩放、拖动查看；点击工位或会议室完成选择</text>
+    </view>
+
+    <view wx:else class="resource-list {{activeMode === 'desk' ? 'desk-resource-list' : 'room-resource-list'}}">
+      <view wx:for="{{visibleResources}}" wx:key="id" class="resource-list-item resource-list-item-{{item.availabilityClass}} {{selectedResource && selectedResource.id === item.id ? 'resource-list-item-selected' : ''}}" data-id="{{item.id}}" bindtap="selectResource" role="button" aria-label="{{item.name}}，{{item.availabilityLabel}}">
+        <view><text>{{item.name}}</text><text>{{item.resourceType === 'meeting_room' ? item.capacity + ' 人 · ' + item.areaLabel : item.areaLabel}}</text></view>
+        <text>{{item.availabilityLabel}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{selectedResource}}" class="selection-card">
+      <view class="selection-heading"><view><text>{{selectedResource.name}}</text><text>{{selectedResource.areaLabel}} · {{windowLabel}}</text></view><text class="status-tag">可预约</text></view>
+      <block wx:if="{{selectedResource.resourceType === 'meeting_room'}}">
+        <label class="booking-field"><text>会议用途 *</text><input maxlength="200" value="{{meetingPurpose}}" bindinput="handlePurposeInput" placeholder="例如：项目需求讨论" /></label>
+        <picker range="{{attendeeOptions}}" value="{{attendeeIndex}}" bindchange="changeAttendeeCount">
+          <view class="attendee-picker"><text>参会人数</text><text>{{attendeeOptions[attendeeIndex]}} 人 ›</text></view>
+        </picker>
+      </block>
+      <button class="primary-button booking-submit" loading="{{submitting}}" disabled="{{submitting}}" bindtap="confirmBooking">{{isLoggedIn ? '确认免费预约' : '登录后预约'}}</button>
+      <text class="booking-note">门禁卡需单独申领，预约成功不代表已经获得实体门禁卡。</text>
+    </view>
+  </view>
+
+  <view wx:if="{{myBookings.length}}" class="section-heading-row community-section-heading"><view><text class="section-eyebrow">MY BOOKINGS</text><text class="section-title">我的空间预约</text></view></view>
+  <view wx:if="{{myBookings.length}}" class="my-bookings">
+    <view wx:for="{{myBookings}}" wx:key="id" class="my-booking-card surface-card">
+      <view class="booking-date-tile"><text>{{item.dateLabel}}</text><text>{{item.timeLabel}}</text></view>
+      <view class="my-booking-copy"><text>{{item.resourceName}}</text><text>{{item.resourceType === 'desk' ? '开放工位' : item.attendeeCount + ' 人会议'}}</text></view>
+      <button wx:if="{{item.status === 'confirmed'}}" class="booking-cancel" data-id="{{item.id}}" bindtap="cancelBooking">取消</button>
+      <text wx:else class="booking-cancelled">已取消</text>
+    </view>
+  </view>
+
+  <view class="section-heading-row community-section-heading"><view><text class="section-eyebrow">ACCESS CARD</text><text class="section-title">申领实体门禁卡</text></view></view>
+  <view class="access-card surface-card">
+    <view class="access-intro"><view class="access-icon"><image src="/assets/icons/privacy-green-v2.png" mode="aspectFit" /></view><view><text>门禁申领与空间预约相互独立</text><text>小程序只记录申请，实体卡由社区线下授予和领取。</text></view></view>
+    <view wx:if="{{accessRequest && accessRequest.status === 'submitted'}}" class="access-status"><text class="status-tag">已提交</text><text>工作人员处理后会通过你留下的联系方式沟通。</text></view>
+    <view wx:elif="{{accessRequest && accessRequest.status === 'processed'}}" class="access-status access-status-processed"><text class="status-tag status-tag-blue">已处理</text><text>申领记录已完成，如需补充请联系社区工作人员。</text></view>
+    <block wx:else>
+      <label class="access-field"><text>联系方式 *</text><input maxlength="100" value="{{accessContact}}" bindinput="handleAccessContactInput" placeholder="手机号或微信号" /></label>
+      <label class="access-field"><text>补充说明（选填）</text><textarea maxlength="300" value="{{accessNote}}" bindinput="handleAccessNoteInput" placeholder="例如：预计首次到访时间" /></label>
+      <button class="secondary-button access-submit" loading="{{accessSubmitting}}" disabled="{{accessSubmitting}}" bindtap="submitAccessRequest">{{isLoggedIn ? '提交申领记录' : '登录后申领'}}</button>
+    </block>
+  </view>
+
+  <view class="community-footer"><text>开放、真实、一起做事</text><text>AI Club OPC 共创社区</text></view>
+</view>
