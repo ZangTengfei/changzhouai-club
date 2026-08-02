@@ -88,7 +88,7 @@
 .event-date-tile {
   position: absolute;
   top: 18rpx;
-  left: 18rpx;
+  right: 18rpx;
   display: flex;
   min-width: 106rpx;
   min-height: 94rpx;
