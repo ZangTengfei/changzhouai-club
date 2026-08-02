@@ -153,7 +153,7 @@
   <view class="name-editor-sheet" catchtap="keepNameEditorOpen">
     <text class="name-editor-title">修改昵称</text>
     <text class="name-editor-hint">这是社区伙伴看到并称呼你的名称。</text>
-    <input class="name-editor-input" type="nickname" maxlength="60" value="{{displayNameDraft}}" bindinput="handleNameInput" confirm-type="done" bindconfirm="saveDisplayName" focus />
+    <input class="name-editor-input" type="text" maxlength="60" value="{{displayNameDraft}}" bindinput="handleNameInput" confirm-type="done" bindconfirm="saveDisplayName" focus />
     <view class="name-editor-actions">
       <button class="name-editor-cancel" bindtap="closeNameEditor" disabled="{{displayNameSaving}}">取消</button>
       <button class="name-editor-save" bindtap="saveDisplayName" loading="{{displayNameSaving}}" disabled="{{displayNameSaving}}">保存</button>

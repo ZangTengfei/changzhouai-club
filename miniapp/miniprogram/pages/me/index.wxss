@@ -380,8 +380,7 @@
 }
 
 .name-editor-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
   gap: 18rpx;
   margin-top: 24rpx;
 }
@@ -389,8 +388,9 @@
 .name-editor-cancel,
 .name-editor-save {
   box-sizing: border-box;
+  width: 0;
   min-width: 0;
-  width: 100%;
+  flex: 1 1 0;
   margin: 0;
   padding: 0 24rpx;
   border-radius: 44rpx;
