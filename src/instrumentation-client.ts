@@ -14,6 +14,7 @@ type PendingNavigation = {
 };
 
 type NavigationEvent = "navigation_slow" | "navigation_stalled" | "navigation_recovered";
+type ObservedProtocol = "h3" | "h2" | "http/1.1";
 
 let pendingNavigation: PendingNavigation | null = null;
 let clientErrorReported = false;
@@ -24,8 +25,21 @@ const staleBuildErrorPatterns = [
   /Loading CSS chunk [\w-]+ failed/i,
   /Failed to fetch dynamically imported module/i,
   /Importing a module script failed/i,
-  /_next\/static\/chunks/i,
 ];
+
+function normalizeProtocol(value?: string): ObservedProtocol | undefined {
+  return value === "h3" || value === "h2" || value === "http/1.1"
+    ? value
+    : undefined;
+}
+
+function getDocumentProtocol() {
+  const navigation = performance.getEntriesByType(
+    "navigation",
+  )[0] as PerformanceNavigationTiming | undefined;
+
+  return normalizeProtocol(navigation?.nextHopProtocol);
+}
 
 function getDeploymentId() {
   for (const script of document.scripts) {
@@ -88,10 +102,12 @@ function getResourceSummary(startedAt: number, destination: string) {
   return {
     rscDurationMs: routeRequest ? Math.round(routeRequest.duration) : undefined,
     rscStatus: routeRequest?.responseStatus || undefined,
+    rscProtocol: normalizeProtocol(routeRequest?.nextHopProtocol),
     slowestResourceDurationMs: slowestResource
       ? Math.round(slowestResource.duration)
       : undefined,
     slowestResourceKind,
+    slowestResourceProtocol: normalizeProtocol(slowestResource?.nextHopProtocol),
   };
 }
 
@@ -119,12 +135,53 @@ function reportNavigation(
     navigationType: navigation.navigationType,
     durationMs,
     connectionType: getConnectionType(),
+    documentProtocol: getDocumentProtocol(),
     visibility: document.visibilityState,
     deploymentId: getDeploymentId(),
     ...getResourceSummary(navigation.startedAt, navigation.to),
   };
 
   sendObservation(payload);
+}
+
+function isSameOriginChunkFilename(filename?: string) {
+  if (!filename) {
+    return false;
+  }
+
+  try {
+    const url = new URL(filename, window.location.origin);
+
+    return (
+      url.origin === window.location.origin &&
+      url.pathname.startsWith("/_next/static/chunks/")
+    );
+  } catch {
+    return false;
+  }
+}
+
+function reserveStaleBuildRecovery(route: string, deploymentId?: string) {
+  if (!navigator.onLine) {
+    return false;
+  }
+
+  const recoveryKey = [
+    "caic:stale-build-recovery",
+    deploymentId ?? "unknown",
+    route,
+  ].join(":");
+
+  try {
+    if (sessionStorage.getItem(recoveryKey)) {
+      return false;
+    }
+
+    sessionStorage.setItem(recoveryKey, "1");
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function reportClientError(value: unknown, filename?: string) {
@@ -134,13 +191,14 @@ function reportClientError(value: unknown, filename?: string) {
 
   const errorText =
     value instanceof Error
-      ? `${value.name}\n${value.message}\n${value.stack ?? ""}`
+      ? `${value.name}\n${value.message}`
       : typeof value === "string"
         ? value
         : "";
-  const staleBuildError = staleBuildErrorPatterns.some((pattern) =>
-    pattern.test(errorText),
-  );
+  const staleBuildError =
+    staleBuildErrorPatterns.some((pattern) => pattern.test(errorText)) ||
+    (isSameOriginChunkFilename(filename) &&
+      /(ChunkLoadError|Loading|Failed|Script error)/i.test(errorText));
 
   if (!staleBuildError) {
     if (!filename) {
@@ -159,6 +217,9 @@ function reportClientError(value: unknown, filename?: string) {
   clientErrorReported = true;
   const route = normalizeObservedRoute(window.location.pathname);
   const errorName = value instanceof Error ? value.name : "Error";
+  const deploymentId = getDeploymentId();
+  const recoveryAttempted =
+    staleBuildError && reserveStaleBuildRecovery(route, deploymentId);
 
   sendObservation({
     event: staleBuildError ? "stale_build_error" : "client_error",
@@ -172,8 +233,15 @@ function reportClientError(value: unknown, filename?: string) {
       ? errorName
       : "Error",
     visibility: document.visibilityState,
-    deploymentId: getDeploymentId(),
+    deploymentId,
+    recoveryAttempted,
   });
+
+  if (recoveryAttempted) {
+    window.setTimeout(() => {
+      window.location.reload();
+    }, 250);
+  }
 }
 
 function finishNavigation() {
