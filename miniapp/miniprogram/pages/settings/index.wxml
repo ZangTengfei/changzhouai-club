@@ -13,11 +13,11 @@
           <text class="settings-label">编辑资料</text>
           <image class="settings-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
         </view>
-        <button class="settings-row phone-row" open-type="getPhoneNumber" bindgetphonenumber="bindPhoneNumber" loading="{{phoneBinding}}" disabled="{{phoneBinding}}">
+        <view class="settings-row phone-row">
           <image class="settings-icon" src="/assets/icons/privacy-green-v2.png" mode="aspectFit" />
           <view class="settings-copy"><text class="settings-label">手机号</text><text class="settings-description">{{phoneBound ? phoneMasked + ' · 仅用于必要联系' : '微信授权获取，仅用于必要联系'}}</text></view>
-          <text class="phone-status">{{phoneBound ? '重新绑定' : '去绑定'}}</text>
-        </button>
+          <button class="phone-status" open-type="getPhoneNumber" bindgetphonenumber="bindPhoneNumber" loading="{{phoneBinding}}" disabled="{{phoneBinding}}" hover-class="none">{{phoneBound ? '重新绑定' : '去绑定'}}</button>
+        </view>
         <view class="settings-row" bindtap="openPrivacy" role="button">
           <image class="settings-icon" src="/assets/icons/privacy-green-v2.png" mode="aspectFit" />
           <text class="settings-label">隐私说明</text>

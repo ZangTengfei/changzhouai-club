@@ -75,26 +75,26 @@
 }
 
 .phone-row {
+  box-sizing: border-box;
   width: 100%;
-  margin: 0;
-  border: 0;
-  border-bottom: 2rpx solid var(--color-line);
-  border-radius: 0;
-  background: #ffffff;
-  color: inherit;
-  line-height: normal;
-  text-align: left;
-}
-
-.phone-row::after {
-  border: 0;
 }
 
 .phone-status {
   flex: 0 0 auto;
+  min-width: 0;
+  min-height: 56rpx;
+  margin: 0;
+  padding: 0 10rpx;
+  border-radius: 20rpx;
+  background: transparent;
   color: var(--color-green-dark);
   font-size: 21rpx;
   font-weight: 700;
+  line-height: 56rpx;
+}
+
+.phone-status::after {
+  border: 0;
 }
 
 .settings-icon {

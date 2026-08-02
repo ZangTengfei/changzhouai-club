@@ -78,9 +78,11 @@
       </view>
       <view class="identity-main">
         <view class="avatar-editor">
-          <image wx:if="{{user.avatarUrl}}" class="avatar" src="{{user.avatarUrl}}" mode="aspectFill" />
-          <view wx:else class="avatar avatar-placeholder">{{avatarInitial}}</view>
-          <button class="avatar-picker-button" open-type="chooseAvatar" bindchooseavatar="chooseAvatar" disabled="{{avatarUploading}}" hover-class="none" aria-label="更换头像"></button>
+          <view class="avatar-hit-area">
+            <image wx:if="{{user.avatarUrl}}" class="avatar" src="{{user.avatarUrl}}" mode="aspectFill" />
+            <view wx:else class="avatar avatar-placeholder">{{avatarInitial}}</view>
+            <button class="avatar-picker-button" open-type="chooseAvatar" bindchooseavatar="chooseAvatar" disabled="{{avatarUploading}}" hover-class="none" aria-label="更换头像"></button>
+          </view>
           <text class="avatar-edit-label">{{avatarUploading ? '上传中' : '换头像'}}</text>
         </view>
         <view class="identity-copy">
