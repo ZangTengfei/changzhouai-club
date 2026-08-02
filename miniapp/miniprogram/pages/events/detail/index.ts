@@ -24,6 +24,7 @@ import {
   saveReminderStatus,
   type ReminderConfig,
 } from "../../../services/subscriptions";
+import { isMiniappBasicProfileReady } from "../../../utils/profile-state";
 
 function getRegistrationStatusView(
   registration: MiniappRegistration | null,
@@ -60,6 +61,7 @@ Page({
     loadFailed: false,
     slug: "",
     user: null as MiniappUser | null,
+    basicProfileReady: false,
     registration: null as MiniappRegistration | null,
     registrationStatusLabel: "",
     registrationStatusTone: "",
@@ -90,6 +92,12 @@ Page({
 
     this.setData({ slug });
     void this.loadPage(slug);
+  },
+
+  onShow() {
+    if (this.data.slug && !this.data.loading) {
+      void this.loadRegistration(this.data.slug);
+    }
   },
 
   async loadPage(slug: string) {
@@ -133,6 +141,7 @@ Page({
       );
       this.setData({
         user,
+        basicProfileReady: isMiniappBasicProfileReady(user),
         registration,
         registrationStatusLabel: statusView.label,
         registrationStatusTone: statusView.tone,
@@ -148,6 +157,7 @@ Page({
     } catch {
       this.setData({
         user: null,
+        basicProfileReady: false,
         registration: null,
         registrationStatusLabel: "",
         registrationStatusTone: "",
@@ -217,18 +227,33 @@ Page({
 
   openProfile() {
     if (!getStoredSessionToken()) {
-      void wx.switchTab({ url: "/pages/me/index" });
+      const title = encodeURIComponent(this.data.event?.title ?? "");
+      void wx.navigateTo({
+        url: `/pages/login/index?intent=event_registration&title=${title}`,
+      });
       return;
     }
 
-    void wx.navigateTo({ url: "/pages/profile/edit/index" });
+    if (!this.data.basicProfileReady) {
+      void wx.navigateTo({
+        url: "/pages/profile/basic/index?intent=event_registration",
+      });
+      return;
+    }
+
+    void wx.navigateTo({
+      url: "/pages/profile/edit/index?intent=event_registration",
+    });
   },
 
   promptProfileCompletion() {
     void wx.showModal({
-      title: "请先完善个人信息",
-      content:
-        "昵称不能使用默认的“微信用户”，且能力档案需达到 100% 后才能报名。",
+      title: this.data.basicProfileReady
+        ? "请先完善社区名片"
+        : "请先设置个人信息",
+      content: this.data.basicProfileReady
+        ? "完成社区名片后即可继续报名。"
+        : "请先设置有效昵称，再继续完善报名所需的社区名片。",
       confirmText: "去完善",
       success: (result) => {
         if (result.confirm) this.openProfile();

@@ -9,7 +9,7 @@ import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 export const runtime = "nodejs";
 
 function getIdentityLabel(status: string, isCoBuilder: boolean) {
-  if (status === "admin" || status === "organizer") return "社区主理人";
+  if (status === "admin" || status === "organizer") return "社区发起人";
   if (isCoBuilder) return "共建伙伴";
   return "社区成员";
 }

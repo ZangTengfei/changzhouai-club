@@ -46,19 +46,14 @@
 
     <view class="section-heading-row"><text class="section-title">我的空间</text></view>
     <view class="space-grid">
-      <view class="space-card space-green space-card-featured" data-destination="growth" bindtap="handleLogin" role="button" aria-label="登录后查看成长档案">
-        <view class="icon-tile"><image src="/assets/icons/growth-purple-v2.png" mode="aspectFit" /></view>
-        <text class="space-title">成长档案</text><text class="space-copy">登录后查看身份路径与社区标签</text>
-        <image class="space-arrow" src="/assets/icons/chevron-green-v2.png" mode="aspectFit" />
-      </view>
       <view class="space-card space-orange" data-destination="registrations" bindtap="handleLogin" role="button" aria-label="登录后查看我的活动">
         <view class="icon-tile"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view>
         <text class="space-title">我的活动</text><text class="space-copy">登录后查看参与记录</text>
         <image class="space-arrow" src="/assets/icons/chevron-orange-v2.png" mode="aspectFit" />
       </view>
-      <view class="space-card space-blue" data-destination="profile" bindtap="handleLogin" role="button" aria-label="登录后查看能力档案">
+      <view class="space-card space-blue" data-destination="profile" bindtap="handleLogin" role="button" aria-label="登录后查看社区名片">
         <view class="icon-tile"><image src="/assets/icons/profile-blue-v2.png" mode="aspectFit" /></view>
-        <text class="space-title">能力档案</text><text class="space-copy">登录后完善技能与方向</text>
+        <text class="space-title">社区名片</text><text class="space-copy">登录后完善技能与方向</text>
         <image class="space-arrow" src="/assets/icons/chevron-blue-v2.png" mode="aspectFit" />
       </view>
     </view>
@@ -90,20 +85,20 @@
             <text class="profile-name">{{user.displayName || '未设置昵称'}}</text>
             <text class="profile-name-action">编辑</text>
           </button>
-          <view class="identity-tag-row" catchtap="openGrowth" role="button" aria-label="查看身份与社区标签">
-            <view class="identity-pill">
+          <view class="identity-tag-row">
+            <view class="identity-pill" bindtap="openGrowth" role="button" aria-label="查看成员身份">
               <image src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
               <text>{{user.identityLabel}}</text>
             </view>
-            <view wx:for="{{visibleCommunityTags}}" wx:key="code" class="community-tag-pill"><text>{{item.label}}</text></view>
-            <view wx:if="{{communityTagOverflowCount}}" class="community-tag-more"><text>+{{communityTagOverflowCount}}</text></view>
+            <view wx:for="{{visibleCommunityTags}}" wx:key="code" class="community-tag-pill" bindtap="openGrowth" role="button" aria-label="查看社区标签{{item.label}}"><text>{{item.label}}</text></view>
+            <view wx:if="{{communityTagOverflowCount}}" class="community-tag-more" bindtap="openGrowth" role="button" aria-label="查看全部社区标签"><text>+{{communityTagOverflowCount}}</text></view>
           </view>
         </view>
       </view>
 
-      <view class="profile-completion" bindtap="openProfile" role="button" aria-label="{{user.profileCompletion.completed ? '查看能力档案' : '继续完善能力档案'}}">
-        <view class="profile-completion-heading"><text>能力档案 {{user.profileCompletion.percent}}%</text><text>{{user.profileCompletion.completed ? '查看档案' : '继续完善'}}</text></view>
-        <text class="profile-completion-copy">{{user.profileCompletion.completed ? '档案已完善，点击查看完整内容' : '再补充 ' + user.profileCompletion.missingItems.length + ' 项，让更多伙伴了解你'}}</text>
+      <view class="profile-completion" bindtap="openProfile" role="button" aria-label="{{user.profileCompletion.completed ? '查看社区名片' : '继续完善社区名片'}}">
+        <view class="profile-completion-heading"><text>社区名片 {{user.profileCompletion.percent}}%</text><text>{{user.profileCompletion.completed ? '查看名片' : '继续完善'}}</text></view>
+        <text class="profile-completion-copy">{{user.profileCompletion.completed ? '名片已完善，点击查看完整内容' : '再补充 ' + user.profileCompletion.missingItems.length + ' 项，让更多伙伴了解你'}}</text>
         <view class="profile-completion-track"><view style="width: {{user.profileCompletion.percent}}%;"></view></view>
       </view>
     </view>
@@ -116,11 +111,6 @@
 
     <view class="section-heading-row"><text class="section-title">我的空间</text></view>
     <view class="space-grid">
-      <view class="space-card space-green space-card-featured" bindtap="openGrowth" role="button" aria-label="查看成长档案">
-        <view class="icon-tile"><image src="/assets/icons/growth-purple-v2.png" mode="aspectFit" /></view>
-        <text class="space-title">成长档案</text><text class="space-copy">查看身份路径与社区标签</text>
-        <image class="space-arrow" src="/assets/icons/chevron-green-v2.png" mode="aspectFit" />
-      </view>
       <view class="space-card space-orange" bindtap="openRegistrations" role="button">
         <view class="icon-tile"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view>
         <text class="space-title">我的活动</text><text class="space-copy">{{user.stats.registrationCount}} 场记录</text>
@@ -128,7 +118,7 @@
       </view>
       <view class="space-card space-blue" bindtap="openProfile" role="button">
         <view class="icon-tile"><image src="/assets/icons/profile-blue-v2.png" mode="aspectFit" /></view>
-        <text class="space-title">能力档案</text><text class="space-copy">技能与方向</text>
+        <text class="space-title">社区名片</text><text class="space-copy">技能与方向</text>
         <image class="space-arrow" src="/assets/icons/chevron-blue-v2.png" mode="aspectFit" />
       </view>
     </view>
@@ -146,17 +136,5 @@
     </view>
     <view wx:else class="empty-state" bindtap="openEvents" role="button">还没有活动记录，去看看社区活动</view>
 
-  </view>
-</view>
-
-<view wx:if="{{nameEditorOpen}}" class="name-editor-mask" catchtap="closeNameEditor">
-  <view class="name-editor-sheet" catchtap="keepNameEditorOpen">
-    <text class="name-editor-title">修改昵称</text>
-    <text class="name-editor-hint">这是社区伙伴看到并称呼你的名称。</text>
-    <input class="name-editor-input" type="text" maxlength="60" value="{{displayNameDraft}}" bindinput="handleNameInput" confirm-type="done" bindconfirm="saveDisplayName" focus />
-    <view class="name-editor-actions">
-      <button class="name-editor-cancel" bindtap="closeNameEditor" disabled="{{displayNameSaving}}">取消</button>
-      <button class="name-editor-save" bindtap="saveDisplayName" loading="{{displayNameSaving}}" disabled="{{displayNameSaving}}">保存</button>
-    </view>
   </view>
 </view>

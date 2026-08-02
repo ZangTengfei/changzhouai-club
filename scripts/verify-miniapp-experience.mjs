@@ -141,6 +141,18 @@ try {
   assert.equal(preConsentBasicProfilePut.body?.user?.privacyAccepted, false);
   pass("display_name_quick_edit_does_not_require_privacy_consent");
 
+  const privacyConsentPost = await request("/api/miniapp/profile/privacy", {
+    method: "POST",
+    headers: authHeaders,
+    body: JSON.stringify({
+      accepted: true,
+      policyVersion: "2026-07-18",
+    }),
+  });
+  assert.equal(privacyConsentPost.response.status, 200);
+  assert.equal(privacyConsentPost.body?.user?.privacyAccepted, true);
+  pass("basic_privacy_consent_saved_outside_capability_profile");
+
   const legacyBootstrapPut = await request("/api/miniapp/profile", {
     method: "PUT",
     headers: authHeaders,
@@ -164,6 +176,7 @@ try {
   });
   assert.equal(legacyBootstrapPut.response.status, 200);
   assert.equal(legacyBootstrapPut.body?.user?.registrationReady, false);
+  assert.equal(legacyBootstrapPut.body?.user?.basicProfileReady, true);
   assert.equal(legacyBootstrapPut.body?.user?.profileComplete, false);
   assert.equal(legacyBootstrapPut.body?.user?.capabilityProfileComplete, false);
   const { data: bootstrapMember, error: bootstrapMemberError } = await supabase
@@ -184,16 +197,12 @@ try {
     city: "常州",
     roleLabel: "测试",
     organization: "常州 AI Club",
-    monthlyTime: "每月 2 小时",
     bio: "自动化验收临时账号",
     industryTags: ["软件与信息服务"],
     skills: ["测试"],
     interests: ["社区活动"],
     capabilitySummary: "可以协助自动化验收",
     seekingSummary: "",
-    willingToAttend: true,
-    willingToShare: false,
-    willingToJoinProjects: false,
     isPubliclyVisible: true,
     privacyAccepted: true,
   };
@@ -219,11 +228,15 @@ try {
   });
   assert.equal(profilePut.response.status, 200);
   assert.equal(profilePut.body?.user?.registrationReady, true);
+  assert.equal(profilePut.body?.user?.basicProfileReady, true);
   assert.equal(profilePut.body?.user?.profileComplete, true);
   assert.equal(profilePut.body?.user?.capabilityProfileComplete, true);
   assert.equal(profilePut.body?.profile?.completion?.percent, 100);
+  assert.equal(profilePut.body?.profile?.completion?.totalCount, 5);
   assert.equal(profilePut.body?.profile?.shareHandle, userId);
+  assert.equal(profilePut.body?.profile?.isPubliclyVisible, true);
   pass("profile_saved_without_wechat");
+  pass("profile_saved_without_removed_preference_fields");
 
   const invalidBasicProfilePut = await request("/api/miniapp/profile/basic", {
     method: "PUT",

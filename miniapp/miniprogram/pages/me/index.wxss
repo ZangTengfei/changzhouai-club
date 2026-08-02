@@ -189,7 +189,7 @@
 
 .account-settings-button {
   position: absolute;
-  z-index: 1;
+  z-index: 6;
   top: 20rpx;
   right: 20rpx;
   display: flex;
@@ -333,84 +333,6 @@
   color: var(--color-green-dark);
   font-size: 19rpx;
   font-weight: 700;
-}
-
-.name-editor-mask {
-  position: fixed;
-  z-index: 20;
-  inset: 0;
-  display: flex;
-  box-sizing: border-box;
-  align-items: flex-end;
-  padding: 28rpx;
-  background: rgba(17, 23, 21, 0.42);
-}
-
-.name-editor-sheet {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 34rpx;
-  border-radius: 34rpx;
-  background: #ffffff;
-}
-
-.name-editor-title {
-  display: block;
-  font-size: 34rpx;
-  font-weight: 820;
-}
-
-.name-editor-hint {
-  display: block;
-  margin-top: 8rpx;
-  color: var(--color-subtle);
-  font-size: 23rpx;
-}
-
-.name-editor-input {
-  box-sizing: border-box;
-  width: 100%;
-  height: 92rpx;
-  margin-top: 28rpx;
-  padding: 0 24rpx;
-  border: 2rpx solid var(--color-line);
-  border-radius: 22rpx;
-  background: #f8faf9;
-  font-size: 30rpx;
-}
-
-.name-editor-actions {
-  display: flex;
-  gap: 18rpx;
-  margin-top: 24rpx;
-}
-
-.name-editor-cancel,
-.name-editor-save {
-  box-sizing: border-box;
-  width: 0;
-  min-width: 0;
-  flex: 1 1 0;
-  margin: 0;
-  padding: 0 24rpx;
-  border-radius: 44rpx;
-  font-size: 27rpx;
-  font-weight: 720;
-}
-
-.name-editor-cancel {
-  background: #eef2f0;
-  color: var(--color-text);
-}
-
-.name-editor-save {
-  background: var(--color-green);
-  color: #ffffff;
-}
-
-.name-editor-cancel::after,
-.name-editor-save::after {
-  border: 0;
 }
 
 .identity-tag-row {
@@ -561,19 +483,6 @@
   border-radius: 28rpx;
 }
 
-.space-card-featured {
-  grid-column: span 2;
-  min-height: 178rpx;
-}
-
-.space-card-featured .space-title {
-  font-size: 32rpx;
-}
-
-.space-green {
-  background: var(--color-green-soft);
-}
-
 .space-orange {
   background: var(--color-orange-soft);
 }
@@ -623,10 +532,6 @@
   padding: 10rpx;
   border-radius: 50%;
   opacity: 1;
-}
-
-.space-green .space-arrow {
-  background: #ccf2dd;
 }
 
 .space-orange .space-arrow {

@@ -20,10 +20,10 @@
       <text class="quick-copy">{{upcomingCount}} 场活动即将开始</text>
       <image class="quick-arrow quick-arrow-orange" src="/assets/icons/chevron-orange-v2.png" mode="aspectFit" />
     </view>
-    <view class="quick-card quick-card-green" bindtap="openGrowth" role="button" aria-label="{{isLoggedIn ? '查看成长档案' : '登录后查看成长档案'}}">
-      <view class="icon-tile"><image src="/assets/icons/growth-purple-v2.png" mode="aspectFit" /></view>
-      <text class="quick-title">成长档案</text>
-      <text class="quick-copy">{{isLoggedIn ? '查看身份路径与社区标签' : '登录后查看身份路径与社区标签'}}</text>
+    <view class="quick-card quick-card-green" bindtap="openProfile" role="button" aria-label="{{isLoggedIn ? '查看社区名片' : '登录后查看社区名片'}}">
+      <view class="icon-tile"><image src="/assets/icons/profile-blue-v2.png" mode="aspectFit" /></view>
+      <text class="quick-title">社区名片</text>
+      <text class="quick-copy">{{isLoggedIn ? '查看技能与连接方向' : '登录后完善技能与方向'}}</text>
       <image class="quick-arrow quick-arrow-green" src="/assets/icons/chevron-green-v2.png" mode="aspectFit" />
     </view>
   </view>
@@ -94,18 +94,18 @@
   </view>
 
   <view wx:if="{{profileCompletion && !profileCompletion.completed}}" class="member-strip surface-card" bindtap="openProfile" role="button">
-    <image class="member-strip-badge" src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
+    <image class="member-strip-badge" src="/assets/icons/profile-blue-v2.png" mode="aspectFit" />
     <view class="member-strip-copy">
-      <text class="member-strip-title">能力档案 {{profileCompletion.percent}}%</text>
+      <text class="member-strip-title">社区名片 {{profileCompletion.percent}}%</text>
       <text class="member-strip-meta">继续完善，让伙伴更了解你</text>
     </view>
     <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
   </view>
-  <view wx:else class="member-strip surface-card" bindtap="openGrowth" role="button">
-    <image class="member-strip-badge" src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
+  <view wx:else class="member-strip surface-card" bindtap="openProfile" role="button" aria-label="查看社区名片">
+    <image class="member-strip-badge" src="/assets/icons/profile-blue-v2.png" mode="aspectFit" />
     <view class="member-strip-copy">
-      <text class="member-strip-title">{{memberIdentity}}</text>
-      <text class="member-strip-meta">{{attendanceSummary}}</text>
+      <text class="member-strip-title">社区名片 100%</text>
+      <text class="member-strip-meta">名片已完善，点击查看完整内容</text>
     </view>
     <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />
   </view>

@@ -7,6 +7,7 @@ import {
 import { trackEvent } from "../../services/analytics";
 import { getStoredSessionToken } from "../../services/api";
 import { ensureSession } from "../../services/auth";
+import { isMiniappBasicProfileReady } from "../../utils/profile-state";
 
 type HomeEvent = EventSummary & {
   coverMode: "aspectFill" | "aspectFit";
@@ -45,8 +46,7 @@ Page({
     avatarUrl: "",
     avatarInitial: "我",
     isLoggedIn: Boolean(getStoredSessionToken()),
-    memberIdentity: "登录后查看成长身份",
-    attendanceSummary: "查看真实参与与社区标签",
+    basicProfileReady: false,
     upcomingCount: 0,
     featuredEvent: null as HomeEvent | null,
     events: [] as HomeEvent[],
@@ -121,10 +121,7 @@ Page({
         avatarUrl: user.avatarUrl || "",
         avatarInitial: user.displayName.slice(0, 1) || "我",
         isLoggedIn: true,
-        memberIdentity: user.identityLabel || "社区成员",
-        attendanceSummary: user.stats.attendanceCount
-          ? `已真实到场 ${user.stats.attendanceCount} 次`
-          : "完成第一次真实参与",
+        basicProfileReady: isMiniappBasicProfileReady(user),
       });
     } catch {
       const isLoggedIn = Boolean(getStoredSessionToken());
@@ -135,8 +132,7 @@ Page({
           ? {
               greetingName: "朋友",
               avatarUrl: "",
-              memberIdentity: "登录后查看成长身份",
-              attendanceSummary: "查看真实参与与社区标签",
+              basicProfileReady: false,
             }
           : {}),
       });
@@ -145,7 +141,12 @@ Page({
 
   openProfile() {
     if (!getStoredSessionToken()) {
-      void wx.switchTab({ url: "/pages/me/index" });
+      void wx.navigateTo({ url: "/pages/login/index?intent=profile" });
+      return;
+    }
+
+    if (!this.data.basicProfileReady) {
+      void wx.navigateTo({ url: "/pages/profile/basic/index?intent=profile" });
       return;
     }
 
@@ -177,10 +178,6 @@ Page({
 
   openEvents() {
     void wx.switchTab({ url: "/pages/events/index" });
-  },
-
-  openGrowth() {
-    void wx.navigateTo({ url: "/pages/growth/index" });
   },
 
   onShareAppMessage() {

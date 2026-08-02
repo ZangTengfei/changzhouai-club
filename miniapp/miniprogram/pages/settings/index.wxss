@@ -2,35 +2,8 @@
   padding-top: 26rpx;
 }
 
-.settings-identity {
-  display: flex;
-  flex-direction: column;
-  gap: 8rpx;
-  padding: 30rpx;
-  border: 2rpx solid #dcefe5;
-  border-radius: var(--radius-card);
-  background: var(--color-green-soft);
-}
-
-.settings-caption {
-  color: var(--color-green-dark);
-  font-size: 22rpx;
-  font-weight: 720;
-}
-
-.settings-name {
-  font-size: 40rpx;
-  font-weight: 830;
-}
-
-.settings-summary {
-  color: var(--color-subtle);
-  font-size: 23rpx;
-  line-height: 1.5;
-}
-
 .settings-group {
-  margin-top: 30rpx;
+  margin-top: 20rpx;
 }
 
 .settings-group-heading {
@@ -77,6 +50,48 @@
 .phone-row {
   box-sizing: border-box;
   width: 100%;
+}
+
+.settings-avatar {
+  display: flex;
+  box-sizing: border-box;
+  width: 64rpx;
+  height: 64rpx;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--color-green-soft);
+}
+
+.settings-avatar-empty {
+  color: var(--color-green-dark);
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.settings-action-button {
+  display: flex;
+  box-sizing: border-box;
+  width: 96rpx;
+  min-width: 96rpx;
+  min-height: 56rpx;
+  flex: 0 0 96rpx;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border-radius: 20rpx;
+  background: transparent;
+  color: var(--color-green-dark);
+  font-size: 21rpx;
+  font-weight: 700;
+  line-height: 56rpx;
+}
+
+.settings-action-button::after {
+  border: 0;
 }
 
 .phone-status {
@@ -179,4 +194,57 @@
 .logout-button image {
   width: 34rpx;
   height: 34rpx;
+}
+
+.nickname-edit-row {
+  min-height: 120rpx;
+}
+
+.nickname-inline-field {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.nickname-inline-label {
+  color: var(--color-subtle);
+  font-size: 19rpx;
+  font-weight: 680;
+  line-height: 1.4;
+}
+
+.nickname-inline-input {
+  width: 100%;
+  height: 54rpx;
+  min-height: 54rpx;
+  padding: 0;
+  color: var(--color-ink);
+  font-size: 28rpx;
+  font-weight: 650;
+  line-height: 54rpx;
+}
+
+.nickname-inline-actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.nickname-inline-cancel,
+.nickname-inline-save {
+  display: flex;
+  min-height: 64rpx;
+  align-items: center;
+  font-size: 21rpx;
+  font-weight: 700;
+}
+
+.nickname-inline-cancel {
+  color: var(--color-muted);
+}
+
+.nickname-inline-save {
+  color: var(--color-green-dark);
 }

@@ -2,39 +2,42 @@ import { ApiError, getStoredSessionToken } from "../../services/api";
 import { ensureSession, login } from "../../services/auth";
 import { formatEventDate } from "../../services/events";
 import { uploadAvatar } from "../../services/avatar";
-import { updateDisplayName } from "../../services/profile";
 import { getCommunityTags } from "../../utils/member-growth";
+import { isMiniappBasicProfileReady } from "../../utils/profile-state";
 
 type FootprintItem = MiniappUser["footprints"][number] & {
   dateLabel: string;
   locationLabel: string;
 };
 
-type LoginDestination = "account" | "profile" | "growth" | "registrations";
+type LoginDestination = "account" | "profile" | "registrations";
 
 function readLoginDestination(
   event: WechatMiniprogram.TouchEvent,
 ): LoginDestination {
   const destination = String(event.currentTarget.dataset.destination ?? "");
-  return ["account", "profile", "growth", "registrations"].includes(destination)
+  return ["account", "profile", "registrations"].includes(destination)
     ? (destination as LoginDestination)
     : "account";
 }
 
 function navigateAfterLogin(destination: LoginDestination, user: MiniappUser) {
-  if (destination === "growth") {
-    return wx.navigateTo({ url: "/pages/growth/index" });
-  }
   if (destination === "registrations") {
     return wx.navigateTo({ url: "/pages/registrations/index" });
   }
   if (destination === "account") {
-    return user.profileCompletion.completed
+    if (!isMiniappBasicProfileReady(user)) {
+      return wx.navigateTo({ url: "/pages/profile/basic/index?intent=account" });
+    }
+    return user.capabilityProfileComplete
       ? undefined
       : wx.navigateTo({ url: "/pages/profile/edit/index" });
   }
+  if (!isMiniappBasicProfileReady(user)) {
+    return wx.navigateTo({ url: "/pages/profile/basic/index?intent=profile" });
+  }
   return wx.navigateTo({
-    url: user.profileCompletion.completed
+    url: user.capabilityProfileComplete
       ? "/pages/profile/index"
       : "/pages/profile/edit/index",
   });
@@ -75,9 +78,6 @@ Page({
     loginRequestId: "",
     suppressAutoLogin: false,
     avatarUploading: false,
-    nameEditorOpen: false,
-    displayNameDraft: "",
-    displayNameSaving: false,
   },
 
   onLoad(options: Record<string, string | undefined>) {
@@ -202,25 +202,26 @@ Page({
   },
 
   openProfile() {
-    const completed = this.data.user?.profileCompletion.completed ?? false;
+    if (!this.data.user || !isMiniappBasicProfileReady(this.data.user)) {
+      void wx.navigateTo({ url: "/pages/profile/basic/index?intent=profile" });
+      return;
+    }
+    const completed = this.data.user.capabilityProfileComplete;
     void wx.navigateTo({
       url: completed ? "/pages/profile/index" : "/pages/profile/edit/index",
     });
   },
 
-  ensureAvatarPrivacyAccepted() {
-    if (this.data.user?.privacyAccepted) return true;
-    void wx.showModal({
-      title: "请先确认隐私说明",
-      content: "头像、昵称和联系方式的使用范围需要先由你确认。",
-      confirmText: "去确认",
-      success: (result) => {
-        if (result.confirm) {
-          void wx.navigateTo({ url: "/pages/profile/edit/index?step=0" });
-        }
-      },
+  confirmAvatarPrivacy() {
+    return new Promise<boolean>((resolve) => {
+      wx.showModal({
+        title: "确认头像使用说明",
+        content: "头像会用于社区账号、活动报名和成员资料展示。",
+        confirmText: "同意并继续",
+        success: (result) => resolve(result.confirm),
+        fail: () => resolve(false),
+      });
     });
-    return false;
   },
 
   async chooseAvatar(
@@ -228,13 +229,17 @@ Page({
   ) {
     const filePath = event.detail.avatarUrl;
     if (!filePath || this.data.avatarUploading) return;
-    if (!this.ensureAvatarPrivacyAccepted() || !this.data.user) return;
+    const user = this.data.user;
+    if (!user) return;
+    if (!user.privacyAccepted) {
+      if (!(await this.confirmAvatarPrivacy())) return;
+    }
 
     this.setData({ avatarUploading: true });
     try {
       const response = await uploadAvatar(
         filePath,
-        this.data.user.privacyPolicyVersion,
+        user.privacyPolicyVersion,
       );
       getApp<IAppOption>().globalData.currentUser = response.user;
       this.setData({
@@ -254,53 +259,7 @@ Page({
   },
 
   openNameEditor() {
-    if (!this.data.user) return;
-    this.setData({
-      nameEditorOpen: true,
-      displayNameDraft: this.data.user.displayName,
-    });
-  },
-
-  closeNameEditor() {
-    if (this.data.displayNameSaving) return;
-    this.setData({ nameEditorOpen: false });
-  },
-
-  keepNameEditorOpen() {},
-
-  handleNameInput(event: WechatMiniprogram.Input) {
-    this.setData({ displayNameDraft: event.detail.value });
-  },
-
-  async saveDisplayName() {
-    const displayName = this.data.displayNameDraft.trim();
-    if (!displayName || displayName === "微信用户") {
-      void wx.showToast({ title: "请输入有效昵称", icon: "none" });
-      return;
-    }
-    if (this.data.displayNameSaving) return;
-
-    this.setData({ displayNameSaving: true });
-    try {
-      const { user } = await updateDisplayName(displayName);
-      getApp<IAppOption>().globalData.currentUser = user;
-      this.setData({
-        ...buildAccountViewData(user),
-        displayNameSaving: false,
-        nameEditorOpen: false,
-      });
-      void wx.showToast({ title: "昵称已更新", icon: "success" });
-    } catch (error) {
-      this.setData({ displayNameSaving: false });
-      void wx.showToast({
-        title:
-          error instanceof ApiError &&
-          error.errorCode === "invalid_display_name"
-            ? "请输入有效昵称"
-            : "昵称更新失败，请重试",
-        icon: "none",
-      });
-    }
+    void wx.navigateTo({ url: "/pages/settings/index?edit=name" });
   },
 
   openEvent(event: WechatMiniprogram.TouchEvent) {

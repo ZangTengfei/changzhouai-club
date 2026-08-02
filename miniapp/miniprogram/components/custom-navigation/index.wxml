@@ -5,7 +5,7 @@
         <image wx:if="{{showMark}}" class="custom-navigation-mark" src="/assets/logo-mark.png" mode="aspectFit" />
         <text class="custom-navigation-title">{{title}}</text>
       </view>
-      <view wx:if="{{showAvatar}}" class="custom-navigation-avatar {{avatarGuest ? 'custom-navigation-login' : ''}}" bindtap="handleAvatarTap" role="button" aria-label="{{avatarGuest ? '登录' : '查看能力档案'}}">
+      <view wx:if="{{showAvatar}}" class="custom-navigation-avatar {{avatarGuest ? 'custom-navigation-login' : ''}}" bindtap="handleAvatarTap" role="button" aria-label="{{avatarGuest ? '登录' : '查看社区名片'}}">
         <block wx:if="{{avatarGuest}}"><image class="custom-navigation-login-icon" src="/assets/icons/me.png" mode="aspectFit" /><text>登录</text></block>
         <image wx:elif="{{avatarUrl}}" src="{{avatarUrl}}" mode="aspectFill" />
         <text wx:else>{{avatarInitial}}</text>

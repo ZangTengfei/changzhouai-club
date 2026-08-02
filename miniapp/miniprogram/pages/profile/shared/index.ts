@@ -7,7 +7,6 @@ Page({
     eventSlug: "",
     profile: null as MiniappSharedProfile | null,
     avatarInitial: "微",
-    preferenceLabels: [] as string[],
     shareCardImageUrl: "",
     loading: true,
     loadFailed: false,
@@ -36,17 +35,10 @@ Page({
         this.data.handle,
         this.data.eventSlug,
       );
-      const preferenceLabels = [
-        profile.willingToAttend ? "参加社区活动" : "",
-        profile.willingToShare ? "分享实践经验" : "",
-        profile.willingToJoinProjects ? "参与共创项目" : "",
-      ].filter(Boolean);
-
       this.setData(
         {
           profile,
           avatarInitial: profile.displayName.slice(0, 1) || "微",
-          preferenceLabels,
           shareCardImageUrl: "",
           loading: false,
         },

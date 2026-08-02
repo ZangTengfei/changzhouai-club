@@ -1,5 +1,5 @@
-import { ApiError, getStoredSessionToken } from "../../services/api";
-import { ensureSession, login } from "../../services/auth";
+import { getStoredSessionToken } from "../../services/api";
+import { ensureSession } from "../../services/auth";
 import {
   getGrowthSteps,
   getCommunityTags,
@@ -26,9 +26,6 @@ Page({
     loading: true,
     loadFailed: false,
     loginRequired: false,
-    loggingIn: false,
-    loginFailed: false,
-    loginRequestId: "",
   },
 
   onShow() {
@@ -74,30 +71,10 @@ Page({
       loading: false,
       loadFailed: false,
       loginRequired: false,
-      loggingIn: false,
     });
   },
 
-  async handleLogin() {
-    if (this.data.loggingIn) return;
-    this.setData({
-      loggingIn: true,
-      loginFailed: false,
-      loginRequestId: "",
-    });
-
-    try {
-      const user = await login();
-      getApp<IAppOption>().globalData.currentUser = user;
-      this.showGrowth(user);
-    } catch (error) {
-      this.setData({
-        loggingIn: false,
-        loginRequired: true,
-        loginFailed: true,
-        loginRequestId:
-          error instanceof ApiError && error.requestId ? error.requestId : "",
-      });
-    }
+  openLogin() {
+    void wx.navigateTo({ url: "/pages/login/index?intent=growth" });
   },
 });

@@ -113,32 +113,28 @@
   line-height: 1.55;
 }
 
+.step-swiper {
+  width: 100%;
+  min-height: 420rpx;
+  transition: height 180ms ease;
+}
+
+.step-swiper-item {
+  overflow: visible;
+}
+
 .step-content {
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   gap: 20rpx;
+  padding-bottom: 2rpx;
 }
 
-.avatar-picker {
-  display: flex;
-  min-height: 150rpx;
-  box-sizing: border-box;
-  align-items: center;
-  gap: 22rpx;
-  margin: 0;
-  padding: 22rpx;
-  border: 2rpx solid #dcefe5;
-  border-radius: 28rpx;
-  background: var(--color-green-soft);
-  text-align: left;
-}
-
-.avatar-picker::after,
 .tag-add-button::after {
   border: 0;
 }
 
-.avatar-preview,
 .preview-avatar {
   display: flex;
   width: 104rpx;
@@ -152,30 +148,10 @@
   background: #ffffff;
 }
 
-.avatar-empty,
 .preview-avatar-empty {
   color: var(--color-green-dark);
   font-size: 22rpx;
   font-weight: 700;
-}
-
-.avatar-copy {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 5rpx;
-}
-
-.avatar-title {
-  color: var(--color-ink);
-  font-size: 28rpx;
-  font-weight: 780;
-}
-
-.avatar-action {
-  color: var(--color-green-dark);
-  font-size: 22rpx;
-  font-weight: 680;
 }
 
 .form-field,
@@ -216,9 +192,7 @@
   line-height: 1.55;
 }
 
-.field-heading,
-.visibility-row,
-.preference-row {
+.field-heading {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -226,8 +200,7 @@
 }
 
 .field-count,
-.field-help,
-.visibility-help {
+.field-help {
   color: var(--color-subtle);
   font-size: 21rpx;
   line-height: 1.5;
@@ -306,24 +279,6 @@
   font-weight: 720;
 }
 
-.preference-list {
-  overflow: hidden;
-  border: 2rpx solid var(--color-line);
-  border-radius: 26rpx;
-  background: #ffffff;
-}
-
-.preference-row {
-  min-height: 100rpx;
-  padding: 0 22rpx;
-  border-bottom: 2rpx solid var(--color-line);
-  font-size: 25rpx;
-}
-
-.preference-row:last-child {
-  border-bottom: 0;
-}
-
 .profile-preview {
   display: flex;
   flex-direction: column;
@@ -377,22 +332,6 @@
 .preview-tags text {
   min-height: 50rpx;
   background: var(--color-purple-soft);
-}
-
-.visibility-row {
-  align-items: flex-start;
-  padding: 24rpx;
-  border: 2rpx solid #dcefe5;
-  border-radius: 26rpx;
-  background: var(--color-green-soft);
-}
-
-.visibility-row > view {
-  display: flex;
-  min-width: 0;
-  flex: 1;
-  flex-direction: column;
-  gap: 6rpx;
 }
 
 .form-actions {

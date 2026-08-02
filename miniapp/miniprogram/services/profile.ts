@@ -32,6 +32,15 @@ export async function updateDisplayName(displayName: string) {
   });
 }
 
+export async function acceptPrivacyPolicy(policyVersion: string) {
+  return apiRequest<{ user: MiniappUser }>({
+    path: "/api/miniapp/profile/privacy",
+    method: "POST",
+    authenticated: true,
+    data: { accepted: true, policyVersion },
+  });
+}
+
 export async function loadSharedProfile(handle: string, eventSlug = "") {
   const eventQuery = eventSlug
     ? `?event=${encodeURIComponent(eventSlug)}`

@@ -62,7 +62,6 @@ type MiniappProfileCompletionInput = {
 };
 
 const completionChecks = [
-  { key: "displayName", label: "昵称" },
   { key: "city", label: "城市/辖区" },
   { key: "roleLabel", label: "当前身份" },
   { key: "industryTags", label: "行业方向" },
@@ -86,14 +85,16 @@ export function isMiniappDisplayNameReady(value: string | null | undefined) {
 export function isMiniappRegistrationReady(
   profile: MiniappProfileCompletionInput,
 ) {
-  return getMiniappProfileCompletion(profile).completed;
+  return (
+    isMiniappDisplayNameReady(profile.displayName) &&
+    getMiniappProfileCompletion(profile).completed
+  );
 }
 
 export function getMiniappProfileCompletion(
   profile: MiniappProfileCompletionInput,
 ) {
   const values: Record<(typeof completionChecks)[number]["key"], boolean> = {
-    displayName: isMiniappDisplayNameReady(profile.displayName),
     city: hasText(profile.city),
     roleLabel: hasText(profile.roleLabel),
     industryTags: hasItems(profile.industryTags),

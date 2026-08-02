@@ -157,7 +157,10 @@ export async function PUT(request: Request) {
   const city = readText(payload?.city, 40);
   const roleLabel = readText(payload?.roleLabel, 80);
   const organization = readText(payload?.organization, 120);
-  const monthlyTime = readText(payload?.monthlyTime, 80);
+  const monthlyTime =
+    payload?.monthlyTime === undefined
+      ? undefined
+      : readText(payload.monthlyTime, 80);
   const bio = readText(payload?.bio, 500);
   const industryTags =
     payload?.industryTags === undefined
@@ -187,16 +190,19 @@ export async function PUT(request: Request) {
     interests === null ||
     capabilitySummary === null ||
     seekingSummary === null ||
-    typeof payload?.willingToAttend !== "boolean" ||
-    typeof payload.willingToShare !== "boolean" ||
-    typeof payload.willingToJoinProjects !== "boolean" ||
-    (payload.isPubliclyVisible !== undefined &&
+    (payload?.willingToAttend !== undefined &&
+      typeof payload.willingToAttend !== "boolean") ||
+    (payload?.willingToShare !== undefined &&
+      typeof payload.willingToShare !== "boolean") ||
+    (payload?.willingToJoinProjects !== undefined &&
+      typeof payload.willingToJoinProjects !== "boolean") ||
+    (payload?.isPubliclyVisible !== undefined &&
       typeof payload.isPubliclyVisible !== "boolean")
   ) {
     return miniappJson({ error: "invalid_profile" }, 400);
   }
 
-  if (payload.privacyAccepted !== true) {
+  if (payload?.privacyAccepted !== true) {
     return miniappJson({ error: "privacy_consent_required" }, 400);
   }
 
@@ -208,7 +214,6 @@ export async function PUT(request: Request) {
     city: city || "常州",
     role_label: roleLabel || null,
     organization: organization || null,
-    monthly_time: monthlyTime || null,
     bio: bio || null,
     skills,
     interests,
@@ -219,13 +224,22 @@ export async function PUT(request: Request) {
     ...(seekingSummary === undefined
       ? {}
       : { seeking_summary: seekingSummary || null }),
+    ...(monthlyTime === undefined
+      ? {}
+      : { monthly_time: monthlyTime || null }),
   };
   const memberUpdate = {
-    willing_to_attend: payload.willingToAttend,
-    willing_to_share: payload.willingToShare,
-    willing_to_join_projects: payload.willingToJoinProjects,
     onboarding_completed_at: now,
-    ...(typeof payload.isPubliclyVisible === "boolean"
+    ...(typeof payload?.willingToAttend === "boolean"
+      ? { willing_to_attend: payload.willingToAttend }
+      : {}),
+    ...(typeof payload?.willingToShare === "boolean"
+      ? { willing_to_share: payload.willingToShare }
+      : {}),
+    ...(typeof payload?.willingToJoinProjects === "boolean"
+      ? { willing_to_join_projects: payload.willingToJoinProjects }
+      : {}),
+    ...(typeof payload?.isPubliclyVisible === "boolean"
       ? { is_publicly_visible: payload.isPubliclyVisible }
       : {}),
   };

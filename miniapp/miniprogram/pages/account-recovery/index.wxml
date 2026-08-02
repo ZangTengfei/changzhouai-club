@@ -84,7 +84,7 @@
     </view>
 
     <view class="merge-note">
-      <text>活动记录、作品、能力档案会合并；技能和兴趣会自动去重。</text>
+      <text>活动记录、作品、社区名片会合并；技能和兴趣会自动去重。</text>
       <text>这是账号归并操作，完成后不能在小程序内自行拆分。</text>
     </view>
     <button class="primary-button merge-button" loading="{{pending}}" disabled="{{pending}}" bindtap="confirmMerge">确认合并账号</button>

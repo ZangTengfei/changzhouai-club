@@ -5,6 +5,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { isMiniappAccountRecoveryAvailable } from "@/lib/account-recovery";
 import {
   getMiniappProfileCompletion,
+  isMiniappDisplayNameReady,
   isMiniappRegistrationReady,
   MINIAPP_PRIVACY_POLICY_VERSION,
 } from "@/lib/miniapp-profile";
@@ -573,9 +574,12 @@ export async function loadMiniappAccountSnapshot(
   const registrationReady = isMiniappRegistrationReady(
     profileCompletionInput,
   );
+  const basicProfileReady = isMiniappDisplayNameReady(
+    profileCompletionInput.displayName,
+  );
   const identityLabel =
     member?.status === "admin" || member?.status === "organizer"
-      ? "社区主理人"
+      ? "社区发起人"
       : member?.is_co_builder
         ? "共建伙伴"
         : member?.status === "pending"
@@ -708,6 +712,7 @@ export async function loadMiniappAccountSnapshot(
     identityLabel,
     joinedAt: member?.joined_at ?? null,
     isCoBuilder: Boolean(member?.is_co_builder),
+    basicProfileReady,
     registrationReady,
     profileComplete: registrationReady,
     capabilityProfileComplete: profileCompletion.completed,

@@ -9,6 +9,7 @@ interface MiniappUser {
   identityLabel: string;
   joinedAt: string | null;
   isCoBuilder: boolean;
+  basicProfileReady: boolean;
   registrationReady: boolean;
   profileComplete: boolean;
   capabilityProfileComplete: boolean;
@@ -111,16 +112,16 @@ interface MiniappProfileUpdate {
   city: string;
   roleLabel: string;
   organization: string;
-  monthlyTime: string;
+  monthlyTime?: string;
   bio: string;
   industryTags: string[];
   skills: string[];
   interests: string[];
   capabilitySummary: string;
   seekingSummary: string;
-  willingToAttend: boolean;
-  willingToShare: boolean;
-  willingToJoinProjects: boolean;
+  willingToAttend?: boolean;
+  willingToShare?: boolean;
+  willingToJoinProjects?: boolean;
   isPubliclyVisible?: boolean;
   privacyAccepted: boolean;
 }

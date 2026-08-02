@@ -22,20 +22,6 @@
   margin-top: 8rpx;
 }
 
-.growth-login-error {
-  color: #b54708;
-  font-size: 24rpx;
-  line-height: 1.5;
-}
-
-.growth-login-diagnostic {
-  color: #66756e;
-  font-family: monospace;
-  font-size: 21rpx;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-
 .growth-intro {
   margin-bottom: 22rpx;
   color: var(--color-subtle);
@@ -127,7 +113,7 @@
   background: #ffffff;
 }
 
-.growth-section:nth-of-type(4) {
+.growth-section-honor {
   border-color: #f1e3ac;
   background: var(--color-yellow-soft);
 }
@@ -165,7 +151,6 @@
 .growth-step-complete {
   border-color: #b9dfca;
   background: var(--color-green-soft);
-  box-shadow: inset 8rpx 0 0 #38a56d;
 }
 
 .growth-step-current {
@@ -185,13 +170,13 @@
   bottom: 12rpx;
   width: 132rpx;
   height: 132rpx;
-  opacity: 0.38;
+  opacity: 1;
 }
 
 .growth-step-current .growth-step-badge-background {
   width: 136rpx;
   height: 136rpx;
-  opacity: 0.62;
+  opacity: 1;
 }
 
 .growth-step-locked .growth-step-badge-background {

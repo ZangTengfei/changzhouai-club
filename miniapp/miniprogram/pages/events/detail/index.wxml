@@ -114,11 +114,23 @@
         <text class="registration-copy">当前确认名额已满，组织方调整名额后可将你转为已报名。</text>
         <button class="secondary-button" loading="{{submitting}}" disabled="{{submitting}}" bindtap="cancelRegistration">取消候补</button>
       </block>
-      <block wx:elif="{{!user || !user.registrationReady}}">
+      <block wx:elif="{{!user}}">
         <text class="registration-kicker">活动报名</text>
-        <text class="registration-title">完善资料后报名</text>
-        <text class="registration-copy">请将昵称修改为非“微信用户”，并把能力档案完善至 100% 后再报名。</text>
-        <button class="primary-button" bindtap="openProfile">去完善能力档案</button>
+        <text class="registration-title">登录后继续报名</text>
+        <text class="registration-copy">登录只用于识别社区账号，完成后会返回当前活动。</text>
+        <button class="primary-button" bindtap="openProfile">微信登录</button>
+      </block>
+      <block wx:elif="{{!basicProfileReady}}">
+        <text class="registration-kicker">活动报名</text>
+        <text class="registration-title">先设置个人信息</text>
+        <text class="registration-copy">请设置社区伙伴称呼你的昵称；头像可以稍后补充。</text>
+        <button class="primary-button" bindtap="openProfile">设置昵称</button>
+      </block>
+      <block wx:elif="{{!user.capabilityProfileComplete}}">
+        <text class="registration-kicker">活动报名</text>
+        <text class="registration-title">完善社区名片后报名</text>
+        <text class="registration-copy">补充城市、身份、行业、能力与连接方向，完成后会返回当前活动。</text>
+        <button class="primary-button" bindtap="openProfile">去完善社区名片</button>
       </block>
       <block wx:else>
         <text class="registration-kicker">活动报名</text>

@@ -42,11 +42,6 @@
       <view wx:if="{{profile.seekingSummary}}" class="profile-view-field"><text class="profile-view-label">我正在寻找</text><text class="profile-view-copy">{{profile.seekingSummary}}</text></view>
     </view>
 
-    <view wx:if="{{preferenceLabels.length}}" class="profile-view-section profile-view-section-purple">
-      <view class="profile-view-section-heading"><text class="profile-view-index">03</text><text class="section-title">参与方式</text></view>
-      <view wx:if="{{preferenceLabels.length}}" class="profile-view-field"><text class="profile-view-label">参与意愿</text><view class="profile-view-tags profile-view-tags-purple"><text wx:for="{{preferenceLabels}}" wx:key="*this">{{item}}</text></view></view>
-    </view>
-
     <view class="profile-view-privacy shared-profile-notice"><text>{{eventSlug ? '这是已确认报名者的成员资料' : '这是成员主动公开的社区名片'}}</text><text>微信号、手机号、报名备注和账号信息不会展示。</text></view>
 
     <view class="profile-view-actions">

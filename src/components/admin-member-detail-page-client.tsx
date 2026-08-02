@@ -456,7 +456,7 @@ export function AdminMemberDetailPageClient({
                     />
                     <AdminPanelBody className="space-y-4">
                       <AdminNotice>
-                        管理员和组织者会在小程序中显示为“社区主理人”；成员成长等级在下方单独认证。
+                        管理员和组织者会在小程序中显示为“社区发起人”；成员成长等级在下方单独认证。
                       </AdminNotice>
                       <form
                         className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"

@@ -1,0 +1,27 @@
+<view class="page-shell basic-profile-page">
+  <view wx:if="{{loading}}" class="empty-state loading-state"><view class="loading-spinner" aria-hidden="true"></view><text>正在加载个人信息</text></view>
+  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage">个人信息加载失败，轻触重试</view>
+
+  <view wx:elif="{{user}}" class="basic-profile-content">
+    <view class="page-intro">
+      <text class="page-intro-title">个人信息</text>
+      <text class="page-intro-copy">设置社区伙伴称呼你的名称；头像可以稍后补充。</text>
+    </view>
+
+    <view class="basic-profile-card">
+      <button class="avatar-picker" open-type="chooseAvatar" bindchooseavatar="chooseAvatar" loading="{{avatarUploading}}" disabled="{{avatarUploading}}">
+        <image wx:if="{{user.avatarUrl}}" class="avatar-preview" src="{{user.avatarUrl}}" mode="aspectFill" />
+        <view wx:else class="avatar-preview avatar-empty">{{avatarInitial}}</view>
+        <view class="avatar-copy"><text class="avatar-title">头像（选填）</text><text class="avatar-action">{{avatarUploading ? '上传中' : '点击更换'}}</text></view>
+      </button>
+
+      <label class="name-field">
+        <text class="field-label">昵称 *</text>
+        <input class="name-input" type="text" maxlength="60" value="{{displayNameDraft}}" bindinput="handleNameInput" placeholder="你希望大家如何称呼你" />
+      </label>
+    </view>
+
+    <text class="privacy-note">更换头像前会单独确认使用说明，昵称修改不需要额外授权。<text class="privacy-link" bindtap="openPrivacy">查看隐私说明</text></text>
+    <button class="primary-button save-button" loading="{{saving}}" disabled="{{saving}}" bindtap="saveAndContinue">保存并继续</button>
+  </view>
+</view>

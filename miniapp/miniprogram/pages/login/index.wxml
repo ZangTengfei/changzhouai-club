@@ -1,0 +1,13 @@
+<view class="page-shell login-page">
+  <view class="login-card">
+    <image class="login-mark" src="/assets/logo-mark.png" mode="aspectFit" />
+    <text class="login-title">{{title}}</text>
+    <text class="login-copy">{{copy}}</text>
+    <text class="login-note">登录仅用于识别社区账号，不会自动获取你的头像和昵称。</text>
+    <button class="primary-button login-button" loading="{{loggingIn}}" disabled="{{loggingIn}}" bindtap="handleLogin">{{loggingIn ? '登录中' : '微信登录'}}</button>
+    <button class="login-back" disabled="{{loggingIn}}" bindtap="goBack">暂不登录</button>
+    <view class="privacy-copy"><text>继续即表示你已阅读</text><text class="privacy-link" bindtap="openPrivacy">《隐私说明》</text></view>
+    <text wx:if="{{loginFailed}}" class="login-error">登录没有完成，请检查网络后重试。</text>
+    <text wx:if="{{loginRequestId}}" class="login-diagnostic">诊断编号：{{loginRequestId}}</text>
+  </view>
+</view>

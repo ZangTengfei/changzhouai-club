@@ -1,8 +1,8 @@
 import { ensureSession } from "../../../services/auth";
 import { trackEvent } from "../../../services/analytics";
-import { uploadAvatar } from "../../../services/avatar";
 import { ApiError } from "../../../services/api";
 import { loadProfile, updateProfile } from "../../../services/profile";
+import { isMiniappBasicProfileReady } from "../../../utils/profile-state";
 
 type SelectableTag = {
   label: string;
@@ -14,7 +14,7 @@ const steps = [
     index: 0,
     label: "身份",
     title: "基本身份",
-    hint: "让社区知道如何称呼和联系你",
+    hint: "补充你所在的地区、当前身份和个人介绍",
   },
   {
     index: 1,
@@ -30,9 +30,9 @@ const steps = [
   },
   {
     index: 3,
-    label: "公开",
-    title: "档案预览",
-    hint: "确认公开范围并查看成员卡效果",
+    label: "预览",
+    title: "名片预览",
+    hint: "确认资料并查看社区名片效果",
   },
 ];
 
@@ -45,21 +45,6 @@ function splitTags(value: string) {
         .filter(Boolean),
     ),
   );
-}
-
-function isDisplayNameReady(value: string) {
-  const displayName = value.trim();
-  return Boolean(displayName && displayName !== "微信用户");
-}
-
-function getAvatarFailureMessage(error: unknown) {
-  if (!(error instanceof ApiError)) return "头像上传失败，请重试";
-  if (error.errorCode === "invalid_avatar") {
-    return "请选择 10MB 内的图片";
-  }
-  if (error.statusCode === 401) return "登录已失效，请重新登录";
-  if (error.statusCode === 0) return "网络异常，请稍后重试";
-  return "头像上传失败，请重试";
 }
 
 function getProfileSaveFailureMessage(error: unknown) {
@@ -82,11 +67,7 @@ function buildSelectableTags(options: string[], selected: string[]) {
 function getInitialStep(profile: MiniappProfile) {
   const missing = new Set(profile.completion.missingItems);
 
-  if (
-    ["昵称", "城市/辖区", "当前身份"].some((item) =>
-      missing.has(item),
-    )
-  ) {
+  if (["城市/辖区", "当前身份"].some((item) => missing.has(item))) {
     return 0;
   }
   if (["行业方向", "擅长方向"].some((item) => missing.has(item))) {
@@ -119,6 +100,7 @@ Page({
     currentStep: 0,
     currentStepTitle: steps[0].title,
     currentStepHint: steps[0].hint,
+    stepSwiperHeight: 620,
     loading: true,
     saving: false,
     loadFailed: false,
@@ -127,10 +109,8 @@ Page({
     city: "常州",
     roleLabel: "",
     organization: "",
-    monthlyTime: "",
     cityOptions: [] as string[],
     roleOptions: [] as string[],
-    monthlyTimeOptions: [] as string[],
     customCity: "",
     customRoleLabel: "",
     bio: "",
@@ -145,27 +125,35 @@ Page({
     skillOptionItems: [] as SelectableTag[],
     customIndustry: "",
     customSkill: "",
-    willingToAttend: true,
-    willingToShare: false,
-    willingToJoinProjects: false,
-    isPubliclyVisible: true,
     privacyAccepted: false,
     privacyPolicyVersion: "",
     avatarUrl: null as string | null,
     avatarInitial: "微",
-    avatarUploading: false,
     completion: null as MiniappProfileCompletion | null,
     profileCompleteBefore: false,
+    registrationIntent: false,
   },
 
   onLoad(options: Record<string, string | undefined>) {
+    this.setData({
+      registrationIntent: options.intent === "event_registration",
+    });
     void this.loadPage(readRequestedStep(options.step));
   },
 
   async loadPage(requestedStep?: number) {
     this.setData({ loading: true, loadFailed: false });
     try {
-      await ensureSession();
+      const user = await ensureSession();
+      if (!isMiniappBasicProfileReady(user)) {
+        this.setData({ loading: false });
+        await wx.redirectTo({
+          url: this.data.registrationIntent
+            ? "/pages/profile/basic/index?intent=event_registration"
+            : "/pages/profile/basic/index?intent=profile",
+        });
+        return;
+      }
       const { profile, options } = await loadProfile();
       const currentStep = requestedStep ?? getInitialStep(profile);
       this.setData({
@@ -178,17 +166,11 @@ Page({
         city: profile.city,
         roleLabel: profile.roleLabel,
         organization: profile.organization,
-        monthlyTime: profile.monthlyTime,
         cityOptions: Array.from(
           new Set([...options.cities, profile.city].filter(Boolean)),
         ),
         roleOptions: Array.from(
           new Set([...options.roles, profile.roleLabel].filter(Boolean)),
-        ),
-        monthlyTimeOptions: Array.from(
-          new Set(
-            [...options.monthlyTimes, profile.monthlyTime].filter(Boolean),
-          ),
         ),
         bio: profile.bio,
         industryTags: profile.industryTags,
@@ -203,12 +185,6 @@ Page({
           profile.industryTags,
         ),
         skillOptionItems: buildSelectableTags(options.skills, profile.skills),
-        willingToAttend: profile.willingToAttend,
-        willingToShare: profile.willingToShare,
-        willingToJoinProjects: profile.willingToJoinProjects,
-        isPubliclyVisible: profile.completion.completed
-          ? profile.isPubliclyVisible
-          : true,
         privacyAccepted: profile.privacyAccepted,
         privacyPolicyVersion: profile.privacyPolicyVersion,
         avatarUrl: profile.avatarUrl,
@@ -216,8 +192,9 @@ Page({
         completion: profile.completion,
         profileCompleteBefore: profile.completion.completed,
       });
+      this.measureActiveStep();
       void wx.setNavigationBarTitle({
-        title: profile.completion.completed ? "编辑能力档案" : "完善能力档案",
+        title: profile.completion.completed ? "编辑社区名片" : "完善社区名片",
       });
       trackEvent("profile_started", "/pages/profile/edit/index", {
         completion: profile.completion.percent,
@@ -234,21 +211,13 @@ Page({
     if (!field) return;
     this.setData({
       [field]: event.detail.value,
-      ...(field === "displayName"
-        ? { avatarInitial: event.detail.value.trim().slice(0, 1) || "微" }
-        : {}),
     });
-  },
-
-  handleSwitch(event: WechatMiniprogram.SwitchChange) {
-    const field = String(event.currentTarget.dataset.field ?? "");
-    if (field) this.setData({ [field]: event.detail.value });
   },
 
   selectProfileOption(event: WechatMiniprogram.TouchEvent) {
     const field = String(event.currentTarget.dataset.field ?? "");
     const value = String(event.currentTarget.dataset.value ?? "").trim();
-    if (!value || !["city", "roleLabel", "monthlyTime"].includes(field)) {
+    if (!value || !["city", "roleLabel"].includes(field)) {
       return;
     }
     this.setData({ [field]: value });
@@ -262,6 +231,7 @@ Page({
       cityOptions: Array.from(new Set([...this.data.cityOptions, value])),
       customCity: "",
     });
+    this.measureActiveStep();
   },
 
   addCustomRoleLabel() {
@@ -272,6 +242,7 @@ Page({
       roleOptions: Array.from(new Set([...this.data.roleOptions, value])),
       customRoleLabel: "",
     });
+    this.measureActiveStep();
   },
 
   handlePrivacyChange(event: WechatMiniprogram.CheckboxGroupChange) {
@@ -330,6 +301,7 @@ Page({
         industryTags,
       ),
     });
+    this.measureActiveStep();
   },
 
   addCustomSkill() {
@@ -344,55 +316,17 @@ Page({
       customSkill: "",
       skillOptionItems: buildSelectableTags(this.data.skillOptions, skills),
     });
+    this.measureActiveStep();
   },
 
   openPrivacy() {
     void wx.navigateTo({ url: "/pages/privacy/index" });
   },
 
-  async chooseAvatar(
-    event: WechatMiniprogram.CustomEvent<{ avatarUrl: string }>,
-  ) {
-    const filePath = event.detail.avatarUrl;
-    if (!filePath || this.data.avatarUploading) return;
-    if (!this.data.privacyAccepted) {
-      void wx.showToast({ title: "请先同意隐私说明", icon: "none" });
-      return;
-    }
-
-    this.setData({ avatarUploading: true });
-    try {
-      const response = await uploadAvatar(
-        filePath,
-        this.data.privacyPolicyVersion,
-      );
-      getApp<IAppOption>().globalData.currentUser = response.user;
-      this.setData({ avatarUrl: response.avatarUrl });
-      void wx.showToast({ title: "头像已更新", icon: "success" });
-    } catch (error) {
-      void wx.showToast({
-        title: getAvatarFailureMessage(error),
-        icon: "none",
-      });
-    } finally {
-      this.setData({ avatarUploading: false });
-    }
-  },
-
   validateStep(step: number) {
     if (step === 0) {
-      if (
-        !isDisplayNameReady(this.data.displayName) ||
-        !this.data.city.trim() ||
-        !this.data.roleLabel.trim()
-      ) {
-        void wx.showToast({
-          title:
-            this.data.displayName.trim() === "微信用户"
-              ? "请设置真实昵称"
-              : "请完成带星号的资料",
-          icon: "none",
-        });
+      if (!this.data.city.trim() || !this.data.roleLabel.trim()) {
+        void wx.showToast({ title: "请完成带星号的资料", icon: "none" });
         return false;
       }
       if (!this.data.privacyAccepted) {
@@ -421,32 +355,26 @@ Page({
     return true;
   },
 
-  buildPayload(includeVisibility = false): MiniappProfileUpdate {
+  buildPayload(makePublic = false): MiniappProfileUpdate {
     return {
       displayName: this.data.displayName.trim(),
       wechat: this.data.wechat.trim(),
       city: this.data.city.trim() || "常州",
       roleLabel: this.data.roleLabel.trim(),
       organization: this.data.organization.trim(),
-      monthlyTime: this.data.monthlyTime.trim(),
       bio: this.data.bio.trim(),
       industryTags: this.data.industryTags,
       skills: this.data.skills,
       interests: this.data.interests,
       capabilitySummary: this.data.capabilitySummary.trim(),
       seekingSummary: this.data.seekingSummary.trim(),
-      willingToAttend: this.data.willingToAttend,
-      willingToShare: this.data.willingToShare,
-      willingToJoinProjects: this.data.willingToJoinProjects,
-      ...(includeVisibility
-        ? { isPubliclyVisible: this.data.isPubliclyVisible }
-        : {}),
+      ...(makePublic ? { isPubliclyVisible: true } : {}),
       privacyAccepted: true,
     };
   },
 
-  async persistProfile(includeVisibility = false) {
-    const response = await updateProfile(this.buildPayload(includeVisibility));
+  async persistProfile(makePublic = false) {
+    const response = await updateProfile(this.buildPayload(makePublic));
     getApp<IAppOption>().globalData.currentUser = response.user;
     this.setData({ completion: response.profile.completion });
     return response;
@@ -454,15 +382,42 @@ Page({
 
   goPrevious() {
     if (this.data.saving || this.data.currentStep === 0) return;
-    const currentStep = this.data.currentStep - 1;
-    this.setData(getStepState(currentStep));
+    this.setCurrentStep(this.data.currentStep - 1);
   },
 
   goToStep(event: WechatMiniprogram.TouchEvent) {
     if (this.data.saving) return;
     const currentStep = Number(event.currentTarget.dataset.step);
     if (!Number.isInteger(currentStep) || !steps[currentStep]) return;
-    this.setData(getStepState(currentStep));
+    this.setCurrentStep(currentStep);
+  },
+
+  handleStepChange(
+    event: WechatMiniprogram.CustomEvent<{ current: number }>,
+  ) {
+    if (this.data.saving) return;
+    const currentStep = event.detail.current;
+    if (!Number.isInteger(currentStep) || !steps[currentStep]) return;
+    this.setCurrentStep(currentStep);
+  },
+
+  setCurrentStep(currentStep: number) {
+    this.setData(getStepState(currentStep), () => this.measureActiveStep());
+  },
+
+  measureActiveStep() {
+    wx.nextTick(() => {
+      this.createSelectorQuery()
+        .select(`#profile-step-panel-${this.data.currentStep}`)
+        .boundingClientRect((rect) => {
+          if (!rect || Array.isArray(rect) || !rect.height) return;
+          const stepSwiperHeight = Math.ceil(rect.height);
+          if (stepSwiperHeight !== this.data.stepSwiperHeight) {
+            this.setData({ stepSwiperHeight });
+          }
+        })
+        .exec();
+    });
   },
 
   async handlePrimaryAction() {
@@ -482,7 +437,7 @@ Page({
         completion: response.profile.completion.percent,
       });
       const currentStep = this.data.currentStep + 1;
-      this.setData(getStepState(currentStep));
+      this.setCurrentStep(currentStep);
     } catch (error) {
       void wx.showToast({
         title: getProfileSaveFailureMessage(error),
@@ -496,7 +451,7 @@ Page({
   async saveProfile() {
     for (let step = 0; step <= 2; step += 1) {
       if (!this.validateStep(step)) {
-        this.setData(getStepState(step));
+        this.setCurrentStep(step);
         return;
       }
     }
@@ -505,8 +460,8 @@ Page({
     try {
       const response = await this.persistProfile(true);
       if (!response.profile.completion.completed) {
-        this.setData(getStepState(getInitialStep(response.profile)));
-        void wx.showToast({ title: "请补全能力档案", icon: "none" });
+        this.setCurrentStep(getInitialStep(response.profile));
+        void wx.showToast({ title: "请补全社区名片", icon: "none" });
         return;
       }
       trackEvent("profile_saved", "/pages/profile/edit/index", {
@@ -519,7 +474,11 @@ Page({
         "/pages/profile/edit/index",
         { completion: response.profile.completion.percent },
       );
-      void wx.showToast({ title: "能力档案已完成", icon: "success" });
+      void wx.showToast({ title: "社区名片已完成", icon: "success" });
+      if (this.data.registrationIntent) {
+        setTimeout(() => void wx.navigateBack(), 500);
+        return;
+      }
       setTimeout(
         () => void wx.redirectTo({ url: "/pages/profile/index" }),
         500,
