@@ -615,7 +615,7 @@
   top: 31%;
   left: 68%;
   width: 25%;
-  height: 20%;
+  height: 22%;
   flex-direction: column;
   justify-content: flex-start;
   gap: 2rpx;

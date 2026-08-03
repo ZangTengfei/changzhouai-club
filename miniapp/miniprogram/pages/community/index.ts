@@ -83,7 +83,7 @@ function applyFloorPlanLayout(
       ...resource,
       areaLabel: "集中办公室",
       x: 70.2 + (seatIndex % 3) * 7.1,
-      y: 36.5 + Math.floor(seatIndex / 3) * 7.4,
+      y: 38 + Math.floor(seatIndex / 3) * 7.4,
       width: 6.4,
       height: 5.8,
       rotation: 0,

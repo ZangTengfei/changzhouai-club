@@ -32,7 +32,7 @@ on conflict (code) do update set
 with focused_office_layout as (
   select
     focused_desk_number,
-    36.5 + floor((focused_desk_number - 1) / 3.0) * 7.4 as y_percent
+    38 + floor((focused_desk_number - 1) / 3.0) * 7.4 as y_percent
   from generate_series(1, 6) as focused_desks(focused_desk_number)
 )
 update public.community_space_resources as resource
