@@ -87,8 +87,12 @@ export function AdminSpacesPageClient() {
       await readResult(response);
       toast.success(decision === "approve" ? "已批准并固定工位" : "已驳回申请");
       reload();
-    } catch {
-      toast.error("处理失败，工位可能已被其他申请占用，请刷新后重试。");
+    } catch (error) {
+      toast.error(
+        error instanceof Error && error.message === "fixed_desk_has_active_bookings"
+          ? "该工位还有进行中或未来预约，请先处理预约后再批准。"
+          : "处理失败，工位可能已被其他申请占用，请刷新后重试。",
+      );
     } finally {
       setProcessingKey("");
     }
@@ -120,13 +124,13 @@ export function AdminSpacesPageClient() {
         <AdminPanelHeader eyebrow="SPACE OPERATIONS" title="空间工位" />
         <AdminPanelBody className="grid gap-4">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <AdminMetric label="固定工位" value={data?.metrics.fixedDeskCount ?? "—"} />
-            <AdminMetric label="已分配" value={data?.metrics.assignedCount ?? "—"} />
-            <AdminMetric label="可申请" value={data?.metrics.availableCount ?? "—"} />
+            <AdminMetric label="工位总数" value={data?.metrics.deskCount ?? "—"} />
+            <AdminMetric label="已固定" value={data?.metrics.assignedCount ?? "—"} />
+            <AdminMetric label="可预约 / 可申请" value={data?.metrics.availableCount ?? "—"} />
             <AdminMetric label="待审核" value={data?.metrics.submittedCount ?? "—"} />
           </div>
           <AdminNotice>
-            批准后工位会长期绑定申请人并展示其头像；只有申请人主动释放或管理员释放后，工位才会重新开放申请。
+            未固定工位同时支持流动预约和固定申请。批准后会长期绑定申请人并停止接受预约；如仍有进行中或未来预约，系统会阻止批准，需先处理预约。
           </AdminNotice>
           {error ? <AdminNotice>加载失败：{error}</AdminNotice> : null}
         </AdminPanelBody>

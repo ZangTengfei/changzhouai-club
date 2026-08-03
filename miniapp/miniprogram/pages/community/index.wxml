@@ -9,8 +9,8 @@
     <text class="hero-copy">{{community.summary}}</text>
     <view class="hero-location"><image src="/assets/icons/location-blue-v2.png" mode="aspectFit" /><text>{{community.location}}</text></view>
     <view class="hero-stats">
-      <view><text>{{community.deskCount}}</text><text>开放工位</text></view>
-      <view><text>{{community.fixedDeskCount}}</text><text>固定工位</text></view>
+      <view><text>{{community.deskCount}}</text><text>工位总数</text></view>
+      <view><text>{{community.fixedDeskCount}}</text><text>已固定</text></view>
       <view><text>{{community.meetingRoomCount}}</text><text>会议室</text></view>
     </view>
     <view class="hero-tags"><text>{{community.openHours}}</text><text>{{community.pricing}}</text><text>无人值守</text></view>
@@ -34,7 +34,7 @@
   <view class="opc-card surface-card">
     <view class="opc-point">
       <view class="opc-icon tone-green"><image src="/assets/icons/cocreate-green-v2.png" mode="aspectFit" /></view>
-      <view><text>常驻共创</text><text>已入驻 OPC 可申请固定工位，形成稳定的工作现场。</text></view>
+      <view><text>常驻共创</text><text>未固定的工位均可申请长期使用，审批后形成稳定的工作现场。</text></view>
     </view>
     <view class="opc-point">
       <view class="opc-icon tone-orange"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view>
@@ -96,7 +96,7 @@
             <view class="floor-window floor-window-top"></view>
             <view class="static-room office-room office-room-one"><text>独立办公室</text></view>
             <view class="static-room office-room office-room-two"><text>独立办公室</text></view>
-            <view class="static-room focused-office-zone"><text>集中办公室</text><text>6 个固定工位</text></view>
+            <view class="static-room focused-office-zone"><text>集中办公室</text><text>6 个工位</text></view>
             <view class="static-room salon-zone"><text>沙龙区</text></view>
             <view class="print-zone"><image src="/assets/icons/news-blue-v2.png" mode="aspectFit" /><text>打印区</text></view>
             <view class="hall-label">办公大厅 · 4 组 × 6 席联排桌</view>
@@ -115,8 +115,8 @@
           </view>
         </movable-view>
       </movable-area>
-      <view class="map-legend"><view><text class="legend-dot available"></text><text>可预约</text></view><view><text class="legend-dot booked"></text><text>已预约</text></view><view><text class="legend-dot fixed-available"></text><text>可申请固定</text></view><view><text class="legend-dot fixed"></text><text>已固定</text></view></view>
-      <text class="map-tip">点击空闲固定工位可发起申请；已固定工位可查看常驻成员名片</text>
+      <view class="map-legend"><view><text class="legend-dot available"></text><text>可预约 / 可申请固定</text></view><view><text class="legend-dot booked"></text><text>该时段已预约</text></view><view><text class="legend-dot fixed"></text><text>已固定</text></view></view>
+      <text class="map-tip">未固定工位默认同时支持流动预约和固定申请；固定后显示常驻成员头像并停止预约</text>
     </view>
 
     <view wx:else class="resource-list {{activeMode === 'desk' ? 'desk-resource-list' : 'room-resource-list'}}">
@@ -139,6 +139,7 @@
         </picker>
       </block>
       <button class="primary-button booking-submit" loading="{{submitting}}" disabled="{{submitting}}" bindtap="confirmBooking">{{isLoggedIn ? '确认免费预约' : '登录后预约'}}</button>
+      <button wx:if="{{selectedResource.resourceType === 'desk' && selectedResource.fixedApplicable}}" class="fixed-application-shortcut" data-id="{{selectedResource.id}}" bindtap="selectFixedDesk">需要长期使用？申请固定此工位</button>
       <text class="booking-note">门禁卡需单独申领，预约成功不代表已经获得实体门禁卡。</text>
     </view>
   </view>
@@ -158,9 +159,9 @@
 
     <block wx:else>
       <view wx:if="{{fixedDeskRequest && fixedDeskRequest.status === 'rejected'}}" class="fixed-desk-review-note"><text>上次申请未通过</text><text>{{fixedDeskRequest.reviewNote || '可选择其他工位后重新提交。'}}</text></view>
-      <text class="fixed-desk-intro">选择集中办公室中的空闲工位并说明常驻计划。审批后可搬入办公设备，直到你主动释放前不会进入临时预约池。</text>
+      <text class="fixed-desk-intro">所有未固定工位都可提交长期使用申请，同时仍可被正常预约。审批时若该工位还有进行中或未来预约，需先处理预约；批准后方可搬入设备，并停止进入流动预约池。</text>
       <view class="fixed-desk-options">
-        <view wx:for="{{fixedDeskOptions}}" wx:key="id" wx:if="{{item.availability === 'fixed_available'}}" class="fixed-desk-option {{selectedFixedDesk && selectedFixedDesk.id === item.id ? 'fixed-desk-option-selected' : ''}}" data-id="{{item.id}}" bindtap="selectResource"><text>{{item.code}}</text><text>可申请</text></view>
+        <view wx:for="{{fixedDeskOptions}}" wx:key="id" class="fixed-desk-option {{selectedFixedDesk && selectedFixedDesk.id === item.id ? 'fixed-desk-option-selected' : ''}}" data-id="{{item.id}}" bindtap="selectFixedDesk"><text>{{item.code}}</text><text>{{item.availability === 'booked' ? '该时段已约 · 可申请固定' : '可预约 · 可申请固定'}}</text></view>
       </view>
       <view wx:if="{{selectedFixedDesk}}" class="fixed-desk-form">
         <label class="access-field"><text>常驻计划（选填）</text><textarea maxlength="500" value="{{fixedDeskNote}}" bindinput="handleFixedDeskNoteInput" placeholder="例如：主要办公项目、每周常驻时间、计划搬入的设备" /></label>
@@ -169,7 +170,7 @@
         </checkbox-group>
         <button class="primary-button fixed-desk-submit" loading="{{fixedDeskSubmitting}}" disabled="{{fixedDeskSubmitting}}" bindtap="submitFixedDeskRequest">{{isLoggedIn ? '申请 ' + selectedFixedDesk.code : '登录后申请固定工位'}}</button>
       </view>
-      <view wx:else class="fixed-desk-empty">当前没有可申请的固定工位</view>
+      <view wx:else class="fixed-desk-empty">当前所有工位都已固定或暂停使用</view>
     </block>
   </view>
 

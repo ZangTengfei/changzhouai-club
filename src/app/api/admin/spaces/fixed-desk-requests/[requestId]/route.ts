@@ -7,6 +7,9 @@ const reviewErrorCodes = [
   "fixed_desk_request_not_reviewable",
   "fixed_desk_already_assigned",
   "fixed_desk_user_already_assigned",
+  "fixed_desk_has_active_bookings",
+  "fixed_desk_not_applicable",
+  "minimum_flexible_desks_required",
   "community_profile_required",
 ] as const;
 

@@ -81,9 +81,9 @@ export const COMMUNITY_SPACE_CONTENT = {
   openHours: "24 小时开放",
   pricing: "社区成员免费",
   eligibility: "社区成员与已入驻 OPC",
-  deskCount: 24,
+  deskCount: 30,
   flexibleDeskMinimum: 6,
-  fixedDeskCount: 6,
+  fixedDeskCount: 0,
   meetingRoomCount: 1,
 } as const;
 
@@ -275,8 +275,6 @@ export async function loadCommunitySpaceSnapshot(
           ? "disabled"
           : fixed
             ? "fixed"
-            : resource.desk_mode === "fixed"
-              ? "fixed_available"
             : booked
               ? "booked"
               : "available";
@@ -295,6 +293,10 @@ export async function loadCommunitySpaceSnapshot(
         height: asNumber(resource.height_percent),
         rotation: resource.rotation_degrees,
         availability,
+        fixedApplicable:
+          resource.resource_type === "desk" &&
+          resource.status === "active" &&
+          !fixed,
         isMine: myBookingResourceIds.has(resource.id),
         fixedAssignment: assignment
           ? {
@@ -315,9 +317,8 @@ export async function loadCommunitySpaceSnapshot(
       };
     });
 
-  const flexibleDesks = mappedResources.filter(
-    (resource) =>
-      resource.resourceType === "desk" && resource.deskMode === "flexible",
+  const desks = mappedResources.filter(
+    (resource) => resource.resourceType === "desk",
   );
   const myFixedAssignment = assignments.find(
     (assignment) => assignment.user_id === userId,
@@ -327,12 +328,21 @@ export async function loadCommunitySpaceSnapshot(
     : null;
 
   return {
-    community: COMMUNITY_SPACE_CONTENT,
+    community: {
+      ...COMMUNITY_SPACE_CONTENT,
+      deskCount: desks.filter((resource) => resource.availability !== "disabled")
+        .length,
+      fixedDeskCount: desks.filter(
+        (resource) => resource.availability === "fixed",
+      ).length,
+    },
     window,
     resources: mappedResources,
     availability: {
-      flexibleDeskCount: flexibleDesks.length,
-      availableDeskCount: flexibleDesks.filter(
+      flexibleDeskCount: desks.filter(
+        (resource) => resource.availability !== "fixed",
+      ).length,
+      availableDeskCount: desks.filter(
         (resource) => resource.availability === "available",
       ).length,
       availableMeetingRoomCount: mappedResources.filter(

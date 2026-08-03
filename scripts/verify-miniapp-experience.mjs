@@ -341,12 +341,15 @@ try {
     ).length,
     1,
   );
-  assert.equal(
-    communityPublic.body?.resources?.filter(
+  const deskResources = communityPublic.body?.resources?.filter(
+    (resource) => resource.resourceType === "desk",
+  );
+  assert.ok(
+    deskResources?.every(
       (resource) =>
-        resource.resourceType === "desk" && resource.availability === "fixed",
-    ).length,
-    6,
+        resource.fixedApplicable ===
+          !["fixed", "disabled"].includes(resource.availability),
+    ),
   );
   const availableDesk = communityPublic.body?.resources?.find(
     (resource) =>
@@ -359,6 +362,7 @@ try {
       resource.availability === "available",
   );
   assert.ok(availableDesk?.id);
+  assert.equal(availableDesk?.fixedApplicable, true);
   assert.ok(availableMeetingRoom?.id);
   pass("community_space_catalog_loaded");
 

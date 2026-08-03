@@ -735,13 +735,6 @@
   color: #9b581d;
 }
 
-.resource-fixed-available {
-  border-color: #6fa9c8;
-  border-style: dashed;
-  background: #edf7fb;
-  color: #356f8e;
-}
-
 .resource-fixed {
   border-color: #9ba7a2;
   background: #e8ecea;
@@ -831,12 +824,6 @@
   background: #fff2e5;
 }
 
-.legend-dot.fixed-available {
-  border-color: #6fa9c8;
-  border-style: dashed;
-  background: #edf7fb;
-}
-
 .legend-dot.fixed {
   border-color: #9ba7a2;
   background: #e8ecea;
@@ -912,11 +899,6 @@
 .resource-list-item-booked {
   border-color: #f2d3b4;
   background: var(--color-orange-soft);
-}
-
-.resource-list-item-fixed-available {
-  border-color: #b6d8e8;
-  background: #f1f9fc;
 }
 
 .resource-list-item-fixed,
@@ -1029,6 +1011,22 @@
   margin-top: 22rpx;
 }
 
+.fixed-application-shortcut {
+  min-height: 70rpx;
+  margin-top: 14rpx;
+  border: 2rpx solid #9fc8dc;
+  border-radius: 18rpx;
+  background: #f3fafd;
+  color: #356f8e;
+  font-size: 20rpx;
+  font-weight: 720;
+  line-height: 70rpx;
+}
+
+.fixed-application-shortcut::after {
+  border: 0;
+}
+
 .booking-note {
   display: block;
   margin-top: 14rpx;
@@ -1075,7 +1073,10 @@
 }
 
 .fixed-desk-option text:last-child {
-  font-size: 17rpx;
+  padding: 0 4rpx;
+  font-size: 15rpx;
+  line-height: 1.35;
+  text-align: center;
 }
 
 .fixed-desk-option-selected {

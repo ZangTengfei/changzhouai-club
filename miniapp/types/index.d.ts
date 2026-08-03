@@ -215,7 +215,6 @@ type MiniappCommunityResourceType = "desk" | "meeting_room";
 type MiniappCommunityAvailability =
   | "available"
   | "booked"
-  | "fixed_available"
   | "fixed"
   | "disabled";
 
@@ -241,6 +240,7 @@ interface MiniappCommunitySpaceResource {
   height: number;
   rotation: number;
   availability: MiniappCommunityAvailability;
+  fixedApplicable: boolean;
   isMine: boolean;
   fixedAssignment: MiniappCommunityFixedDeskAssignee | null;
 }

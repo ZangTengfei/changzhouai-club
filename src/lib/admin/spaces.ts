@@ -73,7 +73,7 @@ export type AdminFixedDeskAssignment = {
 
 export type AdminSpacesData = {
   metrics: {
-    fixedDeskCount: number;
+    deskCount: number;
     assignedCount: number;
     availableCount: number;
     submittedCount: number;
@@ -101,7 +101,6 @@ export async function loadAdminSpacesData(context?: AdminContext) {
       .from("community_space_resources")
       .select("id, code, name, area_label, status")
       .eq("resource_type", "desk")
-      .eq("desk_mode", "fixed")
       .order("sort_order", { ascending: true }),
   ]);
 
@@ -186,7 +185,7 @@ export async function loadAdminSpacesData(context?: AdminContext) {
   ).length;
   return {
     metrics: {
-      fixedDeskCount: resources.filter((resource) => resource.status === "active")
+      deskCount: resources.filter((resource) => resource.status === "active")
         .length,
       assignedCount: mappedAssignments.length,
       availableCount: Math.max(
