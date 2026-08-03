@@ -1,4 +1,4 @@
-<custom-navigation title="社区" show-avatar="{{true}}" avatar-url="{{avatarUrl}}" avatar-initial="{{avatarInitial}}" avatar-guest="{{!isLoggedIn}}" bindavatartap="openProfile" />
+<custom-navigation title="AI Club OPC 共创社区" show-avatar="{{true}}" avatar-url="{{avatarUrl}}" avatar-initial="{{avatarInitial}}" avatar-guest="{{!isLoggedIn}}" bindavatartap="openProfile" />
 
 <view class="page-shell community-page">
   <view class="community-hero">
