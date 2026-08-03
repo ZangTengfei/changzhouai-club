@@ -98,7 +98,7 @@
             <view class="floor-window floor-window-top"></view>
             <view class="static-room office-room office-room-one"><text>独立办公室</text></view>
             <view class="static-room office-room office-room-two"><text>独立办公室</text></view>
-            <view class="static-room focused-office-zone"><text>集中办公室</text><text>6 个工位</text></view>
+            <view class="static-room focused-office-zone"><text>集中办公室</text></view>
             <view class="static-room salon-zone"><text>沙龙区</text></view>
             <view class="hall-label">办公大厅 · 4 组 × 6 席联排桌</view>
             <view class="entrance-label">入口</view>

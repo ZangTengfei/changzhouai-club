@@ -634,12 +634,6 @@
   white-space: nowrap;
 }
 
-.focused-office-zone text:last-child {
-  color: #7a8580;
-  font-size: 14rpx;
-  font-weight: 620;
-}
-
 .salon-zone {
   top: 31%;
   left: 45%;
