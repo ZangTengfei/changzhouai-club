@@ -38,6 +38,7 @@ type DateOption = {
 
 const durationOptions = [1, 2, 4, 8];
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+const communitySummary = "这里有工位、会议室，也有一群正在做事的人。";
 const fallbackSpacePhotos: MiniappCommunitySpacePhoto[] = [
   {
     id: "fallback-office",
@@ -417,7 +418,7 @@ Page({
   data: {
     community: {
       title: "AI Club OPC 共创社区",
-      summary: "让 OPC、社区成员和真实项目在同一个空间里持续发生连接。",
+      summary: communitySummary,
       location: "武进区中以创新园 18 号楼 5 楼",
       openHours: "24 小时开放",
       pricing: "社区成员免费",
@@ -555,6 +556,7 @@ Page({
       this.setData({
         community: {
           ...snapshot.community,
+          summary: communitySummary,
           fixedDeskCount: snapshot.community.fixedDeskCount ?? 0,
           meetingRoomCount: 1,
         },
@@ -766,7 +768,7 @@ Page({
     if (!fixedDesk || this.data.fixedDeskReleasing) return;
     wx.showModal({
       title: `释放 ${fixedDesk.resourceCode}`,
-      content: "释放后该工位将立即恢复为可预约、可申请固定状态，请先搬走个人办公设备。确认继续吗？",
+      content: "释放后，这个工位会立即重新开放。请先搬走个人物品和设备。",
       confirmText: "确认释放",
       confirmColor: "#d44d3d",
       success: (result) => {
@@ -942,7 +944,7 @@ Page({
       });
       this.setData({ accessRequest: response.accessRequest });
       trackEvent("community_access_request", "/pages/community/index");
-      void wx.showToast({ title: "申领记录已提交", icon: "success" });
+      void wx.showToast({ title: "门禁申请已提交", icon: "success" });
     } catch (error) {
       void wx.showToast({
         title:

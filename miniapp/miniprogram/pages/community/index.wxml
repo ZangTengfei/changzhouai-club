@@ -4,7 +4,7 @@
   <view class="community-hero">
     <view class="hero-content">
       <view class="hero-topline"><image src="/assets/logo-mark.png" mode="aspectFit" /><text>AI CLUB · OPC 共创社区</text></view>
-      <view class="hero-title"><text>一个随时可以来，</text><text>也容易遇见</text><text>伙伴的地方</text></view>
+      <view class="hero-title"><text>随时来办公，</text><text>也能遇见</text><text>一起做事的人</text></view>
       <text class="hero-copy">{{community.summary}}</text>
       <view class="hero-location"><image src="/assets/icons/location-blue-v2.png" mode="aspectFit" /><text>{{community.location}}</text></view>
       <view class="hero-stats">
@@ -21,25 +21,25 @@
   </view>
 
   <view class="section-heading-row community-section-heading">
-    <view><text class="section-eyebrow">COMMUNITY OPC</text><text class="section-title">在这里，把一人公司的事做大一点</text></view>
+    <view><text class="section-eyebrow">COMMUNITY OPC</text><text class="section-title">一个人做公司，也不用一个人办公</text></view>
   </view>
   <view class="opc-card surface-card">
     <view class="opc-point">
       <view class="opc-icon tone-green"><image src="/assets/icons/cocreate-green-v2.png" mode="aspectFit" /></view>
-      <view><text>常驻共创</text><text>未固定的工位均可申请长期使用，审批后形成稳定的工作现场。</text></view>
+      <view><text>固定工位</text><text>需要长期办公，可以申请一个固定工位。</text></view>
     </view>
     <view class="opc-point">
       <view class="opc-icon tone-orange"><image src="/assets/icons/events-orange-v2.png" mode="aspectFit" /></view>
-      <view><text>项目协作</text><text>让能力、场景与交付伙伴在空间里持续发生连接。</text></view>
+      <view><text>找人合作</text><text>有项目、有需求，可以在社区里找伙伴一起做。</text></view>
     </view>
     <view class="opc-point">
       <view class="opc-icon tone-blue"><image src="/assets/icons/profile-blue-v2.png" mode="aspectFit" /></view>
-      <view><text>开放连接</text><text>社区成员可免费预约流动工位和会议室，随时来办公。</text></view>
+      <view><text>临时办公</text><text>社区成员可以免费预约工位和会议室。</text></view>
     </view>
   </view>
 
   <view id="space-booking" class="section-heading-row community-section-heading">
-    <view><text class="section-eyebrow">SPACE BOOKING</text><text class="section-title">预约社区空间</text></view>
+    <view><text class="section-eyebrow">SPACE BOOKING</text><text class="section-title">预约工位和会议室</text></view>
     <text class="section-side-note">免费 · 24 小时</text>
   </view>
 
@@ -51,12 +51,12 @@
 
     <view wx:if="{{activeMode === 'desk' && myFixedDesk}}" class="desk-permanent-status">
       <view class="fixed-desk-active-avatar"><image wx:if="{{avatarUrl}}" src="{{avatarUrl}}" mode="aspectFill" /><text wx:else>{{avatarInitial}}</text></view>
-      <view class="desk-permanent-status-copy"><text>{{myFixedDesk.resourceCode}} · 我的常驻工位</text><text>工位会一直为你保留，直到主动释放。</text></view>
+      <view class="desk-permanent-status-copy"><text>{{myFixedDesk.resourceCode}} · 我的常驻工位</text><text>主动释放前，这个工位会一直为你保留。</text></view>
       <button class="fixed-desk-release" loading="{{fixedDeskReleasing}}" disabled="{{fixedDeskReleasing}}" bindtap="releaseFixedDesk">释放</button>
     </view>
     <view wx:elif="{{activeMode === 'desk' && fixedDeskRequest && fixedDeskRequest.status === 'submitted'}}" class="desk-permanent-status">
       <text class="status-tag">审核中</text>
-      <view class="desk-permanent-status-copy"><text>{{fixedDeskRequest.resourceCode || '常驻工位'}} 已提交申请</text><text>通过后将长期保留，并在平面图展示头像。</text></view>
+      <view class="desk-permanent-status-copy"><text>{{fixedDeskRequest.resourceCode || '常驻工位'}} 已提交申请</text><text>审核通过后，这个工位会为你保留。</text></view>
     </view>
 
     <scroll-view class="date-scroller" scroll-x="{{true}}" show-scrollbar="{{false}}" enhanced="{{true}}">
@@ -78,12 +78,12 @@
     </view>
 
     <view class="availability-strip">
-      <view><text>{{activeMode === 'desk' ? availability.availableDeskCount : availability.availableMeetingRoomCount}}</text><text>{{activeMode === 'desk' ? '个工位当天可选' : '间会议室可选'}}</text></view>
+      <view><text>{{activeMode === 'desk' ? availability.availableDeskCount : availability.availableMeetingRoomCount}}</text><text>{{activeMode === 'desk' ? '个工位可选' : '间会议室可选'}}</text></view>
       <text>{{windowLabel}}</text>
     </view>
 
-    <view wx:if="{{loadFailed}}" class="space-warning"><text>预约状态暂时没有加载成功，平面图仅供查看。</text><text bindtap="loadPage">重新加载</text></view>
-    <view wx:elif="{{loading}}" class="space-loading"><view class="loading-spinner"></view><text>正在读取空间状态</text></view>
+    <view wx:if="{{loadFailed}}" class="space-warning"><text>暂时没能加载最新状态，请稍后重试。</text><text bindtap="loadPage">重新加载</text></view>
+    <view wx:elif="{{loading}}" class="space-loading"><view class="loading-spinner"></view><text>正在加载</text></view>
 
     <view class="map-toolbar">
       <view class="mini-segmented"><view class="{{viewMode === 'map' ? 'active' : ''}}" data-view="map" bindtap="switchView">平面图</view><view class="{{viewMode === 'list' ? 'active' : ''}}" data-view="list" bindtap="switchView">列表</view></view>
@@ -115,8 +115,8 @@
           </view>
         </movable-view>
       </movable-area>
-      <view class="map-legend"><view><text class="legend-dot available"></text><text>可预约 / 可申请常驻</text></view><view><text class="legend-dot booked"></text><text>{{activeMode === 'desk' ? '当天已预约' : '该时段已预约'}}</text></view><view><text class="legend-dot fixed"></text><text>已常驻</text></view></view>
-      <text class="map-tip">未固定工位默认同时支持按天预约和常驻申请；常驻后显示灰色占用状态，成员信息可在列表中查看</text>
+      <view class="map-legend"><view><text class="legend-dot available"></text><text>可预约、可申请常驻</text></view><view><text class="legend-dot booked"></text><text>{{activeMode === 'desk' ? '当天已预约' : '该时段已预约'}}</text></view><view><text class="legend-dot fixed"></text><text>已常驻</text></view></view>
+      <text class="map-tip">绿色工位既可按天预约，也可申请常驻。常驻成员可在列表中查看。</text>
     </view>
 
     <view wx:else class="resource-list {{activeMode === 'desk' ? 'desk-resource-list' : 'room-resource-list'}}">
@@ -135,18 +135,18 @@
       <block wx:if="{{selectedResource.resourceType === 'desk'}}">
         <text class="desk-use-prompt">选择使用方式</text>
         <view class="desk-use-options">
-          <button class="desk-use-option {{deskUseMode === 'temporary' ? 'desk-use-option-selected' : ''}} {{selectedResource.availability !== 'available' ? 'desk-use-option-disabled' : ''}}" data-mode="temporary" bindtap="chooseDeskUseMode" hover-class="none" disabled="{{selectedResource.availability !== 'available'}}"><text>按天预约</text><text>{{selectedResource.availability === 'available' ? '当天免费使用' : '当天已被预约'}}</text></button>
-          <button class="desk-use-option {{deskUseMode === 'fixed' ? 'desk-use-option-selected' : ''}} {{!selectedResource.fixedApplicable || myFixedDesk || (fixedDeskRequest && fixedDeskRequest.status === 'submitted') ? 'desk-use-option-disabled' : ''}}" data-mode="fixed" bindtap="chooseDeskUseMode" hover-class="none" disabled="{{!selectedResource.fixedApplicable || myFixedDesk || (fixedDeskRequest && fixedDeskRequest.status === 'submitted')}}"><text>申请常驻</text><text>审批后长期保留</text></button>
+          <button class="desk-use-option {{deskUseMode === 'temporary' ? 'desk-use-option-selected' : ''}} {{selectedResource.availability !== 'available' ? 'desk-use-option-disabled' : ''}}" data-mode="temporary" bindtap="chooseDeskUseMode" hover-class="none" disabled="{{selectedResource.availability !== 'available'}}"><text>按天预约</text><text>{{selectedResource.availability === 'available' ? '仅当天使用' : '当天已被预约'}}</text></button>
+          <button class="desk-use-option {{deskUseMode === 'fixed' ? 'desk-use-option-selected' : ''}} {{!selectedResource.fixedApplicable || myFixedDesk || (fixedDeskRequest && fixedDeskRequest.status === 'submitted') ? 'desk-use-option-disabled' : ''}}" data-mode="fixed" bindtap="chooseDeskUseMode" hover-class="none" disabled="{{!selectedResource.fixedApplicable || myFixedDesk || (fixedDeskRequest && fixedDeskRequest.status === 'submitted')}}"><text>申请常驻</text><text>长期使用这个工位</text></button>
         </view>
         <view wx:if="{{deskUseMode === 'temporary'}}" class="desk-use-action">
           <button class="primary-button booking-submit" loading="{{submitting}}" disabled="{{submitting}}" bindtap="confirmBooking">{{isLoggedIn ? '确认按天预约' : '登录后预约'}}</button>
         </view>
         <view wx:elif="{{deskUseMode === 'fixed'}}" class="desk-fixed-form">
           <view wx:if="{{fixedDeskRequest && fixedDeskRequest.status === 'rejected'}}" class="fixed-desk-review-note"><text>上次申请未通过</text><text>{{fixedDeskRequest.reviewNote || '可更换工位后重新提交。'}}</text></view>
-          <text class="desk-fixed-intro">常驻申请通过后可搬入办公设备，工位将停止流动预约；主动释放前会一直为你保留。</text>
-          <label class="access-field"><text>常驻计划（选填）</text><textarea maxlength="500" value="{{fixedDeskNote}}" bindinput="handleFixedDeskNoteInput" placeholder="例如：主要办公项目、每周常驻时间、计划搬入的设备" /></label>
+          <text class="desk-fixed-intro">申请通过后，你可以把办公设备放在这里。主动释放前，工位会一直为你保留。</text>
+          <label class="access-field"><text>使用说明（选填）</text><textarea maxlength="500" value="{{fixedDeskNote}}" bindinput="handleFixedDeskNoteInput" placeholder="说说你通常什么时候来、会放哪些设备" /></label>
           <checkbox-group bindchange="changeFixedDeskConsent">
-            <label class="fixed-desk-consent"><checkbox value="consent" checked="{{fixedDeskConsent}}" color="#13a567" /><text>我同意在平面图展示头像，并允许其他成员点击查看我的公开成员名片。</text></label>
+            <label class="fixed-desk-consent"><checkbox value="consent" checked="{{fixedDeskConsent}}" color="#13a567" /><text>我同意在工位列表中展示头像和昵称，其他成员可查看我的公开名片。</text></label>
           </checkbox-group>
           <button class="primary-button fixed-desk-submit" loading="{{fixedDeskSubmitting}}" disabled="{{fixedDeskSubmitting}}" bindtap="submitFixedDeskRequest">{{isLoggedIn ? '提交常驻申请' : '登录后申请常驻'}}</button>
         </view>
@@ -158,7 +158,7 @@
         </picker>
         <button class="primary-button booking-submit" loading="{{submitting}}" disabled="{{submitting}}" bindtap="confirmBooking">{{isLoggedIn ? '确认免费预约' : '登录后预约'}}</button>
       </block>
-      <text class="booking-note">门禁卡需单独申领，预约成功不代表已经获得实体门禁卡。</text>
+      <text class="booking-note">预约空间不包含门禁卡；如有需要，请在下方单独申请。</text>
     </view>
   </view>
 
@@ -166,21 +166,21 @@
   <view wx:if="{{myBookings.length}}" class="my-bookings">
     <view wx:for="{{myBookings}}" wx:key="id" class="my-booking-card surface-card">
       <view class="booking-date-tile"><text>{{item.dateLabel}}</text><text>{{item.timeLabel}}</text></view>
-      <view class="my-booking-copy"><text>{{item.resourceName}}</text><text>{{item.resourceType === 'desk' ? '开放工位' : item.attendeeCount + ' 人会议'}}</text></view>
+      <view class="my-booking-copy"><text>{{item.resourceName}}</text><text>{{item.resourceType === 'desk' ? '按天工位' : item.attendeeCount + ' 人会议'}}</text></view>
       <button wx:if="{{item.status === 'confirmed'}}" class="booking-cancel" data-id="{{item.id}}" bindtap="cancelBooking">取消</button>
       <text wx:else class="booking-cancelled">已取消</text>
     </view>
   </view>
 
-  <view class="section-heading-row community-section-heading"><view><text class="section-eyebrow">ACCESS CARD</text><text class="section-title">申领实体门禁卡</text></view></view>
+  <view class="section-heading-row community-section-heading"><view><text class="section-eyebrow">ACCESS CARD</text><text class="section-title">申请门禁卡</text></view></view>
   <view class="access-card surface-card">
-    <view class="access-intro"><view class="access-icon"><image src="/assets/icons/privacy-green-v2.png" mode="aspectFit" /></view><view><text>门禁申领与空间预约相互独立</text><text>小程序只记录申请，实体卡由社区线下授予和领取。</text></view></view>
-    <view wx:if="{{accessRequest && accessRequest.status === 'submitted'}}" class="access-status"><text class="status-tag">已提交</text><text>工作人员处理后会通过你留下的联系方式沟通。</text></view>
-    <view wx:elif="{{accessRequest && accessRequest.status === 'processed'}}" class="access-status access-status-processed"><text class="status-tag status-tag-blue">已处理</text><text>申领记录已完成，如需补充请联系社区工作人员。</text></view>
+    <view class="access-intro"><view class="access-icon"><image src="/assets/icons/privacy-green-v2.png" mode="aspectFit" /></view><view><text>门禁申请</text><text>审核通过后，请到社区线下领取实体门禁卡。</text></view></view>
+    <view wx:if="{{accessRequest && accessRequest.status === 'submitted'}}" class="access-status"><text class="status-tag">已提交</text><text>工作人员会通过你留下的联系方式联系你。</text></view>
+    <view wx:elif="{{accessRequest && accessRequest.status === 'processed'}}" class="access-status access-status-processed"><text class="status-tag status-tag-blue">已处理</text><text>申请已处理，如有问题请联系社区工作人员。</text></view>
     <block wx:else>
       <label class="access-field"><text>联系方式 *</text><input maxlength="100" value="{{accessContact}}" bindinput="handleAccessContactInput" placeholder="手机号或微信号" /></label>
       <label class="access-field"><text>补充说明（选填）</text><textarea maxlength="300" value="{{accessNote}}" bindinput="handleAccessNoteInput" placeholder="例如：预计首次到访时间" /></label>
-      <button class="secondary-button access-submit" loading="{{accessSubmitting}}" disabled="{{accessSubmitting}}" bindtap="submitAccessRequest">{{isLoggedIn ? '提交申领记录' : '登录后申领'}}</button>
+      <button class="secondary-button access-submit" loading="{{accessSubmitting}}" disabled="{{accessSubmitting}}" bindtap="submitAccessRequest">{{isLoggedIn ? '提交申请' : '登录后申请'}}</button>
     </block>
   </view>
 

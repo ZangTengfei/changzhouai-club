@@ -84,7 +84,7 @@ export type CommunitySpaceWindow = {
 
 export const COMMUNITY_SPACE_CONTENT = {
   title: "AI Club OPC 共创社区",
-  summary: "让 OPC、社区成员和真实项目在同一个空间里持续发生连接。",
+  summary: "这里有工位、会议室，也有一群正在做事的人。",
   location: "武进区中以创新园 18 号楼 5 楼",
   openHours: "24 小时开放",
   pricing: "社区成员免费",
