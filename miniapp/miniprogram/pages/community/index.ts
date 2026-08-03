@@ -15,6 +15,7 @@ type ResourceViewMode = "map" | "list";
 type CommunityResourceItem = MiniappCommunitySpaceResource & {
   availabilityClass: string;
   availabilityLabel: string;
+  facingClass: string;
   isActiveMode: boolean;
   selectable: boolean;
   style: string;
@@ -40,6 +41,66 @@ const spacePhotos = [
 ];
 let hasLoaded = false;
 let requestVersion = 0;
+
+function getDeskNumber(code: string, prefix: "D" | "F", maximum: number) {
+  const match = code.match(new RegExp(`^${prefix}(\\d{2})$`));
+  const number = match ? Number(match[1]) : 0;
+  return number >= 1 && number <= maximum ? number : null;
+}
+
+function applyFloorPlanLayout(
+  resource: MiniappCommunitySpaceResource,
+): MiniappCommunitySpaceResource {
+  const hallDeskNumber = getDeskNumber(resource.code, "D", 24);
+  if (hallDeskNumber) {
+    const groupIndex = Math.floor((hallDeskNumber - 1) / 6);
+    const seatIndex = (hallDeskNumber - 1) % 6;
+    return {
+      ...resource,
+      areaLabel: `办公大厅 · ${String.fromCharCode(65 + groupIndex)} 组联排桌`,
+      x: 8 + (seatIndex % 3) * 11.2,
+      y: 17 + groupIndex * 15 + Math.floor(seatIndex / 3) * 6.3,
+      width: 10.4,
+      height: 6,
+      rotation: 0,
+    };
+  }
+
+  const fixedDeskNumber = getDeskNumber(resource.code, "F", 6);
+  if (fixedDeskNumber) {
+    const seatIndex = fixedDeskNumber - 1;
+    return {
+      ...resource,
+      areaLabel: "集中办公室",
+      x: 70.2 + (seatIndex % 3) * 7.1,
+      y: 52.5 + Math.floor(seatIndex / 3) * 7.4,
+      width: 6.4,
+      height: 5.8,
+      rotation: 0,
+    };
+  }
+
+  if (resource.code === "MR-02") {
+    return {
+      ...resource,
+      name: "会议室",
+      areaLabel: "办公大厅南侧",
+      x: 10,
+      y: 79,
+      width: 34,
+      height: 14,
+      rotation: 0,
+    };
+  }
+
+  return resource;
+}
+
+function getDeskFacingClass(code: string) {
+  const deskNumber = getDeskNumber(code, "D", 24) ?? getDeskNumber(code, "F", 6);
+  if (!deskNumber) return "";
+  return (deskNumber - 1) % 6 < 3 ? "desk-facing-south" : "desk-facing-north";
+}
 
 function pad(value: number) {
   return String(value).padStart(2, "0");
@@ -110,19 +171,21 @@ function mapResource(
   resource: MiniappCommunitySpaceResource,
   activeMode: ResourceMode,
 ): CommunityResourceItem {
+  const positionedResource = applyFloorPlanLayout(resource);
   const availability = getAvailabilityMeta(resource.availability);
   return {
-    ...resource,
+    ...positionedResource,
     availabilityClass: availability.className,
     availabilityLabel: availability.label,
+    facingClass: getDeskFacingClass(resource.code),
     isActiveMode: resource.resourceType === activeMode,
     selectable: resource.availability === "available",
     style: [
-      `left:${resource.x}%`,
-      `top:${resource.y}%`,
-      `width:${resource.width}%`,
-      `height:${resource.height}%`,
-      `transform:rotate(${resource.rotation}deg)`,
+      `left:${positionedResource.x}%`,
+      `top:${positionedResource.y}%`,
+      `width:${positionedResource.width}%`,
+      `height:${positionedResource.height}%`,
+      `transform:rotate(${positionedResource.rotation}deg)`,
     ].join(";"),
   };
 }
@@ -142,53 +205,55 @@ function mapBooking(booking: MiniappCommunitySpaceBooking): CommunityBookingItem
 }
 
 function buildPlaceholderResources(activeMode: ResourceMode) {
-  const desks = Array.from({ length: 24 }, (_, index) => {
-    const row = Math.floor(index / 4);
-    const column = index % 4;
-    return {
+  const desks: MiniappCommunitySpaceResource[] = Array.from(
+    { length: 24 },
+    (_, index) => ({
       id: `placeholder-desk-${index + 1}`,
       code: `D${pad(index + 1)}`,
       name: `工位 ${pad(index + 1)}`,
-      resourceType: "desk" as const,
-      deskMode: "flexible" as const,
+      resourceType: "desk",
+      deskMode: "flexible",
       capacity: 1,
       areaLabel: "办公大厅",
-      x: 8 + column * 13,
-      y: 16 + row * 11,
-      width: 9,
-      height: 7,
-      rotation: 0,
-      availability: "disabled" as const,
-      isMine: false,
-    };
-  });
-  const rooms: MiniappCommunitySpaceResource[] = [
-    {
-      id: "placeholder-room-1",
-      code: "MR-01",
-      name: "会议室 1",
-      resourceType: "meeting_room",
-      deskMode: null,
-      capacity: 6,
-      areaLabel: "前台右侧",
-      x: 66,
-      y: 12,
-      width: 27,
-      height: 20,
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1,
       rotation: 0,
       availability: "disabled",
       isMine: false,
-    },
+    }),
+  );
+  const fixedDesks: MiniappCommunitySpaceResource[] = Array.from(
+    { length: 6 },
+    (_, index) => ({
+      id: `placeholder-fixed-desk-${index + 1}`,
+      code: `F${pad(index + 1)}`,
+      name: `固定工位 ${pad(index + 1)}`,
+      resourceType: "desk",
+      deskMode: "fixed",
+      capacity: 1,
+      areaLabel: "集中办公室",
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1,
+      rotation: 0,
+      availability: "fixed",
+      isMine: false,
+    }),
+  );
+  const rooms: MiniappCommunitySpaceResource[] = [
     {
       id: "placeholder-room-2",
       code: "MR-02",
-      name: "会议室 2",
+      name: "会议室",
       resourceType: "meeting_room",
       deskMode: null,
       capacity: 8,
       areaLabel: "办公大厅南侧",
-      x: 9,
-      y: 83,
+      x: 10,
+      y: 79,
       width: 34,
       height: 14,
       rotation: 0,
@@ -196,9 +261,41 @@ function buildPlaceholderResources(activeMode: ResourceMode) {
       isMine: false,
     },
   ];
-  return [...desks, ...rooms].map((resource) =>
+  return [...desks, ...fixedDesks, ...rooms].map((resource) =>
     mapResource(resource, activeMode),
   );
+}
+
+function buildVisibleResources(
+  resources: MiniappCommunitySpaceResource[],
+  activeMode: ResourceMode,
+) {
+  const visibleResources = resources.filter((resource) => resource.code !== "MR-01");
+  const resourceCodes = new Set(visibleResources.map((resource) => resource.code));
+  const fixedDeskFallbacks = buildPlaceholderResources(activeMode).filter(
+    (resource) => resource.code.startsWith("F") && !resourceCodes.has(resource.code),
+  );
+  return [
+    ...visibleResources.map((resource) => mapResource(resource, activeMode)),
+    ...fixedDeskFallbacks,
+  ];
+}
+
+function summarizeAvailability(resources: CommunityResourceItem[]) {
+  const flexibleDesks = resources.filter(
+    (resource) => resource.resourceType === "desk" && resource.deskMode === "flexible",
+  );
+  return {
+    flexibleDeskCount: flexibleDesks.length,
+    availableDeskCount: flexibleDesks.filter(
+      (resource) => resource.availability === "available",
+    ).length,
+    availableMeetingRoomCount: resources.filter(
+      (resource) =>
+        resource.resourceType === "meeting_room" &&
+        resource.availability === "available",
+    ).length,
+  };
 }
 
 function getBookingErrorMessage(error: unknown) {
@@ -223,7 +320,8 @@ Page({
       eligibility: "社区成员与已入驻 OPC",
       deskCount: 24,
       flexibleDeskMinimum: 6,
-      meetingRoomCount: 2,
+      fixedDeskCount: 6,
+      meetingRoomCount: 1,
     },
     spacePhotos,
     spacePhotoUrls: spacePhotos.map((photo) => photo.src),
@@ -326,21 +424,26 @@ Page({
       const snapshot = await loadCommunitySpace(window.startsAt, window.endsAt);
       if (currentRequest !== requestVersion) return;
       hasLoaded = true;
-      const resources = snapshot.resources.map((resource) =>
-        mapResource(resource, this.data.activeMode),
+      const resources = buildVisibleResources(
+        snapshot.resources,
+        this.data.activeMode,
       );
       const selectedResource = this.data.selectedResource
         ? resources.find((resource) => resource.id === this.data.selectedResource?.id) ?? null
         : null;
       this.setData({
-        community: snapshot.community,
+        community: {
+          ...snapshot.community,
+          fixedDeskCount: snapshot.community.fixedDeskCount ?? 6,
+          meetingRoomCount: 1,
+        },
         resources,
         visibleResources: resources.filter(
           (resource) => resource.resourceType === this.data.activeMode,
         ),
         selectedResource:
           selectedResource?.availability === "available" ? selectedResource : null,
-        availability: snapshot.availability,
+        availability: summarizeAvailability(resources),
         myBookings: snapshot.myBookings.map(mapBooking),
         accessRequest: snapshot.accessRequest,
         accessContact: snapshot.accessRequest?.contact ?? this.data.accessContact,

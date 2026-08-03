@@ -9,8 +9,8 @@
     <text class="hero-copy">{{community.summary}}</text>
     <view class="hero-location"><image src="/assets/icons/location-blue-v2.png" mode="aspectFit" /><text>{{community.location}}</text></view>
     <view class="hero-stats">
-      <view><text>{{community.deskCount}}</text><text>办公工位</text></view>
-      <view><text>{{community.flexibleDeskMinimum}}+</text><text>流动工位</text></view>
+      <view><text>{{community.deskCount}}</text><text>开放工位</text></view>
+      <view><text>{{community.fixedDeskCount}}</text><text>固定工位</text></view>
       <view><text>{{community.meetingRoomCount}}</text><text>会议室</text></view>
     </view>
     <view class="hero-tags"><text>{{community.openHours}}</text><text>{{community.pricing}}</text><text>无人值守</text></view>
@@ -96,13 +96,13 @@
             <view class="floor-window floor-window-top"></view>
             <view class="static-room office-room office-room-one"><text>独立办公室</text></view>
             <view class="static-room office-room office-room-two"><text>独立办公室</text></view>
-            <view class="static-room reception-zone"><text>前台</text></view>
-            <view class="static-room lounge-zone"><text>洽谈区</text></view>
+            <view class="static-room focused-office-zone"><text>集中办公室</text><text>6 个固定工位</text></view>
+            <view class="static-room salon-zone"><text>沙龙区</text></view>
             <view class="print-zone"><image src="/assets/icons/news-blue-v2.png" mode="aspectFit" /><text>打印区</text></view>
-            <view class="hall-label">办公大厅 · 4×6 工位</view>
+            <view class="hall-label">办公大厅 · 4 组 × 6 席联排桌</view>
             <view class="entrance-label">入口</view>
 
-            <button wx:for="{{resources}}" wx:key="id" class="map-resource map-resource-{{item.resourceType}} resource-{{item.availabilityClass}} {{item.isActiveMode ? 'map-resource-active-mode' : 'map-resource-muted'}} {{selectedResource && selectedResource.id === item.id ? 'map-resource-selected' : ''}}" style="{{item.style}}" data-id="{{item.id}}" catchtap="selectResource" hover-class="none" aria-label="{{item.name}}，{{item.availabilityLabel}}">
+            <button wx:for="{{resources}}" wx:key="id" class="map-resource map-resource-{{item.resourceType}} {{item.facingClass}} resource-{{item.availabilityClass}} {{item.isActiveMode ? 'map-resource-active-mode' : 'map-resource-muted'}} {{selectedResource && selectedResource.id === item.id ? 'map-resource-selected' : ''}}" style="{{item.style}}" data-id="{{item.id}}" catchtap="selectResource" hover-class="none" aria-label="{{item.name}}，{{item.availabilityLabel}}">
               <text class="resource-code">{{item.resourceType === 'desk' ? item.code : item.name}}</text>
               <text wx:if="{{item.resourceType === 'meeting_room'}}" class="room-capacity">{{item.capacity}} 人</text>
               <text wx:if="{{item.isMine}}" class="mine-dot">我的</text>

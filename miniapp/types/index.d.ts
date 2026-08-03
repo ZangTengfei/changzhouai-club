@@ -268,6 +268,7 @@ interface MiniappCommunitySpaceSnapshot {
     eligibility: string;
     deskCount: number;
     flexibleDeskMinimum: number;
+    fixedDeskCount: number;
     meetingRoomCount: number;
   };
   window: { startsAt: string; endsAt: string };

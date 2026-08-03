@@ -16,7 +16,7 @@ type CommunitySpaceResourceRow = {
   width_percent: number | string;
   height_percent: number | string;
   rotation_degrees: number;
-  status: "active" | "disabled";
+  status: "active" | "disabled" | "retired";
   sort_order: number;
 };
 
@@ -55,7 +55,8 @@ export const COMMUNITY_SPACE_CONTENT = {
   eligibility: "社区成员与已入驻 OPC",
   deskCount: 24,
   flexibleDeskMinimum: 6,
-  meetingRoomCount: 2,
+  fixedDeskCount: 6,
+  meetingRoomCount: 1,
 } as const;
 
 export function parseCommunitySpaceWindow(url: string) {
@@ -187,35 +188,37 @@ export async function loadCommunitySpaceSnapshot(
       .map((booking) => booking.resource_id),
   );
 
-  const mappedResources = resources.map((resource) => {
-    const fixed = fixedResourceIds.has(resource.id);
-    const booked = bookedResourceIds.has(resource.id);
-    const availability =
-      resource.status === "disabled"
-        ? "disabled"
-        : fixed
-          ? "fixed"
-          : booked
-            ? "booked"
-            : "available";
+  const mappedResources = resources
+    .filter((resource) => resource.status !== "retired")
+    .map((resource) => {
+      const fixed = fixedResourceIds.has(resource.id);
+      const booked = bookedResourceIds.has(resource.id);
+      const availability =
+        resource.status === "disabled"
+          ? "disabled"
+          : fixed
+            ? "fixed"
+            : booked
+              ? "booked"
+              : "available";
 
-    return {
-      id: resource.id,
-      code: resource.code,
-      name: resource.name,
-      resourceType: resource.resource_type,
-      deskMode: resource.desk_mode,
-      capacity: resource.capacity,
-      areaLabel: resource.area_label,
-      x: asNumber(resource.x_percent),
-      y: asNumber(resource.y_percent),
-      width: asNumber(resource.width_percent),
-      height: asNumber(resource.height_percent),
-      rotation: resource.rotation_degrees,
-      availability,
-      isMine: myBookingResourceIds.has(resource.id),
-    };
-  });
+      return {
+        id: resource.id,
+        code: resource.code,
+        name: resource.name,
+        resourceType: resource.resource_type,
+        deskMode: resource.desk_mode,
+        capacity: resource.capacity,
+        areaLabel: resource.area_label,
+        x: asNumber(resource.x_percent),
+        y: asNumber(resource.y_percent),
+        width: asNumber(resource.width_percent),
+        height: asNumber(resource.height_percent),
+        rotation: resource.rotation_degrees,
+        availability,
+        isMine: myBookingResourceIds.has(resource.id),
+      };
+    });
 
   const flexibleDesks = mappedResources.filter(
     (resource) =>

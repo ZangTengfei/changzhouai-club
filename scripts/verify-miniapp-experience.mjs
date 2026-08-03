@@ -333,13 +333,20 @@ try {
     communityPublic.body?.resources?.filter(
       (resource) => resource.resourceType === "desk",
     ).length,
-    24,
+    30,
   );
   assert.equal(
     communityPublic.body?.resources?.filter(
       (resource) => resource.resourceType === "meeting_room",
     ).length,
-    2,
+    1,
+  );
+  assert.equal(
+    communityPublic.body?.resources?.filter(
+      (resource) =>
+        resource.resourceType === "desk" && resource.availability === "fixed",
+    ).length,
+    6,
   );
   const availableDesk = communityPublic.body?.resources?.find(
     (resource) =>

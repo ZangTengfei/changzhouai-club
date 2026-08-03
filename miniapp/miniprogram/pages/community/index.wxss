@@ -598,28 +598,39 @@
   left: 70%;
 }
 
-.reception-zone {
-  top: 25%;
-  left: 55%;
-  width: 10%;
-  height: 11%;
-  border-color: #d7c2a2;
-  background: #fff9ec;
+.focused-office-zone {
+  top: 47%;
+  left: 68%;
+  width: 25%;
+  height: 20%;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 2rpx;
+  padding-top: 10rpx;
+  border-color: #9ba7a2;
+  background: #e8ecea;
+  font-size: 18rpx;
 }
 
-.lounge-zone {
-  top: 41%;
-  left: 59%;
-  width: 28%;
-  height: 28%;
+.focused-office-zone text:last-child {
+  color: #7a8580;
+  font-size: 14rpx;
+  font-weight: 620;
+}
+
+.salon-zone {
+  top: 31%;
+  left: 45%;
+  width: 18%;
+  height: 34%;
   border-color: #b8c4be;
   background: #eef4ef;
 }
 
 .print-zone {
   position: absolute;
-  top: 34%;
-  left: 76%;
+  top: 40%;
+  left: 75%;
   display: flex;
   align-items: center;
   gap: 7rpx;
@@ -639,7 +650,7 @@
   top: 11.5%;
   left: 8%;
   color: #7d8883;
-  font-size: 17rpx;
+  font-size: 16rpx;
   font-weight: 720;
 }
 
@@ -682,13 +693,20 @@
 }
 
 .map-resource-desk::before {
-  width: 64%;
+  position: absolute;
+  top: 6rpx;
+  right: 18%;
+  left: 18%;
   height: 24%;
-  margin-bottom: 3rpx;
   border-radius: 3rpx;
   background: currentColor;
   content: "";
   opacity: 0.22;
+}
+
+.desk-facing-south::before {
+  top: auto;
+  bottom: 6rpx;
 }
 
 .map-resource-meeting_room {
