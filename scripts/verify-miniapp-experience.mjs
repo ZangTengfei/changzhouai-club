@@ -831,7 +831,19 @@ try {
   );
   assert.equal(confirmedGroupQr.response.status, 200);
   assert.equal(confirmedGroupQr.body?.groupQr?.note, "自动化验收入群说明");
-  assert.match(confirmedGroupQr.body?.groupQr?.imageUrl ?? "", /token=/);
+  const groupQrImageUrl = confirmedGroupQr.body?.groupQr?.imageUrl ?? "";
+  const groupQrImageLocation = new URL(groupQrImageUrl);
+  assert.match(
+    groupQrImageLocation.pathname,
+    /^\/api\/private-assets\/event-group-qr\//,
+  );
+  assert.ok(groupQrImageLocation.searchParams.has("expires"));
+  assert.ok(groupQrImageLocation.searchParams.has("signature"));
+  const groupQrImage = await fetch(groupQrImageUrl, {
+    signal: AbortSignal.timeout(10_000),
+  });
+  assert.equal(groupQrImage.status, 200);
+  assert.match(groupQrImage.headers.get("content-type") ?? "", /^image\//);
   pass("event_group_qr_visible_after_confirmation");
 
   const repeatedRegistrationPut = await request(
