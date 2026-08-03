@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { Tabs } from "antd";
 import { toast } from "sonner";
 
 import { Button } from "@/components/admin-antd/button";
@@ -247,6 +248,14 @@ export function AdminSpacesPageClient() {
         </AdminPanelBody>
       </AdminPanel>
 
+      <Tabs
+        defaultActiveKey="bookings"
+        items={[
+          {
+            key: "settings",
+            label: "空间配置",
+            children: (
+              <AdminPageStack>
       <AdminPanel>
         <AdminPanelHeader eyebrow="SPACE PHOTOS" title={`社区实景图片（${data?.photos.filter((item) => item.status === "active").length ?? 0}）`} />
         <AdminPanelBody className="grid gap-4">
@@ -291,6 +300,15 @@ export function AdminSpacesPageClient() {
         </AdminPanelBody>
       </AdminPanel>
 
+              </AdminPageStack>
+            ),
+          },
+          {
+            key: "bookings",
+            label: `预约管理（未来 ${upcomingBookings.length}）`,
+            children: (
+              <AdminPageStack>
+
       <AdminPanel>
         <AdminPanelHeader eyebrow="BOOKINGS" title={`未来预约（${upcomingBookings.length}）`} />
         <AdminPanelBody className="grid gap-3">
@@ -304,6 +322,15 @@ export function AdminSpacesPageClient() {
           <details><summary className="cursor-pointer text-sm font-semibold">查看历史预约（{bookingHistory.length}）</summary><div className="mt-3 grid gap-2">{bookingHistory.map((booking) => { const meta = bookingStatusMeta[booking.status]; return <div key={booking.id} className="flex justify-between gap-3 rounded-admin border border-admin-border p-3 text-sm"><span>{booking.resourceCode} · {booking.displayName} · {formatDateTime(booking.startsAt)}</span><AdminStatusBadge tone={meta.tone}>{meta.label}</AdminStatusBadge></div>; })}</div></details>
         </AdminPanelBody>
       </AdminPanel>
+
+              </AdminPageStack>
+            ),
+          },
+          {
+            key: "fixed-desks",
+            label: pendingRequests.length > 0 ? `常驻工位（待审 ${pendingRequests.length}）` : "常驻工位",
+            children: (
+              <AdminPageStack>
 
       <AdminPanel>
         <AdminPanelHeader eyebrow="FIXED DESK REQUESTS" title={`常驻工位待审核（${pendingRequests.length}）`} />
@@ -330,14 +357,28 @@ export function AdminSpacesPageClient() {
         </AdminPanelBody>
       </AdminPanel>
 
-      {data?.capabilities.manageAccess ? <AdminPanel>
+              </AdminPageStack>
+            ),
+          },
+
+          ...(data?.capabilities.manageAccess ? [{
+            key: "access",
+            label: pendingAccess.length > 0 ? `门禁管理（待处理 ${pendingAccess.length}）` : "门禁管理",
+            children: (
+              <AdminPageStack>
+      <AdminPanel>
         <AdminPanelHeader eyebrow="ACCESS REQUESTS" title={`门禁待处理（${pendingAccess.length}）`} />
         <AdminPanelBody className="grid gap-4">
           {pendingAccess.length === 0 ? <p className="text-sm text-muted-foreground">当前没有待处理门禁申请。</p> : null}
           {pendingAccess.map((item) => <article key={item.id} className="grid gap-3 rounded-admin border border-admin-border bg-[#fafafa] p-4"><div className="flex justify-between gap-3"><div><Link href={`/admin/members/${item.userId}`} className="font-semibold hover:underline">{item.displayName}</Link><p className="m-0 mt-1 text-sm text-muted-foreground">联系方式：{item.contact} · {formatDateTime(item.createdAt)}</p></div><AdminStatusBadge tone="pending">待处理</AdminStatusBadge></div><p className="m-0 text-sm">{item.note || "未补充门禁需求。"}</p><div className="grid gap-3 md:grid-cols-2"><Input value={accessIdentifiers[item.id] ?? ""} onChange={(event) => setAccessIdentifiers((current) => ({ ...current, [item.id]: event.target.value }))} maxLength={100} placeholder="门禁卡号 / 权限标识（可选）" /><Input value={accessNotes[item.id] ?? ""} onChange={(event) => setAccessNotes((current) => ({ ...current, [item.id]: event.target.value }))} maxLength={500} placeholder="处理备注（可选）" /></div><div className="flex justify-end"><Button loading={processingKey === `access:${item.id}`} disabled={Boolean(processingKey)} onClick={() => void processAccess(item, "process")}>标记已处理</Button></div></article>)}
           <details><summary className="cursor-pointer text-sm font-semibold">查看门禁处理记录（{accessHistory.length}）</summary><div className="mt-3 grid gap-2">{accessHistory.map((item) => <div key={item.id} className="flex flex-wrap items-center justify-between gap-3 rounded-admin border border-admin-border p-3 text-sm"><span>{item.displayName} · {item.contact} · {item.accessIdentifier || item.reviewNote || "已处理"} · {formatDateTime(item.processedAt)}</span><Button size="sm" variant="outline" loading={processingKey === `access:${item.id}`} disabled={Boolean(processingKey)} onClick={() => void processAccess(item, "reopen")}>恢复待处理</Button></div>)}</div></details>
         </AdminPanelBody>
-      </AdminPanel> : null}
+      </AdminPanel>
+              </AdminPageStack>
+            ),
+          }] : []),
+        ]}
+      />
     </AdminPageStack>
   );
 }
