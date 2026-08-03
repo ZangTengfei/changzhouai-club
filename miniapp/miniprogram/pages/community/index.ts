@@ -34,6 +34,10 @@ type DateOption = {
 
 const durationOptions = [1, 2, 4, 8];
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+const spacePhotos = [
+  { src: "/assets/community-space/office.webp", title: "AI Club OPC 共创办公区" },
+  { src: "/assets/community-space/park.webp", title: "西太湖人工智能社区园区" },
+];
 let hasLoaded = false;
 let requestVersion = 0;
 
@@ -221,6 +225,8 @@ Page({
       flexibleDeskMinimum: 6,
       meetingRoomCount: 2,
     },
+    spacePhotos,
+    spacePhotoUrls: spacePhotos.map((photo) => photo.src),
     activeMode: "desk" as ResourceMode,
     viewMode: "map" as ResourceViewMode,
     dateOptions: [] as DateOption[],
@@ -532,6 +538,15 @@ Page({
 
   handleAccessNoteInput(event: WechatMiniprogram.Input) {
     this.setData({ accessNote: event.detail.value });
+  },
+
+  previewSpacePhotos() {
+    const current = this.data.spacePhotoUrls[0];
+    if (!current) return;
+    trackEvent("community_space_gallery_open", "/pages/community/index", {
+      photoCount: this.data.spacePhotoUrls.length,
+    });
+    void wx.previewImage({ current, urls: this.data.spacePhotoUrls });
   },
 
   async submitAccessRequest() {

@@ -2,6 +2,8 @@
 
 <view class="page-shell community-page">
   <view class="community-hero">
+    <image class="hero-background-image" src="/assets/community-space/office.webp" mode="aspectFill" />
+    <view class="hero-background-overlay"></view>
     <view class="hero-topline"><image src="/assets/logo-mark.png" mode="aspectFit" /><text>AI CLUB · OPC 共创社区</text></view>
     <text class="hero-title">一个随时可以来，<br />也容易遇见伙伴的地方</text>
     <text class="hero-copy">{{community.summary}}</text>
@@ -12,6 +14,18 @@
       <view><text>{{community.meetingRoomCount}}</text><text>会议室</text></view>
     </view>
     <view class="hero-tags"><text>{{community.openHours}}</text><text>{{community.pricing}}</text><text>无人值守</text></view>
+  </view>
+
+  <view class="space-gallery-entry surface-card" bindtap="previewSpacePhotos" role="button" aria-label="查看社区空间实景照片">
+    <view class="space-gallery-copy">
+      <text class="space-gallery-eyebrow">SPACE GALLERY</text>
+      <text class="space-gallery-title">看看真实的社区空间</text>
+      <text class="space-gallery-note">办公区与园区实景 · 点击查看</text>
+    </view>
+    <view class="space-gallery-thumbnails">
+      <image wx:for="{{spacePhotos}}" wx:key="src" src="{{item.src}}" mode="aspectFill" aria-label="{{item.title}}" />
+    </view>
+    <image class="space-gallery-chevron" src="/assets/icons/chevron-green-v2.png" mode="aspectFit" />
   </view>
 
   <view class="section-heading-row community-section-heading">

@@ -14,8 +14,29 @@
   box-shadow: 0 20rpx 44rpx rgba(11, 60, 42, 0.18);
 }
 
+.hero-background-image,
+.hero-background-overlay {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-background-image {
+  opacity: 0.48;
+}
+
+.hero-background-overlay {
+  background: linear-gradient(135deg, rgba(8, 43, 31, 0.56), rgba(10, 37, 29, 0.78));
+}
+
 .community-hero::after {
   position: absolute;
+  z-index: 0;
   width: 300rpx;
   height: 300rpx;
   border: 74rpx solid rgba(76, 222, 155, 0.08);
@@ -123,6 +144,70 @@
   color: #b6f5d7;
   font-size: 19rpx;
   font-weight: 650;
+}
+
+.space-gallery-entry {
+  position: relative;
+  display: flex;
+  min-height: 128rpx;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 18rpx;
+  margin-top: 22rpx;
+  padding: 18rpx 54rpx 18rpx 24rpx;
+  overflow: hidden;
+}
+
+.space-gallery-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 5rpx;
+}
+
+.space-gallery-eyebrow {
+  color: var(--color-green-dark);
+  font-size: 16rpx;
+  font-weight: 800;
+  letter-spacing: 1.4rpx;
+}
+
+.space-gallery-title {
+  font-size: 27rpx;
+  font-weight: 790;
+}
+
+.space-gallery-note {
+  color: var(--color-subtle);
+  font-size: 19rpx;
+}
+
+.space-gallery-thumbnails {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8rpx;
+}
+
+.space-gallery-thumbnails image {
+  width: 82rpx;
+  height: 88rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.86);
+  border-radius: 18rpx;
+  background: #eef4f1;
+  box-shadow: 0 8rpx 20rpx rgba(17, 66, 49, 0.1);
+}
+
+.space-gallery-thumbnails image:last-child {
+  margin-left: -22rpx;
+  transform: rotate(4deg);
+}
+
+.space-gallery-chevron {
+  position: absolute;
+  right: 20rpx;
+  width: 26rpx;
+  height: 26rpx;
 }
 
 .community-section-heading {
