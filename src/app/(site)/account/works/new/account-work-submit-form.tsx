@@ -296,6 +296,7 @@ export function AccountWorkSubmitForm({ userId }: { userId: string }) {
           uploadTarget={{
             kind: "member-work-asset",
             userId,
+            assetKind: "qr",
           }}
           mode="upload-or-url"
           appearance="site"

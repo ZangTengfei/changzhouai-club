@@ -198,7 +198,7 @@ export function AdminSponsorEditorFormClient({
                   defaultValue={sponsor?.logo_url ?? ""}
                   eventSlug={sponsor?.slug ?? ""}
                   uploadScope="sponsor"
-                  placeholder="/china-telecom-logo.svg 或 Supabase Storage 图片地址"
+                  placeholder="/china-telecom-logo.svg 或 COS 图片地址"
                   uploadLabel="上传 Logo"
                 />
               </AdminField>

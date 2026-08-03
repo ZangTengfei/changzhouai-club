@@ -32,6 +32,7 @@ type UploadTarget =
   | {
       kind: "member-work-asset";
       userId: string;
+      assetKind?: "image" | "qr";
     }
   | {
       kind: "storage";
@@ -151,7 +152,9 @@ export function ImageUploadField({
         const payload = new FormData();
         payload.append(
           "assetType",
-          uploadTarget.kind === "member-avatar" ? "avatar" : "work",
+          uploadTarget.kind === "member-avatar"
+            ? "avatar"
+            : uploadTarget.assetKind === "qr" ? "work-qr" : "work",
         );
         payload.append("file", uploadFile);
 

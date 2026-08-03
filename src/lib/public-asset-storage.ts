@@ -1,12 +1,14 @@
 import "server-only";
 
 import { uploadTencentCosObject } from "@/lib/tencent-cos";
+import { optimizePublicImageUpload } from "@/lib/uploaded-image-optimization";
 
 type UploadPublicAssetOptions = {
   bucket: string;
   path: string;
   file: File;
   cacheControl?: string;
+  optimizeImage?: boolean;
 };
 
 const DEFAULT_PUBLIC_ASSET_CACHE_CONTROL =
@@ -26,6 +28,12 @@ function getPublicAssetBaseUrl() {
 
 function normalizeKeySegment(value: string) {
   return value.trim().replace(/^\/+|\/+$/g, "");
+}
+
+function replacePathExtension(path: string, extension: string) {
+  const normalizedExtension = extension.replace(/^\./, "");
+  const pathWithoutExtension = path.replace(/\.[^./]+$/, "");
+  return `${pathWithoutExtension}.${normalizedExtension}`;
 }
 
 export function buildPublicAssetKey(bucket: string, path: string) {
@@ -53,20 +61,27 @@ export async function uploadPublicAsset({
   path,
   file,
   cacheControl = DEFAULT_PUBLIC_ASSET_CACHE_CONTROL,
+  optimizeImage = true,
 }: UploadPublicAssetOptions) {
-  const key = buildPublicAssetKey(bucket, path);
-  const body = Buffer.from(await file.arrayBuffer());
+  const uploadFile = optimizeImage ? await optimizePublicImageUpload(file) : file;
+  const uploadPath = uploadFile.type === "image/webp"
+    ? replacePathExtension(path, "webp")
+    : path;
+  const key = buildPublicAssetKey(bucket, uploadPath);
+  const body = Buffer.from(await uploadFile.arrayBuffer());
 
   await uploadTencentCosObject({
     key,
     body,
     contentLength: body.byteLength,
-    contentType: file.type || "application/octet-stream",
+    contentType: uploadFile.type || "application/octet-stream",
     cacheControl,
   });
 
   return {
     key,
     publicUrl: getPublicAssetUrl(key),
+    sourceBytes: file.size,
+    uploadedBytes: body.byteLength,
   };
 }

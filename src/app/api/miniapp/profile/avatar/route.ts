@@ -75,6 +75,7 @@ export async function POST(request: Request) {
       bucket: MEMBER_AVATARS_BUCKET,
       path,
       file: optimizedFile,
+      optimizeImage: false,
     }));
   } catch (error) {
     console.error("Failed to upload miniapp avatar to Tencent COS.", error);

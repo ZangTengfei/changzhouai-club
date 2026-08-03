@@ -289,6 +289,7 @@ function WorkImageField({
         uploadTarget={{
           kind: "member-work-asset",
           userId,
+          assetKind: name === "qr_code_image_url" ? "qr" : "image",
         }}
         mode="upload-or-url"
         appearance="site"

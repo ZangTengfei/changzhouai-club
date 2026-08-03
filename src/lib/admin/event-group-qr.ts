@@ -2,7 +2,14 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { normalizeAdminEventDateTime } from "@/lib/admin/event-datetime";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
-import { EVENT_PRIVATE_ASSETS_BUCKET } from "@/lib/supabase/storage";
+import {
+  EVENT_PRIVATE_ASSETS_BUCKET,
+  isEventGroupQrCosKey,
+} from "@/lib/supabase/storage";
+import {
+  deleteTencentCosObject,
+  getTencentCosSignedObjectUrl,
+} from "@/lib/tencent-cos";
 
 export type AdminEventGroupQrCode = {
   event_id: string;
@@ -24,10 +31,13 @@ export type AdminEventGroupQrInput = {
 
 function isValidEventGroupQrPath(value: string) {
   return (
-    value.startsWith("events/") &&
-    value.includes("/group-qr/") &&
-    !value.includes("..") &&
-    !value.includes("://")
+    isEventGroupQrCosKey(value) ||
+    (
+      value.startsWith("events/") &&
+      value.includes("/group-qr/") &&
+      !value.includes("..") &&
+      !value.includes("://")
+    )
   );
 }
 
@@ -59,6 +69,15 @@ export function parseAdminEventGroupQrInput(
 
 async function deletePrivateQrObject(storagePath: string | null | undefined) {
   if (!storagePath) return;
+
+  if (isEventGroupQrCosKey(storagePath)) {
+    await deleteTencentCosObject(storagePath).catch((error) => {
+      console.error("Failed to remove private COS event group QR object.", {
+        message: error instanceof Error ? error.message : "unknown_error",
+      });
+    });
+    return;
+  }
 
   const supabase = createSupabaseAdminClient();
   if (!supabase) return;
@@ -127,6 +146,14 @@ export async function createAdminEventGroupQrPreviewUrl(
   storagePath?: string | null,
 ) {
   if (!storagePath) return null;
+
+  if (isEventGroupQrCosKey(storagePath)) {
+    try {
+      return getTencentCosSignedObjectUrl(storagePath, 5 * 60);
+    } catch {
+      return null;
+    }
+  }
 
   const supabase = createSupabaseAdminClient();
   if (!supabase) return null;

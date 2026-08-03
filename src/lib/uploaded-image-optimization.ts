@@ -3,6 +3,8 @@ import "server-only";
 import sharp from "sharp";
 
 const QR_TARGET_BYTES = 190 * 1024;
+const PUBLIC_IMAGE_MAX_BYTES = 10 * 1024 * 1024;
+const PUBLIC_IMAGE_MAX_DIMENSION = 2200;
 
 function replaceImageExtension(fileName: string, extension: string) {
   const baseName = fileName.replace(/\.[^.]+$/, "") || "image";
@@ -55,6 +57,32 @@ export async function optimizeQrCodeUpload(file: File) {
     if (body.byteLength <= QR_TARGET_BYTES) {
       break;
     }
+  }
+
+  return createWebpFile(body, file.name);
+}
+
+export async function optimizePublicImageUpload(file: File) {
+  if (
+    file.size === 0 ||
+    file.size > PUBLIC_IMAGE_MAX_BYTES ||
+    !file.type.startsWith("image/")
+  ) {
+    throw new Error("invalid_public_image");
+  }
+
+  const input = Buffer.from(await file.arrayBuffer());
+  const body = await sharp(input)
+    .rotate()
+    .resize(PUBLIC_IMAGE_MAX_DIMENSION, PUBLIC_IMAGE_MAX_DIMENSION, {
+      fit: "inside",
+      withoutEnlargement: true,
+    })
+    .webp({ quality: 82, effort: 5, smartSubsample: true })
+    .toBuffer();
+
+  if (file.type === "image/webp" && body.byteLength >= input.byteLength) {
+    return file;
   }
 
   return createWebpFile(body, file.name);

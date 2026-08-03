@@ -3,13 +3,14 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
-import { createClient } from "@supabase/supabase-js";
+import COS from "cos-nodejs-sdk-v5";
+import sharp from "sharp";
 
 const DEFAULT_ENV_FILE = ".env.local";
 const DEFAULT_BUCKET = "event-assets";
 
 function printHelp() {
-  console.log(`Upload an event poster/cover image to Supabase Storage.
+  console.log(`Optimize an event poster/cover to WebP and upload it to Tencent COS.
 
 Usage:
   node .codex/skills/changzhou-event-publisher/scripts/upload-event-cover.mjs \\
@@ -20,8 +21,8 @@ Options:
   --slug <slug>        Event slug used in the storage path.
   --file <path>        Local image file to upload.
   --env-file <path>    Env file with Supabase config. Defaults to .env.local.
-  --bucket <bucket>    Storage bucket. Defaults to event-assets.
-  --dry-run            Validate input and print the planned storage path only.
+  --bucket <bucket>    Logical COS key prefix. Defaults to event-assets.
+  --dry-run            Validate and optimize input without uploading.
   --help               Show this help.
 `);
 }
@@ -127,35 +128,14 @@ function sanitizeSegment(value) {
     .replace(/^-|-$/g, "");
 }
 
-function getContentType(fileName) {
-  const ext = path.extname(fileName).toLowerCase();
+function getRequiredEnv(name) {
+  const value = process.env[name]?.trim();
 
-  if (ext === ".png") {
-    return "image/png";
+  if (!value) {
+    throw new Error(`Missing required Tencent COS environment variable: ${name}.`);
   }
 
-  if (ext === ".webp") {
-    return "image/webp";
-  }
-
-  return "image/jpeg";
-}
-
-function getSupabaseConfig() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
-  const serviceRoleKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_SECRET_KEY;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error(
-      "Missing NEXT_PUBLIC_SUPABASE_URL/SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY/SUPABASE_SECRET_KEY.",
-    );
-  }
-
-  return {
-    serviceRoleKey,
-    supabaseUrl,
-  };
+  return value;
 }
 
 function buildStoragePath(slug, fileName) {
@@ -167,6 +147,35 @@ function buildStoragePath(slug, fileName) {
   }
 
   return `events/${safeSlug}/${Date.now()}-${safeFileName}`;
+}
+
+function buildPublicUrl(key) {
+  const baseUrl = getRequiredEnv("NEXT_PUBLIC_IMAGE_CDN_URL").replace(/\/$/, "");
+  const encodedKey = key
+    .split("/")
+    .map((segment) => encodeURIComponent(segment))
+    .join("/");
+
+  return `${baseUrl}/${encodedKey}`;
+}
+
+async function optimizeCover(filePath) {
+  const input = readFileSync(filePath);
+  const body = await sharp(input)
+    .rotate()
+    .resize(2200, 2200, {
+      fit: "inside",
+      withoutEnlargement: true,
+    })
+    .webp({ quality: 82, effort: 5, smartSubsample: true })
+    .toBuffer();
+
+  return {
+    body,
+    originalBytes: input.byteLength,
+    optimizedBytes: body.byteLength,
+    optimizedFileName: `${path.basename(filePath, path.extname(filePath))}.webp`,
+  };
 }
 
 async function main() {
@@ -185,17 +194,22 @@ async function main() {
 
   loadEnvFile(options.envFile);
 
-  const storagePath = buildStoragePath(options.slug, path.basename(filePath));
-  const contentType = getContentType(filePath);
+  const optimized = await optimizeCover(filePath);
+  const storagePath = buildStoragePath(options.slug, optimized.optimizedFileName);
+  const key = `${sanitizeSegment(options.bucket)}/${storagePath}`;
+  const publicUrl = buildPublicUrl(key);
 
   if (options.dryRun) {
     console.log(
       JSON.stringify(
         {
-          bucket: options.bucket,
-          contentType,
+          contentType: "image/webp",
           file: filePath,
+          key,
           mode: "dry-run",
+          optimizedBytes: optimized.optimizedBytes,
+          originalBytes: optimized.originalBytes,
+          publicUrl,
           storagePath,
         },
         null,
@@ -205,31 +219,28 @@ async function main() {
     return;
   }
 
-  const { serviceRoleKey, supabaseUrl } = getSupabaseConfig();
-  const supabase = createClient(supabaseUrl, serviceRoleKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
+  const cos = new COS({
+    SecretId: getRequiredEnv("TENCENT_COS_SECRET_ID"),
+    SecretKey: getRequiredEnv("TENCENT_COS_SECRET_KEY"),
   });
-  const file = readFileSync(filePath);
-  const { error } = await supabase.storage.from(options.bucket).upload(storagePath, file, {
-    contentType,
-    upsert: true,
+  await cos.putObject({
+    Bucket: getRequiredEnv("TENCENT_COS_BUCKET"),
+    Region: getRequiredEnv("TENCENT_COS_REGION"),
+    Key: key,
+    Body: optimized.body,
+    ContentLength: optimized.optimizedBytes,
+    ContentType: "image/webp",
+    CacheControl: "public, max-age=31536000, immutable",
   });
-
-  if (error) {
-    throw error;
-  }
-
-  const { data } = supabase.storage.from(options.bucket).getPublicUrl(storagePath);
 
   console.log(
     JSON.stringify(
       {
-        bucket: options.bucket,
-        contentType,
-        publicUrl: data.publicUrl,
+        contentType: "image/webp",
+        key,
+        optimizedBytes: optimized.optimizedBytes,
+        originalBytes: optimized.originalBytes,
+        publicUrl,
         storagePath,
       },
       null,

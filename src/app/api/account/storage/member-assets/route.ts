@@ -1,7 +1,10 @@
 import { resolveCommunityUserId } from "@/lib/community-user";
 import { uploadPublicAsset } from "@/lib/public-asset-storage";
 import { createClient } from "@/lib/supabase/server";
-import { optimizeAvatarUpload } from "@/lib/uploaded-image-optimization";
+import {
+  optimizeAvatarUpload,
+  optimizeQrCodeUpload,
+} from "@/lib/uploaded-image-optimization";
 import {
   buildMemberAvatarPath,
   buildMemberWorkAssetPath,
@@ -35,20 +38,24 @@ export async function POST(request: Request) {
     return Response.json({ error: "invalid_image" }, { status: 400 });
   }
 
-  if (assetType !== "avatar" && assetType !== "work") {
+  if (assetType !== "avatar" && assetType !== "work" && assetType !== "work-qr") {
     return Response.json({ error: "invalid_asset_type" }, { status: 400 });
   }
 
   try {
     const communityUserId = await resolveCommunityUserId(supabase, user.id);
     const isAvatar = assetType === "avatar";
-    const uploadFile = isAvatar ? await optimizeAvatarUpload(file) : file;
+    const isQrCode = assetType === "work-qr";
+    const uploadFile = isAvatar
+      ? await optimizeAvatarUpload(file)
+      : isQrCode ? await optimizeQrCodeUpload(file) : file;
     const result = await uploadPublicAsset({
       bucket: isAvatar ? MEMBER_AVATARS_BUCKET : MEMBER_WORK_ASSETS_BUCKET,
       path: isAvatar
         ? buildMemberAvatarPath(communityUserId)
         : buildMemberWorkAssetPath(communityUserId, file.name),
       file: uploadFile,
+      optimizeImage: !isAvatar && !isQrCode,
     });
 
     return Response.json({ publicUrl: result.publicUrl });

@@ -2,6 +2,8 @@ import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { createClient } from "@supabase/supabase-js";
+import COS from "cos-nodejs-sdk-v5";
+import sharp from "sharp";
 
 const SUPABASE_URL =
   process.env.NEXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL;
@@ -10,10 +12,23 @@ const SUPABASE_SERVICE_ROLE_KEY =
 const EVENT_ASSETS_BUCKET = "event-assets";
 const HISTORICAL_PREFIX = "events/historical";
 const EVENTS_DIR = path.resolve(process.cwd(), "public/events");
+const COS_BUCKET = process.env.TENCENT_COS_BUCKET;
+const COS_REGION = process.env.TENCENT_COS_REGION;
+const COS_SECRET_ID = process.env.TENCENT_COS_SECRET_ID;
+const COS_SECRET_KEY = process.env.TENCENT_COS_SECRET_KEY;
+const IMAGE_CDN_URL = process.env.NEXT_PUBLIC_IMAGE_CDN_URL?.replace(/\/$/, "");
 
-if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+if (
+  !SUPABASE_URL ||
+  !SUPABASE_SERVICE_ROLE_KEY ||
+  !COS_BUCKET ||
+  !COS_REGION ||
+  !COS_SECRET_ID ||
+  !COS_SECRET_KEY ||
+  !IMAGE_CDN_URL
+) {
   throw new Error(
-    "Missing SUPABASE_URL/NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY.",
+    "Missing Supabase database or Tencent COS configuration.",
   );
 }
 
@@ -23,49 +38,15 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
     autoRefreshToken: false,
   },
 });
-
-function getContentType(fileName) {
-  if (fileName.endsWith(".png")) {
-    return "image/png";
-  }
-
-  if (fileName.endsWith(".webp")) {
-    return "image/webp";
-  }
-
-  return "image/jpeg";
-}
+const cos = new COS({ SecretId: COS_SECRET_ID, SecretKey: COS_SECRET_KEY });
 
 function buildHistoricalPath(fileName) {
-  return `${HISTORICAL_PREFIX}/${fileName.toLowerCase()}`;
+  const baseName = fileName.replace(/\.[^.]+$/, "").toLowerCase();
+  return `${HISTORICAL_PREFIX}/${baseName}.webp`;
 }
 
 function buildPublicUrl(storagePath) {
-  const normalizedBase = SUPABASE_URL.replace(/\/$/, "");
-  return `${normalizedBase}/storage/v1/object/public/${EVENT_ASSETS_BUCKET}/${storagePath}`;
-}
-
-async function ensureBucket() {
-  const { data: buckets, error } = await supabase.storage.listBuckets();
-
-  if (error) {
-    throw error;
-  }
-
-  const existing = buckets.find((bucket) => bucket.id === EVENT_ASSETS_BUCKET);
-
-  if (!existing) {
-    const { error: createError } = await supabase.storage.createBucket(
-      EVENT_ASSETS_BUCKET,
-      {
-        public: true,
-      },
-    );
-
-    if (createError) {
-      throw createError;
-    }
-  }
+  return `${IMAGE_CDN_URL}/${EVENT_ASSETS_BUCKET}/${storagePath}`;
 }
 
 async function uploadHistoricalImages() {
@@ -78,17 +59,21 @@ async function uploadHistoricalImages() {
   for (const fileName of fileNames) {
     const filePath = path.join(EVENTS_DIR, fileName);
     const storagePath = buildHistoricalPath(fileName);
-    const fileBuffer = await readFile(filePath);
-    const { error } = await supabase.storage
-      .from(EVENT_ASSETS_BUCKET)
-      .upload(storagePath, fileBuffer, {
-        upsert: true,
-        contentType: getContentType(fileName.toLowerCase()),
-      });
-
-    if (error) {
-      throw error;
-    }
+    const input = await readFile(filePath);
+    const body = await sharp(input)
+      .rotate()
+      .resize(2200, 2200, { fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 82, effort: 5, smartSubsample: true })
+      .toBuffer();
+    await cos.putObject({
+      Bucket: COS_BUCKET,
+      Region: COS_REGION,
+      Key: `${EVENT_ASSETS_BUCKET}/${storagePath}`,
+      Body: body,
+      ContentLength: body.byteLength,
+      ContentType: "image/webp",
+      CacheControl: "public, max-age=31536000, immutable",
+    });
 
     uploads.push({
       fileName,
@@ -151,7 +136,6 @@ async function syncDatabase(uploads) {
 }
 
 async function main() {
-  await ensureBucket();
   const uploads = await uploadHistoricalImages();
   await syncDatabase(uploads);
 

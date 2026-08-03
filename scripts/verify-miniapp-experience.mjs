@@ -618,11 +618,16 @@ try {
     .eq("id", userId);
   if (restoreMemberStatusError) throw restoreMemberStatusError;
 
-  eventGroupQrPath = `events/${event.slug}/group-qr/verification.png`;
-  const { error: groupQrUploadError } = await supabase.storage
-    .from("event-private-assets")
-    .upload(eventGroupQrPath, png, { contentType: "image/png" });
-  if (groupQrUploadError) throw groupQrUploadError;
+  eventGroupQrPath = `event-private-assets/events/${event.slug}/group-qr/verification.png`;
+  await cos.putObject({
+    Bucket: cosBucket,
+    Region: cosRegion,
+    Key: eventGroupQrPath,
+    Body: png,
+    ContentType: "image/png",
+    CacheControl: "private, max-age=300",
+    ACL: "private",
+  });
   const { error: groupQrCreateError } = await supabase
     .from("event_group_qr_codes")
     .insert({
@@ -1221,9 +1226,11 @@ try {
   console.log(JSON.stringify({ ok: true, checks }, null, 2));
 } finally {
   if (eventGroupQrPath) {
-    await supabase.storage
-      .from("event-private-assets")
-      .remove([eventGroupQrPath]);
+    await cos.deleteObject({
+      Bucket: cosBucket,
+      Region: cosRegion,
+      Key: eventGroupQrPath,
+    });
   }
   if (avatarPath) {
     await cos.deleteObject({

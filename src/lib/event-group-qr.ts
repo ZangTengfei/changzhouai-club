@@ -1,6 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import { EVENT_PRIVATE_ASSETS_BUCKET } from "@/lib/supabase/storage";
+import {
+  EVENT_PRIVATE_ASSETS_BUCKET,
+  isEventGroupQrCosKey,
+} from "@/lib/supabase/storage";
+import { getTencentCosSignedObjectUrl } from "@/lib/tencent-cos";
 
 export type ConfirmedEventGroupQr = {
   imageUrl: string;
@@ -50,13 +54,24 @@ export async function getConfirmedEventGroupQr({
     return null;
   }
 
-  const { data: signedUrl, error: signedUrlError } = await supabase.storage
-    .from(EVENT_PRIVATE_ASSETS_BUCKET)
-    .createSignedUrl(qrCode.storage_path, 5 * 60);
-  if (signedUrlError) throw new Error("group_qr_sign_failed");
+  let imageUrl: string;
+
+  if (isEventGroupQrCosKey(qrCode.storage_path)) {
+    try {
+      imageUrl = getTencentCosSignedObjectUrl(qrCode.storage_path, 5 * 60);
+    } catch {
+      throw new Error("group_qr_sign_failed");
+    }
+  } else {
+    const { data: signedUrl, error: signedUrlError } = await supabase.storage
+      .from(EVENT_PRIVATE_ASSETS_BUCKET)
+      .createSignedUrl(qrCode.storage_path, 5 * 60);
+    if (signedUrlError) throw new Error("group_qr_sign_failed");
+    imageUrl = signedUrl.signedUrl;
+  }
 
   return {
-    imageUrl: signedUrl.signedUrl,
+    imageUrl,
     note: qrCode.note,
     expiresAt: qrCode.expires_at,
   };

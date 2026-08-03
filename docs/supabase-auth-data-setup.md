@@ -63,17 +63,15 @@
 种子 SQL 会把目前网站里已经公开展示的 6 场历史活动写入 `events` 表，状态都是 `completed`。
 同时会同步写入 `event_photos`，让首页、活动页和归档页统一从数据库读取历史活动内容。
 
-历史活动图片现在建议放到 Supabase Storage：
+历史活动公开图片现在统一放到腾讯 COS，并通过 `https://assets.changzhouai.club` 分发：
 
-- bucket: `event-assets`
+- COS key 前缀：`event-assets`
 - 历史图片路径：`events/historical/<filename>`
 
-如果你需要把仓库里的历史图片批量迁移到 Storage，可以运行：
+如果你需要把仓库里的历史图片批量压缩为 WebP 并上传到 COS，可以运行：
 
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=... \
-SUPABASE_SERVICE_ROLE_KEY=... \
-node scripts/migrate-event-images-to-storage.mjs
+node --env-file=.env.local scripts/migrate-event-images-to-storage.mjs
 ```
 
 注意：

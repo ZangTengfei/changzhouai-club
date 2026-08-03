@@ -35,7 +35,7 @@ Use this workflow whenever the user is preparing a repeatable community event:
    - For production posters, keep text and QR reliable: generated backgrounds are fine, but place exact text, logo, and real QR with deterministic local rendering.
    - If the user explicitly asks for a full image-generated poster, warn that model-drawn QR codes may not scan; replace with the real QR before publishing.
 7. **Website publishing**
-   - Upload the finished poster cover to Supabase Storage when publishing:
+   - Optimize the finished poster to WebP and upload it to Tencent COS when publishing:
 
 ```bash
 node .codex/skills/changzhou-event-publisher/scripts/upload-event-cover.mjs \
@@ -209,13 +209,14 @@ Use a positive integer for `registration_capacity` when confirmed attendance is 
 
 ## Authentication
 
-The publish script writes through Supabase using the service role key from `.env.local`. Never print, copy, or expose secret values. A dry run does not require credentials.
+The cover uploader writes to Tencent COS with credentials from `.env.local`; the event publisher writes event data through Supabase using the service role key. Never print, copy, or expose secret values. A cover dry run performs local optimization without uploading.
 
 Do not automate the web admin form for normal event publishing. The website admin API depends on a browser cookie session and staff membership; the local script is the stable path for Codex-driven publishing.
 
 ## Safety Checks
 
 - Always run `--dry-run` before writing.
+- Public event images must use `https://assets.changzhouai.club`; the event publisher rejects Supabase Storage image URLs so old upload paths cannot silently return.
 - Keep raw source material in `output/` if you need a working note; do not add `files/` or `knowledge/` content to Git.
 - Do not put private group QR codes in event JSON, public copy, posters, or public storage. Configure them through the event admin so only confirmed registrations receive a short-lived private image URL.
 - Keep group QR codes hidden from pending, waitlisted, cancelled, and logged-out users. Use the optional expiry and active switch when the organizer replaces or disables a code.

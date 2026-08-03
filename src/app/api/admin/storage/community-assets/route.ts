@@ -25,6 +25,7 @@ export async function POST(request: Request) {
       bucket: EVENT_ASSETS_BUCKET,
       path: buildCommunityQrCodePath(optimizedFile.name),
       file: optimizedFile,
+      optimizeImage: false,
     });
 
     return NextResponse.json({ publicUrl: result.publicUrl });

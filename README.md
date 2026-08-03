@@ -147,12 +147,10 @@ npm run build
 npm run start
 ```
 
-历史活动图片迁移到 Supabase Storage：
+历史活动图片压缩为 WebP 并上传到腾讯 COS：
 
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=... \
-SUPABASE_SERVICE_ROLE_KEY=... \
-node scripts/migrate-event-images-to-storage.mjs
+node --env-file=.env.local scripts/migrate-event-images-to-storage.mjs
 ```
 
 ## 目录说明

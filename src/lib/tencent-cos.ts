@@ -16,6 +16,7 @@ type UploadTencentCosObjectOptions = {
   contentType?: string;
   cacheControl?: string;
   contentDisposition?: string;
+  acl?: COS.ObjectACL;
 };
 
 let cosClient: COS | null = null;
@@ -70,6 +71,7 @@ export async function uploadTencentCosObject({
   contentType,
   cacheControl,
   contentDisposition,
+  acl,
 }: UploadTencentCosObjectOptions) {
   const { bucket, region } = getTencentCosConfig();
 
@@ -82,6 +84,7 @@ export async function uploadTencentCosObject({
     ContentType: contentType,
     CacheControl: cacheControl,
     ContentDisposition: contentDisposition,
+    ACL: acl,
   });
 }
 
@@ -102,5 +105,26 @@ export async function deleteTencentCosObject(key: string) {
     Bucket: bucket,
     Region: region,
     Key: normalizeObjectKey(key),
+  });
+}
+
+export function getTencentCosSignedObjectUrl(
+  key: string,
+  expiresSeconds = 5 * 60,
+) {
+  const { bucket, region } = getTencentCosConfig();
+  const publicImageDomain = new URL(
+    getRequiredEnv("NEXT_PUBLIC_IMAGE_CDN_URL"),
+  ).host;
+
+  return getTencentCosClient().getObjectUrl({
+    Bucket: bucket,
+    Region: region,
+    Key: normalizeObjectKey(key),
+    Sign: true,
+    Method: "GET",
+    Expires: expiresSeconds,
+    Protocol: "https:",
+    Domain: publicImageDomain,
   });
 }

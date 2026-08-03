@@ -292,6 +292,21 @@ function normalizeOptionalUrlValue(value, fieldName) {
   return url.toString();
 }
 
+function normalizeManagedImageUrl(value, fieldName) {
+  const normalized = normalizeOptionalUrlValue(value, fieldName);
+
+  if (!normalized) return null;
+
+  const url = new URL(normalized);
+  if (url.pathname.includes("/storage/v1/")) {
+    throw new Error(
+      `${fieldName} must not use Supabase Storage. Upload the image to Tencent COS first.`,
+    );
+  }
+
+  return normalized;
+}
+
 function normalizeEventType(value) {
   const eventType = getOptionalString(value) ?? "community";
 
@@ -412,11 +427,11 @@ function normalizePayload(rawPayload, options) {
     video_provider: getTextField(rawPayload, "video_provider"),
     video_file_id: getTextField(rawPayload, "video_file_id"),
     video_title: getTextField(rawPayload, "video_title"),
-    video_cover_url: normalizeOptionalUrlValue(rawPayload.video_cover_url, "video_cover_url"),
+    video_cover_url: normalizeManagedImageUrl(rawPayload.video_cover_url, "video_cover_url"),
     event_at: normalizeEventDateTime(rawPayload.event_at),
     venue: getTextField(rawPayload, "venue"),
     city: getTextField(rawPayload, "city") ?? "常州",
-    cover_image_url: getTextField(rawPayload, "cover_image_url"),
+    cover_image_url: normalizeManagedImageUrl(rawPayload.cover_image_url, "cover_image_url"),
     status,
     visibility: normalizeVisibility(rawPayload.visibility),
   };

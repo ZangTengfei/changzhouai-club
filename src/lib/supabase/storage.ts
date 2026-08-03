@@ -34,6 +34,19 @@ export function buildEventGroupQrPath(eventSlug: string, fileName: string) {
   return `events/${safeEventSlug}/group-qr/${timestamp}-${safeFileName}`;
 }
 
+export function buildEventGroupQrCosKey(eventSlug: string, fileName: string) {
+  return `${EVENT_PRIVATE_ASSETS_BUCKET}/${buildEventGroupQrPath(eventSlug, fileName)}`;
+}
+
+export function isEventGroupQrCosKey(value: string) {
+  return (
+    value.startsWith(`${EVENT_PRIVATE_ASSETS_BUCKET}/events/`) &&
+    value.includes("/group-qr/") &&
+    !value.includes("..") &&
+    !value.includes("://")
+  );
+}
+
 export function buildSponsorAssetPath(sponsorSlug: string, fileName: string) {
   const safeSponsorSlug = sanitizeSegment(sponsorSlug || "sponsor");
   const safeFileName = sanitizeSegment(fileName || "upload.jpg");

@@ -21,7 +21,8 @@
     "db:copy": "node scripts/copy-supabase-database.mjs",
     "storage:copy": "node scripts/copy-supabase-storage.mjs",
     "storage:verify:cos": "node --env-file=.env.local scripts/verify-cos-storage.mjs",
-    "storage:migrate:cos": "node --env-file=.env.local scripts/migrate-supabase-images-to-cos.mjs"
+    "storage:migrate:cos": "node --env-file=.env.local scripts/migrate-supabase-images-to-cos.mjs",
+    "storage:migrate:residual-cos": "node --env-file=.env.local scripts/migrate-residual-assets-to-cos.mjs"
   },
   "dependencies": {
     "@ant-design/icons": "^6.3.2",
