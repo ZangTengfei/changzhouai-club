@@ -52,7 +52,7 @@ let hasLoaded = false;
 let requestVersion = 0;
 const communityShareImageUrl = "/assets/share/home-share-v7.jpg";
 
-function getDeskNumber(code: string, prefix: "D" | "F" | "O", maximum: number) {
+function getDeskNumber(code: string, prefix: "D" | "F" | "S", maximum: number) {
   const match = code.match(new RegExp(`^${prefix}(\\d{2})$`));
   const number = match ? Number(match[1]) : 0;
   return number >= 1 && number <= maximum ? number : null;
@@ -90,7 +90,7 @@ function applyFloorPlanLayout(
     };
   }
 
-  const officeDeskNumber = getDeskNumber(resource.code, "O", 2);
+  const officeDeskNumber = getDeskNumber(resource.code, "S", 2);
   if (officeDeskNumber) {
     return {
       ...resource,
@@ -122,7 +122,7 @@ function applyFloorPlanLayout(
 function getDeskFacingClass(code: string) {
   const deskNumber = getDeskNumber(code, "D", 24)
     ?? getDeskNumber(code, "F", 6)
-    ?? getDeskNumber(code, "O", 2);
+    ?? getDeskNumber(code, "S", 2);
   if (!deskNumber) return "";
   return (deskNumber - 1) % 6 < 3 ? "desk-facing-south" : "desk-facing-north";
 }
@@ -298,7 +298,7 @@ function buildPlaceholderResources(activeMode: ResourceMode) {
     { length: 2 },
     (_, index) => ({
       id: `placeholder-office-desk-${index + 1}`,
-      code: `O${pad(index + 1)}`,
+      code: `S${pad(index + 1)}`,
       name: `独立办公室工位 ${index + 1}`,
       resourceType: "desk",
       deskMode: "flexible",

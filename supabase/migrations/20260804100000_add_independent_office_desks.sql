@@ -5,12 +5,12 @@ insert into public.community_space_resources (
 )
 values
   (
-    'O01', '独立办公室工位 1', 'desk', 'flexible', 1, '独立办公室 1',
+    'S01', '独立办公室工位 1', 'desk', 'flexible', 1, '独立办公室 1',
     54, 8.4, 8, 4.3,
     0, 'active', 301
   ),
   (
-    'O02', '独立办公室工位 2', 'desk', 'flexible', 1, '独立办公室 2',
+    'S02', '独立办公室工位 2', 'desk', 'flexible', 1, '独立办公室 2',
     76, 8.4, 8, 4.3,
     0, 'active', 302
   )
