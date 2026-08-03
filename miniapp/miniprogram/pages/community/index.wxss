@@ -607,7 +607,7 @@
 }
 
 .focused-office-zone {
-  top: 47%;
+  top: 31%;
   left: 68%;
   width: 25%;
   height: 20%;
@@ -618,6 +618,15 @@
   border-color: #9ba7a2;
   background: #e8ecea;
   font-size: 18rpx;
+}
+
+.focused-office-zone text:first-child {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0 4rpx;
+  line-height: 1.4;
+  text-align: center;
+  white-space: nowrap;
 }
 
 .focused-office-zone text:last-child {
@@ -633,24 +642,6 @@
   height: 34%;
   border-color: #b8c4be;
   background: #eef4ef;
-}
-
-.print-zone {
-  position: absolute;
-  top: 40%;
-  left: 75%;
-  display: flex;
-  align-items: center;
-  gap: 7rpx;
-  color: #5d6b65;
-  font-size: 17rpx;
-  font-weight: 700;
-}
-
-.print-zone image {
-  width: 28rpx;
-  height: 28rpx;
-  opacity: 0.7;
 }
 
 .hall-label {
