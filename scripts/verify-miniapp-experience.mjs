@@ -333,13 +333,19 @@ try {
     communityPublic.body?.resources?.filter(
       (resource) => resource.resourceType === "desk",
     ).length,
-    30,
+    32,
   );
   assert.equal(
     communityPublic.body?.resources?.filter(
       (resource) => resource.resourceType === "meeting_room",
     ).length,
     1,
+  );
+  assert.ok(communityPublic.body?.spacePhotos?.length >= 2);
+  assert.ok(
+    communityPublic.body?.spacePhotos?.some(
+      (photo) => photo.isHero && /^https:\/\//.test(photo.src),
+    ),
   );
   const deskResources = communityPublic.body?.resources?.filter(
     (resource) => resource.resourceType === "desk",
