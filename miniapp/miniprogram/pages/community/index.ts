@@ -95,7 +95,7 @@ function applyFloorPlanLayout(
       ...resource,
       name: "会议室",
       areaLabel: "办公大厅南侧",
-      x: 10,
+      x: 8,
       y: 79,
       width: 34,
       height: 14,
