@@ -4,6 +4,7 @@
 }
 
 .community-hero {
+  position: relative;
   display: flex;
   min-height: 590rpx;
   box-sizing: border-box;
@@ -138,11 +139,16 @@
 }
 
 .hero-photo {
-  position: relative;
-  width: 48%;
-  flex: none;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 52%;
   overflow: hidden;
-  border-radius: 72rpx 0 0 0;
+  border-radius: 48rpx 0 0 0;
+  transform: skewX(-6deg);
+  transform-origin: right bottom;
 }
 
 .hero-photo-image {
@@ -152,6 +158,8 @@
   left: -296rpx;
   width: 700rpx;
   height: 100%;
+  transform: skewX(6deg) scale(1.04);
+  transform-origin: center;
 }
 
 .hero-photo-entry {
@@ -172,6 +180,8 @@
   font-weight: 720;
   white-space: nowrap;
   box-shadow: 0 8rpx 18rpx rgba(14, 36, 59, 0.16);
+  transform: skewX(6deg);
+  transform-origin: center;
 }
 
 .hero-photo-entry text:last-child {

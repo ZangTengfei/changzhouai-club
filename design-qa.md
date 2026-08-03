@@ -1,45 +1,45 @@
-# 社区页 Hero Design QA
+# 社区页 Hero 斜切遮罩 Design QA
 
-- Source visual truth: `/Users/nobugai/.codex/generated_images/019fc7d1-ddec-7892-814f-aa48174b257a/exec-d65713e2-b563-4863-9052-74d0cd1c522a.png`
-- Implementation screenshot: `/Users/nobugai/develop/changzhouai-club/output/design-qa/community-hero-top-implementation-v3.png`
-- Full comparison: `/Users/nobugai/develop/changzhouai-club/output/design-qa/community-hero-comparison-v3.png`
-- Interaction evidence: `/Users/nobugai/develop/changzhouai-club/output/design-qa/community-gallery-interaction-settled.png`
-- State: 社区页顶部，线上空间数据已加载，未展开其他模块
+- Source visual truth: `/Users/nobugai/develop/changzhouai-club/output/design-qa/community-hero-diagonal-source.png`
+- Implementation screenshot: `/Users/nobugai/develop/changzhouai-club/output/design-qa/community-hero-diagonal-implementation-v3.png`
+- Full comparison: `/Users/nobugai/develop/changzhouai-club/output/design-qa/community-hero-diagonal-comparison-v3.png`
+- State: 社区页顶部，空间数据已加载，页面滚动位置为顶部
 - Simulator viewport: 688 × 1486 px；小程序内容宽度约 688 px，截图密度由微信开发者工具模拟器决定
-- Source pixels: 1358 × 1158 px
+- Source pixels: 1358 × 1158 px；有效 Hero 区域裁切为 1316 × 1111 px
 - Implementation pixels: 688 × 1486 px；Hero 对比区域为 630 × 538 px
-- Density normalization: 将源图缩放到 630 × 538 px，并与实现截图中同尺寸 Hero 区域并排比较
+- CSS size and density normalization: 将源图有效 Hero 区域缩放到 630 × 538 px，并与实现截图中同尺寸 Hero 区域并排比较
 
 ## Findings
 
 - 无 P0、P1、P2 问题。
-- 字体与层级：品牌行、三行主标题、说明、地点、数字统计的层级与目标一致；使用小程序系统字体替代效果图字体，属于运行时约束下的可接受差异。
-- 间距与布局：浅色信息区和实景照片采用 52:48 分栏；相较效果图略微增加信息区宽度，以保证真实地点、动态统计和服务标签在小程序窄屏下不截断。
-- 色彩：Hero 已从墨绿色切换为雾蓝白底、深蓝正文和蓝色数字，没有左侧彩色竖线，也没有多余装饰卡片。
-- 图片：使用真实办公空间原图；照片内容向左移动，墙面 AI Club Logo、世界地图、蓝色前台和部分办公区均可见，图片无拉伸和明显压缩失真。
-- 文案与数据：标题、简介、地点和服务信息与确认稿一致；工位总数使用线上实际值 30，不写死效果图中的旧值 24。
-- 交互：点击右侧照片可进入原有 2 张实景预览，原生预览层显示 `1/2`；自动化截图无法记录原生预览层最终解码出的图片，但入口调用成功且页面控制台无错误。
+- 字体与层级：品牌行、三行主标题、说明、地点和数据统计保持原实现，不因遮罩修正发生换行或层级回退；系统字体与效果图字体的细微差异属于小程序运行时约束。
+- 间距与布局：照片边界已改为顶部靠右、向下逐步往左展开的斜切；底部交点约位于 Hero 宽度 48%，顶部圆角后的交点约位于 57%，与源图比例一致。
+- 色彩：浅色信息底、深蓝正文、蓝色统计和照片色调均保持一致；没有新增彩色左侧竖线或其他装饰。
+- 图片：继续使用真实办公室照片，通过反向变形保持照片中的墙线、Logo 和文字不倾斜；墙面 AI Club Logo、世界地图与蓝色前台仍完整可见。
+- 文案与数据：文案结构与设计稿一致；当前线上数据为 30 个工位且标签为“已常驻”，与设计稿中的静态 24 / 已固定差异属于真实数据和既有产品文案，不是本次遮罩偏差。
+- 交互：实景入口仍位于照片右下角，变形已反向抵消，文字和点击区域保持水平；本次仅修改 WXSS，原有 `previewSpacePhotos` 绑定未变。
 
 ## Focused Region Comparison
 
-- 已在 `community-hero-comparison-v3.png` 中并排检查品牌行、标题换行、地点行、统计区、照片焦点、墙面 Logo 和实景入口，因此无需额外局部裁图。
+- `community-hero-diagonal-comparison-v3.png` 已将源图和 630 × 538 px 的实现 Hero 同框并排，能够清楚检查斜切交点、圆角、照片焦点、标题换行、数据区和实景入口，因此无需额外局部裁图。
 
 ## Comparison History
 
-1. 首轮实现：信息区 60%、照片区 40%，标题换行和照片占比偏离目标。
-2. 第二轮：改为独立三行标题并将照片区扩大到 45%，墙面 Logo 完整显示。
-3. 最终轮：照片区扩大到 48%，同时调整图片偏移，让办公区、蓝色前台和墙面 Logo 共同进入画面；并排复核后无可执行的 P0/P1/P2 差异。
+1. 基线：实现为 52:48 的垂直分栏，照片左边界没有斜切，属于 P1 主视觉偏差。
+2. 第一轮：将照片容器改为斜切并对图片、入口反向校正；56% 照片宽度使边界整体比源图偏左，记录为 P2。
+3. 第二轮：照片宽度收至 52%，底部交点与源图对齐；顶部 72rpx 圆角仍偏大，使顶部可见起点略偏右，记录为 P2。
+4. 最终轮：顶部圆角收至 48rpx；同尺寸并排复核后，顶部和底部交点、边界角度及圆角过渡均与源图一致，无可执行的 P0、P1、P2 差异。
 
 ## Follow-up Polish
 
-- P3：如需更贴近效果图，可在后续素材阶段补充同风格的相册图标；当前采用纯文字入口，避免引入不匹配的图标资产。
+- 无需继续调整。照片本身的亮度和透视差异来自同一素材在不同裁切位置下的呈现，不影响遮罩还原。
 
 ## Verification
 
 - `npm run typecheck`: passed
 - `git diff --check`: passed
 - 微信开发者工具自动化重载 `pages/community/index`: passed
-- 点击 `.hero-photo` 打开 2 张实景预览: passed
-- 控制台错误: 0
+- 页面截图和同尺寸并排对比: passed
+- 变更范围: 仅社区 Hero 遮罩与其内部照片、入口的变形校正
 
 final result: passed
