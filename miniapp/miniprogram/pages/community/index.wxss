@@ -596,6 +596,11 @@
   top: 2.5%;
   width: 20%;
   height: 11%;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 6rpx;
+  font-size: 17rpx;
+  line-height: 1.2;
 }
 
 .office-room-one {

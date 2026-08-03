@@ -81,7 +81,7 @@ export const COMMUNITY_SPACE_CONTENT = {
   openHours: "24 小时开放",
   pricing: "社区成员免费",
   eligibility: "社区成员与已入驻 OPC",
-  deskCount: 30,
+  deskCount: 32,
   flexibleDeskMinimum: 6,
   fixedDeskCount: 0,
   meetingRoomCount: 1,

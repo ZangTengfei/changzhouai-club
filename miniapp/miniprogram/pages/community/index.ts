@@ -52,7 +52,7 @@ let hasLoaded = false;
 let requestVersion = 0;
 const communityShareImageUrl = "/assets/share/home-share-v7.jpg";
 
-function getDeskNumber(code: string, prefix: "D" | "F", maximum: number) {
+function getDeskNumber(code: string, prefix: "D" | "F" | "O", maximum: number) {
   const match = code.match(new RegExp(`^${prefix}(\\d{2})$`));
   const number = match ? Number(match[1]) : 0;
   return number >= 1 && number <= maximum ? number : null;
@@ -90,6 +90,19 @@ function applyFloorPlanLayout(
     };
   }
 
+  const officeDeskNumber = getDeskNumber(resource.code, "O", 2);
+  if (officeDeskNumber) {
+    return {
+      ...resource,
+      areaLabel: `独立办公室 ${officeDeskNumber}`,
+      x: officeDeskNumber === 1 ? 54 : 76,
+      y: 8.4,
+      width: 8,
+      height: 4.3,
+      rotation: 0,
+    };
+  }
+
   if (resource.code === "MR-02") {
     return {
       ...resource,
@@ -107,7 +120,9 @@ function applyFloorPlanLayout(
 }
 
 function getDeskFacingClass(code: string) {
-  const deskNumber = getDeskNumber(code, "D", 24) ?? getDeskNumber(code, "F", 6);
+  const deskNumber = getDeskNumber(code, "D", 24)
+    ?? getDeskNumber(code, "F", 6)
+    ?? getDeskNumber(code, "O", 2);
   if (!deskNumber) return "";
   return (deskNumber - 1) % 6 < 3 ? "desk-facing-south" : "desk-facing-north";
 }
@@ -279,6 +294,27 @@ function buildPlaceholderResources(activeMode: ResourceMode) {
       fixedAssignment: null,
     }),
   );
+  const officeDesks: MiniappCommunitySpaceResource[] = Array.from(
+    { length: 2 },
+    (_, index) => ({
+      id: `placeholder-office-desk-${index + 1}`,
+      code: `O${pad(index + 1)}`,
+      name: `独立办公室工位 ${index + 1}`,
+      resourceType: "desk",
+      deskMode: "flexible",
+      capacity: 1,
+      areaLabel: `独立办公室 ${index + 1}`,
+      x: 0,
+      y: 0,
+      width: 1,
+      height: 1,
+      rotation: 0,
+      availability: "disabled",
+      fixedApplicable: false,
+      isMine: false,
+      fixedAssignment: null,
+    }),
+  );
   const rooms: MiniappCommunitySpaceResource[] = [
     {
       id: "placeholder-room-2",
@@ -299,7 +335,7 @@ function buildPlaceholderResources(activeMode: ResourceMode) {
       fixedAssignment: null,
     },
   ];
-  return [...desks, ...fixedDesks, ...rooms].map((resource) =>
+  return [...desks, ...fixedDesks, ...officeDesks, ...rooms].map((resource) =>
     mapResource(resource, activeMode),
   );
 }
@@ -380,7 +416,7 @@ Page({
       openHours: "24 小时开放",
       pricing: "社区成员免费",
       eligibility: "社区成员与已入驻 OPC",
-      deskCount: 30,
+      deskCount: 32,
       flexibleDeskMinimum: 6,
       fixedDeskCount: 0,
       meetingRoomCount: 1,
@@ -400,7 +436,7 @@ Page({
     selectedResource: null as CommunityResourceItem | null,
     deskUseMode: null as DeskUseMode | null,
     availability: {
-      flexibleDeskCount: 30,
+      flexibleDeskCount: 32,
       availableDeskCount: 0,
       availableMeetingRoomCount: 0,
     },
