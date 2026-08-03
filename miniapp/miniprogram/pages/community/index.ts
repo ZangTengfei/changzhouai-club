@@ -43,6 +43,7 @@ const spacePhotos = [
 ];
 let hasLoaded = false;
 let requestVersion = 0;
+const communityShareImageUrl = "/assets/share/home-share-v7.jpg";
 
 function getDeskNumber(code: string, prefix: "D" | "F", maximum: number) {
   const match = code.match(new RegExp(`^${prefix}(\\d{2})$`));
@@ -402,6 +403,9 @@ Page({
   },
 
   onLoad() {
+    void wx.showShareMenu({
+      menus: ["shareAppMessage", "shareTimeline"],
+    });
     const dateOptions = buildDateOptions();
     const schedule = getDefaultSchedule(dateOptions);
     const resources = buildPlaceholderResources("desk");
@@ -861,5 +865,26 @@ Page({
       return;
     }
     void wx.navigateTo({ url: "/pages/profile/index" });
+  },
+
+  onShareAppMessage() {
+    trackEvent("share_event", "/pages/community/index", {
+      channel: "message",
+    });
+    return {
+      title: "常州 AI Club 共创社区｜工位、会议室和 AI 共创空间",
+      path: "/pages/community/index",
+      imageUrl: communityShareImageUrl,
+    };
+  },
+
+  onShareTimeline() {
+    trackEvent("share_event", "/pages/community/index", {
+      channel: "timeline",
+    });
+    return {
+      title: "常州 AI Club 共创社区｜工位、会议室和 AI 共创空间",
+      imageUrl: communityShareImageUrl,
+    };
   },
 });

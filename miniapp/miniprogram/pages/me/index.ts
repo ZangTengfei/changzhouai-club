@@ -1,4 +1,5 @@
 import { ApiError, getStoredSessionToken } from "../../services/api";
+import { trackEvent } from "../../services/analytics";
 import { ensureSession, login } from "../../services/auth";
 import { formatEventDate } from "../../services/events";
 import { uploadAvatar } from "../../services/avatar";
@@ -11,6 +12,8 @@ type FootprintItem = MiniappUser["footprints"][number] & {
 };
 
 type LoginDestination = "account" | "profile" | "registrations";
+
+const meShareImageUrl = "/assets/share/home-share-v7.jpg";
 
 function readLoginDestination(
   event: WechatMiniprogram.TouchEvent,
@@ -81,6 +84,9 @@ Page({
   },
 
   onLoad(options: Record<string, string | undefined>) {
+    void wx.showShareMenu({
+      menus: ["shareAppMessage", "shareTimeline"],
+    });
     if (options.loggedOut === "1") {
       this.setData({
         loading: false,
@@ -268,5 +274,26 @@ Page({
     void wx.navigateTo({
       url: `/pages/events/detail/index?slug=${encodeURIComponent(slug)}`,
     });
+  },
+
+  onShareAppMessage() {
+    trackEvent("share_event", "/pages/me/index", {
+      channel: "message",
+    });
+    return {
+      title: "常州 AI Club｜我的社区成长记录",
+      path: "/pages/me/index",
+      imageUrl: meShareImageUrl,
+    };
+  },
+
+  onShareTimeline() {
+    trackEvent("share_event", "/pages/me/index", {
+      channel: "timeline",
+    });
+    return {
+      title: "常州 AI Club｜我的社区成长记录",
+      imageUrl: meShareImageUrl,
+    };
   },
 });

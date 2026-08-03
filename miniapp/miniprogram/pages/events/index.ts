@@ -42,6 +42,7 @@ type EventModePanel = {
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
 const pageSize = 5;
 let requestVersion = 0;
+const eventsShareImageUrl = "/assets/share/home-share-v7.jpg";
 
 function getCoverMode(url: string | null): "aspectFill" | "aspectFit" {
   return url && /poster|layout|challenge|registration/i.test(url)
@@ -146,6 +147,9 @@ Page({
   },
 
   onLoad() {
+    void wx.showShareMenu({
+      menus: ["shareAppMessage", "shareTimeline"],
+    });
     void this.loadInitialPage();
   },
 
@@ -436,5 +440,26 @@ Page({
     if (slug) {
       void wx.navigateTo({ url: `/pages/events/detail/index?slug=${encodeURIComponent(slug)}` });
     }
+  },
+
+  onShareAppMessage() {
+    trackEvent("share_event", "/pages/events/index", {
+      channel: "message",
+    });
+    return {
+      title: "常州 AI Club 活动｜发现社区活动，记录每一次真实连接",
+      path: "/pages/events/index",
+      imageUrl: eventsShareImageUrl,
+    };
+  },
+
+  onShareTimeline() {
+    trackEvent("share_event", "/pages/events/index", {
+      channel: "timeline",
+    });
+    return {
+      title: "常州 AI Club 活动｜发现社区活动，记录每一次真实连接",
+      imageUrl: eventsShareImageUrl,
+    };
   },
 });
