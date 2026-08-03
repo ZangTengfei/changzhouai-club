@@ -38,6 +38,12 @@
         "selectedIconPath": "assets/icons/home-tab-active-v2.png"
       },
       {
+        "pagePath": "pages/community/index",
+        "text": "社区",
+        "iconPath": "assets/icons/cocreate-tab-v2.png",
+        "selectedIconPath": "assets/icons/cocreate-green-v2.png"
+      },
+      {
         "pagePath": "pages/events/index",
         "text": "活动",
         "iconPath": "assets/icons/events-tab-v2.png",
