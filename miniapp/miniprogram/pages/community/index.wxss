@@ -154,12 +154,12 @@
 .hero-photo-image {
   position: absolute;
   top: 0;
+  right: 0;
   bottom: 0;
-  left: -296rpx;
   width: 700rpx;
   height: 100%;
   transform: skewX(6deg) scale(1.04);
-  transform-origin: center;
+  transform-origin: right center;
 }
 
 .hero-photo-entry {
