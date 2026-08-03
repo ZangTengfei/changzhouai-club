@@ -39,8 +39,14 @@ type DateOption = {
 const durationOptions = [1, 2, 4, 8];
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
 const spacePhotos = [
-  { src: "/assets/community-space/office.webp", title: "AI Club OPC 共创办公区" },
-  { src: "/assets/community-space/park.webp", title: "西太湖人工智能社区园区" },
+  {
+    src: "https://assets.changzhouai.club/event-assets/community/space/office-v1.jpg",
+    title: "AI Club OPC 共创办公区",
+  },
+  {
+    src: "https://assets.changzhouai.club/event-assets/community/space/park-v1.jpg",
+    title: "西太湖人工智能社区园区",
+  },
 ];
 let hasLoaded = false;
 let requestVersion = 0;
@@ -858,7 +864,14 @@ Page({
     trackEvent("community_space_gallery_open", "/pages/community/index", {
       photoCount: this.data.spacePhotoUrls.length,
     });
-    void wx.previewImage({ current, urls: this.data.spacePhotoUrls });
+    void wx.previewImage({
+      current,
+      urls: this.data.spacePhotoUrls,
+      fail: (error) => {
+        console.warn("Failed to preview community space photos.", error);
+        void wx.showToast({ title: "实景照片加载失败", icon: "none" });
+      },
+    });
   },
 
   async submitAccessRequest() {
