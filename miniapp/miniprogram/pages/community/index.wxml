@@ -15,7 +15,7 @@
       <view class="hero-tags"><text>{{community.openHours}}</text><text>{{community.pricing}}</text></view>
     </view>
     <view class="hero-photo" bindtap="previewSpacePhotos" role="button" aria-label="查看社区空间实景照片">
-      <image class="hero-photo-image" src="https://assets.changzhouai.club/event-assets/community/space/office-v1.jpg" mode="aspectFill" />
+      <image class="hero-photo-image" src="{{heroPhotoUrl}}" mode="aspectFill" />
       <view class="hero-photo-entry"><text>空间实景 {{spacePhotos.length}} 张</text><text>›</text></view>
     </view>
   </view>

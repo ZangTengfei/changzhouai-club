@@ -287,6 +287,14 @@ interface MiniappCommunityMyFixedDesk {
   assignedAt: string;
 }
 
+interface MiniappCommunitySpacePhoto {
+  id: string;
+  title: string;
+  src: string;
+  sortOrder: number;
+  isHero: boolean;
+}
+
 interface MiniappCommunitySpaceSnapshot {
   community: {
     title: string;
@@ -301,6 +309,7 @@ interface MiniappCommunitySpaceSnapshot {
     meetingRoomCount: number;
   };
   window: { startsAt: string; endsAt: string };
+  spacePhotos: MiniappCommunitySpacePhoto[];
   resources: MiniappCommunitySpaceResource[];
   availability: {
     flexibleDeskCount: number;

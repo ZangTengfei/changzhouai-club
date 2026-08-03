@@ -69,6 +69,14 @@ type CommunityAccessRequestRow = {
   created_at: string;
 };
 
+type CommunitySpacePhotoRow = {
+  id: string;
+  title: string;
+  image_url: string;
+  sort_order: number;
+  is_hero: boolean;
+};
+
 export type CommunitySpaceWindow = {
   startsAt: string;
   endsAt: string;
@@ -139,7 +147,11 @@ export async function loadCommunitySpaceSnapshot(
   window: CommunitySpaceWindow,
   userId: string | null,
 ) {
-  const [{ data: resourceData, error: resourceError }, assignmentsResult] =
+  const [
+    { data: resourceData, error: resourceError },
+    assignmentsResult,
+    photosResult,
+  ] =
     await Promise.all([
       supabase
         .from("community_space_resources")
@@ -152,9 +164,15 @@ export async function loadCommunitySpaceSnapshot(
         .select(
           "resource_id, user_id, opc_name, assigned_at, public_profile_consent_at",
         ),
+      supabase
+        .from("community_space_photos")
+        .select("id, title, image_url, sort_order, is_hero")
+        .eq("status", "active")
+        .order("is_hero", { ascending: false })
+        .order("sort_order", { ascending: true }),
     ]);
 
-  if (resourceError || assignmentsResult.error) {
+  if (resourceError || assignmentsResult.error || photosResult.error) {
     throw new Error("community_space_resources_load_failed");
   }
 
@@ -337,6 +355,15 @@ export async function loadCommunitySpaceSnapshot(
       ).length,
     },
     window,
+    spacePhotos: ((photosResult.data ?? []) as CommunitySpacePhotoRow[]).map(
+      (photo) => ({
+        id: photo.id,
+        title: photo.title,
+        src: photo.image_url,
+        sortOrder: photo.sort_order,
+        isHero: photo.is_hero,
+      }),
+    ),
     resources: mappedResources,
     availability: {
       flexibleDeskCount: desks.filter(

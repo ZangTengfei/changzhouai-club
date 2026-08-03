@@ -38,14 +38,20 @@ type DateOption = {
 
 const durationOptions = [1, 2, 4, 8];
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
-const spacePhotos = [
+const fallbackSpacePhotos: MiniappCommunitySpacePhoto[] = [
   {
+    id: "fallback-office",
     src: "https://assets.changzhouai.club/event-assets/community/space/office-v1.jpg",
     title: "AI Club OPC 共创办公区",
+    sortOrder: 10,
+    isHero: true,
   },
   {
+    id: "fallback-park",
     src: "https://assets.changzhouai.club/event-assets/community/space/park-v1.jpg",
     title: "西太湖人工智能社区园区",
+    sortOrder: 20,
+    isHero: false,
   },
 ];
 let hasLoaded = false;
@@ -421,8 +427,9 @@ Page({
       fixedDeskCount: 0,
       meetingRoomCount: 1,
     },
-    spacePhotos,
-    spacePhotoUrls: spacePhotos.map((photo) => photo.src),
+    spacePhotos: fallbackSpacePhotos,
+    spacePhotoUrls: fallbackSpacePhotos.map((photo) => photo.src),
+    heroPhotoUrl: fallbackSpacePhotos[0].src,
     activeMode: "desk" as ResourceMode,
     viewMode: "map" as ResourceViewMode,
     dateOptions: [] as DateOption[],
@@ -540,6 +547,11 @@ Page({
       const selectedResource = this.data.selectedResource
         ? resources.find((resource) => resource.id === this.data.selectedResource?.id) ?? null
         : null;
+      const loadedSpacePhotos = snapshot.spacePhotos?.length
+        ? snapshot.spacePhotos
+        : fallbackSpacePhotos;
+      const heroPhoto = loadedSpacePhotos.find((photo) => photo.isHero)
+        ?? loadedSpacePhotos[0];
       this.setData({
         community: {
           ...snapshot.community,
@@ -551,6 +563,9 @@ Page({
           (resource) => resource.resourceType === this.data.activeMode,
         ),
         selectedResource: selectedResource?.selectable ? selectedResource : null,
+        spacePhotos: loadedSpacePhotos,
+        spacePhotoUrls: loadedSpacePhotos.map((photo) => photo.src),
+        heroPhotoUrl: heroPhoto.src,
         availability: summarizeAvailability(resources),
         myBookings: snapshot.myBookings.map(mapBooking),
         fixedDeskRequest: snapshot.fixedDeskRequest ?? null,

@@ -74,6 +74,11 @@ export function buildCommunityQrCodePath(fileName: string) {
   return `community/wechat-qr/${timestamp}-${safeFileName}`;
 }
 
+export function buildCommunitySpacePhotoPath(fileName: string) {
+  const safeFileName = sanitizeSegment(fileName || "space-photo.jpg") || "space-photo.jpg";
+  return `community/space/${Date.now()}-${crypto.randomUUID()}-${safeFileName}`;
+}
+
 export function buildWechatArticleAssetPath(fileName: string) {
   const safeFileName =
     sanitizeSegment(fileName || "wechat-article-image.jpg") ||

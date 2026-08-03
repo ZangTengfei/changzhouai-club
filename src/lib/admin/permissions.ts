@@ -49,6 +49,30 @@ export const ADMIN_PERMISSION_DEFINITIONS = [
     module: "spaces",
     sensitivity: "L2",
   },
+  {
+    key: "spaces.manage_resources",
+    label: "管理空间资源",
+    module: "spaces",
+    sensitivity: "L2",
+  },
+  {
+    key: "spaces.manage_bookings",
+    label: "管理空间预约",
+    module: "spaces",
+    sensitivity: "L2",
+  },
+  {
+    key: "spaces.manage_access",
+    label: "管理门禁申请",
+    module: "spaces",
+    sensitivity: "L2",
+  },
+  {
+    key: "spaces.manage_photos",
+    label: "管理空间图片",
+    module: "spaces",
+    sensitivity: "L2",
+  },
 
   { key: "projects.read", label: "查看共建项目", module: "projects", sensitivity: "L1" },
   { key: "projects.write", label: "编辑共建项目", module: "projects", sensitivity: "L1" },
