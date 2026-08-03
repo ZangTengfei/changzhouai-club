@@ -13,6 +13,7 @@ import { isMiniappBasicProfileReady } from "../../utils/profile-state";
 
 type ResourceMode = "desk" | "meeting_room";
 type ResourceViewMode = "map" | "list";
+type DeskUseMode = "temporary" | "fixed";
 
 type CommunityResourceItem = MiniappCommunitySpaceResource & {
   availabilityClass: string;
@@ -148,6 +149,25 @@ function buildWindow(dateValue: string, startTime: string, durationHours: number
   };
 }
 
+function buildDeskDayWindow(dateValue: string) {
+  const dayStart = new Date(`${dateValue}T00:00:00+08:00`);
+  const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1_000);
+  const now = new Date();
+  const startsAt = formatDateValue(now) === dateValue
+    ? new Date(Math.min(now.getTime() + 60 * 1_000, dayEnd.getTime()))
+    : dayStart;
+  startsAt.setSeconds(0, 0);
+  return {
+    startsAt: startsAt.toISOString(),
+    endsAt: dayEnd.toISOString(),
+  };
+}
+
+function canBookDeskDay(dateValue: string) {
+  const dayEnd = new Date(`${dateValue}T00:00:00+08:00`).getTime() + 24 * 60 * 60 * 1_000;
+  return dayEnd - Date.now() >= 32 * 60 * 1_000;
+}
+
 function formatBeijingParts(value: string) {
   const date = new Date(value);
   const beijingDate = new Date(date.getTime() + 8 * 60 * 60 * 1_000);
@@ -165,7 +185,7 @@ function getAvailabilityMeta(availability: MiniappCommunityAvailability) {
     return { label: "已预约", className: "booked" };
   }
   if (availability === "fixed") {
-    return { label: "固定使用", className: "fixed" };
+    return { label: "常驻使用", className: "fixed" };
   }
   return { label: "暂停使用", className: "disabled" };
 }
@@ -182,7 +202,9 @@ function mapResource(
     availabilityLabel: availability.label,
     facingClass: getDeskFacingClass(resource.code),
     isActiveMode: resource.resourceType === activeMode,
-    selectable: resource.availability === "available",
+    selectable:
+      resource.availability === "available" ||
+      (resource.resourceType === "desk" && resource.fixedApplicable),
     style: [
       `left:${positionedResource.x}%`,
       `top:${positionedResource.y}%`,
@@ -199,8 +221,9 @@ function mapBooking(booking: MiniappCommunitySpaceBooking): CommunityBookingItem
   return {
     ...booking,
     dateLabel: start.dateLabel,
-    timeLabel:
-      start.dateLabel === end.dateLabel
+    timeLabel: booking.resourceType === "desk"
+      ? "按天使用"
+      : start.dateLabel === end.dateLabel
         ? `${start.timeLabel}—${end.timeLabel}`
         : `${start.timeLabel}—${end.dateLabel} ${end.timeLabel}`,
     statusLabel: booking.status === "confirmed" ? "已确认" : "已取消",
@@ -310,7 +333,7 @@ function summarizeAvailability(resources: CommunityResourceItem[]) {
 function getBookingErrorMessage(error: unknown) {
   if (!(error instanceof ApiError)) return "预约失败，请稍后重试";
   if (error.errorCode === "space_resource_already_booked") return "刚刚被其他成员预约了，请换一个";
-  if (error.errorCode === "fixed_desk_unavailable") return "该工位刚刚已转为固定使用，请换一个";
+  if (error.errorCode === "fixed_desk_unavailable") return "该工位刚刚已转为常驻使用，请换一个";
   if (error.errorCode === "community_membership_required") return "当前账号还不是可预约社区成员";
   if (error.errorCode === "community_profile_required") return "请先设置社区昵称";
   if (error.errorCode === "meeting_purpose_required") return "请填写会议用途";
@@ -328,16 +351,16 @@ function getFixedDeskErrorMessage(error: unknown) {
     return "请先完善社区昵称";
   }
   if (error.errorCode === "fixed_desk_already_assigned") {
-    return "该工位刚刚已分配，请选择其他工位";
+    return "该工位刚刚已转为常驻，请选择其他工位";
   }
   if (error.errorCode === "fixed_desk_user_already_assigned") {
-    return "你已经有固定工位";
+    return "你已经有常驻工位";
   }
   if (error.errorCode === "fixed_desk_request_already_submitted") {
-    return "你已有一条申请正在审核";
+    return "你已有一条常驻申请正在审核";
   }
   if (error.errorCode === "fixed_desk_not_applicable") {
-    return "该工位当前无法申请固定";
+    return "该工位当前无法申请常驻";
   }
   return "提交失败，请稍后重试";
 }
@@ -369,6 +392,7 @@ Page({
     resources: [] as CommunityResourceItem[],
     visibleResources: [] as CommunityResourceItem[],
     selectedResource: null as CommunityResourceItem | null,
+    deskUseMode: null as DeskUseMode | null,
     availability: {
       flexibleDeskCount: 30,
       availableDeskCount: 0,
@@ -378,8 +402,6 @@ Page({
     attendeeIndex: 0,
     meetingPurpose: "",
     myBookings: [] as CommunityBookingItem[],
-    fixedDeskOptions: [] as CommunityResourceItem[],
-    selectedFixedDesk: null as CommunityResourceItem | null,
     fixedDeskRequest: null as MiniappCommunityFixedDeskRequest | null,
     myFixedDesk: null as MiniappCommunityMyFixedDesk | null,
     fixedDeskNote: "",
@@ -414,7 +436,6 @@ Page({
       ...schedule,
       resources,
       visibleResources: resources.filter((item) => item.resourceType === "desk"),
-      fixedDeskOptions: resources.filter((item) => item.fixedApplicable),
     });
     void this.loadPage();
     void ensureSession()
@@ -456,6 +477,7 @@ Page({
 
   getWindow() {
     const date = this.data.dateOptions[this.data.selectedDateIndex];
+    if (this.data.activeMode === "desk") return buildDeskDayWindow(date.value);
     return buildWindow(date.value, this.data.startTime, this.data.durationHours);
   },
 
@@ -476,16 +498,6 @@ Page({
       const selectedResource = this.data.selectedResource
         ? resources.find((resource) => resource.id === this.data.selectedResource?.id) ?? null
         : null;
-      const fixedDeskOptions = resources.filter(
-        (resource) => resource.fixedApplicable,
-      );
-      const selectedFixedDesk = this.data.selectedFixedDesk
-        ? fixedDeskOptions.find(
-            (resource) => resource.id === this.data.selectedFixedDesk?.id,
-          ) ?? null
-        : fixedDeskOptions.find(
-            (resource) => resource.fixedApplicable,
-          ) ?? null;
       this.setData({
         community: {
           ...snapshot.community,
@@ -496,15 +508,9 @@ Page({
         visibleResources: resources.filter(
           (resource) => resource.resourceType === this.data.activeMode,
         ),
-        selectedResource:
-          selectedResource?.availability === "available" ? selectedResource : null,
+        selectedResource: selectedResource?.selectable ? selectedResource : null,
         availability: summarizeAvailability(resources),
         myBookings: snapshot.myBookings.map(mapBooking),
-        fixedDeskOptions,
-        selectedFixedDesk:
-          selectedFixedDesk?.fixedApplicable
-            ? selectedFixedDesk
-            : null,
         fixedDeskRequest: snapshot.fixedDeskRequest ?? null,
         myFixedDesk: snapshot.myFixedDesk ?? null,
         fixedDeskNote:
@@ -528,8 +534,9 @@ Page({
     const start = formatBeijingParts(startsAt);
     const end = formatBeijingParts(endsAt);
     this.setData({
-      windowLabel:
-        start.dateLabel === end.dateLabel
+      windowLabel: this.data.activeMode === "desk"
+        ? `${start.dateLabel} · 按天使用`
+        : start.dateLabel === end.dateLabel
           ? `${start.dateLabel} ${start.timeLabel}—${end.timeLabel}`
           : `${start.dateLabel} ${start.timeLabel}—${end.dateLabel} ${end.timeLabel}`,
     });
@@ -549,6 +556,7 @@ Page({
         (resource) => resource.resourceType === activeMode,
       ),
       selectedResource: null,
+      deskUseMode: null,
       meetingPurpose: "",
       attendeeIndex: 0,
       attendeeOptions: [1],
@@ -564,19 +572,24 @@ Page({
   changeDate(event: WechatMiniprogram.TouchEvent) {
     const selectedDateIndex = Number(event.currentTarget.dataset.index);
     if (!Number.isInteger(selectedDateIndex)) return;
-    this.setData({ selectedDateIndex, selectedResource: null });
+    const date = this.data.dateOptions[selectedDateIndex];
+    if (this.data.activeMode === "desk" && date && !canBookDeskDay(date.value)) {
+      void wx.showToast({ title: "今天已无法按天预约，请选择明天", icon: "none" });
+      return;
+    }
+    this.setData({ selectedDateIndex, selectedResource: null, deskUseMode: null });
     void this.loadPage(false);
   },
 
   changeStartTime(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
-    this.setData({ startTime: event.detail.value, selectedResource: null });
+    this.setData({ startTime: event.detail.value, selectedResource: null, deskUseMode: null });
     void this.loadPage(false);
   },
 
   changeDuration(event: WechatMiniprogram.TouchEvent) {
     const durationHours = Number(event.currentTarget.dataset.duration);
     if (!durationOptions.includes(durationHours)) return;
-    this.setData({ durationHours, selectedResource: null });
+    this.setData({ durationHours, selectedResource: null, deskUseMode: null });
     void this.loadPage(false);
   },
 
@@ -609,24 +622,37 @@ Page({
     this.setData({
       activeMode: resource.resourceType,
       selectedResource: resource,
+      deskUseMode: null,
       attendeeOptions,
       attendeeIndex: Math.min(this.data.attendeeIndex, attendeeOptions.length - 1),
     });
   },
 
-  selectFixedDesk(event: WechatMiniprogram.TouchEvent) {
-    const resourceId = String(event.currentTarget.dataset.id ?? "");
-    const resource = this.data.resources.find((item) => item.id === resourceId);
-    if (!resource?.fixedApplicable) {
-      void wx.showToast({ title: "该工位当前无法申请固定", icon: "none" });
+  chooseDeskUseMode(event: WechatMiniprogram.TouchEvent) {
+    const deskUseMode = String(event.currentTarget.dataset.mode) as DeskUseMode;
+    const resource = this.data.selectedResource;
+    if (!resource || resource.resourceType !== "desk") return;
+    if (deskUseMode === "temporary" && resource.availability !== "available") {
+      void wx.showToast({ title: "该工位当天已被预约", icon: "none" });
       return;
     }
-    this.setData({ selectedFixedDesk: resource }, () => {
-      wx.pageScrollTo({
-        selector: "#fixed-desk-application",
-        duration: 280,
-      });
-    });
+    if (deskUseMode === "fixed") {
+      if (this.data.myFixedDesk) {
+        void wx.showToast({ title: "你已经有常驻工位", icon: "none" });
+        return;
+      }
+      if (this.data.fixedDeskRequest?.status === "submitted") {
+        void wx.showToast({ title: "你的常驻申请正在审核", icon: "none" });
+        return;
+      }
+      if (!resource.fixedApplicable) {
+        void wx.showToast({ title: "该工位当前无法申请常驻", icon: "none" });
+        return;
+      }
+    }
+    if (deskUseMode === "temporary" || deskUseMode === "fixed") {
+      this.setData({ deskUseMode });
+    }
   },
 
   handleFixedDeskNoteInput(event: WechatMiniprogram.Input) {
@@ -643,9 +669,9 @@ Page({
     if (this.data.fixedDeskSubmitting) return;
     const user = await this.requireCommunityUser();
     if (!user) return;
-    const resource = this.data.selectedFixedDesk;
-    if (!resource?.fixedApplicable) {
-      void wx.showToast({ title: "请选择可申请的固定工位", icon: "none" });
+    const resource = this.data.selectedResource;
+    if (resource?.resourceType !== "desk" || !resource.fixedApplicable) {
+      void wx.showToast({ title: "请选择可申请常驻的工位", icon: "none" });
       return;
     }
     if (!this.data.fixedDeskConsent) {
@@ -660,12 +686,16 @@ Page({
         note: this.data.fixedDeskNote.trim(),
         publicProfileConsent: true,
       });
-      this.setData({ fixedDeskRequest: response.fixedDeskRequest });
+      this.setData({
+        fixedDeskRequest: response.fixedDeskRequest,
+        selectedResource: null,
+        deskUseMode: null,
+      });
       trackEvent("community_fixed_desk_request", "/pages/community/index", {
         resourceCode: resource.code,
       });
       await this.loadPage(false);
-      void wx.showToast({ title: "固定工位申请已提交", icon: "success" });
+      void wx.showToast({ title: "常驻申请已提交", icon: "success" });
     } catch (error) {
       void wx.showToast({ title: getFixedDeskErrorMessage(error), icon: "none" });
       await this.loadPage(false);
@@ -754,6 +784,10 @@ Page({
   async confirmBooking() {
     const resource = this.data.selectedResource;
     if (!resource || this.data.submitting) return;
+    if (resource.resourceType === "desk" && resource.availability !== "available") {
+      void wx.showToast({ title: "该工位当天已被预约", icon: "none" });
+      return;
+    }
     const user = await this.requireCommunityUser();
     if (!user) return;
     const purpose = this.data.meetingPurpose.trim();
@@ -775,7 +809,7 @@ Page({
       trackEvent("community_booking_success", "/pages/community/index", {
         resourceType: resource.resourceType,
       });
-      this.setData({ selectedResource: null, meetingPurpose: "" });
+      this.setData({ selectedResource: null, deskUseMode: null, meetingPurpose: "" });
       await this.loadPage(false);
       void wx.showToast({ title: "预约成功", icon: "success" });
     } catch (error) {

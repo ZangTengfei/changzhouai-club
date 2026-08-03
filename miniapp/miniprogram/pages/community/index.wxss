@@ -271,6 +271,35 @@
   margin-bottom: 22rpx;
 }
 
+.desk-permanent-status {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+  padding: 18rpx;
+  border-radius: 22rpx;
+  background: #f3f8fc;
+}
+
+.desk-permanent-status-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 5rpx;
+}
+
+.desk-permanent-status-copy text:first-child {
+  font-size: 23rpx;
+  font-weight: 780;
+}
+
+.desk-permanent-status-copy text:last-child {
+  color: var(--color-subtle);
+  font-size: 18rpx;
+  line-height: 1.45;
+}
+
 .date-scroller {
   width: 100%;
   margin: 0 -2rpx;
@@ -980,20 +1009,86 @@
   margin-top: 22rpx;
 }
 
-.fixed-application-shortcut {
-  min-height: 70rpx;
-  margin-top: 14rpx;
-  border: 2rpx solid #9fc8dc;
-  border-radius: 18rpx;
-  background: #f3fafd;
-  color: #356f8e;
-  font-size: 20rpx;
-  font-weight: 720;
-  line-height: 70rpx;
+.selection-status-booked {
+  background: var(--color-orange-soft);
+  color: #9a571f;
 }
 
-.fixed-application-shortcut::after {
+.desk-use-prompt {
+  display: block;
+  margin-top: 22rpx;
+  color: var(--color-muted);
+  font-size: 21rpx;
+  font-weight: 700;
+}
+
+.desk-use-options {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 12rpx;
+}
+
+.desk-use-option {
+  display: flex;
+  width: 100%;
+  min-height: 96rpx;
+  min-width: 0;
+  flex: 1;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 5rpx;
+  margin: 0;
+  padding: 14rpx 12rpx;
+  border: 2rpx solid #d6e1dc;
+  border-radius: 20rpx;
+  background: #ffffff;
+  color: var(--color-ink);
+  line-height: 1.3;
+  text-align: left;
+}
+
+.desk-use-option::after {
   border: 0;
+}
+
+.desk-use-option text:first-child {
+  font-size: 22rpx;
+  font-weight: 780;
+  white-space: nowrap;
+}
+
+.desk-use-option text:last-child {
+  color: var(--color-subtle);
+  font-size: 17rpx;
+}
+
+.desk-use-option-selected {
+  border-color: var(--color-green);
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
+}
+
+.desk-use-option-selected text:last-child {
+  color: var(--color-green-dark);
+}
+
+.desk-use-option-disabled {
+  opacity: 0.5;
+}
+
+.desk-use-action,
+.desk-fixed-form {
+  margin-top: 4rpx;
+}
+
+.desk-fixed-intro {
+  display: block;
+  margin-top: 18rpx;
+  color: var(--color-muted);
+  font-size: 19rpx;
+  line-height: 1.55;
 }
 
 .booking-note {
@@ -1002,64 +1097,6 @@
   color: var(--color-subtle);
   font-size: 18rpx;
   line-height: 1.5;
-}
-
-.fixed-desk-card {
-  padding: 26rpx;
-}
-
-.fixed-desk-intro {
-  display: block;
-  color: var(--color-muted);
-  font-size: 21rpx;
-  line-height: 1.65;
-}
-
-.fixed-desk-options {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12rpx;
-  margin-top: 20rpx;
-}
-
-.fixed-desk-option {
-  display: flex;
-  min-height: 82rpx;
-  box-sizing: border-box;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 4rpx;
-  border: 2rpx dashed #9fc8dc;
-  border-radius: 18rpx;
-  background: #f3fafd;
-  color: #356f8e;
-}
-
-.fixed-desk-option text:first-child {
-  font-size: 24rpx;
-  font-weight: 780;
-}
-
-.fixed-desk-option text:last-child {
-  padding: 0 4rpx;
-  font-size: 15rpx;
-  line-height: 1.35;
-  text-align: center;
-}
-
-.fixed-desk-option-selected {
-  border-style: solid;
-  border-color: var(--color-green);
-  background: var(--color-green-soft);
-  color: var(--color-green-dark);
-  box-shadow: 0 0 0 4rpx rgba(19, 165, 103, 0.1);
-}
-
-.fixed-desk-form {
-  margin-top: 22rpx;
-  padding-top: 4rpx;
-  border-top: 2rpx solid var(--color-line);
 }
 
 .fixed-desk-consent {
@@ -1080,35 +1117,6 @@
 
 .fixed-desk-submit {
   margin-top: 22rpx;
-}
-
-.fixed-desk-status,
-.fixed-desk-active {
-  display: flex;
-  align-items: center;
-  gap: 18rpx;
-}
-
-.fixed-desk-status > view,
-.fixed-desk-active-copy {
-  display: flex;
-  min-width: 0;
-  flex: 1;
-  flex-direction: column;
-  gap: 6rpx;
-}
-
-.fixed-desk-status > view text:first-child,
-.fixed-desk-active-copy text:first-child {
-  font-size: 25rpx;
-  font-weight: 780;
-}
-
-.fixed-desk-status > view text:last-child,
-.fixed-desk-active-copy text:last-child {
-  color: var(--color-subtle);
-  font-size: 19rpx;
-  line-height: 1.5;
 }
 
 .fixed-desk-active-avatar {
@@ -1168,16 +1176,6 @@
 .fixed-desk-review-note text:last-child {
   font-size: 18rpx;
   line-height: 1.5;
-}
-
-.fixed-desk-empty {
-  margin-top: 18rpx;
-  padding: 22rpx;
-  border-radius: 18rpx;
-  background: #f3f5f4;
-  color: var(--color-subtle);
-  font-size: 20rpx;
-  text-align: center;
 }
 
 .my-bookings {

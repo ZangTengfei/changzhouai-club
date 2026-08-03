@@ -9,7 +9,7 @@
       <view class="hero-location"><image src="/assets/icons/location-blue-v2.png" mode="aspectFit" /><text>{{community.location}}</text></view>
       <view class="hero-stats">
         <view class="hero-stat"><text>{{community.deskCount}}</text><text>工位</text></view>
-        <view class="hero-stat"><text>{{community.fixedDeskCount}}</text><text>已固定</text></view>
+        <view class="hero-stat"><text>{{community.fixedDeskCount}}</text><text>已常驻</text></view>
         <view class="hero-stat"><text>{{community.meetingRoomCount}}</text><text>会议室</text></view>
       </view>
       <view class="hero-tags"><text>{{community.openHours}}</text><text>{{community.pricing}}</text></view>
@@ -49,6 +49,16 @@
       <view class="segmented-item {{activeMode === 'meeting_room' ? 'segmented-item-active' : ''}}" data-mode="meeting_room" bindtap="switchMode">约会议室</view>
     </view>
 
+    <view wx:if="{{activeMode === 'desk' && myFixedDesk}}" class="desk-permanent-status">
+      <view class="fixed-desk-active-avatar"><image wx:if="{{avatarUrl}}" src="{{avatarUrl}}" mode="aspectFill" /><text wx:else>{{avatarInitial}}</text></view>
+      <view class="desk-permanent-status-copy"><text>{{myFixedDesk.resourceCode}} · 我的常驻工位</text><text>工位会一直为你保留，直到主动释放。</text></view>
+      <button class="fixed-desk-release" loading="{{fixedDeskReleasing}}" disabled="{{fixedDeskReleasing}}" bindtap="releaseFixedDesk">主动释放</button>
+    </view>
+    <view wx:elif="{{activeMode === 'desk' && fixedDeskRequest && fixedDeskRequest.status === 'submitted'}}" class="desk-permanent-status">
+      <text class="status-tag">审核中</text>
+      <view class="desk-permanent-status-copy"><text>{{fixedDeskRequest.resourceCode || '常驻工位'}} 已提交申请</text><text>通过后将长期保留，并在平面图展示头像。</text></view>
+    </view>
+
     <scroll-view class="date-scroller" scroll-x="{{true}}" show-scrollbar="{{false}}" enhanced="{{true}}">
       <view class="date-row">
         <view wx:for="{{dateOptions}}" wx:key="value" class="date-chip {{selectedDateIndex === index ? 'date-chip-active' : ''}}" data-index="{{index}}" bindtap="changeDate">
@@ -57,7 +67,7 @@
       </view>
     </scroll-view>
 
-    <view class="time-controls">
+    <view wx:if="{{activeMode === 'meeting_room'}}" class="time-controls">
       <picker mode="time" value="{{startTime}}" bindchange="changeStartTime">
         <view class="time-picker"><text>开始时间</text><text>{{startTime}}</text></view>
       </picker>
@@ -68,7 +78,7 @@
     </view>
 
     <view class="availability-strip">
-      <view><text>{{activeMode === 'desk' ? availability.availableDeskCount : availability.availableMeetingRoomCount}}</text><text>{{activeMode === 'desk' ? '个工位可选' : '间会议室可选'}}</text></view>
+      <view><text>{{activeMode === 'desk' ? availability.availableDeskCount : availability.availableMeetingRoomCount}}</text><text>{{activeMode === 'desk' ? '个工位当天可选' : '间会议室可选'}}</text></view>
       <text>{{windowLabel}}</text>
     </view>
 
@@ -107,8 +117,8 @@
           </view>
         </movable-view>
       </movable-area>
-      <view class="map-legend"><view><text class="legend-dot available"></text><text>可预约 / 可申请固定</text></view><view><text class="legend-dot booked"></text><text>该时段已预约</text></view><view><text class="legend-dot fixed"></text><text>已固定</text></view></view>
-      <text class="map-tip">未固定工位默认同时支持流动预约和固定申请；固定后显示常驻成员头像并停止预约</text>
+      <view class="map-legend"><view><text class="legend-dot available"></text><text>可预约 / 可申请常驻</text></view><view><text class="legend-dot booked"></text><text>{{activeMode === 'desk' ? '当天已预约' : '该时段已预约'}}</text></view><view><text class="legend-dot fixed"></text><text>已常驻</text></view></view>
+      <text class="map-tip">未固定工位默认同时支持按天预约和常驻申请；常驻后显示成员头像并停止预约</text>
     </view>
 
     <view wx:else class="resource-list {{activeMode === 'desk' ? 'desk-resource-list' : 'room-resource-list'}}">
@@ -123,47 +133,35 @@
     </view>
 
     <view wx:if="{{selectedResource}}" class="selection-card">
-      <view class="selection-heading"><view><text>{{selectedResource.name}}</text><text>{{selectedResource.areaLabel}} · {{windowLabel}}</text></view><text class="status-tag">可预约</text></view>
-      <block wx:if="{{selectedResource.resourceType === 'meeting_room'}}">
+      <view class="selection-heading"><view><text>{{selectedResource.name}}</text><text>{{selectedResource.areaLabel}} · {{windowLabel}}</text></view><text class="status-tag {{selectedResource.availability === 'booked' ? 'selection-status-booked' : ''}}">{{selectedResource.availabilityLabel}}</text></view>
+      <block wx:if="{{selectedResource.resourceType === 'desk'}}">
+        <text class="desk-use-prompt">选择使用方式</text>
+        <view class="desk-use-options">
+          <button class="desk-use-option {{deskUseMode === 'temporary' ? 'desk-use-option-selected' : ''}} {{selectedResource.availability !== 'available' ? 'desk-use-option-disabled' : ''}}" data-mode="temporary" bindtap="chooseDeskUseMode" hover-class="none" disabled="{{selectedResource.availability !== 'available'}}"><text>按天预约</text><text>{{selectedResource.availability === 'available' ? '当天免费使用' : '当天已被预约'}}</text></button>
+          <button class="desk-use-option {{deskUseMode === 'fixed' ? 'desk-use-option-selected' : ''}} {{!selectedResource.fixedApplicable || myFixedDesk || (fixedDeskRequest && fixedDeskRequest.status === 'submitted') ? 'desk-use-option-disabled' : ''}}" data-mode="fixed" bindtap="chooseDeskUseMode" hover-class="none" disabled="{{!selectedResource.fixedApplicable || myFixedDesk || (fixedDeskRequest && fixedDeskRequest.status === 'submitted')}}"><text>申请常驻</text><text>审批后长期保留</text></button>
+        </view>
+        <view wx:if="{{deskUseMode === 'temporary'}}" class="desk-use-action">
+          <button class="primary-button booking-submit" loading="{{submitting}}" disabled="{{submitting}}" bindtap="confirmBooking">{{isLoggedIn ? '确认按天预约' : '登录后预约'}}</button>
+        </view>
+        <view wx:elif="{{deskUseMode === 'fixed'}}" class="desk-fixed-form">
+          <view wx:if="{{fixedDeskRequest && fixedDeskRequest.status === 'rejected'}}" class="fixed-desk-review-note"><text>上次申请未通过</text><text>{{fixedDeskRequest.reviewNote || '可更换工位后重新提交。'}}</text></view>
+          <text class="desk-fixed-intro">常驻申请通过后可搬入办公设备，工位将停止流动预约；主动释放前会一直为你保留。</text>
+          <label class="access-field"><text>常驻计划（选填）</text><textarea maxlength="500" value="{{fixedDeskNote}}" bindinput="handleFixedDeskNoteInput" placeholder="例如：主要办公项目、每周常驻时间、计划搬入的设备" /></label>
+          <checkbox-group bindchange="changeFixedDeskConsent">
+            <label class="fixed-desk-consent"><checkbox value="consent" checked="{{fixedDeskConsent}}" color="#13a567" /><text>我同意在平面图展示头像，并允许其他成员点击查看我的公开成员名片。</text></label>
+          </checkbox-group>
+          <button class="primary-button fixed-desk-submit" loading="{{fixedDeskSubmitting}}" disabled="{{fixedDeskSubmitting}}" bindtap="submitFixedDeskRequest">{{isLoggedIn ? '提交常驻申请' : '登录后申请常驻'}}</button>
+        </view>
+      </block>
+      <block wx:else>
         <label class="booking-field"><text>会议用途 *</text><input maxlength="200" value="{{meetingPurpose}}" bindinput="handlePurposeInput" placeholder="例如：项目需求讨论" /></label>
         <picker range="{{attendeeOptions}}" value="{{attendeeIndex}}" bindchange="changeAttendeeCount">
           <view class="attendee-picker"><text>参会人数</text><text>{{attendeeOptions[attendeeIndex]}} 人 ›</text></view>
         </picker>
+        <button class="primary-button booking-submit" loading="{{submitting}}" disabled="{{submitting}}" bindtap="confirmBooking">{{isLoggedIn ? '确认免费预约' : '登录后预约'}}</button>
       </block>
-      <button class="primary-button booking-submit" loading="{{submitting}}" disabled="{{submitting}}" bindtap="confirmBooking">{{isLoggedIn ? '确认免费预约' : '登录后预约'}}</button>
-      <button wx:if="{{selectedResource.resourceType === 'desk' && selectedResource.fixedApplicable}}" class="fixed-application-shortcut" data-id="{{selectedResource.id}}" bindtap="selectFixedDesk">需要长期使用？申请固定此工位</button>
       <text class="booking-note">门禁卡需单独申领，预约成功不代表已经获得实体门禁卡。</text>
     </view>
-  </view>
-
-  <view id="fixed-desk-application" class="section-heading-row community-section-heading"><view><text class="section-eyebrow">FIXED DESK</text><text class="section-title">常驻固定工位</text></view><text class="section-side-note">审批后长期保留</text></view>
-  <view class="fixed-desk-card surface-card">
-    <view wx:if="{{myFixedDesk}}" class="fixed-desk-active">
-      <view class="fixed-desk-active-avatar"><image wx:if="{{avatarUrl}}" src="{{avatarUrl}}" mode="aspectFill" /><text wx:else>{{avatarInitial}}</text></view>
-      <view class="fixed-desk-active-copy"><text>{{myFixedDesk.resourceCode}} · 我的固定工位</text><text>该工位会持续为你保留，平面图展示你的头像；点击头像可查看成员名片。</text></view>
-      <button class="fixed-desk-release" loading="{{fixedDeskReleasing}}" disabled="{{fixedDeskReleasing}}" bindtap="releaseFixedDesk">主动释放</button>
-    </view>
-
-    <view wx:elif="{{fixedDeskRequest && fixedDeskRequest.status === 'submitted'}}" class="fixed-desk-status">
-      <text class="status-tag">审核中</text>
-      <view><text>{{fixedDeskRequest.resourceCode || '固定工位'}} 已提交申请</text><text>审核通过后工位会长期保留，并显示你的头像。</text></view>
-    </view>
-
-    <block wx:else>
-      <view wx:if="{{fixedDeskRequest && fixedDeskRequest.status === 'rejected'}}" class="fixed-desk-review-note"><text>上次申请未通过</text><text>{{fixedDeskRequest.reviewNote || '可选择其他工位后重新提交。'}}</text></view>
-      <text class="fixed-desk-intro">所有未固定工位都可提交长期使用申请，同时仍可被正常预约。审批时若该工位还有进行中或未来预约，需先处理预约；批准后方可搬入设备，并停止进入流动预约池。</text>
-      <view class="fixed-desk-options">
-        <view wx:for="{{fixedDeskOptions}}" wx:key="id" class="fixed-desk-option {{selectedFixedDesk && selectedFixedDesk.id === item.id ? 'fixed-desk-option-selected' : ''}}" data-id="{{item.id}}" bindtap="selectFixedDesk"><text>{{item.code}}</text><text>{{item.availability === 'booked' ? '该时段已约 · 可申请固定' : '可预约 · 可申请固定'}}</text></view>
-      </view>
-      <view wx:if="{{selectedFixedDesk}}" class="fixed-desk-form">
-        <label class="access-field"><text>常驻计划（选填）</text><textarea maxlength="500" value="{{fixedDeskNote}}" bindinput="handleFixedDeskNoteInput" placeholder="例如：主要办公项目、每周常驻时间、计划搬入的设备" /></label>
-        <checkbox-group bindchange="changeFixedDeskConsent">
-          <label class="fixed-desk-consent"><checkbox value="consent" checked="{{fixedDeskConsent}}" color="#13a567" /><text>我同意固定期间在平面图展示头像，并允许其他成员点击查看我的公开成员名片。</text></label>
-        </checkbox-group>
-        <button class="primary-button fixed-desk-submit" loading="{{fixedDeskSubmitting}}" disabled="{{fixedDeskSubmitting}}" bindtap="submitFixedDeskRequest">{{isLoggedIn ? '申请 ' + selectedFixedDesk.code : '登录后申请固定工位'}}</button>
-      </view>
-      <view wx:else class="fixed-desk-empty">当前所有工位都已固定或暂停使用</view>
-    </block>
   </view>
 
   <view wx:if="{{myBookings.length}}" class="section-heading-row community-section-heading"><view><text class="section-eyebrow">MY BOOKINGS</text><text class="section-title">我的空间预约</text></view></view>
