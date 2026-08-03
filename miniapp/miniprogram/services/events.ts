@@ -23,6 +23,7 @@ export type EventSummary = {
   status: "draft" | "scheduled" | "completed";
   statusLabel: string;
   visibility: "public" | "admin_only";
+  registration_count: number;
   confirmed_count: number;
   participant_preview: EventParticipantPreview[];
 };
@@ -78,6 +79,7 @@ export type EventDetail = {
   registrationUrl: string | null;
   registrationMode: "instant" | "review";
   registrationCapacity: number | null;
+  registrationCount: number;
   confirmedCount: number;
   participants: EventParticipantPreview[];
   status: string;

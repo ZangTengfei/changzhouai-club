@@ -96,6 +96,7 @@ export async function GET(request: Request) {
     const summary = participantSummaries.get(event.id);
     return {
       ...event,
+      registration_count: summary?.registrationCount ?? 0,
       confirmed_count: summary?.confirmedCount ?? 0,
       participant_preview: summary?.participants ?? [],
     };

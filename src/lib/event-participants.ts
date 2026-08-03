@@ -9,6 +9,7 @@ export type EventParticipantPreview = {
 };
 
 export type EventParticipantSummary = {
+  registrationCount: number;
   confirmedCount: number;
   participants: EventParticipantPreview[];
 };
@@ -16,6 +17,7 @@ export type EventParticipantSummary = {
 type RegistrationRow = {
   event_id: string;
   user_id: string;
+  status: "pending" | "registered" | "waitlisted";
 };
 
 type ProfileRow = {
@@ -33,7 +35,11 @@ export async function getEventParticipantSummaries(
   const summaries = new Map<string, EventParticipantSummary>();
 
   for (const eventId of uniqueEventIds) {
-    summaries.set(eventId, { confirmedCount: 0, participants: [] });
+    summaries.set(eventId, {
+      registrationCount: 0,
+      confirmedCount: 0,
+      participants: [],
+    });
   }
   if (uniqueEventIds.length === 0) return summaries;
 
@@ -42,20 +48,26 @@ export async function getEventParticipantSummaries(
 
   const { data: registrations, error: registrationsError } = await supabase
     .from("event_registrations")
-    .select("event_id, user_id")
+    .select("event_id, user_id, status")
     .in("event_id", uniqueEventIds)
-    .eq("status", "registered")
+    .in("status", ["pending", "registered", "waitlisted"])
     .order("created_at", { ascending: true });
   if (registrationsError) throw new Error("event_participants_load_failed");
 
   const registrationRows = (registrations ?? []) as RegistrationRow[];
   for (const registration of registrationRows) {
     const summary = summaries.get(registration.event_id);
-    if (summary) summary.confirmedCount += 1;
+    if (!summary) continue;
+    summary.registrationCount += 1;
+    if (registration.status === "registered") summary.confirmedCount += 1;
   }
 
   const userIds = Array.from(
-    new Set(registrationRows.map((registration) => registration.user_id)),
+    new Set(
+      registrationRows
+        .filter((registration) => registration.status === "registered")
+        .map((registration) => registration.user_id),
+    ),
   );
   if (userIds.length === 0) return summaries;
 
@@ -71,6 +83,7 @@ export async function getEventParticipantSummaries(
   const safePreviewLimit = Math.max(0, previewLimit);
 
   for (const registration of registrationRows) {
+    if (registration.status !== "registered") continue;
     const summary = summaries.get(registration.event_id);
     const profile = profilesById.get(registration.user_id);
     if (!summary || !profile || summary.participants.length >= safePreviewLimit) {

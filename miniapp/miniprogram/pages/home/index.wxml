@@ -55,14 +55,14 @@
         <text wx:for="{{featuredEvent.registrationTags}}" wx:key="label" class="featured-registration-tag featured-registration-tag-{{item.tone}}">{{item.label}}</text>
       </view>
       <text wx:if="{{featuredEvent.summary}}" class="featured-summary">{{featuredEvent.summary}}</text>
-      <view wx:if="{{featuredEvent.confirmed_count}}" class="featured-participants">
-        <view class="featured-avatar-stack">
+      <view wx:if="{{featuredEvent.registration_count}}" class="featured-participants">
+        <view wx:if="{{featuredEvent.participant_preview.length}}" class="featured-avatar-stack">
           <view wx:for="{{featuredEvent.participant_preview}}" wx:key="shareHandle" wx:for-item="participant" class="featured-avatar-item" data-handle="{{participant.shareHandle}}" data-event="{{featuredEvent.slug}}" catchtap="openParticipantProfile" role="button" aria-label="查看{{participant.displayName}}的成员资料">
             <image wx:if="{{participant.avatarUrl}}" src="{{participant.avatarUrl}}" mode="aspectFill" />
             <text wx:else>{{participant.avatarInitial}}</text>
           </view>
         </view>
-        <text>已确认 {{featuredEvent.confirmed_count}} 人</text>
+        <text>{{featuredEvent.registration_count}} 人已报名{{featuredEvent.registration_mode === 'review' ? ' · ' + featuredEvent.confirmed_count + ' 个席位已确认' : ''}}</text>
       </view>
       <view class="featured-footer">
         <text>社区现场</text>
@@ -79,14 +79,14 @@
         <text class="compact-event-meta">{{item.dateLabel}} · {{item.statusLabel}}</text>
         <text class="compact-event-title">{{item.title}}</text>
         <text class="compact-event-location">{{item.locationLabel}}</text>
-        <view wx:if="{{item.confirmed_count}}" class="compact-participants">
-          <view class="compact-avatar-stack">
+        <view wx:if="{{item.registration_count}}" class="compact-participants">
+          <view wx:if="{{item.participant_preview.length}}" class="compact-avatar-stack">
             <view wx:for="{{item.participant_preview}}" wx:key="shareHandle" wx:for-item="participant" class="compact-avatar-item" data-handle="{{participant.shareHandle}}" data-event="{{item.slug}}" catchtap="openParticipantProfile" role="button" aria-label="查看{{participant.displayName}}的成员资料">
               <image wx:if="{{participant.avatarUrl}}" src="{{participant.avatarUrl}}" mode="aspectFill" />
               <text wx:else>{{participant.avatarInitial}}</text>
             </view>
           </view>
-          <text>已确认 {{item.confirmed_count}} 人</text>
+          <text>{{item.registration_count}} 人已报名{{item.registration_mode === 'review' ? ' · ' + item.confirmed_count + ' 个席位已确认' : ''}}</text>
         </view>
       </view>
       <image class="row-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" />

@@ -167,6 +167,15 @@
   color: var(--color-subtle);
   font-size: 22rpx;
   font-weight: 700;
+  text-align: right;
+}
+
+.participant-pending-copy {
+  display: block;
+  margin-top: 18rpx;
+  color: var(--color-subtle);
+  font-size: 22rpx;
+  line-height: 1.55;
 }
 
 .participant-grid {

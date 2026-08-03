@@ -64,14 +64,14 @@
                   <view wx:if="{{event.registrationTags.length}}" class="registration-tag-row">
                     <text wx:for="{{event.registrationTags}}" wx:key="label" class="registration-meta-tag registration-meta-tag-{{item.tone}}">{{item.label}}</text>
                   </view>
-                  <view wx:if="{{event.confirmed_count}}" class="event-participant-preview">
-                    <view class="event-avatar-stack">
+                  <view wx:if="{{event.registration_count}}" class="event-participant-preview">
+                    <view wx:if="{{event.participant_preview.length}}" class="event-avatar-stack">
                       <view wx:for="{{event.participant_preview}}" wx:key="shareHandle" wx:for-item="participant" class="event-avatar-item" data-handle="{{participant.shareHandle}}" data-event="{{event.slug}}" catchtap="openParticipantProfile" role="button" aria-label="查看{{participant.displayName}}的成员资料">
                         <image wx:if="{{participant.avatarUrl}}" src="{{participant.avatarUrl}}" mode="aspectFill" />
                         <text wx:else>{{participant.avatarInitial}}</text>
                       </view>
                     </view>
-                    <text>已确认 {{event.confirmed_count}} 人</text>
+                    <text>{{event.registration_count}} 人已报名{{event.registration_mode === 'review' ? ' · ' + event.confirmed_count + ' 个席位已确认' : ''}}</text>
                   </view>
                   <view class="event-footer">
                     <text class="event-location">{{event.locationLabel}}</text>

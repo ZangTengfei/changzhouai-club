@@ -27,12 +27,12 @@
       <view wx:else class="fact-row fact-row-blue"><view class="icon-tile"><image src="/assets/icons/location-blue-v2.png" mode="aspectFit" /></view><view class="fact-copy"><text class="fact-label">地点</text><text class="fact-value">{{event.locationLabel}}</text></view></view>
     </view>
 
-    <view wx:if="{{event.confirmedCount}}" class="participant-section surface-card">
+    <view wx:if="{{event.registrationCount}}" class="participant-section surface-card">
       <view class="participant-heading">
-        <view><text class="participant-kicker">一起参加</text><text class="participant-title">已确认报名</text></view>
-        <text class="participant-count">{{event.registrationCapacity ? event.confirmedCount + ' / ' + event.registrationCapacity + ' 人' : event.confirmedCount + ' 人'}}</text>
+        <view><text class="participant-kicker">一起参加</text><text class="participant-title">报名情况</text></view>
+        <text class="participant-count">{{event.registrationCount}} 人已报名{{event.registrationMode === 'review' ? ' · ' + event.confirmedCount + ' 个席位已确认' : ''}}</text>
       </view>
-      <view class="participant-grid">
+      <view wx:if="{{event.participants.length}}" class="participant-grid">
         <view wx:for="{{event.participants}}" wx:key="shareHandle" wx:for-item="participant" class="participant-item" data-handle="{{participant.shareHandle}}" bindtap="openParticipantProfile" role="button" aria-label="查看{{participant.displayName}}的成员资料">
           <image wx:if="{{participant.avatarUrl}}" class="participant-avatar" src="{{participant.avatarUrl}}" mode="aspectFill" />
           <view wx:else class="participant-avatar participant-avatar-empty">{{participant.avatarInitial}}</view>
@@ -40,6 +40,7 @@
         </view>
         <view wx:if="{{event.confirmedCount > event.participants.length}}" class="participant-more">还有 {{event.confirmedCount - event.participants.length}} 人</view>
       </view>
+      <text wx:else class="participant-pending-copy">报名申请正在确认中，确认后会展示参与者头像。</text>
     </view>
 
     <view wx:if="{{event.recapParagraphs.length}}" class="detail-section detail-section-green">

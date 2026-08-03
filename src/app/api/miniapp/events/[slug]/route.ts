@@ -14,12 +14,18 @@ async function withParticipants<T extends { id: string }>(event: T) {
     const summary = summaries.get(event.id);
     return {
       ...event,
+      registrationCount: summary?.registrationCount ?? 0,
       confirmedCount: summary?.confirmedCount ?? 0,
       participants: summary?.participants ?? [],
     };
   } catch (error) {
     console.error("Failed to load mini-program event participants.", error);
-    return { ...event, confirmedCount: 0, participants: [] };
+    return {
+      ...event,
+      registrationCount: 0,
+      confirmedCount: 0,
+      participants: [],
+    };
   }
 }
 
