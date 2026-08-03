@@ -35,7 +35,11 @@ export function buildEventGroupQrPath(eventSlug: string, fileName: string) {
 }
 
 export function buildEventGroupQrCosKey(eventSlug: string, fileName: string) {
-  return `${EVENT_PRIVATE_ASSETS_BUCKET}/${buildEventGroupQrPath(eventSlug, fileName)}`;
+  const safeEventSlug = sanitizeSegment(eventSlug || "event");
+  const safeFileName =
+    sanitizeSegment(fileName || "wechat-group-qr.jpg") ||
+    "wechat-group-qr.jpg";
+  return `${EVENT_PRIVATE_ASSETS_BUCKET}/events/${safeEventSlug}/group-qr/${Date.now()}-${crypto.randomUUID()}-${safeFileName}`;
 }
 
 export function isEventGroupQrCosKey(value: string) {

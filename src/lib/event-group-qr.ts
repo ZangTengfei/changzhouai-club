@@ -4,7 +4,7 @@ import {
   EVENT_PRIVATE_ASSETS_BUCKET,
   isEventGroupQrCosKey,
 } from "@/lib/supabase/storage";
-import { getTencentCosSignedObjectUrl } from "@/lib/tencent-cos";
+import { buildPrivateEventGroupQrUrl } from "@/lib/private-event-group-qr-url";
 
 export type ConfirmedEventGroupQr = {
   imageUrl: string;
@@ -58,7 +58,7 @@ export async function getConfirmedEventGroupQr({
 
   if (isEventGroupQrCosKey(qrCode.storage_path)) {
     try {
-      imageUrl = getTencentCosSignedObjectUrl(qrCode.storage_path, 5 * 60);
+      imageUrl = buildPrivateEventGroupQrUrl(event.id);
     } catch {
       throw new Error("group_qr_sign_failed");
     }

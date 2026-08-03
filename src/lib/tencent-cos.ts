@@ -108,14 +108,21 @@ export async function deleteTencentCosObject(key: string) {
   });
 }
 
+export async function getTencentCosObject(key: string) {
+  const { bucket, region } = getTencentCosConfig();
+
+  return getTencentCosClient().getObject({
+    Bucket: bucket,
+    Region: region,
+    Key: normalizeObjectKey(key),
+  });
+}
+
 export function getTencentCosSignedObjectUrl(
   key: string,
   expiresSeconds = 5 * 60,
 ) {
   const { bucket, region } = getTencentCosConfig();
-  const publicImageDomain = new URL(
-    getRequiredEnv("NEXT_PUBLIC_IMAGE_CDN_URL"),
-  ).host;
 
   return getTencentCosClient().getObjectUrl({
     Bucket: bucket,
@@ -125,6 +132,5 @@ export function getTencentCosSignedObjectUrl(
     Method: "GET",
     Expires: expiresSeconds,
     Protocol: "https:",
-    Domain: publicImageDomain,
   });
 }

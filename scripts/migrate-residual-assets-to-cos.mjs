@@ -1,5 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { randomUUID } from "node:crypto";
 
 import { createClient } from "@supabase/supabase-js";
 import COS from "cos-nodejs-sdk-v5";
@@ -198,10 +199,11 @@ async function preparePrivateChanges(supabase) {
     }
 
     const body = Buffer.from(await blob.arrayBuffer());
+    const extension = path.extname(row.storage_path) || ".webp";
     changes.push({
       eventId: row.event_id,
       previous: row.storage_path,
-      next: `${PRIVATE_BUCKET}/${row.storage_path}`,
+      next: `${PRIVATE_BUCKET}/events/${row.event_id}/group-qr/${Date.now()}-${randomUUID()}${extension}`,
       body,
       bytes: body.byteLength,
       contentType: blob.type || "image/webp",
