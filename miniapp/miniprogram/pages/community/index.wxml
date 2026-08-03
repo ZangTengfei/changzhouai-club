@@ -52,7 +52,7 @@
     <view wx:if="{{activeMode === 'desk' && myFixedDesk}}" class="desk-permanent-status">
       <view class="fixed-desk-active-avatar"><image wx:if="{{avatarUrl}}" src="{{avatarUrl}}" mode="aspectFill" /><text wx:else>{{avatarInitial}}</text></view>
       <view class="desk-permanent-status-copy"><text>{{myFixedDesk.resourceCode}} · 我的常驻工位</text><text>工位会一直为你保留，直到主动释放。</text></view>
-      <button class="fixed-desk-release" loading="{{fixedDeskReleasing}}" disabled="{{fixedDeskReleasing}}" bindtap="releaseFixedDesk">主动释放</button>
+      <button class="fixed-desk-release" loading="{{fixedDeskReleasing}}" disabled="{{fixedDeskReleasing}}" bindtap="releaseFixedDesk">释放</button>
     </view>
     <view wx:elif="{{activeMode === 'desk' && fixedDeskRequest && fixedDeskRequest.status === 'submitted'}}" class="desk-permanent-status">
       <text class="status-tag">审核中</text>
@@ -105,19 +105,18 @@
 
             <button wx:for="{{resources}}" wx:key="id" class="map-resource map-resource-{{item.resourceType}} {{item.facingClass}} resource-{{item.availabilityClass}} {{item.isActiveMode ? 'map-resource-active-mode' : 'map-resource-muted'}} {{item.fixedAssignment ? 'map-resource-assigned' : ''}} {{selectedResource && selectedResource.id === item.id ? 'map-resource-selected' : ''}}" style="{{item.style}}" data-id="{{item.id}}" catchtap="selectResource" hover-class="none" aria-label="{{item.name}}，{{item.availabilityLabel}}">
               <block wx:if="{{item.fixedAssignment}}">
-                <image wx:if="{{item.fixedAssignment.avatarUrl}}" class="fixed-assignee-avatar" src="{{item.fixedAssignment.avatarUrl}}" mode="aspectFill" />
-                <image wx:else class="fixed-assignee-avatar fixed-assignee-avatar-empty" src="/assets/icons/profile-blue-v2.png" mode="aspectFit" />
                 <text class="fixed-resource-code">{{item.code}}</text>
+                <text class="fixed-resource-status">常驻</text>
               </block>
               <text wx:else class="resource-code">{{item.resourceType === 'desk' ? item.code : item.name}}</text>
               <text wx:if="{{item.resourceType === 'meeting_room'}}" class="room-capacity">{{item.capacity}} 人</text>
-              <text wx:if="{{item.isMine || (item.fixedAssignment && item.fixedAssignment.isMine)}}" class="mine-dot">我的</text>
+              <text wx:if="{{item.isMine}}" class="mine-dot">我的</text>
             </button>
           </view>
         </movable-view>
       </movable-area>
       <view class="map-legend"><view><text class="legend-dot available"></text><text>可预约 / 可申请常驻</text></view><view><text class="legend-dot booked"></text><text>{{activeMode === 'desk' ? '当天已预约' : '该时段已预约'}}</text></view><view><text class="legend-dot fixed"></text><text>已常驻</text></view></view>
-      <text class="map-tip">未固定工位默认同时支持按天预约和常驻申请；常驻后显示成员头像并停止预约</text>
+      <text class="map-tip">未固定工位默认同时支持按天预约和常驻申请；常驻后显示灰色占用状态，成员信息可在列表中查看</text>
     </view>
 
     <view wx:else class="resource-list {{activeMode === 'desk' ? 'desk-resource-list' : 'room-resource-list'}}">

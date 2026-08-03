@@ -1,43 +1,44 @@
-# 社区平面图集中办公室调整 Design QA
+# 社区常驻工位释放按钮 Design QA
 
-- Source visual truth: `/Users/nobugai/develop/changzhouai-club/output/design-qa/community-floor-plan-source.png`，结合用户指令“去掉打印区；集中办公室文字完整显示；整体上移并与沙龙区顶部对齐”
-- Implementation screenshot: `/Users/nobugai/develop/changzhouai-club/output/design-qa/community-floor-plan-refined-v1.png`
-- Full comparison: `/Users/nobugai/develop/changzhouai-club/output/design-qa/community-floor-plan-comparison-v1.png`
-- State: 社区页工位预约模式，平面图视图，空间数据已加载
-- Simulator viewport: 688 × 1486 px；小程序截图密度由微信开发者工具模拟器决定
-- Source pixels: 612 × 718 px；有效平面图区域为 586 × 694 px
-- Implementation pixels: 688 × 1486 px；有效平面图区域为 586 × 696 px
-- CSS size and density normalization: 将源图有效区域缩放到 586 × 696 px，与实现平面图同尺寸并排比较
+- Source visual truth: `/var/folders/m9/rb2gjwb53zjbjdk39rf2v2nm0000gn/T/codex-clipboard-1449058a-84b2-4386-99da-12f3f1106f99.png`
+- Implementation screenshot: `/Users/nobugai/develop/changzhouai-club/output/playwright/community-release-button-compact-v3.png`
+- Focused comparison: `/Users/nobugai/develop/changzhouai-club/output/playwright/community-release-button-comparison.png`
+- State: 社区页工位模式，用户已有 S01 常驻工位，释放操作空闲状态
+- Simulator viewport: 688 × 1486 px，由微信开发者工具模拟器截图
+- Source pixels: 620 × 188 px；implementation full pixels: 688 × 1486 px
+- Density normalization: 从实现截图裁出 586 × 110 px 常驻卡区域并缩放到 620 px 宽，与 620 × 188 px 源问题截图纵向合并比较
 
 ## Findings
 
-- 无 P0、P1、P2 问题。
-- 字体与层级：集中办公室标题完整保持单行显示，标题与两排工位之间保留清晰间距；独立办公室、沙龙区和会议室的文字层级未发生回退。
-- 间距与布局：集中办公室容器顶部由 47% 上移到 31%，与沙龙区顶部严格对齐；F01–F06 同步整体上移 16 个百分点，仍完整落在办公室边界内。
-- 色彩与视觉标记：房间边框、工位状态色、底色和阴影保持原样；未引入新的左侧彩色竖线。
-- 图片与图标：打印区及其图标已经完整移除，没有留下空图标、占位或无效素材引用；其他区域不依赖新增图片资源。
-- 文案与内容：平面图不再显示“打印区”；“集中办公室”完整可读，6 个工位编号及其他空间名称保持正确。
-- 交互：仅调整静态房间和 F01–F06 的布局坐标，工位按钮、选择状态、预约与常驻申请交互均保持原绑定。
+- 无待处理的 P0、P1、P2 问题。
+- 字体与层级：主标题、说明文字和“释放”次级操作的字号层级清楚；释放按钮不再与主操作同等强调。
+- 间距与布局：按钮从 184 px 缩减为 56 px，固定 `flex-basis` 后不再吞占剩余宽度；卡片由 89.1 px 降至 57 px，说明文字可以单行展示。
+- 色彩与视觉标记：保留淡蓝卡片背景，按钮改为白色半透明底、浅灰描边和低强调棕色文字；未引入左侧彩色竖线。
+- 图片与资产：继续使用已有成员头像，裁切、圆形遮罩和清晰度未改变，没有新增或替换图片资产。
+- 文案：按钮从“主动释放”精简为“释放”，卡片说明已经明确“直到主动释放”，语义没有损失。
+- 交互与状态：保留原 `bindtap="releaseFixedDesk"`、loading 和 disabled 状态；自动化运行未发现异常。
 
 ## Focused Region Comparison
 
-- `community-floor-plan-comparison-v1.png` 将调整前后平面图等宽并排，可清楚核对打印区移除、集中办公室顶线、标题完整度以及六个工位边界，因此无需额外局部裁图。
+- `community-release-button-comparison.png` 上方为用户反馈的旧状态，下方为微信开发者工具实际渲染的新状态。局部对比足以核对按钮占位、卡片高度、标题换行、头像和色彩，因此无需再做全页等高对比。
 
 ## Comparison History
 
-1. 基线：打印区仍可见；集中办公室顶部位于 47%，明显低于沙龙区 31% 的顶部；标题可用宽度缺少明确约束，属于 P1/P2 可见偏差。
-2. 最终轮：删除打印区结构和样式；集中办公室及 F01–F06 同步上移 16 个百分点；标题增加全宽、居中、禁止换行约束。开发者工具同尺寸并排复核后无可执行的 P0、P1、P2 差异。
+1. 基线：释放按钮约 184 px 宽，占据卡片超过一半空间，标题换成两行，属于明显的 P1 密度问题。
+2. 第一轮：改为自动宽度、紧凑描边样式，但微信小程序 `button` 在 flex 容器内仍渲染为 184 px，P1 未解除。
+3. 最终轮：增加 `width`、`max-width` 和固定 `flex-basis: 108rpx`；实测按钮 56 × 28 px、卡片 332 × 57 px，无可执行的 P0、P1、P2 差异。
 
 ## Follow-up Polish
 
-- 无需继续调整；集中办公室与沙龙区顶部已形成清晰水平基准线。
+- 当前尺寸兼顾节省空间和文字可读性，无需继续缩小。
 
 ## Verification
 
-- `npm run typecheck`: passed
-- `git diff --check`: passed
+- `npm --prefix miniapp run typecheck`: passed
 - 微信开发者工具自动化重载 `pages/community/index`: passed
-- 小程序运行时异常: 0
-- 页面截图和同尺寸并排对比: passed
+- 运行时异常: 0
+- 常驻卡尺寸: 332 × 57 px
+- 释放按钮尺寸: 56 × 28 px
+- 局部同图对比: passed
 
 final result: passed
