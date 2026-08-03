@@ -156,7 +156,7 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 700rpx;
+  width: auto;
   height: 100%;
   transform: skewX(6deg) scale(1.04);
   transform-origin: right center;
