@@ -4,8 +4,10 @@ import { ensureSession } from "../../services/auth";
 import {
   cancelCommunityBooking,
   loadCommunitySpace,
+  releaseCommunityFixedDesk,
   submitCommunityAccessRequest,
   submitCommunityBooking,
+  submitCommunityFixedDeskRequest,
 } from "../../services/community";
 import { isMiniappBasicProfileReady } from "../../utils/profile-state";
 
@@ -161,8 +163,11 @@ function getAvailabilityMeta(availability: MiniappCommunityAvailability) {
   if (availability === "booked") {
     return { label: "已预约", className: "booked" };
   }
+  if (availability === "fixed_available") {
+    return { label: "可申请", className: "fixed-available" };
+  }
   if (availability === "fixed") {
-    return { label: "固定工位", className: "fixed" };
+    return { label: "固定使用", className: "fixed" };
   }
   return { label: "暂停使用", className: "disabled" };
 }
@@ -222,6 +227,7 @@ function buildPlaceholderResources(activeMode: ResourceMode) {
       rotation: 0,
       availability: "disabled",
       isMine: false,
+      fixedAssignment: null,
     }),
   );
   const fixedDesks: MiniappCommunitySpaceResource[] = Array.from(
@@ -239,8 +245,9 @@ function buildPlaceholderResources(activeMode: ResourceMode) {
       width: 1,
       height: 1,
       rotation: 0,
-      availability: "fixed",
+      availability: "disabled",
       isMine: false,
+      fixedAssignment: null,
     }),
   );
   const rooms: MiniappCommunitySpaceResource[] = [
@@ -259,6 +266,7 @@ function buildPlaceholderResources(activeMode: ResourceMode) {
       rotation: 0,
       availability: "disabled",
       isMine: false,
+      fixedAssignment: null,
     },
   ];
   return [...desks, ...fixedDesks, ...rooms].map((resource) =>
@@ -309,6 +317,26 @@ function getBookingErrorMessage(error: unknown) {
   return "预约失败，请稍后重试";
 }
 
+function getFixedDeskErrorMessage(error: unknown) {
+  if (!(error instanceof ApiError)) return "提交失败，请稍后重试";
+  if (error.errorCode === "community_membership_required") {
+    return "当前账号还不是可申请的社区成员";
+  }
+  if (error.errorCode === "community_profile_required") {
+    return "请先完善社区昵称";
+  }
+  if (error.errorCode === "fixed_desk_already_assigned") {
+    return "该工位刚刚已分配，请选择其他工位";
+  }
+  if (error.errorCode === "fixed_desk_user_already_assigned") {
+    return "你已经有固定工位";
+  }
+  if (error.errorCode === "fixed_desk_request_already_submitted") {
+    return "你已有一条申请正在审核";
+  }
+  return "提交失败，请稍后重试";
+}
+
 Page({
   data: {
     community: {
@@ -345,6 +373,14 @@ Page({
     attendeeIndex: 0,
     meetingPurpose: "",
     myBookings: [] as CommunityBookingItem[],
+    fixedDeskOptions: [] as CommunityResourceItem[],
+    selectedFixedDesk: null as CommunityResourceItem | null,
+    fixedDeskRequest: null as MiniappCommunityFixedDeskRequest | null,
+    myFixedDesk: null as MiniappCommunityMyFixedDesk | null,
+    fixedDeskNote: "",
+    fixedDeskConsent: false,
+    fixedDeskSubmitting: false,
+    fixedDeskReleasing: false,
     accessRequest: null as MiniappCommunityAccessRequest | null,
     accessContact: "",
     accessNote: "",
@@ -370,6 +406,7 @@ Page({
       ...schedule,
       resources,
       visibleResources: resources.filter((item) => item.resourceType === "desk"),
+      fixedDeskOptions: resources.filter((item) => item.deskMode === "fixed"),
     });
     void this.loadPage();
     void ensureSession()
@@ -431,6 +468,16 @@ Page({
       const selectedResource = this.data.selectedResource
         ? resources.find((resource) => resource.id === this.data.selectedResource?.id) ?? null
         : null;
+      const fixedDeskOptions = resources.filter(
+        (resource) => resource.deskMode === "fixed",
+      );
+      const selectedFixedDesk = this.data.selectedFixedDesk
+        ? fixedDeskOptions.find(
+            (resource) => resource.id === this.data.selectedFixedDesk?.id,
+          ) ?? null
+        : fixedDeskOptions.find(
+            (resource) => resource.availability === "fixed_available",
+          ) ?? null;
       this.setData({
         community: {
           ...snapshot.community,
@@ -445,6 +492,17 @@ Page({
           selectedResource?.availability === "available" ? selectedResource : null,
         availability: summarizeAvailability(resources),
         myBookings: snapshot.myBookings.map(mapBooking),
+        fixedDeskOptions,
+        selectedFixedDesk:
+          selectedFixedDesk?.availability === "fixed_available"
+            ? selectedFixedDesk
+            : null,
+        fixedDeskRequest: snapshot.fixedDeskRequest ?? null,
+        myFixedDesk: snapshot.myFixedDesk ?? null,
+        fixedDeskNote:
+          snapshot.fixedDeskRequest?.status === "rejected"
+            ? snapshot.fixedDeskRequest.note ?? ""
+            : this.data.fixedDeskNote,
         accessRequest: snapshot.accessRequest,
         accessContact: snapshot.accessRequest?.contact ?? this.data.accessContact,
         accessNote: snapshot.accessRequest?.note ?? this.data.accessNote,
@@ -518,6 +576,29 @@ Page({
     const resourceId = String(event.currentTarget.dataset.id ?? "");
     const resource = this.data.resources.find((item) => item.id === resourceId);
     if (!resource) return;
+    if (resource.deskMode === "fixed") {
+      const shareHandle = resource.fixedAssignment?.shareHandle;
+      if (shareHandle) {
+        void wx.navigateTo({
+          url: `/pages/profile/shared/index?handle=${encodeURIComponent(shareHandle)}`,
+        });
+        return;
+      }
+      if (resource.availability === "fixed_available") {
+        this.setData({ selectedFixedDesk: resource }, () => {
+          wx.pageScrollTo({
+            selector: "#fixed-desk-application",
+            duration: 280,
+          });
+        });
+        return;
+      }
+      void wx.showToast({
+        title: resource.fixedAssignment ? "该工位已固定使用" : "该工位暂不可申请",
+        icon: "none",
+      });
+      return;
+    }
     if (!resource.selectable) {
       void wx.showToast({ title: resource.availabilityLabel, icon: "none" });
       return;
@@ -532,6 +613,86 @@ Page({
       attendeeOptions,
       attendeeIndex: Math.min(this.data.attendeeIndex, attendeeOptions.length - 1),
     });
+  },
+
+  handleFixedDeskNoteInput(event: WechatMiniprogram.Input) {
+    this.setData({ fixedDeskNote: event.detail.value });
+  },
+
+  changeFixedDeskConsent(
+    event: WechatMiniprogram.CustomEvent<{ value: string[] }>,
+  ) {
+    this.setData({ fixedDeskConsent: event.detail.value.includes("consent") });
+  },
+
+  async submitFixedDeskRequest() {
+    if (this.data.fixedDeskSubmitting) return;
+    const user = await this.requireCommunityUser();
+    if (!user) return;
+    const resource = this.data.selectedFixedDesk;
+    if (!resource || resource.availability !== "fixed_available") {
+      void wx.showToast({ title: "请选择可申请的固定工位", icon: "none" });
+      return;
+    }
+    if (!this.data.fixedDeskConsent) {
+      void wx.showToast({ title: "请先确认头像和成员名片展示授权", icon: "none" });
+      return;
+    }
+
+    this.setData({ fixedDeskSubmitting: true });
+    try {
+      const response = await submitCommunityFixedDeskRequest({
+        resourceId: resource.id,
+        note: this.data.fixedDeskNote.trim(),
+        publicProfileConsent: true,
+      });
+      this.setData({ fixedDeskRequest: response.fixedDeskRequest });
+      trackEvent("community_fixed_desk_request", "/pages/community/index", {
+        resourceCode: resource.code,
+      });
+      await this.loadPage(false);
+      void wx.showToast({ title: "固定工位申请已提交", icon: "success" });
+    } catch (error) {
+      void wx.showToast({ title: getFixedDeskErrorMessage(error), icon: "none" });
+      await this.loadPage(false);
+    } finally {
+      this.setData({ fixedDeskSubmitting: false });
+    }
+  },
+
+  releaseFixedDesk() {
+    const fixedDesk = this.data.myFixedDesk;
+    if (!fixedDesk || this.data.fixedDeskReleasing) return;
+    wx.showModal({
+      title: `释放 ${fixedDesk.resourceCode}`,
+      content: "释放后该工位将立即恢复为可申请状态，请先搬走个人办公设备。确认继续吗？",
+      confirmText: "确认释放",
+      confirmColor: "#d44d3d",
+      success: (result) => {
+        if (result.confirm) void this.performReleaseFixedDesk(fixedDesk.resourceId);
+      },
+    });
+  },
+
+  async performReleaseFixedDesk(resourceId: string) {
+    this.setData({ fixedDeskReleasing: true });
+    try {
+      await releaseCommunityFixedDesk(resourceId);
+      trackEvent("community_fixed_desk_release", "/pages/community/index");
+      this.setData({
+        myFixedDesk: null,
+        fixedDeskRequest: null,
+        fixedDeskConsent: false,
+        fixedDeskNote: "",
+      });
+      await this.loadPage(false);
+      void wx.showToast({ title: "固定工位已释放", icon: "success" });
+    } catch {
+      void wx.showToast({ title: "当前工位无法释放，请联系工作人员", icon: "none" });
+      await this.loadPage(false);
+    } finally {
+      this.setData({ fixedDeskReleasing: false });
+    }
   },
 
   resetMap() {

@@ -42,6 +42,14 @@ export const ADMIN_PERMISSION_DEFINITIONS = [
   { key: "members.manage_roles", label: "管理成员后台角色", module: "members", sensitivity: "L4" },
   { key: "members.export", label: "导出成员数据", module: "members", sensitivity: "L4" },
 
+  { key: "spaces.read", label: "查看空间工位", module: "spaces", sensitivity: "L1" },
+  {
+    key: "spaces.manage_fixed_desks",
+    label: "管理固定工位",
+    module: "spaces",
+    sensitivity: "L2",
+  },
+
   { key: "projects.read", label: "查看共建项目", module: "projects", sensitivity: "L1" },
   { key: "projects.write", label: "编辑共建项目", module: "projects", sensitivity: "L1" },
   {

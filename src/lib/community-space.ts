@@ -1,5 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { getAvatarImageUrl } from "@/lib/public-image-url";
+
 const MAX_BOOKING_WINDOW_MS = 24 * 60 * 60 * 1_000;
 const MIN_BOOKING_WINDOW_MS = 30 * 60 * 1_000;
 
@@ -30,6 +32,32 @@ type CommunitySpaceBookingRow = {
   attendee_count: number;
   status: "confirmed" | "cancelled" | "completed" | "no_show";
   created_at: string;
+};
+
+type CommunityFixedDeskAssignmentRow = {
+  resource_id: string;
+  user_id: string | null;
+  opc_name: string;
+  assigned_at: string;
+  public_profile_consent_at: string | null;
+};
+
+type CommunityFixedDeskRequestRow = {
+  id: string;
+  resource_id: string;
+  note: string | null;
+  status: "submitted" | "approved" | "rejected" | "withdrawn" | "released";
+  review_note: string | null;
+  reviewed_at: string | null;
+  released_at: string | null;
+  created_at: string;
+};
+
+type FixedDeskProfileRow = {
+  id: string;
+  public_slug: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
 };
 
 type CommunityAccessRequestRow = {
@@ -119,7 +147,11 @@ export async function loadCommunitySpaceSnapshot(
           "id, code, name, resource_type, desk_mode, capacity, area_label, x_percent, y_percent, width_percent, height_percent, rotation_degrees, status, sort_order",
         )
         .order("sort_order", { ascending: true }),
-      supabase.from("community_fixed_desk_assignments").select("resource_id"),
+      supabase
+        .from("community_fixed_desk_assignments")
+        .select(
+          "resource_id, user_id, opc_name, assigned_at, public_profile_consent_at",
+        ),
     ]);
 
   if (resourceError || assignmentsResult.error) {
@@ -128,12 +160,31 @@ export async function loadCommunitySpaceSnapshot(
 
   const resources = (resourceData ?? []) as CommunitySpaceResourceRow[];
   const resourceMap = new Map(resources.map((resource) => [resource.id, resource]));
-  const fixedResourceIds = new Set(
-    (assignmentsResult.data ?? []).map((assignment) => assignment.resource_id),
+  const assignments = (assignmentsResult.data ?? []) as CommunityFixedDeskAssignmentRow[];
+  const assignedUserIds = assignments
+    .map((assignment) => assignment.user_id)
+    .filter((userId): userId is string => Boolean(userId));
+  const profileResult = assignedUserIds.length
+    ? await supabase
+        .from("profiles")
+        .select("id, public_slug, display_name, avatar_url")
+        .in("id", assignedUserIds)
+    : { data: [], error: null };
+  if (profileResult.error) {
+    throw new Error("community_space_resources_load_failed");
+  }
+  const profileMap = new Map(
+    ((profileResult.data ?? []) as FixedDeskProfileRow[]).map((profile) => [
+      profile.id,
+      profile,
+    ]),
   );
-  resources
-    .filter((resource) => resource.desk_mode === "fixed")
-    .forEach((resource) => fixedResourceIds.add(resource.id));
+  const assignmentMap = new Map(
+    assignments.map((assignment) => [assignment.resource_id, assignment]),
+  );
+  const fixedResourceIds = new Set(
+    assignments.map((assignment) => assignment.resource_id),
+  );
 
   const bookingQuery = supabase
     .from("community_space_bookings")
@@ -167,13 +218,35 @@ export async function loadCommunitySpaceSnapshot(
         .maybeSingle()
     : Promise.resolve({ data: null, error: null });
 
-  const [bookingsResult, myBookingsResult, accessRequestResult] =
-    await Promise.all([bookingQuery, myBookingsQuery, accessRequestQuery]);
+  const fixedDeskRequestQuery = userId
+    ? supabase
+        .from("community_fixed_desk_requests")
+        .select(
+          "id, resource_id, note, status, review_note, reviewed_at, released_at, created_at",
+        )
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+    : Promise.resolve({ data: null, error: null });
+
+  const [
+    bookingsResult,
+    myBookingsResult,
+    accessRequestResult,
+    fixedDeskRequestResult,
+  ] = await Promise.all([
+    bookingQuery,
+    myBookingsQuery,
+    accessRequestQuery,
+    fixedDeskRequestQuery,
+  ]);
 
   if (
     bookingsResult.error ||
     myBookingsResult.error ||
-    accessRequestResult.error
+    accessRequestResult.error ||
+    fixedDeskRequestResult.error
   ) {
     throw new Error("community_space_bookings_load_failed");
   }
@@ -191,6 +264,10 @@ export async function loadCommunitySpaceSnapshot(
   const mappedResources = resources
     .filter((resource) => resource.status !== "retired")
     .map((resource) => {
+      const assignment = assignmentMap.get(resource.id) ?? null;
+      const assigneeProfile = assignment?.user_id
+        ? profileMap.get(assignment.user_id) ?? null
+        : null;
       const fixed = fixedResourceIds.has(resource.id);
       const booked = bookedResourceIds.has(resource.id);
       const availability =
@@ -198,6 +275,8 @@ export async function loadCommunitySpaceSnapshot(
           ? "disabled"
           : fixed
             ? "fixed"
+            : resource.desk_mode === "fixed"
+              ? "fixed_available"
             : booked
               ? "booked"
               : "available";
@@ -217,13 +296,35 @@ export async function loadCommunitySpaceSnapshot(
         rotation: resource.rotation_degrees,
         availability,
         isMine: myBookingResourceIds.has(resource.id),
+        fixedAssignment: assignment
+          ? {
+              displayName: assignment.public_profile_consent_at
+                ? assigneeProfile?.display_name?.trim() || assignment.opc_name
+                : "常驻 OPC",
+              avatarUrl: assignment.public_profile_consent_at
+                ? getAvatarImageUrl(assigneeProfile?.avatar_url)
+                : null,
+              shareHandle:
+                assignment.public_profile_consent_at && assignment.user_id
+                  ? assigneeProfile?.public_slug?.trim() || assignment.user_id
+                  : null,
+              assignedAt: assignment.assigned_at,
+              isMine: assignment.user_id === userId,
+            }
+          : null,
       };
     });
 
   const flexibleDesks = mappedResources.filter(
     (resource) =>
-      resource.resourceType === "desk" && resource.availability !== "fixed",
+      resource.resourceType === "desk" && resource.deskMode === "flexible",
   );
+  const myFixedAssignment = assignments.find(
+    (assignment) => assignment.user_id === userId,
+  );
+  const myFixedResource = myFixedAssignment
+    ? resourceMap.get(myFixedAssignment.resource_id) ?? null
+    : null;
 
   return {
     community: COMMUNITY_SPACE_CONTENT,
@@ -254,6 +355,37 @@ export async function loadCommunitySpaceSnapshot(
             .processed_at,
           createdAt: (accessRequestResult.data as CommunityAccessRequestRow)
             .created_at,
+        }
+      : null,
+    fixedDeskRequest: fixedDeskRequestResult.data
+      ? {
+          id: (fixedDeskRequestResult.data as CommunityFixedDeskRequestRow).id,
+          resourceId: (fixedDeskRequestResult.data as CommunityFixedDeskRequestRow)
+            .resource_id,
+          resourceCode:
+            resourceMap.get(
+              (fixedDeskRequestResult.data as CommunityFixedDeskRequestRow)
+                .resource_id,
+            )?.code ?? "",
+          note: (fixedDeskRequestResult.data as CommunityFixedDeskRequestRow).note,
+          status: (fixedDeskRequestResult.data as CommunityFixedDeskRequestRow)
+            .status,
+          reviewNote: (fixedDeskRequestResult.data as CommunityFixedDeskRequestRow)
+            .review_note,
+          reviewedAt: (fixedDeskRequestResult.data as CommunityFixedDeskRequestRow)
+            .reviewed_at,
+          releasedAt: (fixedDeskRequestResult.data as CommunityFixedDeskRequestRow)
+            .released_at,
+          createdAt: (fixedDeskRequestResult.data as CommunityFixedDeskRequestRow)
+            .created_at,
+        }
+      : null,
+    myFixedDesk: myFixedAssignment
+      ? {
+          resourceId: myFixedAssignment.resource_id,
+          resourceCode: myFixedResource?.code ?? "",
+          resourceName: myFixedResource?.name ?? "固定工位",
+          assignedAt: myFixedAssignment.assigned_at,
         }
       : null,
   };

@@ -45,3 +45,25 @@ export function submitCommunityAccessRequest(input: {
     data: input,
   });
 }
+
+export function submitCommunityFixedDeskRequest(input: {
+  resourceId: string;
+  note: string;
+  publicProfileConsent: boolean;
+}) {
+  return apiRequest<{ fixedDeskRequest: MiniappCommunityFixedDeskRequest }>({
+    path: "/api/miniapp/community/fixed-desk-requests",
+    method: "POST",
+    authenticated: true,
+    data: input,
+  });
+}
+
+export function releaseCommunityFixedDesk(resourceId: string) {
+  return apiRequest<{ releasedResourceId: string }>({
+    path: "/api/miniapp/community/fixed-desk-assignment",
+    method: "DELETE",
+    authenticated: true,
+    data: { resourceId },
+  });
+}

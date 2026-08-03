@@ -215,8 +215,17 @@ type MiniappCommunityResourceType = "desk" | "meeting_room";
 type MiniappCommunityAvailability =
   | "available"
   | "booked"
+  | "fixed_available"
   | "fixed"
   | "disabled";
+
+interface MiniappCommunityFixedDeskAssignee {
+  displayName: string;
+  avatarUrl: string | null;
+  shareHandle: string | null;
+  assignedAt: string;
+  isMine: boolean;
+}
 
 interface MiniappCommunitySpaceResource {
   id: string;
@@ -233,6 +242,7 @@ interface MiniappCommunitySpaceResource {
   rotation: number;
   availability: MiniappCommunityAvailability;
   isMine: boolean;
+  fixedAssignment: MiniappCommunityFixedDeskAssignee | null;
 }
 
 interface MiniappCommunitySpaceBooking {
@@ -258,6 +268,25 @@ interface MiniappCommunityAccessRequest {
   createdAt: string;
 }
 
+interface MiniappCommunityFixedDeskRequest {
+  id: string;
+  resourceId: string;
+  resourceCode: string;
+  note: string | null;
+  status: "submitted" | "approved" | "rejected" | "withdrawn" | "released";
+  reviewNote: string | null;
+  reviewedAt: string | null;
+  releasedAt: string | null;
+  createdAt: string;
+}
+
+interface MiniappCommunityMyFixedDesk {
+  resourceId: string;
+  resourceCode: string;
+  resourceName: string;
+  assignedAt: string;
+}
+
 interface MiniappCommunitySpaceSnapshot {
   community: {
     title: string;
@@ -280,6 +309,8 @@ interface MiniappCommunitySpaceSnapshot {
   };
   myBookings: MiniappCommunitySpaceBooking[];
   accessRequest: MiniappCommunityAccessRequest | null;
+  fixedDeskRequest: MiniappCommunityFixedDeskRequest | null;
+  myFixedDesk: MiniappCommunityMyFixedDesk | null;
 }
 
 interface MiniappRegistrationEvent {

@@ -2,6 +2,7 @@
 
 import {
   CalendarOutlined,
+  DesktopOutlined,
   FileTextOutlined,
   FundProjectionScreenOutlined,
   GiftOutlined,
@@ -44,6 +45,7 @@ const groups: NavGroup[] = [
     label: "成员生态",
     items: [
       { href: "/admin/members", label: "成员管理", icon: <TeamOutlined />, permissions: ["members.read"] },
+      { href: "/admin/spaces", label: "空间工位", icon: <DesktopOutlined />, permissions: ["spaces.read"] },
       { href: "/admin/projects", label: "共建项目", icon: <ProjectOutlined />, permissions: ["projects.read"] },
       { href: "/admin/works", label: "成员作品", icon: <FundProjectionScreenOutlined />, permissions: ["works.read", "updates.review"] },
     ],

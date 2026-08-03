@@ -102,22 +102,31 @@
             <view class="hall-label">办公大厅 · 4 组 × 6 席联排桌</view>
             <view class="entrance-label">入口</view>
 
-            <button wx:for="{{resources}}" wx:key="id" class="map-resource map-resource-{{item.resourceType}} {{item.facingClass}} resource-{{item.availabilityClass}} {{item.isActiveMode ? 'map-resource-active-mode' : 'map-resource-muted'}} {{selectedResource && selectedResource.id === item.id ? 'map-resource-selected' : ''}}" style="{{item.style}}" data-id="{{item.id}}" catchtap="selectResource" hover-class="none" aria-label="{{item.name}}，{{item.availabilityLabel}}">
-              <text class="resource-code">{{item.resourceType === 'desk' ? item.code : item.name}}</text>
+            <button wx:for="{{resources}}" wx:key="id" class="map-resource map-resource-{{item.resourceType}} {{item.facingClass}} resource-{{item.availabilityClass}} {{item.isActiveMode ? 'map-resource-active-mode' : 'map-resource-muted'}} {{item.fixedAssignment ? 'map-resource-assigned' : ''}} {{selectedResource && selectedResource.id === item.id ? 'map-resource-selected' : ''}}" style="{{item.style}}" data-id="{{item.id}}" catchtap="selectResource" hover-class="none" aria-label="{{item.name}}，{{item.availabilityLabel}}">
+              <block wx:if="{{item.fixedAssignment}}">
+                <image wx:if="{{item.fixedAssignment.avatarUrl}}" class="fixed-assignee-avatar" src="{{item.fixedAssignment.avatarUrl}}" mode="aspectFill" />
+                <image wx:else class="fixed-assignee-avatar fixed-assignee-avatar-empty" src="/assets/icons/profile-blue-v2.png" mode="aspectFit" />
+                <text class="fixed-resource-code">{{item.code}}</text>
+              </block>
+              <text wx:else class="resource-code">{{item.resourceType === 'desk' ? item.code : item.name}}</text>
               <text wx:if="{{item.resourceType === 'meeting_room'}}" class="room-capacity">{{item.capacity}} 人</text>
-              <text wx:if="{{item.isMine}}" class="mine-dot">我的</text>
+              <text wx:if="{{item.isMine || (item.fixedAssignment && item.fixedAssignment.isMine)}}" class="mine-dot">我的</text>
             </button>
           </view>
         </movable-view>
       </movable-area>
-      <view class="map-legend"><view><text class="legend-dot available"></text><text>可预约</text></view><view><text class="legend-dot booked"></text><text>已预约</text></view><view><text class="legend-dot fixed"></text><text>固定工位</text></view></view>
-      <text class="map-tip">双指缩放、拖动查看；点击工位或会议室完成选择</text>
+      <view class="map-legend"><view><text class="legend-dot available"></text><text>可预约</text></view><view><text class="legend-dot booked"></text><text>已预约</text></view><view><text class="legend-dot fixed-available"></text><text>可申请固定</text></view><view><text class="legend-dot fixed"></text><text>已固定</text></view></view>
+      <text class="map-tip">点击空闲固定工位可发起申请；已固定工位可查看常驻成员名片</text>
     </view>
 
     <view wx:else class="resource-list {{activeMode === 'desk' ? 'desk-resource-list' : 'room-resource-list'}}">
       <view wx:for="{{visibleResources}}" wx:key="id" class="resource-list-item resource-list-item-{{item.availabilityClass}} {{selectedResource && selectedResource.id === item.id ? 'resource-list-item-selected' : ''}}" data-id="{{item.id}}" bindtap="selectResource" role="button" aria-label="{{item.name}}，{{item.availabilityLabel}}">
-        <view><text>{{item.name}}</text><text>{{item.resourceType === 'meeting_room' ? item.capacity + ' 人 · ' + item.areaLabel : item.areaLabel}}</text></view>
-        <text>{{item.availabilityLabel}}</text>
+        <view>
+          <view wx:if="{{item.fixedAssignment}}" class="fixed-list-assignee"><image wx:if="{{item.fixedAssignment.avatarUrl}}" src="{{item.fixedAssignment.avatarUrl}}" mode="aspectFill" /><image wx:else src="/assets/icons/profile-blue-v2.png" mode="aspectFit" /><text>{{item.fixedAssignment.displayName}}</text></view>
+          <text wx:else>{{item.name}}</text>
+          <text>{{item.resourceType === 'meeting_room' ? item.capacity + ' 人 · ' + item.areaLabel : item.code + ' · ' + item.areaLabel}}</text>
+        </view>
+        <text>{{item.fixedAssignment ? '查看成员' : item.availabilityLabel}}</text>
       </view>
     </view>
 
@@ -132,6 +141,36 @@
       <button class="primary-button booking-submit" loading="{{submitting}}" disabled="{{submitting}}" bindtap="confirmBooking">{{isLoggedIn ? '确认免费预约' : '登录后预约'}}</button>
       <text class="booking-note">门禁卡需单独申领，预约成功不代表已经获得实体门禁卡。</text>
     </view>
+  </view>
+
+  <view id="fixed-desk-application" class="section-heading-row community-section-heading"><view><text class="section-eyebrow">FIXED DESK</text><text class="section-title">常驻固定工位</text></view><text class="section-side-note">审批后长期保留</text></view>
+  <view class="fixed-desk-card surface-card">
+    <view wx:if="{{myFixedDesk}}" class="fixed-desk-active">
+      <view class="fixed-desk-active-avatar"><image wx:if="{{avatarUrl}}" src="{{avatarUrl}}" mode="aspectFill" /><text wx:else>{{avatarInitial}}</text></view>
+      <view class="fixed-desk-active-copy"><text>{{myFixedDesk.resourceCode}} · 我的固定工位</text><text>该工位会持续为你保留，平面图展示你的头像；点击头像可查看成员名片。</text></view>
+      <button class="fixed-desk-release" loading="{{fixedDeskReleasing}}" disabled="{{fixedDeskReleasing}}" bindtap="releaseFixedDesk">主动释放</button>
+    </view>
+
+    <view wx:elif="{{fixedDeskRequest && fixedDeskRequest.status === 'submitted'}}" class="fixed-desk-status">
+      <text class="status-tag">审核中</text>
+      <view><text>{{fixedDeskRequest.resourceCode || '固定工位'}} 已提交申请</text><text>审核通过后工位会长期保留，并显示你的头像。</text></view>
+    </view>
+
+    <block wx:else>
+      <view wx:if="{{fixedDeskRequest && fixedDeskRequest.status === 'rejected'}}" class="fixed-desk-review-note"><text>上次申请未通过</text><text>{{fixedDeskRequest.reviewNote || '可选择其他工位后重新提交。'}}</text></view>
+      <text class="fixed-desk-intro">选择集中办公室中的空闲工位并说明常驻计划。审批后可搬入办公设备，直到你主动释放前不会进入临时预约池。</text>
+      <view class="fixed-desk-options">
+        <view wx:for="{{fixedDeskOptions}}" wx:key="id" wx:if="{{item.availability === 'fixed_available'}}" class="fixed-desk-option {{selectedFixedDesk && selectedFixedDesk.id === item.id ? 'fixed-desk-option-selected' : ''}}" data-id="{{item.id}}" bindtap="selectResource"><text>{{item.code}}</text><text>可申请</text></view>
+      </view>
+      <view wx:if="{{selectedFixedDesk}}" class="fixed-desk-form">
+        <label class="access-field"><text>常驻计划（选填）</text><textarea maxlength="500" value="{{fixedDeskNote}}" bindinput="handleFixedDeskNoteInput" placeholder="例如：主要办公项目、每周常驻时间、计划搬入的设备" /></label>
+        <checkbox-group bindchange="changeFixedDeskConsent">
+          <label class="fixed-desk-consent"><checkbox value="consent" checked="{{fixedDeskConsent}}" color="#13a567" /><text>我同意固定期间在平面图展示头像，并允许其他成员点击查看我的公开成员名片。</text></label>
+        </checkbox-group>
+        <button class="primary-button fixed-desk-submit" loading="{{fixedDeskSubmitting}}" disabled="{{fixedDeskSubmitting}}" bindtap="submitFixedDeskRequest">{{isLoggedIn ? '申请 ' + selectedFixedDesk.code : '登录后申请固定工位'}}</button>
+      </view>
+      <view wx:else class="fixed-desk-empty">当前没有可申请的固定工位</view>
+    </block>
   </view>
 
   <view wx:if="{{myBookings.length}}" class="section-heading-row community-section-heading"><view><text class="section-eyebrow">MY BOOKINGS</text><text class="section-title">我的空间预约</text></view></view>

@@ -93,24 +93,36 @@ export async function GET(
     isConfirmedEventParticipant = Boolean(registration);
   }
 
-  const { data: member, error: memberError } = await supabase
-    .from("members")
-    .select(
-      "status, is_co_builder, is_publicly_visible, willing_to_attend, willing_to_share, willing_to_join_projects",
-    )
-    .eq("id", profile.id)
-    .maybeSingle();
+  const [memberResult, fixedDeskAssignmentResult] = await Promise.all([
+    supabase
+      .from("members")
+      .select(
+        "status, is_co_builder, is_publicly_visible, willing_to_attend, willing_to_share, willing_to_join_projects",
+      )
+      .eq("id", profile.id)
+      .maybeSingle(),
+    supabase
+      .from("community_fixed_desk_assignments")
+      .select("resource_id")
+      .eq("user_id", profile.id)
+      .not("public_profile_consent_at", "is", null)
+      .limit(1)
+      .maybeSingle(),
+  ]);
+  const { data: member, error: memberError } = memberResult;
 
-  if (memberError) {
+  if (memberError || fixedDeskAssignmentResult.error) {
     console.error("Failed to load shared mini-program member.", {
-      code: memberError.code,
+      code: memberError?.code ?? fixedDeskAssignmentResult.error?.code,
     });
     return NextResponse.json({ error: "profile_load_failed" }, { status: 500 });
   }
 
   if (
     !member ||
-    (!member.is_publicly_visible && !isConfirmedEventParticipant)
+    (!member.is_publicly_visible &&
+      !isConfirmedEventParticipant &&
+      !fixedDeskAssignmentResult.data)
   ) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
