@@ -99,7 +99,7 @@ export async function PUT(
   if (event.status !== "scheduled") {
     return miniappJson({ error: "registration_closed" }, 409);
   }
-  if (event.event_type === "external" || event.registration_url) {
+  if (event.registration_url) {
     return miniappJson({ error: "external_registration_required" }, 409);
   }
   if (event.registration_mode === "review" && !note) {
