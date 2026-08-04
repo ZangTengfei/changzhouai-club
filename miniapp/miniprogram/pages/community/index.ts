@@ -77,8 +77,8 @@ function applyFloorPlanLayout(
       areaLabel: `办公大厅 · ${String.fromCharCode(65 + groupIndex)} 组联排桌`,
       x: 8 + (seatIndex % 3) * 11.2,
       y: 17 + groupIndex * 15 + Math.floor(seatIndex / 3) * 6.3,
-      width: 10.4,
-      height: 6,
+      width: 10.6,
+      height: 6.1,
       rotation: 0,
     };
   }
@@ -91,8 +91,8 @@ function applyFloorPlanLayout(
       areaLabel: "集中办公室",
       x: 70.2 + (seatIndex % 3) * 7.1,
       y: 38 + Math.floor(seatIndex / 3) * 7.4,
-      width: 6.4,
-      height: 5.8,
+      width: 6.8,
+      height: 6.4,
       rotation: 0,
     };
   }
@@ -102,10 +102,10 @@ function applyFloorPlanLayout(
     return {
       ...resource,
       areaLabel: `独立办公室 ${officeDeskNumber}`,
-      x: officeDeskNumber === 1 ? 54 : 76,
-      y: 8.4,
-      width: 8,
-      height: 4.3,
+      x: officeDeskNumber === 1 ? 53.3 : 75.3,
+      y: 8,
+      width: 9.4,
+      height: 5.3,
       rotation: 0,
     };
   }
