@@ -78,6 +78,17 @@ type EventRegistrationNotificationPayload = {
   note: string | null;
 };
 
+type FixedDeskRequestNotificationPayload = {
+  applicantDisplayName: string;
+  resourceCode: string;
+  createdAt: string;
+};
+
+type AccessRequestNotificationPayload = {
+  applicantDisplayName: string;
+  createdAt: string;
+};
+
 type EventProposalNotificationPayload = {
   initiatorName: string;
   contactWechat: string | null;
@@ -374,18 +385,31 @@ async function sendFeishuNotification(
     body: JSON.stringify(payload),
   });
 
-  if (!response.ok) {
-    const body = await response.text();
+  const responseBody = (await response.json().catch(() => null)) as
+    | {
+        code?: number;
+        msg?: string;
+        StatusCode?: number;
+        StatusMessage?: string;
+      }
+    | null;
+  const feishuCode = responseBody?.code ?? responseBody?.StatusCode;
+
+  if (!response.ok || (typeof feishuCode === "number" && feishuCode !== 0)) {
     console.error("Failed to send Feishu admin notification.", {
       status: response.status,
-      body,
+      code: feishuCode,
+      message: responseBody?.msg ?? responseBody?.StatusMessage,
       subject: envelope.subject,
     });
 
     return {
       channel: "feishu",
       ok: false,
-      detail: `feishu_http_${response.status}`,
+      detail:
+        typeof feishuCode === "number" && feishuCode !== 0
+          ? `feishu_code_${feishuCode}`
+          : `feishu_http_${response.status}`,
     };
   }
 
@@ -551,6 +575,61 @@ export async function sendAdminEventRegistrationNotification(
       { label: "成员微信", value: payload.registrantWechat },
       { label: "成员城市", value: payload.registrantCity },
       { label: "报名备注", value: payload.note },
+    ],
+  });
+
+  return result.ok;
+}
+
+export async function sendAdminFixedDeskRequestNotification(
+  payload: FixedDeskRequestNotificationPayload,
+) {
+  const result = await dispatchAdminNotification({
+    subject: `新的常驻工位申请：${payload.resourceCode} / ${payload.applicantDisplayName}`,
+    title: "有新的常驻工位申请",
+    intro: "有成员提交了常驻工位申请，请及时进入后台审核。",
+    adminUrl: getAdminUrl("/admin/spaces"),
+    fields: [
+      { label: "申请成员", value: payload.applicantDisplayName },
+      { label: "申请工位", value: payload.resourceCode },
+      {
+        label: "提交时间",
+        value: formatChangzhouDateTime(payload.createdAt, {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        }),
+      },
+    ],
+  });
+
+  return result.ok;
+}
+
+export async function sendAdminAccessRequestNotification(
+  payload: AccessRequestNotificationPayload,
+) {
+  const result = await dispatchAdminNotification({
+    subject: `新的门禁卡申领：${payload.applicantDisplayName}`,
+    title: "有新的门禁卡申领",
+    intro: "有成员提交了门禁卡申领，请在后台查看联系方式和补充说明。",
+    adminUrl: getAdminUrl("/admin/spaces"),
+    fields: [
+      { label: "申请成员", value: payload.applicantDisplayName },
+      {
+        label: "提交时间",
+        value: formatChangzhouDateTime(payload.createdAt, {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        }),
+      },
     ],
   });
 

@@ -1,3 +1,4 @@
+import { sendAdminFixedDeskRequestNotification } from "@/lib/email";
 import { miniappJson, requireMiniappSession } from "@/lib/miniapp-api";
 
 export const runtime = "nodejs";
@@ -78,15 +79,36 @@ export async function POST(request: Request) {
   }
 
   const requestRow = data as Parameters<typeof mapRequest>[0];
-  const { data: resource } = await auth.supabase
-    .from("community_space_resources")
-    .select("code")
-    .eq("id", requestRow.resource_id)
-    .maybeSingle();
+  const [{ data: resource }, { data: profile }] = await Promise.all([
+    auth.supabase
+      .from("community_space_resources")
+      .select("code")
+      .eq("id", requestRow.resource_id)
+      .maybeSingle(),
+    auth.supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", auth.session.user_id)
+      .maybeSingle(),
+  ]);
+  const resourceCode = resource?.code ?? "待确认工位";
+
+  try {
+    await sendAdminFixedDeskRequestNotification({
+      applicantDisplayName: profile?.display_name?.trim() || "社区成员",
+      resourceCode,
+      createdAt: requestRow.created_at,
+    });
+  } catch (notificationError) {
+    console.error("Failed to send fixed desk request notification.", {
+      requestId: requestRow.id,
+      notificationError,
+    });
+  }
 
   return miniappJson(
     {
-      fixedDeskRequest: mapRequest(requestRow, resource?.code ?? ""),
+      fixedDeskRequest: mapRequest(requestRow, resourceCode),
     },
     201,
   );
