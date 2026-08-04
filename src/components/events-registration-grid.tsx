@@ -81,7 +81,7 @@ export function EventsRegistrationGrid({
           authState={authState}
           registrationStatus={registrationStatuses.get(event.id) ?? null}
           redirectTo={`/events/${event.slug}`}
-          highlightEventType
+          compact
           showEventSlug={false}
         />
       ))}
