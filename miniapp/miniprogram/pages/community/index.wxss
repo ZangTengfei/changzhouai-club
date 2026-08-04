@@ -595,7 +595,7 @@
 .office-room {
   top: 2.5%;
   width: 20%;
-  height: 11%;
+  height: 13%;
   flex-direction: column;
   justify-content: flex-start;
   padding-top: 6rpx;
