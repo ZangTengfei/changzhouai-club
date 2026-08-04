@@ -1176,8 +1176,8 @@ try {
     method: "POST",
     headers: authHeaders,
     body: JSON.stringify({
-      eventName: "profile_saved",
-      pagePath: "/verification",
+      eventName: "community_view",
+      pagePath: "/pages/community/index",
       eventData: { source: "automated_check" },
     }),
   });
