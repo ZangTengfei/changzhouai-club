@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run miniapp:verify-analytics-events",
     "build": "next build",
     "start": "next start",
     "event:publish": "node scripts/publish-event.mjs",
@@ -14,6 +15,7 @@
     "miniapp:verify-api": "node --env-file=.env.local scripts/verify-miniapp-experience.mjs",
     "miniapp:metrics": "node --env-file=.env.local scripts/report-miniapp-metrics.mjs",
     "miniapp:login-failures": "node --env-file=.env.local scripts/report-miniapp-login-failures.mjs",
+    "miniapp:verify-analytics-events": "node scripts/verify-miniapp-analytics-events.mjs",
     "news:radar": "node scripts/ai-news-radar.mjs",
     "news:radar:md": "node scripts/ai-news-radar.mjs --format markdown --limit 12",
     "news:social": "node scripts/ai-daily-social-materials.mjs",

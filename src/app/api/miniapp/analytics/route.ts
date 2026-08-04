@@ -20,9 +20,18 @@ const ALLOWED_EVENTS = new Set([
   "profile_saved",
   "registration_created",
   "registration_cancelled",
+  "checkin_success",
+  "feedback_saved",
   "reminder_accepted",
   "reminder_rejected",
   "share_event",
+  "share_member_profile",
+  "community_view",
+  "community_booking_success",
+  "community_fixed_desk_request",
+  "community_fixed_desk_release",
+  "community_space_gallery_open",
+  "community_access_request",
 ]);
 
 export async function POST(request: Request) {
