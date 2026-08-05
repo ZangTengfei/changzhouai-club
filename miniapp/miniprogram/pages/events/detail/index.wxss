@@ -372,6 +372,18 @@
   font-size: 24rpx;
 }
 
+.retry-home-button {
+  min-width: 210rpx;
+  min-height: 72rpx;
+  margin-top: 0;
+  font-size: 25rpx;
+  line-height: 72rpx;
+}
+
+.home-navigation {
+  margin-top: 28rpx;
+}
+
 .registration-panel,
 .completed-panel {
   display: flex;

@@ -130,6 +130,10 @@ Page({
     }
   },
 
+  goHome() {
+    void wx.switchTab({ url: "/pages/home/index" });
+  },
+
   async loadRegistration(slug: string) {
     this.setData({ registrationLoading: true });
     try {

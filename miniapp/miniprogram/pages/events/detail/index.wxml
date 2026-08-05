@@ -6,6 +6,7 @@
       <text class="retry-title">暂时无法打开这个活动</text>
       <text class="retry-copy">网络可能开了个小差，请重新加载</text>
       <button class="retry-button" bindtap="retryLoad" aria-label="重新加载活动详情">重新加载</button>
+      <button class="secondary-button retry-home-button" bindtap="goHome" aria-label="返回主页">返回主页</button>
     </view>
   </view>
 
@@ -165,6 +166,10 @@
         <textarea class="registration-textarea" maxlength="500" value="{{feedbackComment}}" bindinput="handleFeedbackInput" placeholder="可选：留下一条建议" />
         <button class="primary-button" loading="{{feedbackSubmitting}}" disabled="{{feedbackSubmitting || !feedbackRating}}" bindtap="submitFeedback">保存反馈</button>
       </view>
+    </view>
+
+    <view class="home-navigation">
+      <button class="secondary-button" bindtap="goHome" aria-label="返回主页">返回主页</button>
     </view>
   </view>
 </view>
