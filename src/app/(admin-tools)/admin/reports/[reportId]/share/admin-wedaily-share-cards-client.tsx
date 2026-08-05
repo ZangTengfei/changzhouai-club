@@ -26,25 +26,25 @@ const DAILY_SHARE_TEMPLATES = [
     id: "neural-glass",
     name: "神经玻璃",
     description: "轻盈蓝白光感与神经网络",
-    background: "/share-cards/wedaily-neural-glass.png",
+    background: "/share-cards/wedaily-neural-glass.webp",
   },
   {
     id: "intelligent-grid",
     name: "智能网格",
     description: "理性技术纸张与大字排版",
-    background: "/share-cards/wedaily-intelligent-grid.png",
+    background: "/share-cards/wedaily-intelligent-grid.webp",
   },
   {
     id: "holographic-orbit",
     name: "全息光场",
     description: "柔和环形光带与空间层次",
-    background: "/share-cards/wedaily-holographic-orbit.png",
+    background: "/share-cards/wedaily-holographic-orbit.webp",
   },
   {
     id: "topic-list",
     name: "今日清单",
     description: "封面直接展示当日全部要点",
-    background: "/share-cards/wedaily-intelligent-grid.png",
+    background: "/share-cards/wedaily-intelligent-grid.webp",
   },
 ] as const;
 const TOPIC_EMOJIS = [
@@ -271,6 +271,8 @@ export function AdminWeDailyShareCardsClient({
                     src={template.background}
                     alt=""
                     aria-hidden="true"
+                    decoding="async"
+                    loading="lazy"
                     className="h-full w-full object-cover"
                   />
                 </span>
@@ -833,6 +835,7 @@ function CardBackground({ templateId }: { templateId: DailyShareTemplateId }) {
       alt=""
       aria-hidden="true"
       data-export-background
+      decoding="async"
     />
   );
 }
