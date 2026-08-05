@@ -1,0 +1,4 @@
+interface:
+  display_name: "常州活动成员私有画像提取"
+  short_description: "从活动总结与逐字稿筛选人物，并生成可复核的私有成员画像"
+  default_prompt: "Use $changzhou-member-profile-extractor to review these event transcripts and prepare a privacy-safe member profile import."
