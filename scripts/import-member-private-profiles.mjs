@@ -455,10 +455,16 @@ async function applyImport(supabase, profiles, observations) {
       observation: item.text.slice(0, 8000),
       confidence: item.identityStatus === "named" ? 0.82 : 0.62,
       source_fingerprint: sha256(
-        `${item.profileKey}|${item.eventDate}|${item.summaryFilename}|${item.observedName}`,
+        `${item.profileKey}|${item.eventDate}|${item.sourceLocator}|${item.observedName}|${sha256(item.text)}`,
       ),
     };
   });
+  const evidenceFingerprints = new Set(
+    evidence.map((item) => item.source_fingerprint),
+  );
+  if (evidenceFingerprints.size !== evidence.length) {
+    throw new Error("Evidence fingerprint collision detected before import.");
+  }
 
   const { error: evidenceError } = await supabase
     .from("member_private_profile_evidence")
