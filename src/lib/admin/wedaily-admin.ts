@@ -67,6 +67,33 @@ export async function listAdminWeDailyReports({
   return reports.filter((report): report is AdminWeDailyReport => report !== null);
 }
 
+export async function getAdminWeDailyReport(reportId: number) {
+  const config = requireAdminWeDailyConfig();
+  const response = await fetch(`${config.baseUrl}/api/admin/reports/${reportId}`, {
+    cache: "no-store",
+    headers: buildAdminHeaders(config),
+    signal: AbortSignal.timeout(WEDAILY_ADMIN_REQUEST_TIMEOUT_MS),
+  });
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(getPayloadError(payload) ?? `wedaily_admin_request_failed_${response.status}`);
+  }
+
+  const report = normalizeAdminWeDailyReport(payload);
+
+  if (!report) {
+    throw new Error("invalid_report_response");
+  }
+
+  return report;
+}
+
 export async function updateAdminWeDailyReport(reportId: number, markdown: string) {
   const payload = await fetchAdminWeDailyJson<unknown>(`/api/admin/reports/${reportId}`, {
     body: JSON.stringify({ markdown }),

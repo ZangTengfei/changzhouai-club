@@ -6,6 +6,7 @@
     "dev": "next dev",
     "prebuild": "npm run miniapp:verify-analytics-events",
     "build": "next build",
+    "web:verify-share-performance": "node scripts/verify-wedaily-share-performance.mjs",
     "start": "next start",
     "event:publish": "node scripts/publish-event.mjs",
     "project:publish": "node scripts/publish-project-opportunity.mjs",

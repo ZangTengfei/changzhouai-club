@@ -1,20 +1,21 @@
 "use client";
 
+import type {
+  ButtonHTMLAttributes,
+  InputHTMLAttributes,
+  TextareaHTMLAttributes,
+} from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Copy, Download, LoaderCircle, ShieldCheck, X } from "lucide-react";
 
-import { AdminNotice, AdminStatusBadge } from "@/components/admin-ui";
-import { Button } from "@/components/admin-antd/button";
-import { Input } from "@/components/admin-antd/input";
-import { Textarea } from "@/components/admin-antd/textarea";
-import type { AdminWeDailyReport } from "@/lib/admin/wedaily-admin";
-import type { ParsedWeDailyMarkdown } from "@/lib/wedaily";
+import { cn } from "@/lib/utils";
 import {
   DAILY_SHARE_CARD_CSS,
   DAILY_SHARE_CARD_HEIGHT,
   DAILY_SHARE_CARD_WIDTH,
   downloadDailyShareCardPng,
 } from "@/lib/wedaily-share-card";
+import type { WeDailyShareData, WeDailyShareTopic } from "@/lib/wedaily-share-data";
 
 const MAX_TOPIC_CARDS = 6;
 const MAX_COVER_TOPICS = 12;
@@ -51,14 +52,7 @@ const TOPIC_EMOJIS = [
   "🤖", "🏭", "📣", "🎯", "🧭", "🔧",
 ];
 
-type SourceTopic = {
-  id: string;
-  label: string;
-  title: string;
-  summary: string;
-};
-
-type ShareTopicCard = SourceTopic;
+type ShareTopicCard = WeDailyShareTopic;
 
 type DailyShareTemplateId = (typeof DAILY_SHARE_TEMPLATES)[number]["id"];
 
@@ -69,27 +63,25 @@ type CardExport = {
 };
 
 export function AdminWeDailyShareCardsClient({
-  report,
-  parsed,
+  data,
 }: {
-  report: AdminWeDailyReport;
-  parsed: ParsedWeDailyMarkdown;
+  data: WeDailyShareData;
 }) {
-  const sourceTopics = useMemo(() => buildSourceTopics(parsed), [parsed]);
+  const sourceTopics = data.topics;
   const importantTopics = useMemo(() => {
     const highlights = sourceTopics.filter((item) => item.label === "今日要点");
     return highlights.length ? highlights : sourceTopics;
   }, [sourceTopics]);
   const [coverTitle, setCoverTitle] = useState("常州 AI Club 群聊精华");
   const [coverSummary, setCoverSummary] = useState(
-    parsed.overview || "从一天的群聊中，选出值得继续讨论的本地 AI 观察与实践线索。",
+    data.overview || "从一天的群聊中，选出值得继续讨论的本地 AI 观察与实践线索。",
   );
   const [selectedCards, setSelectedCards] = useState<ShareTopicCard[]>(() =>
     sourceTopics.filter((item) => item.label === "今日要点").slice(0, 4),
   );
   const [privacyReviewed, setPrivacyReviewed] = useState(false);
   const [templateId, setTemplateId] = useState<DailyShareTemplateId>("intelligent-grid");
-  const [socialTitle, setSocialTitle] = useState(() => formatDailyReportTitle(report.date));
+  const [socialTitle, setSocialTitle] = useState(() => formatDailyReportTitle(data.date));
   const [copyState, setCopyState] = useState<"idle" | "copied" | "error">("idle");
   const [exporting, setExporting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -99,7 +91,7 @@ export function AdminWeDailyShareCardsClient({
     setCopyState("idle");
   }, [selectedCards, socialTitle]);
 
-  function toggleTopic(topic: SourceTopic) {
+  function toggleTopic(topic: WeDailyShareTopic) {
     const selected = selectedCards.some((item) => item.id === topic.id);
 
     if (selected) {
@@ -201,17 +193,17 @@ export function AdminWeDailyShareCardsClient({
     {
       id: "cover",
       label: "封面",
-      fileName: `01-${report.date}-群聊精华-封面.png`,
+      fileName: `01-${data.date}-群聊精华-封面.png`,
     },
     ...selectedCards.map((card, index) => ({
       id: card.id,
       label: `话题卡 ${index + 1}`,
-      fileName: `${String(index + 2).padStart(2, "0")}-${report.date}-精华话题.png`,
+      fileName: `${String(index + 2).padStart(2, "0")}-${data.date}-精华话题.png`,
     })),
     {
       id: "end",
       label: "社区微信结尾卡",
-      fileName: `${String(selectedCards.length + 2).padStart(2, "0")}-${report.date}-添加社区微信.png`,
+      fileName: `${String(selectedCards.length + 2).padStart(2, "0")}-${data.date}-添加社区微信.png`,
     },
   ];
 
@@ -222,19 +214,19 @@ export function AdminWeDailyShareCardsClient({
       <header className="flex flex-col gap-3 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-muted/30 p-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <AdminStatusBadge tone="active">HTML 模板</AdminStatusBadge>
-            <AdminStatusBadge tone={privacyReviewed ? "active" : "pending"}>
+            <ShareStatusBadge active>HTML 模板</ShareStatusBadge>
+            <ShareStatusBadge active={privacyReviewed}>
               {privacyReviewed ? "已确认公开" : "待隐私确认"}
-            </AdminStatusBadge>
+            </ShareStatusBadge>
           </div>
           <h2 className="text-lg font-semibold text-foreground">
-            {report.date} · 精华贴图
+            {data.date} · 精华贴图
           </h2>
           <p className="text-sm text-muted-foreground">
             已选 {selectedCards.length} 个话题，共生成 {selectedCards.length + 2} 张图片。
           </p>
         </div>
-        <Button
+        <ShareButton
           type="button"
           data-testid="daily-share-export"
           onClick={exportCards}
@@ -242,10 +234,10 @@ export function AdminWeDailyShareCardsClient({
         >
           {exporting ? <LoaderCircle className="animate-spin" /> : <Download />}
           {exporting ? "导出中" : "批量导出 PNG"}
-        </Button>
+        </ShareButton>
       </header>
 
-      {message ? <AdminNotice>{message}</AdminNotice> : null}
+      {message ? <ShareNotice>{message}</ShareNotice> : null}
 
       <section className="grid gap-3 rounded-[calc(var(--radius)-2px)] border border-border/70 bg-background p-4">
         <div>
@@ -307,7 +299,7 @@ export function AdminWeDailyShareCardsClient({
           </div>
           <label className="grid gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">发布标题</span>
-            <Input
+            <ShareInput
               data-testid="daily-share-social-title"
               value={socialTitle}
               onChange={(event) => setSocialTitle(event.target.value)}
@@ -319,7 +311,7 @@ export function AdminWeDailyShareCardsClient({
         <div className="grid gap-2">
           <label className="grid gap-1.5">
             <span className="text-xs font-medium text-muted-foreground">复制内容</span>
-            <Textarea
+            <ShareTextarea
               data-testid="daily-share-social-copy"
               value={socialCopyText}
               readOnly
@@ -333,7 +325,7 @@ export function AdminWeDailyShareCardsClient({
                 ? "复制失败，请手动选择上方文字。"
                 : `全部 ${socialTopicLines.length} 个今日要点`}
             </span>
-            <Button
+            <ShareButton
               type="button"
               variant="secondary"
               data-testid="daily-share-copy-text"
@@ -342,7 +334,7 @@ export function AdminWeDailyShareCardsClient({
             >
               {copyState === "copied" ? <Check /> : <Copy />}
               {copyState === "copied" ? "已复制" : "复制标题与话题"}
-            </Button>
+            </ShareButton>
           </div>
         </div>
       </section>
@@ -405,7 +397,7 @@ export function AdminWeDailyShareCardsClient({
               <>
                 <label className="grid gap-1.5">
                   <span className="text-xs font-medium text-muted-foreground">标题</span>
-                  <Input
+                  <ShareInput
                     data-testid="daily-share-cover-title"
                     value={coverTitle}
                     onChange={(event) => setCoverTitle(event.target.value)}
@@ -414,7 +406,7 @@ export function AdminWeDailyShareCardsClient({
                 </label>
                 <label className="grid gap-1.5">
                   <span className="text-xs font-medium text-muted-foreground">一句话概览</span>
-                  <Textarea
+                  <ShareTextarea
                     value={coverSummary}
                     onChange={(event) => setCoverSummary(event.target.value)}
                     className="min-h-28 resize-y"
@@ -434,7 +426,7 @@ export function AdminWeDailyShareCardsClient({
                 <strong className="text-sm font-semibold text-foreground">
                   话题卡 {index + 1}
                 </strong>
-                <Button
+                <ShareButton
                   type="button"
                   variant="ghost"
                   size="icon"
@@ -442,11 +434,11 @@ export function AdminWeDailyShareCardsClient({
                   onClick={() => toggleTopic(card)}
                 >
                   <X />
-                </Button>
+                </ShareButton>
               </div>
               <label className="grid gap-1.5">
                 <span className="text-xs font-medium text-muted-foreground">栏目</span>
-                <Input
+                <ShareInput
                   value={card.label}
                   onChange={(event) => updateTopic(card.id, "label", event.target.value)}
                   maxLength={12}
@@ -454,7 +446,7 @@ export function AdminWeDailyShareCardsClient({
               </label>
               <label className="grid gap-1.5">
                 <span className="text-xs font-medium text-muted-foreground">标题</span>
-                <Input
+                <ShareInput
                   value={card.title}
                   onChange={(event) => updateTopic(card.id, "title", event.target.value)}
                   maxLength={32}
@@ -462,7 +454,7 @@ export function AdminWeDailyShareCardsClient({
               </label>
               <label className="grid gap-1.5">
                 <span className="text-xs font-medium text-muted-foreground">公开摘要</span>
-                <Textarea
+                <ShareTextarea
                   value={card.summary}
                   onChange={(event) => updateTopic(card.id, "summary", event.target.value)}
                   className="min-h-32 resize-y"
@@ -507,12 +499,12 @@ export function AdminWeDailyShareCardsClient({
             >
               <DailyShareCoverCard
                 cardRef={bindCardRef("cover")}
-                date={report.date}
+                date={data.date}
                 templateId={templateId}
                 title={coverTitle}
                 summary={coverSummary}
-                messageCount={report.stats?.message_count ?? 0}
-                speakerCount={report.stats?.speaker_count ?? 0}
+                messageCount={data.messageCount}
+                speakerCount={data.speakerCount}
                 totalTopicCount={importantTopics.length}
                 topicCount={selectedCards.length}
                 topics={coverTopicLines}
@@ -529,7 +521,7 @@ export function AdminWeDailyShareCardsClient({
                 <DailyShareTopicCard
                   cardRef={bindCardRef(card.id)}
                   card={card}
-                  date={report.date}
+                  date={data.date}
                   index={index + 1}
                   templateId={templateId}
                   total={selectedCards.length}
@@ -544,7 +536,7 @@ export function AdminWeDailyShareCardsClient({
             >
               <DailyShareEndCard
                 cardRef={bindCardRef("end")}
-                date={report.date}
+                date={data.date}
                 qrCodeImageUrl={COMMUNITY_WECHAT_QR_IMAGE_PATH}
                 templateId={templateId}
               />
@@ -554,29 +546,6 @@ export function AdminWeDailyShareCardsClient({
       </div>
     </div>
   );
-}
-
-function buildSourceTopics(parsed: ParsedWeDailyMarkdown): SourceTopic[] {
-  return [
-    ...parsed.highlights.map((item) => ({
-      id: `highlight-${item.index}`,
-      label: "今日要点",
-      title: item.title,
-      summary: item.summary,
-    })),
-    ...parsed.discussions.map((item) => ({
-      id: `discussion-${item.index}`,
-      label: "重点讨论",
-      title: item.title,
-      summary: item.conclusion,
-    })),
-    ...parsed.resources.map((item) => ({
-      id: `resource-${item.index}`,
-      label: "干货资源",
-      title: item.title,
-      summary: item.body.replace(/https?:\/\/\S+/g, "").trim(),
-    })),
-  ].filter((item) => item.title && item.summary);
 }
 
 function formatDailyReportTitle(date: string) {
@@ -615,10 +584,96 @@ function CardPreviewFrame({
           {children}
         </div>
       </div>
-      <Button type="button" variant="outline" size="sm" disabled={disabled} onClick={onExport}>
+      <ShareButton type="button" variant="outline" size="sm" disabled={disabled} onClick={onExport}>
         <Download />
         {actionLabel}
-      </Button>
+      </ShareButton>
+    </div>
+  );
+}
+
+type ShareButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  size?: "default" | "sm" | "icon";
+  variant?: "default" | "secondary" | "outline" | "ghost";
+};
+
+function ShareButton({
+  className,
+  size = "default",
+  variant = "default",
+  ...props
+}: ShareButtonProps) {
+  return (
+    <button
+      className={cn(
+        "inline-flex min-h-10 items-center justify-center gap-2 rounded-full px-4 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-45 [&_svg]:size-4",
+        variant === "default" && "bg-blue-600 text-white hover:bg-blue-700",
+        variant === "secondary" &&
+          "border border-slate-300 bg-white text-slate-800 hover:bg-slate-50",
+        variant === "outline" &&
+          "border border-slate-300 bg-transparent text-slate-800 hover:bg-white",
+        variant === "ghost" && "bg-transparent text-slate-600 hover:bg-slate-100",
+        size === "sm" && "min-h-8 px-3 text-xs",
+        size === "icon" && "size-9 min-h-9 p-0",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+function ShareInput({ className, ...props }: InputHTMLAttributes<HTMLInputElement>) {
+  return (
+    <input
+      className={cn(
+        "min-h-10 w-full rounded-lg border border-slate-300 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+function ShareTextarea({
+  className,
+  ...props
+}: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return (
+    <textarea
+      className={cn(
+        "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100",
+        className,
+      )}
+      {...props}
+    />
+  );
+}
+
+function ShareStatusBadge({
+  active,
+  children,
+}: {
+  active: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold tracking-wide",
+        active
+          ? "border-emerald-200 bg-emerald-100 text-emerald-700"
+          : "border-amber-200 bg-amber-100 text-amber-700",
+      )}
+    >
+      {children}
+    </span>
+  );
+}
+
+function ShareNotice({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2.5 text-sm text-slate-600">
+      {children}
     </div>
   );
 }
