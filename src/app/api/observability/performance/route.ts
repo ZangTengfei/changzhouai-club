@@ -4,6 +4,10 @@ import { normalizeObservedRoute } from "@/lib/performance-observability";
 
 const ALLOWED_EVENTS = new Set([
   "client_error",
+  "document_load_sample",
+  "document_load_slow",
+  "document_load_stalled",
+  "navigation_sample",
   "navigation_slow",
   "navigation_stalled",
   "navigation_recovered",
@@ -48,7 +52,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "invalid_observation" }, { status: 400 });
   }
 
-  const durationMs = optionalBoundedNumber(input.durationMs, 120_000);
+  const isDocumentEvent = String(input.event).startsWith("document_load_");
+  const maximumDurationMs = isDocumentEvent ? 300_000 : 120_000;
+  const durationMs = optionalBoundedNumber(input.durationMs, maximumDurationMs);
 
   if (durationMs === undefined) {
     return NextResponse.json({ error: "invalid_observation" }, { status: 400 });
@@ -62,6 +68,10 @@ export async function POST(request: NextRequest) {
       ? input.navigationType
       : "unknown",
     durationMs,
+    ttfbMs: optionalBoundedNumber(input.ttfbMs, 300_000),
+    responseEndMs: optionalBoundedNumber(input.responseEndMs, 300_000),
+    domContentLoadedMs: optionalBoundedNumber(input.domContentLoadedMs, 300_000),
+    loadMs: optionalBoundedNumber(input.loadMs, 300_000),
     rscDurationMs: optionalBoundedNumber(input.rscDurationMs, 120_000),
     rscStatus: optionalBoundedNumber(input.rscStatus, 599),
     rscProtocol: ALLOWED_PROTOCOLS.has(String(input.rscProtocol))
@@ -69,7 +79,7 @@ export async function POST(request: NextRequest) {
       : undefined,
     slowestResourceDurationMs: optionalBoundedNumber(
       input.slowestResourceDurationMs,
-      120_000,
+      maximumDurationMs,
     ),
     slowestResourceKind: ALLOWED_RESOURCE_KINDS.has(
       String(input.slowestResourceKind),

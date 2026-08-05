@@ -2,6 +2,11 @@ import { normalizeObservedRoute } from "@/lib/performance-observability";
 
 const SLOW_NAVIGATION_MS = 1_500;
 const STALLED_NAVIGATION_MS = 5_000;
+const SLOW_DOCUMENT_CONTENT_MS = 3_000;
+const SLOW_DOCUMENT_LOAD_MS = 5_000;
+const STALLED_DOCUMENT_CONTENT_MS = 10_000;
+const STALLED_DOCUMENT_LOAD_MS = 15_000;
+const PERFORMANCE_SAMPLE_RATE = 0.1;
 
 type PendingNavigation = {
   from: string;
@@ -13,11 +18,20 @@ type PendingNavigation = {
   stalledReported: boolean;
 };
 
-type NavigationEvent = "navigation_slow" | "navigation_stalled" | "navigation_recovered";
+type NavigationEvent =
+  | "navigation_sample"
+  | "navigation_slow"
+  | "navigation_stalled"
+  | "navigation_recovered";
+type DocumentEvent =
+  | "document_load_sample"
+  | "document_load_slow"
+  | "document_load_stalled";
 type ObservedProtocol = "h3" | "h2" | "http/1.1";
 
 let pendingNavigation: PendingNavigation | null = null;
 let clientErrorReported = false;
+let documentLoadReported = false;
 
 const staleBuildErrorPatterns = [
   /ChunkLoadError/i,
@@ -68,6 +82,24 @@ function getConnectionType() {
     : undefined;
 }
 
+function getResourceKind(resource?: PerformanceResourceTiming) {
+  if (!resource) {
+    return undefined;
+  }
+
+  const url = new URL(resource.name);
+
+  return url.origin === window.location.origin
+    ? "first_party"
+    : url.hostname === "assets.changzhouai.club"
+      ? "asset_cdn"
+      : "third_party";
+}
+
+function getSlowestResource(resources: PerformanceResourceTiming[]) {
+  return [...resources].sort((left, right) => right.duration - left.duration)[0];
+}
+
 function getResourceSummary(startedAt: number, destination: string) {
   const destinationPath = new URL(destination, window.location.origin).pathname;
   const resources = performance
@@ -83,21 +115,7 @@ function getResourceSummary(startedAt: number, destination: string) {
       );
     })
     .sort((left, right) => right.duration - left.duration)[0];
-  const slowestResource = resources.sort(
-    (left, right) => right.duration - left.duration,
-  )[0];
-
-  let slowestResourceKind: "first_party" | "asset_cdn" | "third_party" | undefined;
-
-  if (slowestResource) {
-    const url = new URL(slowestResource.name);
-    slowestResourceKind =
-      url.origin === window.location.origin
-        ? "first_party"
-        : url.hostname === "assets.changzhouai.club"
-          ? "asset_cdn"
-          : "third_party";
-  }
+  const slowestResource = getSlowestResource(resources);
 
   return {
     rscDurationMs: routeRequest ? Math.round(routeRequest.duration) : undefined,
@@ -106,9 +124,42 @@ function getResourceSummary(startedAt: number, destination: string) {
     slowestResourceDurationMs: slowestResource
       ? Math.round(slowestResource.duration)
       : undefined,
-    slowestResourceKind,
+    slowestResourceKind: getResourceKind(slowestResource),
     slowestResourceProtocol: normalizeProtocol(slowestResource?.nextHopProtocol),
   };
+}
+
+function getDocumentResourceSummary() {
+  const resources = performance.getEntriesByType(
+    "resource",
+  ) as PerformanceResourceTiming[];
+  const slowestResource = getSlowestResource(resources);
+
+  return {
+    slowestResourceDurationMs: slowestResource
+      ? Math.round(slowestResource.duration)
+      : undefined,
+    slowestResourceKind: getResourceKind(slowestResource),
+    slowestResourceProtocol: normalizeProtocol(slowestResource?.nextHopProtocol),
+  };
+}
+
+function shouldSamplePerformance(kind: "document" | "navigation") {
+  const key = `caic:performance-sample:${kind}`;
+
+  try {
+    const existingValue = sessionStorage.getItem(key);
+
+    if (existingValue) {
+      return existingValue === "1";
+    }
+
+    const sampled = Math.random() < PERFORMANCE_SAMPLE_RATE;
+    sessionStorage.setItem(key, sampled ? "1" : "0");
+    return sampled;
+  } catch {
+    return Math.random() < PERFORMANCE_SAMPLE_RATE;
+  }
 }
 
 function sendObservation(payload: Record<string, unknown>) {
@@ -142,6 +193,59 @@ function reportNavigation(
   };
 
   sendObservation(payload);
+}
+
+function reportDocumentLoad() {
+  if (documentLoadReported) {
+    return;
+  }
+
+  documentLoadReported = true;
+  const navigation = performance.getEntriesByType(
+    "navigation",
+  )[0] as PerformanceNavigationTiming | undefined;
+
+  if (!navigation) {
+    return;
+  }
+
+  const ttfbMs = Math.round(navigation.responseStart);
+  const responseEndMs = Math.round(navigation.responseEnd);
+  const domContentLoadedMs = Math.round(navigation.domContentLoadedEventEnd);
+  const loadMs = Math.round(navigation.loadEventEnd || navigation.duration);
+  const event: DocumentEvent | null =
+    domContentLoadedMs >= STALLED_DOCUMENT_CONTENT_MS ||
+    loadMs >= STALLED_DOCUMENT_LOAD_MS
+      ? "document_load_stalled"
+      : domContentLoadedMs >= SLOW_DOCUMENT_CONTENT_MS ||
+          loadMs >= SLOW_DOCUMENT_LOAD_MS
+        ? "document_load_slow"
+        : shouldSamplePerformance("document")
+          ? "document_load_sample"
+          : null;
+
+  if (!event) {
+    return;
+  }
+
+  const route = normalizeObservedRoute(window.location.pathname);
+
+  sendObservation({
+    event,
+    from: route,
+    to: route,
+    navigationType: "unknown",
+    durationMs: loadMs,
+    ttfbMs,
+    responseEndMs,
+    domContentLoadedMs,
+    loadMs,
+    connectionType: getConnectionType(),
+    documentProtocol: normalizeProtocol(navigation.nextHopProtocol),
+    visibility: document.visibilityState,
+    deploymentId: getDeploymentId(),
+    ...getDocumentResourceSummary(),
+  });
 }
 
 function isSameOriginChunkFilename(filename?: string) {
@@ -271,11 +375,13 @@ function finishNavigation() {
     requestAnimationFrame(() => {
       const durationMs = performance.now() - navigation.startedAt;
 
-      const event = navigation.stalledReported
+      const event: NavigationEvent | null = navigation.stalledReported
         ? "navigation_recovered"
         : durationMs >= SLOW_NAVIGATION_MS
           ? "navigation_slow"
-          : null;
+          : shouldSamplePerformance("navigation")
+            ? "navigation_sample"
+            : null;
 
       if (event) {
         window.setTimeout(() => {
@@ -297,6 +403,17 @@ if (process.env.NODE_ENV === "production") {
   window.addEventListener("unhandledrejection", (event) => {
     reportClientError(event.reason);
   });
+  if (document.readyState === "complete") {
+    window.setTimeout(reportDocumentLoad, 0);
+  } else {
+    window.addEventListener(
+      "load",
+      () => {
+        window.setTimeout(reportDocumentLoad, 0);
+      },
+      { once: true },
+    );
+  }
 }
 
 export function onRouterTransitionStart(url: string, navigationType: string) {
