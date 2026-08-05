@@ -6,6 +6,7 @@ import {
   FileTextOutlined,
   FundProjectionScreenOutlined,
   GiftOutlined,
+  IdcardOutlined,
   NotificationOutlined,
   ProjectOutlined,
   ReadOutlined,
@@ -45,6 +46,12 @@ const groups: NavGroup[] = [
     label: "成员生态",
     items: [
       { href: "/admin/members", label: "成员管理", icon: <TeamOutlined />, permissions: ["members.read"] },
+      {
+        href: "/admin/member-profiles",
+        label: "成员画像",
+        icon: <IdcardOutlined />,
+        permissions: ["members.read_private_profile"],
+      },
       { href: "/admin/spaces", label: "空间管理", icon: <DesktopOutlined />, permissions: ["spaces.read"] },
       { href: "/admin/projects", label: "共建项目", icon: <ProjectOutlined />, permissions: ["projects.read"] },
       { href: "/admin/works", label: "成员作品", icon: <FundProjectionScreenOutlined />, permissions: ["works.read", "updates.review"] },

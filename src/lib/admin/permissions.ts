@@ -35,7 +35,19 @@ export const ADMIN_PERMISSION_DEFINITIONS = [
 
   { key: "members.read", label: "查看成员", module: "members", sensitivity: "L1" },
   { key: "members.read_contact", label: "查看成员联系方式", module: "members", sensitivity: "L2" },
+  {
+    key: "members.read_private_profile",
+    label: "查看成员私有画像",
+    module: "members",
+    sensitivity: "L3",
+  },
   { key: "members.write_profile", label: "编辑成员资料", module: "members", sensitivity: "L1" },
+  {
+    key: "members.write_private_profile",
+    label: "复核成员私有画像",
+    module: "members",
+    sensitivity: "L3",
+  },
   { key: "members.manage_status", label: "管理成员状态", module: "members", sensitivity: "L3" },
   { key: "members.manage_co_builder", label: "管理共建身份", module: "members", sensitivity: "L2" },
   { key: "members.manage_badges", label: "管理社区标签", module: "members", sensitivity: "L2" },
@@ -258,7 +270,9 @@ export const ADMIN_ROLE_DEFINITIONS: AdminRoleDefinition[] = [
     permissions: [
       "admin.access",
       "members.read",
+      "members.read_private_profile",
       "members.write_profile",
+      "members.write_private_profile",
       "members.manage_co_builder",
       "members.manage_badges",
     ],
