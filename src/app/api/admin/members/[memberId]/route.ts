@@ -145,6 +145,13 @@ export async function PATCH(
         willing_to_join_projects: willingToJoinProjects,
         is_publicly_visible: isPubliclyVisible,
         is_featured_on_home: isFeaturedOnHome,
+        ...(!isPubliclyVisible
+          ? {
+              directory_priority: 0,
+              directory_featured_until: null,
+              directory_feature_reason: null,
+            }
+          : {}),
       })
       .eq("id", memberId),
   ]);

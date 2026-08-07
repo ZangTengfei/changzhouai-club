@@ -39,6 +39,9 @@ type AdminMemberRow = {
   is_co_builder: boolean;
   is_publicly_visible: boolean;
   is_featured_on_home: boolean;
+  directory_priority: number;
+  directory_featured_until: string | null;
+  directory_feature_reason: string | null;
   joined_at: string;
   last_active_at: string | null;
 };
@@ -99,6 +102,9 @@ export type AdminMember = {
   isCoBuilder: boolean;
   isPubliclyVisible: boolean;
   isFeaturedOnHome: boolean;
+  directoryPriority: number;
+  directoryFeaturedUntil: string | null;
+  directoryFeatureReason: string | null;
   joinedAt: string;
   lastActiveAt: string | null;
   registrationCount: number;
@@ -243,7 +249,7 @@ export async function loadAdminMembersData(
     supabase
       .from("members")
       .select(
-        "id, status, willing_to_attend, willing_to_share, willing_to_join_projects, is_co_builder, is_publicly_visible, is_featured_on_home, joined_at, last_active_at",
+        "id, status, willing_to_attend, willing_to_share, willing_to_join_projects, is_co_builder, is_publicly_visible, is_featured_on_home, directory_priority, directory_featured_until, directory_feature_reason, joined_at, last_active_at",
       ),
     supabase.from("event_registrations").select("user_id, status"),
     supabase
@@ -362,6 +368,9 @@ export async function loadAdminMembersData(
         isCoBuilder: member.is_co_builder,
         isPubliclyVisible: member.is_publicly_visible,
         isFeaturedOnHome: member.is_featured_on_home,
+        directoryPriority: member.directory_priority,
+        directoryFeaturedUntil: member.directory_featured_until,
+        directoryFeatureReason: member.directory_feature_reason,
         joinedAt: member.joined_at,
         lastActiveAt: member.last_active_at,
         registrationCount: registrationsByUserId.get(member.id) ?? 0,

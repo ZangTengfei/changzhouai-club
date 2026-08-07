@@ -318,7 +318,21 @@ try {
   assert.equal("email" in verifiedMember, false);
   assert.equal("bio" in verifiedMember, false);
   assert.equal("joinedAt" in verifiedMember, false);
+  assert.match(verifiedMember.joinedLabel, /^\d{4}年\d{1,2}月$/);
+  assert.equal(typeof verifiedMember.attendanceCount, "number");
+  assert.equal(typeof verifiedMember.isRecommended, "boolean");
+  assert.equal("directoryPriority" in verifiedMember, false);
   pass("member_pool_authenticated_search_excludes_private_fields");
+
+  for (const sort of ["recommended", "newest", "active"]) {
+    const sortedMemberPool = await request(
+      `/api/miniapp/members?sort=${sort}`,
+      { headers: authHeaders },
+    );
+    assert.equal(sortedMemberPool.response.status, 200);
+    assert.equal(sortedMemberPool.body?.sort, sort);
+  }
+  pass("member_pool_sort_options_loaded");
 
   const invalidMemberFilter = await request(
     "/api/miniapp/members?intent=private-contact",
@@ -327,6 +341,14 @@ try {
   assert.equal(invalidMemberFilter.response.status, 400);
   assert.equal(invalidMemberFilter.body?.error, "invalid_member_filter");
   pass("member_pool_invalid_filter_rejected");
+
+  const invalidMemberSort = await request(
+    "/api/miniapp/members?sort=tag-count",
+    { headers: authHeaders },
+  );
+  assert.equal(invalidMemberSort.response.status, 400);
+  assert.equal(invalidMemberSort.body?.error, "invalid_member_sort");
+  pass("member_pool_invalid_sort_rejected");
 
   const sharedProfile = await request(
     `/api/miniapp/members/${encodeURIComponent(userId)}`,

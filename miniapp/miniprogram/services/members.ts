@@ -6,6 +6,7 @@ export type MemberPoolQuery = {
   industry?: string;
   skill?: string;
   intent?: "share" | "projects" | "seeking" | "";
+  sort?: "recommended" | "newest" | "active";
   page?: number;
 };
 

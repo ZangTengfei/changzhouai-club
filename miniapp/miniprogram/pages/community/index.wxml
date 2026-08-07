@@ -207,6 +207,9 @@
       <view class="member-pool-heading-copy"><text>公开成员</text><text>{{memberPoolGuestPreview ? '登录后查看更多社区成员' : '按公开资料和参与方向发现成员'}}</text></view>
       <view class="member-pool-heading-actions">
         <text wx:if="{{memberPoolTotal}}">{{memberPoolTotal}} 位</text>
+        <picker class="member-sort-picker" mode="selector" range="{{memberSortOptions}}" range-key="label" value="{{memberSortIndex}}" bindchange="changeMemberSort">
+          <view class="member-sort-trigger" role="button" aria-label="成员排序：{{memberSortLabel}}"><text>{{memberSortLabel}}</text><text>⌄</text></view>
+        </picker>
         <button class="icon-button member-search-toggle {{memberSearchExpanded ? 'member-search-toggle-active' : ''}}" bindtap="toggleMemberSearch" aria-label="{{memberSearchExpanded ? '关闭成员搜索' : '搜索社区成员'}}">
           <icon type="{{memberSearchExpanded ? 'clear' : 'search'}}" size="20" color="{{memberSearchExpanded ? '#087448' : '#64756d'}}" />
         </button>
@@ -230,12 +233,13 @@
         <view class="member-card-top">
           <image wx:if="{{item.avatarUrl}}" class="member-card-avatar" src="{{item.avatarUrl}}" mode="aspectFill" lazy-load="{{true}}" />
           <view wx:else class="member-card-avatar member-card-avatar-empty">{{item.avatarInitial}}</view>
-          <view class="member-card-identity"><view><text class="member-card-name">{{item.displayName}}</text><text class="member-card-badge">{{item.identityLabel}}</text></view><text class="member-card-headline">{{item.headline}}</text></view>
+          <view class="member-card-identity"><view><text class="member-card-name">{{item.displayName}}</text><text class="member-card-badge">{{item.identityLabel}}</text><text wx:if="{{item.isRecommended}}" class="member-card-recommended">社区推荐</text></view><text class="member-card-headline">{{item.headline}}</text></view>
           <text class="member-card-arrow">›</text>
         </view>
         <view wx:if="{{item.communityTags.length}}" class="member-card-community-tags"><text wx:for="{{item.communityTags}}" wx:key="*this">{{item}}</text></view>
         <view wx:if="{{item.visibleSkills.length}}" class="member-card-skills"><text wx:for="{{item.visibleSkills}}" wx:key="*this">{{item}}</text></view>
         <view class="member-card-summary"><text>{{item.primarySummaryLabel}}</text><text>{{item.primarySummary}}</text></view>
+        <view class="member-card-meta"><text>加入社区 · {{item.joinedLabel}}</text><text>近一年参与 · {{item.attendanceCount}} 场</text></view>
         <view wx:if="{{item.willingToShare || item.willingToJoinProjects}}" class="member-card-signals"><text wx:if="{{item.willingToShare}}">愿意分享</text><text wx:if="{{item.willingToJoinProjects}}">可参与项目</text></view>
       </view>
     </view>

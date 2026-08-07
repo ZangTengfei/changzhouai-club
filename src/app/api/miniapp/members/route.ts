@@ -12,6 +12,14 @@ const MEMBER_PAGE_SIZE = 20;
 const GUEST_MEMBER_LIMIT = 6;
 const ACTIVE_MEMBER_STATUSES = new Set(["active", "organizer", "admin"]);
 const MEMBER_INTENTS = new Set(["share", "projects", "seeking"]);
+const MEMBER_SORTS = new Set(["recommended", "newest", "active"]);
+const joinedMonthFormatter = new Intl.DateTimeFormat("zh-CN", {
+  year: "numeric",
+  month: "long",
+  timeZone: "Asia/Shanghai",
+});
+
+type MemberSort = "recommended" | "newest" | "active";
 
 type MemberRow = {
   id: string;
@@ -19,7 +27,8 @@ type MemberRow = {
   willing_to_share: boolean;
   willing_to_join_projects: boolean;
   is_co_builder: boolean;
-  is_featured_on_home: boolean;
+  directory_priority: number;
+  directory_featured_until: string | null;
   joined_at: string;
 };
 
@@ -44,6 +53,10 @@ type MemberBadgeRow = {
   awarded_at: string;
 };
 
+type MemberAttendanceRow = {
+  user_id: string;
+};
+
 type MemberPoolItem = {
   id: string;
   shareHandle: string;
@@ -62,8 +75,9 @@ type MemberPoolItem = {
   identityLabel: string;
   communityTags: string[];
   isCoBuilder: boolean;
-  isFeatured: boolean;
+  directoryPriority: number;
   joinedAt: string;
+  attendanceCount: number;
 };
 
 function getIdentityLabel(status: string, isCoBuilder: boolean) {
@@ -105,8 +119,21 @@ function matchesQuery(member: MemberPoolItem, query: string) {
   ].some((value) => normalizeSearchText(value).includes(query));
 }
 
-function compareMembers(a: MemberPoolItem, b: MemberPoolItem) {
-  if (a.isFeatured !== b.isFeatured) return a.isFeatured ? -1 : 1;
+function compareJoinedAt(a: MemberPoolItem, b: MemberPoolItem) {
+  const joinedAtDiff = new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime();
+  if (joinedAtDiff !== 0) return joinedAtDiff;
+  return a.displayName.localeCompare(b.displayName, "zh-CN");
+}
+
+function compareMembers(a: MemberPoolItem, b: MemberPoolItem, sort: MemberSort) {
+  if (sort === "newest") return compareJoinedAt(a, b);
+  if (sort === "active") {
+    const attendanceDiff = b.attendanceCount - a.attendanceCount;
+    return attendanceDiff !== 0 ? attendanceDiff : compareJoinedAt(a, b);
+  }
+
+  const priorityDiff = b.directoryPriority - a.directoryPriority;
+  if (priorityDiff !== 0) return priorityDiff;
 
   const identityWeight = (member: MemberPoolItem) => {
     if (member.identityLabel === "社区发起人") return 0;
@@ -115,10 +142,7 @@ function compareMembers(a: MemberPoolItem, b: MemberPoolItem) {
   };
   const identityDiff = identityWeight(a) - identityWeight(b);
   if (identityDiff !== 0) return identityDiff;
-
-  const joinedAtDiff = new Date(b.joinedAt).getTime() - new Date(a.joinedAt).getTime();
-  if (joinedAtDiff !== 0) return joinedAtDiff;
-  return a.displayName.localeCompare(b.displayName, "zh-CN");
+  return compareJoinedAt(a, b);
 }
 
 function uniqueSorted(values: string[]) {
@@ -143,6 +167,9 @@ function toMemberPoolResponse(member: MemberPoolItem) {
     willingToJoinProjects: member.willingToJoinProjects,
     identityLabel: member.identityLabel,
     communityTags: member.communityTags.slice(0, 2),
+    isRecommended: member.directoryPriority > 0,
+    joinedLabel: joinedMonthFormatter.format(new Date(member.joinedAt)),
+    attendanceCount: member.attendanceCount,
   };
 }
 
@@ -160,16 +187,21 @@ export async function GET(request: Request) {
   const industry = readSearchParam(url.searchParams, "industry", 40);
   const skill = readSearchParam(url.searchParams, "skill", 100);
   const intent = readSearchParam(url.searchParams, "intent", 20);
+  const sort = readSearchParam(url.searchParams, "sort", 20) || "recommended";
   const requestedPage = authenticated ? readPage(url.searchParams) : 1;
 
   if (intent && !MEMBER_INTENTS.has(intent)) {
     return miniappJson({ error: "invalid_member_filter" }, 400);
   }
+  if (!MEMBER_SORTS.has(sort)) {
+    return miniappJson({ error: "invalid_member_sort" }, 400);
+  }
+  const memberSort = sort as MemberSort;
 
   const { data: memberData, error: memberError } = await supabase
     .from("members")
     .select(
-      "id, status, willing_to_share, willing_to_join_projects, is_co_builder, is_featured_on_home, joined_at",
+      "id, status, willing_to_share, willing_to_join_projects, is_co_builder, directory_priority, directory_featured_until, joined_at",
     )
     .eq("is_publicly_visible", true)
     .in("status", ["active", "organizer", "admin"]);
@@ -193,10 +225,13 @@ export async function GET(request: Request) {
       pagination: { page: 1, pageSize: authenticated ? MEMBER_PAGE_SIZE : GUEST_MEMBER_LIMIT, total: 0, hasMore: false },
       authenticated,
       guestPreview: !authenticated,
+      sort: memberSort,
     });
   }
 
-  const [profileResult, badgeResult] = await Promise.all([
+  const activeSince = new Date();
+  activeSince.setUTCFullYear(activeSince.getUTCFullYear() - 1);
+  const [profileResult, badgeResult, attendanceResult] = await Promise.all([
     supabase
       .from("profiles")
       .select(
@@ -208,20 +243,30 @@ export async function GET(request: Request) {
       .select("user_id, label, awarded_at")
       .in("user_id", memberIds)
       .order("awarded_at", { ascending: false }),
+    supabase
+      .from("event_attendance")
+      .select("user_id")
+      .in("user_id", memberIds)
+      .in("status", ["attended", "late", "speaker"])
+      .not("checked_in_at", "is", null)
+      .gte("checked_in_at", activeSince.toISOString()),
   ]);
   const { data: profileData, error: profileError } = profileResult;
   const { data: badgeData, error: badgeError } = badgeResult;
+  const { data: attendanceData, error: attendanceError } = attendanceResult;
 
-  if (profileError || badgeError) {
+  if (profileError || badgeError || attendanceError) {
     console.error("Failed to load mini-program member profiles.", {
       profileCode: profileError?.code,
       badgeCode: badgeError?.code,
+      attendanceCode: attendanceError?.code,
     });
     return miniappJson({ error: "member_pool_load_failed" }, 500);
   }
 
   const membersById = new Map(memberRows.map((member) => [member.id, member]));
   const communityTagsByMemberId = new Map<string, string[]>();
+  const attendanceCountByMemberId = new Map<string, number>();
   ((badgeData ?? []) as MemberBadgeRow[]).forEach((badge) => {
     const label = badge.label.trim();
     if (!label) return;
@@ -229,6 +274,13 @@ export async function GET(request: Request) {
     if (!tags.includes(label)) tags.push(label);
     communityTagsByMemberId.set(badge.user_id, tags);
   });
+  ((attendanceData ?? []) as MemberAttendanceRow[]).forEach((attendance) => {
+    attendanceCountByMemberId.set(
+      attendance.user_id,
+      (attendanceCountByMemberId.get(attendance.user_id) ?? 0) + 1,
+    );
+  });
+  const now = Date.now();
   const eligibleMembers = ((profileData ?? []) as ProfileRow[])
     .flatMap((profile): MemberPoolItem[] => {
       const member = membersById.get(profile.id);
@@ -267,11 +319,17 @@ export async function GET(request: Request) {
           .filter((label) => label !== identityLabel)
           .slice(0, 2),
         isCoBuilder,
-        isFeatured: Boolean(member.is_featured_on_home),
+        directoryPriority:
+          member.directory_priority > 0 &&
+          (!member.directory_featured_until ||
+            new Date(member.directory_featured_until).getTime() > now)
+            ? member.directory_priority
+            : 0,
         joinedAt: member.joined_at,
+        attendanceCount: attendanceCountByMemberId.get(profile.id) ?? 0,
       }];
     })
-    .sort(compareMembers);
+    .sort((a, b) => compareMembers(a, b, memberSort));
 
   const filters = {
     cities: uniqueSorted(eligibleMembers.map((member) => member.city)),
@@ -307,5 +365,6 @@ export async function GET(request: Request) {
     },
     authenticated,
     guestPreview: !authenticated,
+    sort: memberSort,
   });
 }

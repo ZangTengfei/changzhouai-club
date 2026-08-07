@@ -43,7 +43,13 @@ export async function PATCH(
 
   const memberUpdate = isPubliclyVisible
     ? { is_publicly_visible: true }
-    : { is_publicly_visible: false, is_featured_on_home: false };
+    : {
+        is_publicly_visible: false,
+        is_featured_on_home: false,
+        directory_priority: 0,
+        directory_featured_until: null,
+        directory_feature_reason: null,
+      };
   const { error: memberError } = await staffContext.supabase
     .from("members")
     .update(memberUpdate)
