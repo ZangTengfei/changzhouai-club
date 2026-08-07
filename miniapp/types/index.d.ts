@@ -106,6 +106,39 @@ interface MiniappSharedProfile {
   identityLabel: string;
 }
 
+interface MiniappMemberPoolItem {
+  id: string;
+  shareHandle: string;
+  displayName: string;
+  avatarUrl: string | null;
+  city: string;
+  roleLabel: string;
+  organization: string;
+  skills: string[];
+  capabilitySummary: string;
+  seekingSummary: string;
+  willingToShare: boolean;
+  willingToJoinProjects: boolean;
+  identityLabel: string;
+}
+
+interface MiniappMemberPoolResponse {
+  members: MiniappMemberPoolItem[];
+  filters: {
+    cities: string[];
+    industries: string[];
+    skills: string[];
+  };
+  pagination: {
+    page: number;
+    pageSize: number;
+    total: number;
+    hasMore: boolean;
+  };
+  authenticated: boolean;
+  guestPreview: boolean;
+}
+
 interface MiniappProfileUpdate {
   displayName: string;
   wechat: string;

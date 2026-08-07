@@ -290,6 +290,44 @@ try {
   assert.deepEqual(legacyLongSkillPut.body?.profile?.skills, [legacyLongSkill]);
   pass("legacy_long_skill_preserved");
 
+  const guestMemberPool = await request(
+    `/api/miniapp/members?query=${encodeURIComponent("快捷编辑测试用户")}`,
+  );
+  assert.equal(guestMemberPool.response.status, 200);
+  assert.equal(guestMemberPool.body?.authenticated, false);
+  assert.equal(guestMemberPool.body?.guestPreview, true);
+  assert.ok((guestMemberPool.body?.members?.length ?? 0) <= 6);
+  assert.equal(
+    guestMemberPool.body?.members?.some((member) => member.id === userId),
+    true,
+  );
+  pass("member_pool_guest_preview_loaded");
+
+  const authenticatedMemberPool = await request(
+    `/api/miniapp/members?query=${encodeURIComponent("快捷编辑测试用户")}`,
+    { headers: authHeaders },
+  );
+  assert.equal(authenticatedMemberPool.response.status, 200);
+  assert.equal(authenticatedMemberPool.body?.authenticated, true);
+  const verifiedMember = authenticatedMemberPool.body?.members?.find(
+    (member) => member.id === userId,
+  );
+  assert.ok(verifiedMember);
+  assert.equal("wechat" in verifiedMember, false);
+  assert.equal("phone" in verifiedMember, false);
+  assert.equal("email" in verifiedMember, false);
+  assert.equal("bio" in verifiedMember, false);
+  assert.equal("joinedAt" in verifiedMember, false);
+  pass("member_pool_authenticated_search_excludes_private_fields");
+
+  const invalidMemberFilter = await request(
+    "/api/miniapp/members?intent=private-contact",
+    { headers: authHeaders },
+  );
+  assert.equal(invalidMemberFilter.response.status, 400);
+  assert.equal(invalidMemberFilter.body?.error, "invalid_member_filter");
+  pass("member_pool_invalid_filter_rejected");
+
   const sharedProfile = await request(
     `/api/miniapp/members/${encodeURIComponent(userId)}`,
   );
@@ -309,6 +347,17 @@ try {
   );
   assert.equal(hiddenProfile.response.status, 404);
   pass("private_member_profile_hidden");
+
+  const hiddenMemberPool = await request(
+    `/api/miniapp/members?query=${encodeURIComponent("快捷编辑测试用户")}`,
+    { headers: authHeaders },
+  );
+  assert.equal(hiddenMemberPool.response.status, 200);
+  assert.equal(
+    hiddenMemberPool.body?.members?.some((member) => member.id === userId),
+    false,
+  );
+  pass("private_member_excluded_from_member_pool");
 
   const { error: restoreProfileError } = await supabase
     .from("members")

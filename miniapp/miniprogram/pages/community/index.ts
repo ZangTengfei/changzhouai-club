@@ -9,11 +9,21 @@ import {
   submitCommunityBooking,
   submitCommunityFixedDeskRequest,
 } from "../../services/community";
+import { loadMemberPool as fetchMemberPool } from "../../services/members";
 import { isMiniappBasicProfileReady } from "../../utils/profile-state";
 
+type CommunitySection = "members" | "space";
 type ResourceMode = "desk" | "meeting_room";
 type ResourceViewMode = "map" | "list";
 type DeskUseMode = "temporary" | "fixed";
+
+type MemberPoolCard = MiniappMemberPoolItem & {
+  avatarInitial: string;
+  headline: string;
+  primarySummary: string;
+  primarySummaryLabel: string;
+  visibleSkills: string[];
+};
 
 type CommunityResourceItem = MiniappCommunitySpaceResource & {
   availabilityClass: string;
@@ -38,6 +48,8 @@ type DateOption = {
 
 const durationOptions = [1, 2, 4, 8];
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+const memberIntentOptions = ["全部方向", "愿意分享", "可参与项目", "正在寻找"];
+const memberIntentValues = ["", "share", "projects", "seeking"] as const;
 const communitySummary = "这里有工位、会议室，也有一群正在做事的人。";
 const fallbackSpacePhotos: MiniappCommunitySpacePhoto[] = [
   {
@@ -57,7 +69,25 @@ const fallbackSpacePhotos: MiniappCommunitySpacePhoto[] = [
 ];
 let hasLoaded = false;
 let requestVersion = 0;
+let memberPoolRequestVersion = 0;
+let hasTrackedMemberPoolView = false;
+let communityTouchStart: { x: number; y: number } | null = null;
+let communitySectionTransitionTimer: ReturnType<typeof setTimeout> | null = null;
 const communityShareImageUrl = "/assets/share/home-share-v7.jpg";
+
+function mapMemberPoolCard(member: MiniappMemberPoolItem): MemberPoolCard {
+  const headline = [member.roleLabel, member.organization, member.city]
+    .filter(Boolean)
+    .join(" · ");
+  return {
+    ...member,
+    avatarInitial: member.displayName.slice(0, 1) || "成",
+    headline,
+    primarySummary: member.capabilitySummary || member.seekingSummary,
+    primarySummaryLabel: member.capabilitySummary ? "可以提供" : "正在寻找",
+    visibleSkills: member.skills.slice(0, 3),
+  };
+}
 
 function getDeskNumber(code: string, prefix: "D" | "F" | "S", maximum: number) {
   const match = code.match(new RegExp(`^${prefix}(\\d{2})$`));
@@ -416,6 +446,34 @@ function getFixedDeskErrorMessage(error: unknown) {
 
 Page({
   data: {
+    communitySection: "space" as CommunitySection,
+    communitySectionTransition: "",
+    memberSearchDraft: "",
+    memberSearchQuery: "",
+    memberCards: [] as MemberPoolCard[],
+    memberFilters: {
+      cities: ["全部辖区"],
+      industries: ["全部行业"],
+      skills: ["全部技能"],
+    },
+    memberIntentOptions,
+    memberCityIndex: 0,
+    memberIndustryIndex: 0,
+    memberSkillIndex: 0,
+    memberIntentIndex: 0,
+    memberCity: "",
+    memberIndustry: "",
+    memberSkill: "",
+    memberIntent: "" as (typeof memberIntentValues)[number],
+    memberPoolTotal: 0,
+    memberPoolPage: 1,
+    memberPoolHasMore: false,
+    memberPoolAuthenticated: false,
+    memberPoolGuestPreview: true,
+    memberPoolLoading: true,
+    memberPoolLoadingMore: false,
+    memberPoolLoadFailed: false,
+    memberPoolLoaded: false,
     community: {
       title: "AI Club OPC 共创社区",
       summary: communitySummary,
@@ -487,7 +545,7 @@ Page({
       resources,
       visibleResources: resources.filter((item) => item.resourceType === "desk"),
     });
-    void this.loadPage();
+    void this.loadPage(true);
     void ensureSession()
       .then((user) => {
         getApp<IAppOption>().globalData.currentUser = user;
@@ -498,12 +556,20 @@ Page({
           avatarInitial: user.displayName.slice(0, 1) || "我",
         });
         trackEvent("community_view", "/pages/community/index");
+        return this.loadPage(false);
       })
       .catch(() => undefined);
   },
 
+  onUnload() {
+    if (communitySectionTransitionTimer) {
+      clearTimeout(communitySectionTransitionTimer);
+      communitySectionTransitionTimer = null;
+    }
+    communityTouchStart = null;
+  },
+
   onShow() {
-    if (!hasLoaded) return;
     const isLoggedIn = Boolean(getStoredSessionToken());
     this.setData({ isLoggedIn });
     if (isLoggedIn) {
@@ -515,14 +581,251 @@ Page({
             avatarUrl: user.avatarUrl ?? "",
             avatarInitial: user.displayName.slice(0, 1) || "我",
           });
-          return this.loadPage(false);
+          if (this.data.communitySection === "members") {
+            if (!hasTrackedMemberPoolView) {
+              hasTrackedMemberPoolView = true;
+              trackEvent("member_pool_view", "/pages/community/index");
+            }
+            return this.loadMemberPoolPage(false);
+          }
+          return hasLoaded ? this.loadPage(false) : this.loadPage();
         })
-        .catch(() => this.loadPage(false));
+        .catch(() => undefined);
+      return;
+    }
+
+    if (this.data.memberPoolAuthenticated) {
+      void this.loadMemberPoolPage(false);
     }
   },
 
   onPullDownRefresh() {
-    void this.loadPage(false).finally(() => wx.stopPullDownRefresh());
+    const refresh = this.data.communitySection === "members"
+      ? this.loadMemberPoolPage(false)
+      : this.loadPage(false);
+    void refresh.finally(() => wx.stopPullDownRefresh());
+  },
+
+  switchCommunitySection(event: WechatMiniprogram.TouchEvent) {
+    const section = String(event.currentTarget.dataset.section) as CommunitySection;
+    if (!(["members", "space"] as CommunitySection[]).includes(section)) return;
+    this.activateCommunitySection(section);
+  },
+
+  activateCommunitySection(section: CommunitySection) {
+    if (section === this.data.communitySection) return;
+    const currentIndex = this.data.communitySection === "space" ? 0 : 1;
+    const nextIndex = section === "space" ? 0 : 1;
+    const transition = nextIndex > currentIndex
+      ? "community-panel-from-right"
+      : "community-panel-from-left";
+
+    if (communitySectionTransitionTimer) {
+      clearTimeout(communitySectionTransitionTimer);
+    }
+    this.setData({
+      communitySection: section,
+      communitySectionTransition: transition,
+    });
+    communitySectionTransitionTimer = setTimeout(() => {
+      this.setData({ communitySectionTransition: "" });
+      communitySectionTransitionTimer = null;
+    }, 240);
+
+    if (section === "members") {
+      if (!this.data.memberPoolLoaded) void this.loadMemberPoolPage();
+      if (this.data.isLoggedIn && !hasTrackedMemberPoolView) {
+        hasTrackedMemberPoolView = true;
+        trackEvent("member_pool_view", "/pages/community/index");
+      }
+      return;
+    }
+
+    if (!hasLoaded) void this.loadPage();
+  },
+
+  handleCommunityTouchStart(event: WechatMiniprogram.TouchEvent) {
+    const touch = event.touches[0];
+    communityTouchStart = touch
+      ? { x: touch.clientX, y: touch.clientY }
+      : null;
+  },
+
+  handleCommunityTouchEnd(event: WechatMiniprogram.TouchEvent) {
+    const start = communityTouchStart;
+    const touch = event.changedTouches[0];
+    communityTouchStart = null;
+    if (!start || !touch) return;
+
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    if (Math.abs(deltaX) < 70 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.25) {
+      return;
+    }
+
+    if (deltaX < 0 && this.data.communitySection === "space") {
+      this.activateCommunitySection("members");
+      return;
+    }
+    if (deltaX > 0 && this.data.communitySection === "members") {
+      this.activateCommunitySection("space");
+    }
+  },
+
+  blockCommunitySwipe() {
+    communityTouchStart = null;
+  },
+
+  async loadMemberPoolPage(showLoading = true, append = false) {
+    const currentRequest = ++memberPoolRequestVersion;
+    const requestedPage = append ? this.data.memberPoolPage + 1 : 1;
+    if (append) {
+      this.setData({ memberPoolLoadingMore: true });
+    } else if (showLoading) {
+      this.setData({ memberPoolLoading: true, memberPoolLoadFailed: false });
+    }
+
+    try {
+      const response = await fetchMemberPool({
+        query: this.data.memberSearchQuery,
+        city: this.data.memberCity,
+        industry: this.data.memberIndustry,
+        skill: this.data.memberSkill,
+        intent: this.data.memberIntent,
+        page: requestedPage,
+      });
+      if (currentRequest !== memberPoolRequestVersion) return;
+
+      const memberFilters = {
+        cities: ["全部辖区", ...response.filters.cities],
+        industries: ["全部行业", ...response.filters.industries],
+        skills: ["全部技能", ...response.filters.skills],
+      };
+      const newCards = response.members.map(mapMemberPoolCard);
+      this.setData({
+        memberCards: append ? [...this.data.memberCards, ...newCards] : newCards,
+        memberFilters,
+        memberCityIndex: Math.max(0, memberFilters.cities.indexOf(this.data.memberCity || "全部辖区")),
+        memberIndustryIndex: Math.max(0, memberFilters.industries.indexOf(this.data.memberIndustry || "全部行业")),
+        memberSkillIndex: Math.max(0, memberFilters.skills.indexOf(this.data.memberSkill || "全部技能")),
+        memberPoolTotal: response.pagination.total,
+        memberPoolPage: response.pagination.page,
+        memberPoolHasMore: response.pagination.hasMore,
+        memberPoolAuthenticated: response.authenticated,
+        memberPoolGuestPreview: response.guestPreview,
+        memberPoolLoading: false,
+        memberPoolLoadingMore: false,
+        memberPoolLoadFailed: false,
+        memberPoolLoaded: true,
+      });
+    } catch {
+      if (currentRequest !== memberPoolRequestVersion) return;
+      this.setData({
+        memberPoolLoading: false,
+        memberPoolLoadingMore: false,
+        memberPoolLoadFailed: true,
+        memberPoolLoaded: true,
+      });
+    }
+  },
+
+  handleMemberSearchInput(event: WechatMiniprogram.Input) {
+    this.setData({ memberSearchDraft: event.detail.value });
+  },
+
+  submitMemberSearch() {
+    const memberSearchQuery = this.data.memberSearchDraft.trim();
+    this.setData({ memberSearchQuery });
+    if (this.data.isLoggedIn) {
+      trackEvent("member_pool_search", "/pages/community/index", {
+        queryLength: memberSearchQuery.length,
+      });
+    }
+    void this.loadMemberPoolPage();
+  },
+
+  clearMemberSearch() {
+    this.setData({ memberSearchDraft: "", memberSearchQuery: "" });
+    void this.loadMemberPoolPage();
+  },
+
+  changeMemberFilter(
+    event: WechatMiniprogram.CustomEvent<{ value: string }>,
+  ) {
+    const field = String(event.currentTarget.dataset.field);
+    const index = Number(event.detail.value);
+    const config = {
+      city: {
+        options: this.data.memberFilters.cities,
+        indexKey: "memberCityIndex",
+        valueKey: "memberCity",
+      },
+      industry: {
+        options: this.data.memberFilters.industries,
+        indexKey: "memberIndustryIndex",
+        valueKey: "memberIndustry",
+      },
+      skill: {
+        options: this.data.memberFilters.skills,
+        indexKey: "memberSkillIndex",
+        valueKey: "memberSkill",
+      },
+      intent: {
+        options: memberIntentOptions,
+        indexKey: "memberIntentIndex",
+        valueKey: "memberIntent",
+      },
+    }[field];
+    if (!config || !Number.isInteger(index) || index < 0 || index >= config.options.length) {
+      return;
+    }
+
+    const value = field === "intent"
+      ? memberIntentValues[index] ?? ""
+      : index === 0
+        ? ""
+        : config.options[index];
+    this.setData({
+      [config.indexKey]: index,
+      [config.valueKey]: value,
+    } as WechatMiniprogram.IAnyObject);
+    if (this.data.isLoggedIn) {
+      trackEvent("member_pool_filter", "/pages/community/index", {
+        filter: field,
+        active: Boolean(value),
+      });
+    }
+    void this.loadMemberPoolPage();
+  },
+
+  loadMoreMembers() {
+    if (!this.data.memberPoolHasMore || this.data.memberPoolLoadingMore) return;
+    void this.loadMemberPoolPage(false, true);
+  },
+
+  openMemberProfile(event: WechatMiniprogram.TouchEvent) {
+    const handle = String(event.currentTarget.dataset.handle ?? "").trim();
+    if (!handle) return;
+    if (this.data.isLoggedIn) {
+      trackEvent("member_profile_view", "/pages/community/index", {
+        source: "member_pool",
+      });
+    }
+    void wx.navigateTo({
+      url: `/pages/profile/shared/index?handle=${encodeURIComponent(handle)}`,
+    });
+  },
+
+  openMemberPoolLogin() {
+    void wx.navigateTo({ url: "/pages/login/index?intent=community" });
+  },
+
+  completeMemberProfile() {
+    if (!this.data.isLoggedIn) {
+      this.openMemberPoolLogin();
+      return;
+    }
+    void wx.navigateTo({ url: "/pages/profile/edit/index" });
   },
 
   getWindow() {
@@ -971,6 +1274,13 @@ Page({
     trackEvent("share_event", "/pages/community/index", {
       channel: "message",
     });
+    if (this.data.communitySection === "members") {
+      return {
+        title: "在常州 AI Club，找到一起做事的人",
+        path: "/pages/community/index",
+        imageUrl: communityShareImageUrl,
+      };
+    }
     return {
       title: "常州 AI Club 共创社区｜工位、会议室和 AI 共创空间",
       path: "/pages/community/index",
@@ -982,6 +1292,12 @@ Page({
     trackEvent("share_event", "/pages/community/index", {
       channel: "timeline",
     });
+    if (this.data.communitySection === "members") {
+      return {
+        title: "在常州 AI Club，找到一起做事的人",
+        imageUrl: communityShareImageUrl,
+      };
+    }
     return {
       title: "常州 AI Club 共创社区｜工位、会议室和 AI 共创空间",
       imageUrl: communityShareImageUrl,
