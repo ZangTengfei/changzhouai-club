@@ -187,6 +187,33 @@
   flex: none;
 }
 
+.member-sort-picker {
+  flex: none;
+}
+
+.member-sort-trigger {
+  display: flex;
+  min-height: 56rpx;
+  box-sizing: border-box;
+  align-items: center;
+  gap: 5rpx;
+  padding: 0 15rpx;
+  border: 2rpx solid #dfe8e3;
+  border-radius: 28rpx;
+  background: #ffffff;
+  color: #52635c;
+  font-size: 18rpx;
+  font-weight: 700;
+}
+
+.member-sort-arrow {
+  width: 18rpx;
+  height: 18rpx;
+  flex: 0 0 18rpx;
+  opacity: 0.72;
+  transform: rotate(90deg);
+}
+
 .member-search-toggle {
   border: 2rpx solid #dfe8e3;
   background: #ffffff;
@@ -316,13 +343,6 @@
   font-weight: 720;
 }
 
-.member-card-recommended {
-  flex: none;
-  color: #b0781b;
-  font-size: 16rpx;
-  font-weight: 720;
-}
-
 .member-card-headline {
   overflow: hidden;
   color: var(--color-subtle);
@@ -401,6 +421,11 @@
 .member-card-signals text {
   background: var(--color-blue-soft);
   color: #376a9f;
+}
+
+.member-card-signals .member-card-registration {
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
 }
 
 .member-load-more {

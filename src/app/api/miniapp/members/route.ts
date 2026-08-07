@@ -12,9 +12,9 @@ const MEMBER_PAGE_SIZE = 20;
 const GUEST_MEMBER_LIMIT = 6;
 const ACTIVE_MEMBER_STATUSES = new Set(["active", "organizer", "admin"]);
 const MEMBER_INTENTS = new Set(["share", "projects", "seeking"]);
-const MEMBER_SORTS = new Set(["recommended", "newest", "active"]);
+const MEMBER_SORTS = new Set(["identity", "recommended", "newest", "active"]);
 
-type MemberSort = "recommended" | "newest" | "active";
+type MemberSort = "identity" | "recommended" | "newest" | "active";
 
 type MemberRow = {
   id: string;
@@ -22,8 +22,6 @@ type MemberRow = {
   willing_to_share: boolean;
   willing_to_join_projects: boolean;
   is_co_builder: boolean;
-  directory_priority: number;
-  directory_featured_until: string | null;
   joined_at: string;
 };
 
@@ -48,7 +46,7 @@ type MemberBadgeRow = {
   awarded_at: string;
 };
 
-type MemberAttendanceRow = {
+type MemberRegistrationRow = {
   user_id: string;
 };
 
@@ -70,9 +68,8 @@ type MemberPoolItem = {
   identityLabel: string;
   communityTags: string[];
   isCoBuilder: boolean;
-  directoryPriority: number;
   joinedAt: string;
-  attendanceCount: number;
+  registrationCount: number;
 };
 
 function getIdentityLabel(status: string, isCoBuilder: boolean) {
@@ -120,22 +117,25 @@ function compareJoinedAt(a: MemberPoolItem, b: MemberPoolItem) {
   return a.displayName.localeCompare(b.displayName, "zh-CN");
 }
 
-function compareMembers(a: MemberPoolItem, b: MemberPoolItem, sort: MemberSort) {
-  if (sort === "newest") return compareJoinedAt(a, b);
-  if (sort === "active") {
-    const attendanceDiff = b.attendanceCount - a.attendanceCount;
-    return attendanceDiff !== 0 ? attendanceDiff : compareJoinedAt(a, b);
-  }
-
-  const priorityDiff = b.directoryPriority - a.directoryPriority;
-  if (priorityDiff !== 0) return priorityDiff;
-
+function compareIdentity(a: MemberPoolItem, b: MemberPoolItem) {
   const identityWeight = (member: MemberPoolItem) => {
     if (member.identityLabel === "社区发起人") return 0;
     if (member.isCoBuilder) return 1;
     return 2;
   };
-  const identityDiff = identityWeight(a) - identityWeight(b);
+  return identityWeight(a) - identityWeight(b);
+}
+
+function compareMembers(a: MemberPoolItem, b: MemberPoolItem, sort: MemberSort) {
+  if (sort === "newest") return compareJoinedAt(a, b);
+  if (sort === "active") {
+    const registrationDiff = b.registrationCount - a.registrationCount;
+    if (registrationDiff !== 0) return registrationDiff;
+    const identityDiff = compareIdentity(a, b);
+    return identityDiff !== 0 ? identityDiff : compareJoinedAt(a, b);
+  }
+
+  const identityDiff = compareIdentity(a, b);
   if (identityDiff !== 0) return identityDiff;
   return compareJoinedAt(a, b);
 }
@@ -162,7 +162,7 @@ function toMemberPoolResponse(member: MemberPoolItem) {
     willingToJoinProjects: member.willingToJoinProjects,
     identityLabel: member.identityLabel,
     communityTags: member.communityTags.slice(0, 2),
-    isRecommended: member.directoryPriority > 0,
+    registrationCount: member.registrationCount,
   };
 }
 
@@ -180,7 +180,7 @@ export async function GET(request: Request) {
   const industry = readSearchParam(url.searchParams, "industry", 40);
   const skill = readSearchParam(url.searchParams, "skill", 100);
   const intent = readSearchParam(url.searchParams, "intent", 20);
-  const sort = readSearchParam(url.searchParams, "sort", 20) || "recommended";
+  const sort = readSearchParam(url.searchParams, "sort", 20) || "identity";
   const requestedPage = authenticated ? readPage(url.searchParams) : 1;
 
   if (intent && !MEMBER_INTENTS.has(intent)) {
@@ -195,7 +195,7 @@ export async function GET(request: Request) {
     supabase
       .from("members")
       .select(
-        "id, status, willing_to_share, willing_to_join_projects, is_co_builder, directory_priority, directory_featured_until, joined_at",
+        "id, status, willing_to_share, willing_to_join_projects, is_co_builder, joined_at",
       )
       .eq("is_publicly_visible", true)
       .in("status", ["active", "organizer", "admin"]),
@@ -233,9 +233,7 @@ export async function GET(request: Request) {
     });
   }
 
-  const activeSince = new Date();
-  activeSince.setUTCFullYear(activeSince.getUTCFullYear() - 1);
-  const [profileResult, badgeResult, attendanceResult] = await Promise.all([
+  const [profileResult, badgeResult, registrationResult] = await Promise.all([
     supabase
       .from("profiles")
       .select(
@@ -248,29 +246,28 @@ export async function GET(request: Request) {
       .in("user_id", memberIds)
       .order("awarded_at", { ascending: false }),
     supabase
-      .from("event_attendance")
+      .from("event_registrations")
       .select("user_id")
       .in("user_id", memberIds)
-      .in("status", ["attended", "late", "speaker"])
-      .not("checked_in_at", "is", null)
-      .gte("checked_in_at", activeSince.toISOString()),
+      .in("status", ["pending", "registered", "waitlisted"]),
   ]);
   const { data: profileData, error: profileError } = profileResult;
   const { data: badgeData, error: badgeError } = badgeResult;
-  const { data: attendanceData, error: attendanceError } = attendanceResult;
+  const { data: registrationData, error: registrationError } =
+    registrationResult;
 
-  if (profileError || badgeError || attendanceError) {
+  if (profileError || badgeError || registrationError) {
     console.error("Failed to load mini-program member profiles.", {
       profileCode: profileError?.code,
       badgeCode: badgeError?.code,
-      attendanceCode: attendanceError?.code,
+      registrationCode: registrationError?.code,
     });
     return miniappJson({ error: "member_pool_load_failed" }, 500);
   }
 
   const membersById = new Map(memberRows.map((member) => [member.id, member]));
   const communityTagsByMemberId = new Map<string, string[]>();
-  const attendanceCountByMemberId = new Map<string, number>();
+  const registrationCountByMemberId = new Map<string, number>();
   ((badgeData ?? []) as MemberBadgeRow[]).forEach((badge) => {
     const label = badge.label.trim();
     if (!label) return;
@@ -278,13 +275,14 @@ export async function GET(request: Request) {
     if (!tags.includes(label)) tags.push(label);
     communityTagsByMemberId.set(badge.user_id, tags);
   });
-  ((attendanceData ?? []) as MemberAttendanceRow[]).forEach((attendance) => {
-    attendanceCountByMemberId.set(
-      attendance.user_id,
-      (attendanceCountByMemberId.get(attendance.user_id) ?? 0) + 1,
-    );
-  });
-  const now = Date.now();
+  ((registrationData ?? []) as MemberRegistrationRow[]).forEach(
+    (registration) => {
+      registrationCountByMemberId.set(
+        registration.user_id,
+        (registrationCountByMemberId.get(registration.user_id) ?? 0) + 1,
+      );
+    },
+  );
   const eligibleMembers = ((profileData ?? []) as ProfileRow[])
     .flatMap((profile): MemberPoolItem[] => {
       const member = membersById.get(profile.id);
@@ -323,14 +321,8 @@ export async function GET(request: Request) {
           .filter((label) => label !== identityLabel)
           .slice(0, 2),
         isCoBuilder,
-        directoryPriority:
-          member.directory_priority > 0 &&
-          (!member.directory_featured_until ||
-            new Date(member.directory_featured_until).getTime() > now)
-            ? member.directory_priority
-            : 0,
         joinedAt: member.joined_at,
-        attendanceCount: attendanceCountByMemberId.get(profile.id) ?? 0,
+        registrationCount: registrationCountByMemberId.get(profile.id) ?? 0,
       }];
     })
     .sort((a, b) => compareMembers(a, b, memberSort));

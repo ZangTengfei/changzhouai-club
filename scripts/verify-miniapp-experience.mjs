@@ -324,12 +324,13 @@ try {
   assert.equal("bio" in verifiedMember, false);
   assert.equal("joinedAt" in verifiedMember, false);
   assert.equal("joinedLabel" in verifiedMember, false);
+  assert.equal(verifiedMember.registrationCount, 0);
   assert.equal("attendanceCount" in verifiedMember, false);
-  assert.equal(typeof verifiedMember.isRecommended, "boolean");
+  assert.equal("isRecommended" in verifiedMember, false);
   assert.equal("directoryPriority" in verifiedMember, false);
   pass("member_pool_authenticated_search_excludes_private_fields");
 
-  for (const sort of ["recommended", "newest", "active"]) {
+  for (const sort of ["identity", "newest", "active"]) {
     const sortedMemberPool = await request(
       `/api/miniapp/members?sort=${sort}`,
       { headers: authHeaders },
@@ -858,6 +859,19 @@ try {
   assert.equal(registrationPut.response.status, 200);
   assert.equal(registrationPut.body?.registration?.status, "pending");
   pass("event_registration_pending_review");
+
+  const memberPoolWithPendingRegistration = await request(
+    `/api/miniapp/members?query=${encodeURIComponent("体验版测试用户")}`,
+    { headers: authHeaders },
+  );
+  assert.equal(memberPoolWithPendingRegistration.response.status, 200);
+  assert.equal(
+    memberPoolWithPendingRegistration.body?.members?.find(
+      (member) => member.id === userId,
+    )?.registrationCount,
+    1,
+  );
+  pass("member_pool_registration_count_tracks_non_cancelled");
 
   const pendingGroupQr = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/group-qr`,

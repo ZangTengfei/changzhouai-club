@@ -239,39 +239,6 @@ export function AdminMemberDetailPageClient({
     });
   }
 
-  function handleDirectorySubmit(formData: FormData) {
-    startTransition(async () => {
-      try {
-        const response = await fetch(
-          `/api/admin/members/${memberId}/directory`,
-          {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              priority: Number(formData.get("directory_priority")),
-              featuredUntil: String(
-                formData.get("directory_featured_until") ?? "",
-              ),
-              reason: String(formData.get("directory_feature_reason") ?? ""),
-            }),
-          },
-        );
-        const result = await readApiResult(response);
-        toast.success(
-          getAdminSavedMessage(result?.saved ?? "member_directory") ??
-            "成员页推荐设置已更新。",
-        );
-        reload();
-      } catch (requestError) {
-        toast.error(
-          requestError instanceof Error
-            ? requestError.message
-            : "成员页推荐设置保存失败。",
-        );
-      }
-    });
-  }
-
   function handleRolesSubmit(formData: FormData) {
     startTransition(async () => {
       try {
@@ -392,11 +359,6 @@ export function AdminMemberDetailPageClient({
             <AdminStatusBadge tone="neutral">
               {member.isPubliclyVisible ? "公开展示中" : "未公开展示"}
             </AdminStatusBadge>
-            {member.directoryPriority > 0 ? (
-              <AdminStatusBadge tone="scheduled">
-                成员页推荐 · {member.directoryPriority}
-              </AdminStatusBadge>
-            ) : null}
           </AdminPanelBody>
         </AdminPanel>
       ) : null}
@@ -589,65 +551,6 @@ export function AdminMemberDetailPageClient({
                           </AdminField>
                           <Button type="submit" disabled={isPending}>
                             {isPending ? "认证中..." : "保存等级认证"}
-                          </Button>
-                        </div>
-                      </form>
-                    </AdminPanelBody>
-                  </AdminPanel>
-
-                  <AdminPanel>
-                    <AdminPanelHeader
-                      eyebrow="Member Directory"
-                      title="成员页推荐"
-                    />
-                    <AdminPanelBody className="space-y-4">
-                      <AdminNotice>
-                        只影响“社区推荐”排序，不影响“最近加入”和“活跃参与”。建议仅设置少量成员，并填写截止日期避免推荐位长期固化。
-                      </AdminNotice>
-                      <form
-                        key={`${member.id}-${member.directoryPriority}-${member.directoryFeaturedUntil ?? "none"}`}
-                        className="grid gap-4 md:grid-cols-2"
-                        onSubmit={(formEvent) => {
-                          formEvent.preventDefault();
-                          handleDirectorySubmit(
-                            new FormData(formEvent.currentTarget),
-                          );
-                        }}
-                      >
-                        <AdminField label="推荐优先级">
-                          <NativeSelect
-                            name="directory_priority"
-                            defaultValue={String(member.directoryPriority)}
-                          >
-                            <option value="0">不推荐</option>
-                            <option value="10">推荐</option>
-                            <option value="20">重点推荐</option>
-                            <option value="30">优先推荐</option>
-                          </NativeSelect>
-                        </AdminField>
-                        <AdminField label="推荐截止日期">
-                          <Input
-                            type="date"
-                            name="directory_featured_until"
-                            defaultValue={
-                              member.directoryFeaturedUntil?.slice(0, 10) ?? ""
-                            }
-                          />
-                        </AdminField>
-                        <AdminField
-                          label="推荐原因（仅后台可见）"
-                          className="md:col-span-2"
-                        >
-                          <Input
-                            name="directory_feature_reason"
-                            maxLength={100}
-                            defaultValue={member.directoryFeatureReason ?? ""}
-                            placeholder="例如：本期分享嘉宾、项目合作方"
-                          />
-                        </AdminField>
-                        <div className="md:col-span-2 md:justify-self-end">
-                          <Button type="submit" disabled={isPending}>
-                            {isPending ? "保存中..." : "保存成员页推荐"}
                           </Button>
                         </div>
                       </form>

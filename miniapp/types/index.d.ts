@@ -121,7 +121,7 @@ interface MiniappMemberPoolItem {
   willingToJoinProjects: boolean;
   identityLabel: string;
   communityTags: string[];
-  isRecommended: boolean;
+  registrationCount: number;
 }
 
 interface MiniappMemberPoolResponse {
@@ -143,7 +143,7 @@ interface MiniappMemberPoolResponse {
   };
   authenticated: boolean;
   guestPreview: boolean;
-  sort: "recommended" | "newest" | "active";
+  sort: "identity" | "newest" | "active";
 }
 
 interface MiniappProfileUpdate {
