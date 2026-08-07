@@ -197,6 +197,25 @@
   background: var(--color-green-soft);
 }
 
+.member-visibility-note {
+  display: flex;
+  align-items: center;
+  margin: -2rpx 2rpx 16rpx;
+  color: var(--color-green-dark);
+  font-size: 19rpx;
+  line-height: 1.5;
+}
+
+.member-visibility-note::before {
+  width: 9rpx;
+  height: 9rpx;
+  flex: 0 0 9rpx;
+  margin-right: 10rpx;
+  border-radius: 50%;
+  background: var(--color-green);
+  content: "";
+}
+
 .member-pool-state,
 .member-pool-empty {
   display: flex;

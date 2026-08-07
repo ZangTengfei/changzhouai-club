@@ -191,17 +191,27 @@ export async function GET(request: Request) {
   }
   const memberSort = sort as MemberSort;
 
-  const { data: memberData, error: memberError } = await supabase
-    .from("members")
-    .select(
-      "id, status, willing_to_share, willing_to_join_projects, is_co_builder, directory_priority, directory_featured_until, joined_at",
-    )
-    .eq("is_publicly_visible", true)
-    .in("status", ["active", "organizer", "admin"]);
+  const [memberResult, communityTotalResult] = await Promise.all([
+    supabase
+      .from("members")
+      .select(
+        "id, status, willing_to_share, willing_to_join_projects, is_co_builder, directory_priority, directory_featured_until, joined_at",
+      )
+      .eq("is_publicly_visible", true)
+      .in("status", ["active", "organizer", "admin"]),
+    supabase
+      .from("members")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["active", "organizer", "admin"]),
+  ]);
+  const { data: memberData, error: memberError } = memberResult;
+  const { count: communityTotal, error: communityTotalError } =
+    communityTotalResult;
 
-  if (memberError) {
+  if (memberError || communityTotalError) {
     console.error("Failed to load mini-program member pool.", {
-      code: memberError.code,
+      code: memberError?.code,
+      countCode: communityTotalError?.code,
     });
     return miniappJson({ error: "member_pool_load_failed" }, 500);
   }
@@ -215,6 +225,7 @@ export async function GET(request: Request) {
     return miniappJson({
       members: [],
       filters: { cities: [], industries: [], skills: [] },
+      summary: { communityTotal: communityTotal ?? 0, publicTotal: 0 },
       pagination: { page: 1, pageSize: authenticated ? MEMBER_PAGE_SIZE : GUEST_MEMBER_LIMIT, total: 0, hasMore: false },
       authenticated,
       guestPreview: !authenticated,
@@ -350,6 +361,10 @@ export async function GET(request: Request) {
       .slice(start, start + pageSize)
       .map(toMemberPoolResponse),
     filters,
+    summary: {
+      communityTotal: communityTotal ?? eligibleMembers.length,
+      publicTotal: eligibleMembers.length,
+    },
     pagination: {
       page,
       pageSize,

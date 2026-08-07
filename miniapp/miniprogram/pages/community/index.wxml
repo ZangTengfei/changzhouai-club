@@ -204,7 +204,7 @@
     </view>
 
     <view class="member-pool-heading">
-      <view class="member-pool-heading-copy"><text>公开成员</text><text>{{memberPoolGuestPreview ? '登录后查看更多社区成员' : '按公开资料和参与方向发现成员'}}</text></view>
+      <view class="member-pool-heading-copy"><text>公开成员</text><text wx:if="{{memberCommunityTotal}}">社区已有 {{memberCommunityTotal}} 位成员 · {{memberPublicTotal}} 位公开展示</text><text wx:else>{{memberPoolGuestPreview ? '登录后查看更多社区成员' : '按公开资料和参与方向发现成员'}}</text></view>
       <view class="member-pool-heading-actions">
         <text wx:if="{{memberPoolTotal}}">{{memberPoolTotal}} 位</text>
         <button class="icon-button member-search-toggle {{memberSearchExpanded ? 'member-search-toggle-active' : ''}}" bindtap="toggleMemberSearch" aria-label="{{memberSearchExpanded ? '关闭成员搜索' : '搜索社区成员'}}">
@@ -212,6 +212,8 @@
         </button>
       </view>
     </view>
+
+    <view wx:if="{{memberCommunityTotal > memberPublicTotal}}" class="member-visibility-note"><text>公开社区名片，让更多合作机会找到你</text></view>
 
     <view wx:if="{{memberSearchExpanded}}" class="member-search-panel">
       <view class="member-search-row">

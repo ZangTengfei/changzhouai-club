@@ -126,6 +126,10 @@ interface MiniappMemberPoolItem {
 
 interface MiniappMemberPoolResponse {
   members: MiniappMemberPoolItem[];
+  summary: {
+    communityTotal: number;
+    publicTotal: number;
+  };
   filters: {
     cities: string[];
     industries: string[];

@@ -309,6 +309,11 @@ try {
   );
   assert.equal(authenticatedMemberPool.response.status, 200);
   assert.equal(authenticatedMemberPool.body?.authenticated, true);
+  assert.ok(authenticatedMemberPool.body?.summary?.communityTotal >= 1);
+  assert.ok(
+    authenticatedMemberPool.body?.summary?.communityTotal >=
+      authenticatedMemberPool.body?.summary?.publicTotal,
+  );
   const verifiedMember = authenticatedMemberPool.body?.members?.find(
     (member) => member.id === userId,
   );

@@ -451,6 +451,8 @@ Page({
     memberSearchExpanded: false,
     memberSearchFocused: false,
     memberCards: [] as MemberPoolCard[],
+    memberCommunityTotal: 0,
+    memberPublicTotal: 0,
     memberPoolTotal: 0,
     memberPoolPage: 1,
     memberPoolHasMore: false,
@@ -670,6 +672,8 @@ Page({
       this.setData(
         {
           memberCards: append ? [...this.data.memberCards, ...newCards] : newCards,
+          memberCommunityTotal: response.summary.communityTotal,
+          memberPublicTotal: response.summary.publicTotal,
           memberPoolTotal: response.pagination.total,
           memberPoolPage: response.pagination.page,
           memberPoolHasMore: response.pagination.hasMore,
