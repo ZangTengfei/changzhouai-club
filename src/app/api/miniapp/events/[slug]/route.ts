@@ -8,9 +8,14 @@ import { getEventParticipantSummaries } from "@/lib/event-participants";
 import { canPreviewMiniappDraftEvents } from "@/lib/miniapp-admin";
 import { loadOptionalMiniappSession } from "@/lib/miniapp-api";
 
+const EVENT_DETAIL_PARTICIPANT_PREVIEW_LIMIT = 9;
+
 async function withParticipants<T extends { id: string }>(event: T) {
   try {
-    const summaries = await getEventParticipantSummaries([event.id], 12);
+    const summaries = await getEventParticipantSummaries(
+      [event.id],
+      EVENT_DETAIL_PARTICIPANT_PREVIEW_LIMIT,
+    );
     const summary = summaries.get(event.id);
     return {
       ...event,
