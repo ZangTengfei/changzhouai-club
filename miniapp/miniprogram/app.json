@@ -6,6 +6,7 @@
     "pages/me/index",
     "pages/login/index",
     "pages/events/detail/index",
+    "pages/events/participants/index",
     "pages/event-consent/index",
     "pages/profile/index",
     "pages/profile/shared/index",

@@ -31,7 +31,11 @@
     <view wx:if="{{event.registrationCount}}" class="participant-section surface-card">
       <view class="participant-heading">
         <view><text class="participant-kicker">一起参加</text><text class="participant-title">报名情况</text></view>
-        <text class="participant-count">{{event.registrationCount}} 人已报名{{event.registrationMode === 'review' ? ' · ' + event.confirmedCount + ' 个席位已确认' : ''}}</text>
+        <view wx:if="{{event.confirmedCount}}" class="participant-heading-action" bindtap="openParticipantList" role="button" aria-label="查看全部 {{event.confirmedCount}} 位已确认报名成员">
+          <text class="participant-count">{{event.registrationCount}} 人已报名{{event.registrationMode === 'review' ? ' · ' + event.confirmedCount + ' 个席位已确认' : ''}}</text>
+          <text class="participant-view-all">查看全部 ›</text>
+        </view>
+        <text wx:else class="participant-count">{{event.registrationCount}} 人已报名{{event.registrationMode === 'review' ? ' · ' + event.confirmedCount + ' 个席位已确认' : ''}}</text>
       </view>
       <view wx:if="{{event.participants.length}}" class="participant-grid">
         <view wx:for="{{event.participants}}" wx:key="shareHandle" wx:for-item="participant" class="participant-item" data-handle="{{participant.shareHandle}}" bindtap="openParticipantProfile" role="button" aria-label="查看{{participant.displayName}}的成员资料">
@@ -39,7 +43,7 @@
           <view wx:else class="participant-avatar participant-avatar-empty">{{participant.avatarInitial}}</view>
           <text class="participant-name">{{participant.displayName}}</text>
         </view>
-        <view wx:if="{{event.confirmedCount > event.participants.length}}" class="participant-more">还有 {{event.confirmedCount - event.participants.length}} 人</view>
+        <view wx:if="{{event.confirmedCount > event.participants.length}}" class="participant-more" bindtap="openParticipantList" role="button" aria-label="查看其余 {{event.confirmedCount - event.participants.length}} 位报名成员"><text>还有 {{event.confirmedCount - event.participants.length}} 人</text><text class="participant-more-link">查看全部 ›</text></view>
       </view>
       <text wx:else class="participant-pending-copy">报名申请正在确认中，确认后会展示参与者头像。</text>
     </view>

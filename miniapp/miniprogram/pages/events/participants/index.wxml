@@ -1,0 +1,19 @@
+<view class="page-shell participants-page">
+  <view class="page-intro">
+    <text class="page-intro-title">报名成员</text>
+    <text wx:if="{{eventTitle}}" class="page-intro-copy">{{eventTitle}}</text>
+    <text wx:if="{{!loading && !loadFailed}}" class="participant-total">{{confirmedCount}} 位已确认成员</text>
+  </view>
+
+  <view wx:if="{{loading}}" class="empty-state loading-state"><view class="loading-spinner" aria-hidden="true"></view><text>正在加载报名成员</text></view>
+  <view wx:elif="{{loadFailed}}" class="empty-state" bindtap="loadPage" role="button">成员列表加载失败，轻触重试</view>
+  <view wx:elif="{{participants.length === 0}}" class="empty-state">暂时还没有已确认成员</view>
+  <view wx:else class="participant-list surface-card">
+    <view wx:for="{{participants}}" wx:key="shareHandle" wx:for-item="participant" class="participant-row" data-handle="{{participant.shareHandle}}" bindtap="openParticipantProfile" role="button" aria-label="查看{{participant.displayName}}的成员资料">
+      <image wx:if="{{participant.avatarUrl}}" class="participant-avatar" src="{{participant.avatarUrl}}" mode="aspectFill" />
+      <view wx:else class="participant-avatar participant-avatar-empty">{{participant.avatarInitial}}</view>
+      <text class="participant-name">{{participant.displayName}}</text>
+      <text class="participant-arrow">›</text>
+    </view>
+  </view>
+</view>

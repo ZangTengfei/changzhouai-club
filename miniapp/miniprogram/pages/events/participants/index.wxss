@@ -1,0 +1,71 @@
+.participants-page {
+  padding-top: 28rpx;
+}
+
+.page-intro {
+  gap: 10rpx;
+}
+
+.participant-total {
+  align-self: flex-start;
+  margin-top: 4rpx;
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
+  font-size: 21rpx;
+  font-weight: 760;
+}
+
+.participant-list {
+  overflow: hidden;
+  padding: 0 26rpx;
+}
+
+.participant-row {
+  display: flex;
+  min-height: 116rpx;
+  align-items: center;
+  gap: 20rpx;
+  border-bottom: 2rpx solid rgba(17, 23, 21, 0.06);
+}
+
+.participant-row:last-child {
+  border-bottom: 0;
+}
+
+.participant-avatar {
+  display: flex;
+  box-sizing: border-box;
+  width: 76rpx;
+  height: 76rpx;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 3rpx solid #ffffff;
+  border-radius: 50%;
+  background: var(--color-green-soft);
+  box-shadow: 0 5rpx 12rpx rgba(29, 70, 55, 0.1);
+}
+
+.participant-avatar-empty {
+  color: var(--color-green-dark);
+  font-size: 27rpx;
+  font-weight: 800;
+}
+
+.participant-name {
+  overflow: hidden;
+  flex: 1;
+  font-size: 27rpx;
+  font-weight: 740;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.participant-arrow {
+  flex: none;
+  color: var(--color-subtle);
+  font-size: 42rpx;
+  line-height: 1;
+}

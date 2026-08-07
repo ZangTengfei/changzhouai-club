@@ -170,6 +170,21 @@
   text-align: right;
 }
 
+.participant-heading-action {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  flex-direction: column;
+  gap: 6rpx;
+  padding: 8rpx 0 8rpx 16rpx;
+}
+
+.participant-view-all {
+  color: var(--color-green-dark);
+  font-size: 21rpx;
+  font-weight: 760;
+}
+
 .participant-pending-copy {
   display: block;
   margin-top: 18rpx;
@@ -228,12 +243,19 @@
   min-height: 68rpx;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+  gap: 2rpx;
   border-radius: 22rpx;
   background: var(--color-green-soft);
   color: var(--color-green-dark);
   font-size: 19rpx;
   font-weight: 700;
   text-align: center;
+}
+
+.participant-more-link {
+  font-size: 16rpx;
+  opacity: 0.78;
 }
 
 .detail-section {

@@ -100,6 +100,15 @@ export type EventDetail = {
   }>;
 };
 
+export type EventParticipants = {
+  event: {
+    slug: string;
+    title: string;
+  };
+  confirmedCount: number;
+  participants: EventParticipantPreview[];
+};
+
 export async function loadEvents(options: {
   mode?: EventMode;
   filter?: EventFilter;
@@ -125,6 +134,13 @@ export async function loadEventDetail(slug: string) {
     authenticated: true,
   });
   return response.event;
+}
+
+export async function loadEventParticipants(slug: string) {
+  return apiRequest<EventParticipants>({
+    path: `/api/miniapp/events/${encodeURIComponent(slug)}/participants`,
+    authenticated: true,
+  });
 }
 
 export function getEventRegistrationTags(

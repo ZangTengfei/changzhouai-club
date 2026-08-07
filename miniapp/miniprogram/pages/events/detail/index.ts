@@ -275,6 +275,15 @@ Page({
     });
   },
 
+  openParticipantList() {
+    if (!this.data.slug || !this.data.event?.confirmedCount) return;
+    void wx.navigateTo({
+      url: `/pages/events/participants/index?slug=${encodeURIComponent(
+        this.data.slug,
+      )}`,
+    });
+  },
+
   copyExternalLink() {
     const url = this.data.event?.registrationUrl;
     if (url) {
