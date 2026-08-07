@@ -112,8 +112,11 @@
 
 .member-search-submit {
   display: flex;
+  width: 96rpx;
+  min-width: 96rpx;
+  max-width: 96rpx;
   min-height: 72rpx;
-  flex: none;
+  flex: 0 0 96rpx;
   align-items: center;
   justify-content: center;
   margin: 0;
@@ -185,18 +188,8 @@
 }
 
 .member-search-toggle {
-  display: flex;
-  width: 80rpx;
-  min-height: 80rpx;
-  box-sizing: border-box;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-  padding: 0;
   border: 2rpx solid #dfe8e3;
-  border-radius: 40rpx;
   background: #ffffff;
-  line-height: 1;
 }
 
 .member-search-toggle-active {

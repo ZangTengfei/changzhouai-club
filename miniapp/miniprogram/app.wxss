@@ -26,8 +26,34 @@ page {
   font-size: 30rpx;
 }
 
+/* 清除微信原生 button 的自动外边距和内边距，避免控件被默认样式撑宽。 */
 button {
+  min-width: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
   letter-spacing: 0;
+}
+
+button::after {
+  border: 0;
+}
+
+/* 图标按钮统一使用固定尺寸，具体颜色和边框由页面样式补充。 */
+.icon-button {
+  display: flex;
+  width: 72rpx;
+  min-width: 72rpx;
+  max-width: 72rpx;
+  height: 72rpx;
+  min-height: 72rpx;
+  flex: 0 0 72rpx;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  line-height: 1;
 }
 
 text,

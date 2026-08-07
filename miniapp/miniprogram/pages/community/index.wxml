@@ -207,7 +207,7 @@
       <view class="member-pool-heading-copy"><text>公开成员</text><text>{{memberPoolGuestPreview ? '登录后查看更多社区成员' : '按公开资料和参与方向发现成员'}}</text></view>
       <view class="member-pool-heading-actions">
         <text wx:if="{{memberPoolTotal}}">{{memberPoolTotal}} 位</text>
-        <button class="member-search-toggle {{memberSearchExpanded ? 'member-search-toggle-active' : ''}}" bindtap="toggleMemberSearch" aria-label="{{memberSearchExpanded ? '关闭成员搜索' : '搜索社区成员'}}">
+        <button class="icon-button member-search-toggle {{memberSearchExpanded ? 'member-search-toggle-active' : ''}}" bindtap="toggleMemberSearch" aria-label="{{memberSearchExpanded ? '关闭成员搜索' : '搜索社区成员'}}">
           <icon type="{{memberSearchExpanded ? 'clear' : 'search'}}" size="20" color="{{memberSearchExpanded ? '#087448' : '#64756d'}}" />
         </button>
       </view>

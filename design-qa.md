@@ -1,44 +1,49 @@
-# 社区常驻工位释放按钮 Design QA
+# 社区成员搜索入口 Design QA
 
-- Source visual truth: `/var/folders/m9/rb2gjwb53zjbjdk39rf2v2nm0000gn/T/codex-clipboard-1449058a-84b2-4386-99da-12f3f1106f99.png`
-- Implementation screenshot: `/Users/nobugai/develop/changzhouai-club/output/playwright/community-release-button-compact-v3.png`
-- Focused comparison: `/Users/nobugai/develop/changzhouai-club/output/playwright/community-release-button-comparison.png`
-- State: 社区页工位模式，用户已有 S01 常驻工位，释放操作空闲状态
-- Simulator viewport: 688 × 1486 px，由微信开发者工具模拟器截图
-- Source pixels: 620 × 188 px；implementation full pixels: 688 × 1486 px
-- Density normalization: 从实现截图裁出 586 × 110 px 常驻卡区域并缩放到 620 px 宽，与 620 × 188 px 源问题截图纵向合并比较
+- Source visual truth: `/var/folders/m9/rb2gjwb53zjbjdk39rf2v2nm0000gn/T/codex-clipboard-de3d7197-0184-4cef-bec9-37ea592d1ba1.png`
+- Implementation screenshot: `/Users/nobugai/develop/changzhouai-club/output/design-qa/member-search-collapsed.png`
+- Expanded-state screenshot: `/Users/nobugai/develop/changzhouai-club/output/design-qa/member-search-expanded.png`
+- Focused comparison: `/Users/nobugai/develop/changzhouai-club/output/design-qa/member-search-comparison.png`
+- Viewport: 微信开发者工具 iPhone 模拟器；截图 688 x 1486 px，控件自动化测量 37 x 37 CSS px
+- Source pixels: 702 x 150 px
+- Implementation pixels: 688 x 1486 px；聚焦区域裁切为 688 x 150 px，与来源保持相同高度后并排比较
+- State: 社区成员页，搜索入口默认收起；另验证展开、输入状态
+
+## Full-view comparison evidence
+
+默认态截图确认成员标题、人数和卡片布局保持原样，搜索入口位于人数右侧并收为圆形。展开态仍使用原有独立搜索输入区，没有挤压标题或成员卡片。
+
+## Focused region comparison evidence
+
+`member-search-comparison.png` 左侧为来源中的过宽胶囊按钮，右侧为实现后的固定圆形按钮。实现按钮自动化测量为 37 x 37 CSS px，宽高一致；标题、说明和人数的层级、颜色与文案没有变化。
+
+## Required fidelity surfaces
+
+- Fonts and typography: 未修改字体、字号、字重和行高，标题与说明层级保持一致。
+- Spacing and layout rhythm: 搜索入口固定为 72rpx 方形并使用 50% 圆角；标题区域不再被宽按钮占用。
+- Colors and visual tokens: 沿用原有白底、浅灰绿描边和激活态绿色，没有引入新色值。
+- Image quality and asset fidelity: 本次没有新增或替换图片资源；搜索图标继续使用微信原生 icon。
+- Copy and content: “公开成员”、说明、人数、搜索占位和按钮文案均保持不变。
+
+## Interaction verification
+
+- 点击圆形搜索按钮后正常展开搜索输入区。
+- 输入“张”后控件值为“张”。
+- 自动化运行时异常数为 0。
+- 当前页面保持为 `pages/community/index`。
+
+## Comparison history
+
+1. Earlier P2: 默认搜索入口为大面积胶囊形，视觉重量过高并挤占标题区域。
+2. Fix: 将入口锁定为 72rpx 宽高、固定 flex basis、最小/最大宽度一致，并使用 50% 圆角。
+3. Post-fix evidence: 微信开发者工具实测 37 x 37 CSS px；聚焦并排图确认入口为圆形，无标题换行或卡片位移。
 
 ## Findings
 
-- 无待处理的 P0、P1、P2 问题。
-- 字体与层级：主标题、说明文字和“释放”次级操作的字号层级清楚；释放按钮不再与主操作同等强调。
-- 间距与布局：按钮从 184 px 缩减为 56 px，固定 `flex-basis` 后不再吞占剩余宽度；卡片由 89.1 px 降至 57 px，说明文字可以单行展示。
-- 色彩与视觉标记：保留淡蓝卡片背景，按钮改为白色半透明底、浅灰描边和低强调棕色文字；未引入左侧彩色竖线。
-- 图片与资产：继续使用已有成员头像，裁切、圆形遮罩和清晰度未改变，没有新增或替换图片资产。
-- 文案：按钮从“主动释放”精简为“释放”，卡片说明已经明确“直到主动释放”，语义没有损失。
-- 交互与状态：保留原 `bindtap="releaseFixedDesk"`、loading 和 disabled 状态；自动化运行未发现异常。
+没有剩余 P0、P1 或 P2 问题。
 
-## Focused Region Comparison
+## Follow-up polish
 
-- `community-release-button-comparison.png` 上方为用户反馈的旧状态，下方为微信开发者工具实际渲染的新状态。局部对比足以核对按钮占位、卡片高度、标题换行、头像和色彩，因此无需再做全页等高对比。
-
-## Comparison History
-
-1. 基线：释放按钮约 184 px 宽，占据卡片超过一半空间，标题换成两行，属于明显的 P1 密度问题。
-2. 第一轮：改为自动宽度、紧凑描边样式，但微信小程序 `button` 在 flex 容器内仍渲染为 184 px，P1 未解除。
-3. 最终轮：增加 `width`、`max-width` 和固定 `flex-basis: 108rpx`；实测按钮 56 × 28 px、卡片 332 × 57 px，无可执行的 P0、P1、P2 差异。
-
-## Follow-up Polish
-
-- 当前尺寸兼顾节省空间和文字可读性，无需继续缩小。
-
-## Verification
-
-- `npm --prefix miniapp run typecheck`: passed
-- 微信开发者工具自动化重载 `pages/community/index`: passed
-- 运行时异常: 0
-- 常驻卡尺寸: 332 × 57 px
-- 释放按钮尺寸: 56 × 28 px
-- 局部同图对比: passed
+无必要的 P3 跟进。
 
 final result: passed
