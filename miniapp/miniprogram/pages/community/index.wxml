@@ -1,61 +1,14 @@
 <custom-navigation title="{{communitySection === 'members' ? '社区成员池' : 'AI Club OPC 共创社区'}}" show-avatar="{{true}}" avatar-url="{{avatarUrl}}" avatar-initial="{{avatarInitial}}" avatar-guest="{{!isLoggedIn}}" bindavatartap="openProfile" />
 
-<view class="page-shell community-page" bindtouchstart="handleCommunityTouchStart" bindtouchend="handleCommunityTouchEnd">
+<view class="page-shell community-page">
   <view class="community-section-switch" aria-label="社区功能">
     <view class="community-section-switch-item {{communitySection === 'space' ? 'community-section-switch-active' : ''}}" data-section="space" bindtap="switchCommunitySection" role="button">社区空间</view>
     <view class="community-section-switch-item {{communitySection === 'members' ? 'community-section-switch-active' : ''}}" data-section="members" bindtap="switchCommunitySection" role="button">成员池</view>
   </view>
 
-  <block wx:if="{{communitySection === 'members'}}">
-    <view class="community-section-panel {{communitySectionTransition}}">
-    <view wx:if="{{isLoggedIn && currentUser && !currentUser.profileCompletion.completed}}" class="member-profile-prompt surface-card" bindtap="completeMemberProfile" role="button">
-      <view><text>先让大家认识你</text><text>社区名片 {{currentUser.profileCompletion.percent}}%，完善后才能进入成员池。</text></view>
-      <text>去完善 ›</text>
-    </view>
-
-    <view class="member-search-card surface-card">
-      <view class="member-search-row">
-        <input class="member-search-input" type="text" maxlength="60" value="{{memberSearchDraft}}" bindinput="handleMemberSearchInput" bindconfirm="submitMemberSearch" confirm-type="search" placeholder="搜索姓名、组织、行业或技能" />
-        <button class="member-search-button" bindtap="submitMemberSearch">搜索</button>
-      </view>
-      <view wx:if="{{memberSearchQuery}}" class="member-active-search"><text>正在搜索“{{memberSearchQuery}}”</text><text bindtap="clearMemberSearch">清除</text></view>
-    </view>
-
-    <view class="member-pool-heading">
-      <view><text>公开成员</text><text>{{memberPoolGuestPreview ? '登录后查看完整成员池' : '按公开资料和参与方向发现成员'}}</text></view>
-      <text wx:if="{{memberPoolTotal}}">{{memberPoolTotal}} 位</text>
-    </view>
-
-    <view wx:if="{{memberPoolLoading}}" class="member-pool-state"><view class="loading-spinner"></view><text>正在加载成员池</text></view>
-    <view wx:elif="{{memberPoolLoadFailed}}" class="member-pool-state member-pool-state-error"><text>暂时没能加载成员池，请稍后重试。</text><button class="retry-button" bindtap="loadMemberPoolPage">重新加载</button></view>
-    <view wx:elif="{{!memberCards.length}}" class="member-pool-empty"><text>{{memberSearchQuery ? '没有找到匹配的成员' : '暂时没有可展示的公开成员'}}</text><text>{{memberSearchQuery ? '可以换一个关键词试试。' : '成员完成并公开社区名片后会显示在这里。'}}</text></view>
-    <view wx:else class="member-card-list">
-      <view wx:for="{{memberCards}}" wx:key="id" class="member-pool-card surface-card" data-handle="{{item.shareHandle}}" bindtap="openMemberProfile" role="button" aria-label="查看{{item.displayName}}的社区名片">
-        <view class="member-card-top">
-          <image wx:if="{{item.avatarUrl}}" class="member-card-avatar" src="{{item.avatarUrl}}" mode="aspectFill" lazy-load="{{true}}" />
-          <view wx:else class="member-card-avatar member-card-avatar-empty">{{item.avatarInitial}}</view>
-          <view class="member-card-identity"><view><text class="member-card-name">{{item.displayName}}</text><text class="member-card-badge">{{item.identityLabel}}</text></view><text class="member-card-headline">{{item.headline}}</text></view>
-          <text class="member-card-arrow">›</text>
-        </view>
-        <view wx:if="{{item.visibleSkills.length}}" class="member-card-skills"><text wx:for="{{item.visibleSkills}}" wx:key="*this">{{item}}</text></view>
-        <view class="member-card-summary"><text>{{item.primarySummaryLabel}}</text><text>{{item.primarySummary}}</text></view>
-        <view wx:if="{{item.willingToShare || item.willingToJoinProjects}}" class="member-card-signals"><text wx:if="{{item.willingToShare}}">愿意分享</text><text wx:if="{{item.willingToJoinProjects}}">可参与项目</text></view>
-      </view>
-    </view>
-
-    <button wx:if="{{memberPoolHasMore}}" class="member-load-more" loading="{{memberPoolLoadingMore}}" disabled="{{memberPoolLoadingMore}}" bindtap="loadMoreMembers">查看更多成员</button>
-
-    <view wx:if="{{memberPoolGuestPreview}}" class="member-login-card surface-card">
-      <view><text>登录后查看完整成员池</text><text>可以搜索成员，并查看每个人主动公开的能力与需求。</text></view>
-      <button class="primary-button" bindtap="openMemberPoolLogin">微信登录</button>
-    </view>
-
-    <view class="community-footer"><text>先认识，再一起做事</text><text>AI Club 社区成员池</text></view>
-    </view>
-  </block>
-
-  <block wx:else>
-  <view class="community-section-panel {{communitySectionTransition}}">
+  <swiper class="community-section-swiper" style="height: {{communitySectionSwiperHeight}}px;" current="{{communitySectionIndex}}" duration="280" disable-touch="{{memberSearchFocused}}" bindchange="handleCommunitySwiperChange">
+  <swiper-item>
+  <view id="community-space-panel" class="community-section-panel">
   <view class="community-hero">
     <view class="hero-content">
       <view class="hero-topline"><image src="/assets/logo-mark.png" mode="aspectFit" /><text>AI CLUB · OPC 共创社区</text></view>
@@ -241,5 +194,54 @@
 
   <view class="community-footer"><text>开放、真实、一起做事</text><text>AI Club OPC 共创社区</text></view>
   </view>
-  </block>
+  </swiper-item>
+
+  <swiper-item>
+    <view id="community-members-panel" class="community-section-panel">
+    <view wx:if="{{isLoggedIn && currentUser && !currentUser.profileCompletion.completed}}" class="member-profile-prompt surface-card" bindtap="completeMemberProfile" role="button">
+      <view><text>先让大家认识你</text><text>社区名片 {{currentUser.profileCompletion.percent}}%，完善后才能进入成员池。</text></view>
+      <text>去完善 ›</text>
+    </view>
+
+    <view class="member-search-card surface-card">
+      <view class="member-search-row">
+        <input class="member-search-input" type="text" maxlength="60" value="{{memberSearchDraft}}" bindfocus="handleMemberSearchFocus" bindblur="handleMemberSearchBlur" bindinput="handleMemberSearchInput" bindconfirm="submitMemberSearch" confirm-type="search" placeholder="搜索姓名、组织、行业或技能" />
+        <button class="member-search-button" bindtap="submitMemberSearch">搜索</button>
+      </view>
+      <view wx:if="{{memberSearchQuery}}" class="member-active-search"><text>正在搜索“{{memberSearchQuery}}”</text><text bindtap="clearMemberSearch">清除</text></view>
+    </view>
+
+    <view class="member-pool-heading">
+      <view><text>公开成员</text><text>{{memberPoolGuestPreview ? '登录后查看完整成员池' : '按公开资料和参与方向发现成员'}}</text></view>
+      <text wx:if="{{memberPoolTotal}}">{{memberPoolTotal}} 位</text>
+    </view>
+
+    <view wx:if="{{memberPoolLoading}}" class="member-pool-state"><view class="loading-spinner"></view><text>正在加载成员池</text></view>
+    <view wx:elif="{{memberPoolLoadFailed}}" class="member-pool-state member-pool-state-error"><text>暂时没能加载成员池，请稍后重试。</text><button class="retry-button" bindtap="loadMemberPoolPage">重新加载</button></view>
+    <view wx:elif="{{!memberCards.length}}" class="member-pool-empty"><text>{{memberSearchQuery ? '没有找到匹配的成员' : '暂时没有可展示的公开成员'}}</text><text>{{memberSearchQuery ? '可以换一个关键词试试。' : '成员完成并公开社区名片后会显示在这里。'}}</text></view>
+    <view wx:else class="member-card-list">
+      <view wx:for="{{memberCards}}" wx:key="id" class="member-pool-card surface-card" data-handle="{{item.shareHandle}}" bindtap="openMemberProfile" role="button" aria-label="查看{{item.displayName}}的社区名片">
+        <view class="member-card-top">
+          <image wx:if="{{item.avatarUrl}}" class="member-card-avatar" src="{{item.avatarUrl}}" mode="aspectFill" lazy-load="{{true}}" />
+          <view wx:else class="member-card-avatar member-card-avatar-empty">{{item.avatarInitial}}</view>
+          <view class="member-card-identity"><view><text class="member-card-name">{{item.displayName}}</text><text class="member-card-badge">{{item.identityLabel}}</text></view><text class="member-card-headline">{{item.headline}}</text></view>
+          <text class="member-card-arrow">›</text>
+        </view>
+        <view wx:if="{{item.visibleSkills.length}}" class="member-card-skills"><text wx:for="{{item.visibleSkills}}" wx:key="*this">{{item}}</text></view>
+        <view class="member-card-summary"><text>{{item.primarySummaryLabel}}</text><text>{{item.primarySummary}}</text></view>
+        <view wx:if="{{item.willingToShare || item.willingToJoinProjects}}" class="member-card-signals"><text wx:if="{{item.willingToShare}}">愿意分享</text><text wx:if="{{item.willingToJoinProjects}}">可参与项目</text></view>
+      </view>
+    </view>
+
+    <button wx:if="{{memberPoolHasMore}}" class="member-load-more" loading="{{memberPoolLoadingMore}}" disabled="{{memberPoolLoadingMore}}" bindtap="loadMoreMembers">查看更多成员</button>
+
+    <view wx:if="{{memberPoolGuestPreview}}" class="member-login-card surface-card">
+      <view><text>登录后查看完整成员池</text><text>可以搜索成员，并查看每个人主动公开的能力与需求。</text></view>
+      <button class="primary-button" bindtap="openMemberPoolLogin">微信登录</button>
+    </view>
+
+    <view class="community-footer"><text>先认识，再一起做事</text><text>AI Club 社区成员池</text></view>
+    </view>
+  </swiper-item>
+  </swiper>
 </view>

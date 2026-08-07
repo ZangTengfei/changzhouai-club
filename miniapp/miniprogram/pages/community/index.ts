@@ -69,8 +69,6 @@ let hasLoaded = false;
 let requestVersion = 0;
 let memberPoolRequestVersion = 0;
 let hasTrackedMemberPoolView = false;
-let communityTouchStart: { x: number; y: number } | null = null;
-let communitySectionTransitionTimer: ReturnType<typeof setTimeout> | null = null;
 const communityShareImageUrl = "/assets/share/home-share-v7.jpg";
 
 function mapMemberPoolCard(member: MiniappMemberPoolItem): MemberPoolCard {
@@ -445,9 +443,11 @@ function getFixedDeskErrorMessage(error: unknown) {
 Page({
   data: {
     communitySection: "space" as CommunitySection,
-    communitySectionTransition: "",
+    communitySectionIndex: 0,
+    communitySectionSwiperHeight: 1200,
     memberSearchDraft: "",
     memberSearchQuery: "",
+    memberSearchFocused: false,
     memberCards: [] as MemberPoolCard[],
     memberPoolTotal: 0,
     memberPoolPage: 1,
@@ -545,12 +545,8 @@ Page({
       .catch(() => undefined);
   },
 
-  onUnload() {
-    if (communitySectionTransitionTimer) {
-      clearTimeout(communitySectionTransitionTimer);
-      communitySectionTransitionTimer = null;
-    }
-    communityTouchStart = null;
+  onReady() {
+    this.measureCommunitySectionPanel();
   },
 
   onShow() {
@@ -598,24 +594,28 @@ Page({
 
   activateCommunitySection(section: CommunitySection) {
     if (section === this.data.communitySection) return;
-    const currentIndex = this.data.communitySection === "space" ? 0 : 1;
     const nextIndex = section === "space" ? 0 : 1;
-    const transition = nextIndex > currentIndex
-      ? "community-panel-from-right"
-      : "community-panel-from-left";
+    this.setData(
+      { communitySection: section, communitySectionIndex: nextIndex },
+      () => this.measureCommunitySectionPanel(),
+    );
 
-    if (communitySectionTransitionTimer) {
-      clearTimeout(communitySectionTransitionTimer);
-    }
-    this.setData({
-      communitySection: section,
-      communitySectionTransition: transition,
-    });
-    communitySectionTransitionTimer = setTimeout(() => {
-      this.setData({ communitySectionTransition: "" });
-      communitySectionTransitionTimer = null;
-    }, 240);
+    this.prepareCommunitySection(section);
+  },
 
+  handleCommunitySwiperChange(
+    event: WechatMiniprogram.CustomEvent<{ current: number }>,
+  ) {
+    const communitySectionIndex = event.detail.current;
+    const section: CommunitySection = communitySectionIndex === 1 ? "members" : "space";
+    this.setData(
+      { communitySection: section, communitySectionIndex },
+      () => this.measureCommunitySectionPanel(),
+    );
+    this.prepareCommunitySection(section);
+  },
+
+  prepareCommunitySection(section: CommunitySection) {
     if (section === "members") {
       if (!this.data.memberPoolLoaded) void this.loadMemberPoolPage();
       if (this.data.isLoggedIn && !hasTrackedMemberPoolView) {
@@ -628,37 +628,25 @@ Page({
     if (!hasLoaded) void this.loadPage();
   },
 
-  handleCommunityTouchStart(event: WechatMiniprogram.TouchEvent) {
-    const touch = event.touches[0];
-    communityTouchStart = touch
-      ? { x: touch.clientX, y: touch.clientY }
-      : null;
+  measureCommunitySectionPanel() {
+    const panelId = this.data.communitySection === "members"
+      ? "community-members-panel"
+      : "community-space-panel";
+    wx.nextTick(() => {
+      this.createSelectorQuery()
+        .select(`#${panelId}`)
+        .boundingClientRect((rect) => {
+          if (!rect || Array.isArray(rect) || !rect.height) return;
+          const communitySectionSwiperHeight = Math.ceil(rect.height);
+          if (communitySectionSwiperHeight !== this.data.communitySectionSwiperHeight) {
+            this.setData({ communitySectionSwiperHeight });
+          }
+        })
+        .exec();
+    });
   },
 
-  handleCommunityTouchEnd(event: WechatMiniprogram.TouchEvent) {
-    const start = communityTouchStart;
-    const touch = event.changedTouches[0];
-    communityTouchStart = null;
-    if (!start || !touch) return;
-
-    const deltaX = touch.clientX - start.x;
-    const deltaY = touch.clientY - start.y;
-    if (Math.abs(deltaX) < 70 || Math.abs(deltaX) <= Math.abs(deltaY) * 1.25) {
-      return;
-    }
-
-    if (deltaX < 0 && this.data.communitySection === "space") {
-      this.activateCommunitySection("members");
-      return;
-    }
-    if (deltaX > 0 && this.data.communitySection === "members") {
-      this.activateCommunitySection("space");
-    }
-  },
-
-  blockCommunitySwipe() {
-    communityTouchStart = null;
-  },
+  blockCommunitySwipe() {},
 
   async loadMemberPoolPage(showLoading = true, append = false) {
     const currentRequest = ++memberPoolRequestVersion;
@@ -677,31 +665,45 @@ Page({
       if (currentRequest !== memberPoolRequestVersion) return;
 
       const newCards = response.members.map(mapMemberPoolCard);
-      this.setData({
-        memberCards: append ? [...this.data.memberCards, ...newCards] : newCards,
-        memberPoolTotal: response.pagination.total,
-        memberPoolPage: response.pagination.page,
-        memberPoolHasMore: response.pagination.hasMore,
-        memberPoolAuthenticated: response.authenticated,
-        memberPoolGuestPreview: response.guestPreview,
-        memberPoolLoading: false,
-        memberPoolLoadingMore: false,
-        memberPoolLoadFailed: false,
-        memberPoolLoaded: true,
-      });
+      this.setData(
+        {
+          memberCards: append ? [...this.data.memberCards, ...newCards] : newCards,
+          memberPoolTotal: response.pagination.total,
+          memberPoolPage: response.pagination.page,
+          memberPoolHasMore: response.pagination.hasMore,
+          memberPoolAuthenticated: response.authenticated,
+          memberPoolGuestPreview: response.guestPreview,
+          memberPoolLoading: false,
+          memberPoolLoadingMore: false,
+          memberPoolLoadFailed: false,
+          memberPoolLoaded: true,
+        },
+        () => this.measureCommunitySectionPanel(),
+      );
     } catch {
       if (currentRequest !== memberPoolRequestVersion) return;
-      this.setData({
-        memberPoolLoading: false,
-        memberPoolLoadingMore: false,
-        memberPoolLoadFailed: true,
-        memberPoolLoaded: true,
-      });
+      this.setData(
+        {
+          memberPoolLoading: false,
+          memberPoolLoadingMore: false,
+          memberPoolLoadFailed: true,
+          memberPoolLoaded: true,
+        },
+        () => this.measureCommunitySectionPanel(),
+      );
     }
   },
 
   handleMemberSearchInput(event: WechatMiniprogram.Input) {
     this.setData({ memberSearchDraft: event.detail.value });
+  },
+
+  handleMemberSearchFocus() {
+    this.setData({ memberSearchFocused: true });
+  },
+
+  handleMemberSearchBlur() {
+    this.setData({ memberSearchFocused: false });
   },
 
   submitMemberSearch() {
@@ -778,39 +780,45 @@ Page({
         : fallbackSpacePhotos;
       const heroPhoto = loadedSpacePhotos.find((photo) => photo.isHero)
         ?? loadedSpacePhotos[0];
-      this.setData({
-        community: {
-          ...snapshot.community,
-          summary: communitySummary,
-          fixedDeskCount: snapshot.community.fixedDeskCount ?? 0,
-          meetingRoomCount: 1,
+      this.setData(
+        {
+          community: {
+            ...snapshot.community,
+            summary: communitySummary,
+            fixedDeskCount: snapshot.community.fixedDeskCount ?? 0,
+            meetingRoomCount: 1,
+          },
+          resources,
+          visibleResources: resources.filter(
+            (resource) => resource.resourceType === this.data.activeMode,
+          ),
+          selectedResource: selectedResource?.selectable ? selectedResource : null,
+          spacePhotos: loadedSpacePhotos,
+          spacePhotoUrls: loadedSpacePhotos.map((photo) => photo.src),
+          heroPhotoUrl: heroPhoto.src,
+          availability: summarizeAvailability(resources),
+          myBookings: snapshot.myBookings.map(mapBooking),
+          fixedDeskRequest: snapshot.fixedDeskRequest ?? null,
+          myFixedDesk: snapshot.myFixedDesk ?? null,
+          fixedDeskNote:
+            snapshot.fixedDeskRequest?.status === "rejected"
+              ? snapshot.fixedDeskRequest.note ?? ""
+              : this.data.fixedDeskNote,
+          accessRequest: snapshot.accessRequest,
+          accessContact: snapshot.accessRequest?.contact ?? this.data.accessContact,
+          accessNote: snapshot.accessRequest?.note ?? this.data.accessNote,
+          loading: false,
+          loadFailed: false,
         },
-        resources,
-        visibleResources: resources.filter(
-          (resource) => resource.resourceType === this.data.activeMode,
-        ),
-        selectedResource: selectedResource?.selectable ? selectedResource : null,
-        spacePhotos: loadedSpacePhotos,
-        spacePhotoUrls: loadedSpacePhotos.map((photo) => photo.src),
-        heroPhotoUrl: heroPhoto.src,
-        availability: summarizeAvailability(resources),
-        myBookings: snapshot.myBookings.map(mapBooking),
-        fixedDeskRequest: snapshot.fixedDeskRequest ?? null,
-        myFixedDesk: snapshot.myFixedDesk ?? null,
-        fixedDeskNote:
-          snapshot.fixedDeskRequest?.status === "rejected"
-            ? snapshot.fixedDeskRequest.note ?? ""
-            : this.data.fixedDeskNote,
-        accessRequest: snapshot.accessRequest,
-        accessContact: snapshot.accessRequest?.contact ?? this.data.accessContact,
-        accessNote: snapshot.accessRequest?.note ?? this.data.accessNote,
-        loading: false,
-        loadFailed: false,
-      });
+        () => this.measureCommunitySectionPanel(),
+      );
     } catch {
       if (currentRequest !== requestVersion) return;
       hasLoaded = true;
-      this.setData({ loading: false, loadFailed: true });
+      this.setData(
+        { loading: false, loadFailed: true },
+        () => this.measureCommunitySectionPanel(),
+      );
     }
   },
 
@@ -850,7 +858,9 @@ Page({
 
   switchView(event: WechatMiniprogram.TouchEvent) {
     const viewMode = String(event.currentTarget.dataset.view) as ResourceViewMode;
-    if (viewMode === "map" || viewMode === "list") this.setData({ viewMode });
+    if (viewMode === "map" || viewMode === "list") {
+      this.setData({ viewMode }, () => this.measureCommunitySectionPanel());
+    }
   },
 
   changeDate(event: WechatMiniprogram.TouchEvent) {
@@ -903,13 +913,16 @@ Page({
       { length: resource.resourceType === "meeting_room" ? resource.capacity : 1 },
       (_, index) => index + 1,
     );
-    this.setData({
-      activeMode: resource.resourceType,
-      selectedResource: resource,
-      deskUseMode: null,
-      attendeeOptions,
-      attendeeIndex: Math.min(this.data.attendeeIndex, attendeeOptions.length - 1),
-    });
+    this.setData(
+      {
+        activeMode: resource.resourceType,
+        selectedResource: resource,
+        deskUseMode: null,
+        attendeeOptions,
+        attendeeIndex: Math.min(this.data.attendeeIndex, attendeeOptions.length - 1),
+      },
+      () => this.measureCommunitySectionPanel(),
+    );
   },
 
   chooseDeskUseMode(event: WechatMiniprogram.TouchEvent) {
@@ -935,7 +948,7 @@ Page({
       }
     }
     if (deskUseMode === "temporary" || deskUseMode === "fixed") {
-      this.setData({ deskUseMode });
+      this.setData({ deskUseMode }, () => this.measureCommunitySectionPanel());
     }
   },
 
@@ -1167,7 +1180,10 @@ Page({
         contact,
         note: this.data.accessNote.trim(),
       });
-      this.setData({ accessRequest: response.accessRequest });
+      this.setData(
+        { accessRequest: response.accessRequest },
+        () => this.measureCommunitySectionPanel(),
+      );
       trackEvent("community_access_request", "/pages/community/index");
       void wx.showToast({ title: "门禁申请已提交", icon: "success" });
     } catch (error) {

@@ -31,37 +31,15 @@
 }
 
 .community-section-panel {
+  box-sizing: border-box;
   width: 100%;
+  padding-bottom: 4rpx;
 }
 
-.community-panel-from-right {
-  animation: community-panel-from-right 220ms ease-out both;
-}
-
-.community-panel-from-left {
-  animation: community-panel-from-left 220ms ease-out both;
-}
-
-@keyframes community-panel-from-right {
-  from {
-    opacity: 0.35;
-    transform: translateX(26rpx);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes community-panel-from-left {
-  from {
-    opacity: 0.35;
-    transform: translateX(-26rpx);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
+.community-section-swiper {
+  width: 100%;
+  min-height: 960rpx;
+  transition: height 180ms ease;
 }
 
 .member-profile-prompt {
