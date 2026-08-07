@@ -16,7 +16,6 @@ type CommunitySection = "members" | "space";
 type ResourceMode = "desk" | "meeting_room";
 type ResourceViewMode = "map" | "list";
 type DeskUseMode = "temporary" | "fixed";
-type MemberSort = "recommended" | "newest" | "active";
 
 type MemberPoolCard = MiniappMemberPoolItem & {
   avatarInitial: string;
@@ -48,11 +47,6 @@ type DateOption = {
 };
 
 const durationOptions = [1, 2, 4, 8];
-const memberSortOptions: Array<{ label: string; value: MemberSort }> = [
-  { label: "社区推荐", value: "recommended" },
-  { label: "最近加入", value: "newest" },
-  { label: "活跃参与", value: "active" },
-];
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
 const communitySummary = "这里有工位、会议室，也有一群正在做事的人。";
 const fallbackSpacePhotos: MiniappCommunitySpacePhoto[] = [
@@ -456,10 +450,6 @@ Page({
     memberSearchQuery: "",
     memberSearchExpanded: false,
     memberSearchFocused: false,
-    memberSort: "recommended" as MemberSort,
-    memberSortIndex: 0,
-    memberSortLabel: memberSortOptions[0].label,
-    memberSortOptions,
     memberCards: [] as MemberPoolCard[],
     memberPoolTotal: 0,
     memberPoolPage: 1,
@@ -672,7 +662,6 @@ Page({
     try {
       const response = await fetchMemberPool({
         query: this.data.memberSearchQuery,
-        sort: this.data.memberSort,
         page: requestedPage,
       });
       if (currentRequest !== memberPoolRequestVersion) return;
@@ -757,31 +746,6 @@ Page({
   clearMemberSearch() {
     this.setData({ memberSearchDraft: "", memberSearchQuery: "" });
     void this.loadMemberPoolPage();
-  },
-
-  changeMemberSort(
-    event: WechatMiniprogram.CustomEvent<{ value: string }>,
-  ) {
-    const memberSortIndex = Number(event.detail.value);
-    const selectedSort = memberSortOptions[memberSortIndex];
-    if (!selectedSort || selectedSort.value === this.data.memberSort) return;
-
-    this.setData(
-      {
-        memberSort: selectedSort.value,
-        memberSortIndex,
-        memberSortLabel: selectedSort.label,
-        memberPoolPage: 1,
-        memberPoolHasMore: false,
-      },
-      () => void this.loadMemberPoolPage(),
-    );
-    if (this.data.isLoggedIn) {
-      trackEvent("member_pool_filter", "/pages/community/index", {
-        filter: "sort",
-        value: selectedSort.value,
-      });
-    }
   },
 
   loadMoreMembers() {

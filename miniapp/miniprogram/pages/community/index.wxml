@@ -207,9 +207,6 @@
       <view class="member-pool-heading-copy"><text>公开成员</text><text>{{memberPoolGuestPreview ? '登录后查看更多社区成员' : '按公开资料和参与方向发现成员'}}</text></view>
       <view class="member-pool-heading-actions">
         <text wx:if="{{memberPoolTotal}}">{{memberPoolTotal}} 位</text>
-        <picker class="member-sort-picker" mode="selector" range="{{memberSortOptions}}" range-key="label" value="{{memberSortIndex}}" bindchange="changeMemberSort">
-          <view class="member-sort-trigger" role="button" aria-label="成员排序：{{memberSortLabel}}"><text>{{memberSortLabel}}</text><image class="member-sort-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" /></view>
-        </picker>
         <button class="icon-button member-search-toggle {{memberSearchExpanded ? 'member-search-toggle-active' : ''}}" bindtap="toggleMemberSearch" aria-label="{{memberSearchExpanded ? '关闭成员搜索' : '搜索社区成员'}}">
           <icon type="{{memberSearchExpanded ? 'clear' : 'search'}}" size="20" color="{{memberSearchExpanded ? '#087448' : '#64756d'}}" />
         </button>
