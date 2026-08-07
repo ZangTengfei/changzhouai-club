@@ -120,6 +120,7 @@ interface MiniappMemberPoolItem {
   willingToShare: boolean;
   willingToJoinProjects: boolean;
   identityLabel: string;
+  communityTags: string[];
 }
 
 interface MiniappMemberPoolResponse {

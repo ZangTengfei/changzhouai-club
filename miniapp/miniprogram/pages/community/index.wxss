@@ -5,29 +5,37 @@
 
 .community-section-switch {
   display: flex;
-  gap: 8rpx;
-  margin-bottom: 24rpx;
-  padding: 7rpx;
-  border-radius: 25rpx;
-  background: #eef3f0;
+  margin-bottom: 12rpx;
+  border-bottom: 2rpx solid #e8eeeb;
 }
 
 .community-section-switch-item {
+  position: relative;
   display: flex;
-  min-height: 72rpx;
+  min-height: 76rpx;
   flex: 1;
   align-items: center;
   justify-content: center;
-  border-radius: 20rpx;
   color: var(--color-subtle);
-  font-size: 25rpx;
-  font-weight: 720;
+  font-size: 24rpx;
+  font-weight: 680;
 }
 
 .community-section-switch-active {
-  background: #ffffff;
   color: var(--color-green-dark);
-  box-shadow: 0 8rpx 18rpx rgba(31, 55, 45, 0.08);
+  font-weight: 800;
+}
+
+.community-section-switch-active::after {
+  position: absolute;
+  bottom: -2rpx;
+  left: 50%;
+  width: 54rpx;
+  height: 5rpx;
+  border-radius: 5rpx 5rpx 0 0;
+  background: var(--color-green);
+  content: "";
+  transform: translateX(-50%);
 }
 
 .community-section-panel {
@@ -77,47 +85,48 @@
   font-weight: 720;
 }
 
-.member-search-card {
-  margin-top: 24rpx;
-  padding: 22rpx;
+.member-search-panel {
+  margin: 0 0 20rpx;
 }
 
 .member-search-row {
   display: flex;
+  min-height: 72rpx;
+  box-sizing: border-box;
   align-items: center;
-  gap: 12rpx;
+  gap: 13rpx;
+  padding: 0 10rpx 0 20rpx;
+  border: 2rpx solid #dfe8e3;
+  border-radius: 24rpx;
+  background: #f6f9f7;
 }
 
 .member-search-input {
   min-width: 0;
-  min-height: 82rpx;
+  min-height: 68rpx;
   box-sizing: border-box;
   flex: 1;
-  padding: 0 22rpx;
-  border: 2rpx solid #dfe8e3;
-  border-radius: 23rpx;
-  background: #f8faf9;
+  padding: 0;
   font-size: 23rpx;
 }
 
-.member-search-button {
+.member-search-submit {
   display: flex;
-  width: 126rpx;
-  min-height: 82rpx;
-  flex: 0 0 126rpx;
+  min-height: 72rpx;
+  flex: none;
   align-items: center;
   justify-content: center;
   margin: 0;
-  padding: 0;
-  border-radius: 23rpx;
-  background: var(--color-green);
-  color: #ffffff;
-  font-size: 23rpx;
+  padding: 0 16rpx;
+  background: transparent;
+  color: var(--color-green-dark);
+  font-size: 21rpx;
   font-weight: 760;
   line-height: 1;
 }
 
-.member-search-button::after,
+.member-search-submit::after,
+.member-search-toggle::after,
 .member-load-more::after {
   border: 0;
 }
@@ -139,34 +148,60 @@
 
 .member-pool-heading {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 18rpx;
-  margin: 42rpx 2rpx 18rpx;
+  margin: 28rpx 2rpx 16rpx;
 }
 
-.member-pool-heading > view {
+.member-pool-heading-copy {
   display: flex;
   min-width: 0;
   flex-direction: column;
   gap: 6rpx;
 }
 
-.member-pool-heading > view text:first-child {
+.member-pool-heading-copy text:first-child {
   color: var(--color-ink);
   font-size: 34rpx;
   font-weight: 820;
 }
 
-.member-pool-heading > view text:last-child,
-.member-pool-heading > text:last-child {
+.member-pool-heading-copy text:last-child,
+.member-pool-heading-actions > text {
   color: var(--color-subtle);
   font-size: 19rpx;
 }
 
-.member-pool-heading > text:last-child {
+.member-pool-heading-actions {
+  display: flex;
   flex: none;
-  padding-bottom: 3rpx;
+  align-items: center;
+  gap: 10rpx;
+}
+
+.member-pool-heading-actions > text {
+  flex: none;
+}
+
+.member-search-toggle {
+  display: flex;
+  width: 80rpx;
+  min-height: 80rpx;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 2rpx solid #dfe8e3;
+  border-radius: 40rpx;
+  background: #ffffff;
+  line-height: 1;
+}
+
+.member-search-toggle-active {
+  border-color: rgba(18, 165, 102, 0.24);
+  background: var(--color-green-soft);
 }
 
 .member-pool-state,
@@ -284,6 +319,7 @@
   line-height: 1;
 }
 
+.member-card-community-tags,
 .member-card-skills,
 .member-card-signals {
   display: flex;
@@ -292,6 +328,7 @@
   margin-top: 18rpx;
 }
 
+.member-card-community-tags text,
 .member-card-skills text,
 .member-card-signals text {
   padding: 7rpx 12rpx;
@@ -300,6 +337,16 @@
   color: #52635c;
   font-size: 17rpx;
   font-weight: 650;
+}
+
+.member-card-community-tags {
+  margin-top: 16rpx;
+}
+
+.member-card-community-tags text {
+  background: #fff5df;
+  color: #8a5b17;
+  font-weight: 720;
 }
 
 .member-card-summary {

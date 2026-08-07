@@ -716,6 +716,19 @@ try {
     });
   if (badgeError) throw badgeError;
 
+  const taggedMemberPool = await request(
+    `/api/miniapp/members?query=${encodeURIComponent("体验版测试用户")}`,
+  );
+  assert.equal(taggedMemberPool.response.status, 200);
+  const taggedMember = taggedMemberPool.body?.members?.find(
+    (member) => member.id === userId,
+  );
+  assert.ok(taggedMember);
+  assert.deepEqual(taggedMember.communityTags, ["验收徽章"]);
+  assert.equal("badgeAwards" in taggedMember, false);
+  assert.equal("badgeDescriptions" in taggedMember, false);
+  pass("member_pool_public_community_tags_loaded");
+
   const registrationWithoutConsent = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
     {

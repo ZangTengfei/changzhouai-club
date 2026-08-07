@@ -1,4 +1,4 @@
-<custom-navigation title="{{communitySection === 'members' ? '社区成员' : 'AI Club OPC 共创社区'}}" show-avatar="{{true}}" avatar-url="{{avatarUrl}}" avatar-initial="{{avatarInitial}}" avatar-guest="{{!isLoggedIn}}" bindavatartap="openProfile" />
+<custom-navigation title="社区" show-avatar="{{true}}" avatar-url="{{avatarUrl}}" avatar-initial="{{avatarInitial}}" avatar-guest="{{!isLoggedIn}}" bindavatartap="openProfile" />
 
 <view class="page-shell community-page">
   <view class="community-section-switch" aria-label="社区功能">
@@ -203,17 +203,23 @@
       <text>去完善 ›</text>
     </view>
 
-    <view class="member-search-card surface-card">
-      <view class="member-search-row">
-        <input class="member-search-input" type="text" maxlength="60" value="{{memberSearchDraft}}" bindfocus="handleMemberSearchFocus" bindblur="handleMemberSearchBlur" bindinput="handleMemberSearchInput" bindconfirm="submitMemberSearch" confirm-type="search" placeholder="搜索姓名、组织、行业或技能" />
-        <button class="member-search-button" bindtap="submitMemberSearch">搜索</button>
+    <view class="member-pool-heading">
+      <view class="member-pool-heading-copy"><text>公开成员</text><text>{{memberPoolGuestPreview ? '登录后查看更多社区成员' : '按公开资料和参与方向发现成员'}}</text></view>
+      <view class="member-pool-heading-actions">
+        <text wx:if="{{memberPoolTotal}}">{{memberPoolTotal}} 位</text>
+        <button class="member-search-toggle {{memberSearchExpanded ? 'member-search-toggle-active' : ''}}" bindtap="toggleMemberSearch" aria-label="{{memberSearchExpanded ? '关闭成员搜索' : '搜索社区成员'}}">
+          <icon type="{{memberSearchExpanded ? 'clear' : 'search'}}" size="20" color="{{memberSearchExpanded ? '#087448' : '#64756d'}}" />
+        </button>
       </view>
-      <view wx:if="{{memberSearchQuery}}" class="member-active-search"><text>正在搜索“{{memberSearchQuery}}”</text><text bindtap="clearMemberSearch">清除</text></view>
     </view>
 
-    <view class="member-pool-heading">
-      <view><text>公开成员</text><text>{{memberPoolGuestPreview ? '登录后查看更多社区成员' : '按公开资料和参与方向发现成员'}}</text></view>
-      <text wx:if="{{memberPoolTotal}}">{{memberPoolTotal}} 位</text>
+    <view wx:if="{{memberSearchExpanded}}" class="member-search-panel">
+      <view class="member-search-row">
+        <icon type="search" size="18" color="#7b8a83" />
+        <input class="member-search-input" type="text" maxlength="60" focus="{{memberSearchExpanded}}" value="{{memberSearchDraft}}" bindfocus="handleMemberSearchFocus" bindblur="handleMemberSearchBlur" bindinput="handleMemberSearchInput" bindconfirm="submitMemberSearch" confirm-type="search" placeholder="搜索姓名、组织、行业或技能" />
+        <button class="member-search-submit" bindtap="submitMemberSearch">搜索</button>
+      </view>
+      <view wx:if="{{memberSearchQuery}}" class="member-active-search"><text>正在搜索“{{memberSearchQuery}}”</text><text bindtap="clearMemberSearch">清除</text></view>
     </view>
 
     <view wx:if="{{memberPoolLoading}}" class="member-pool-state"><view class="loading-spinner"></view><text>正在加载社区成员</text></view>
@@ -227,6 +233,7 @@
           <view class="member-card-identity"><view><text class="member-card-name">{{item.displayName}}</text><text class="member-card-badge">{{item.identityLabel}}</text></view><text class="member-card-headline">{{item.headline}}</text></view>
           <text class="member-card-arrow">›</text>
         </view>
+        <view wx:if="{{item.communityTags.length}}" class="member-card-community-tags"><text wx:for="{{item.communityTags}}" wx:key="*this">{{item}}</text></view>
         <view wx:if="{{item.visibleSkills.length}}" class="member-card-skills"><text wx:for="{{item.visibleSkills}}" wx:key="*this">{{item}}</text></view>
         <view class="member-card-summary"><text>{{item.primarySummaryLabel}}</text><text>{{item.primarySummary}}</text></view>
         <view wx:if="{{item.willingToShare || item.willingToJoinProjects}}" class="member-card-signals"><text wx:if="{{item.willingToShare}}">愿意分享</text><text wx:if="{{item.willingToJoinProjects}}">可参与项目</text></view>

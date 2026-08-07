@@ -77,6 +77,7 @@ function mapMemberPoolCard(member: MiniappMemberPoolItem): MemberPoolCard {
     .join(" · ");
   return {
     ...member,
+    communityTags: member.communityTags ?? [],
     avatarInitial: member.displayName.slice(0, 1) || "成",
     headline,
     primarySummary: member.capabilitySummary || member.seekingSummary,
@@ -447,6 +448,7 @@ Page({
     communitySectionSwiperHeight: 1200,
     memberSearchDraft: "",
     memberSearchQuery: "",
+    memberSearchExpanded: false,
     memberSearchFocused: false,
     memberCards: [] as MemberPoolCard[],
     memberPoolTotal: 0,
@@ -696,6 +698,30 @@ Page({
 
   handleMemberSearchInput(event: WechatMiniprogram.Input) {
     this.setData({ memberSearchDraft: event.detail.value });
+  },
+
+  toggleMemberSearch() {
+    if (!this.data.memberSearchExpanded) {
+      this.setData(
+        { memberSearchExpanded: true },
+        () => this.measureCommunitySectionPanel(),
+      );
+      return;
+    }
+
+    const shouldReset = Boolean(
+      this.data.memberSearchDraft || this.data.memberSearchQuery,
+    );
+    this.setData(
+      {
+        memberSearchExpanded: false,
+        memberSearchFocused: false,
+        memberSearchDraft: "",
+        memberSearchQuery: "",
+      },
+      () => this.measureCommunitySectionPanel(),
+    );
+    if (shouldReset) void this.loadMemberPoolPage();
   },
 
   handleMemberSearchFocus() {

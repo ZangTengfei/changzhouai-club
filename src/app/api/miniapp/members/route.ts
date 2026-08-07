@@ -38,6 +38,12 @@ type ProfileRow = {
   seeking_summary: string | null;
 };
 
+type MemberBadgeRow = {
+  user_id: string;
+  label: string;
+  awarded_at: string;
+};
+
 type MemberPoolItem = {
   id: string;
   shareHandle: string;
@@ -54,6 +60,7 @@ type MemberPoolItem = {
   willingToShare: boolean;
   willingToJoinProjects: boolean;
   identityLabel: string;
+  communityTags: string[];
   isCoBuilder: boolean;
   isFeatured: boolean;
   joinedAt: string;
@@ -94,6 +101,7 @@ function matchesQuery(member: MemberPoolItem, query: string) {
     member.seekingSummary,
     ...member.industryTags,
     ...member.skills,
+    ...member.communityTags,
   ].some((value) => normalizeSearchText(value).includes(query));
 }
 
@@ -134,6 +142,7 @@ function toMemberPoolResponse(member: MemberPoolItem) {
     willingToShare: member.willingToShare,
     willingToJoinProjects: member.willingToJoinProjects,
     identityLabel: member.identityLabel,
+    communityTags: member.communityTags.slice(0, 2),
   };
 }
 
@@ -187,21 +196,39 @@ export async function GET(request: Request) {
     });
   }
 
-  const { data: profileData, error: profileError } = await supabase
-    .from("profiles")
-    .select(
-      "id, public_slug, display_name, avatar_url, city, role_label, organization, bio, industry_tags, skills, capability_summary, seeking_summary",
-    )
-    .in("id", memberIds);
+  const [profileResult, badgeResult] = await Promise.all([
+    supabase
+      .from("profiles")
+      .select(
+        "id, public_slug, display_name, avatar_url, city, role_label, organization, bio, industry_tags, skills, capability_summary, seeking_summary",
+      )
+      .in("id", memberIds),
+    supabase
+      .from("member_badge_awards")
+      .select("user_id, label, awarded_at")
+      .in("user_id", memberIds)
+      .order("awarded_at", { ascending: false }),
+  ]);
+  const { data: profileData, error: profileError } = profileResult;
+  const { data: badgeData, error: badgeError } = badgeResult;
 
-  if (profileError) {
+  if (profileError || badgeError) {
     console.error("Failed to load mini-program member profiles.", {
-      code: profileError.code,
+      profileCode: profileError?.code,
+      badgeCode: badgeError?.code,
     });
     return miniappJson({ error: "member_pool_load_failed" }, 500);
   }
 
   const membersById = new Map(memberRows.map((member) => [member.id, member]));
+  const communityTagsByMemberId = new Map<string, string[]>();
+  ((badgeData ?? []) as MemberBadgeRow[]).forEach((badge) => {
+    const label = badge.label.trim();
+    if (!label) return;
+    const tags = communityTagsByMemberId.get(badge.user_id) ?? [];
+    if (!tags.includes(label)) tags.push(label);
+    communityTagsByMemberId.set(badge.user_id, tags);
+  });
   const eligibleMembers = ((profileData ?? []) as ProfileRow[])
     .flatMap((profile): MemberPoolItem[] => {
       const member = membersById.get(profile.id);
@@ -219,6 +246,7 @@ export async function GET(request: Request) {
       if (!completion.completed) return [];
 
       const isCoBuilder = Boolean(member.is_co_builder);
+      const identityLabel = getIdentityLabel(member.status, isCoBuilder);
       return [{
         id: profile.id,
         shareHandle: profile.public_slug?.trim() || profile.id,
@@ -234,7 +262,10 @@ export async function GET(request: Request) {
         seekingSummary: profile.seeking_summary?.trim() || "",
         willingToShare: member.willing_to_share,
         willingToJoinProjects: member.willing_to_join_projects,
-        identityLabel: getIdentityLabel(member.status, isCoBuilder),
+        identityLabel,
+        communityTags: (communityTagsByMemberId.get(profile.id) ?? [])
+          .filter((label) => label !== identityLabel)
+          .slice(0, 2),
         isCoBuilder,
         isFeatured: Boolean(member.is_featured_on_home),
         joinedAt: member.joined_at,
