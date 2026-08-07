@@ -122,8 +122,6 @@ interface MiniappMemberPoolItem {
   identityLabel: string;
   communityTags: string[];
   isRecommended: boolean;
-  joinedLabel: string;
-  attendanceCount: number;
 }
 
 interface MiniappMemberPoolResponse {

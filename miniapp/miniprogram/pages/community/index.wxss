@@ -206,9 +206,12 @@
   font-weight: 700;
 }
 
-.member-sort-trigger text:last-child {
-  color: #85928c;
-  font-size: 17rpx;
+.member-sort-arrow {
+  width: 18rpx;
+  height: 18rpx;
+  flex: 0 0 18rpx;
+  opacity: 0.72;
+  transform: rotate(90deg);
 }
 
 .member-search-toggle {
@@ -401,15 +404,6 @@
 
 .member-card-signals {
   margin-top: 13rpx;
-}
-
-.member-card-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8rpx 18rpx;
-  margin-top: 14rpx;
-  color: #77847e;
-  font-size: 17rpx;
 }
 
 .member-card-signals text {

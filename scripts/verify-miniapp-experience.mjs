@@ -318,8 +318,8 @@ try {
   assert.equal("email" in verifiedMember, false);
   assert.equal("bio" in verifiedMember, false);
   assert.equal("joinedAt" in verifiedMember, false);
-  assert.match(verifiedMember.joinedLabel, /^\d{4}年\d{1,2}月$/);
-  assert.equal(typeof verifiedMember.attendanceCount, "number");
+  assert.equal("joinedLabel" in verifiedMember, false);
+  assert.equal("attendanceCount" in verifiedMember, false);
   assert.equal(typeof verifiedMember.isRecommended, "boolean");
   assert.equal("directoryPriority" in verifiedMember, false);
   pass("member_pool_authenticated_search_excludes_private_fields");

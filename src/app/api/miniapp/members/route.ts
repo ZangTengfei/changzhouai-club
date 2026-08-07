@@ -13,11 +13,6 @@ const GUEST_MEMBER_LIMIT = 6;
 const ACTIVE_MEMBER_STATUSES = new Set(["active", "organizer", "admin"]);
 const MEMBER_INTENTS = new Set(["share", "projects", "seeking"]);
 const MEMBER_SORTS = new Set(["recommended", "newest", "active"]);
-const joinedMonthFormatter = new Intl.DateTimeFormat("zh-CN", {
-  year: "numeric",
-  month: "long",
-  timeZone: "Asia/Shanghai",
-});
 
 type MemberSort = "recommended" | "newest" | "active";
 
@@ -168,8 +163,6 @@ function toMemberPoolResponse(member: MemberPoolItem) {
     identityLabel: member.identityLabel,
     communityTags: member.communityTags.slice(0, 2),
     isRecommended: member.directoryPriority > 0,
-    joinedLabel: joinedMonthFormatter.format(new Date(member.joinedAt)),
-    attendanceCount: member.attendanceCount,
   };
 }
 
