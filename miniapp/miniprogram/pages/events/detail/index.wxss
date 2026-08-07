@@ -111,6 +111,59 @@
   height: 34rpx;
 }
 
+.community-guide-entry {
+  display: flex;
+  min-height: 104rpx;
+  align-items: center;
+  gap: 18rpx;
+  margin-top: 18rpx;
+  padding: 20rpx 24rpx;
+  background: linear-gradient(135deg, #eef8ff 0%, #f2fbf6 100%);
+}
+
+.community-guide-icon {
+  display: flex;
+  width: 58rpx;
+  height: 58rpx;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 19rpx;
+  background: #ffffff;
+}
+
+.community-guide-icon image {
+  width: 34rpx;
+  height: 34rpx;
+}
+
+.community-guide-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 5rpx;
+}
+
+.community-guide-kicker {
+  color: #2870a7;
+  font-size: 20rpx;
+  font-weight: 740;
+}
+
+.community-guide-title {
+  font-size: 25rpx;
+  font-weight: 790;
+  line-height: 1.4;
+}
+
+.community-guide-arrow {
+  flex: none;
+  color: #2870a7;
+  font-size: 42rpx;
+  line-height: 1;
+}
+
 .fact-copy {
   display: flex;
   min-width: 0;

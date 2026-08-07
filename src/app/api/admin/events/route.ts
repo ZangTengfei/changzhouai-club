@@ -15,7 +15,7 @@ import {
 } from "@/lib/event-registration-options";
 import { canAdmin } from "@/lib/supabase/guards";
 import { parseEventVisibility } from "@/lib/event-visibility";
-import { parseEventMapCoordinates } from "@/lib/event-location";
+import { resolveEventMapCoordinates } from "@/lib/event-location";
 
 export async function GET() {
   const { context, response } = await requireAdminApiPermission("events.read");
@@ -70,10 +70,11 @@ export async function POST(request: Request) {
   const slugInput = String(payload.slug ?? "").trim();
   const slug = normalizeSlug(slugInput || title);
   const status = String(payload.status ?? "draft").trim();
+  const venue = getOptionalValue(payload, "venue");
   let registrationCapacity: number | null;
   let registrationMode: "instant" | "review";
   let groupQrInput: ReturnType<typeof parseAdminEventGroupQrInput>;
-  let mapCoordinates: ReturnType<typeof parseEventMapCoordinates>;
+  let mapCoordinates: ReturnType<typeof resolveEventMapCoordinates>;
 
   try {
     registrationCapacity = parseEventRegistrationCapacity(
@@ -81,7 +82,8 @@ export async function POST(request: Request) {
     );
     registrationMode = parseEventRegistrationMode(payload.registration_mode);
     groupQrInput = parseAdminEventGroupQrInput(payload);
-    mapCoordinates = parseEventMapCoordinates(
+    mapCoordinates = resolveEventMapCoordinates(
+      venue,
       payload.location_latitude,
       payload.location_longitude,
     );
@@ -120,7 +122,7 @@ export async function POST(request: Request) {
       recap: getOptionalValue(payload, "recap"),
       docs_url: getOptionalValue(payload, "docs_url"),
       event_at: normalizeAdminEventDateTime(getOptionalValue(payload, "event_at")),
-      venue: getOptionalValue(payload, "venue"),
+      venue,
       city: getOptionalValue(payload, "city") ?? "常州",
       location_latitude: mapCoordinates.latitude,
       location_longitude: mapCoordinates.longitude,

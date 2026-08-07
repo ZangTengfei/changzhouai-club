@@ -9,6 +9,7 @@ import {
   type EventType,
 } from "@/lib/event-type";
 import { getEventImageUrl } from "@/lib/public-image-url";
+import { isCommunityEventVenue } from "@/lib/event-location";
 import { createPublicServerClient } from "@/lib/supabase/public-server";
 
 type EventPhotoRow = {
@@ -146,6 +147,7 @@ export type PublicEventDetail = {
   locationLabel: string;
   locationLatitude: number | null;
   locationLongitude: number | null;
+  communityGuideAvailable: boolean;
   imageUrl: string | null;
   imageThumbnailUrl: string | null;
   descriptionParagraphs: string[];
@@ -385,6 +387,7 @@ function mapPublicEventDetail(row: EventRow): PublicEventDetail {
     locationLabel: buildLocationLabel(row.city, row.venue),
     locationLatitude: row.location_latitude,
     locationLongitude: row.location_longitude,
+    communityGuideAvailable: isCommunityEventVenue(row.venue),
     imageUrl,
     imageThumbnailUrl: getEventImageUrl(imageUrl, "miniapp-detail-cover"),
     descriptionParagraphs: parseParagraphs(row.description),

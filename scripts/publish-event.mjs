@@ -13,6 +13,10 @@ const EVENT_TYPE_VALUES = new Set(["community", "external"]);
 const REGISTRATION_MODE_VALUES = new Set(["instant", "review"]);
 const VISIBILITY_VALUES = new Set(["public", "admin_only"]);
 const CHANGZHOU_TIMEZONE_OFFSET = "+08:00";
+const COMMUNITY_DEFAULT_MAP_COORDINATES = {
+  location_latitude: 31.677251,
+  location_longitude: 119.972065,
+};
 const TEXT_LIST_FIELDS = new Set(["agenda", "speaker_lineup"]);
 const PARAGRAPH_FIELDS = new Set(["description", "recap"]);
 const EVENT_FIELDS = new Set([
@@ -37,6 +41,8 @@ const EVENT_FIELDS = new Set([
   "event_at",
   "venue",
   "city",
+  "location_latitude",
+  "location_longitude",
   "cover_image_url",
   "status",
   "visibility",
@@ -74,7 +80,8 @@ Required JSON fields:
   title, slug
 
 Common JSON fields:
-  summary, description, event_at, venue, city, agenda, speaker_lineup,
+  summary, description, event_at, venue, city, location_latitude,
+  location_longitude, agenda, speaker_lineup,
   registration_note, registration_url, registration_mode, registration_capacity,
   event_type, cover_image_url,
   video_url, video_provider, video_file_id, video_title, video_cover_url, status,
@@ -216,6 +223,61 @@ function getOptionalString(value) {
 
   const trimmed = String(value).trim();
   return trimmed || null;
+}
+
+function normalizeVenue(value) {
+  return String(value ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s｜|·•()（）-]+/g, "");
+}
+
+function isCommunityEventVenue(value) {
+  const venue = normalizeVenue(value);
+  if (!venue) return false;
+
+  return (
+    venue.includes("aiclubopc共创社区") ||
+    (venue.includes("中以创新园") && venue.includes("18号楼5楼")) ||
+    (venue.includes("西太湖人工智能国际社区") &&
+      venue.includes("18号楼5楼"))
+  );
+}
+
+function normalizeOptionalCoordinate(value) {
+  if (value === null || value === undefined || String(value).trim() === "") {
+    return null;
+  }
+
+  const coordinate = Number(value);
+  if (!Number.isFinite(coordinate)) {
+    throw new Error("location coordinates must be finite numbers.");
+  }
+  return coordinate;
+}
+
+function normalizeMapCoordinates(payload, venue) {
+  const latitude = normalizeOptionalCoordinate(payload.location_latitude);
+  const longitude = normalizeOptionalCoordinate(payload.location_longitude);
+
+  if ((latitude === null) !== (longitude === null)) {
+    throw new Error("location_latitude and location_longitude must be provided together.");
+  }
+
+  if (latitude === null && longitude === null) {
+    return isCommunityEventVenue(venue)
+      ? { ...COMMUNITY_DEFAULT_MAP_COORDINATES }
+      : null;
+  }
+
+  if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+    throw new Error("location coordinates are outside the valid range.");
+  }
+
+  return {
+    location_latitude: latitude,
+    location_longitude: longitude,
+  };
 }
 
 function getTextField(payload, fieldName) {
@@ -396,6 +458,8 @@ function normalizePayload(rawPayload, options) {
   const title = getOptionalString(rawPayload.title);
   const slug = normalizeSlug(rawPayload.slug);
   const status = getOptionalString(rawPayload.status) ?? "scheduled";
+  const venue = getTextField(rawPayload, "venue");
+  const mapCoordinates = normalizeMapCoordinates(rawPayload, venue);
 
   if (!title) {
     throw new Error("title is required.");
@@ -429,8 +493,9 @@ function normalizePayload(rawPayload, options) {
     video_title: getTextField(rawPayload, "video_title"),
     video_cover_url: normalizeManagedImageUrl(rawPayload.video_cover_url, "video_cover_url"),
     event_at: normalizeEventDateTime(rawPayload.event_at),
-    venue: getTextField(rawPayload, "venue"),
+    venue,
     city: getTextField(rawPayload, "city") ?? "常州",
+    ...(mapCoordinates ?? {}),
     cover_image_url: normalizeManagedImageUrl(rawPayload.cover_image_url, "cover_image_url"),
     status,
     visibility: normalizeVisibility(rawPayload.visibility),

@@ -1,0 +1,81 @@
+.guide-page {
+  min-height: 100%;
+  background: #f5f7f6;
+}
+
+.guide-tabs-wrap {
+  position: sticky;
+  z-index: 5;
+  top: 0;
+  padding: 18rpx 24rpx;
+  background: rgba(245, 247, 246, 0.96);
+}
+
+.guide-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12rpx;
+  padding: 8rpx;
+  border-radius: 26rpx;
+  background: #e8edeb;
+}
+
+.guide-tab {
+  display: flex;
+  min-height: 76rpx;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 3rpx;
+  border-radius: 20rpx;
+  color: var(--color-subtle);
+}
+
+.guide-tab-active {
+  background: #ffffff;
+  color: var(--color-green-dark);
+  box-shadow: 0 6rpx 16rpx rgba(28, 55, 44, 0.08);
+}
+
+.guide-tab-title {
+  font-size: 25rpx;
+  font-weight: 790;
+}
+
+.guide-tab-note {
+  font-size: 18rpx;
+}
+
+.guide-content {
+  padding: 0 20rpx 48rpx;
+}
+
+.guide-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 8rpx 6rpx 18rpx;
+  color: var(--color-subtle);
+  font-size: 19rpx;
+}
+
+.guide-hint text:last-child {
+  flex: none;
+  color: #2870a7;
+}
+
+.guide-image {
+  display: block;
+  width: 100%;
+  border-radius: 24rpx;
+  background: #ffffff;
+  box-shadow: var(--shadow-card);
+}
+
+.guide-image-hidden {
+  width: 1rpx;
+  height: 1rpx;
+  overflow: hidden;
+  opacity: 0;
+}

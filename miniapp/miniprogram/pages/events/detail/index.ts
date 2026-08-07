@@ -326,6 +326,11 @@ Page({
     });
   },
 
+  openCommunityGuide() {
+    if (!this.data.event?.communityGuideAvailable) return;
+    void wx.navigateTo({ url: "/pages/community/guide/index" });
+  },
+
   async submitRegistration() {
     if (this.data.submitting || !this.data.event) return;
     if (!this.data.user?.registrationReady) {

@@ -350,7 +350,7 @@ export function AdminEventEditorFormClient({
                           placeholder="常州"
                         />
                       </AdminField>
-                      <AdminField label="地图纬度">
+                      <AdminField label="地图纬度（社区地址可留空）">
                         <Input
                           type="number"
                           name="location_latitude"
@@ -358,10 +358,10 @@ export function AdminEventEditorFormClient({
                           max="90"
                           step="any"
                           defaultValue={event?.location_latitude ?? ""}
-                          placeholder="例如：31.810689"
+                          placeholder="社区默认：31.677251"
                         />
                       </AdminField>
-                      <AdminField label="地图经度">
+                      <AdminField label="地图经度（社区地址可留空）">
                         <Input
                           type="number"
                           name="location_longitude"
@@ -369,7 +369,7 @@ export function AdminEventEditorFormClient({
                           max="180"
                           step="any"
                           defaultValue={event?.location_longitude ?? ""}
-                          placeholder="例如：119.974061"
+                          placeholder="社区默认：119.972065"
                         />
                       </AdminField>
                     </div>

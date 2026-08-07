@@ -2,6 +2,7 @@
   "pages": [
     "pages/home/index",
     "pages/community/index",
+    "pages/community/guide/index",
     "pages/events/index",
     "pages/me/index",
     "pages/login/index",

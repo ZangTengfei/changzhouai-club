@@ -1,0 +1,17 @@
+<view class="guide-page">
+  <view class="guide-tabs-wrap">
+    <view class="guide-tabs">
+      <view wx:for="{{tabs}}" wx:key="key" class="guide-tab {{activeGuide === item.key ? 'guide-tab-active' : ''}}" data-guide="{{item.key}}" bindtap="selectGuide" role="button" aria-label="查看{{item.label}}导览">
+        <text class="guide-tab-title">{{item.label}}</text>
+        <text class="guide-tab-note">{{item.note}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="guide-content">
+    <view class="guide-hint"><text>CAIC18 · AI Club OPC 共创社区</text><text>轻触导览图可放大查看</text></view>
+    <view wx:if="{{imageLoading}}" class="empty-state loading-state"><view class="loading-spinner" aria-hidden="true"></view><text>正在加载路线导览</text></view>
+    <view wx:elif="{{imageFailed}}" class="empty-state retry-state" bindtap="retryImage" role="button"><text class="retry-icon">↻</text><text class="retry-title">导览图加载失败</text><text class="retry-copy">轻触重新加载</text></view>
+    <image class="guide-image {{imageLoading || imageFailed ? 'guide-image-hidden' : ''}}" src="{{imageUrl}}" mode="widthFix" bindload="handleImageLoad" binderror="handleImageError" bindtap="previewGuide" aria-label="社区路线导览图，轻触可放大" />
+  </view>
+</view>

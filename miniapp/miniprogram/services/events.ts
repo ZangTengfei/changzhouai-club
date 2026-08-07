@@ -70,6 +70,7 @@ export type EventDetail = {
   locationLabel: string;
   locationLatitude: number | null;
   locationLongitude: number | null;
+  communityGuideAvailable: boolean;
   imageUrl: string | null;
   imageThumbnailUrl: string | null;
   descriptionParagraphs: string[];
