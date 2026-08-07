@@ -2,6 +2,7 @@ import { memberTags } from "@/lib/site-data";
 
 export const MINIAPP_PRIVACY_POLICY_VERSION = "2026-07-18";
 export const MINIAPP_PHONE_CONTACT_POLICY_VERSION = "phone-contact:2026-08-01";
+export const MINIAPP_DISPLAY_NAME_MAX_LENGTH = 12;
 
 export const MINIAPP_CITY_OPTIONS = [
   "常州",

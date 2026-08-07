@@ -16,7 +16,7 @@
           <image class="settings-icon" src="/assets/icons/profile-blue-v2.png" mode="aspectFit" />
           <view class="nickname-inline-field">
             <text class="nickname-inline-label">昵称</text>
-            <input class="nickname-inline-input" type="nickname" maxlength="60" value="{{displayNameDraft}}" bindinput="handleNameInput" bindblur="handleNameBlur" confirm-type="done" bindconfirm="saveDisplayName" focus />
+            <input class="nickname-inline-input" type="nickname" maxlength="{{displayNameMaxLength}}" value="{{displayNameDraft}}" bindinput="handleNameInput" bindblur="handleNameBlur" confirm-type="done" bindconfirm="saveDisplayName" focus />
           </view>
           <view class="nickname-inline-actions" bindtouchstart="prepareNameEditAction" bindtouchcancel="cancelNameEditAction">
             <text class="nickname-inline-cancel" catchtap="cancelNameEdit">取消</text>

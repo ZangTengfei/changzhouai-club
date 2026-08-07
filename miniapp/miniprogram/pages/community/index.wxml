@@ -206,7 +206,6 @@
     <view class="member-pool-heading">
       <view class="member-pool-heading-copy"><text>公开成员</text><text wx:if="{{memberCommunityTotal}}">社区已有 {{memberCommunityTotal}} 位成员 · {{memberPublicTotal}} 位公开展示</text><text wx:else>{{memberPoolGuestPreview ? '登录后查看更多社区成员' : '按公开资料和参与方向发现成员'}}</text></view>
       <view class="member-pool-heading-actions">
-        <text wx:if="{{memberPoolTotal}}">{{memberPoolTotal}} 位</text>
         <picker class="member-sort-picker" mode="selector" range="{{memberSortOptions}}" range-key="label" value="{{memberSortIndex}}" bindchange="changeMemberSort">
           <view class="member-sort-trigger" role="button" aria-label="成员排序：{{memberSortLabel}}"><text>{{memberSortLabel}}</text><image class="member-sort-arrow" src="/assets/icons/chevron-soft-v2.png" mode="aspectFit" /></view>
         </picker>
@@ -215,8 +214,6 @@
         </button>
       </view>
     </view>
-
-    <view wx:if="{{memberCommunityTotal > memberPublicTotal}}" class="member-visibility-note"><text>公开社区名片，让更多合作机会找到你</text></view>
 
     <view wx:if="{{memberSearchExpanded}}" class="member-search-panel">
       <view class="member-search-row">
@@ -235,13 +232,18 @@
         <view class="member-card-top">
           <image wx:if="{{item.avatarUrl}}" class="member-card-avatar" src="{{item.avatarUrl}}" mode="aspectFill" lazy-load="{{true}}" />
           <view wx:else class="member-card-avatar member-card-avatar-empty">{{item.avatarInitial}}</view>
-          <view class="member-card-identity"><view><text class="member-card-name">{{item.displayName}}</text><text class="member-card-badge">{{item.identityLabel}}</text></view><text class="member-card-headline">{{item.headline}}</text></view>
+          <view class="member-card-identity">
+            <view class="member-card-name-row">
+              <text class="member-card-name">{{item.displayName}}</text>
+              <view wx:if="{{item.communityLabels.length}}" class="member-card-community-tags"><text wx:for="{{item.communityLabels}}" wx:key="*this" wx:for-index="communityIndex" class="member-card-community-tag {{communityIndex === 0 ? 'member-card-community-tag-primary' : ''}}">{{item}}</text></view>
+            </view>
+            <text class="member-card-headline">{{item.headline}}</text>
+          </view>
           <text class="member-card-arrow">›</text>
         </view>
-        <view wx:if="{{item.communityTags.length}}" class="member-card-community-tags"><text wx:for="{{item.communityTags}}" wx:key="*this">{{item}}</text></view>
         <view wx:if="{{item.visibleSkills.length}}" class="member-card-skills"><text wx:for="{{item.visibleSkills}}" wx:key="*this">{{item}}</text></view>
-        <view class="member-card-summary"><text>{{item.primarySummaryLabel}}</text><text>{{item.primarySummary}}</text></view>
-        <view class="member-card-signals"><text class="member-card-registration">累计报名 {{item.registrationCount}} 场</text><text wx:if="{{item.willingToShare}}">愿意分享</text><text wx:if="{{item.willingToJoinProjects}}">可参与项目</text></view>
+        <view wx:if="{{item.primarySummary}}" class="member-card-summary"><text>{{item.primarySummaryLabel}}</text><text>{{item.primarySummary}}</text></view>
+        <text class="member-card-registration">累计报名 {{item.registrationCount}} 场</text>
       </view>
     </view>
 

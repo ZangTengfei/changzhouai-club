@@ -17,7 +17,7 @@
 
       <label class="name-field">
         <text class="field-label">昵称 *</text>
-        <input class="name-input" type="text" maxlength="60" value="{{displayNameDraft}}" bindinput="handleNameInput" placeholder="你希望大家如何称呼你" />
+        <input class="name-input" type="text" maxlength="{{displayNameMaxLength}}" value="{{displayNameDraft}}" bindinput="handleNameInput" placeholder="你希望大家如何称呼你（最多 12 个字）" />
       </label>
     </view>
 

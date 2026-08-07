@@ -95,6 +95,19 @@ function hasValue(values: string[], target: string) {
   return values.some((value) => value === target);
 }
 
+function normalizeCommunityLabel(value: string) {
+  return value.trim().toLocaleLowerCase("zh-CN").replace(/[\s·_-]+/g, "");
+}
+
+function isIdentityEquivalentTag(label: string, identityLabel: string) {
+  const aliases: Record<string, Set<string>> = {
+    社区发起人: new Set(["社区发起人", "发起人", "创始人", "联合创始人"]),
+    共建伙伴: new Set(["共建伙伴", "共建成员", "社区共建成员"]),
+    社区成员: new Set(["社区成员", "正式成员"]),
+  };
+  return aliases[identityLabel]?.has(normalizeCommunityLabel(label)) ?? false;
+}
+
 function matchesQuery(member: MemberPoolItem, query: string) {
   if (!query) return true;
   return [
@@ -158,8 +171,6 @@ function toMemberPoolResponse(member: MemberPoolItem) {
     skills: member.skills.slice(0, 3),
     capabilitySummary: member.capabilitySummary,
     seekingSummary: member.seekingSummary,
-    willingToShare: member.willingToShare,
-    willingToJoinProjects: member.willingToJoinProjects,
     identityLabel: member.identityLabel,
     communityTags: member.communityTags.slice(0, 2),
     registrationCount: member.registrationCount,
@@ -318,7 +329,7 @@ export async function GET(request: Request) {
         willingToJoinProjects: member.willing_to_join_projects,
         identityLabel,
         communityTags: (communityTagsByMemberId.get(profile.id) ?? [])
-          .filter((label) => label !== identityLabel)
+          .filter((label) => !isIdentityEquivalentTag(label, identityLabel))
           .slice(0, 2),
         isCoBuilder,
         joinedAt: member.joined_at,

@@ -1,6 +1,9 @@
 import { loadMiniappAccountSnapshot } from "@/lib/miniapp-auth";
 import { miniappJson, requireMiniappSession } from "@/lib/miniapp-api";
-import { isMiniappDisplayNameReady } from "@/lib/miniapp-profile";
+import {
+  isMiniappDisplayNameReady,
+  MINIAPP_DISPLAY_NAME_MAX_LENGTH,
+} from "@/lib/miniapp-profile";
 
 export const runtime = "nodejs";
 
@@ -14,7 +17,10 @@ export async function PUT(request: Request) {
   const displayName =
     typeof payload?.displayName === "string" ? payload.displayName.trim() : "";
 
-  if (displayName.length > 60 || !isMiniappDisplayNameReady(displayName)) {
+  if (
+    displayName.length > MINIAPP_DISPLAY_NAME_MAX_LENGTH ||
+    !isMiniappDisplayNameReady(displayName)
+  ) {
     return miniappJson({ error: "invalid_display_name" }, 400);
   }
 

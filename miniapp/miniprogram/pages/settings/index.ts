@@ -15,6 +15,7 @@ const channelLabels: Record<string, string> = {
 
 let nameBlurTimer: ReturnType<typeof setTimeout> | null = null;
 let nameEditActionPending = false;
+const displayNameMaxLength = 12;
 
 function clearNameBlurTimer() {
   if (nameBlurTimer === null) return;
@@ -50,6 +51,7 @@ Page({
     nameEditing: false,
     nameEditRequested: false,
     displayNameDraft: "",
+    displayNameMaxLength,
     displayNameSaving: false,
   },
 
@@ -195,6 +197,10 @@ Page({
       void wx.showToast({ title: "请输入有效昵称", icon: "none" });
       return;
     }
+    if (displayName.length > displayNameMaxLength) {
+      void wx.showToast({ title: `昵称最多 ${displayNameMaxLength} 个字`, icon: "none" });
+      return;
+    }
     if (this.data.displayNameSaving) return;
     if (displayName === this.data.user?.displayName) {
       this.setData({ nameEditing: false });
@@ -218,7 +224,7 @@ Page({
         title:
           error instanceof ApiError &&
           error.errorCode === "invalid_display_name"
-            ? "请输入有效昵称"
+            ? `昵称最多 ${displayNameMaxLength} 个字`
             : "昵称更新失败，请重试",
         icon: "none",
       });

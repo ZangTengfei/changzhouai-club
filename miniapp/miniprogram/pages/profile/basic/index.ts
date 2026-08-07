@@ -10,6 +10,8 @@ type BasicProfileIntent =
   | "account"
   | "community";
 
+const displayNameMaxLength = 12;
+
 function readIntent(value: string | undefined): BasicProfileIntent {
   return ["event_registration", "profile", "account", "community"].includes(
     value ?? "",
@@ -35,6 +37,7 @@ Page({
     intent: "account" as BasicProfileIntent,
     user: null as MiniappUser | null,
     displayNameDraft: "",
+    displayNameMaxLength,
     avatarInitial: "微",
     loading: true,
     loadFailed: false,
@@ -107,6 +110,10 @@ Page({
       void wx.showToast({ title: "请输入有效昵称", icon: "none" });
       return;
     }
+    if (displayName.length > displayNameMaxLength) {
+      void wx.showToast({ title: `昵称最多 ${displayNameMaxLength} 个字`, icon: "none" });
+      return;
+    }
     if (this.data.saving) return;
 
     this.setData({ saving: true });
@@ -120,7 +127,7 @@ Page({
         title:
           error instanceof ApiError &&
           error.errorCode === "invalid_display_name"
-            ? "请输入有效昵称"
+            ? `昵称最多 ${displayNameMaxLength} 个字`
             : "昵称保存失败，请重试",
         icon: "none",
       });

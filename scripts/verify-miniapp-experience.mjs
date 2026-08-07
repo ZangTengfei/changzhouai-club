@@ -246,6 +246,14 @@ try {
   assert.equal(invalidBasicProfilePut.response.status, 400);
   assert.equal(invalidBasicProfilePut.body?.error, "invalid_display_name");
 
+  const tooLongBasicProfilePut = await request("/api/miniapp/profile/basic", {
+    method: "PUT",
+    headers: authHeaders,
+    body: JSON.stringify({ displayName: "这是一个超过十二个字的社区昵称" }),
+  });
+  assert.equal(tooLongBasicProfilePut.response.status, 400);
+  assert.equal(tooLongBasicProfilePut.body?.error, "invalid_display_name");
+
   const basicProfilePut = await request("/api/miniapp/profile/basic", {
     method: "PUT",
     headers: authHeaders,
@@ -328,6 +336,8 @@ try {
   assert.equal("attendanceCount" in verifiedMember, false);
   assert.equal("isRecommended" in verifiedMember, false);
   assert.equal("directoryPriority" in verifiedMember, false);
+  assert.equal("willingToShare" in verifiedMember, false);
+  assert.equal("willingToJoinProjects" in verifiedMember, false);
   pass("member_pool_authenticated_search_excludes_private_fields");
 
   for (const sort of ["identity", "newest", "active"]) {

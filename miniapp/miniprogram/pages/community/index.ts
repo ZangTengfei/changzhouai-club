@@ -23,6 +23,7 @@ type MemberPoolCard = MiniappMemberPoolItem & {
   headline: string;
   primarySummary: string;
   primarySummaryLabel: string;
+  communityLabels: string[];
   visibleSkills: string[];
 };
 
@@ -51,7 +52,7 @@ const durationOptions = [1, 2, 4, 8];
 const memberSortOptions: Array<{ label: string; value: MemberSort }> = [
   { label: "社区身份", value: "identity" },
   { label: "最近加入", value: "newest" },
-  { label: "活跃参与", value: "active" },
+  { label: "报名活跃", value: "active" },
 ];
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
 const communitySummary = "这里有工位、会议室，也有一群正在做事的人。";
@@ -76,11 +77,22 @@ let requestVersion = 0;
 let memberPoolRequestVersion = 0;
 let hasTrackedMemberPoolView = false;
 const communityShareImageUrl = "/assets/share/home-share-v7.jpg";
+const communitySectionSwiperBottomBuffer = 24;
 
 function mapMemberPoolCard(member: MiniappMemberPoolItem): MemberPoolCard {
   const headline = [member.roleLabel, member.organization, member.city]
     .filter(Boolean)
     .join(" · ");
+  const normalizeLabel = (value: string) =>
+    value.trim().toLocaleLowerCase("zh-CN").replace(/[\s·_-]+/g, "");
+  const communityLabels = Array.from(
+    new Map(
+      [member.identityLabel, ...(member.communityTags ?? [])]
+        .filter(Boolean)
+        .map((label) => [normalizeLabel(label), label.trim()]),
+    ).values(),
+  ).slice(0, 2);
+  const communityLabelKeys = new Set(communityLabels.map(normalizeLabel));
   return {
     ...member,
     communityTags: member.communityTags ?? [],
@@ -88,7 +100,10 @@ function mapMemberPoolCard(member: MiniappMemberPoolItem): MemberPoolCard {
     headline,
     primarySummary: member.capabilitySummary || member.seekingSummary,
     primarySummaryLabel: member.capabilitySummary ? "可以提供" : "正在寻找",
-    visibleSkills: member.skills.slice(0, 3),
+    communityLabels,
+    visibleSkills: member.skills
+      .filter((skill) => !communityLabelKeys.has(normalizeLabel(skill)))
+      .slice(0, 3),
   };
 }
 
@@ -463,7 +478,6 @@ Page({
     memberCards: [] as MemberPoolCard[],
     memberCommunityTotal: 0,
     memberPublicTotal: 0,
-    memberPoolTotal: 0,
     memberPoolPage: 1,
     memberPoolHasMore: false,
     memberPoolAuthenticated: false,
@@ -651,7 +665,9 @@ Page({
         .select(`#${panelId}`)
         .boundingClientRect((rect) => {
           if (!rect || Array.isArray(rect) || !rect.height) return;
-          const communitySectionSwiperHeight = Math.ceil(rect.height);
+          const communitySectionSwiperHeight = Math.ceil(
+            rect.height + communitySectionSwiperBottomBuffer,
+          );
           if (communitySectionSwiperHeight !== this.data.communitySectionSwiperHeight) {
             this.setData({ communitySectionSwiperHeight });
           }
@@ -685,7 +701,6 @@ Page({
           memberCards: append ? [...this.data.memberCards, ...newCards] : newCards,
           memberCommunityTotal: response.summary.communityTotal,
           memberPublicTotal: response.summary.publicTotal,
-          memberPoolTotal: response.pagination.total,
           memberPoolPage: response.pagination.page,
           memberPoolHasMore: response.pagination.hasMore,
           memberPoolAuthenticated: response.authenticated,

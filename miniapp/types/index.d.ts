@@ -117,8 +117,6 @@ interface MiniappMemberPoolItem {
   skills: string[];
   capabilitySummary: string;
   seekingSummary: string;
-  willingToShare: boolean;
-  willingToJoinProjects: boolean;
   identityLabel: string;
   communityTags: string[];
   registrationCount: number;

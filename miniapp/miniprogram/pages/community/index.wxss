@@ -170,10 +170,9 @@
   font-weight: 820;
 }
 
-.member-pool-heading-copy text:last-child,
-.member-pool-heading-actions > text {
+.member-pool-heading-copy text:last-child {
   color: var(--color-subtle);
-  font-size: 19rpx;
+  font-size: 20rpx;
 }
 
 .member-pool-heading-actions {
@@ -183,26 +182,22 @@
   gap: 10rpx;
 }
 
-.member-pool-heading-actions > text {
-  flex: none;
-}
-
 .member-sort-picker {
   flex: none;
 }
 
 .member-sort-trigger {
   display: flex;
-  min-height: 56rpx;
+  min-height: 72rpx;
   box-sizing: border-box;
   align-items: center;
   gap: 5rpx;
-  padding: 0 15rpx;
+  padding: 0 20rpx;
   border: 2rpx solid #dfe8e3;
-  border-radius: 28rpx;
+  border-radius: 36rpx;
   background: #ffffff;
   color: #52635c;
-  font-size: 18rpx;
+  font-size: 20rpx;
   font-weight: 700;
 }
 
@@ -222,25 +217,6 @@
 .member-search-toggle-active {
   border-color: rgba(18, 165, 102, 0.24);
   background: var(--color-green-soft);
-}
-
-.member-visibility-note {
-  display: flex;
-  align-items: center;
-  margin: -2rpx 2rpx 16rpx;
-  color: var(--color-green-dark);
-  font-size: 19rpx;
-  line-height: 1.5;
-}
-
-.member-visibility-note::before {
-  width: 9rpx;
-  height: 9rpx;
-  flex: 0 0 9rpx;
-  margin-right: 10rpx;
-  border-radius: 50%;
-  background: var(--color-green);
-  content: "";
 }
 
 .member-pool-state,
@@ -317,30 +293,22 @@
   gap: 7rpx;
 }
 
-.member-card-identity > view {
+.member-card-name-row {
   display: flex;
   min-width: 0;
   align-items: center;
-  gap: 9rpx;
+  gap: 8rpx;
 }
 
 .member-card-name {
+  max-width: 188rpx;
+  flex: 0 1 auto;
   overflow: hidden;
   color: var(--color-ink);
   font-size: 29rpx;
   font-weight: 820;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.member-card-badge {
-  flex: none;
-  padding: 5rpx 10rpx;
-  border-radius: 13rpx;
-  background: var(--color-green-soft);
-  color: var(--color-green-dark);
-  font-size: 16rpx;
-  font-weight: 720;
 }
 
 .member-card-headline {
@@ -354,78 +322,87 @@
 .member-card-arrow {
   flex: none;
   color: #9aa5a0;
-  font-size: 39rpx;
+  font-size: 34rpx;
   line-height: 1;
 }
 
-.member-card-community-tags,
-.member-card-skills,
-.member-card-signals {
+.member-card-skills {
   display: flex;
   flex-wrap: wrap;
   gap: 8rpx;
   margin-top: 18rpx;
 }
 
-.member-card-community-tags text,
-.member-card-skills text,
-.member-card-signals text {
+.member-card-skills text {
   padding: 7rpx 12rpx;
   border-radius: 15rpx;
   background: #f1f5f3;
   color: #52635c;
-  font-size: 17rpx;
+  font-size: 19rpx;
   font-weight: 650;
 }
 
 .member-card-community-tags {
-  margin-top: 16rpx;
+  display: flex;
+  min-width: 0;
+  flex: 0 1 auto;
+  align-items: center;
+  gap: 6rpx;
+  overflow: hidden;
 }
 
-.member-card-community-tags text {
+.member-card-community-tags .member-card-community-tag {
+  flex: none;
+  padding: 5rpx 9rpx;
+  border-radius: 13rpx;
   background: #fff5df;
   color: #8a5b17;
+  font-size: 17rpx;
   font-weight: 720;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.member-card-community-tags .member-card-community-tag-primary {
+  background: var(--color-green-soft);
+  color: var(--color-green-dark);
+}
+
+.member-card-skills {
+  margin-top: 12rpx;
 }
 
 .member-card-summary {
   display: flex;
-  flex-direction: column;
-  gap: 6rpx;
-  margin-top: 18rpx;
-  padding: 17rpx 18rpx;
-  border-radius: 20rpx;
-  background: #f7f9f8;
+  align-items: baseline;
+  gap: 10rpx;
+  margin-top: 16rpx;
 }
 
 .member-card-summary text:first-child {
+  flex: none;
   color: var(--color-green-dark);
-  font-size: 17rpx;
+  font-size: 19rpx;
   font-weight: 760;
+  line-height: 1.5;
 }
 
 .member-card-summary text:last-child {
   display: -webkit-box;
   overflow: hidden;
   color: #425049;
-  font-size: 21rpx;
-  line-height: 1.55;
+  font-size: 22rpx;
+  line-height: 1.5;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }
 
-.member-card-signals {
+.member-card-registration {
+  display: block;
   margin-top: 13rpx;
-}
-
-.member-card-signals text {
-  background: var(--color-blue-soft);
-  color: #376a9f;
-}
-
-.member-card-signals .member-card-registration {
-  background: var(--color-green-soft);
-  color: var(--color-green-dark);
+  color: var(--color-subtle);
+  font-size: 19rpx;
+  font-weight: 650;
 }
 
 .member-load-more {
