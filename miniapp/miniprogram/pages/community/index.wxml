@@ -13,7 +13,7 @@
       <text>去完善 ›</text>
     </view>
 
-    <view class="member-search-card surface-card" catchtouchstart="blockCommunitySwipe" catchtouchend="blockCommunitySwipe">
+    <view class="member-search-card surface-card">
       <view class="member-search-row">
         <input class="member-search-input" type="text" maxlength="60" value="{{memberSearchDraft}}" bindinput="handleMemberSearchInput" bindconfirm="submitMemberSearch" confirm-type="search" placeholder="搜索姓名、组织、行业或技能" />
         <button class="member-search-button" bindtap="submitMemberSearch">搜索</button>
