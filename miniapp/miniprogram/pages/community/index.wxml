@@ -8,13 +8,6 @@
 
   <block wx:if="{{communitySection === 'members'}}">
     <view class="community-section-panel {{communitySectionTransition}}">
-    <view class="member-pool-hero">
-      <view class="member-pool-hero-brand"><image src="/assets/logo-mark.png" mode="aspectFit" /><text>MEMBER POOL</text></view>
-      <text class="member-pool-hero-title">找到正在做事的人</text>
-      <text class="member-pool-hero-copy">从行业、技能和连接方向认识社区成员，再去具体交流。</text>
-      <view class="member-pool-privacy"><image src="/assets/icons/privacy-green-v2.png" mode="aspectFit" /><text>仅展示成员主动公开的社区名片，联系方式不会公开。</text></view>
-    </view>
-
     <view wx:if="{{isLoggedIn && currentUser && !currentUser.profileCompletion.completed}}" class="member-profile-prompt surface-card" bindtap="completeMemberProfile" role="button">
       <view><text>先让大家认识你</text><text>社区名片 {{currentUser.profileCompletion.percent}}%，完善后才能进入成员池。</text></view>
       <text>去完善 ›</text>
@@ -26,14 +19,6 @@
         <button class="member-search-button" bindtap="submitMemberSearch">搜索</button>
       </view>
       <view wx:if="{{memberSearchQuery}}" class="member-active-search"><text>正在搜索“{{memberSearchQuery}}”</text><text bindtap="clearMemberSearch">清除</text></view>
-      <scroll-view class="member-filter-scroll" scroll-x="{{true}}" show-scrollbar="{{false}}" enhanced="{{true}}">
-        <view class="member-filter-row">
-          <picker range="{{memberFilters.cities}}" value="{{memberCityIndex}}" data-field="city" bindchange="changeMemberFilter"><view class="member-filter-chip {{memberCity ? 'member-filter-chip-active' : ''}}">{{memberFilters.cities[memberCityIndex]}}⌄</view></picker>
-          <picker range="{{memberFilters.industries}}" value="{{memberIndustryIndex}}" data-field="industry" bindchange="changeMemberFilter"><view class="member-filter-chip {{memberIndustry ? 'member-filter-chip-active' : ''}}">{{memberFilters.industries[memberIndustryIndex]}}⌄</view></picker>
-          <picker range="{{memberFilters.skills}}" value="{{memberSkillIndex}}" data-field="skill" bindchange="changeMemberFilter"><view class="member-filter-chip {{memberSkill ? 'member-filter-chip-active' : ''}}">{{memberFilters.skills[memberSkillIndex]}}⌄</view></picker>
-          <picker range="{{memberIntentOptions}}" value="{{memberIntentIndex}}" data-field="intent" bindchange="changeMemberFilter"><view class="member-filter-chip {{memberIntent ? 'member-filter-chip-active' : ''}}">{{memberIntentOptions[memberIntentIndex]}}⌄</view></picker>
-        </view>
-      </scroll-view>
     </view>
 
     <view class="member-pool-heading">
@@ -43,7 +28,7 @@
 
     <view wx:if="{{memberPoolLoading}}" class="member-pool-state"><view class="loading-spinner"></view><text>正在加载成员池</text></view>
     <view wx:elif="{{memberPoolLoadFailed}}" class="member-pool-state member-pool-state-error"><text>暂时没能加载成员池，请稍后重试。</text><button class="retry-button" bindtap="loadMemberPoolPage">重新加载</button></view>
-    <view wx:elif="{{!memberCards.length}}" class="member-pool-empty"><text>没有找到符合条件的成员</text><text>可以减少筛选条件，或者换一个关键词试试。</text></view>
+    <view wx:elif="{{!memberCards.length}}" class="member-pool-empty"><text>{{memberSearchQuery ? '没有找到匹配的成员' : '暂时没有可展示的公开成员'}}</text><text>{{memberSearchQuery ? '可以换一个关键词试试。' : '成员完成并公开社区名片后会显示在这里。'}}</text></view>
     <view wx:else class="member-card-list">
       <view wx:for="{{memberCards}}" wx:key="id" class="member-pool-card surface-card" data-handle="{{item.shareHandle}}" bindtap="openMemberProfile" role="button" aria-label="查看{{item.displayName}}的社区名片">
         <view class="member-card-top">
@@ -61,7 +46,7 @@
     <button wx:if="{{memberPoolHasMore}}" class="member-load-more" loading="{{memberPoolLoadingMore}}" disabled="{{memberPoolLoadingMore}}" bindtap="loadMoreMembers">查看更多成员</button>
 
     <view wx:if="{{memberPoolGuestPreview}}" class="member-login-card surface-card">
-      <view><text>登录后查看完整成员池</text><text>可以继续筛选成员，并查看每个人主动公开的能力与需求。</text></view>
+      <view><text>登录后查看完整成员池</text><text>可以搜索成员，并查看每个人主动公开的能力与需求。</text></view>
       <button class="primary-button" bindtap="openMemberPoolLogin">微信登录</button>
     </view>
 

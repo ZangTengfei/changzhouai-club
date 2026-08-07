@@ -48,8 +48,6 @@ type DateOption = {
 
 const durationOptions = [1, 2, 4, 8];
 const weekdayLabels = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
-const memberIntentOptions = ["全部方向", "愿意分享", "可参与项目", "正在寻找"];
-const memberIntentValues = ["", "share", "projects", "seeking"] as const;
 const communitySummary = "这里有工位、会议室，也有一群正在做事的人。";
 const fallbackSpacePhotos: MiniappCommunitySpacePhoto[] = [
   {
@@ -451,20 +449,6 @@ Page({
     memberSearchDraft: "",
     memberSearchQuery: "",
     memberCards: [] as MemberPoolCard[],
-    memberFilters: {
-      cities: ["全部辖区"],
-      industries: ["全部行业"],
-      skills: ["全部技能"],
-    },
-    memberIntentOptions,
-    memberCityIndex: 0,
-    memberIndustryIndex: 0,
-    memberSkillIndex: 0,
-    memberIntentIndex: 0,
-    memberCity: "",
-    memberIndustry: "",
-    memberSkill: "",
-    memberIntent: "" as (typeof memberIntentValues)[number],
     memberPoolTotal: 0,
     memberPoolPage: 1,
     memberPoolHasMore: false,
@@ -688,26 +672,13 @@ Page({
     try {
       const response = await fetchMemberPool({
         query: this.data.memberSearchQuery,
-        city: this.data.memberCity,
-        industry: this.data.memberIndustry,
-        skill: this.data.memberSkill,
-        intent: this.data.memberIntent,
         page: requestedPage,
       });
       if (currentRequest !== memberPoolRequestVersion) return;
 
-      const memberFilters = {
-        cities: ["全部辖区", ...response.filters.cities],
-        industries: ["全部行业", ...response.filters.industries],
-        skills: ["全部技能", ...response.filters.skills],
-      };
       const newCards = response.members.map(mapMemberPoolCard);
       this.setData({
         memberCards: append ? [...this.data.memberCards, ...newCards] : newCards,
-        memberFilters,
-        memberCityIndex: Math.max(0, memberFilters.cities.indexOf(this.data.memberCity || "全部辖区")),
-        memberIndustryIndex: Math.max(0, memberFilters.industries.indexOf(this.data.memberIndustry || "全部行业")),
-        memberSkillIndex: Math.max(0, memberFilters.skills.indexOf(this.data.memberSkill || "全部技能")),
         memberPoolTotal: response.pagination.total,
         memberPoolPage: response.pagination.page,
         memberPoolHasMore: response.pagination.hasMore,
@@ -746,55 +717,6 @@ Page({
 
   clearMemberSearch() {
     this.setData({ memberSearchDraft: "", memberSearchQuery: "" });
-    void this.loadMemberPoolPage();
-  },
-
-  changeMemberFilter(
-    event: WechatMiniprogram.CustomEvent<{ value: string }>,
-  ) {
-    const field = String(event.currentTarget.dataset.field);
-    const index = Number(event.detail.value);
-    const config = {
-      city: {
-        options: this.data.memberFilters.cities,
-        indexKey: "memberCityIndex",
-        valueKey: "memberCity",
-      },
-      industry: {
-        options: this.data.memberFilters.industries,
-        indexKey: "memberIndustryIndex",
-        valueKey: "memberIndustry",
-      },
-      skill: {
-        options: this.data.memberFilters.skills,
-        indexKey: "memberSkillIndex",
-        valueKey: "memberSkill",
-      },
-      intent: {
-        options: memberIntentOptions,
-        indexKey: "memberIntentIndex",
-        valueKey: "memberIntent",
-      },
-    }[field];
-    if (!config || !Number.isInteger(index) || index < 0 || index >= config.options.length) {
-      return;
-    }
-
-    const value = field === "intent"
-      ? memberIntentValues[index] ?? ""
-      : index === 0
-        ? ""
-        : config.options[index];
-    this.setData({
-      [config.indexKey]: index,
-      [config.valueKey]: value,
-    } as WechatMiniprogram.IAnyObject);
-    if (this.data.isLoggedIn) {
-      trackEvent("member_pool_filter", "/pages/community/index", {
-        filter: field,
-        active: Boolean(value),
-      });
-    }
     void this.loadMemberPoolPage();
   },
 
