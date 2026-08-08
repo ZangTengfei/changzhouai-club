@@ -104,6 +104,7 @@ interface MiniappSharedProfile {
   willingToShare: boolean;
   willingToJoinProjects: boolean;
   identityLabel: string;
+  communityTags: string[];
 }
 
 interface MiniappMemberPoolItem {

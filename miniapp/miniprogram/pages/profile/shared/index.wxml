@@ -25,7 +25,10 @@
           <text class="profile-view-location">{{profile.city}}</text>
         </view>
       </view>
-      <view class="profile-view-status"><text>{{profile.identityLabel}}</text><text>{{eventSlug ? '活动参与者名片' : '公开成员名片'}}</text></view>
+      <view class="profile-view-status shared-profile-status">
+        <view class="shared-profile-community-labels"><text class="shared-profile-community-identity">{{profile.identityLabel}}</text><text wx:for="{{profile.communityTags}}" wx:key="*this">{{item}}</text></view>
+        <text class="shared-profile-context">{{eventSlug ? '活动参与者名片' : '公开成员名片'}}</text>
+      </view>
     </view>
 
     <view wx:if="{{profile.bio}}" class="profile-view-intro">{{profile.bio}}</view>

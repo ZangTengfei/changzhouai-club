@@ -3,23 +3,10 @@ import { NextResponse } from "next/server";
 import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { recordAdminAuditLog } from "@/lib/admin/audit";
 import { revalidateAdminMemberPaths } from "@/lib/admin/revalidate";
-
-const MEMBERSHIP_BADGE_CODES = new Set([
-  "co_builder",
-  "core_builder",
-  "honor_builder",
-]);
-
-function getMembershipLevel(
-  isCoBuilder: boolean,
-  badgeAwards: Array<{ badge_code: string }>,
-) {
-  const badgeCodes = new Set(badgeAwards.map((award) => award.badge_code));
-  if (badgeCodes.has("honor_builder")) return 3;
-  if (badgeCodes.has("core_builder")) return 2;
-  if (isCoBuilder || badgeCodes.has("co_builder")) return 1;
-  return 0;
-}
+import {
+  getMemberMembershipLevel,
+  MEMBER_MEMBERSHIP_BADGE_CODES,
+} from "@/lib/member-membership";
 
 export async function PATCH(
   request: Request,
@@ -59,7 +46,7 @@ export async function PATCH(
         .from("member_badge_awards")
         .select("badge_code")
         .eq("user_id", memberId)
-        .in("badge_code", Array.from(MEMBERSHIP_BADGE_CODES)),
+        .in("badge_code", Array.from(MEMBER_MEMBERSHIP_BADGE_CODES)),
     ]);
 
   if (memberError) {
@@ -73,9 +60,9 @@ export async function PATCH(
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
 
-  const previousLevel = getMembershipLevel(
+  const previousLevel = getMemberMembershipLevel(
     member.is_co_builder,
-    badgeAwards ?? [],
+    (badgeAwards ?? []).map((award) => award.badge_code),
   );
   const { error } = await staffContext.supabase.rpc(
     "set_member_membership_level",

@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { requireAdminApiPermission } from "@/lib/admin/api-auth";
 import { recordAdminAuditLog } from "@/lib/admin/audit";
 import { revalidateAdminMemberPaths } from "@/lib/admin/revalidate";
+import { isMemberMembershipLabel } from "@/lib/member-membership";
 
 export async function PUT(
   request: Request,
@@ -21,7 +22,13 @@ export async function PUT(
   const label = String(payload?.label ?? "").trim();
   const description = String(payload?.description ?? "").trim();
 
-  if (!memberId || label.length < 2 || label.length > 20 || description.length > 100) {
+  if (
+    !memberId ||
+    label.length < 2 ||
+    label.length > 20 ||
+    description.length > 100 ||
+    isMemberMembershipLabel(label)
+  ) {
     return NextResponse.json({ error: "invalid_payload" }, { status: 400 });
   }
 

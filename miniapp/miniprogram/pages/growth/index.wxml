@@ -15,7 +15,7 @@
       <view class="growth-identity-copy">
         <text class="growth-kicker">成员身份</text>
         <text class="growth-level">{{user.identityLabel}}</text>
-        <text class="growth-member">成长等级 {{currentLevelLabel}} · {{joinedLabel}}</text>
+        <text class="growth-member">{{joinedLabel}}</text>
       </view>
     </view>
 

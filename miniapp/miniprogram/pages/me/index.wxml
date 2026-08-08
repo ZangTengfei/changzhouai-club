@@ -87,7 +87,7 @@
           </button>
           <view class="identity-tag-row">
             <view class="identity-pill" bindtap="openGrowth" role="button" aria-label="查看成员身份">
-              <image src="/assets/badges/level-3-core-builder-128.png" mode="aspectFit" />
+              <image src="{{identityAsset}}" mode="aspectFit" />
               <text>{{user.identityLabel}}</text>
             </view>
             <view wx:for="{{visibleCommunityTags}}" wx:key="code" class="community-tag-pill" bindtap="openGrowth" role="button" aria-label="查看社区标签{{item.label}}"><text>{{item.label}}</text></view>

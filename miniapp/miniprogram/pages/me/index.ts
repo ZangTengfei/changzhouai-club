@@ -3,7 +3,11 @@ import { trackEvent } from "../../services/analytics";
 import { ensureSession, login } from "../../services/auth";
 import { formatEventDate } from "../../services/events";
 import { uploadAvatar } from "../../services/avatar";
-import { getCommunityTags } from "../../utils/member-growth";
+import {
+  getCommunityTags,
+  getMembershipLevel,
+  membershipLevels,
+} from "../../utils/member-growth";
 import { isMiniappBasicProfileReady } from "../../utils/profile-state";
 
 type FootprintItem = MiniappUser["footprints"][number] & {
@@ -49,10 +53,12 @@ function navigateAfterLogin(destination: LoginDestination, user: MiniappUser) {
 function buildAccountViewData(user: MiniappUser) {
   const latestFootprint = user.footprints[0];
   const communityTags = getCommunityTags(user);
+  const membershipLevel = getMembershipLevel(user);
 
   return {
     user,
     avatarInitial: user.displayName.slice(0, 1) || "微",
+    identityAsset: membershipLevels[membershipLevel].asset,
     visibleCommunityTags: communityTags.slice(0, 2),
     communityTagOverflowCount: Math.max(communityTags.length - 2, 0),
     latestFootprint: latestFootprint
@@ -70,6 +76,7 @@ Page({
   data: {
     user: null as MiniappUser | null,
     avatarInitial: "微",
+    identityAsset: membershipLevels[0].asset as string,
     visibleCommunityTags: [] as MiniappUser["badges"],
     communityTagOverflowCount: 0,
     latestFootprint: null as FootprintItem | null,

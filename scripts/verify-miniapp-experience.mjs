@@ -745,14 +745,36 @@ try {
 
   const { error: badgeError } = await supabase
     .from("member_badge_awards")
-    .insert({
-      user_id: userId,
-      badge_code: "verification_badge",
-      label: "验收徽章",
-      description: "仅用于自动化验收",
-      source: "admin",
-    });
+    .insert([
+      {
+        user_id: userId,
+        badge_code: "verification_badge",
+        label: "验收徽章",
+        description: "仅用于自动化验收",
+        source: "admin",
+      },
+      {
+        user_id: userId,
+        badge_code: "honor_builder",
+        label: "荣誉共建",
+        description: "仅用于验证社区身份",
+        source: "admin",
+      },
+      {
+        user_id: userId,
+        badge_code: "verification_founder",
+        label: "社区发起人",
+        description: "仅用于验证自定义角色标签",
+        source: "admin",
+      },
+    ]);
   if (badgeError) throw badgeError;
+
+  const { error: adminIdentityStatusError } = await supabase
+    .from("members")
+    .update({ status: "admin", is_co_builder: true })
+    .eq("id", userId);
+  if (adminIdentityStatusError) throw adminIdentityStatusError;
 
   const taggedMemberPool = await request(
     `/api/miniapp/members?query=${encodeURIComponent("体验版测试用户")}`,
@@ -762,10 +784,31 @@ try {
     (member) => member.id === userId,
   );
   assert.ok(taggedMember);
-  assert.deepEqual(taggedMember.communityTags, ["验收徽章"]);
+  assert.equal(taggedMember.identityLabel, "荣誉共建");
+  assert.deepEqual(
+    [...taggedMember.communityTags].sort((a, b) => a.localeCompare(b, "zh-CN")),
+    ["社区发起人", "验收徽章"].sort((a, b) => a.localeCompare(b, "zh-CN")),
+  );
   assert.equal("badgeAwards" in taggedMember, false);
   assert.equal("badgeDescriptions" in taggedMember, false);
   pass("member_pool_public_community_tags_loaded");
+  pass("member_pool_membership_identity_precedes_custom_roles");
+
+  const taggedSharedProfile = await request(
+    `/api/miniapp/members/${encodeURIComponent(userId)}`,
+  );
+  assert.equal(taggedSharedProfile.response.status, 200);
+  assert.equal(taggedSharedProfile.body?.profile?.identityLabel, "荣誉共建");
+  assert.ok(
+    taggedSharedProfile.body?.profile?.communityTags?.includes("社区发起人"),
+  );
+  pass("shared_profile_uses_membership_identity_and_custom_roles");
+
+  const { error: restoreIdentityStatusError } = await supabase
+    .from("members")
+    .update({ status: "active" })
+    .eq("id", userId);
+  if (restoreIdentityStatusError) throw restoreIdentityStatusError;
 
   const registrationWithoutConsent = await request(
     `/api/miniapp/events/${encodeURIComponent(event.slug)}/registration`,
@@ -1048,6 +1091,7 @@ try {
     headers: authHeaders,
   });
   assert.equal(accountSnapshot.response.status, 200);
+  assert.equal(accountSnapshot.body?.user?.identityLabel, "荣誉共建");
   assert.ok(accountSnapshot.body?.user?.stats?.registrationCount >= 1);
   assert.equal(accountSnapshot.body?.user?.stats?.attendanceCount, 1);
   assert.ok(

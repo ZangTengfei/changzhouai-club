@@ -3,6 +3,7 @@ import { createHash, randomBytes, randomUUID } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { isMiniappAccountRecoveryAvailable } from "@/lib/account-recovery";
+import { getMemberMembershipLabel } from "@/lib/member-membership";
 import {
   getMiniappProfileCompletion,
   isMiniappDisplayNameReady,
@@ -577,16 +578,10 @@ export async function loadMiniappAccountSnapshot(
   const basicProfileReady = isMiniappDisplayNameReady(
     profileCompletionInput.displayName,
   );
-  const identityLabel =
-    member?.status === "admin" || member?.status === "organizer"
-      ? "社区发起人"
-      : member?.is_co_builder
-        ? "共建伙伴"
-        : member?.status === "pending"
-          ? "待确认成员"
-          : member?.status === "paused"
-            ? "暂停参与"
-            : "社区成员";
+  const identityLabel = getMemberMembershipLabel(
+    Boolean(member?.is_co_builder),
+    badgeAwards.map((badge) => badge.badge_code),
+  );
   const attendanceCount = attendances.length;
   const hasSpeakerAttendance = attendances.some(
     (attendance) => attendance.status === "speaker",

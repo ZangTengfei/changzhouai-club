@@ -1,18 +1,16 @@
 import { NextResponse } from "next/server";
 
 import { isUuidLike, isValidMemberPublicSlug } from "@/lib/member-public-slug";
+import {
+  getMemberMembershipLabel,
+  isMemberMembershipBadgeCode,
+} from "@/lib/member-membership";
 import { canPreviewMiniappDraftEvents } from "@/lib/miniapp-admin";
 import { loadOptionalMiniappSession } from "@/lib/miniapp-api";
 import { getAvatarImageUrl } from "@/lib/public-image-url";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 export const runtime = "nodejs";
-
-function getIdentityLabel(status: string, isCoBuilder: boolean) {
-  if (status === "admin" || status === "organizer") return "社区发起人";
-  if (isCoBuilder) return "共建伙伴";
-  return "社区成员";
-}
 
 export async function GET(
   request: Request,
@@ -93,7 +91,7 @@ export async function GET(
     isConfirmedEventParticipant = Boolean(registration);
   }
 
-  const [memberResult, fixedDeskAssignmentResult] = await Promise.all([
+  const [memberResult, badgeResult, fixedDeskAssignmentResult] = await Promise.all([
     supabase
       .from("members")
       .select(
@@ -101,6 +99,11 @@ export async function GET(
       )
       .eq("id", profile.id)
       .maybeSingle(),
+    supabase
+      .from("member_badge_awards")
+      .select("badge_code, label, awarded_at")
+      .eq("user_id", profile.id)
+      .order("awarded_at", { ascending: false }),
     supabase
       .from("community_fixed_desk_assignments")
       .select("resource_id")
@@ -111,9 +114,12 @@ export async function GET(
   ]);
   const { data: member, error: memberError } = memberResult;
 
-  if (memberError || fixedDeskAssignmentResult.error) {
+  if (memberError || badgeResult.error || fixedDeskAssignmentResult.error) {
     console.error("Failed to load shared mini-program member.", {
-      code: memberError?.code ?? fixedDeskAssignmentResult.error?.code,
+      code:
+        memberError?.code ??
+        badgeResult.error?.code ??
+        fixedDeskAssignmentResult.error?.code,
     });
     return NextResponse.json({ error: "profile_load_failed" }, { status: 500 });
   }
@@ -128,6 +134,22 @@ export async function GET(
   }
 
   const isCoBuilder = Boolean(member.is_co_builder);
+  const badgeAwards = badgeResult.data ?? [];
+  const membershipBadgeCodes = badgeAwards
+    .filter((badge) => isMemberMembershipBadgeCode(badge.badge_code))
+    .map((badge) => badge.badge_code);
+  const identityLabel = getMemberMembershipLabel(
+    isCoBuilder,
+    membershipBadgeCodes,
+  );
+  const communityTags = Array.from(
+    new Set(
+      badgeAwards
+        .filter((badge) => !isMemberMembershipBadgeCode(badge.badge_code))
+        .map((badge) => badge.label.trim())
+        .filter((label) => label && label !== identityLabel),
+    ),
+  ).slice(0, 4);
 
   return NextResponse.json(
     {
@@ -147,7 +169,8 @@ export async function GET(
         willingToAttend: member.willing_to_attend,
         willingToShare: member.willing_to_share,
         willingToJoinProjects: member.willing_to_join_projects,
-        identityLabel: getIdentityLabel(member.status, isCoBuilder),
+        identityLabel,
+        communityTags,
       },
     },
     {

@@ -33,6 +33,11 @@ import {
   getAdminSavedMessage,
 } from "@/lib/admin/event-feedback";
 import type { AdminMember } from "@/lib/admin/members";
+import {
+  getMemberMembershipLevel,
+  MEMBER_MEMBERSHIP_BADGE_CODES as MEMBERSHIP_BADGE_CODES,
+  MEMBER_MEMBERSHIP_LEVELS as MEMBERSHIP_LEVELS,
+} from "@/lib/member-membership";
 
 type AdminMemberDetailData = {
   member: AdminMember;
@@ -46,42 +51,6 @@ type AdminMemberDetailData = {
   }>;
   queryErrors: string[];
 };
-
-const MEMBERSHIP_LEVELS = [
-  {
-    label: "社区成员",
-    description: "完成社区注册",
-  },
-  {
-    label: "共建伙伴",
-    description: "参与社区共建并获得认证",
-  },
-  {
-    label: "核心共建",
-    description: "持续承担社区核心工作",
-  },
-  {
-    label: "荣誉共建",
-    description: "长期贡献并获得社区授予",
-  },
-] as const;
-
-const MEMBERSHIP_BADGE_CODES = new Set([
-  "co_builder",
-  "core_builder",
-  "honor_builder",
-]);
-
-function getMembershipLevel(
-  member: AdminMember,
-  badgeAwards: AdminMemberDetailData["badgeAwards"],
-) {
-  const badgeCodes = new Set(badgeAwards.map((award) => award.badge_code));
-  if (badgeCodes.has("honor_builder")) return 3;
-  if (badgeCodes.has("core_builder")) return 2;
-  if (member.isCoBuilder || badgeCodes.has("co_builder")) return 1;
-  return 0;
-}
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -129,7 +98,12 @@ export function AdminMemberDetailPageClient({
   const communityBadgeAwards = badgeAwards.filter(
     (award) => !MEMBERSHIP_BADGE_CODES.has(award.badge_code),
   );
-  const membershipLevel = member ? getMembershipLevel(member, badgeAwards) : 0;
+  const membershipLevel = member
+    ? getMemberMembershipLevel(
+        member.isCoBuilder,
+        badgeAwards.map((award) => award.badge_code),
+      )
+    : 0;
   const querySaved = searchParams.get("saved") ?? undefined;
   const queryError = searchParams.get("error") ?? undefined;
   const backHref = getBackHref(searchParams.get("from"));
@@ -345,11 +319,9 @@ export function AdminMemberDetailPageClient({
             >
               {formatAdminMemberStatus(member.status)}
             </AdminStatusBadge>
-            {membershipLevel > 0 ? (
-              <AdminStatusBadge tone="completed">
-                {MEMBERSHIP_LEVELS[membershipLevel].label}
-              </AdminStatusBadge>
-            ) : null}
+            <AdminStatusBadge tone="completed">
+              {MEMBERSHIP_LEVELS[membershipLevel].label}
+            </AdminStatusBadge>
             {member.adminRoles.map((role) => (
               <AdminStatusBadge key={role.roleId} tone="scheduled">
                 {role.name}
@@ -452,11 +424,11 @@ export function AdminMemberDetailPageClient({
                   <AdminPanel>
                     <AdminPanelHeader
                       eyebrow="Member Identity"
-                      title="成员状态与社区角色"
+                      title="成员状态"
                     />
                     <AdminPanelBody className="space-y-4">
                       <AdminNotice>
-                        管理员和组织者会在小程序中显示为“社区发起人”；成员成长等级在下方单独认证。
+                        成员状态只控制后台权限和账号可用状态，不再自动生成公开标签。小程序首标签由下方“社区身份”决定。
                       </AdminNotice>
                       <form
                         className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] md:items-end"
@@ -489,11 +461,11 @@ export function AdminMemberDetailPageClient({
                   <AdminPanel>
                     <AdminPanelHeader
                       eyebrow="Membership Level"
-                      title="成员等级认证"
+                      title="社区身份"
                     />
                     <AdminPanelBody className="space-y-4">
                       <AdminNotice>
-                        成员只能表达参与意愿，不能自行选择等级。等级由管理员根据真实共建与贡献进行认证。
+                        首个标签固定为社区身份。发起人、联合发起人、负责人、顾问等称谓请在下方作为社区标签添加。
                       </AdminNotice>
                       <form
                         key={`${member.id}-${membershipLevel}`}
@@ -524,7 +496,7 @@ export function AdminMemberDetailPageClient({
                                   className="size-4 accent-[var(--primary)]"
                                 />
                                 <span className="text-xs text-muted-foreground">
-                                  身份 {index + 1}
+                                  公开首标签
                                 </span>
                               </span>
                               <strong className="text-sm text-foreground">
@@ -550,7 +522,7 @@ export function AdminMemberDetailPageClient({
                             />
                           </AdminField>
                           <Button type="submit" disabled={isPending}>
-                            {isPending ? "认证中..." : "保存等级认证"}
+                            {isPending ? "保存中..." : "保存社区身份"}
                           </Button>
                         </div>
                       </form>
@@ -598,7 +570,7 @@ export function AdminMemberDetailPageClient({
                         </div>
                       ) : (
                         <AdminNotice>
-                          尚未人工添加社区标签。基于签到自动生成的标签不在这里重复显示。
+                          尚未添加自定义标签。社区身份不会在这里重复显示。
                         </AdminNotice>
                       )}
 
@@ -617,14 +589,14 @@ export function AdminMemberDetailPageClient({
                             minLength={2}
                             maxLength={20}
                             required
-                            placeholder="例如：商业顾问"
+                            placeholder="例如：社区发起人"
                           />
                         </AdminField>
                         <AdminField label="授予说明">
                           <Input
                             name="badge_description"
                             maxLength={100}
-                            placeholder="说明标签对应的角色或贡献"
+                            placeholder="例如：负责社区方向与长期运营"
                           />
                         </AdminField>
                         <Button type="submit" disabled={isPending}>
@@ -723,7 +695,7 @@ export function AdminMemberDetailPageClient({
                                 : "暂不共建"}
                             </AdminStatusBadge>
                             <AdminStatusBadge tone="completed">
-                              成长等级：
+                              社区身份：
                               {MEMBERSHIP_LEVELS[membershipLevel].label}
                             </AdminStatusBadge>
                             <AdminStatusBadge tone="neutral">

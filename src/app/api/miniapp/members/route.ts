@@ -3,6 +3,11 @@ import {
   getMiniappProfileCompletion,
   isMiniappDisplayNameReady,
 } from "@/lib/miniapp-profile";
+import {
+  getMemberMembershipLabel,
+  getMemberMembershipLevel,
+  isMemberMembershipBadgeCode,
+} from "@/lib/member-membership";
 import { getAvatarImageUrl } from "@/lib/public-image-url";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
@@ -42,6 +47,7 @@ type ProfileRow = {
 
 type MemberBadgeRow = {
   user_id: string;
+  badge_code: string;
   label: string;
   awarded_at: string;
 };
@@ -66,17 +72,12 @@ type MemberPoolItem = {
   willingToShare: boolean;
   willingToJoinProjects: boolean;
   identityLabel: string;
+  membershipLevel: number;
   communityTags: string[];
   isCoBuilder: boolean;
   joinedAt: string;
   registrationCount: number;
 };
-
-function getIdentityLabel(status: string, isCoBuilder: boolean) {
-  if (status === "admin" || status === "organizer") return "社区发起人";
-  if (isCoBuilder) return "共建伙伴";
-  return "社区成员";
-}
 
 function normalizeSearchText(value: string) {
   return value.trim().toLocaleLowerCase("zh-CN");
@@ -101,8 +102,9 @@ function normalizeCommunityLabel(value: string) {
 
 function isIdentityEquivalentTag(label: string, identityLabel: string) {
   const aliases: Record<string, Set<string>> = {
-    社区发起人: new Set(["社区发起人", "发起人", "创始人", "联合创始人"]),
     共建伙伴: new Set(["共建伙伴", "共建成员", "社区共建成员"]),
+    核心共建: new Set(["核心共建", "核心共建伙伴", "核心共建成员"]),
+    荣誉共建: new Set(["荣誉共建", "荣誉共建伙伴", "荣誉共建成员"]),
     社区成员: new Set(["社区成员", "正式成员"]),
   };
   return aliases[identityLabel]?.has(normalizeCommunityLabel(label)) ?? false;
@@ -131,12 +133,7 @@ function compareJoinedAt(a: MemberPoolItem, b: MemberPoolItem) {
 }
 
 function compareIdentity(a: MemberPoolItem, b: MemberPoolItem) {
-  const identityWeight = (member: MemberPoolItem) => {
-    if (member.identityLabel === "社区发起人") return 0;
-    if (member.isCoBuilder) return 1;
-    return 2;
-  };
-  return identityWeight(a) - identityWeight(b);
+  return b.membershipLevel - a.membershipLevel;
 }
 
 function compareMembers(a: MemberPoolItem, b: MemberPoolItem, sort: MemberSort) {
@@ -253,7 +250,7 @@ export async function GET(request: Request) {
       .in("id", memberIds),
     supabase
       .from("member_badge_awards")
-      .select("user_id, label, awarded_at")
+      .select("user_id, badge_code, label, awarded_at")
       .in("user_id", memberIds)
       .order("awarded_at", { ascending: false }),
     supabase
@@ -277,9 +274,16 @@ export async function GET(request: Request) {
   }
 
   const membersById = new Map(memberRows.map((member) => [member.id, member]));
+  const membershipBadgeCodesByMemberId = new Map<string, string[]>();
   const communityTagsByMemberId = new Map<string, string[]>();
   const registrationCountByMemberId = new Map<string, number>();
   ((badgeData ?? []) as MemberBadgeRow[]).forEach((badge) => {
+    if (isMemberMembershipBadgeCode(badge.badge_code)) {
+      const codes = membershipBadgeCodesByMemberId.get(badge.user_id) ?? [];
+      if (!codes.includes(badge.badge_code)) codes.push(badge.badge_code);
+      membershipBadgeCodesByMemberId.set(badge.user_id, codes);
+      return;
+    }
     const label = badge.label.trim();
     if (!label) return;
     const tags = communityTagsByMemberId.get(badge.user_id) ?? [];
@@ -311,7 +315,16 @@ export async function GET(request: Request) {
       if (!completion.completed) return [];
 
       const isCoBuilder = Boolean(member.is_co_builder);
-      const identityLabel = getIdentityLabel(member.status, isCoBuilder);
+      const membershipBadgeCodes =
+        membershipBadgeCodesByMemberId.get(profile.id) ?? [];
+      const membershipLevel = getMemberMembershipLevel(
+        isCoBuilder,
+        membershipBadgeCodes,
+      );
+      const identityLabel = getMemberMembershipLabel(
+        isCoBuilder,
+        membershipBadgeCodes,
+      );
       return [{
         id: profile.id,
         shareHandle: profile.public_slug?.trim() || profile.id,
@@ -328,6 +341,7 @@ export async function GET(request: Request) {
         willingToShare: member.willing_to_share,
         willingToJoinProjects: member.willing_to_join_projects,
         identityLabel,
+        membershipLevel,
         communityTags: (communityTagsByMemberId.get(profile.id) ?? [])
           .filter((label) => !isIdentityEquivalentTag(label, identityLabel))
           .slice(0, 2),

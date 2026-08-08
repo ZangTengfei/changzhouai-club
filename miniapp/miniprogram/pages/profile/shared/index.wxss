@@ -36,3 +36,35 @@
 .shared-profile-notice {
   margin-bottom: 12rpx;
 }
+
+.shared-profile-status {
+  align-items: flex-end;
+}
+
+.shared-profile-community-labels {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.shared-profile-community-labels text {
+  padding: 5rpx 10rpx;
+  border-radius: 14rpx;
+  background: #fff5df;
+  color: #8a5b17;
+  font-size: 18rpx;
+  line-height: 1.35;
+}
+
+.shared-profile-community-labels .shared-profile-community-identity {
+  background: #ffffff;
+  color: var(--color-green-dark);
+}
+
+.shared-profile-context {
+  flex: none;
+  color: var(--color-subtle);
+  font-size: 19rpx;
+  font-weight: 650;
+}
