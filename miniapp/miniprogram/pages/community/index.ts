@@ -50,7 +50,7 @@ type DateOption = {
 
 const durationOptions = [1, 2, 4, 8];
 const memberSortOptions: Array<{ label: string; value: MemberSort }> = [
-  { label: "社区身份", value: "identity" },
+  { label: "默认排序", value: "identity" },
   { label: "最近加入", value: "newest" },
   { label: "报名活跃", value: "active" },
 ];
