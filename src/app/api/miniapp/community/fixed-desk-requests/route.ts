@@ -1,3 +1,4 @@
+import { isAutomatedVerificationUser } from "@/lib/admin-notification-delivery";
 import { sendAdminFixedDeskRequestNotification } from "@/lib/email";
 import { miniappJson, requireMiniappSession } from "@/lib/miniapp-api";
 
@@ -93,17 +94,24 @@ export async function POST(request: Request) {
   ]);
   const resourceCode = resource?.code ?? "待确认工位";
 
-  try {
-    await sendAdminFixedDeskRequestNotification({
-      applicantDisplayName: profile?.display_name?.trim() || "社区成员",
-      resourceCode,
-      createdAt: requestRow.created_at,
-    });
-  } catch (notificationError) {
-    console.error("Failed to send fixed desk request notification.", {
-      requestId: requestRow.id,
-      notificationError,
-    });
+  if (
+    !(await isAutomatedVerificationUser(
+      auth.supabase,
+      auth.session.user_id,
+    ))
+  ) {
+    try {
+      await sendAdminFixedDeskRequestNotification({
+        applicantDisplayName: profile?.display_name?.trim() || "社区成员",
+        resourceCode,
+        createdAt: requestRow.created_at,
+      });
+    } catch (notificationError) {
+      console.error("Failed to send fixed desk request notification.", {
+        requestId: requestRow.id,
+        notificationError,
+      });
+    }
   }
 
   return miniappJson(

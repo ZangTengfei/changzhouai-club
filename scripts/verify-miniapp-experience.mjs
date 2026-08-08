@@ -80,6 +80,7 @@ try {
     await supabase.auth.admin.createUser({
       email,
       email_confirm: true,
+      app_metadata: { automated_verification: true },
       user_metadata: { name: "体验版测试用户" },
     });
   if (createError || !created.user)
@@ -809,6 +810,7 @@ try {
     await supabase.auth.admin.createUser({
       email: `miniapp-sort-compare-${randomUUID()}@users.invalid`,
       email_confirm: true,
+      app_metadata: { automated_verification: true },
       user_metadata: { name: "联合发起人排序测试" },
     });
   if (comparisonCreateError || !comparisonCreated.user) {

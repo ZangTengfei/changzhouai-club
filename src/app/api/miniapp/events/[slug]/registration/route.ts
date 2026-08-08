@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { isAutomatedVerificationUser } from "@/lib/admin-notification-delivery";
 import { sendAdminEventRegistrationNotification } from "@/lib/email";
 import {
   EVENT_PORTRAIT_CONSENT_VERSION,
@@ -192,7 +193,10 @@ export async function PUT(
     created_at: string;
   };
 
-  if (existing?.status !== registration.status) {
+  if (
+    existing?.status !== registration.status &&
+    !(await isAutomatedVerificationUser(auth.supabase, userId))
+  ) {
     try {
       await sendAdminEventRegistrationNotification({
         eventTitle: event.title,

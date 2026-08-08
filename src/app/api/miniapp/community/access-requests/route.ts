@@ -1,3 +1,4 @@
+import { isAutomatedVerificationUser } from "@/lib/admin-notification-delivery";
 import { sendAdminAccessRequestNotification } from "@/lib/email";
 import { miniappJson, requireMiniappSession } from "@/lib/miniapp-api";
 
@@ -90,16 +91,23 @@ export async function POST(request: Request) {
     return miniappJson({ error: "access_request_save_failed" }, 500);
   }
 
-  try {
-    await sendAdminAccessRequestNotification({
-      applicantDisplayName: profile.display_name.trim(),
-      createdAt: data.created_at,
-    });
-  } catch (notificationError) {
-    console.error("Failed to send access request notification.", {
-      requestId: data.id,
-      notificationError,
-    });
+  if (
+    !(await isAutomatedVerificationUser(
+      auth.supabase,
+      auth.session.user_id,
+    ))
+  ) {
+    try {
+      await sendAdminAccessRequestNotification({
+        applicantDisplayName: profile.display_name.trim(),
+        createdAt: data.created_at,
+      });
+    } catch (notificationError) {
+      console.error("Failed to send access request notification.", {
+        requestId: data.id,
+        notificationError,
+      });
+    }
   }
 
   return miniappJson({ accessRequest: mapAccessRequest(data) }, 201);
