@@ -34,6 +34,7 @@ const supabase = createClient(supabaseUrl, serviceRoleKey, {
 const cos = new COS({ SecretId: cosSecretId, SecretKey: cosSecretKey });
 const checks = [];
 let userId = null;
+let comparisonUserId = null;
 let avatarPath = null;
 let temporaryEventId = null;
 let temporaryDraftEventId = null;
@@ -763,7 +764,7 @@ try {
       {
         user_id: userId,
         badge_code: "verification_founder",
-        label: "社区发起人",
+        label: "创始人",
         description: "仅用于验证自定义角色标签",
         source: "admin",
       },
@@ -787,7 +788,7 @@ try {
   assert.equal(taggedMember.identityLabel, "荣誉共建");
   assert.deepEqual(
     [...taggedMember.communityTags].sort((a, b) => a.localeCompare(b, "zh-CN")),
-    ["社区发起人", "验收徽章"].sort((a, b) => a.localeCompare(b, "zh-CN")),
+    ["创始人", "验收徽章"].sort((a, b) => a.localeCompare(b, "zh-CN")),
   );
   assert.equal("badgeAwards" in taggedMember, false);
   assert.equal("badgeDescriptions" in taggedMember, false);
@@ -800,9 +801,83 @@ try {
   assert.equal(taggedSharedProfile.response.status, 200);
   assert.equal(taggedSharedProfile.body?.profile?.identityLabel, "荣誉共建");
   assert.ok(
-    taggedSharedProfile.body?.profile?.communityTags?.includes("社区发起人"),
+    taggedSharedProfile.body?.profile?.communityTags?.includes("创始人"),
   );
   pass("shared_profile_uses_membership_identity_and_custom_roles");
+
+  const { data: comparisonCreated, error: comparisonCreateError } =
+    await supabase.auth.admin.createUser({
+      email: `miniapp-sort-compare-${randomUUID()}@users.invalid`,
+      email_confirm: true,
+      user_metadata: { name: "联合发起人排序测试" },
+    });
+  if (comparisonCreateError || !comparisonCreated.user) {
+    throw comparisonCreateError ?? new Error("comparison_user_create_failed");
+  }
+  comparisonUserId = comparisonCreated.user.id;
+
+  const [{ error: founderProfileError }, { error: comparisonProfileError }] =
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .update({ display_name: "创始人排序测试" })
+        .eq("id", userId),
+      supabase
+        .from("profiles")
+        .update({
+          display_name: "联合发起人排序测试",
+          city: "常州",
+          role_label: "测试",
+          industry_tags: ["软件与信息服务"],
+          skills: ["测试"],
+          capability_summary: "用于验证成员角色排序",
+        })
+        .eq("id", comparisonUserId),
+    ]);
+  if (founderProfileError || comparisonProfileError) {
+    throw founderProfileError ?? comparisonProfileError;
+  }
+
+  const { error: comparisonMemberError } = await supabase
+    .from("members")
+    .update({
+      status: "active",
+      is_co_builder: true,
+      is_publicly_visible: true,
+    })
+    .eq("id", comparisonUserId);
+  if (comparisonMemberError) throw comparisonMemberError;
+
+  const { error: comparisonBadgeError } = await supabase
+    .from("member_badge_awards")
+    .insert([
+      {
+        user_id: comparisonUserId,
+        badge_code: "honor_builder",
+        label: "荣誉共建",
+        description: "仅用于验证社区身份",
+        source: "admin",
+      },
+      {
+        user_id: comparisonUserId,
+        badge_code: "verification_cofounder",
+        label: "联合发起人",
+        description: "仅用于验证自定义角色排序",
+        source: "admin",
+      },
+    ]);
+  if (comparisonBadgeError) throw comparisonBadgeError;
+
+  const roleSortedMemberPool = await request(
+    `/api/miniapp/members?query=${encodeURIComponent("排序测试")}&sort=identity`,
+    { headers: authHeaders },
+  );
+  assert.equal(roleSortedMemberPool.response.status, 200);
+  assert.deepEqual(
+    roleSortedMemberPool.body?.members?.map((member) => member.id),
+    [userId, comparisonUserId],
+  );
+  pass("member_pool_founder_precedes_cofounder_within_membership_level");
 
   const { error: restoreIdentityStatusError } = await supabase
     .from("members")
@@ -1433,6 +1508,9 @@ try {
   }
   if (userId) {
     await supabase.auth.admin.deleteUser(userId);
+  }
+  if (comparisonUserId) {
+    await supabase.auth.admin.deleteUser(comparisonUserId);
   }
   if (temporaryEventId) {
     await supabase.from("events").delete().eq("id", temporaryEventId);

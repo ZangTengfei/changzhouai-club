@@ -532,6 +532,9 @@ export function AdminMemberDetailPageClient({
                   <AdminPanel>
                     <AdminPanelHeader eyebrow="Member Tags" title="社区标签" />
                     <AdminPanelBody className="space-y-4">
+                      <AdminNotice>
+                        默认排序中，同一社区身份内按“创始人 → 联合发起人 → 其他角色”展示；角色相同时再按加入时间排序。
+                      </AdminNotice>
                       {communityBadgeAwards.length ? (
                         <div className="divide-y divide-border/70 border-y border-border/70">
                           {communityBadgeAwards.map((badge) => (

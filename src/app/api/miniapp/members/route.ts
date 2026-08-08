@@ -4,6 +4,7 @@ import {
   isMiniappDisplayNameReady,
 } from "@/lib/miniapp-profile";
 import {
+  getMemberCommunityRolePriority,
   getMemberMembershipLabel,
   getMemberMembershipLevel,
   isMemberMembershipBadgeCode,
@@ -133,7 +134,12 @@ function compareJoinedAt(a: MemberPoolItem, b: MemberPoolItem) {
 }
 
 function compareIdentity(a: MemberPoolItem, b: MemberPoolItem) {
-  return b.membershipLevel - a.membershipLevel;
+  const membershipDiff = b.membershipLevel - a.membershipLevel;
+  if (membershipDiff !== 0) return membershipDiff;
+  return (
+    getMemberCommunityRolePriority(a.communityTags) -
+    getMemberCommunityRolePriority(b.communityTags)
+  );
 }
 
 function compareMembers(a: MemberPoolItem, b: MemberPoolItem, sort: MemberSort) {
