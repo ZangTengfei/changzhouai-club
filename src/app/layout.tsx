@@ -6,6 +6,12 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import { AppToaster } from "@/components/app-toaster";
 import { StaleBuildReloadGuard } from "@/components/stale-build-reload-guard";
+import {
+  DEFAULT_SITE_DESCRIPTION,
+  DEFAULT_SOCIAL_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/seo";
 
 import "./globals.css";
 
@@ -35,28 +41,31 @@ function getUmamiConfig() {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://changzhouai.club"),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: "常州 AI Club",
-    template: "%s | 常州 AI Club",
+    default: SITE_NAME,
+    template: `%s | ${SITE_NAME}`,
   },
   icons: {
     icon: "/logo.ico",
     shortcut: "/logo.ico",
   },
   alternates: {
-    canonical: "./",
+    canonical: SITE_URL,
   },
-  description:
-    "连接常州的 OPC、开发者、产品人、创业者、高校同学与企业伙伴，持续组织线下交流、主题分享与合作对接。",
+  description: DEFAULT_SITE_DESCRIPTION,
   openGraph: {
-    title: "常州 AI Club",
-    description:
-      "一个立足常州本地的 AI 开发者社区，关注线下交流、成员连接与企业合作。",
-    url: "https://changzhouai.club",
-    siteName: "常州 AI Club",
+    title: SITE_NAME,
+    description: DEFAULT_SOCIAL_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
     locale: "zh_CN",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_NAME,
+    description: DEFAULT_SOCIAL_DESCRIPTION,
   },
 };
 

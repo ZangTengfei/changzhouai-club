@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -20,12 +19,15 @@ import {
 } from "lucide-react";
 
 import styles from "../ai-office-course-survey/survey-report-page.module.css";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "2026 AI 编程现状及电信 OPC 套餐需求调研",
   description:
     "常州 AI 交流群基于 16 份有效问卷整理的 AI 编程现状与电信 OPC 套餐需求调研报告，覆盖模型使用、Token 消耗、痛点和套餐偏好。",
-};
+  path: "/reports/opc-package-survey",
+  type: "article",
+});
 
 type Tone = "green" | "blue" | "orange" | "red" | "purple" | "gray";
 

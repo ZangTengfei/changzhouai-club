@@ -1,9 +1,21 @@
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 
 import { AdminAntdProvider } from "@/components/admin-antd-provider";
 import { AdminAccessDenied, AdminShell } from "@/components/admin-shell";
 import { getAdminContext } from "@/lib/supabase/guards";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
+  },
+};
 
 export default async function AdminLayout({
   children,

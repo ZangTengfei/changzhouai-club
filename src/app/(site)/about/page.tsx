@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -11,11 +10,13 @@ import {
 import { DoodleSparkles } from "@/components/home-visual-assets";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { cn } from "@/lib/utils";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "关于我们",
   description: "了解常州 AI Club 的定位、初心和长期运营方向。",
-};
+  path: "/about",
+});
 
 const designThoughts = [
   {

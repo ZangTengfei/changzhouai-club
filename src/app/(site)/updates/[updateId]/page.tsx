@@ -10,6 +10,7 @@ import {
 
 import { toggleCommunityUpdateLike } from "@/app/(site)/updates/actions";
 import { MemberAvatar } from "@/components/member-avatar";
+import { JsonLd } from "@/components/json-ld";
 import { RevealHtmlImages } from "@/components/reveal-image";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import { getViewerCommunityUpdateLike } from "@/lib/community-update-interactions";
@@ -24,6 +25,11 @@ import {
   type WechatArticleTemplateId,
 } from "@/lib/wechat-article-template";
 import { cn } from "@/lib/utils";
+import {
+  SITE_URL,
+  createNoIndexMetadata,
+  createPageMetadata,
+} from "@/lib/seo";
 
 import { CommunityUpdateViewTracker } from "./community-update-view-tracker";
 
@@ -78,16 +84,20 @@ export async function generateMetadata({
   const update = await getPublicCommunityUpdateById(updateId);
 
   if (!update) {
-    return {
-      title: "社区动态",
-      description: "查看常州 AI Club 社区动态。",
-    };
+    return createNoIndexMetadata(
+      "社区动态",
+      "查看常州 AI Club 社区动态。",
+      `/updates/${updateId}`,
+    );
   }
 
-  return {
+  return createPageMetadata({
     title: update.title ?? update.typeLabel,
     description: update.excerpt,
-  };
+    path: `/updates/${update.id}`,
+    image: update.images[0]?.imageUrl,
+    type: "article",
+  });
 }
 
 export default async function UpdateDetailPage({
@@ -112,6 +122,34 @@ export default async function UpdateDetailPage({
 
   return (
     <div className="mx-auto grid max-w-235 gap-4.5">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "@id": `${SITE_URL}${update.href}#article`,
+          headline: update.title ?? update.typeLabel,
+          description: update.excerpt,
+          url: `${SITE_URL}${update.href}`,
+          datePublished: update.publishedAt ?? update.createdAt,
+          dateModified: update.updatedAt,
+          image: update.images[0]?.imageUrl,
+          inLanguage: "zh-CN",
+          author: {
+            "@type": "Person",
+            name: update.author.displayName,
+            url:
+              update.author.href === "/members"
+                ? undefined
+                : `${SITE_URL}${update.author.href}`,
+          },
+          publisher: {
+            "@type": "Organization",
+            "@id": `${SITE_URL}/#organization`,
+            name: "常州 AI Club",
+            url: SITE_URL,
+          },
+        }}
+      />
       <CommunityUpdateViewTracker updateId={update.id} />
 
       <Link href="/updates" className="inline-flex w-fit items-center gap-2 font-black text-primary-strong [&_svg]:size-4.5">

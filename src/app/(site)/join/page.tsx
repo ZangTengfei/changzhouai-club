@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -16,16 +15,18 @@ import { DoodleSparkles, HandDrawnArrow } from "@/components/home-visual-assets"
 import { hasSupabaseEnv } from "@/lib/env";
 import { joinSteps, siteNameEn } from "@/lib/site-data";
 import { createClient } from "@/lib/supabase/server";
+import { createPageMetadata } from "@/lib/seo";
 
 const joinSectionHeadingClassName =
   "grid grid-cols-[auto_minmax(0,1fr)] items-start gap-[18px] max-sm:grid-cols-1 max-sm:gap-3 [&_h2]:m-0 [&_h2]:text-[clamp(2rem,3.4vw,2.55rem)] [&_h2]:leading-[1.08] [&_h2]:font-black [&_h2]:tracking-normal [&_h2]:text-[#111a1d] [&_div>p]:mt-2 [&_div>p]:mb-0 [&_div>p]:max-w-3xl [&_div>p]:font-semibold [&_div>p]:text-[rgba(var(--ink-rgb),0.66)]";
 const profilePanelClassName =
   "grid min-w-0 content-start gap-[18px] rounded-[var(--radius-lg)] bg-white p-6 shadow-[0_14px_34px_rgba(var(--ink-rgb),0.07)] max-sm:p-5 [&_h3]:mt-1.5 [&_h3]:mb-0 [&_h3]:text-[clamp(1.55rem,2.4vw,2rem)] [&_h3]:leading-[1.12] [&_h3]:font-black [&_h3]:tracking-normal [&_h3]:text-[#111a1d]";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "加入我们",
   description: "了解如何加入常州 AI Club，参与线下活动、项目协作和长期共建。",
-};
+  path: "/join",
+});
 
 const onboardingPath = "/account?onboarding=1";
 

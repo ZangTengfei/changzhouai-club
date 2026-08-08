@@ -1,5 +1,4 @@
 import type { CSSProperties } from "react";
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -21,12 +20,15 @@ import {
 } from "lucide-react";
 
 import styles from "../ai-office-course-survey/survey-report-page.module.css";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "常州 AI Club 培训需求调研",
   description:
     "常州 AI Club 基于 23 份回收问卷整理的培训需求调研，覆盖成员职业分布、AI 使用程度、学习痛点、内容偏好、培训形式和价格接受度。",
-};
+  path: "/reports/training-demand-survey",
+  type: "article",
+});
 
 type Tone = "green" | "blue" | "orange" | "red" | "purple" | "gray";
 

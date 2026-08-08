@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -16,11 +15,13 @@ import {
   workTypeLabels,
 } from "@/lib/community-works";
 import { cn } from "@/lib/utils";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "案例库",
   description: "查看常州 AI Club 成员公开展示的 AI 产品、工具、OPC 揭榜挂帅项目和场景实践案例。",
-};
+  path: "/works",
+});
 
 type WorksPageSearchParams = {
   type?: string;

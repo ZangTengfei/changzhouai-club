@@ -21,6 +21,11 @@ import { ToneBadge } from "@/components/tone-badge";
 import { getPublicMemberByHandle, isCorePublicMember } from "@/lib/community-members";
 import { getPublicWorksByMemberId } from "@/lib/community-works";
 import { getMemberPublicSlugPath, isUuidLike } from "@/lib/member-public-slug";
+import {
+  createNoIndexMetadata,
+  createPageMetadata,
+  isSearchIndexablePublicMember,
+} from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 const memberSectionClassName =
@@ -90,19 +95,24 @@ export async function generateMetadata({
   const member = await getPublicMemberByHandle(memberId);
 
   if (!member) {
-    return {
-      title: "成员主页",
-      description: "查看常州 AI Club 成员的公开资料。",
-    };
+    return createNoIndexMetadata(
+      "成员主页",
+      "查看常州 AI Club 成员的公开资料。",
+      `/members/${memberId}`,
+    );
   }
 
-  return {
+  return createPageMetadata({
     title: `${member.displayName} · 成员主页`,
     description:
       member.bio?.trim() ||
       formatMemberHeadline(member) ||
       "查看常州 AI Club 成员的公开资料。",
-  };
+    path: getMemberPublicSlugPath(member),
+    image: member.avatarUrl,
+    imageAlt: `${member.displayName} 的公开成员头像`,
+    noIndex: !isSearchIndexablePublicMember(member),
+  });
 }
 
 export default async function MemberDetailPage({

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 
 import { RevealImage } from "@/components/reveal-image";
+import { JsonLd } from "@/components/json-ld";
 
 import { EventDetailRegistrationPanel } from "@/components/event-detail-registration-panel";
 import { getPublicEventBySlug } from "@/lib/community-events";
@@ -27,6 +28,12 @@ import {
   getRegistrationNoteWithoutUrl,
 } from "@/lib/event-registration-link";
 import { getEventImageUrl } from "@/lib/public-image-url";
+import {
+  SITE_NAME,
+  SITE_URL,
+  createNoIndexMetadata,
+  createPageMetadata,
+} from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 const eventPanelClassName =
@@ -71,16 +78,32 @@ export async function generateMetadata({
   const event = await getPublicEventBySlug(slug);
 
   if (!event) {
-    return {
-      title: "活动详情",
-      description: "查看常州 AI Club 的活动详情。",
-    };
+    return createNoIndexMetadata(
+      "活动详情",
+      "查看常州 AI Club 的活动详情。",
+      `/events/${slug}`,
+    );
   }
 
-  return {
+  return createPageMetadata({
     title: event.title,
     description: event.summary,
-  };
+    path: `/events/${event.slug}`,
+    image: event.imageUrl,
+    imageAlt: `${event.title} 活动现场`,
+  });
+}
+
+function getEventSchemaStatus(status: string) {
+  if (status === "completed") {
+    return "https://schema.org/EventCompleted";
+  }
+
+  if (status === "cancelled") {
+    return "https://schema.org/EventCancelled";
+  }
+
+  return "https://schema.org/EventScheduled";
 }
 
 export default async function EventDetailPage({
@@ -144,9 +167,67 @@ export default async function EventDetailPage({
       icon: Camera,
     },
   ];
+  const structuredData: Array<Record<string, unknown>> = [];
+
+  if (event.eventAt) {
+    structuredData.push({
+      "@context": "https://schema.org",
+      "@type": "Event",
+      "@id": `${SITE_URL}${detailHref}#event`,
+      name: event.title,
+      description: event.summary,
+      url: `${SITE_URL}${detailHref}`,
+      startDate: event.eventAt,
+      eventStatus: getEventSchemaStatus(event.status),
+      eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+      image: event.imageUrl ? [event.imageUrl] : undefined,
+      location: {
+        "@type": "Place",
+        name: event.venue ?? event.locationLabel,
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: event.city ?? "常州",
+          addressRegion: "江苏",
+          addressCountry: "CN",
+        },
+      },
+      organizer: {
+        "@type": "Organization",
+        "@id": `${SITE_URL}/#organization`,
+        name: SITE_NAME,
+        url: SITE_URL,
+      },
+    });
+  }
+
+  structuredData.push({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "首页",
+        item: SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "活动",
+        item: `${SITE_URL}/events`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: event.title,
+        item: `${SITE_URL}${detailHref}`,
+      },
+    ],
+  });
 
   return (
     <div className="grid min-w-0 gap-7 max-sm:gap-[22px]">
+      <JsonLd data={structuredData} />
       {query.registration ? (
         <div className="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-2.5 rounded-[var(--radius-md)] border border-dashed border-[rgba(var(--accent-rgb),0.28)] bg-[rgba(var(--accent-rgb),0.08)] px-[18px] py-4 font-extrabold text-[var(--accent-strong)]">
           <CheckCircle2 className="size-5" aria-hidden="true" strokeWidth={1.9} />

@@ -99,6 +99,7 @@ export type PublicEventSummary = {
   status: "draft" | "scheduled" | "completed";
   statusLabel: string;
   visibility: "public" | "admin_only";
+  updated_at?: string | null;
 };
 
 export type PublicGalleryImage = {
@@ -638,7 +639,7 @@ const getCachedPublishedEventSummaries = unstable_cache(
     const { data } = await supabase
       .from("events")
       .select(
-        "id, slug, title, summary, event_at, venue, city, cover_image_url, event_type, registration_mode, registration_capacity, status, visibility",
+        "id, slug, title, summary, event_at, venue, city, cover_image_url, event_type, registration_mode, registration_capacity, status, visibility, updated_at",
       )
       .in("status", ["scheduled", "completed"])
       .eq("visibility", "public")

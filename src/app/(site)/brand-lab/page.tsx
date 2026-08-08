@@ -1,16 +1,16 @@
-import type { Metadata } from "next";
-
 import {
   LogoDraftCAICMonogram,
   LogoDraftBuildEngine,
   LogoDraftCityAgent,
   LogoDraftCityNodes,
 } from "@/components/logo-drafts";
+import { createNoIndexMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "品牌视觉",
-  description: "查看常州 AI Club 当前标识的设计方向与应用展示。",
-};
+export const metadata = createNoIndexMetadata(
+  "品牌视觉",
+  "查看常州 AI Club 当前标识的设计方向与应用展示。",
+  "/brand-lab",
+);
 
 const logoDrafts = [
   {

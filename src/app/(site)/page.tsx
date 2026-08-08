@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 
 import { RevealImage } from "@/components/reveal-image";
+import { JsonLd } from "@/components/json-ld";
 
 import { DoodleSparkles } from "@/components/home-visual-assets";
 import { HeroPhotoCarousel } from "@/components/hero-photo-carousel";
@@ -24,6 +25,11 @@ import {
 } from "@/lib/community-metrics";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import { getEventImageUrl } from "@/lib/public-image-url";
+import {
+  DEFAULT_SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_URL,
+} from "@/lib/seo";
 import { cn } from "@/lib/utils";
 const HERO_CAROUSEL_IMAGE_LIMIT = 3;
 
@@ -221,6 +227,40 @@ export default async function HomePage() {
 
   return (
     <div className="grid gap-7 max-sm:gap-[18px]" data-home-page>
+      <JsonLd
+        data={[
+          {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "@id": `${SITE_URL}/#organization`,
+            name: SITE_NAME,
+            url: SITE_URL,
+            logo: `${SITE_URL}/logo.png`,
+            description: DEFAULT_SITE_DESCRIPTION,
+            areaServed: {
+              "@type": "City",
+              name: "常州",
+            },
+            sameAs: [
+              "https://www.xiaohongshu.com/user/profile/6982189c0000000021010bff",
+              "https://space.bilibili.com/3706970819267057",
+              "https://github.com/ZangTengfei/changzhouai-club",
+            ],
+          },
+          {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "@id": `${SITE_URL}/#website`,
+            name: SITE_NAME,
+            url: SITE_URL,
+            description: DEFAULT_SITE_DESCRIPTION,
+            inLanguage: "zh-CN",
+            publisher: {
+              "@id": `${SITE_URL}/#organization`,
+            },
+          },
+        ]}
+      />
       <section className="grid min-h-[542px] grid-cols-[minmax(0,0.88fr)_minmax(470px,1.12fr)] items-start gap-[30px] pt-6 pb-3.5 max-lg:min-h-0 max-lg:grid-cols-1 max-lg:gap-6 max-lg:pt-2.5 max-sm:pt-0" aria-labelledby="home-hero-title">
         <div className="grid content-start gap-[18px] pt-11 max-sm:gap-3.5 max-sm:pt-[18px]">
           <p className="m-0 inline-flex w-fit rounded-[var(--radius-pill)] bg-[rgba(244,240,225,0.96)] px-[13px] py-1.5 text-[0.84rem] font-extrabold tracking-[0.02em] text-[var(--accent-strong)]">连接・分享・共创 👋</p>

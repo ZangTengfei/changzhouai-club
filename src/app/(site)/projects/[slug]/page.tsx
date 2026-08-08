@@ -21,6 +21,7 @@ import { getProjectCoverImageUrl } from "@/lib/public-image-url";
 import { submitProjectApplication } from "@/app/(site)/projects/actions";
 import { MarkdownContent } from "@/components/markdown-content";
 import { getVisibleProjectOpportunityBySlug } from "@/lib/community-projects";
+import { createNoIndexMetadata, createPageMetadata } from "@/lib/seo";
 import { createClient } from "@/lib/supabase/server";
 import { resolveCommunityUserId } from "@/lib/community-user";
 
@@ -89,16 +90,19 @@ export async function generateMetadata({
   const opportunity = await getVisibleProjectOpportunityBySlug(slug);
 
   if (!opportunity) {
-    return {
-      title: "项目机会",
-      description: "查看常州 AI Club 的项目协作机会。",
-    };
+    return createNoIndexMetadata(
+      "项目机会",
+      "查看常州 AI Club 的项目协作机会。",
+      `/projects/${slug}`,
+    );
   }
 
-  return {
+  return createPageMetadata({
     title: opportunity.title,
     description: opportunity.summary,
-  };
+    path: `/projects/${opportunity.slug}`,
+    image: opportunity.coverImageUrl,
+  });
 }
 
 async function getSignedInUserId() {

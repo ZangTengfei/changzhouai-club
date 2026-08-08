@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -12,11 +11,13 @@ import {
 import { RevealImage } from "@/components/reveal-image";
 import { Button } from "@/components/ui/button";
 import { getVisibleProjectOpportunities } from "@/lib/community-projects";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "项目协作",
   description: "查看常州 AI Club 面向真实政企与企业需求的项目招募、协作状态与参与方式。",
-};
+  path: "/projects",
+});
 
 const projectNotes = [
   {

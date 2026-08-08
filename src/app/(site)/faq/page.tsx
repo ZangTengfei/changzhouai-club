@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-
 import { PageHero } from "@/components/page-hero";
 import { faqItems } from "@/lib/site-data";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "常见问题",
   description: "查看常州 AI Club 的加入方式、活动形式和合作方向说明。",
-};
+  path: "/faq",
+});
 
 export default function FaqPage() {
   return (

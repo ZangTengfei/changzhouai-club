@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { RevealImage } from "@/components/reveal-image";
 import { Button } from "@/components/ui/button";
 import { getPublicSponsorBySlug } from "@/lib/sponsors";
+import { createNoIndexMetadata, createPageMetadata } from "@/lib/seo";
 
 export async function generateMetadata({
   params,
@@ -15,16 +16,20 @@ export async function generateMetadata({
   const sponsor = await getPublicSponsorBySlug(slug);
 
   if (!sponsor) {
-    return {
-      title: "赞助者详情",
-      description: "查看常州 AI Club 赞助者信息。",
-    };
+    return createNoIndexMetadata(
+      "赞助者详情",
+      "查看常州 AI Club 赞助者信息。",
+      `/sponsors/${slug}`,
+    );
   }
 
-  return {
+  return createPageMetadata({
     title: `${sponsor.name} · 赞助者`,
     description: sponsor.summary,
-  };
+    path: `/sponsors/${sponsor.slug}`,
+    image: sponsor.logoUrl,
+    imageAlt: `${sponsor.name} Logo`,
+  });
 }
 
 export default async function SponsorDetailPage({

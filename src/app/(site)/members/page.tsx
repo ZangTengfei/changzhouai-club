@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, ExternalLink } from "lucide-react";
 
@@ -6,11 +5,13 @@ import { MemberDirectoryCard } from "@/components/member-directory-card";
 import { ToneBadge } from "@/components/tone-badge";
 import { getPublicMembersDirectory } from "@/lib/community-members";
 import { memberTags } from "@/lib/site-data";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "成员地图",
   description: "展示常州 AI Club 的成员技能分布和参与方向。",
-};
+  path: "/members",
+});
 
 type SearchParams = {
   page?: string | string[];

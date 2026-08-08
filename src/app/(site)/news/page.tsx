@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowUpRight,
@@ -42,11 +41,13 @@ import {
 import { DailyReportExportButton } from "./daily-report-export-button";
 import { GroupDailyReportExportButton } from "./group-daily-report-export-button";
 import { newsStyles as styles } from "./news-tailwind";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "AI 资讯",
   description: "浏览常州 AI Club 汇总的 AI 资讯流、AI 日报与本地 AI 实践线索。",
-};
+  path: "/news",
+});
 
 export const revalidate = 300;
 

@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 
 import { PageHero } from "@/components/page-hero";
@@ -6,11 +5,13 @@ import { RevealImage } from "@/components/reveal-image";
 import { getCompletedEventRecaps } from "@/lib/community-events";
 import { getEventImageUrl } from "@/lib/public-image-url";
 import { archiveItems } from "@/lib/site-data";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "往期回顾",
   description: "回顾常州 AI Club 的活动照片、分享主题与现场记录。",
-};
+  path: "/archive",
+});
 
 export default async function ArchivePage() {
   const completedEvents = await getCompletedEventRecaps();

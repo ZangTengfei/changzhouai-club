@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -14,11 +13,13 @@ import {
 import { PageHero } from "@/components/page-hero";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "研究与报告",
   description: "常州 AI Club 面向活动、课程和企业合作场景沉淀的公开研究与分析报告。",
-};
+  path: "/reports",
+});
 
 const reports = [
   {

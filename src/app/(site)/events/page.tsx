@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -14,6 +13,7 @@ import { EventsRegistrationGrid } from "@/components/events-registration-grid";
 import { formatChangzhouDateTime } from "@/lib/changzhou-time";
 import { getCompletedEventRecaps, getScheduledEvents } from "@/lib/community-events";
 import { getEventImageUrl } from "@/lib/public-image-url";
+import { createPageMetadata } from "@/lib/seo";
 import { cn } from "@/lib/utils";
 
 const sectionHeadingClassName =
@@ -27,10 +27,11 @@ const recapMediaToneClassNames = [
   "bg-[#edf5ff]",
 ] as const;
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "活动",
-  description: "浏览常州 AI Club 的近期活动与往期回顾。",
-};
+  description: "浏览常州 AI Club 的近期活动、开放报名与往期活动回顾。",
+  path: "/events",
+});
 
 function formatEventDateTime(value: string | null) {
   if (!value) {

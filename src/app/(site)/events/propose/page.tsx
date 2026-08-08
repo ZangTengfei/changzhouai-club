@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -13,13 +12,15 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import { createNoIndexMetadata } from "@/lib/seo";
 
 import { submitEventProposal } from "./actions";
 
-export const metadata: Metadata = {
-  title: "发起活动申请",
-  description: "提交常州 AI Club 成员活动发起申请，成为活动主要分享者。",
-};
+export const metadata = createNoIndexMetadata(
+  "发起活动申请",
+  "提交常州 AI Club 成员活动发起申请，成为活动主要分享者。",
+  "/events/propose",
+);
 
 type SearchParams = {
   submitted?: string;

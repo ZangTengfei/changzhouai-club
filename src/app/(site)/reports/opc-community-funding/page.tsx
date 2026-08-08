@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowLeft,
@@ -24,12 +23,15 @@ import {
 
 import { DeckControls } from "./deck-controls";
 import styles from "./opc-community-funding-page.module.css";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "常州科教城 OPC 共创社区运营经费申请汇报",
   description:
     "常州 AI Club 面向常州科教城的 OPC 共创社区运营经费申请网页演示稿，覆盖社区介绍、已有基础、园区价值、场地需求、年度计划和经费预算。",
-};
+  path: "/reports/opc-community-funding",
+  type: "article",
+});
 
 const slideTotal = 15;
 

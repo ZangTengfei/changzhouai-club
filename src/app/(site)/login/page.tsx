@@ -1,17 +1,17 @@
-import type { Metadata } from "next";
-
 import { LoginPanel } from "@/components/login-panel";
 import { SiteLogoMark } from "@/components/site-logo-mark";
 import { hasSupabaseEnv } from "@/lib/env";
+import { createNoIndexMetadata } from "@/lib/seo";
 import {
   hasWechatOAuthEnv,
   hasWechatOfficialAccountOAuthEnv,
 } from "@/lib/wechat-oauth";
 
-export const metadata: Metadata = {
-  title: "登录",
-  description: "使用邮箱密码登录常州 AI Club 账号。",
-};
+export const metadata = createNoIndexMetadata(
+  "登录",
+  "登录常州 AI Club 社区账号。",
+  "/login",
+);
 
 export default async function LoginPage({
   searchParams,

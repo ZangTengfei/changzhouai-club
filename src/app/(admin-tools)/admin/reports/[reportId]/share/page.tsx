@@ -12,6 +12,10 @@ import { AdminWeDailyShareCardsClient } from "./admin-wedaily-share-cards-client
 
 export const metadata: Metadata = {
   title: "制作群聊日报精华贴图",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default async function AdminWeDailyShareCardsPage({

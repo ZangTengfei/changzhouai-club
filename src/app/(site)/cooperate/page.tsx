@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import {
   ArrowRight,
   CheckCircle2,
@@ -9,11 +8,13 @@ import { submitCooperationLead } from "@/app/(site)/cooperate/actions";
 import { ToneBadge } from "@/components/tone-badge";
 import { cooperationAreas } from "@/lib/site-data";
 import { cn } from "@/lib/utils";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "合作联系",
   description: "欢迎企业、机构、园区与高校与常州 AI Club 进行分享、培训、PoC 和项目合作。",
-};
+  path: "/cooperate",
+});
 
 type SearchParams = {
   submitted?: string;

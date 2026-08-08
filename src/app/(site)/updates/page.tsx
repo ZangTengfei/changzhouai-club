@@ -1,4 +1,3 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -18,11 +17,13 @@ import {
   type PublicCommunityUpdate,
 } from "@/lib/community-updates";
 import { cn } from "@/lib/utils";
+import { createPageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata = createPageMetadata({
   title: "社区动态",
   description: "查看常州 AI Club 成员的活动瞬间、项目进展、经验分享和协作招募。",
-};
+  path: "/updates",
+});
 
 type UpdatesPageProps = {
   searchParams: Promise<{
